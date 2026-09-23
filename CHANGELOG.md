@@ -1,5 +1,35 @@
 # Changelog
 
+## 3.13.0 (23 Sep 2026)
+
+### Super admin
+- Three roles: **Super admin**, **Admin** and **User**.
+- The super admin has every right and is the only one who can manage people, passcodes, rights and fixed filters.
+- Admins and users get exactly the rights the super admin ticks. There is a new **Admin** preset.
+- New Settings rights: **Choose the mandatory fields**, and **Backups, sign-in history and replacing the workbook**.
+- Upgrading: the first admin becomes the super admin. To make someone else (for example Jamir) super admin, open Settings > People & access and set their role to **Super admin**. There must always be one active super admin.
+
+### Rights by module
+- Each module (Overview, Employees, Attendance, Action center, Reports, Filters, Settings) is a box with its title and a "can open this page" tick.
+- The module's rights are listed underneath the title. They are greyed out while the page is off.
+
+### Fixed filters
+- The super admin can fix filters for each person: set the filters on screen, then **Use the filters on my screen now**.
+- New right **Change the filters**. Without it, the person always sees their fixed filters and the filter bar is hidden.
+- People saved before 3.13 keep the ability to change filters.
+
+### Log leave
+- The Employee field is a real dropdown: every name, with code and status, filtered as you type.
+- With only the "Log leave" right, the type is fixed to **LA** (leave application).
+- Days that already hold approved leave are left as they are and listed in the preview. Changing them needs "Approve leave".
+
+### Who's out
+- Opens on 7 days from today.
+- **Pending applications** counts people waiting for approval, with the number of days underneath.
+
+### Upgrading
+- Run `supabase/setup.sql` again.
+
 ## 3.12.0 (23 Sep 2026)
 
 ### Settings is a page

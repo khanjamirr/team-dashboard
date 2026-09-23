@@ -69,11 +69,11 @@ Click **Settings** in the left menu.
 
 | Section | Who sees it | What it does |
 |---|---|---|
-| People & access | Admin (online) | Passcodes, roles, an optional linked employee, and each person's rights: pages, employee editing, Who's out, grid, log leave, leave approval, holidays, activity, tools, download |
-| Mandatory fields | Admin | Which fields Action items checks for Active, New and OJT people, and the people who need no client |
+| People & access | Super admin (online) | Passcodes, roles, an optional linked employee, and each person's rights: pages, employee editing, Who's out, grid, log leave, leave approval, holidays, activity, tools, download |
+| Mandatory fields | Super admin, or with the right | Which fields Action items checks for Active, New and OJT people, and the people who need no client |
 | Save & sync | Everyone | File status, Start/Stop auto-sync, Save now, Undo |
 | Activity log | Admin, or with the right | The Activity Log sheet: past 30 days, filter by area, search |
-| Workbook & backups | Admin, or with the download right | Download, replace, daily backups, sign-ins and saves |
+| Workbook & backups | Super admin, or with the backups or download right | Download, replace, daily backups, sign-ins and saves |
 | Tools | With the right | Approximate distance from the office |
 | Preferences | Everyone | Theme, your name (local files) or Sign out |
 

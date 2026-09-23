@@ -2,10 +2,10 @@
 
 The team's workbook is stored in your Supabase database. People sign in with a **passcode** only.
 
-- **Admin passcode:** opens the dashboard with every right. The admin manages passcodes and rights in **Settings**, sees sign-in and save history, downloads daily backups, and replaces the workbook.
-- **User passcodes:** open the dashboard with the rights the admin ticked for them (pages, editing, leave approval, and so on). Users can't see or change passcodes.
+- **Super admin:** every right. Only super admins manage people, passcodes, rights and fixed filters (**Settings** > **People & access**). There is always at least one.
+- **Admin** and **User:** exactly the rights the super admin ticks for them (pages, editing, log leave, leave approval, filters, mandatory fields, backups, and so on). Neither can see or change passcodes.
 
-**Upgrading from 3.10 or 3.11:** run the whole `setup.sql` again in the SQL Editor. It's safe to rerun: passcodes, the workbook and backups are kept, and existing passcodes keep full user rights until you change them.
+**Upgrading:** run the whole `setup.sql` again in the SQL Editor. It's safe to rerun: passcodes, the workbook and backups are kept. The first admin becomes the super admin; other admins keep full access to the data until the super admin sets their rights. To make someone else super admin, set their role in **People & access**.
 
 ## One-time setup (admin)
 
@@ -32,6 +32,7 @@ In **Settings** > **People & access**, pick a person on the left:
 | Change what someone can do | Tick or untick rights (or click a preset), **Save changes**. It applies within a minute. |
 | Let someone approve leave | Tick **Approve or reject leave**. Others can only mark LA and don't see approve buttons. |
 | Let someone only log leave | Click the **Leave logger** preset: Who's out and Log leave, nothing else. |
+| Fix someone's filters | Set the filters on your screen, open the person, click **Use the filters on my screen now**, untick **Change the filters** if they must not change them, **Save changes**. |
 | Link a passcode to an employee | Pick them in **Linked employee (optional)**. Log leave then opens with that person filled in. |
 | Stop someone signing in | Untick **Can sign in**, or **Delete** (click twice) |
 

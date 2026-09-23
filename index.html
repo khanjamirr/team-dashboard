@@ -4,7 +4,7 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <link rel="icon" href="data:,">
-<title>Team Dashboard · 3.12.0</title>
+<title>Team Dashboard · 3.13.0</title>
 <style>
 :root {
   color-scheme: light;
@@ -1114,6 +1114,22 @@ dialog.td-settings::backdrop { background:rgba(14,22,19,.42); }
 #cardAttendance .att-summary-table th, #cardAttendance .att-summary-table td { padding:6px 12px; }
 #cardAttendance .att-summary-table th { font-size:10.5px; }
 #cardAttendance .att-table-empty { margin:0 12px 12px; padding:12px; }
+</style><style>
+/* ---------- v3.13: rights by module, locked filters ---------- */
+.rmods { display:grid; grid-template-columns:repeat(auto-fill,minmax(250px,1fr)); gap:12px; align-items:start; }
+.rmod { border:1px solid var(--border); border-radius:10px; padding:10px 12px 8px; background:var(--surface); }
+.rmod-head { display:flex; align-items:center; gap:8px; padding:2px 0 6px; margin:0; cursor:pointer; }
+div.rmod-head { cursor:default; }
+.rmod-head b { font-size:13px; color:var(--ink); }
+.rmod-head small { margin-left:auto; font-size:11px; color:var(--ink-3); font-weight:400; }
+.rmod-head input { accent-color:var(--accent); }
+.rmod-items { border-top:1px solid var(--border); padding-top:4px; }
+.rmod-items .chk-line { padding:3px 0 3px 2px; font-size:12.5px; }
+.rmod.off .rmod-items { opacity:.45; }
+.rmod-extra { border-top:1px solid var(--border); margin-top:6px; padding-top:8px; }
+.rmod-note { margin:0 0 8px; font-size:12px; line-height:1.45; color:var(--ink-2); }
+.rights.is-admin .rmods { opacity:.55; }
+body.filters-locked #cleanFilters, body.filters-locked #xchips, body.filters-locked .saved-filter-row, body.filters-locked #customFieldControls { display:none !important; }
 </style></head>
 
 
@@ -1127,10 +1143,10 @@ dialog.td-settings::backdrop { background:rgba(14,22,19,.42); }
     <p class="gate-sub">One place for your people, priorities and team insights.</p>
     <div id="connectBody"><div class="empty">Loading…</div></div>
   </div>
-  <p class="gate-ver">3.12.0</p>
+  <p class="gate-ver">3.13.0</p>
 </section>
 
-<div id="app" hidden><aside class="sidebar" aria-label="Workspace navigation"><div class="brand dashboard-identity">      <h1><span id="title">Team Dashboard</span><span class="ver" id="ver" title="Version 3.12.0">3.12.0</span></h1><p class="brand-tag">One place for your people, priorities and team insights.</p>      <span class="sync" id="sync" role="status"><i></i><span id="syncText">Loading…</span></span></div><div class="nav-label">WORKSPACE</div>      <nav class="tabs" role="tablist" aria-label="Pages" aria-orientation="vertical">
+<div id="app" hidden><aside class="sidebar" aria-label="Workspace navigation"><div class="brand dashboard-identity">      <h1><span id="title">Team Dashboard</span><span class="ver" id="ver" title="Version 3.13.0">3.13.0</span></h1><p class="brand-tag">One place for your people, priorities and team insights.</p>      <span class="sync" id="sync" role="status"><i></i><span id="syncText">Loading…</span></span></div><div class="nav-label">WORKSPACE</div>      <nav class="tabs" role="tablist" aria-label="Pages" aria-orientation="vertical">
         <button class="tab on" role="tab" aria-controls="pageSummary" data-view="summary" aria-selected="true">Overview</button>
         <button class="tab" role="tab" aria-controls="pageEmployees" data-view="employees" aria-selected="false">Employees</button>
       <button class="tab" role="tab" aria-controls="pageAttendance" data-view="attendance" aria-selected="false">Attendance</button>
@@ -2316,12 +2332,12 @@ const CLOUD = (() => {
     WRONG_PASSCODE: 'That passcode is not correct.',
     TOO_MANY_ATTEMPTS: 'Too many wrong passcodes from this network. Wait 10 minutes and try again.',
     SESSION_EXPIRED: 'Your session has ended. Enter your passcode again.',
-    ADMIN_ONLY: 'Only the admin can do that.',
+    ADMIN_ONLY: 'Only the super admin can do that, or someone they gave that right to.',
     CONFLICT: 'Someone else saved the workbook a moment ago, so your change was not saved. The latest version will load; please redo your change.',
     PASSCODE_TAKEN: 'Someone else already has that passcode. Choose a different one.',
     PASSCODE_TOO_SHORT: 'Passcodes need at least 4 characters.',
     NAME_REQUIRED: 'Enter a name.',
-    LAST_ADMIN: 'There must always be at least one active admin.',
+    LAST_ADMIN: 'There must always be at least one active super admin. Make someone else super admin first.',
     CANNOT_DELETE_SELF: 'You can’t delete the account you are signed in with.',
     FILE_NOT_FOUND: 'The workbook is not in Supabase yet.',
     READ_ONLY: 'Your passcode can view the workbook but not change it. Ask the admin for editing rights.',
@@ -2385,7 +2401,7 @@ const CLOUD = (() => {
   let handle = null;
   const wb = () => handle || (handle = new CloudHandle(cfg().workbookFile || 'Team Dashboard.xlsx'));
   const mode = () => ls.get(LS_MODE);
-  const isAdmin = () => !!(session && session.role === 'admin');
+  const isAdmin = () => !!(session && (session.role === 'admin' || session.role === 'superadmin'));
 
   async function open() {
     const h = wb(), c = cfg();
@@ -2497,13 +2513,13 @@ const CLOUD = (() => {
   /* ---------- sidebar: who is signed in ---------- */
   function decorate() {
     const lab = document.querySelector('.sidebar-bottom .local-label'); if (!lab || mode() !== 'cloud' || !session) return;
-    lab.replaceChildren(h('i'), ' ' + session.name + (isAdmin() ? ' · Admin' : ''));
+    lab.replaceChildren(h('i'), ' ' + session.name + (session.role === 'superadmin' ? ' · Super admin' : session.role === 'admin' ? ' · Admin' : ''));
     const links = h('div', { class: 'cloud-links' }, h('button', { class: 'linkbtn', type: 'button', onclick: signOut }, 'Sign out'));
     lab.after(links);
     document.querySelectorAll('.cloud-links').forEach((el, i, all) => { if (i < all.length - 1) el.remove(); });
   }
   /* v3.11: "Manage passcodes" is now Settings > People & access */
-  function openAdmin() { if (isAdmin() && window.openSettings) window.openSettings('people'); }
+  function openAdmin() { if (session && session.role === 'superadmin' && window.openSettings) window.openSettings('people'); }
   return { SUPABASE_CONFIG, card, resume, mode, decorate, signOut, useLocalFiles, openAdmin, configured, isAdmin, refreshMe, user, getSettings, setSetting, setShared, admin, _rpc: rpc };
 })();
 
@@ -2513,37 +2529,54 @@ const CLOUD = (() => {
    The database also refuses saves from passcodes that have no editing right at all.
    ===================================================================== */
 (() => {
+/* v3.13: rights are grouped by module. A module with a page has a "can open" box; its items sit underneath. */
 const PERM_GROUPS = [
-  { name: 'Pages they can open', items: [['page.overview', 'Overview'], ['page.employees', 'Employees'], ['page.attendance', 'Attendance'], ['page.actions', 'Action center'], ['page.reports', 'Reports']] },
-  { name: 'Employees', items: [['emp.edit', 'Edit employee details'], ['emp.add', 'Add employees'], ['emp.delete', 'Delete employees'], ['emp.bulk', 'Fill in bulk and add columns']] },
-  { name: 'Attendance', items: [['att.who', 'See Who’s out'], ['att.grid', 'See the attendance grid and People'], ['att.log', 'Log leave (applications and other non-approved codes)'], ['att.edit', 'Mark and edit attendance'], ['att.approve', 'Approve or reject leave (AL, CL, SL, RJ)'], ['att.holidays', 'Mark holidays for everyone']] },
-  { name: 'Other', items: [['activity.view', 'See the activity log'], ['tools.distance', 'Use the distance tool'], ['workbook.download', 'Download a copy of the workbook']] },
+  { name: 'Overview', page: 'page.overview', items: [] },
+  { name: 'Employees', page: 'page.employees', items: [['emp.edit', 'Edit employee details'], ['emp.add', 'Add employees'], ['emp.delete', 'Delete employees'], ['emp.bulk', 'Fill in bulk and add columns']] },
+  { name: 'Attendance', page: 'page.attendance', items: [['att.who', 'See Who’s out'], ['att.grid', 'See the attendance grid and People'], ['att.log', 'Log leave applications (LA)'], ['att.edit', 'Mark and edit attendance'], ['att.approve', 'Approve or reject leave (AL, CL, SL, RJ)'], ['att.holidays', 'Mark holidays for everyone']] },
+  { name: 'Action center', page: 'page.actions', items: [] },
+  { name: 'Reports', page: 'page.reports', items: [] },
+  { name: 'Filters', items: [['filters.custom', 'Change the filters (search, status, client…)']] },
+  { name: 'Settings', items: [['activity.view', 'See the activity log'], ['set.fields', 'Choose the mandatory fields'], ['set.workbook', 'Backups, sign-in history and replacing the workbook'], ['workbook.download', 'Download a copy of the workbook'], ['tools.distance', 'Use the distance tool']] },
 ];
-const PERM_KEYS = PERM_GROUPS.flatMap(g => g.items.map(i => i[0]));
+const PAGES = PERM_GROUPS.filter(g => g.page).map(g => g.page);
+const PERM_KEYS = [...PAGES, ...PERM_GROUPS.flatMap(g => g.items.map(i => i[0]))];
 const PAGE_OF = { summary: 'page.overview', employees: 'page.employees', attendance: 'page.attendance', actions: 'page.actions', reports: 'page.reports' };
-const pick = keys => Object.fromEntries([['_v', 2], ...PERM_KEYS.map(k => [k, keys.includes(k)])]);
-const PAGES = PERM_GROUPS[0].items.map(i => i[0]);
+const pick = keys => Object.fromEntries([['_v', 3], ...PERM_KEYS.map(k => [k, keys.includes(k)])]);
+const ROLE_NAMES = { superadmin: 'Super admin', admin: 'Admin', user: 'User' };
 window.PERM = {
-  groups: PERM_GROUPS, keys: PERM_KEYS,
+  groups: PERM_GROUPS, keys: PERM_KEYS, roleNames: ROLE_NAMES,
   presets: {
     'Full access': pick(PERM_KEYS),
-    'Editor': pick([...PAGES, 'emp.edit', 'emp.add', 'emp.bulk', 'att.who', 'att.grid', 'att.log', 'att.edit', 'activity.view', 'tools.distance']),
-    'Leave approver': pick([...PAGES, 'att.who', 'att.grid', 'att.log', 'att.edit', 'att.approve', 'activity.view']),
+    'Admin': pick([...PAGES, 'emp.edit', 'emp.add', 'emp.delete', 'emp.bulk', 'att.who', 'att.grid', 'att.log', 'att.edit', 'att.approve', 'att.holidays', 'filters.custom', 'activity.view', 'set.fields', 'set.workbook', 'workbook.download', 'tools.distance']),
+    'Editor': pick([...PAGES, 'emp.edit', 'emp.add', 'emp.bulk', 'att.who', 'att.grid', 'att.log', 'att.edit', 'filters.custom', 'activity.view', 'tools.distance']),
+    'Leave approver': pick([...PAGES, 'att.who', 'att.grid', 'att.log', 'att.edit', 'att.approve', 'filters.custom', 'activity.view']),
     'Leave logger': pick(['page.overview', 'page.attendance', 'att.who', 'att.log']),
     'View only': pick([...PAGES, 'att.who', 'att.grid']),
   },
   online: () => CLOUD.mode() === 'cloud' && !!CLOUD.user(),
-  isAdmin() { return !this.online() || CLOUD.isAdmin(); },
-  rights() { const u = CLOUD.user(); if (!this.online()) return pick(PERM_KEYS); if (u.role === 'admin' || !u.permissions || !u.permissions._v) return pick(PERM_KEYS); return u.permissions; },
-  can(k) {
-    if (!this.online()) return true; const u = CLOUD.user(); if (u.role === 'admin') return true; const p = u.permissions || {};
-    if (!p._v) return true;
-    if (p._v < 2 && (k === 'att.who' || k === 'att.grid')) return !!p['page.attendance'];   // rights saved in 3.11, before these existed
-    if (p._v < 2 && k === 'att.log') return !!p['att.edit'];
-    return !!p[k];
+  /* the super admin (or anyone on Excel files on this computer) manages people, rights and fixed filters */
+  isSuper() { return !this.online() || CLOUD.user().role === 'superadmin'; },
+  isAdmin() { return this.isSuper(); },
+  rights() { const u = CLOUD.user(); if (!this.online() || u.role === 'superadmin' || !u.permissions || !u.permissions._v) return pick(PERM_KEYS); return u.permissions; },
+  /* rights saved by an older version: fill in the ones that did not exist yet the way they used to behave */
+  upgrade(p) {
+    if (!p || !p._v) return p;
+    const q = { ...p };
+    if (q._v < 2) { q['att.who'] = !!q['page.attendance']; q['att.grid'] = !!q['page.attendance']; q['att.log'] = !!q['att.edit']; }
+    if (q._v < 3) { q['filters.custom'] = true; q['set.fields'] = false; q['set.workbook'] = false; }
+    return q;
   },
-  /* the employee this passcode is linked to (optional, set by the admin): used as the default person in Log leave */
+  can(k) {
+    if (!this.online()) return true; const u = CLOUD.user(); if (u.role === 'superadmin') return true;
+    const p = u.permissions || {};
+    if (!p._v) return true;   // rights never set: full access, as before
+    return !!this.upgrade(p)[k];
+  },
+  /* the employee this passcode is linked to (optional): the default person in Log leave */
   linkedEmp() { const u = this.online() ? CLOUD.user() : null; const p = (u && u.permissions) || {}; return p._emp ? { code: String(p._emp), name: p._empName || '' } : null; },
+  /* filters the super admin fixed for this passcode (optional) */
+  fixedFilters() { const u = this.online() ? CLOUD.user() : null; const f = u && u.permissions && u.permissions._filters; return f && typeof f === 'object' ? f : null; },
   canWrite() { return ['emp.edit', 'emp.add', 'emp.delete', 'emp.bulk', 'att.log', 'att.edit', 'att.approve', 'att.holidays'].some(k => this.can(k)); },
   canView(view) { return view === 'settings' || this.can(PAGE_OF[view] || 'page.overview'); },
   firstView() { return Object.keys(PAGE_OF).find(v => this.canView(v)) || 'summary'; },
@@ -2962,7 +2995,7 @@ const S = {
   ui: {
     view: 'who', period: null, client: 'all', scope: 'all', showUnmatched: false, health: { tab: 'checks', f: 'all', q: '', all: false }, card: { date: null, past: 7, next: 15, kind: 'all', view: 'today', names: 'real' },
     grid: { month: null, q: '', client: 'all', filter: 'all', status: 'all', kinds: [] },
-    who: { start: isoDate(TODAY), days: 14, show: { leave: true, applied: true, late: false, remote: false } },
+    who: { start: isoDate(TODAY), days: 7, show: { leave: true, applied: true, late: false, remote: false } },
     people: { sel: null, q: '' },
     act: { wb: 'att', user: 'all', via: 'all', type: 'all', q: '', shown: 100 },
     thr: { month: { ul: 2, total: 5 }, long: { ul: 5, total: 15 } },
@@ -3095,6 +3128,7 @@ function codeAllowed(oldC, newC) {
   return can('att.edit') || (LOG_CTX && can('att.log'));
 }
 const permError = msg => Object.assign(new Error(msg), { perm: true });
+const allowedInLog = (o, n) => { const was = LOG_CTX; LOG_CTX = true; try { return codeAllowed(o, n); } finally { LOG_CTX = was; } };
 function mutate(desc, fn, opts = {}) {
   if (S.saving) { toast("Saving to Excel. Please wait a moment."); return false; }
   if (!(can('att.edit') || (opts.cells && can('att.approve')) || (opts.holiday && can('att.holidays')) || (opts.log && can('att.log')))) { toast('Your passcode can view attendance but not change this. Ask the admin for the right in Settings.'); return false; }
@@ -4065,7 +4099,7 @@ function whoView() {
       <div class="card tile"><div class="lbl">OUT TODAY</div><div class="val">${dayOut(TODAY)}</div><div class="delta">${longDate(TODAY)}</div></div>
       <div class="card tile"><div class="lbl">OUT TOMORROW</div><div class="val">${dayOut(tomorrow)}</div><div class="delta">${longDate(tomorrow)}</div></div>
       <div class="card tile"><div class="lbl">BUSIEST DAY IN WINDOW</div><div class="val">${perDay[peak].out}</div><div class="delta">${longDate(dates[peak])}</div></div>
-      <div class="card tile"><div class="lbl">PENDING APPLICATIONS</div><div class="val">${pend.length}</div><div class="delta">from today onward</div></div></div>
+      <div class="card tile"><div class="lbl">PENDING APPLICATIONS</div><div class="val">${new Set(pend.map(x => applicationPerson(x.r))).size}</div><div class="delta">${(() => { const n = new Set(pend.map(x => applicationPerson(x.r))).size; return (n === 1 ? 'person' : 'people') + ' waiting for approval · ' + pend.length + ' day' + (pend.length === 1 ? '' : 's'); })()}</div></div></div>
     <div class="toolbar"><label>From <input type="date" value="${w.start}" data-bind="who-start"></label>
       <div class="seg" role="group" aria-label="Window length">${[7, 14, 21, 30].map(n => `<button data-act="who-days" data-n="${n}" aria-pressed="${w.days === n}">${n} days</button>`).join('')}</div>
       <button class="btn" data-act="who-today">Today</button><button class="btn" data-act="who-picture">Copy as picture</button><span class="sm muted">Show:</span>${chk('leave', 'Leaves')}${chk('applied', 'Applied (LA)')}${chk('late', 'Late')}${chk('remote', 'Remote')}
@@ -4728,12 +4762,14 @@ function openLogLeave(preKey) {
   const linked = window.PERM && PERM.linkedEmp && PERM.linkedEmp();
   const linkedName = linked ? ((rosterRows().find(r => idKey(gs(r, 'key_column')) === idKey(linked.code)) && gs(rosterRows().find(r => idKey(gs(r, 'key_column')) === idKey(linked.code)), 'name_column').trim()) || linked.name) : '';
   const pre = preKey ? d.people.get(preKey)?.name : linkedName;
-  const codesAllowed = ['AL', 'CL', 'SL', 'UL', 'AB', 'HD1', 'HD2', 'LA', 'R', 'L', 'C'].filter(c => APPROVAL_CODES.has(c) ? can('att.approve') : (can('att.edit') || can('att.log')));
+  /* v3.13: with only "Log leave", the one thing to log is a leave application (LA) */
+  const codesAllowed = ['AL', 'CL', 'SL', 'UL', 'AB', 'HD1', 'HD2', 'LA', 'R', 'L', 'C'].filter(c => APPROVAL_CODES.has(c) ? can('att.approve') : c === 'LA' ? true : can('att.edit'));
   const openedAt = new Date();
   const today = isoDate(new Date(Date.UTC(openedAt.getFullYear(), openedAt.getMonth(), openedAt.getDate())));
   const m = openModal({
     title: 'Log leave',
-    body: `<div class="form"><label class="full">Employee<input type="text" id="l-name" list="l-names" value="${esc(pre || '')}" placeholder="Start typing a name" autocomplete="off"><datalist id="l-names">${names.map(n => `<option value="${esc(n.name)}">${esc(n.hint)}</option>`).join('')}</datalist></label>
+    body: `<style>.cbx{position:relative}.cbx-list{position:absolute;left:0;right:0;top:calc(100% + 4px);z-index:5;max-height:260px;overflow:auto;background:var(--surface);border:1px solid var(--line-2);border-radius:10px;box-shadow:0 10px 30px rgba(0,0,0,.18);padding:4px}.cbx-opt{display:flex;justify-content:space-between;gap:12px;width:100%;border:0;background:transparent;text-align:left;padding:7px 10px;border-radius:7px;font-size:13px;color:var(--ink);font-weight:500}.cbx-opt small{color:var(--ink-3);font-weight:400}.cbx-opt.on,.cbx-opt:hover{background:var(--accent-soft)}.cbx-empty{padding:10px;color:var(--ink-3);font-size:12px}.cbx-caret{position:absolute;right:8px;top:50%;transform:translateY(-50%);border:0;background:transparent;color:var(--ink-3);padding:4px 6px}</style>
+      <div class="form"><div class="full" style="display:flex;flex-direction:column;gap:4px"><span style="font-size:12px;font-weight:600;color:var(--ink-2)">Employee</span><div class="cbx"><input type="text" id="l-name" value="${esc(pre || '')}" placeholder="Pick or type a name" autocomplete="off" role="combobox" aria-expanded="false" aria-controls="l-list" aria-label="Employee" style="width:100%;padding-right:32px"><button type="button" class="cbx-caret" id="l-caret" tabindex="-1" aria-label="Show all employees">▾</button><div class="cbx-list" id="l-list" role="listbox" hidden></div></div></div>
       <label>Type<select id="l-code">${codesAllowed.map(c => `<option value="${c}" ${c === 'LA' && !can('att.approve') ? 'selected' : ''}>${c} · ${CODES[c].label}</option>`).join('')}</select></label><span></span>
       <label>From<input type="date" id="l-from" value="${today}"></label><label>To<input type="date" id="l-to" value="${today}"></label>
       <label class="full" style="flex-direction:row;align-items:center;gap:8px;font-weight:500"><input type="checkbox" id="l-skip" checked> Keep week offs and holidays (don’t overwrite WO / H)</label></div>
@@ -4744,18 +4780,41 @@ function openLogLeave(preKey) {
     const name = $('#l-name', m).value, p = resolvePerson(name), from = new Date($('#l-from', m).value + 'T00:00:00Z'), to = new Date($('#l-to', m).value + 'T00:00:00Z');
     if (!p) return { err: name.trim() ? 'No employee with that name in the workforce file or the tracker.' : 'Pick an employee.' };
     if (isNaN(from) || isNaN(to)) return { err: 'Choose both dates.' }; if (to < from) return { err: '“To” is before “From”.' }; if ((to - from) / 86400000 > 92) return { err: 'That range is longer than 3 months. Split it up.' };
-    const code = $('#l-code', m).value, skip = $('#l-skip', m).checked; const set = [], skipped = [], create = new Set(); let overwrite = 0;
+    const code = $('#l-code', m).value, skip = $('#l-skip', m).checked; const set = [], skipped = [], blocked = [], create = new Set(); let overwrite = 0;
     for (let t = from; t <= to; t = new Date(t.getTime() + 86400000)) {
       const ms = Engine.monthSerial(t.getUTCFullYear(), t.getUTCMonth()), i = t.getUTCDate() - 1; const row = p.rows.find(r => r.month === ms);
       const cur = row ? row.days[i] : (t.getUTCDay() % 6 === 0 ? 'WO' : null);
       if (skip && catOf(cur) === 'off') { skipped.push(t); continue; }
+      if (row && !allowedInLog(cur, code)) { blocked.push(t); continue; }   // e.g. already approved leave, without the Approve leave right
       if (!row) create.add(ms); if (cur != null && String(cur).trim().toUpperCase() !== code) overwrite++; set.push({ ms, i, t });
     }
-    return { p, code, set, skipped, create: [...create], overwrite };
+    return { p, code, set, skipped, blocked, create: [...create], overwrite };
   };
-  const show = () => { const pl = plan(); $('#l-err', m).textContent = pl.err || ''; $('#l-go', m).disabled = !!pl.err || !pl.set.length; $('#l-prev', m).innerHTML = pl.err ? 'Fill in the form to see a preview.' : `<b>${pl.set.length}</b> day${pl.set.length === 1 ? '' : 's'} will be set to <b>${pl.code}</b>${pl.skipped.length ? `, <b>${pl.skipped.length}</b> skipped (week off / holiday)` : ''}${pl.overwrite ? `, replacing <b>${pl.overwrite}</b> existing entr${pl.overwrite === 1 ? 'y' : 'ies'}` : ''}.${pl.create.length ? `<br>A new row will be created for ${pl.create.map(monthLabel).join(', ')}.` : ''}`; };
+  const show = () => { const pl = plan(); $('#l-err', m).textContent = pl.err || ''; $('#l-go', m).disabled = !!pl.err || !pl.set.length; $('#l-prev', m).innerHTML = pl.err ? 'Fill in the form to see a preview.' : `<b>${pl.set.length}</b> day${pl.set.length === 1 ? '' : 's'} will be set to <b>${pl.code}</b>${pl.skipped.length ? `, <b>${pl.skipped.length}</b> skipped (week off / holiday)` : ''}${pl.blocked && pl.blocked.length ? `, <b>${pl.blocked.length}</b> left as they are (already approved or decided leave, which needs the Approve leave right to change)` : ''}${pl.overwrite ? `, replacing <b>${pl.overwrite}</b> existing entr${pl.overwrite === 1 ? 'y' : 'ies'}` : ''}.${pl.create.length ? `<br>A new row will be created for ${pl.create.map(monthLabel).join(', ')}.` : ''}`; };
   bindLeaveDates($('#l-from', m), $('#l-to', m));
-  m.addEventListener('input', show); m.addEventListener('change', show); show(); $('#l-name', m).focus();
+  /* employee dropdown: every name, filtered as you type */
+  { const inp = $('#l-name', m), list = $('#l-list', m); let cur = -1, shown = [];
+    const open = all => {
+      const q = all ? '' : inp.value.trim().toLowerCase();
+      shown = names.filter(n => !q || n.name.toLowerCase().includes(q) || String(n.hint).toLowerCase().includes(q)).slice(0, 200); cur = -1;
+      list.innerHTML = shown.length ? shown.map((n, i) => `<button type="button" class="cbx-opt" role="option" data-i="${i}"><span>${esc(n.name)}</span><small>${esc(n.hint)}</small></button>`).join('') : '<div class="cbx-empty">No employee with that name.</div>';
+      list.hidden = false; inp.setAttribute('aria-expanded', 'true');
+    };
+    const close = () => { list.hidden = true; inp.setAttribute('aria-expanded', 'false'); };
+    const choose = i => { if (!shown[i]) return; inp.value = shown[i].name; close(); show(); };
+    const mark = () => list.querySelectorAll('.cbx-opt').forEach((b, i) => { b.classList.toggle('on', i === cur); if (i === cur) b.scrollIntoView({ block: 'nearest' }); });
+    inp.addEventListener('focus', () => open(true)); inp.addEventListener('input', () => open(false));
+    inp.addEventListener('keydown', e => {
+      if (e.key === 'ArrowDown') { e.preventDefault(); if (list.hidden) open(true); cur = Math.min(shown.length - 1, cur + 1); mark(); }
+      else if (e.key === 'ArrowUp') { e.preventDefault(); cur = Math.max(0, cur - 1); mark(); }
+      else if (e.key === 'Enter' && !list.hidden && cur >= 0) { e.preventDefault(); choose(cur); }
+      else if (e.key === 'Escape' && !list.hidden) { e.stopPropagation(); close(); }
+    });
+    list.addEventListener('mousedown', e => { e.preventDefault(); const b = e.target.closest('[data-i]'); if (b) choose(+b.dataset.i); });
+    $('#l-caret', m).addEventListener('mousedown', e => { e.preventDefault(); if (list.hidden) { inp.focus(); open(true); } else close(); });
+    inp.addEventListener('blur', () => setTimeout(close, 120));
+  }
+  m.addEventListener('input', show); m.addEventListener('change', show); show(); if (!pre) $('#l-name', m).focus(); else $('#l-code', m).focus();
   $('#l-go', m).onclick = () => {
     const pl = plan(); if (pl.err) return; closeModal();
     mutate(`Logged ${pl.code} for ${pl.p.name} · ${pl.set.length} day${pl.set.length === 1 ? '' : 's'} (${longDate(pl.set[0].t)}${pl.set.length > 1 ? ' – ' + longDate(pl.set[pl.set.length - 1].t) : ''})`, () => {
@@ -5577,7 +5636,7 @@ async function poll() {
 }
 
 /* ============================== filtering ============================== */
-const APP = { title: "Team Dashboard", version: "3.12.0", released: "23 Sep 2026" };
+const APP = { title: "Team Dashboard", version: "3.13.0", released: "23 Sep 2026" };
 const BASE_DIMS = { status: "status_column", desig: "designation_column", client: "client_column", mode: "mode_column" };
 const STANDARD_STATUSES = ["Active", "Manager", "OJT", "Bench", "New", "Projected", "Left", "Moved"];
 const TILE_ORDER = ["Active", "Manager", "OJT", "Bench", "New", "Projected"];
@@ -7614,6 +7673,7 @@ async function openWorkbook(name) {
 async function enterApp() {
   if (window.loadTeamSettings) await loadTeamSettings();
   await loadData(false);
+  if (window.applyFixedFilters) applyFixedFilters();
   await initGoogleDistance();
   document.title = APP.title + " · " + APP.version;
   $("#title").textContent = APP.title;
@@ -7900,7 +7960,7 @@ async function saveSharedSetting(key, value) {
     try { await CLOUD.setShared(key, value); }
     catch (e) {
       if (!/not set up|function|schema cache/i.test(e.message || '')) throw e;
-      if (!PERM.isAdmin()) throw new Error('Ask the admin to run the latest supabase/setup.sql once, then try again.');
+      if (!PERM.isSuper()) throw new Error('Ask the super admin to run the latest supabase/setup.sql once, then try again.');
       await CLOUD.setSetting(key, value);
     }
   } else { const all = JSON.parse(localStorage.getItem(LOCAL_KEY) || '{}'); all[key] = value; localStorage.setItem(LOCAL_KEY, JSON.stringify(all)); }
@@ -7986,11 +8046,11 @@ function confirmButton(label, sure, fn, cls = 'btn danger') {
 const checkLine = (text, checked, attrs = {}) => { const c = h('input', { type: 'checkbox', checked, ...attrs }); return { box: c, el: h('label', { class: 'chk-line' }, c, h('span', {}, text)) }; };
 
 const MODULES = [
-  { id: 'people', name: 'People & access', show: () => PERM.online() && PERM.isAdmin(), draw: drawPeople },
-  { id: 'fields', name: 'Mandatory fields', show: () => PERM.isAdmin(), draw: drawFields },
+  { id: 'people', name: 'People & access', show: () => PERM.online() && PERM.isSuper(), draw: drawPeople },
+  { id: 'fields', name: 'Mandatory fields', show: () => PERM.isSuper() || PERM.can('set.fields'), draw: drawFields },
   { id: 'sync', name: 'Save & sync', show: () => true, draw: drawSync },
-  { id: 'activity', name: 'Activity log', show: () => PERM.isAdmin() || PERM.can('activity.view'), draw: pane => openActivity(pane) },
-  { id: 'workbook', name: 'Workbook & backups', show: () => PERM.isAdmin() || PERM.can('workbook.download'), draw: drawWorkbook },
+  { id: 'activity', name: 'Activity log', show: () => PERM.can('activity.view'), draw: pane => openActivity(pane) },
+  { id: 'workbook', name: 'Workbook & backups', show: () => PERM.can('set.workbook') || PERM.can('workbook.download'), draw: drawWorkbook },
   { id: 'tools', name: 'Tools', show: () => PERM.can('tools.distance'), draw: drawTools },
   { id: 'prefs', name: 'Preferences', show: () => true, draw: drawPrefs },
 ];
@@ -8003,7 +8063,7 @@ window.drawSettingsPage = () => {
   const mods = MODULES.filter(m => m.show());
   const mod = mods.find(m => m.id === current) || mods[0];
   current = mod.id;
-  const u = CLOUD.user(), who = PERM.online() ? ('Signed in as ' + u.name + (u.role === 'admin' ? ' · Admin' : '')) : 'Excel file on this computer';
+  const u = CLOUD.user(), who = PERM.online() ? ('Signed in as ' + u.name + ' · ' + (PERM.roleNames[u.role] || 'User')) : 'Excel file on this computer';
   const pane = h('div', { class: 'set-pane' });
   fill(host, h('div', { class: 'set-page' },
     h('nav', { class: 'set-nav', 'aria-label': 'Settings sections' }, h('p', { class: 'set-who' }, who), ...mods.map(m => h('button', { class: 'set-nav-item', type: 'button', 'aria-current': m === mod ? 'page' : null, onclick: () => { current = m.id; drawSettingsPage(); } }, m.name))),
@@ -8014,11 +8074,12 @@ const onSettings = () => typeof state !== 'undefined' && state.view === 'setting
 
 /* ----- People & access (admin, online) ----- */
 function rightsSummary(u) {
-  if (u.role === 'admin') return 'Admin · every right';
-  const p = u.permissions || {};
-  if (!p._v) return 'Full access';
-  for (const [name, preset] of Object.entries(PERM.presets)) if (PERM.keys.every(k => !!p[k] === !!preset[k])) return name;
-  return 'Custom · ' + PERM.keys.filter(k => p[k]).length + ' rights';
+  const role = PERM.roleNames[u.role] || 'User';
+  if (u.role === 'superadmin') return 'Super admin · every right';
+  const p = PERM.upgrade(u.permissions || {});
+  if (!p._v) return role + ' · full access';
+  for (const [name, preset] of Object.entries(PERM.presets)) if (PERM.keys.every(k => !!p[k] === !!preset[k])) return role + ' · ' + name;
+  return role + ' · custom (' + PERM.keys.filter(k => p[k]).length + ' rights)';
 }
 async function drawPeople(pane, selectId) {
   fill(pane, h('p', { class: 'set-hint' }, 'Loading people…'));
@@ -8035,6 +8096,20 @@ async function drawPeople(pane, selectId) {
     h('div', { class: 'ppl' }, h('div', { class: 'ppl-side' }, h('button', { class: 'btn primary', type: 'button', onclick: () => select(null) }, 'Add person'), list), editor));
   select(users.find(u => u.id === selectId) || users.find(u => u.id === me.id) || users[0] || null);
 }
+/* filters: what the super admin can fix for a person */
+const FILTER_NAMES = { status: 'Status', desig: 'Designation', client: 'Client', mode: 'Work mode' };
+function currentFilters() {
+  return { fields: typeof chosenFilterFields === 'function' ? chosenFilterFields() : undefined, q: (state.filters && state.filters.q) || '',
+    sel: Object.fromEntries(Object.entries((state.filters && state.filters.sel) || {}).map(([k, v]) => [k, [...v]]).filter(([, v]) => v.length)) };
+}
+function filterText(f) {
+  if (!f) return '';
+  const label = k => FILTER_NAMES[k] || (k.startsWith('field:') ? ((state.idx[k.slice(6)] != null && state.cols[state.idx[k.slice(6)]].label) || k.slice(6)) : k);
+  const parts = Object.entries(f.sel || {}).filter(([, v]) => v && v.length).map(([k, v]) => label(k) + ': ' + v.join(', '));
+  if (f.q) parts.unshift('search “' + f.q + '”');
+  return parts.join(' · ') || 'no filters (everyone)';
+}
+window.filterText = filterText;
 function drawEditor(box, u, reload) {
   const me = CLOUD.user(), isNew = !u, self = u && u.id === me.id;
   const err = h('p', { class: 'err', role: 'alert' });
@@ -8042,7 +8117,8 @@ function drawEditor(box, u, reload) {
   const code = h('input', { class: 'input', type: isNew ? 'text' : 'password', value: u ? u.passcode : CLOUD.admin.genCode(), 'aria-label': 'Passcode', autocomplete: 'off', spellcheck: 'false' });
   const eye = h('button', { class: 'btn', type: 'button', onclick: () => { code.type = code.type === 'password' ? 'text' : 'password'; eye.textContent = code.type === 'password' ? 'Show' : 'Hide'; } }, isNew ? 'Hide' : 'Show');
   const fresh = h('button', { class: 'btn', type: 'button', onclick: () => { code.value = CLOUD.admin.genCode(); code.type = 'text'; eye.textContent = 'Hide'; } }, 'New');
-  const role = h('select', { class: 'input', 'aria-label': 'Role' }, h('option', { value: 'user', selected: !u || u.role !== 'admin' }, 'User'), h('option', { value: 'admin', selected: !!u && u.role === 'admin' }, 'Admin'));
+  const curRole = u ? u.role : 'user';
+  const role = h('select', { class: 'input', 'aria-label': 'Role' }, ...['user', 'admin', 'superadmin'].map(r => h('option', { value: r, selected: curRole === r }, PERM.roleNames[r])));
   const active = checkLine('Can sign in', u ? u.active : true);
   /* optional link to an employee in the workforce sheet */
   const empOpts = (typeof state !== 'undefined' && state.schema ? state.rows : []).map(r => ({ code: String(gs(r, 'key_column') || ''), name: gs(r, 'name_column').trim() })).filter(x => x.code && x.name).sort((a, b) => a.name.localeCompare(b.name));
@@ -8051,25 +8127,49 @@ function drawEditor(box, u, reload) {
   const emp = h('input', { class: 'input', list: 'setEmpList', value: curEmp ? labelOf(curEmp) : '', placeholder: 'Not linked', 'aria-label': 'Linked employee (optional)', autocomplete: 'off' });
   const empList = h('datalist', { id: 'setEmpList' }, ...empOpts.map(x => h('option', { value: labelOf(x) })));
   const empPick = () => { const v = emp.value.trim(); if (!v) return null; return empOpts.find(x => labelOf(x) === v) || empOpts.find(x => x.code === v) || empOpts.find(x => x.name.toLowerCase() === v.toLowerCase()); };
-  let start = u && u.permissions && u.permissions._v ? u.permissions : u ? PERM.presets['Full access'] : PERM.presets['Editor'];
-  if (start._v < 2) start = { ...start, 'att.who': !!start['page.attendance'], 'att.grid': !!start['page.attendance'], 'att.log': !!start['att.edit'] };   // rights saved in 3.11
-  const boxes = {};
-  const groups = PERM.groups.map(g => h('fieldset', {}, h('legend', {}, g.name), ...g.items.map(([k, label]) => { const c = checkLine(label, !!start[k], { 'data-k': k }); boxes[k] = c.box; return c.el; })));
-  const presets = h('div', { class: 'rights-presets' }, h('span', {}, 'Start from:'), ...Object.entries(PERM.presets).map(([n, p]) => h('button', { class: 'btn mini', type: 'button', onclick: () => { for (const k of PERM.keys) boxes[k].checked = !!p[k]; } }, n)));
-  const adminNote = h('p', { class: 'set-hint' }, 'Admins have every right and can open Settings. Switch the role to User to choose rights.');
-  const rights = h('div', { class: 'rights' }, h('h4', {}, 'What they can do'), adminNote, presets, h('div', { class: 'rights-grid' }, ...groups));
-  const syncRole = () => { const adm = role.value === 'admin'; rights.classList.toggle('is-admin', adm); adminNote.hidden = !adm; presets.hidden = adm; for (const b of Object.values(boxes)) b.disabled = adm; };
-  role.addEventListener('change', syncRole); syncRole();
-  const rightsNow = () => Object.fromEntries([['_v', 2], ...PERM.keys.map(k => [k, boxes[k].checked])]);
+  const start = u && u.permissions && u.permissions._v ? PERM.upgrade(u.permissions) : u ? PERM.presets['Full access'] : PERM.presets['Editor'];
+  /* fixed filters for this person */
+  let fixed = u && u.permissions && u.permissions._filters ? u.permissions._filters : null;
+  const fsum = h('p', { class: 'rmod-note' });
+  const drawFixed = () => { fsum.textContent = fixed ? 'Fixed filters: ' + filterText(fixed) : 'No fixed filters: they start with everyone shown.'; };
+  drawFixed();
+  const fixedBox = h('div', { class: 'rmod-extra' }, fsum,
+    h('div', { class: 'set-actions flat' },
+      h('button', { class: 'btn mini', type: 'button', onclick: () => { fixed = currentFilters(); drawFixed(); } }, 'Use the filters on my screen now'),
+      h('button', { class: 'btn mini', type: 'button', onclick: () => { fixed = null; drawFixed(); } }, 'Clear')),
+    h('p', { class: 'rmod-note' }, 'They start with these filters every time they sign in. Without “Change the filters” they can’t change or clear them.'));
+  /* rights, one card per module: the module's page on top, what they can do in it underneath */
+  const boxes = {}, syncs = [];
+  const isSuper = () => role.value === 'superadmin';
+  const modules = PERM.groups.map(g => {
+    const items = g.items.map(([k, label]) => { const c = checkLine(label, !!start[k], { 'data-k': k }); boxes[k] = c.box; return c; });
+    let head;
+    if (g.page) { const c = checkLine('', !!start[g.page], { 'data-k': g.page, 'aria-label': 'Can open ' + g.name }); boxes[g.page] = c.box; head = h('label', { class: 'rmod-head' }, c.box, h('b', {}, g.name), h('small', {}, 'can open this page')); }
+    else head = h('div', { class: 'rmod-head' }, h('b', {}, g.name));
+    const card = h('div', { class: 'rmod' }, head, items.length ? h('div', { class: 'rmod-items' }, ...items.map(c => c.el)) : null, g.name === 'Filters' ? fixedBox : null);
+    const sync = () => { const off = g.page && !boxes[g.page].checked; card.classList.toggle('off', !!off); for (const c of items) c.box.disabled = isSuper() || !!off; if (g.page) boxes[g.page].disabled = isSuper(); };
+    if (g.page) boxes[g.page].addEventListener('change', sync);
+    syncs.push(sync);
+    return card;
+  });
+  const presets = h('div', { class: 'rights-presets' }, h('span', {}, 'Start from:'), ...Object.entries(PERM.presets).map(([n, p]) => h('button', { class: 'btn mini', type: 'button', onclick: () => { for (const k of PERM.keys) boxes[k].checked = !!p[k]; syncs.forEach(f => f()); } }, n)));
+  const superNote = h('p', { class: 'set-hint' }, 'Super admins have every right, and only they can manage people, rights and fixed filters.');
+  const roleNote = h('p', { class: 'set-hint' }, 'Admins and users get exactly the rights ticked below; only a super admin can change them.');
+  const rights = h('div', { class: 'rights' }, h('h4', {}, 'What they can do'), superNote, roleNote, presets, h('div', { class: 'rmods' }, ...modules));
+  const syncRole = () => { const sup = isSuper(); rights.classList.toggle('is-admin', sup); superNote.hidden = !sup; roleNote.hidden = sup; presets.hidden = sup; fixedBox.hidden = sup; syncs.forEach(f => f()); };
+  role.addEventListener('change', () => { if (isNew && role.value === 'admin') { for (const k of PERM.keys) boxes[k].checked = !!PERM.presets['Admin'][k]; } syncRole(); });
+  syncRole();
+  const rightsNow = () => Object.fromEntries([['_v', 3], ...PERM.keys.map(k => [k, boxes[k].checked])]);
   const save = h('button', { class: 'btn primary', type: 'button', onclick: async () => {
     err.textContent = ''; save.disabled = true; save.textContent = 'Saving…';
     try {
       const nm = name.value.trim(), pc = code.value.trim(), linked = empPick();
       if (linked === undefined) throw new Error('Pick the linked employee from the list, or leave it empty.');
       const link = linked ? { _emp: linked.code, _empName: linked.name } : {};
-      const r = await CLOUD.admin.save(u ? u.id : null, nm, pc, role.value, active.box.checked, role.value === 'admin' ? link : { ...rightsNow(), ...link });
+      const perms = isSuper() ? link : { ...rightsNow(), ...link, ...(fixed ? { _filters: fixed } : {}) };
+      const r = await CLOUD.admin.save(u ? u.id : null, nm, pc, role.value, active.box.checked, perms);
       if (self) { CLOUD.admin.selfUpdated(nm); await CLOUD.refreshMe(); applyAccess(); }
-      BE.appendActivity([{ time: BE.nowText(), user: BE.userName(), action: 'settings', key: '', name: nm, details: { note: (isNew ? 'Added ' : 'Updated access for ') + nm + ' · ' + (role.value === 'admin' ? 'Admin' : rightsSummary({ role: 'user', permissions: rightsNow() })) + (active.box.checked ? '' : ' · sign-in disabled') } }]);
+      BE.appendActivity([{ time: BE.nowText(), user: BE.userName(), action: 'settings', key: '', name: nm, details: { note: (isNew ? 'Added ' : 'Updated access for ') + nm + ' · ' + rightsSummary({ role: role.value, permissions: perms }) + (fixed && !isSuper() ? ' · fixed filters: ' + filterText(fixed) : '') + (active.box.checked ? '' : ' · sign-in disabled') } }]);
       toast(isNew ? 'Added ' + nm + '. Give them their passcode.' : 'Saved. ' + (u.passcode !== pc ? 'The new passcode works now; the old one has stopped.' : 'Their rights apply within a minute.'));
       await reload(r && r.id);
     } catch (e) { err.textContent = e.message; save.disabled = false; save.textContent = isNew ? 'Add person' : 'Save changes'; }
@@ -8077,7 +8177,7 @@ function drawEditor(box, u, reload) {
   const del = !isNew && !self ? confirmButton('Delete', 'Click again to delete', async () => {
     try { await CLOUD.admin.remove(u.id); toast(u.name + ' deleted. Their passcode no longer works.'); await reload(null); } catch (e) { err.textContent = e.message; }
   }) : null;
-  fill(box, 
+  fill(box,
     h('h4', { class: 'ppl-name' }, isNew ? 'New person' : u.name),
     h('div', { class: 'ppl-row' },
       h('label', {}, 'Name', name),
@@ -8091,6 +8191,16 @@ function drawEditor(box, u, reload) {
     err);
   if (isNew) name.focus();
 }
+
+/* ----- fixed filters: applied when someone signs in; locked unless they may change filters ----- */
+window.applyFixedFilters = () => {
+  const f = PERM.fixedFilters(), locked = !PERM.can('filters.custom');
+  if (f) {
+    state.filters = { fields: Array.isArray(f.fields) ? f.fields.filter(k => typeof k === 'string') : undefined, q: f.q || '', sel: Object.fromEntries(Object.entries(f.sel || {}).map(([k, v]) => [k, new Set(v)])), inited: true };
+    const q = el('fq'); if (q) q.value = f.q || '';
+  } else if (locked) { state.filters = { q: '', sel: {}, inited: true }; const q = el('fq'); if (q) q.value = ''; }
+  document.body.classList.toggle('filters-locked', locked);
+};
 
 /* ----- Mandatory fields ----- */
 async function drawFields(pane) {
@@ -8161,7 +8271,7 @@ async function drawWorkbook(pane) {
     return;
   }
   const dl = h('button', { class: 'btn', type: 'button', onclick: () => run(async () => download(state.file || 'Team Dashboard.xlsx', await CLOUD.admin.download())) }, 'Download current workbook');
-  if (!PERM.isAdmin()) { fill(pane, h('p', { class: 'set-hint' }, 'Download a copy of the team workbook to open in Excel. Changes made in the copy are not sent back.'), h('div', { class: 'set-actions flat' }, dl), err); return; }
+  if (!PERM.can('set.workbook')) { fill(pane, h('p', { class: 'set-hint' }, 'Download a copy of the team workbook to open in Excel. Changes made in the copy are not sent back.'), h('div', { class: 'set-actions flat' }, dl), err); return; }
   fill(pane, h('p', { class: 'set-hint' }, 'Loading history…'));
   const hist = await CLOUD.admin.history();
   const list = (items, fmt, empty) => items.length ? h('ul', { class: 'td-hist' }, ...items.map(x => h('li', {}, ...fmt(x)))) : h('p', { class: 'set-hint' }, empty);

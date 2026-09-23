@@ -15,7 +15,7 @@
 --     The admin sets them in Settings > People & access. Admins always have every right.
 --   * Team-wide settings (for example which fields are mandatory) live in td_settings.
 --
--- Upgrading from 3.10 or 3.11: just run this whole file again. Existing passcodes keep working and keep full
+-- Upgrading from 3.10, 3.11 or 3.12: just run this whole file again. The first admin becomes the super admin. Existing passcodes keep working and keep full
 -- (non-admin) rights until you change them in Settings.
 --   * The first save of each day keeps a backup copy for 30 days (table td_file_backups).
 -- =====================================================================
@@ -27,12 +27,19 @@ create table if not exists public.td_users (
   id          bigint generated always as identity primary key,
   name        text not null,
   passcode    text not null unique,
-  role        text not null default 'user' check (role in ('admin', 'user')),
+  role        text not null default 'user',
   active      boolean not null default true,
   created_at  timestamptz not null default now(),
   last_login  timestamptz
 );
 alter table public.td_users add column if not exists permissions jsonb not null default '{}'::jsonb;
+-- 3.13: three roles. The super admin has every right and is the only one who manages people and rights.
+alter table public.td_users drop constraint if exists td_users_role_check;
+alter table public.td_users add constraint td_users_role_check check (role in ('superadmin', 'admin', 'user'));
+-- Upgrading: the first admin becomes the super admin (change it later in Settings > People & access).
+update public.td_users set role = 'superadmin'
+where id = (select min(id) from public.td_users where role = 'admin' and active)
+  and not exists (select 1 from public.td_users where role = 'superadmin');
 create table if not exists public.td_settings (
   key         text primary key,
   value       jsonb not null,
@@ -107,22 +114,34 @@ begin
   return u;
 end $$;
 
+-- Only the super admin: people, passcodes and rights.
 create or replace function public.td_require_admin(p_token text) returns public.td_users
 language plpgsql security definer set search_path = public as $$
 declare u public.td_users;
 begin
   u := public.td_session_user(p_token);
-  if u.role <> 'admin' then raise exception 'ADMIN_ONLY'; end if;
+  if u.role <> 'superadmin' then raise exception 'ADMIN_ONLY'; end if;
   return u;
 end $$;
 
--- A right is on when the admin ticked it. Passcodes created before 3.11 (no "_v" key) keep full user rights.
+-- A right is on when the super admin ticked it (admins and users alike).
+-- Passcodes whose rights were never set (no "_v" key) keep full rights, as before.
 create or replace function public.td_can(u public.td_users, p_right text) returns boolean
 language sql stable as $$
-  select u.role = 'admin'
+  select u.role = 'superadmin'
       or coalesce(u.permissions ->> '_v', '') = ''
       or coalesce((u.permissions ->> p_right)::boolean, false)
 $$;
+
+-- The super admin, or someone who was given this right.
+create or replace function public.td_require_right(p_token text, p_right text) returns public.td_users
+language plpgsql security definer set search_path = public as $$
+declare u public.td_users;
+begin
+  u := public.td_session_user(p_token);
+  if not public.td_can(u, p_right) then raise exception 'ADMIN_ONLY'; end if;
+  return u;
+end $$;
 create or replace function public.td_can_write(u public.td_users) returns boolean
 language sql stable as $$
   select public.td_can(u, 'emp.edit') or public.td_can(u, 'emp.add') or public.td_can(u, 'emp.delete') or public.td_can(u, 'emp.bulk')
@@ -180,7 +199,8 @@ create or replace function public.td_admin_set_setting(p_token text, p_key text,
 language plpgsql security definer set search_path = public as $$
 declare me public.td_users;
 begin
-  me := public.td_require_admin(p_token);
+  -- mandatory fields: anyone given that right; everything else: the super admin
+  if p_key = 'required_fields' then me := public.td_require_right(p_token, 'set.fields'); else me := public.td_require_admin(p_token); end if;
   insert into public.td_settings (key, value, updated_at, updated_by) values (p_key, p_value, now(), me.name)
   on conflict (key) do update set value = excluded.value, updated_at = now(), updated_by = me.name;
 end $$;
@@ -229,7 +249,7 @@ begin
   u := public.td_session_user(p_token);
   if not public.td_can_write(u) then raise exception 'READ_ONLY'; end if;
   if coalesce(p_base_version, 0) = 0 and not coalesce(p_force, false) then
-    if u.role <> 'admin' then raise exception 'ADMIN_ONLY'; end if;   -- only the admin sets up the workbook
+    if u.role not in ('superadmin', 'admin') then raise exception 'ADMIN_ONLY'; end if;   -- only an admin sets up the workbook
     insert into public.td_files (name, data, version, size, updated_by)
     values (p_name, bytes, 1, length(bytes), u.name)
     on conflict (name) do nothing;
@@ -269,20 +289,20 @@ begin
   me := public.td_require_admin(p_token);
   if coalesce(trim(p_name), '') = '' then raise exception 'NAME_REQUIRED'; end if;
   if length(pc) < 4 then raise exception 'PASSCODE_TOO_SHORT'; end if;
-  if p_role not in ('admin', 'user') then raise exception 'BAD_ROLE'; end if;
+  if p_role not in ('superadmin', 'admin', 'user') then raise exception 'BAD_ROLE'; end if;
   if exists (select 1 from public.td_users where passcode = pc and id is distinct from p_id) then raise exception 'PASSCODE_TAKEN'; end if;
   if p_id is null then
     insert into public.td_users (name, passcode, role, active, permissions) values (trim(p_name), pc, p_role, coalesce(p_active, true), coalesce(p_permissions, '{}'::jsonb)) returning id into rid;
   else
     select * into old from public.td_users where id = p_id;
     if not found then raise exception 'USER_NOT_FOUND'; end if;
-    if old.role = 'admin' and (p_role <> 'admin' or not coalesce(p_active, true)) then
-      select count(*) into admins from public.td_users where role = 'admin' and active and id <> p_id;
+    if old.role = 'superadmin' and (p_role <> 'superadmin' or not coalesce(p_active, true)) then
+      select count(*) into admins from public.td_users where role = 'superadmin' and active and id <> p_id;
       if admins = 0 then raise exception 'LAST_ADMIN'; end if;
     end if;
     update public.td_users set name = trim(p_name), passcode = pc, role = p_role, active = coalesce(p_active, true),
       permissions = coalesce(p_permissions, old.permissions) where id = p_id;
-    if old.passcode <> pc or not coalesce(p_active, true) or old.role <> p_role then
+    if old.passcode <> pc or not coalesce(p_active, true) then
       delete from public.td_sessions where user_id = p_id and token <> p_token;   -- changed passcode signs them out elsewhere
     end if;
     rid := p_id;
@@ -298,8 +318,8 @@ begin
   if me.id = p_id then raise exception 'CANNOT_DELETE_SELF'; end if;
   select * into old from public.td_users where id = p_id;
   if not found then return; end if;
-  if old.role = 'admin' then
-    select count(*) into admins from public.td_users where role = 'admin' and active and id <> p_id;
+  if old.role = 'superadmin' then
+    select count(*) into admins from public.td_users where role = 'superadmin' and active and id <> p_id;
     if admins = 0 then raise exception 'LAST_ADMIN'; end if;
   end if;
   delete from public.td_users where id = p_id;
@@ -308,7 +328,7 @@ end $$;
 create or replace function public.td_admin_history(p_token text) returns json
 language plpgsql security definer set search_path = public as $$
 begin
-  perform public.td_require_admin(p_token);
+  perform public.td_require_right(p_token, 'set.workbook');
   return json_build_object(
     'logins', coalesce((select json_agg(x) from (select at, name, ok, ip from public.td_login_log order by at desc limit 50) x), '[]'::json),
     'saves',  coalesce((select json_agg(x) from (select at, file, version, size, saved_by from public.td_save_log order by at desc limit 50) x), '[]'::json),
@@ -320,7 +340,7 @@ create or replace function public.td_admin_get_backup(p_token text, p_name text,
 language plpgsql security definer set search_path = public as $$
 declare b public.td_file_backups;
 begin
-  perform public.td_require_admin(p_token);
+  perform public.td_require_right(p_token, 'set.workbook');
   select * into b from public.td_file_backups where name = p_name and day = p_day;
   if not found then raise exception 'FILE_NOT_FOUND'; end if;
   return json_build_object('data', replace(encode(b.data, 'base64'), E'\n', ''), 'version', b.version);
@@ -330,7 +350,7 @@ end $$;
 do $$ declare f text; begin
   foreach f in array array[
     'td_client_ip()', 'td_session_user(text)', 'td_require_admin(text)',
-    'td_can(public.td_users, text)', 'td_can_write(public.td_users)'] loop
+    'td_can(public.td_users, text)', 'td_can_write(public.td_users)', 'td_require_right(text, text)'] loop
     execute format('revoke all on function public.%s from public, anon, authenticated', f);
   end loop;
   foreach f in array array[
@@ -346,5 +366,5 @@ end $$;
 -- ---------- the first admin ----------
 -- CHANGE THIS PASSCODE before running. After the first sign-in, manage every passcode from the dashboard.
 insert into public.td_users (name, passcode, role)
-select 'Admin', 'CHANGE-ME-2468', 'admin'
-where not exists (select 1 from public.td_users where role = 'admin');
+select 'Admin', 'CHANGE-ME-2468', 'superadmin'
+where not exists (select 1 from public.td_users where role = 'superadmin');
