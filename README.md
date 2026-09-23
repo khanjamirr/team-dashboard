@@ -1,15 +1,18 @@
 # Team Dashboard
 
-A single-file HTML dashboard for managing a team's workforce and attendance directly in two Excel workbooks. It runs entirely in the browser. There is no server, nothing to install, and no data leaves the computer: the page reads and writes the `.xlsx` files you select.
+A single-file HTML dashboard for managing a team's workforce and attendance in two Excel workbooks. It runs entirely in the browser, with nothing to install. The workbooks can be local files on your computer or files in a private Supabase bucket shared with your team.
 
 ## Quick start
 
-1. Download `index.html`.
-2. Open it in **Microsoft Edge** or **Google Chrome** on a computer. Other browsers can't edit local files.
-3. On the setup screen, either:
-   - select your existing **workforce** and **attendance** workbooks, or
-   - click **Choose folder and create files** to start fresh. The dashboard creates `Team Workforce.xlsx` and `Team Attendance.xlsx` in the folder you pick and saves everything there.
-4. Allow editing when the browser asks. Your file choices are remembered in this browser.
+Open `index.html` in a browser. You can work in one of two ways:
+
+**A. Supabase (shared online, recommended for teams).** The workbooks live in your private Supabase project, everyone signs in with their own account, and it works in any modern browser. Set it up once with [supabase/README.md](supabase/README.md), then sign in on the first screen.
+
+**B. Excel files on this computer.** Requires Edge or Chrome on a computer. On the setup screen, either:
+- select your existing **workforce** and **attendance** workbooks, or
+- click **Choose folder and create files** to start fresh. The dashboard creates `Team Workforce.xlsx` and `Team Attendance.xlsx` in the folder you pick and saves everything there.
+
+Allow editing when the browser asks. Your file choices are remembered in this browser.
 
 ## Features
 
@@ -43,18 +46,19 @@ Day codes: `AL` approved, `CL` casual, `SL` sick, `UL` unplanned, `AB` absent, `
 
 The dashboard edits only the sheet data it needs. Styles, pivots, other sheets and formulas elsewhere in the workbooks are kept.
 
-## Sharing with a team through OneDrive
+## Sharing with a team
 
-The page can only open files that exist on the computer, so each person needs the workbooks synced locally:
+**Best option: Supabase.** See [supabase/README.md](supabase/README.md). Each person signs in, and all saves go to the same online files. If two people save the same file at the same moment, the second save is refused, so nobody silently overwrites anyone. The first save each day also makes a backup copy.
+
+**Alternative: OneDrive-synced files.** The page can only open files that exist on the computer, so each person needs the workbooks synced locally:
 
 1. In OneDrive on the web, open the shared folder and choose **Add shortcut to My files**.
 2. In File Explorer, right-click both workbooks and choose **Always keep on this device**.
 3. Open `index.html` in Edge or Chrome and select the files from that OneDrive folder.
 
-This is not live co-editing. Each save rewrites the file and OneDrive syncs it a few seconds later:
+With OneDrive this is not live co-editing:
 
 - Close the workbook in Excel desktop while anyone is using the dashboard. Whichever program saves last wins, and OneDrive may create a conflict copy.
-- Avoid two people saving within the same few seconds. When the attendance file changes underneath you, use **Reload** before continuing.
 - It works best when one person updates at a time.
 
 ## Customising
@@ -66,19 +70,22 @@ These values live near the top of the relevant script blocks in `index.html`:
 | Title and version | `const APP = { title, version, released }` |
 | Column names | `const CFG = { key, name, status, … }` |
 | Office address for distance estimates | `const GOOGLE_OFFICE = '…'` |
+| Supabase project, bucket and file names | `const SUPABASE_CONFIG = { url, anonKey, bucket, … }` |
 
 ## Privacy
 
-- Employee data stays in your Excel files and in the browser's private storage (for backups and the activity log). Nothing is uploaded.
-- The only network calls are the optional distance tool, which looks up addresses via OpenStreetMap's Photon service, and "open in Google Maps" links.
-- **Never commit your workbooks to this repository.** `.gitignore` blocks `.xlsx`, `.xlsm`, `.xls` and `.csv` files to help prevent that.
+- **Local mode:** employee data stays in your Excel files and in the browser's private storage (for backups and the activity log). Nothing is uploaded.
+- **Supabase mode:** the workbooks are stored in your own Supabase project, in a private bucket. Only signed-in members listed in `dashboard_members` can read or save them.
+- **Other network calls:** the optional distance tool looks up addresses via OpenStreetMap's Photon service, and "open in Google Maps" links open in a new tab.
+- **Never commit your workbooks to this repository.** `.gitignore` blocks `.xlsx`, `.xlsm`, `.xls` and `.csv` files.
+- **Never put the Supabase `service_role` key in `index.html`.** Only the anon key belongs there.
 
 ## Browser support
 
-| Browser | Support |
-|---|---|
-| Edge / Chrome (Windows, macOS, Linux desktop) | Full |
-| Firefox, Safari, mobile browsers | Not supported (no File System Access API) |
+| Browser | Supabase mode | Local Excel files |
+|---|---|---|
+| Edge / Chrome (desktop) | Yes | Yes |
+| Firefox, Safari, mobile browsers | Yes | No (no File System Access API) |
 
 ## Changelog
 

@@ -1,5 +1,16 @@
 # Changelog
 
+## 3.9.0 (23 Sep 2026)
+
+### Supabase cloud mode
+- Sign in with email and password to work on workbooks stored in a private Supabase Storage bucket. This works in any modern browser.
+- On first sign-in, you can upload your existing Excel files or create blank ones.
+- Saves are refused, with a clear message, if someone else saved the same file since you loaded it.
+- The first save of each day backs up the previous version to `backups/YYYY-MM-DD/`.
+- Every save is recorded in a `save_log` table.
+- The session is remembered, so a reload reopens straight into the dashboard. A Sign out link is in the sidebar.
+- `supabase/setup.sql` creates the bucket, the member allowlist, the access rules and the save log.
+
 ## 3.8.0 (22 Sep 2026)
 
 ### Reports

@@ -4,7 +4,7 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <link rel="icon" href="data:,">
-<title>Team Dashboard - JK's Operations · 3.8.0</title>
+<title>Team Dashboard - JK's Operations · 3.9.0</title>
 <style>
 :root {
   color-scheme: light;
@@ -702,6 +702,9 @@ header.top .spacer { display:block; }
 /* v3.5 Live Link */
 .login-card { box-shadow:0 24px 80px #17386118; padding:36px; border-radius:24px; }
 .login-card h1 { font-size:28px; letter-spacing:-1px; margin-bottom:16px; }
+.connection-card.cloud-card { border-color:color-mix(in srgb,var(--accent) 45%,var(--border)); background:var(--surface); }
+.cloud-row { display:flex; align-items:center; gap:8px; flex-wrap:wrap; padding:8px 0; border-top:1px solid var(--border); }
+.cloud-or { margin:18px 0 0; font-size:12px; color:var(--ink-2); }
 .connection-card.starter-card { border-style:dashed; background:var(--surface); }
 .connection-card { padding:18px; border:1px solid var(--border); border-radius:14px; margin:12px 0; background:var(--surface-2); }
 .connection-card .lbl { margin-bottom:8px; color:var(--accent); }
@@ -982,13 +985,13 @@ table.data td { padding:9px 10px; font-size:12px; }
 
 <section id="connect" hidden>
   <div class="login-card" style="width:min(720px,100%)">
-    <h1>Team Dashboard - JK's Operations <span class="ver">3.8.0</span></h1>
+    <h1>Team Dashboard - JK's Operations <span class="ver">3.9.0</span></h1>
     <p>Open this single HTML file in Edge or Chrome. Select the workforce and attendance workbooks separately, then manage your team with automatic saves. No launcher or installation needed.</p><div class="setup-steps"><span>01 · Workforce file</span><span>02 · Attendance file</span><span>03 · Stay in sync</span></div>
     <div id="connectBody"><div class="empty">Loading…</div></div>
   </div>
 </section>
 
-<div id="app" hidden><aside class="sidebar" aria-label="Workspace navigation"><div class="brand dashboard-identity">      <h1><span id="title">Team Dashboard - JK's Operations</span><span class="ver" id="ver" title="Version 3.8.0">3.8.0</span></h1>      <span class="sync" id="sync" role="status"><i></i><span id="syncText">Loading…</span></span></div><div class="nav-label">WORKSPACE</div>      <nav class="tabs" role="tablist" aria-label="Pages" aria-orientation="vertical">
+<div id="app" hidden><aside class="sidebar" aria-label="Workspace navigation"><div class="brand dashboard-identity">      <h1><span id="title">Team Dashboard - JK's Operations</span><span class="ver" id="ver" title="Version 3.9.0">3.9.0</span></h1>      <span class="sync" id="sync" role="status"><i></i><span id="syncText">Loading…</span></span></div><div class="nav-label">WORKSPACE</div>      <nav class="tabs" role="tablist" aria-label="Pages" aria-orientation="vertical">
         <button class="tab on" role="tab" aria-controls="pageSummary" data-view="summary" aria-selected="true">Overview</button>
         <button class="tab" role="tab" aria-controls="pageEmployees" data-view="employees" aria-selected="false">Employees</button>
       <button class="tab" role="tab" aria-controls="pageAttendance" data-view="attendance" aria-selected="false">Attendance</button>
@@ -1574,6 +1577,7 @@ function selectedDirectory(handles) {
 
 function mapFsError(e) {
   if (e instanceof ApiErr) return e;
+  if (e && e.cloud) return new ApiErr(e.status || 500, e.message);
   const n = e && e.name;
   if (n === "NotAllowedError" || n === "SecurityError") return new ApiErr(401, "The browser needs permission to edit the linked workbooks again.");
   if (n === "NotFoundError") return new ApiErr(404, (Conn.fileName || "The workbook") + " could not be accessed. Was it moved, renamed or deleted?");
@@ -1602,7 +1606,7 @@ async function writeBlob(fh, blob) {
   let w;
   for (let i = 0; i < 3; i++) {
     try { w = await fh.createWritable(); await w.write(blob); await w.close(); return; }
-    catch (e) { try { if (w) await w.abort(); } catch (_) { /* ignore */ } w = null; if (i < 2) await sleep(700); }
+    catch (e) { try { if (w) await w.abort(); } catch (_) { /* ignore */ } w = null; if (e && e.cloud) throw new ApiErr(e.status || 500, e.message); if (i < 2) await sleep(700); }
   }
   throw new ApiErr(423, "Couldn't save: the Excel file is most likely open in Excel (or OneDrive is syncing it). Close it there and try again. Nothing was changed.");
 }
@@ -2005,9 +2009,215 @@ return {
   },
   async useWorkbook(name) { Conn.fileName = name; Conn.cache = null; await saveConn(); },
   _internals: { Zip, openBook, buildSchema, crc32 },
+  /* v3.9: Supabase cloud files behave like picked files, but are never stored as browser file handles */
+  useCloud(handles, workforceName, pairId) { const d = selectedDirectory(handles); d.name = 'Supabase'; Conn.handles = handles.slice(); Conn.pairId = pairId; Conn.dir = d; Conn.fileName = workforceName; Conn.cache = null; },
 };
 })();
 
+</script>
+<script>
+/* =====================================================================
+   SUPABASE CLOUD MODE (v3.9)
+   The two workbooks live in a private Supabase Storage bucket instead of on this computer.
+   Everyone signs in with their own email + password; the dashboard downloads the .xlsx,
+   edits it exactly as it does locally, and uploads it back. Works in any modern browser.
+   - Optimistic locking: a save is refused if someone else saved the file since you last loaded it.
+   - Daily cloud backup: the first save of each day copies the previous version to backups/YYYY-MM-DD/.
+   - Save log: every upload is recorded in the save_log table (who, which file, when).
+   Fill in SUPABASE_CONFIG below, or type the project URL and anon key on the sign-in screen.
+   ===================================================================== */
+const SUPABASE_CONFIG = {
+  url: '',                     // e.g. 'https://abcdefghijkl.supabase.co'
+  anonKey: '',                 // Project Settings → API → "anon public" key (safe to share; access is controlled by the policies in setup.sql)
+  bucket: 'team-dashboard',
+  workforceFile: 'Team Workforce.xlsx',
+  attendanceFile: 'Team Attendance.xlsx',
+};
+const CLOUD = (() => {
+  const LS_CFG = 'td-supabase-config', LS_SESSION = 'td-supabase-session', LS_MODE = 'td-mode', LS_BACKUP = 'td-supabase-backup-day';
+  const XLSX_TYPE = 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet';
+  const ls = { get(k) { try { return JSON.parse(localStorage.getItem(k) || 'null'); } catch { return null; } }, set(k, v) { try { v == null ? localStorage.removeItem(k) : localStorage.setItem(k, JSON.stringify(v)); } catch { } } };
+  const cfg = () => { const saved = ls.get(LS_CFG) || {}; const c = { ...SUPABASE_CONFIG }; for (const k of ['url', 'anonKey']) if (!c[k] && saved[k]) c[k] = saved[k]; c.url = String(c.url || '').trim().replace(/\/+$/, ''); c.anonKey = String(c.anonKey || '').trim(); return c; };
+  const configured = () => { const c = cfg(); return !!(c.url && c.anonKey); };
+  const fromFile = () => !!(SUPABASE_CONFIG.url && SUPABASE_CONFIG.anonKey);
+  let session = ls.get(LS_SESSION);
+  const cloudErr = (status, message) => Object.assign(new Error(message), { cloud: true, status });
+  const enc = p => p.split('/').map(encodeURIComponent).join('/');
+
+  async function authRequest(grant, body) {
+    const c = cfg();
+    let res;
+    try { res = await fetch(`${c.url}/auth/v1/token?grant_type=${grant}`, { method: 'POST', headers: { apikey: c.anonKey, 'Content-Type': 'application/json' }, body: JSON.stringify(body) }); }
+    catch (e) { throw cloudErr(503, 'Could not reach Supabase. Check the project URL and your internet connection.'); }
+    const j = await res.json().catch(() => ({}));
+    if (!res.ok) throw cloudErr(401, j.error_description || j.msg || j.message || 'Sign-in failed.');
+    session = { access_token: j.access_token, refresh_token: j.refresh_token, expires_at: Date.now() + (j.expires_in || 3600) * 1000, email: (j.user && j.user.email) || body.email || (session && session.email) || '' };
+    ls.set(LS_SESSION, session); return session;
+  }
+  async function token(force) {
+    if (!session) throw cloudErr(401, 'Sign in to Supabase again.');
+    if (force || Date.now() > session.expires_at - 60000) {
+      try { await authRequest('refresh_token', { refresh_token: session.refresh_token }); }
+      catch (e) { if (e.status === 401) { session = null; ls.set(LS_SESSION, null); throw cloudErr(401, 'Your Supabase sign-in expired. Sign in again.'); } throw e; }
+    }
+    return session.access_token;
+  }
+  async function api(path, opts = {}, retried) {
+    const c = cfg(), t = await token();
+    let res;
+    try { res = await fetch(c.url + path, { cache: 'no-store', ...opts, headers: { apikey: c.anonKey, Authorization: 'Bearer ' + t, ...(opts.headers || {}) } }); }
+    catch (e) { throw cloudErr(503, 'Could not reach Supabase. Check your internet connection. Nothing was changed.'); }
+    if (res.status === 401 && !retried) { await token(true); return api(path, opts, true); }
+    return res;
+  }
+  async function failText(res) { const j = await res.json().catch(() => null); return (j && (j.message || j.error || j.msg)) || res.statusText || ('HTTP ' + res.status); }
+  const S3 = {
+    async info(name) {
+      const c = cfg(), slash = name.lastIndexOf('/'), prefix = slash >= 0 ? name.slice(0, slash) : '', base = name.slice(slash + 1);
+      const res = await api(`/storage/v1/object/list/${enc(c.bucket)}`, { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ prefix, search: base, limit: 100, offset: 0, sortBy: { column: 'name', order: 'asc' } }) });
+      if (res.status === 403) throw cloudErr(403, 'Your account is not allowed to use this dashboard. Ask the owner to add your email to dashboard_members.');
+      if (!res.ok) throw cloudErr(res.status, 'Supabase: ' + await failText(res));
+      const hit = (await res.json()).find(o => o.name === base && o.id);
+      if (!hit) return null;
+      const md = hit.metadata || {};
+      return { etag: md.eTag || md.etag || hit.updated_at, size: md.size ?? md.contentLength ?? 0, mtime: Date.parse(hit.updated_at || hit.created_at) || Date.now() };
+    },
+    async download(name) {
+      const res = await api(`/storage/v1/object/authenticated/${enc(cfg().bucket)}/${enc(name)}`);
+      if (!res.ok) throw cloudErr(res.status === 400 || res.status === 404 ? 404 : res.status, 'Could not download ' + name + ': ' + await failText(res));
+      return res.blob();
+    },
+    async upload(name, blob) {
+      const res = await api(`/storage/v1/object/${enc(cfg().bucket)}/${enc(name)}`, { method: 'POST', headers: { 'x-upsert': 'true', 'Content-Type': XLSX_TYPE, 'cache-control': 'no-cache' }, body: blob });
+      if (res.status === 403) throw cloudErr(403, 'Supabase refused the save: your account can read but not edit. Ask the owner to add your email to dashboard_members.');
+      if (!res.ok) throw cloudErr(res.status, 'Supabase refused the save: ' + await failText(res));
+    },
+    async copy(from, to) { const res = await api('/storage/v1/object/copy', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ bucketId: cfg().bucket, sourceKey: from, destinationKey: to }) }); return res.ok; },
+    log(file, size) { api('/rest/v1/save_log', { method: 'POST', headers: { 'Content-Type': 'application/json', Prefer: 'return=minimal' }, body: JSON.stringify({ file, size }) }).catch(() => { }); },
+  };
+  async function dailyBackup(name, cur) {
+    if (!cur) return;
+    const day = new Date().toISOString().slice(0, 10), done = ls.get(LS_BACKUP) || {};
+    if (done[name] === day) return;
+    try { await S3.copy(name, `backups/${day}/${name}`); } catch { /* an existing backup for today is fine */ }
+    done[name] = day; ls.set(LS_BACKUP, done);
+  }
+  /* A stand-in for a FileSystemFileHandle, so the rest of the dashboard can't tell the difference. */
+  class CloudHandle {
+    constructor(name) { this.kind = 'file'; this.name = name; this.cloud = true; this._meta = null; this._metaAt = 0; this._file = null; this._etag = null; }
+    async queryPermission() { return 'granted'; }
+    async requestPermission() { return 'granted'; }
+    async isSameEntry(o) { return o === this || !!(o && o.cloud && o.name === this.name); }
+    async meta(force) { if (!force && this._metaAt && Date.now() - this._metaAt < 4000) return this._meta; this._meta = await S3.info(this.name); this._metaAt = Date.now(); return this._meta; }
+    async getFile() {
+      const m = await this.meta(); if (!m) throw cloudErr(404, this.name + ' is not in the Supabase bucket any more.');
+      if (this._file && this._etag === m.etag) return this._file;
+      const blob = await S3.download(this.name);
+      this._file = new File([blob], this.name, { type: XLSX_TYPE, lastModified: m.mtime }); this._etag = m.etag; return this._file;
+    }
+    async createWritable() {
+      const parts = [], self = this;
+      return { async write(d) { parts.push(d && d.type === 'write' ? d.data : d); }, async close() { await self.put(new Blob(parts, { type: XLSX_TYPE })); }, async abort() { parts.length = 0; } };
+    }
+    async put(blob) {
+      const cur = await this.meta(true);
+      if (cur && this._etag && cur.etag !== this._etag) { this._metaAt = 0; throw cloudErr(409, 'Someone else saved ' + this.name + ' a moment ago. Your change was not saved. The latest version will load; please redo your change.'); }
+      await dailyBackup(this.name, cur);
+      await S3.upload(this.name, blob);
+      const m = await this.meta(true);
+      this._file = new File([blob], this.name, { type: XLSX_TYPE, lastModified: m ? m.mtime : Date.now() }); this._etag = m ? m.etag : null;
+      S3.log(this.name, blob.size);
+    }
+  }
+  const names = () => { const c = cfg(); return { workforce: c.workforceFile, attendance: c.attendanceFile }; };
+  let handles = null;
+  const getHandles = () => handles || (handles = { workforce: new CloudHandle(names().workforce), attendance: new CloudHandle(names().attendance) });
+  async function missingFiles() { const hs = getHandles(), out = []; for (const role of ['workforce', 'attendance']) if (!(await hs[role].meta(true))) out.push(role); return out; }
+  async function open() {
+    const hs = getHandles(), c = cfg();
+    BE.useCloud([hs.workforce, hs.attendance], hs.workforce.name, 'supabase:' + c.url.replace(/^https?:\/\//, '') + '/' + c.bucket);
+    await BE.kvSet('att:handle', null); await BE.kvSet('att:file', hs.attendance.name); ATT.state().folderKey = null;
+    ls.set(LS_MODE, 'cloud');
+    await enterApp(); decorate();
+  }
+  function decorate() {
+    const lab = document.querySelector('.sidebar-bottom .local-label'); if (!lab || !active()) return;
+    lab.innerHTML = '';
+    lab.append(Object.assign(document.createElement('i'), {}), document.createTextNode(' Supabase · ' + (session && session.email || '') + ' '));
+    const b = Object.assign(document.createElement('button'), { className: 'linkbtn', textContent: 'Sign out', type: 'button' });
+    b.style.fontSize = 'inherit'; b.onclick = signOut; lab.append(b);
+  }
+  async function signOut() {
+    if (window.ATT?.dirty && ATT.dirty()) { toast('Save your attendance changes first.', true); return; }
+    try { const c = cfg(); await fetch(c.url + '/auth/v1/logout', { method: 'POST', headers: { apikey: c.anonKey, Authorization: 'Bearer ' + (session && session.access_token) } }); } catch { }
+    session = null; ls.set(LS_SESSION, null); ls.set(LS_MODE, 'local'); location.reload();
+  }
+  const active = () => ls.get(LS_MODE) === 'cloud' && !!session;
+  let pending = null;   // files missing after sign-in: ['workforce', 'attendance']
+  async function afterSignIn() {
+    const miss = await missingFiles();
+    if (!miss.length) { pending = null; await open(); return true; }
+    pending = miss; ls.set(LS_MODE, 'cloud'); renderConnect({}); return false;
+  }
+  async function provide(role, source) {
+    const h = getHandles()[role];
+    let blob;
+    if (source === 'blank') blob = await starterWorkbook(role);
+    else {
+      const file = await pickFile(); if (!file) return;
+      const u8 = new Uint8Array(await file.arrayBuffer());
+      if (role === 'attendance' && !await ATT.hasTracker(u8)) throw new Error('That file has no "Attendance Tracker" sheet. Choose the attendance workbook.');
+      if (role === 'workforce' && await ATT.hasTracker(u8)) throw new Error('That looks like the attendance workbook. Choose the workforce file.');
+      blob = new Blob([u8], { type: XLSX_TYPE });
+    }
+    if (await h.meta(true)) throw new Error(h.name + ' already exists in Supabase. Refresh the page.');
+    await h.put(blob);
+    pending = pending.filter(r => r !== role);
+    if (!pending.length) { pending = null; await open(); } else renderConnect({ note: 'Uploaded ' + h.name + '.' });
+  }
+  function pickFile() {
+    return new Promise(res => { const i = Object.assign(document.createElement('input'), { type: 'file', accept: '.xlsx,.xlsm' }); i.onchange = () => res(i.files[0] || null); i.click(); });
+  }
+  function card(info) {
+    const c = cfg(), wrap = h('div', { class: 'connection-card cloud-card' }), err = h('p', { class: 'err', role: 'alert' }, '');
+    const title = h('div', { class: 'lbl' }, 'Supabase · shared online');
+    if (session && pending) {
+      const n = names();
+      const row = role => h('div', { class: 'cloud-row' }, h('span', {}, h('b', {}, role === 'workforce' ? 'Workforce' : 'Attendance'), ' · ' + n[role]),
+        h('span', { class: 'grow' }),
+        h('button', { class: 'btn', onclick: () => run(() => provide(role, 'upload')) }, 'Upload my existing file'),
+        h('button', { class: 'btn ghost', onclick: () => run(() => provide(role, 'blank')) }, 'Create blank'));
+      const run = async fn => { try { err.textContent = ''; await fn(); } catch (e) { err.textContent = e.message; } };
+      wrap.append(title, h('p', { class: 'tip', style: 'margin:4px 0 10px' }, 'Signed in as ' + session.email + '. These files are not in Supabase yet. Upload your current Excel file to move your data online, or start with a blank one.'),
+        ...pending.map(row), err, h('button', { class: 'linkbtn', onclick: signOut }, 'Sign out'));
+      return wrap;
+    }
+    const inp = (type, ph, val, ac) => h('input', { class: 'input', type, placeholder: ph, value: val || '', autocomplete: ac || 'off', style: 'width:100%;margin-bottom:8px' });
+    const url = inp('url', 'Project URL (https://xxxx.supabase.co)', c.url), key = inp('text', 'anon public key', c.anonKey);
+    const email = inp('email', 'Email', session && session.email || '', 'username'), pass = inp('password', 'Password', '', 'current-password');
+    const needProject = !fromFile();
+    const go = h('button', { class: 'btn primary', onclick: async () => {
+      go.disabled = true; go.textContent = 'Signing in…'; err.textContent = '';
+      try {
+        if (needProject) ls.set(LS_CFG, { url: url.value.trim(), anonKey: key.value.trim() });
+        if (!configured()) throw new Error('Enter the project URL and anon key.');
+        await authRequest('password', { email: email.value.trim(), password: pass.value });
+        await afterSignIn();
+      } catch (e) { err.textContent = e.message; go.disabled = false; go.textContent = 'Sign in'; }
+    } }, 'Sign in');
+    pass.addEventListener('keydown', e => { if (e.key === 'Enter') go.click(); });
+    wrap.append(title, h('p', { class: 'tip', style: 'margin:4px 0 10px' }, 'Keep the workbooks online so your team works on the same data from any browser. Sign in with the account the owner created for you.'),
+      ...(needProject ? [h('details', { open: !configured() }, h('summary', { class: 'tip', style: 'cursor:pointer;margin-bottom:8px' }, configured() ? 'Project: ' + c.url : 'Supabase project'), url, key)] : []),
+      email, pass, err, go);
+    return wrap;
+  }
+  async function resume() {
+    if (!session || !configured()) return false;
+    await token();
+    return afterSignIn();
+  }
+  return { SUPABASE_CONFIG, card, resume, active, mode: () => ls.get(LS_MODE), decorate, signOut, configured, isCloudHandle: h => !!(h && h.cloud), _S3: S3 };
+})();
 </script>
 <script>
 "use strict";
@@ -4927,7 +5137,7 @@ async function poll() {
 }
 
 /* ============================== filtering ============================== */
-const APP = { title: "Team Dashboard - JK's Operations", version: "3.8.0", released: "22 Sep 2026" };
+const APP = { title: "Team Dashboard - JK's Operations", version: "3.9.0", released: "23 Sep 2026" };
 const BASE_DIMS = { status: "status_column", desig: "designation_column", client: "client_column", mode: "mode_column" };
 const STANDARD_STATUSES = ["Active", "Manager", "OJT", "Bench", "New", "Projected", "Left", "Moved"];
 const TILE_ORDER = ["Active", "Manager", "OJT", "Bench", "New", "Projected"];
@@ -6849,7 +7059,9 @@ async function createStarterFiles() {
 }
 function renderConnect(info={}) {
   const box=$('#connectBody');
-  if(!BE.supported()){box.replaceChildren(h('p',{class:'err'},'Open this HTML in Microsoft Edge or Google Chrome to edit your Excel files.'));return;}
+  const cloudCard=CLOUD.card(info);
+  if(!BE.supported()){box.replaceChildren(cloudCard,h('p',{class:'tip'},'To use Excel files on this computer instead, open this HTML in Microsoft Edge or Google Chrome.'));return;}
+  const localTitle=h('p',{class:'lbl cloud-or'},'Or use Excel files on this computer');
   const card=(role,title)=>h('div',{class:'connection-card'},h('div',{class:'lbl'},title),
     h('div',{style:'display:flex;gap:12px;align-items:center;flex-wrap:wrap'},
       h('button',{class:'btn',onclick:()=>chooseWorkbookRole(role)},fileChoices[role]?'Change file':'Select '+(role==='workforce'?'workforce':'attendance')+' file'),
@@ -6870,7 +7082,7 @@ function renderConnect(info={}) {
       ? 'Choose a folder and the dashboard creates a blank workforce file ('+STARTER_NAMES.workforce+') and a blank attendance file ('+STARTER_NAMES.attendance+') in it, then opens. Everything you add is saved into those files.'
       : 'Choose a folder and the dashboard creates a blank '+missing[0]+' file ('+STARTER_NAMES[missing[0]]+') there and opens it with your '+(missing[0]==='workforce'?'attendance':'workforce')+' file.'),
     h('button',{class:missing.length===2?'btn primary':'btn',onclick:createStarterFiles},'Choose folder and create '+(missing.length===2?'files':'the file'))) : null;
-  box.replaceChildren(card('workforce','01 · Workforce / employees'),card('attendance','02 · Attendance'),...[fresh,info.note ? h('p',{class:'tip',role:'status'},info.note) : null].filter(Boolean),
+  box.replaceChildren(cloudCard,localTitle,card('workforce','01 · Workforce / employees'),card('attendance','02 · Attendance'),...[fresh,info.note ? h('p',{class:'tip',role:'status'},info.note) : null].filter(Boolean),
     h('p',{class:'err',role:'alert'},info.error || ''),open,h('button',{class:'btn ghost',onclick:doPick},'Or select both together'),
     ...[reconnect].filter(Boolean),
     h('p',{class:'tip'},'Select files one at a time from any location. Your selections are remembered on this browser, including after refresh. Allow editing when asked.'),
@@ -6975,6 +7187,10 @@ document.addEventListener("visibilitychange", () => { if (!document.hidden) poll
   $('#connect').hidden=false; $('#app').hidden=true;
   $('#connectBody').replaceChildren(h('p',{class:'tip',role:'status'},'Restoring your saved workbooks…'));
   try {
+    if(CLOUD.mode()==='cloud'){
+      try{ if(!(await CLOUD.resume()))showConnect({}); return; }
+      catch(e){showConnect({error:e.message});return;}
+    }
     if(!BE.supported()){showConnect({});return;}
     const saved=await BE.restore();
     if(saved?.choices)Object.assign(fileChoices,saved.choices);
