@@ -8,10 +8,7 @@ Open `index.html` in a browser.
 
 **A. Passcode sign-in with Supabase (recommended for teams).** The workbook lives in your Supabase database. Everyone signs in with their own passcode, and one admin passcode manages all the others. Works in any modern browser. Set it up once with [supabase/README.md](supabase/README.md).
 
-**B. An Excel workbook on this computer.** Requires Edge or Chrome on a computer. On the start screen, either:
-- **Select workbook** for one Excel file that holds both a workforce sheet and an **Attendance Tracker** sheet, or
-- select two separate files (workforce and attendance), or
-- click **Choose folder and create the workbook** to start with a blank `Team Dashboard.xlsx`.
+**B. An Excel workbook on this computer.** Requires Edge or Chrome on a computer. On the start screen, click **Open an Excel file instead**, then **Choose workbook** (one Excel file with a workforce sheet and an **Attendance Tracker** sheet), or **Start with a blank workbook**.
 
 ## Features
 
@@ -23,7 +20,7 @@ Open `index.html` in a browser.
 
 ## The workbook
 
-One Excel workbook with two sheets. Two separate files also still work when using local files.
+One Excel workbook with a workforce sheet and an Attendance Tracker sheet. The dashboard adds a third sheet, **Activity Log**, with every change from the past 30 days (newest first).
 
 **Workforce sheet.** Any sheet name except "Attendance Tracker", with a header row. Column names the dashboard recognises:
 
@@ -52,7 +49,8 @@ The dashboard edits only the sheet data it needs. Styles, pivots, other sheets a
 **Best option: Supabase with passcodes.** See [supabase/README.md](supabase/README.md). Everyone signs in with their own passcode and works on the same online workbook:
 - If two people save at the same moment, the second save is refused, so nobody silently overwrites anyone.
 - The first save each day keeps a backup for 30 days.
-- The admin manages all passcodes from inside the dashboard.
+- The admin manages passcodes, each person's rights and the mandatory fields in **Settings**.
+- If someone else saved attendance first, you choose: overwrite with your changes, load theirs, or decide later.
 
 **Alternative: OneDrive-synced files.** The page can only open files that exist on the computer, so each person needs the workbooks synced locally:
 
@@ -64,6 +62,20 @@ With OneDrive this is not live co-editing:
 
 - Close the workbook in Excel desktop while anyone is using the dashboard. Whichever program saves last wins, and OneDrive may create a conflict copy.
 - It works best when one person updates at a time.
+
+## Settings
+
+Click **Settings** in the left menu.
+
+| Section | Who sees it | What it does |
+|---|---|---|
+| People & access | Admin (online) | Passcodes, roles, an optional linked employee, and each person's rights: pages, employee editing, Who's out, grid, log leave, leave approval, holidays, activity, tools, download |
+| Mandatory fields | Admin | Which fields Action items checks for Active, New and OJT people, and the people who need no client |
+| Save & sync | Everyone | File status, Start/Stop auto-sync, Save now, Undo |
+| Activity log | Admin, or with the right | The Activity Log sheet: past 30 days, filter by area, search |
+| Workbook & backups | Admin, or with the download right | Download, replace, daily backups, sign-ins and saves |
+| Tools | With the right | Approximate distance from the office |
+| Preferences | Everyone | Theme, your name (local files) or Sign out |
 
 ## Customising
 
