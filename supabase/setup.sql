@@ -9,7 +9,14 @@
 --   * The workbook is stored inside the database (table td_files). Nobody can read any
 --     td_ table directly: every request goes through the functions below, which check
 --     the passcode session first.
---   * Saves are refused if someone else saved since you loaded (no silent overwrites).
+--   * Saves are refused if someone else saved since you loaded (no silent overwrites), unless the person
+--     confirms "Overwrite" in the dashboard: then the save is forced (p_force) and still backed up first.
+--   * Each passcode has its own rights (pages it can open, what it can change, who approves leave).
+--     The admin sets them in Settings > People & access. Admins always have every right.
+--   * Team-wide settings (for example which fields are mandatory) live in td_settings.
+--
+-- Upgrading from 3.10: just run this whole file again. Existing passcodes keep working and keep full
+-- (non-admin) rights until you change them in Settings.
 --   * The first save of each day keeps a backup copy for 30 days (table td_file_backups).
 -- =====================================================================
 
@@ -24,6 +31,13 @@ create table if not exists public.td_users (
   active      boolean not null default true,
   created_at  timestamptz not null default now(),
   last_login  timestamptz
+);
+alter table public.td_users add column if not exists permissions jsonb not null default '{}'::jsonb;
+create table if not exists public.td_settings (
+  key         text primary key,
+  value       jsonb not null,
+  updated_at  timestamptz not null default now(),
+  updated_by  text
 );
 create table if not exists public.td_sessions (
   token       text primary key,
@@ -67,7 +81,7 @@ create table if not exists public.td_save_log (
 
 -- Lock every table: no direct access for the public API keys. Only the functions below can touch them.
 do $$ declare t text; begin
-  foreach t in array array['td_users','td_sessions','td_files','td_file_backups','td_login_log','td_save_log'] loop
+  foreach t in array array['td_users','td_sessions','td_files','td_file_backups','td_login_log','td_save_log','td_settings'] loop
     execute format('alter table public.%I enable row level security', t);
     execute format('revoke all on public.%I from anon, authenticated', t);
   end loop;
@@ -102,6 +116,19 @@ begin
   return u;
 end $$;
 
+-- A right is on when the admin ticked it. Passcodes created before 3.11 (no "_v" key) keep full user rights.
+create or replace function public.td_can(u public.td_users, p_right text) returns boolean
+language sql stable as $$
+  select u.role = 'admin'
+      or coalesce(u.permissions ->> '_v', '') = ''
+      or coalesce((u.permissions ->> p_right)::boolean, false)
+$$;
+create or replace function public.td_can_write(u public.td_users) returns boolean
+language sql stable as $$
+  select public.td_can(u, 'emp.edit') or public.td_can(u, 'emp.add') or public.td_can(u, 'emp.delete') or public.td_can(u, 'emp.bulk')
+      or public.td_can(u, 'att.edit') or public.td_can(u, 'att.approve') or public.td_can(u, 'att.holidays')
+$$;
+
 -- ---------- sign in / out ----------
 create or replace function public.td_login(p_passcode text) returns json
 language plpgsql security definer set search_path = public, extensions as $$
@@ -124,7 +151,8 @@ begin
   insert into public.td_sessions (token, user_id, expires_at) values (v_tok, u.id, now() + interval '12 hours');
   update public.td_users set last_login = now() where id = u.id;
   insert into public.td_login_log (user_id, name, ok, ip) values (u.id, u.name, true, v_ip);
-  return json_build_object('token', v_tok, 'name', u.name, 'role', u.role, 'user_id', u.id);
+  delete from public.td_login_log where at < now() - interval '30 days';
+  return json_build_object('token', v_tok, 'name', u.name, 'role', u.role, 'user_id', u.id, 'permissions', u.permissions);
 end $$;
 
 create or replace function public.td_logout(p_token text) returns void
@@ -137,7 +165,24 @@ language plpgsql security definer set search_path = public as $$
 declare u public.td_users;
 begin
   u := public.td_session_user(p_token);
-  return json_build_object('name', u.name, 'role', u.role, 'user_id', u.id);
+  return json_build_object('name', u.name, 'role', u.role, 'user_id', u.id, 'permissions', u.permissions);
+end $$;
+
+-- ---------- team settings ----------
+create or replace function public.td_get_settings(p_token text) returns json
+language plpgsql security definer set search_path = public as $$
+begin
+  perform public.td_session_user(p_token);
+  return coalesce((select json_object_agg(key, value) from public.td_settings), '{}'::json);
+end $$;
+
+create or replace function public.td_admin_set_setting(p_token text, p_key text, p_value jsonb) returns void
+language plpgsql security definer set search_path = public as $$
+declare me public.td_users;
+begin
+  me := public.td_require_admin(p_token);
+  insert into public.td_settings (key, value, updated_at, updated_by) values (p_key, p_value, now(), me.name)
+  on conflict (key) do update set value = excluded.value, updated_at = now(), updated_by = me.name;
 end $$;
 
 -- ---------- the workbook ----------
@@ -162,13 +207,16 @@ begin
                            'size', f.size, 'updated_at', f.updated_at, 'updated_by', f.updated_by);
 end $$;
 
--- p_base_version: the version you loaded (0 when creating the file). Raises CONFLICT if it moved on.
-create or replace function public.td_put_file(p_token text, p_name text, p_data text, p_base_version integer) returns json
+-- p_base_version: the version you loaded (0 when creating the file). Raises CONFLICT if it moved on,
+-- unless p_force is true (the person saw the conflict and chose Overwrite). A backup is kept either way.
+drop function if exists public.td_put_file(text, text, text, integer);
+create or replace function public.td_put_file(p_token text, p_name text, p_data text, p_base_version integer, p_force boolean default false) returns json
 language plpgsql security definer set search_path = public as $$
 declare u public.td_users; bytes bytea := decode(p_data, 'base64'); cur public.td_files; newv integer;
 begin
   u := public.td_session_user(p_token);
-  if coalesce(p_base_version, 0) = 0 then
+  if not public.td_can_write(u) then raise exception 'READ_ONLY'; end if;
+  if coalesce(p_base_version, 0) = 0 and not coalesce(p_force, false) then
     if u.role <> 'admin' then raise exception 'ADMIN_ONLY'; end if;   -- only the admin sets up the workbook
     insert into public.td_files (name, data, version, size, updated_by)
     values (p_name, bytes, 1, length(bytes), u.name)
@@ -177,7 +225,8 @@ begin
     newv := 1;
   else
     select * into cur from public.td_files where name = p_name for update;
-    if not found or cur.version <> p_base_version then raise exception 'CONFLICT'; end if;
+    if not found then raise exception 'FILE_NOT_FOUND'; end if;
+    if cur.version <> p_base_version and not coalesce(p_force, false) then raise exception 'CONFLICT'; end if;
     insert into public.td_file_backups (name, day, version, data)
     values (p_name, current_date, cur.version, cur.data)
     on conflict (name, day) do nothing;                       -- first save of the day keeps yesterday's state
@@ -186,6 +235,7 @@ begin
     where name = p_name returning version into newv;
   end if;
   insert into public.td_save_log (file, version, size, saved_by) values (p_name, newv, length(bytes), u.name);
+  delete from public.td_save_log where at < now() - interval '30 days';
   return json_build_object('version', newv, 'updated_at', now());
 end $$;
 
@@ -195,11 +245,12 @@ language plpgsql security definer set search_path = public as $$
 begin
   perform public.td_require_admin(p_token);
   return coalesce((select json_agg(json_build_object('id', id, 'name', name, 'passcode', passcode, 'role', role,
-           'active', active, 'last_login', last_login, 'created_at', created_at) order by role, name)
+           'active', active, 'last_login', last_login, 'created_at', created_at, 'permissions', permissions) order by role, name)
          from public.td_users), '[]'::json);
 end $$;
 
-create or replace function public.td_admin_save_user(p_token text, p_id bigint, p_name text, p_passcode text, p_role text, p_active boolean) returns json
+drop function if exists public.td_admin_save_user(text, bigint, text, text, text, boolean);
+create or replace function public.td_admin_save_user(p_token text, p_id bigint, p_name text, p_passcode text, p_role text, p_active boolean, p_permissions jsonb default null) returns json
 language plpgsql security definer set search_path = public as $$
 declare me public.td_users; old public.td_users; pc text := trim(p_passcode); rid bigint; admins int;
 begin
@@ -209,7 +260,7 @@ begin
   if p_role not in ('admin', 'user') then raise exception 'BAD_ROLE'; end if;
   if exists (select 1 from public.td_users where passcode = pc and id is distinct from p_id) then raise exception 'PASSCODE_TAKEN'; end if;
   if p_id is null then
-    insert into public.td_users (name, passcode, role, active) values (trim(p_name), pc, p_role, coalesce(p_active, true)) returning id into rid;
+    insert into public.td_users (name, passcode, role, active, permissions) values (trim(p_name), pc, p_role, coalesce(p_active, true), coalesce(p_permissions, '{}'::jsonb)) returning id into rid;
   else
     select * into old from public.td_users where id = p_id;
     if not found then raise exception 'USER_NOT_FOUND'; end if;
@@ -217,7 +268,8 @@ begin
       select count(*) into admins from public.td_users where role = 'admin' and active and id <> p_id;
       if admins = 0 then raise exception 'LAST_ADMIN'; end if;
     end if;
-    update public.td_users set name = trim(p_name), passcode = pc, role = p_role, active = coalesce(p_active, true) where id = p_id;
+    update public.td_users set name = trim(p_name), passcode = pc, role = p_role, active = coalesce(p_active, true),
+      permissions = coalesce(p_permissions, old.permissions) where id = p_id;
     if old.passcode <> pc or not coalesce(p_active, true) or old.role <> p_role then
       delete from public.td_sessions where user_id = p_id and token <> p_token;   -- changed passcode signs them out elsewhere
     end if;
@@ -265,12 +317,14 @@ end $$;
 -- ---------- who may call what ----------
 do $$ declare f text; begin
   foreach f in array array[
-    'td_client_ip()', 'td_session_user(text)', 'td_require_admin(text)'] loop
+    'td_client_ip()', 'td_session_user(text)', 'td_require_admin(text)',
+    'td_can(public.td_users, text)', 'td_can_write(public.td_users)'] loop
     execute format('revoke all on function public.%s from public, anon, authenticated', f);
   end loop;
   foreach f in array array[
     'td_login(text)', 'td_logout(text)', 'td_me(text)', 'td_file_info(text, text)', 'td_get_file(text, text)',
-    'td_put_file(text, text, text, integer)', 'td_admin_list_users(text)', 'td_admin_save_user(text, bigint, text, text, text, boolean)',
+    'td_put_file(text, text, text, integer, boolean)', 'td_admin_list_users(text)', 'td_admin_save_user(text, bigint, text, text, text, boolean, jsonb)',
+    'td_get_settings(text)', 'td_admin_set_setting(text, text, jsonb)',
     'td_admin_delete_user(text, bigint)', 'td_admin_history(text)', 'td_admin_get_backup(text, text, date)'] loop
     execute format('revoke all on function public.%s from public', f);
     execute format('grant execute on function public.%s to anon, authenticated', f);

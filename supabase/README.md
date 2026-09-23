@@ -2,8 +2,10 @@
 
 The team's workbook is stored in your Supabase database. People sign in with a **passcode** only.
 
-- **Admin passcode:** opens the dashboard with admin rights. The admin can manage everyone's passcodes, see sign-in and save history, download daily backups, and replace the workbook.
-- **User passcodes:** open the dashboard to view and edit the data. Users can't see or change passcodes.
+- **Admin passcode:** opens the dashboard with every right. The admin manages passcodes and rights in **Settings**, sees sign-in and save history, downloads daily backups, and replaces the workbook.
+- **User passcodes:** open the dashboard with the rights the admin ticked for them (pages, editing, leave approval, and so on). Users can't see or change passcodes.
+
+**Upgrading from 3.10:** run the whole `setup.sql` again in the SQL Editor. It's safe to rerun: passcodes, the workbook and backups are kept, and existing passcodes keep full user rights until you change them.
 
 ## One-time setup (admin)
 
@@ -16,25 +18,26 @@ The team's workbook is stored in your Supabase database. People sign in with a *
    1. Open `index.html` and sign in with the admin passcode.
    2. Click **Upload my workbook** and choose your Excel file. It needs a workforce sheet and a sheet named **Attendance Tracker**.
    3. Or click **Create a blank workbook** to start fresh.
-7. **Add your team.** In the sidebar, click **Manage passcodes**, then add each person with a name and passcode. **New** suggests a random 6-digit code. Give each person their own passcode.
+7. **Add your team.** Click **Settings** > **People & access** > **Add person**. Enter a name, keep or change the suggested passcode, pick what they can do (or start from a preset: Full access, Editor, Leave approver, View only), and click **Add person**.
 
-## Managing passcodes (admin only)
+## People & access (admin only)
 
-In the sidebar, click **Manage passcodes**:
+In **Settings** > **People & access**, pick a person on the left:
 
 | Task | How |
 |---|---|
-| See passcodes | **Show** reveals one; **Show all passcodes** reveals every one |
-| Add a person | Fill in name, role (User or Admin) and passcode, then **Add person** |
-| Change a passcode or name | **Edit**, change it, **Save**. The old passcode stops working immediately and that person is signed out. |
-| Change your own admin passcode | **Edit** on your own row |
-| Stop someone signing in | **Disable** (reversible with **Enable**) or **Delete** |
+| See a passcode | **Show** next to it |
+| Add a person | **Add person**, fill in the form, **Add person** |
+| Change a passcode or name | Change it, **Save changes**. The old passcode stops working immediately and that person is signed out. |
+| Change what someone can do | Tick or untick rights (or click a preset), **Save changes**. It applies within a minute. |
+| Let someone approve leave | Tick **Approve or reject leave**. Others can only mark LA. |
+| Stop someone signing in | Untick **Can sign in**, or **Delete** (click twice) |
 
 Rules the database enforces:
 - Passcodes need at least 4 characters and must all be different.
 - There must always be at least one active admin, and you can't delete yourself.
 
-The panel also shows recent sign-ins (including wrong-passcode attempts), recent saves, and the daily backups.
+**Settings** > **Workbook & backups** shows recent sign-ins (including wrong-passcode attempts), recent saves, and the daily backups.
 
 ## Security notes
 
@@ -47,8 +50,9 @@ The panel also shows recent sign-ins (including wrong-passcode attempts), recent
 ## How saving works
 
 - **One workbook, both sheets.** Employee changes and attendance changes are saved into the same workbook.
-- **Simultaneous saves are caught.** If two people save at the same moment, the database accepts the first and refuses the second with a message, so nobody silently overwrites anyone. The dashboard reloads the latest version.
-- **Daily backups.** The first save of each day keeps a backup of the previous version for 30 days. The admin can download any backup from **Manage passcodes** → **Daily backups**, and restore it with **Replace workbook…**.
+- **Simultaneous saves are caught.** If two people change different records at the same moment, the second save is applied on top of the first automatically. If someone else saved attendance after you opened it, you are asked once: **Overwrite with my changes**, **Load latest**, or **Not now** (auto-sync stops until you decide). Nothing is overwritten without asking.
+- **Activity Log sheet.** Every change is written into the workbook's Activity Log sheet, and only the past 30 days are kept.
+- **Daily backups.** The first save of each day keeps a backup of the previous version for 30 days. The admin can download any backup from **Settings** → **Workbook & backups**, and restore it with **Replace workbook…**.
 - **Download a copy anytime.** Admins can use **Download current workbook** to get the file for Excel.
 
 ## Forgot the admin passcode?

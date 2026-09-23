@@ -1,5 +1,45 @@
 # Changelog
 
+## 3.11.0 (23 Sep 2026)
+
+### Settings (replaces "Manage passcodes")
+- One **Settings** button in the header, with sections: People & access, Mandatory fields, Save & sync, Activity log, Workbook & backups, Tools and Preferences.
+- Save & sync, Tools, Activity, Theme, "Set your name" and "Linked files" moved into Settings. The header now shows only All employees, Start/Stop auto-sync and Settings.
+- Admin-only sections appear only for the admin passcode.
+
+### Rights per person
+- For each passcode the admin ticks which pages it can open (Overview, Employees, Attendance, Action center, Reports) and what it can change: edit, add or delete employees, fill in bulk, mark attendance, **approve or reject leave**, mark holidays for everyone, see the activity log, use the distance tool, download the workbook.
+- Presets: Full access, Editor, Leave approver, View only.
+- Without "Approve leave", people can mark LA (leave applied) but not AL, CL, SL or RJ.
+- Admins always have every right. Passcodes created before 3.11 keep full user rights until changed.
+- The database refuses saves from passcodes with no editing right.
+
+### Mandatory fields
+- The admin chooses which fields Action items checks. Phone is no longer mandatory by default.
+
+### Activity log in the workbook
+- Every change is written to an **Activity Log** sheet in the same workbook (newest first). Entries older than 30 days are removed automatically.
+- The "Choose a folder" text-file option is removed. Activity kept only in a browser by earlier versions is not moved into the sheet.
+
+### Saving and conflicts
+- **Start / Stop auto-sync** button in the header. (The old Auto-save toggle could not actually be switched off.)
+- When someone else saved attendance first, you are asked once: Overwrite with my changes, Load latest, or Not now (stops auto-sync). No more repeating errors.
+- An overwrite is forced through in Supabase and still keeps the daily backup.
+- Saves to different records at the same moment are merged automatically.
+- Employee edits: if someone else saved the same person first, choose Overwrite or Load theirs.
+- Online requests time out instead of leaving the dashboard on "Saving…".
+
+### Start screen and Overview
+- Minimal sign-in: passcode and Sign in only.
+- On this computer, one workbook with both sheets. The two-file option is removed.
+- The Action center summary is removed from the Overview.
+
+### Fixes
+- Workbooks saved without a shared-strings part (by some tools) no longer end up with unreadable names in the Attendance Tracker after a save.
+
+### Upgrading
+- Run `supabase/setup.sql` again in the SQL Editor (safe to rerun; passcodes and the workbook are kept).
+
 ## 3.10.3 (23 Sep 2026)
 - The Supabase project URL and anon key are built in: the start screen asks only for the passcode, on every computer.
 
@@ -71,3 +111,13 @@
 
 ## 3.7.7.2
 - Baseline version.
+
+## Fix: recovery/save loop and sign-out (2026-09-23)
+
+- Recover attendance edits only when loading a file, never after a successful save or discard.
+- Clear recovery data after saving and serialize recovery writes so an older write cannot recreate a cleared draft.
+- Allow sign-out with a confirmed browser recovery copy; offline logout times out after three seconds.
+- Remove the shared OneDrive folder section and stop starting its watcher.
+- Refresh the open Save & sync panel as save state changes and display save errors.
+
+Validation: all nine inline scripts parse; isolated regression checks cover successful and failed saves, no repeat auto-save, recovery on load, ordered recovery clearing, offline sign-out, cancelled sign-out, and removed shared-folder UI. Live Supabase and real Excel file writes were not exercised.
