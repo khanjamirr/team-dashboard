@@ -4,7 +4,7 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <link rel="icon" href="data:,">
-<title>Team Dashboard - JK's Operations · 3.9.0</title>
+<title>Team Dashboard - JK's Operations · 3.10.3</title>
 <style>
 :root {
   color-scheme: light;
@@ -703,6 +703,16 @@ header.top .spacer { display:block; }
 .login-card { box-shadow:0 24px 80px #17386118; padding:36px; border-radius:24px; }
 .login-card h1 { font-size:28px; letter-spacing:-1px; margin-bottom:16px; }
 .connection-card.cloud-card { border-color:color-mix(in srgb,var(--accent) 45%,var(--border)); background:var(--surface); }
+.cloud-links { display:flex; flex-wrap:wrap; gap:4px 14px; margin:4px 0 8px 14px; font-size:12px; } .cloud-links .linkbtn { white-space:nowrap; }
+dialog.td-admin { width:min(980px,94vw); max-height:88vh; border:1px solid var(--border); border-radius:14px; padding:20px 22px; background:var(--surface); color:var(--ink); box-shadow:0 20px 60px rgba(0,0,0,.25); }
+dialog.td-admin::backdrop { background:rgba(15,23,42,.45); }
+.td-admin-head { display:flex; align-items:center; gap:12px; } .td-admin-head h2 { margin:0; font-size:18px; } .td-admin-head .grow { flex:1; }
+.td-admin table td.acts { white-space:nowrap; text-align:right; } .td-admin table td .btn + .btn { margin-left:6px; }
+.td-admin table tr.off td { opacity:.55; } .td-admin table tr.add td { background:var(--surface-2); }
+.td-admin .code { font-family:ui-monospace,Consolas,monospace; letter-spacing:.08em; }
+.td-admin .input.mini { height:28px; min-width:0; width:100%; max-width:180px; }
+.td-admin-grid { display:grid; grid-template-columns:repeat(auto-fit,minmax(240px,1fr)); gap:18px; margin-top:18px; }
+.td-admin-grid h3 { font-size:13px; margin:0 0 6px; } .td-hist { list-style:none; margin:0; padding:0; font-size:12px; max-height:200px; overflow:auto; } .td-hist li { padding:4px 0; border-bottom:1px solid var(--border); } .td-hist .bad { color:var(--c-red,#c0392b); font-weight:600; }
 .cloud-row { display:flex; align-items:center; gap:8px; flex-wrap:wrap; padding:8px 0; border-top:1px solid var(--border); }
 .cloud-or { margin:18px 0 0; font-size:12px; color:var(--ink-2); }
 .connection-card.starter-card { border-style:dashed; background:var(--surface); }
@@ -985,13 +995,13 @@ table.data td { padding:9px 10px; font-size:12px; }
 
 <section id="connect" hidden>
   <div class="login-card" style="width:min(720px,100%)">
-    <h1>Team Dashboard - JK's Operations <span class="ver">3.9.0</span></h1>
-    <p>Open this single HTML file in Edge or Chrome. Select the workforce and attendance workbooks separately, then manage your team with automatic saves. No launcher or installation needed.</p><div class="setup-steps"><span>01 · Workforce file</span><span>02 · Attendance file</span><span>03 · Stay in sync</span></div>
+    <h1>Team Dashboard - JK's Operations <span class="ver">3.10.3</span></h1>
+    <p>Sign in with your passcode to open your team’s workbook: one Excel file with a workforce sheet and an Attendance Tracker sheet. Every change saves automatically. No installation needed.</p><div class="setup-steps"><span>01 · Enter your passcode</span><span>02 · Work on the same data</span><span>03 · Saves automatically</span></div>
     <div id="connectBody"><div class="empty">Loading…</div></div>
   </div>
 </section>
 
-<div id="app" hidden><aside class="sidebar" aria-label="Workspace navigation"><div class="brand dashboard-identity">      <h1><span id="title">Team Dashboard - JK's Operations</span><span class="ver" id="ver" title="Version 3.9.0">3.9.0</span></h1>      <span class="sync" id="sync" role="status"><i></i><span id="syncText">Loading…</span></span></div><div class="nav-label">WORKSPACE</div>      <nav class="tabs" role="tablist" aria-label="Pages" aria-orientation="vertical">
+<div id="app" hidden><aside class="sidebar" aria-label="Workspace navigation"><div class="brand dashboard-identity">      <h1><span id="title">Team Dashboard - JK's Operations</span><span class="ver" id="ver" title="Version 3.10.3">3.10.3</span></h1>      <span class="sync" id="sync" role="status"><i></i><span id="syncText">Loading…</span></span></div><div class="nav-label">WORKSPACE</div>      <nav class="tabs" role="tablist" aria-label="Pages" aria-orientation="vertical">
         <button class="tab on" role="tab" aria-controls="pageSummary" data-view="summary" aria-selected="true">Overview</button>
         <button class="tab" role="tab" aria-controls="pageEmployees" data-view="employees" aria-selected="false">Employees</button>
       <button class="tab" role="tab" aria-controls="pageAttendance" data-view="attendance" aria-selected="false">Attendance</button>
@@ -1286,7 +1296,7 @@ async function openBook(u8, sheetPref) {
     name: s.getAttribute("name"), state: s.getAttribute("state") || "visible",
     path: resolvePath("xl/workbook.xml", relMap[s.getAttributeNS(NS_REL, "id")]),
   }));
-  const sheet = sheets.find(s => s.name === sheetPref) || sheets.find(s => s.state === "visible") || sheets[0];
+  const sheet = sheets.find(s => s.name === sheetPref) || sheets.find(s => s.state === "visible" && s.name !== "Attendance Tracker") || sheets.find(s => s.name !== "Attendance Tracker") || sheets.find(s => s.state === "visible") || sheets[0];
   if (!sheet) throw new ApiErr(400, "The workbook has no sheets.");
   const sheetBytes = await zip.get(sheet.path);
   if (!sheetBytes) throw new ApiErr(400, "Couldn't find the worksheet inside the workbook.");
@@ -1970,13 +1980,13 @@ return {
     const choices=draft?.choices || (stored?.handles?.length===2 ? {
       workforce:stored.handles.find(h=>h.name===stored.file) || null,
       attendance:stored.handles.find(h=>h.name!==stored.file) || null
-    } : null);
+    } : stored?.handles?.length===1 ? { workforce:stored.handles[0], attendance:stored.handles[0], single:true } : null);
     if(!choices || (!choices.workforce && !choices.attendance))return null;
-    const handles=[choices.workforce,choices.attendance].filter(Boolean);
+    const handles=[...new Set([choices.workforce,choices.attendance].filter(Boolean))];
     const complete=!!choices.workforce && !!choices.attendance;
     if(complete){
       let pairId=stored?.pairId;
-      const same=stored?.handles?.length===2 && (await Promise.all(handles.map(async h=>{
+      const same=stored?.handles?.length===handles.length && (await Promise.all(handles.map(async h=>{
         try{return (await Promise.all(stored.handles.map(p=>h.isSameEntry(p)))).some(Boolean);}catch{return false;}
       }))).every(Boolean);
       if(!same || !pairId)pairId=crypto.randomUUID();
@@ -1993,11 +2003,13 @@ return {
   },
   handles: () => Conn.handles.slice(),
   async linkPair(handles, workforceName) {
-    if(handles.length!==2 || !handles.some(h=>h.name===workforceName))throw new Error('Select workforce and attendance files first.');
-    if(handles[0].name===handles[1].name || await handles[0].isSameEntry(handles[1]))throw new Error('Choose two distinct workbooks with different names.');
+    /* v3.10: one workbook holding both sheets is linked as a single handle */
+    if(handles.length===2 && (handles[0]===handles[1] || await handles[0].isSameEntry(handles[1])))handles=[handles[0]];
+    if(!handles.length || handles.length>2 || !handles.some(h=>h.name===workforceName))throw new Error('Select workforce and attendance files first.');
+    if(handles.length===2 && handles[0].name===handles[1].name)throw new Error('Choose two distinct workbooks with different names.');
     for(const handle of handles)if(await handle.requestPermission({mode:'readwrite'})!=='granted')throw new Error('Allow editing both workbooks.');
     const prior=await kvGet('conn-v35');let pairId=crypto.randomUUID();
-    if(prior?.handles?.length===2 && (await Promise.all(handles.map(async h=>(await Promise.all(prior.handles.map(p=>h.isSameEntry(p)))).some(Boolean)))).every(Boolean))pairId=prior.pairId;
+    if(prior?.handles?.length===handles.length && (await Promise.all(handles.map(async h=>(await Promise.all(prior.handles.map(p=>h.isSameEntry(p)))).some(Boolean)))).every(Boolean))pairId=prior.pairId;
     const previous={...Conn};
     Conn.handles=handles.slice();Conn.pairId=pairId;Conn.dir=selectedDirectory(handles);Conn.fileName=workforceName;Conn.cache=null;
     try{await saveConn();await kvSet("selection-v372",null);}catch(e){Object.assign(Conn,previous);throw e;}
@@ -2010,6 +2022,7 @@ return {
   async useWorkbook(name) { Conn.fileName = name; Conn.cache = null; await saveConn(); },
   _internals: { Zip, openBook, buildSchema, crc32 },
   /* v3.9: Supabase cloud files behave like picked files, but are never stored as browser file handles */
+  single: () => Conn.handles.length === 1,
   useCloud(handles, workforceName, pairId) { const d = selectedDirectory(handles); d.name = 'Supabase'; Conn.handles = handles.slice(); Conn.pairId = pairId; Conn.dir = d; Conn.fileName = workforceName; Conn.cache = null; },
 };
 })();
@@ -2017,206 +2030,257 @@ return {
 </script>
 <script>
 /* =====================================================================
-   SUPABASE CLOUD MODE (v3.9)
-   The two workbooks live in a private Supabase Storage bucket instead of on this computer.
-   Everyone signs in with their own email + password; the dashboard downloads the .xlsx,
-   edits it exactly as it does locally, and uploads it back. Works in any modern browser.
-   - Optimistic locking: a save is refused if someone else saved the file since you last loaded it.
-   - Daily cloud backup: the first save of each day copies the previous version to backups/YYYY-MM-DD/.
-   - Save log: every upload is recorded in the save_log table (who, which file, when).
-   Fill in SUPABASE_CONFIG below, or type the project URL and anon key on the sign-in screen.
+   SUPABASE · PASSCODE SIGN-IN (v3.10)
+   One workbook (a workforce sheet + an "Attendance Tracker" sheet) is stored in your Supabase database.
+   People sign in with a passcode only. The admin passcode opens the dashboard with admin rights:
+   manage everyone's passcodes, see sign-in / save history, download daily backups, replace the workbook.
+   All checks happen in the database functions from supabase/setup.sql.
    ===================================================================== */
 const SUPABASE_CONFIG = {
-  url: '',                     // e.g. 'https://abcdefghijkl.supabase.co'
-  anonKey: '',                 // Project Settings → API → "anon public" key (safe to share; access is controlled by the policies in setup.sql)
-  bucket: 'team-dashboard',
-  workforceFile: 'Team Workforce.xlsx',
-  attendanceFile: 'Team Attendance.xlsx',
+  url: 'https://iiogwevtyzgedhoaqlrn.supabase.co',
+  anonKey: 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Imlpb2d3ZXZ0eXpnZWRob2FxbHJuIiwicm9sZSI6ImFub24iLCJpYXQiOjE3OTAxMzMwODIsImV4cCI6MjEwNTcwOTA4Mn0.jO3fZe8X8a9ZaxrZ8UVXQsUfNAz2fe4WqU07SWQPlqc',   // anon public key: safe to include; every action still needs a valid passcode
+  workbookFile: 'Team Dashboard.xlsx',
 };
 const CLOUD = (() => {
-  const LS_CFG = 'td-supabase-config', LS_SESSION = 'td-supabase-session', LS_MODE = 'td-mode', LS_BACKUP = 'td-supabase-backup-day';
+  const LS_CFG = 'td-supabase-config', LS_SESSION = 'td-pass-session', LS_MODE = 'td-mode';
   const XLSX_TYPE = 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet';
   const ls = { get(k) { try { return JSON.parse(localStorage.getItem(k) || 'null'); } catch { return null; } }, set(k, v) { try { v == null ? localStorage.removeItem(k) : localStorage.setItem(k, JSON.stringify(v)); } catch { } } };
-  const cfg = () => { const saved = ls.get(LS_CFG) || {}; const c = { ...SUPABASE_CONFIG }; for (const k of ['url', 'anonKey']) if (!c[k] && saved[k]) c[k] = saved[k]; c.url = String(c.url || '').trim().replace(/\/+$/, ''); c.anonKey = String(c.anonKey || '').trim(); return c; };
+  const cfg = () => { const saved = ls.get(LS_CFG) || {}, c = { ...SUPABASE_CONFIG }; for (const k of ['url', 'anonKey']) if (!c[k] && saved[k]) c[k] = saved[k]; c.anonKey = String(c.anonKey || '').trim(); c.url = fixUrl(c.url, c.anonKey).url; return c; };
   const configured = () => { const c = cfg(); return !!(c.url && c.anonKey); };
   const fromFile = () => !!(SUPABASE_CONFIG.url && SUPABASE_CONFIG.anonKey);
+  /* The anon key carries the project id ("ref"). Use it to fill in or correct the Project URL, so a typo can't break sign-in. */
+  function keyRef(key) { try { const p = String(key).split('.')[1].replace(/-/g, '+').replace(/_/g, '/'); return JSON.parse(atob(p + '==='.slice((p.length + 3) % 4))).ref || ''; } catch { return ''; } }
+  function fixUrl(url, key) {
+    url = String(url || '').trim().replace(/\/+$/, ''); const ref = keyRef(key);
+    if (url && !/^https?:\/\//i.test(url)) url = 'https://' + url;
+    if (!ref) return { url, note: '' };
+    const m = /^https?:\/\/([a-z0-9]+)\.supabase\.co$/i.exec(url);
+    if (!url) return { url: `https://${ref}.supabase.co`, note: '' };
+    if (m && m[1].toLowerCase() !== ref.toLowerCase()) return { url: `https://${ref}.supabase.co`, note: `The Project URL didn’t match your key, so it was corrected to https://${ref}.supabase.co.` };
+    return { url, note: '' };
+  }
   let session = ls.get(LS_SESSION);
-  const cloudErr = (status, message) => Object.assign(new Error(message), { cloud: true, status });
-  const enc = p => p.split('/').map(encodeURIComponent).join('/');
-
-  async function authRequest(grant, body) {
-    const c = cfg();
-    let res;
-    try { res = await fetch(`${c.url}/auth/v1/token?grant_type=${grant}`, { method: 'POST', headers: { apikey: c.anonKey, 'Content-Type': 'application/json' }, body: JSON.stringify(body) }); }
-    catch (e) { throw cloudErr(503, 'Could not reach Supabase. Check the project URL and your internet connection.'); }
-    const j = await res.json().catch(() => ({}));
-    if (!res.ok) throw cloudErr(401, j.error_description || j.msg || j.message || 'Sign-in failed.');
-    session = { access_token: j.access_token, refresh_token: j.refresh_token, expires_at: Date.now() + (j.expires_in || 3600) * 1000, email: (j.user && j.user.email) || body.email || (session && session.email) || '' };
-    ls.set(LS_SESSION, session); return session;
-  }
-  async function token(force) {
-    if (!session) throw cloudErr(401, 'Sign in to Supabase again.');
-    if (force || Date.now() > session.expires_at - 60000) {
-      try { await authRequest('refresh_token', { refresh_token: session.refresh_token }); }
-      catch (e) { if (e.status === 401) { session = null; ls.set(LS_SESSION, null); throw cloudErr(401, 'Your Supabase sign-in expired. Sign in again.'); } throw e; }
-    }
-    return session.access_token;
-  }
-  async function api(path, opts = {}, retried) {
-    const c = cfg(), t = await token();
-    let res;
-    try { res = await fetch(c.url + path, { cache: 'no-store', ...opts, headers: { apikey: c.anonKey, Authorization: 'Bearer ' + t, ...(opts.headers || {}) } }); }
-    catch (e) { throw cloudErr(503, 'Could not reach Supabase. Check your internet connection. Nothing was changed.'); }
-    if (res.status === 401 && !retried) { await token(true); return api(path, opts, true); }
-    return res;
-  }
-  async function failText(res) { const j = await res.json().catch(() => null); return (j && (j.message || j.error || j.msg)) || res.statusText || ('HTTP ' + res.status); }
-  const S3 = {
-    async info(name) {
-      const c = cfg(), slash = name.lastIndexOf('/'), prefix = slash >= 0 ? name.slice(0, slash) : '', base = name.slice(slash + 1);
-      const res = await api(`/storage/v1/object/list/${enc(c.bucket)}`, { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ prefix, search: base, limit: 100, offset: 0, sortBy: { column: 'name', order: 'asc' } }) });
-      if (res.status === 403) throw cloudErr(403, 'Your account is not allowed to use this dashboard. Ask the owner to add your email to dashboard_members.');
-      if (!res.ok) throw cloudErr(res.status, 'Supabase: ' + await failText(res));
-      const hit = (await res.json()).find(o => o.name === base && o.id);
-      if (!hit) return null;
-      const md = hit.metadata || {};
-      return { etag: md.eTag || md.etag || hit.updated_at, size: md.size ?? md.contentLength ?? 0, mtime: Date.parse(hit.updated_at || hit.created_at) || Date.now() };
-    },
-    async download(name) {
-      const res = await api(`/storage/v1/object/authenticated/${enc(cfg().bucket)}/${enc(name)}`);
-      if (!res.ok) throw cloudErr(res.status === 400 || res.status === 404 ? 404 : res.status, 'Could not download ' + name + ': ' + await failText(res));
-      return res.blob();
-    },
-    async upload(name, blob) {
-      const res = await api(`/storage/v1/object/${enc(cfg().bucket)}/${enc(name)}`, { method: 'POST', headers: { 'x-upsert': 'true', 'Content-Type': XLSX_TYPE, 'cache-control': 'no-cache' }, body: blob });
-      if (res.status === 403) throw cloudErr(403, 'Supabase refused the save: your account can read but not edit. Ask the owner to add your email to dashboard_members.');
-      if (!res.ok) throw cloudErr(res.status, 'Supabase refused the save: ' + await failText(res));
-    },
-    async copy(from, to) { const res = await api('/storage/v1/object/copy', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ bucketId: cfg().bucket, sourceKey: from, destinationKey: to }) }); return res.ok; },
-    log(file, size) { api('/rest/v1/save_log', { method: 'POST', headers: { 'Content-Type': 'application/json', Prefer: 'return=minimal' }, body: JSON.stringify({ file, size }) }).catch(() => { }); },
+  const MESSAGES = {
+    WRONG_PASSCODE: 'That passcode is not correct.',
+    TOO_MANY_ATTEMPTS: 'Too many wrong passcodes from this network. Wait 10 minutes and try again.',
+    SESSION_EXPIRED: 'Your session has ended. Enter your passcode again.',
+    ADMIN_ONLY: 'Only the admin can do that.',
+    CONFLICT: 'Someone else saved the workbook a moment ago, so your change was not saved. The latest version will load; please redo your change.',
+    PASSCODE_TAKEN: 'Someone else already has that passcode. Choose a different one.',
+    PASSCODE_TOO_SHORT: 'Passcodes need at least 4 characters.',
+    NAME_REQUIRED: 'Enter a name.',
+    LAST_ADMIN: 'There must always be at least one active admin.',
+    CANNOT_DELETE_SELF: 'You can’t delete the account you are signed in with.',
+    FILE_NOT_FOUND: 'The workbook is not in Supabase yet.',
+    USER_NOT_FOUND: 'That person no longer exists. Refresh the list.',
   };
-  async function dailyBackup(name, cur) {
-    if (!cur) return;
-    const day = new Date().toISOString().slice(0, 10), done = ls.get(LS_BACKUP) || {};
-    if (done[name] === day) return;
-    try { await S3.copy(name, `backups/${day}/${name}`); } catch { /* an existing backup for today is fine */ }
-    done[name] = day; ls.set(LS_BACKUP, done);
+  const cloudErr = (status, code, extra) => Object.assign(new Error(MESSAGES[code] || code), { cloud: true, status, code, ...extra });
+  async function rpc(fn, args) {
+    const c = cfg(); let res;
+    try { res = await fetch(`${c.url}/rest/v1/rpc/${fn}`, { method: 'POST', cache: 'no-store', headers: { apikey: c.anonKey, Authorization: 'Bearer ' + c.anonKey, 'Content-Type': 'application/json' }, body: JSON.stringify(args || {}) }); }
+    catch { throw cloudErr(503, `Could not reach Supabase at ${c.url}. Check that the Project URL is exactly as shown in Supabase (Project Settings → API) and that you are online. Nothing was changed.`); }
+    const text = await res.text(); let j = null; try { j = text ? JSON.parse(text) : null; } catch { }
+    if (!res.ok) {
+      const code = (j && j.message) || res.statusText;
+      if (res.status === 404 && /function|schema cache/i.test(code)) throw cloudErr(500, 'The Supabase database is not set up yet. Run supabase/setup.sql in the SQL Editor.');
+      if (res.status === 401) { if (!SUPABASE_CONFIG.anonKey) ls.set(LS_CFG, null); throw cloudErr(401, 'Supabase rejected the anon key. Paste the “anon public” key again from Supabase → Project Settings → API.', { badKey: true }); }
+      if (code === 'SESSION_EXPIRED') { dropSession(); throw cloudErr(401, code); }
+      throw cloudErr(code === 'CONFLICT' ? 409 : code === 'ADMIN_ONLY' ? 403 : res.status, code);
+    }
+    return j;
   }
-  /* A stand-in for a FileSystemFileHandle, so the rest of the dashboard can't tell the difference. */
+  const tok = () => { if (!session) throw cloudErr(401, 'SESSION_EXPIRED'); return session.token; };
+  function dropSession() { session = null; ls.set(LS_SESSION, null); }
+  const b64 = blob => new Promise((res, rej) => { const r = new FileReader(); r.onload = () => res(String(r.result).split(',')[1] || ''); r.onerror = () => rej(r.error); r.readAsDataURL(blob); });
+  const unb64 = s => { const bin = atob(s), u = new Uint8Array(bin.length); for (let i = 0; i < bin.length; i++) u[i] = bin.charCodeAt(i); return u; };
+
+  /* Behaves like a picked Excel file, so every dashboard feature works unchanged. The version number is the lock. */
   class CloudHandle {
-    constructor(name) { this.kind = 'file'; this.name = name; this.cloud = true; this._meta = null; this._metaAt = 0; this._file = null; this._etag = null; }
+    constructor(name) { this.kind = 'file'; this.name = name; this.cloud = true; this._meta = null; this._metaAt = 0; this._file = null; this._ver = 0; }
     async queryPermission() { return 'granted'; }
     async requestPermission() { return 'granted'; }
     async isSameEntry(o) { return o === this || !!(o && o.cloud && o.name === this.name); }
-    async meta(force) { if (!force && this._metaAt && Date.now() - this._metaAt < 4000) return this._meta; this._meta = await S3.info(this.name); this._metaAt = Date.now(); return this._meta; }
+    async meta(force) {
+      if (!force && this._metaAt && Date.now() - this._metaAt < 4000) return this._meta;
+      const m = await rpc('td_file_info', { p_token: tok(), p_name: this.name });
+      this._meta = m ? { version: m.version, size: m.size, mtime: Date.parse(m.updated_at) || Date.now(), by: m.updated_by } : null; this._metaAt = Date.now(); return this._meta;
+    }
     async getFile() {
-      const m = await this.meta(); if (!m) throw cloudErr(404, this.name + ' is not in the Supabase bucket any more.');
-      if (this._file && this._etag === m.etag) return this._file;
-      const blob = await S3.download(this.name);
-      this._file = new File([blob], this.name, { type: XLSX_TYPE, lastModified: m.mtime }); this._etag = m.etag; return this._file;
+      const m = await this.meta(); if (!m) throw cloudErr(404, 'FILE_NOT_FOUND');
+      if (this._file && this._ver === m.version) return this._file;
+      const g = await rpc('td_get_file', { p_token: tok(), p_name: this.name });
+      this._file = new File([unb64(g.data)], this.name, { type: XLSX_TYPE, lastModified: Date.parse(g.updated_at) || Date.now() }); this._ver = g.version;
+      this._meta = { version: g.version, size: g.size, mtime: this._file.lastModified, by: g.updated_by }; this._metaAt = Date.now();
+      return this._file;
     }
     async createWritable() {
       const parts = [], self = this;
       return { async write(d) { parts.push(d && d.type === 'write' ? d.data : d); }, async close() { await self.put(new Blob(parts, { type: XLSX_TYPE })); }, async abort() { parts.length = 0; } };
     }
-    async put(blob) {
-      const cur = await this.meta(true);
-      if (cur && this._etag && cur.etag !== this._etag) { this._metaAt = 0; throw cloudErr(409, 'Someone else saved ' + this.name + ' a moment ago. Your change was not saved. The latest version will load; please redo your change.'); }
-      await dailyBackup(this.name, cur);
-      await S3.upload(this.name, blob);
-      const m = await this.meta(true);
-      this._file = new File([blob], this.name, { type: XLSX_TYPE, lastModified: m ? m.mtime : Date.now() }); this._etag = m ? m.etag : null;
-      S3.log(this.name, blob.size);
+    async put(blob, base) {
+      try {
+        const r = await rpc('td_put_file', { p_token: tok(), p_name: this.name, p_data: await b64(blob), p_base_version: base ?? this._ver ?? 0 });
+        this._ver = r.version; this._file = new File([blob], this.name, { type: XLSX_TYPE, lastModified: Date.parse(r.updated_at) || Date.now() });
+        this._meta = { version: r.version, size: blob.size, mtime: this._file.lastModified, by: session && session.name }; this._metaAt = Date.now();
+      } catch (e) { if (e.code === 'CONFLICT') { this._metaAt = 0; this._file = null; } throw e; }
     }
   }
-  const names = () => { const c = cfg(); return { workforce: c.workforceFile, attendance: c.attendanceFile }; };
-  let handles = null;
-  const getHandles = () => handles || (handles = { workforce: new CloudHandle(names().workforce), attendance: new CloudHandle(names().attendance) });
-  async function missingFiles() { const hs = getHandles(), out = []; for (const role of ['workforce', 'attendance']) if (!(await hs[role].meta(true))) out.push(role); return out; }
+  let handle = null;
+  const wb = () => handle || (handle = new CloudHandle(cfg().workbookFile || 'Team Dashboard.xlsx'));
+  const mode = () => ls.get(LS_MODE);
+  const isAdmin = () => !!(session && session.role === 'admin');
+
   async function open() {
-    const hs = getHandles(), c = cfg();
-    BE.useCloud([hs.workforce, hs.attendance], hs.workforce.name, 'supabase:' + c.url.replace(/^https?:\/\//, '') + '/' + c.bucket);
-    await BE.kvSet('att:handle', null); await BE.kvSet('att:file', hs.attendance.name); ATT.state().folderKey = null;
+    const h = wb(), c = cfg();
+    BE.useCloud([h], h.name, 'supabase:' + c.url.replace(/^https?:\/\//, ''));
+    BE.setUser(session.name);
+    await BE.kvSet('att:handle', null); await BE.kvSet('att:file', h.name); ATT.state().folderKey = null;
     ls.set(LS_MODE, 'cloud');
     await enterApp(); decorate();
   }
-  function decorate() {
-    const lab = document.querySelector('.sidebar-bottom .local-label'); if (!lab || !active()) return;
-    lab.innerHTML = '';
-    lab.append(Object.assign(document.createElement('i'), {}), document.createTextNode(' Supabase · ' + (session && session.email || '') + ' '));
-    const b = Object.assign(document.createElement('button'), { className: 'linkbtn', textContent: 'Sign out', type: 'button' });
-    b.style.fontSize = 'inherit'; b.onclick = signOut; lab.append(b);
-  }
-  async function signOut() {
-    if (window.ATT?.dirty && ATT.dirty()) { toast('Save your attendance changes first.', true); return; }
-    try { const c = cfg(); await fetch(c.url + '/auth/v1/logout', { method: 'POST', headers: { apikey: c.anonKey, Authorization: 'Bearer ' + (session && session.access_token) } }); } catch { }
-    session = null; ls.set(LS_SESSION, null); ls.set(LS_MODE, 'local'); location.reload();
-  }
-  const active = () => ls.get(LS_MODE) === 'cloud' && !!session;
-  let pending = null;   // files missing after sign-in: ['workforce', 'attendance']
+  let missing = false;
   async function afterSignIn() {
-    const miss = await missingFiles();
-    if (!miss.length) { pending = null; await open(); return true; }
-    pending = miss; ls.set(LS_MODE, 'cloud'); renderConnect({}); return false;
-  }
-  async function provide(role, source) {
-    const h = getHandles()[role];
-    let blob;
-    if (source === 'blank') blob = await starterWorkbook(role);
-    else {
-      const file = await pickFile(); if (!file) return;
-      const u8 = new Uint8Array(await file.arrayBuffer());
-      if (role === 'attendance' && !await ATT.hasTracker(u8)) throw new Error('That file has no "Attendance Tracker" sheet. Choose the attendance workbook.');
-      if (role === 'workforce' && await ATT.hasTracker(u8)) throw new Error('That looks like the attendance workbook. Choose the workforce file.');
-      blob = new Blob([u8], { type: XLSX_TYPE });
-    }
-    if (await h.meta(true)) throw new Error(h.name + ' already exists in Supabase. Refresh the page.');
-    await h.put(blob);
-    pending = pending.filter(r => r !== role);
-    if (!pending.length) { pending = null; await open(); } else renderConnect({ note: 'Uploaded ' + h.name + '.' });
-  }
-  function pickFile() {
-    return new Promise(res => { const i = Object.assign(document.createElement('input'), { type: 'file', accept: '.xlsx,.xlsm' }); i.onchange = () => res(i.files[0] || null); i.click(); });
-  }
-  function card(info) {
-    const c = cfg(), wrap = h('div', { class: 'connection-card cloud-card' }), err = h('p', { class: 'err', role: 'alert' }, '');
-    const title = h('div', { class: 'lbl' }, 'Supabase · shared online');
-    if (session && pending) {
-      const n = names();
-      const row = role => h('div', { class: 'cloud-row' }, h('span', {}, h('b', {}, role === 'workforce' ? 'Workforce' : 'Attendance'), ' · ' + n[role]),
-        h('span', { class: 'grow' }),
-        h('button', { class: 'btn', onclick: () => run(() => provide(role, 'upload')) }, 'Upload my existing file'),
-        h('button', { class: 'btn ghost', onclick: () => run(() => provide(role, 'blank')) }, 'Create blank'));
-      const run = async fn => { try { err.textContent = ''; await fn(); } catch (e) { err.textContent = e.message; } };
-      wrap.append(title, h('p', { class: 'tip', style: 'margin:4px 0 10px' }, 'Signed in as ' + session.email + '. These files are not in Supabase yet. Upload your current Excel file to move your data online, or start with a blank one.'),
-        ...pending.map(row), err, h('button', { class: 'linkbtn', onclick: signOut }, 'Sign out'));
-      return wrap;
-    }
-    const inp = (type, ph, val, ac) => h('input', { class: 'input', type, placeholder: ph, value: val || '', autocomplete: ac || 'off', style: 'width:100%;margin-bottom:8px' });
-    const url = inp('url', 'Project URL (https://xxxx.supabase.co)', c.url), key = inp('text', 'anon public key', c.anonKey);
-    const email = inp('email', 'Email', session && session.email || '', 'username'), pass = inp('password', 'Password', '', 'current-password');
-    const needProject = !fromFile();
-    const go = h('button', { class: 'btn primary', onclick: async () => {
-      go.disabled = true; go.textContent = 'Signing in…'; err.textContent = '';
-      try {
-        if (needProject) ls.set(LS_CFG, { url: url.value.trim(), anonKey: key.value.trim() });
-        if (!configured()) throw new Error('Enter the project URL and anon key.');
-        await authRequest('password', { email: email.value.trim(), password: pass.value });
-        await afterSignIn();
-      } catch (e) { err.textContent = e.message; go.disabled = false; go.textContent = 'Sign in'; }
-    } }, 'Sign in');
-    pass.addEventListener('keydown', e => { if (e.key === 'Enter') go.click(); });
-    wrap.append(title, h('p', { class: 'tip', style: 'margin:4px 0 10px' }, 'Keep the workbooks online so your team works on the same data from any browser. Sign in with the account the owner created for you.'),
-      ...(needProject ? [h('details', { open: !configured() }, h('summary', { class: 'tip', style: 'cursor:pointer;margin-bottom:8px' }, configured() ? 'Project: ' + c.url : 'Supabase project'), url, key)] : []),
-      email, pass, err, go);
-    return wrap;
+    if (!(await wb().meta(true))) { missing = true; ls.set(LS_MODE, 'cloud'); renderConnect({}); return false; }
+    missing = false; await open(); return true;
   }
   async function resume() {
     if (!session || !configured()) return false;
-    await token();
+    const me = await rpc('td_me', { p_token: session.token });
+    session = { ...session, ...me }; ls.set(LS_SESSION, session);
     return afterSignIn();
   }
-  return { SUPABASE_CONFIG, card, resume, active, mode: () => ls.get(LS_MODE), decorate, signOut, configured, isCloudHandle: h => !!(h && h.cloud), _S3: S3 };
+  async function signOut() {
+    if (window.ATT?.dirty && ATT.dirty()) { toast('Save your attendance changes first.', true); return; }
+    try { if (session) await rpc('td_logout', { p_token: session.token }); } catch { }
+    dropSession(); location.reload();
+  }
+  function useLocalFiles() { dropSession(); ls.set(LS_MODE, 'local'); location.reload(); }
+
+  async function checkWorkbook(file) {
+    const u8 = new Uint8Array(await file.arrayBuffer());
+    if (!await ATT.hasTracker(u8)) throw new Error('That workbook has no sheet named “Attendance Tracker”. The online workbook needs a workforce sheet and an Attendance Tracker sheet.');
+    const book = await BE._internals.openBook(u8);
+    if (book.sheet.name === 'Attendance Tracker') throw new Error('That workbook only has the Attendance Tracker sheet. Add the workforce sheet to it first.');
+    return new Blob([u8], { type: XLSX_TYPE });
+  }
+  const pickFile = () => new Promise(res => { const i = Object.assign(document.createElement('input'), { type: 'file', accept: '.xlsx,.xlsm' }); i.onchange = () => res(i.files[0] || null); i.click(); });
+
+  /* ---------- sign-in card on the start screen ---------- */
+  function card() {
+    const c = cfg(), wrap = h('div', { class: 'connection-card cloud-card' }), err = h('p', { class: 'err', role: 'alert' }, '');
+    const title = h('div', { class: 'lbl' }, 'Sign in with your passcode');
+    if (session && missing) {
+      const run = async fn => { try { err.textContent = ''; await fn(); } catch (e) { err.textContent = e.message; } };
+      if (!isAdmin()) wrap.append(title, h('p', { class: 'tip' }, 'Signed in as ' + session.name + '. The admin hasn’t put the workbook online yet. Please try again later.'), h('button', { class: 'linkbtn', onclick: signOut }, 'Sign out'));
+      else wrap.append(h('div', { class: 'lbl' }, 'Set up the online workbook'),
+        h('p', { class: 'tip', style: 'margin:4px 0 10px' }, 'Signed in as ' + session.name + ' (admin). Upload your workbook (a workforce sheet plus an “Attendance Tracker” sheet) to put your data online, or start with a blank one.'),
+        h('div', { class: 'cloud-row' },
+          h('button', { class: 'btn primary', onclick: () => run(async () => { const f = await pickFile(); if (!f) return; await wb().put(await checkWorkbook(f), 0); missing = false; await open(); }) }, 'Upload my workbook'),
+          h('button', { class: 'btn', onclick: () => run(async () => { await wb().put(await starterWorkbook('combined'), 0); missing = false; await open(); }) }, 'Create a blank workbook')),
+        err, h('button', { class: 'linkbtn', onclick: signOut }, 'Sign out'));
+      return wrap;
+    }
+    const inp = (type, ph, val, extra) => h('input', { class: 'input', type, placeholder: ph, value: val || '', autocomplete: 'off', style: 'width:100%;margin-bottom:8px', ...(extra || {}) });
+    const url = inp('url', 'Project URL (optional, read from the key)', c.url), key = inp('text', 'anon public key', c.anonKey);
+    const pass = inp('password', 'Passcode', '', { autocomplete: 'current-password', 'aria-label': 'Passcode', style: 'width:100%;margin-bottom:8px;font-size:18px;letter-spacing:.15em' });
+    const eye = h('button', { class: 'linkbtn', type: 'button', onclick: () => { pass.type = pass.type === 'password' ? 'text' : 'password'; eye.textContent = pass.type === 'password' ? 'Show' : 'Hide'; } }, 'Show');
+    const needKey = !SUPABASE_CONFIG.anonKey, needUrl = !SUPABASE_CONFIG.url, needProject = needKey || needUrl;
+    const go = h('button', { class: 'btn primary', onclick: async () => {
+      go.disabled = true; go.textContent = 'Checking…'; err.textContent = '';
+      try {
+        if (needProject && !configured()) { const f = fixUrl(needUrl ? url.value : SUPABASE_CONFIG.url, needKey ? key.value.trim() : SUPABASE_CONFIG.anonKey); url.value = f.url; ls.set(LS_CFG, { url: f.url, anonKey: needKey ? key.value.trim() : SUPABASE_CONFIG.anonKey }); if (f.note) toast(f.note); }
+        if (!configured()) throw new Error('Enter the Supabase project URL and anon key first.');
+        if (!pass.value.trim()) throw new Error('Enter your passcode.');
+        const r = await rpc('td_login', { p_passcode: pass.value });
+        if (r && r.error) throw cloudErr(401, r.error);
+        session = { token: r.token, name: r.name, role: r.role }; ls.set(LS_SESSION, session);
+        await afterSignIn();
+      } catch (e) { if (e.badKey) { renderConnect({ error: e.message }); return; } err.textContent = e.message; go.disabled = false; go.textContent = 'Sign in'; pass.select(); }
+    } }, 'Sign in');
+    pass.addEventListener('keydown', e => { if (e.key === 'Enter') go.click(); });
+    setTimeout(() => { if (configured() && pass.isConnected) pass.focus(); }, 50);
+    wrap.append(title, h('p', { class: 'tip', style: 'margin:4px 0 10px' }, 'Your data is kept online so the whole team works on the same workbook. Ask the admin for your passcode.'),
+      ...(needProject && !configured() ? [h('div', { class: 'tip', style: 'margin-bottom:6px' }, 'First time on this computer: paste the Supabase anon key once. It is remembered after you sign in.'), ...(needUrl ? [url] : []), ...(needKey ? [key] : [])] : []),
+      pass, h('div', { style: 'display:flex;align-items:center;gap:12px' }, go, eye), err);
+    return wrap;
+  }
+
+  /* ---------- sidebar: who is signed in ---------- */
+  function decorate() {
+    const lab = document.querySelector('.sidebar-bottom .local-label'); if (!lab || mode() !== 'cloud' || !session) return;
+    lab.replaceChildren(h('i'), ' ' + session.name + (isAdmin() ? ' · Admin' : ''));
+    const links = h('div', { class: 'cloud-links' },
+      ...(isAdmin() ? [h('button', { class: 'linkbtn', type: 'button', onclick: openAdmin }, 'Manage passcodes')] : []),
+      h('button', { class: 'linkbtn', type: 'button', onclick: signOut }, 'Sign out'));
+    lab.after(links);
+    document.querySelectorAll('.cloud-links').forEach((el, i, all) => { if (i < all.length - 1) el.remove(); });
+  }
+
+  /* ---------- admin panel ---------- */
+  let dlg = null;
+  const when = t => t ? new Date(t).toLocaleString(undefined, { day: 'numeric', month: 'short', hour: '2-digit', minute: '2-digit' }) : '—';
+  const genCode = () => { const a = new Uint32Array(1); crypto.getRandomValues(a); return String(100000 + (a[0] % 900000)); };
+  async function openAdmin() {
+    if (!isAdmin()) return;
+    if (!dlg) { dlg = h('dialog', { class: 'td-admin', 'aria-label': 'Manage passcodes' }); document.body.append(dlg); }
+    dlg.replaceChildren(h('p', { class: 'tip' }, 'Loading…')); if (!dlg.open) dlg.showModal();
+    await drawAdmin();
+  }
+  async function drawAdmin(msg) {
+    let users, hist;
+    try { [users, hist] = await Promise.all([rpc('td_admin_list_users', { p_token: tok() }), rpc('td_admin_history', { p_token: tok() })]); }
+    catch (e) { dlg.replaceChildren(h('p', { class: 'err' }, e.message), h('button', { class: 'btn', onclick: () => dlg.close() }, 'Close')); return; }
+    const err = h('p', { class: 'err', role: 'alert' }, msg || '');
+    let showAll = !!drawAdmin.showAll;
+    const act = async (fn, okMsg) => { try { err.textContent = ''; await fn(); await drawAdmin(); if (okMsg) toast(okMsg); } catch (e) { err.textContent = e.message; } };
+    const save = (id, name, code, role, active) => rpc('td_admin_save_user', { p_token: tok(), p_id: id, p_name: name, p_passcode: code, p_role: role, p_active: active });
+    const rows = users.map(u => {
+      const tr = h('tr', { class: u.active ? '' : 'off' });
+      const code = h('span', { class: 'code' }, showAll ? u.passcode : '••••••');
+      const peek = h('button', { class: 'linkbtn', type: 'button', onclick: () => { const hidden = code.textContent.startsWith('•'); code.textContent = hidden ? u.passcode : '••••••'; peek.textContent = hidden ? 'Hide' : 'Show'; } }, showAll ? 'Hide' : 'Show');
+      const view = () => tr.replaceChildren(
+        h('td', {}, h('b', {}, u.name)), h('td', {}, u.role === 'admin' ? 'Admin' : 'User'), h('td', {}, code, ' ', peek),
+        h('td', {}, u.active ? 'Active' : 'Disabled'), h('td', { class: 'sm muted' }, when(u.last_login)),
+        h('td', { class: 'acts' }, h('button', { class: 'btn mini', onclick: edit }, 'Edit'),
+          h('button', { class: 'btn mini ghost', onclick: () => act(() => save(u.id, u.name, u.passcode, u.role, !u.active), u.active ? u.name + ' can no longer sign in.' : u.name + ' can sign in again.') }, u.active ? 'Disable' : 'Enable'),
+          h('button', { class: 'btn mini ghost', onclick: async () => { if (await confirmBox('Delete ' + u.name + '?', 'Their passcode stops working immediately. Their past saves stay in the history.', 'Delete')) act(() => rpc('td_admin_delete_user', { p_token: tok(), p_id: u.id }), u.name + ' deleted.'); } }, 'Delete')));
+      function edit() {
+        const n = h('input', { class: 'input mini', value: u.name, 'aria-label': 'Name' }), c = h('input', { class: 'input mini', value: u.passcode, 'aria-label': 'Passcode' });
+        const r = h('select', { class: 'input mini', 'aria-label': 'Role' }, h('option', { value: 'user', selected: u.role === 'user' }, 'User'), h('option', { value: 'admin', selected: u.role === 'admin' }, 'Admin'));
+        tr.replaceChildren(h('td', {}, n), h('td', {}, r), h('td', {}, c, ' ', h('button', { class: 'linkbtn', type: 'button', onclick: () => { c.value = genCode(); } }, 'New')),
+          h('td', {}, u.active ? 'Active' : 'Disabled'), h('td', {}),
+          h('td', { class: 'acts' }, h('button', { class: 'btn mini primary', onclick: () => act(async () => { await save(u.id, n.value, c.value, r.value, u.active); if (u.id === session.user_id || (session.name === u.name && u.role === 'admin')) { session.name = n.value.trim(); ls.set(LS_SESSION, session); BE.setUser(session.name); decorate(); } }, 'Saved. ' + (c.value.trim() !== u.passcode ? 'The new passcode works now; the old one has stopped working.' : '')) }, 'Save'),
+            h('button', { class: 'btn mini ghost', onclick: view }, 'Cancel')));
+        n.focus();
+      }
+      view(); return tr;
+    });
+    const nName = h('input', { class: 'input mini', placeholder: 'Name', 'aria-label': 'New person name' }), nCode = h('input', { class: 'input mini', placeholder: 'Passcode', value: genCode(), 'aria-label': 'New passcode' });
+    const nRole = h('select', { class: 'input mini', 'aria-label': 'Role' }, h('option', { value: 'user' }, 'User'), h('option', { value: 'admin' }, 'Admin'));
+    const addRow = h('tr', { class: 'add' }, h('td', {}, nName), h('td', {}, nRole), h('td', {}, nCode, ' ', h('button', { class: 'linkbtn', type: 'button', onclick: () => { nCode.value = genCode(); } }, 'New')), h('td', {}), h('td', {}),
+      h('td', { class: 'acts' }, h('button', { class: 'btn mini primary', onclick: () => act(() => save(null, nName.value, nCode.value, nRole.value, true), 'Added ' + nName.value.trim() + '. Give them their passcode.') }, 'Add person')));
+    const table = h('div', { class: 'att-table-scroll' }, h('table', { class: 'att-summary-table' }, h('thead', {}, h('tr', {}, ...['Name', 'Role', 'Passcode', 'Status', 'Last sign-in', ''].map(t => h('th', {}, t)))), h('tbody', {}, ...rows, addRow)));
+    const toggleAll = h('label', { class: 'sm' }, h('input', { type: 'checkbox', checked: showAll, onchange: e => { drawAdmin.showAll = e.target.checked; drawAdmin(); } }), ' Show all passcodes');
+    const list = (items, fmtItem, empty) => items.length ? h('ul', { class: 'td-hist' }, ...items.map(x => h('li', {}, ...fmtItem(x)))) : h('p', { class: 'sm muted' }, empty);
+    const dl = (name, bytes) => { const a = h('a', { href: URL.createObjectURL(new Blob([bytes], { type: XLSX_TYPE })), download: name }); document.body.append(a); a.click(); setTimeout(() => a.remove(), 500); };
+    const backups = list(hist.backups, b => [h('b', {}, b.day), ` · ${Math.round(b.size / 1024)} KB · version ${b.version} `, h('button', { class: 'linkbtn', type: 'button', onclick: () => act(async () => { const r = await rpc('td_admin_get_backup', { p_token: tok(), p_name: b.name, p_day: b.day }); dl(b.name.replace(/\.xlsx$/i, '') + ' backup ' + b.day + '.xlsx', unb64(r.data)); }) }, 'Download')], 'No backups yet. The first save of each day keeps one.');
+    const replace = h('button', { class: 'btn mini', onclick: () => act(async () => {
+      if (window.ATT?.dirty && ATT.dirty()) throw new Error('Save your attendance changes first.');
+      const f = await pickFile(); if (!f) return; const blob = await checkWorkbook(f);
+      if (!await confirmBox('Replace the online workbook?', 'Everyone will see the uploaded file from now on. Today’s backup keeps the current version.', 'Replace')) return;
+      await wb().meta(true); await wb().put(blob, wb()._meta ? wb()._meta.version : 0); dlg.close(); await open(); toast('Workbook replaced.');
+    }) }, 'Replace workbook…');
+    const download = h('button', { class: 'btn mini', onclick: () => act(async () => { const f = await wb().getFile(); dl(wb().name, new Uint8Array(await f.arrayBuffer())); }) }, 'Download current workbook');
+    dlg.replaceChildren(
+      h('div', { class: 'td-admin-head' }, h('h2', {}, 'Manage passcodes'), h('span', { class: 'grow' }), toggleAll, h('button', { class: 'btn mini ghost', onclick: () => dlg.close(), 'aria-label': 'Close' }, 'Close')),
+      h('p', { class: 'sm muted' }, 'Only the admin can see and change passcodes. Changing or disabling a passcode signs that person out straight away. Passcodes need at least 4 characters and must all be different.'),
+      err, table,
+      h('div', { class: 'td-admin-grid' },
+        h('section', {}, h('h3', {}, 'Recent sign-ins'), list(hist.logins.slice(0, 15), l => [h('span', { class: l.ok ? '' : 'bad' }, l.ok ? l.name : 'Wrong passcode'), ' · ' + when(l.at) + (l.ip ? ' · ' + l.ip : '')], 'None yet.')),
+        h('section', {}, h('h3', {}, 'Recent saves'), list(hist.saves.slice(0, 15), s => [h('b', {}, s.saved_by || '?'), ' · ' + when(s.at) + ' · v' + s.version], 'None yet.')),
+        h('section', {}, h('h3', {}, 'Daily backups (30 days)'), backups, h('div', { style: 'display:flex;gap:8px;flex-wrap:wrap;margin-top:10px' }, download, replace))));
+  }
+  return { SUPABASE_CONFIG, card, resume, mode, decorate, signOut, useLocalFiles, openAdmin, configured, isAdmin, _rpc: rpc };
 })();
 </script>
 <script>
@@ -2847,16 +2911,27 @@ async function adopt(ctx) {
   if (!has(TODAY_MS)) S.ui.who.start = isoDate(dateOf(d.latestMonth, 0));
   await restorePendingIfAny();
 }
+/* v3.10: when workforce and attendance share one workbook, a workforce save changes the file but not the
+   attendance sheet. The attendance "version" is then the CRC of its sheet part, read from the zip directory. */
+const sigCache = { key: null, val: null };
+async function attSig(f, sheetPath) {
+  if (!BE.single()) return f.lastModified;
+  const key = f.lastModified + ':' + f.size + ':' + sheetPath;
+  if (sigCache.key === key) return sigCache.val;
+  const z = await BE._internals.Zip.open(new Uint8Array(await f.arrayBuffer())), e = z.find(sheetPath);
+  sigCache.key = key; sigCache.val = 'crc:' + (e ? e.crc + ':' + e.usize : 'none');
+  return sigCache.val;
+}
 async function loadFrom(handle, name, inFolder) {
   const f = await handle.getFile(); const u8 = new Uint8Array(await f.arrayBuffer());
   const ctx = await Engine.load(u8);
-  S.handle = handle; S.fileName = name; S.mtime = f.lastModified; S.inFolder = inFolder;
+  S.handle = handle; S.fileName = name; S.mtime = await attSig(f, ctx.sheetPath); S.inFolder = inFolder;
   await adopt(ctx); S.status = 'ready'; S.picking = false; S.msg = '';
   try { await syncExternal(ctx, f); } catch (e) { console.error(e); }
 }
 async function scanFolder() {
   const roster = BE.fileName();
-  S.candidates = (await BE.listWorkbooks()).filter(f => f.name !== roster);
+  S.candidates = (await BE.listWorkbooks()).filter(f => BE.single() || f.name !== roster);   // one shared workbook: the roster file is also the attendance file
   return S.candidates;
 }
 /* Called when the Team Dashboard opens its workbook: look in the same folder for the attendance workbook. */
@@ -2922,8 +2997,8 @@ async function reloadFromDisk() { try { await loadFrom(S.handle, S.fileName, S.i
 async function checkDisk() {
   if (!S.handle || S.saving || S.status !== 'ready') return;
   try {
-    const f = await S.handle.getFile(); if (f.lastModified === S.mtime) return;
-    if (!S.changes.length) { if (await reloadFromDisk()) toast('The attendance workbook was changed in Excel, so the dashboard reloaded it.'); }
+    const f = await S.handle.getFile(); if (await attSig(f, S.ctx.sheetPath) === S.mtime) return;
+    if (!S.changes.length) { if (await reloadFromDisk()) toast(BE.single() ? 'Attendance was changed by someone else, so the dashboard reloaded it.' : 'The attendance workbook was changed in Excel, so the dashboard reloaded it.'); }
     else if (!S.diskChanged) { S.diskChanged = true; render(); }
   } catch { }
 }
@@ -2950,23 +3025,29 @@ async function save(opts = {}) {
   if (!S.changes.length && auto) return;
   S.saving = true; render();
   try {
-    const out = await Engine.build(S.ctx, S.rows);
     const base = S.fileName.replace(/\.(xlsx|xlsm)$/i, '');
     if ((await S.handle.queryPermission({ mode: 'readwrite' })) !== 'granted' && (await S.handle.requestPermission({ mode: 'readwrite' })) !== 'granted') throw new Error('Permission to write to the file was not granted.');
     if (S.inFolder && await BE.isLocked(S.fileName)) throw Object.assign(new Error('The attendance workbook is open in Excel. Close it there, then Save again. Nothing was changed.'), { busy: true });
-    const f = await S.handle.getFile();
-    if (auto && S.mtime && f.lastModified !== S.mtime) { S.autoErr = 'the file was changed in Excel or elsewhere. Press Save to Excel to choose what to keep'; S.autoRetry = Date.now() + 30000; S.saving = false; render(); return; }
-    if (S.mtime && f.lastModified !== S.mtime) {
+    const f = await S.handle.getFile(), fSig = await attSig(f, S.ctx.sheetPath);
+    if (auto && S.mtime && fSig !== S.mtime) { S.autoErr = 'the file was changed in Excel or elsewhere. Press Save to Excel to choose what to keep'; S.autoRetry = Date.now() + 30000; S.saving = false; render(); return; }
+    if (S.mtime && fSig !== S.mtime && BE.single()) {
+      const ok = await confirmBox('Attendance was changed by someone else', 'Another person saved attendance after you opened it. Reload to see their version. Your unsaved attendance changes here will be discarded.', 'Reload now');
+      S.saving = false; if (ok) { S.changes = []; await clearPending(); await reloadFromDisk(); } render(); return;
+    }
+    if (S.mtime && fSig !== S.mtime) {
       const ok = await confirmBox('The workbook changed on disk', 'Someone (or Excel / OneDrive) saved this file after you opened it here. Saving now will overwrite those changes with what you see in the dashboard.', 'Overwrite anyway');
       if (!ok) { S.saving = false; render(); return; }
     }
     /* backups live in the workforce folder's team-dashboard-data/backups. Auto-saves make one at most every 10 minutes, so a busy hour does not push the older backups out. */
     if (!auto || Date.now() - S.lastBackup > 600000) { try { await BE.backup(S.ctx.bytes, S.fileName); S.lastBackup = Date.now(); } catch (e) { if (!auto) downloadBytes(S.ctx.bytes, `${base}_backup_${stamp()}.xlsx`); else console.error(e); } }
     const n = S.changes.length, diff = diffRows(S.base, S.rows, r => 'u' + r.uid);
+    /* in a shared workbook, build on top of the latest file so the workforce sheet's newest edits are kept */
+    const out = await Engine.build(BE.single() ? await Engine.load(new Uint8Array(await f.arrayBuffer())) : S.ctx, S.rows);
     if ((await S.handle.getFile()).lastModified !== f.lastModified) throw new Error('The workbook changed during saving. Review external changes before retrying.');
     await BE.writeBlob(S.handle, new Blob([out], { type: 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet' }));
-    const f2 = await S.handle.getFile(); S.mtime = f2.lastModified;
+    const f2 = await S.handle.getFile();
     const ctx = await Engine.load(out);
+    S.mtime = await attSig(f2, ctx.sheetPath);
     await writeSnap(ctx.rows, f2.lastModified + ':' + f2.size);           // so this save is not mistaken for an Excel edit next time
     const entries = entriesFromDiff(diff, { user: BE.userName(), time: BE.nowText(), external: false });
     if (entries.length) await BE.appendActivity(entries);
@@ -5137,7 +5218,7 @@ async function poll() {
 }
 
 /* ============================== filtering ============================== */
-const APP = { title: "Team Dashboard - JK's Operations", version: "3.9.0", released: "23 Sep 2026" };
+const APP = { title: "Team Dashboard - JK's Operations", version: "3.10.3", released: "23 Sep 2026" };
 const BASE_DIMS = { status: "status_column", desig: "designation_column", client: "client_column", mode: "mode_column" };
 const STANDARD_STATUSES = ["Active", "Manager", "OJT", "Bench", "New", "Projected", "Left", "Moved"];
 const TILE_ORDER = ["Active", "Manager", "OJT", "Bench", "New", "Projected"];
@@ -6961,6 +7042,7 @@ let choosingFiles=false;
 const workbookPickerTypes=[{description:'Excel workbooks',accept:{'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet':['.xlsx','.xlsm']}}];
 async function stageWorkbook(role,handle) {
   if(!/\.(xlsx|xlsm)$/i.test(handle.name) || handle.name.startsWith('~$'))throw new Error('Select an Excel workbook, not its temporary lock file.');
+  if(fileChoices.workforce && fileChoices.workforce===fileChoices.attendance)fileChoices[role==='workforce'?'attendance':'workforce']=null;
   const other=fileChoices[role==='workforce'?'attendance':'workforce'];
   if(other && (other.name===handle.name || await other.isSameEntry(handle)))throw new Error('Select a different workbook for each role. The two filenames must be different.');
   if(await handle.requestPermission({mode:'readwrite'})!=='granted')throw new Error('Allow editing so changes can save back to this workbook.');
@@ -6968,6 +7050,27 @@ async function stageWorkbook(role,handle) {
   const next={...fileChoices,[role]:handle};
   await BE.kvSet("selection-v372",{choices:next});
   Object.assign(fileChoices,next);
+}
+/* v3.10: one workbook with a workforce sheet and an "Attendance Tracker" sheet */
+async function stageSingle(handle) {
+  if(!/\.(xlsx|xlsm)$/i.test(handle.name) || handle.name.startsWith('~$'))throw new Error('Select an Excel workbook, not its temporary lock file.');
+  if(await handle.requestPermission({mode:'readwrite'})!=='granted')throw new Error('Allow editing so changes can save back to this workbook.');
+  const u8=new Uint8Array(await (await handle.getFile()).arrayBuffer());
+  if(!await ATT.hasTracker(u8))throw new Error('That workbook has no sheet named “Attendance Tracker”. Add it, or use two separate files below.');
+  const book=await BE._internals.openBook(u8);
+  if(book.sheet.name==='Attendance Tracker')throw new Error('That workbook only has the Attendance Tracker sheet. Add a workforce sheet (one row per employee) to it.');
+  const next={workforce:handle,attendance:handle};
+  await BE.kvSet("selection-v372",{choices:next});
+  Object.assign(fileChoices,next);
+}
+async function chooseSingleWorkbook() {
+  if(choosingFiles)return;choosingFiles=true;
+  try {
+    const [handle]=await window.showOpenFilePicker({id:'team-single',multiple:false,types:workbookPickerTypes});
+    if(handle)await stageSingle(handle);
+    renderConnect();
+  }catch(e){if(e.name!=='AbortError')renderConnect({error:e.message});}
+  finally{choosingFiles=false;}
 }
 async function chooseWorkbookRole(role) {
   if(choosingFiles)return;choosingFiles=true;
@@ -6979,46 +7082,47 @@ async function chooseWorkbookRole(role) {
   finally{choosingFiles=false;}
 }
 /* ---------- v3.8: starting fresh. No workbooks yet? Create blank ones in a folder the user picks. ---------- */
-const STARTER_NAMES = { workforce: 'Team Workforce.xlsx', attendance: 'Team Attendance.xlsx' };
+const STARTER_NAMES = { workforce: 'Team Workforce.xlsx', attendance: 'Team Attendance.xlsx', combined: 'Team Dashboard.xlsx' };
 const WORKFORCE_HEADERS = ['Emp Code', 'Employee Name', 'Status', 'Designation', 'Client', 'Sub Client/Type', 'Phone', 'WhatsApp', 'Gender', 'DOB', 'DOJ', 'Left Date', 'Notice Period', 'Current Area', 'Distance to Office', 'Cab', 'Status2', 'Column1', 'Asset?', 'Dual Monitor', 'From City', 'From State', 'Remarks'];
 const xmlEsc = s => String(s).replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/"/g, '&quot;');
 const colLetter = n => { let s = ''; while (n > 0) { const m = (n - 1) % 26; s = String.fromCharCode(65 + m) + s; n = Math.floor((n - 1) / 26); } return s; };
 const strCellXml = (ref, text, s) => `<c r="${ref}" s="${s}" t="inlineStr"><is><t>${xmlEsc(text)}</t></is></c>`;
+/* kind: 'workforce' | 'attendance' | 'combined' (one workbook: an "Employees" sheet and an "Attendance Tracker" sheet) */
 async function starterWorkbook(kind) {
   const NS = 'xmlns="http://schemas.openxmlformats.org/spreadsheetml/2006/main" xmlns:r="http://schemas.openxmlformats.org/officeDocument/2006/relationships"';
   const head = '<?xml version="1.0" encoding="UTF-8" standalone="yes"?>\r\n';
-  const sheetName = kind === 'attendance' ? 'Attendance Tracker' : 'Employees';
   const xf = (numFmtId, fontId, fillId, borderId, center) => `<xf numFmtId="${numFmtId}" fontId="${fontId}" fillId="${fillId}" borderId="${borderId}" xfId="0"${numFmtId ? ' applyNumberFormat="1"' : ''}${fontId ? ' applyFont="1"' : ''}${fillId ? ' applyFill="1"' : ''}${borderId ? ' applyBorder="1"' : ''}${center ? ' applyAlignment="1"><alignment horizontal="center" vertical="center"/></xf>' : '/>'}`;
-  let xfs, sheet, lastCol;
-  if (kind === 'workforce') {
-    // 0 plain · 1 header · 2 date
-    xfs = [xf(0, 0, 0, 0), xf(0, 1, 2, 1), xf(165, 0, 0, 0)];
-    lastCol = colLetter(WORKFORCE_HEADERS.length);
+  /* One style table serves both sheets. The attendance engine writes rows with fixed style numbers
+     (A=96 month, B/C=3 text, D and days=2, totals=93); the workforce sheet uses 1 for headers and 5 for dates.
+     5 is the lowest-numbered date style, so it is the one the dashboard picks for new workforce dates. */
+  const xfs = Array.from({ length: 97 }, () => xf(0, 0, 0, 0));
+  xfs[1] = xf(0, 1, 2, 1, true); xfs[2] = xf(0, 0, 0, 1, true); xfs[3] = xf(0, 0, 0, 1); xfs[4] = xf(0, 2, 0, 0); xfs[5] = xf(165, 0, 0, 0);
+  xfs[93] = xf(2, 1, 0, 1, true); xfs[96] = xf(164, 0, 0, 1, true);
+  const wfSheet = () => {
+    const last = colLetter(WORKFORCE_HEADERS.length);
     const widths = WORKFORCE_HEADERS.map((h, i) => `<col min="${i + 1}" max="${i + 1}" width="${/name/i.test(h) ? 26 : /remarks|area|client/i.test(h) ? 20 : 14}" customWidth="1"/>`).join('');
-    sheet = `<worksheet ${NS}><dimension ref="A1:${lastCol}1"/><sheetViews><sheetView workbookViewId="0"><pane ySplit="1" topLeftCell="A2" activePane="bottomLeft" state="frozen"/><selection pane="bottomLeft" activeCell="A2" sqref="A2"/></sheetView></sheetViews><sheetFormatPr defaultRowHeight="15"/><cols>${widths}</cols><sheetData><row r="1">${WORKFORCE_HEADERS.map((h, i) => strCellXml(colLetter(i + 1) + '1', h, 1)).join('')}</row></sheetData><pageMargins left="0.7" right="0.7" top="0.75" bottom="0.75" header="0.3" footer="0.3"/></worksheet>`;
-  } else {
-    // The attendance engine writes rows with fixed style numbers (A=96 month, B/C=3 text, D/days=2, totals=93), so those slots must exist.
-    xfs = Array.from({ length: 97 }, () => xf(0, 0, 0, 0));
-    xfs[1] = xf(0, 1, 2, 1, true); xfs[2] = xf(0, 0, 0, 1, true); xfs[3] = xf(0, 0, 0, 1); xfs[4] = xf(0, 2, 0, 0);
-    xfs[93] = xf(2, 1, 0, 1, true); xfs[96] = xf(164, 0, 0, 1, true);
-    lastCol = 'AM';
+    return `<worksheet ${NS}><dimension ref="A1:${last}1"/><sheetViews><sheetView workbookViewId="0"${kind === 'combined' ? ' tabSelected="1"' : ''}><pane ySplit="1" topLeftCell="A2" activePane="bottomLeft" state="frozen"/><selection pane="bottomLeft" activeCell="A2" sqref="A2"/></sheetView></sheetViews><sheetFormatPr defaultRowHeight="15"/><cols>${widths}</cols><sheetData><row r="1">${WORKFORCE_HEADERS.map((h, i) => strCellXml(colLetter(i + 1) + '1', h, 1)).join('')}</row></sheetData><pageMargins left="0.7" right="0.7" top="0.75" bottom="0.75" header="0.3" footer="0.3"/></worksheet>`;
+  };
+  const attSheet = () => {
     const hdr = ['Month', 'Emp ID', 'Recruiter Name', 'Client', ...Array.from({ length: 31 }, (_, i) => String(i + 1)), 'Total Leaves', 'Unapproved Leaves', 'Upcoming Leaves', 'Regularizations'];
     const widths = `<col min="1" max="1" width="10" customWidth="1"/><col min="2" max="2" width="11" customWidth="1"/><col min="3" max="3" width="26" customWidth="1"/><col min="4" max="4" width="18" customWidth="1"/><col min="5" max="35" width="5.5" customWidth="1"/><col min="36" max="39" width="13" customWidth="1"/>`;
     const legend = 'Attendance Tracker · Codes: AL approved, CL casual, SL sick, UL unplanned, AB absent, HD1/HD2 half day, LA applied, RJ rejected, L late, C cab late, R remote, WO week off, H holiday, P present, M moved, NA not applicable. Blank = present.';
-    sheet = `<worksheet ${NS}><dimension ref="A1:AM2"/><sheetViews><sheetView workbookViewId="0"><pane xSplit="4" ySplit="2" topLeftCell="E3" activePane="bottomRight" state="frozen"/><selection pane="topRight" activeCell="E1" sqref="E1"/><selection pane="bottomLeft" activeCell="A3" sqref="A3"/><selection pane="bottomRight" activeCell="C3" sqref="C3"/></sheetView></sheetViews><sheetFormatPr defaultRowHeight="15"/><cols>${widths}</cols><sheetData><row r="1">${strCellXml('A1', legend, 4)}</row><row r="2">${hdr.map((h, i) => strCellXml(colLetter(i + 1) + '2', h, 1)).join('')}</row></sheetData><pageMargins left="0.7" right="0.7" top="0.75" bottom="0.75" header="0.3" footer="0.3"/></worksheet>`;
-  }
+    return `<worksheet ${NS}><dimension ref="A1:AM2"/><sheetViews><sheetView workbookViewId="0"><pane xSplit="4" ySplit="2" topLeftCell="E3" activePane="bottomRight" state="frozen"/><selection pane="topRight" activeCell="E1" sqref="E1"/><selection pane="bottomLeft" activeCell="A3" sqref="A3"/><selection pane="bottomRight" activeCell="C3" sqref="C3"/></sheetView></sheetViews><sheetFormatPr defaultRowHeight="15"/><cols>${widths}</cols><sheetData><row r="1">${strCellXml('A1', legend, 4)}</row><row r="2">${hdr.map((h, i) => strCellXml(colLetter(i + 1) + '2', h, 1)).join('')}</row></sheetData><pageMargins left="0.7" right="0.7" top="0.75" bottom="0.75" header="0.3" footer="0.3"/></worksheet>`;
+  };
+  const sheets = kind === 'combined' ? [['Employees', wfSheet()], ['Attendance Tracker', attSheet()]] : kind === 'attendance' ? [['Attendance Tracker', attSheet()]] : [['Employees', wfSheet()]];
   const styles = `<styleSheet xmlns="http://schemas.openxmlformats.org/spreadsheetml/2006/main"><numFmts count="2"><numFmt numFmtId="164" formatCode="mmm\\-yy"/><numFmt numFmtId="165" formatCode="dd\\-mmm\\-yyyy"/></numFmts><fonts count="3"><font><sz val="11"/><name val="Calibri"/><family val="2"/></font><font><b/><sz val="11"/><name val="Calibri"/><family val="2"/></font><font><i/><sz val="10"/><color rgb="FF595959"/><name val="Calibri"/><family val="2"/></font></fonts><fills count="3"><fill><patternFill patternType="none"/></fill><fill><patternFill patternType="gray125"/></fill><fill><patternFill patternType="solid"><fgColor rgb="FFDDE7F3"/><bgColor indexed="64"/></patternFill></fill></fills><borders count="2"><border><left/><right/><top/><bottom/><diagonal/></border><border><left style="thin"><color rgb="FFC9CFD8"/></left><right style="thin"><color rgb="FFC9CFD8"/></right><top style="thin"><color rgb="FFC9CFD8"/></top><bottom style="thin"><color rgb="FFC9CFD8"/></bottom><diagonal/></border></borders><cellStyleXfs count="1"><xf numFmtId="0" fontId="0" fillId="0" borderId="0"/></cellStyleXfs><cellXfs count="${xfs.length}">${xfs.join('')}</cellXfs><cellStyles count="1"><cellStyle name="Normal" xfId="0" builtinId="0"/></cellStyles></styleSheet>`;
+  const title = (STARTER_NAMES[kind] || 'Team Dashboard.xlsx').replace(/\.xlsx$/, '');
   const parts = {
-    '[Content_Types].xml': `<Types xmlns="http://schemas.openxmlformats.org/package/2006/content-types"><Default Extension="rels" ContentType="application/vnd.openxmlformats-package.relationships+xml"/><Default Extension="xml" ContentType="application/xml"/><Override PartName="/xl/workbook.xml" ContentType="application/vnd.openxmlformats-officedocument.spreadsheetml.sheet.main+xml"/><Override PartName="/xl/worksheets/sheet1.xml" ContentType="application/vnd.openxmlformats-officedocument.spreadsheetml.worksheet+xml"/><Override PartName="/xl/styles.xml" ContentType="application/vnd.openxmlformats-officedocument.spreadsheetml.styles+xml"/><Override PartName="/xl/sharedStrings.xml" ContentType="application/vnd.openxmlformats-officedocument.spreadsheetml.sharedStrings+xml"/><Override PartName="/docProps/core.xml" ContentType="application/vnd.openxmlformats-package.core-properties+xml"/><Override PartName="/docProps/app.xml" ContentType="application/vnd.openxmlformats-officedocument.extended-properties+xml"/></Types>`,
+    '[Content_Types].xml': `<Types xmlns="http://schemas.openxmlformats.org/package/2006/content-types"><Default Extension="rels" ContentType="application/vnd.openxmlformats-package.relationships+xml"/><Default Extension="xml" ContentType="application/xml"/><Override PartName="/xl/workbook.xml" ContentType="application/vnd.openxmlformats-officedocument.spreadsheetml.sheet.main+xml"/>${sheets.map((_, i) => `<Override PartName="/xl/worksheets/sheet${i + 1}.xml" ContentType="application/vnd.openxmlformats-officedocument.spreadsheetml.worksheet+xml"/>`).join('')}<Override PartName="/xl/styles.xml" ContentType="application/vnd.openxmlformats-officedocument.spreadsheetml.styles+xml"/><Override PartName="/xl/sharedStrings.xml" ContentType="application/vnd.openxmlformats-officedocument.spreadsheetml.sharedStrings+xml"/><Override PartName="/docProps/core.xml" ContentType="application/vnd.openxmlformats-package.core-properties+xml"/><Override PartName="/docProps/app.xml" ContentType="application/vnd.openxmlformats-officedocument.extended-properties+xml"/></Types>`,
     '_rels/.rels': `<Relationships xmlns="http://schemas.openxmlformats.org/package/2006/relationships"><Relationship Id="rId1" Type="http://schemas.openxmlformats.org/officeDocument/2006/relationships/officeDocument" Target="xl/workbook.xml"/><Relationship Id="rId2" Type="http://schemas.openxmlformats.org/package/2006/relationships/metadata/core-properties" Target="docProps/core.xml"/><Relationship Id="rId3" Type="http://schemas.openxmlformats.org/officeDocument/2006/relationships/extended-properties" Target="docProps/app.xml"/></Relationships>`,
-    'docProps/core.xml': `<cp:coreProperties xmlns:cp="http://schemas.openxmlformats.org/package/2006/metadata/core-properties" xmlns:dc="http://purl.org/dc/elements/1.1/" xmlns:dcterms="http://purl.org/dc/terms/" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"><dc:title>${xmlEsc(STARTER_NAMES[kind].replace(/\.xlsx$/, ''))}</dc:title><dc:creator>Team Dashboard</dc:creator><dcterms:created xsi:type="dcterms:W3CDTF">${new Date().toISOString().replace(/\.\d+Z$/, 'Z')}</dcterms:created></cp:coreProperties>`,
+    'docProps/core.xml': `<cp:coreProperties xmlns:cp="http://schemas.openxmlformats.org/package/2006/metadata/core-properties" xmlns:dc="http://purl.org/dc/elements/1.1/" xmlns:dcterms="http://purl.org/dc/terms/" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"><dc:title>${xmlEsc(title)}</dc:title><dc:creator>Team Dashboard</dc:creator><dcterms:created xsi:type="dcterms:W3CDTF">${new Date().toISOString().replace(/\.\d+Z$/, 'Z')}</dcterms:created></cp:coreProperties>`,
     'docProps/app.xml': `<Properties xmlns="http://schemas.openxmlformats.org/officeDocument/2006/extended-properties"><Application>Microsoft Excel</Application></Properties>`,
-    'xl/workbook.xml': `<workbook ${NS}><bookViews><workbookView xWindow="0" yWindow="0" windowWidth="28800" windowHeight="15000"/></bookViews><sheets><sheet name="${sheetName}" sheetId="1" r:id="rId1"/></sheets><calcPr calcId="191029" fullCalcOnLoad="1"/></workbook>`,
-    'xl/_rels/workbook.xml.rels': `<Relationships xmlns="http://schemas.openxmlformats.org/package/2006/relationships"><Relationship Id="rId1" Type="http://schemas.openxmlformats.org/officeDocument/2006/relationships/worksheet" Target="worksheets/sheet1.xml"/><Relationship Id="rId2" Type="http://schemas.openxmlformats.org/officeDocument/2006/relationships/styles" Target="styles.xml"/><Relationship Id="rId3" Type="http://schemas.openxmlformats.org/officeDocument/2006/relationships/sharedStrings" Target="sharedStrings.xml"/></Relationships>`,
+    'xl/workbook.xml': `<workbook ${NS}><bookViews><workbookView xWindow="0" yWindow="0" windowWidth="28800" windowHeight="15000" activeTab="0"/></bookViews><sheets>${sheets.map(([n], i) => `<sheet name="${n}" sheetId="${i + 1}" r:id="rId${i + 1}"/>`).join('')}</sheets><calcPr calcId="191029" fullCalcOnLoad="1"/></workbook>`,
+    'xl/_rels/workbook.xml.rels': `<Relationships xmlns="http://schemas.openxmlformats.org/package/2006/relationships">${sheets.map((_, i) => `<Relationship Id="rId${i + 1}" Type="http://schemas.openxmlformats.org/officeDocument/2006/relationships/worksheet" Target="worksheets/sheet${i + 1}.xml"/>`).join('')}<Relationship Id="rId${sheets.length + 1}" Type="http://schemas.openxmlformats.org/officeDocument/2006/relationships/styles" Target="styles.xml"/><Relationship Id="rId${sheets.length + 2}" Type="http://schemas.openxmlformats.org/officeDocument/2006/relationships/sharedStrings" Target="sharedStrings.xml"/></Relationships>`,
     'xl/styles.xml': styles,
     'xl/sharedStrings.xml': `<sst xmlns="http://schemas.openxmlformats.org/spreadsheetml/2006/main" count="0" uniqueCount="0"></sst>`,
-    'xl/worksheets/sheet1.xml': sheet,
   };
+  sheets.forEach(([, xml], i) => { parts[`xl/worksheets/sheet${i + 1}.xml`] = xml; });
   const zip = new BE._internals.Zip(), enc = new TextEncoder();
   for (const [name, xml] of Object.entries(parts)) await zip.set(name, enc.encode(head + xml));
   return zip.build();
@@ -7028,26 +7132,27 @@ async function fileExists(dir, name) { try { await dir.getFileHandle(name); retu
 async function createStarterFiles() {
   if (choosingFiles) return; choosingFiles = true;
   const missing = ['workforce', 'attendance'].filter(r => !fileChoices[r]);
+  const combined = missing.length === 2;
   try {
     if (typeof window.showDirectoryPicker !== 'function') throw new Error('This browser cannot create files. Open the dashboard in Microsoft Edge or Google Chrome.');
     const dir = await window.showDirectoryPicker({ id: 'team-dashboard-new', mode: 'readwrite', startIn: 'documents' });
     if (await dir.requestPermission({ mode: 'readwrite' }) !== 'granted') throw new Error('Allow editing in that folder so the dashboard can create and save the files.');
     renderConnect({ note: 'Creating files in “' + dir.name + '”…' });
     const made = [], reused = [];
-    for (const role of missing) {
+    for (const role of combined ? ['combined'] : missing) {
       const name = STARTER_NAMES[role];
       let handle;
       if (await fileExists(dir, name)) {
         handle = await dir.getFileHandle(name);
         const bytes = new Uint8Array(await (await handle.getFile()).arrayBuffer());
-        if (role === 'attendance' && !await ATT.hasTracker(bytes)) throw new Error('“' + name + '” already exists in that folder but is not an attendance workbook. Rename or move it, then try again.');
+        if (role !== 'workforce' && !await ATT.hasTracker(bytes)) throw new Error('“' + name + '” already exists in that folder but has no Attendance Tracker sheet. Rename or move it, then try again.');
         reused.push(name);
       } else {
         handle = await dir.getFileHandle(name, { create: true });
         const w = await handle.createWritable(); await w.write(await starterWorkbook(role)); await w.close();
         made.push(name);
       }
-      await stageWorkbook(role, handle);
+      if (role === 'combined') await stageSingle(handle); else await stageWorkbook(role, handle);
     }
     await BE.linkPair([fileChoices.workforce, fileChoices.attendance], fileChoices.workforce.name);
     await BE.kvSet('att:handle', null); await BE.kvSet('att:file', fileChoices.attendance.name); ATT.state().folderKey = null;
@@ -7060,12 +7165,24 @@ async function createStarterFiles() {
 function renderConnect(info={}) {
   const box=$('#connectBody');
   const cloudCard=CLOUD.card(info);
+  if(CLOUD.mode()==='cloud' || CLOUD.SUPABASE_CONFIG.url){
+    box.replaceChildren(cloudCard,h('p',{class:'err',role:'alert'},info.error || ''),
+      h('p',{class:'tip'},h('button',{class:'linkbtn',type:'button',onclick:()=>{ if(CLOUD.mode()==='cloud')CLOUD.useLocalFiles(); else { localStorage.setItem('td-mode','"local-forced"'); renderConnect(info); } }},'Use Excel files on this computer instead')));
+    if(localStorage.getItem('td-mode')!=='"local-forced"')return;
+  }
   if(!BE.supported()){box.replaceChildren(cloudCard,h('p',{class:'tip'},'To use Excel files on this computer instead, open this HTML in Microsoft Edge or Google Chrome.'));return;}
   const localTitle=h('p',{class:'lbl cloud-or'},'Or use Excel files on this computer');
+  const isSingle=!!fileChoices.workforce && fileChoices.workforce===fileChoices.attendance;
+  const singleCard=h('div',{class:'connection-card'},h('div',{class:'lbl'},'One workbook with both sheets'),
+    h('p',{class:'tip',style:'margin:4px 0 8px'},'A workforce sheet (one row per employee) and a sheet named “Attendance Tracker” in the same file.'),
+    h('div',{style:'display:flex;gap:12px;align-items:center;flex-wrap:wrap'},
+      h('button',{class:'btn',onclick:chooseSingleWorkbook},isSingle?'Change workbook':'Select workbook'),
+      h('span',{style:'overflow-wrap:anywhere'},isSingle?fileChoices.workforce.name:'Not selected')));
+  const twoTitle=h('p',{class:'lbl cloud-or'},'Or two separate files');
   const card=(role,title)=>h('div',{class:'connection-card'},h('div',{class:'lbl'},title),
     h('div',{style:'display:flex;gap:12px;align-items:center;flex-wrap:wrap'},
       h('button',{class:'btn',onclick:()=>chooseWorkbookRole(role)},fileChoices[role]?'Change file':'Select '+(role==='workforce'?'workforce':'attendance')+' file'),
-      h('span',{style:'overflow-wrap:anywhere'},fileChoices[role]?.name || 'Not selected')));
+      h('span',{style:'overflow-wrap:anywhere'},isSingle?'Using the one workbook above':(fileChoices[role]?.name || 'Not selected'))));
   const open=h('button',{class:'btn primary',disabled:!fileChoices.workforce || !fileChoices.attendance,onclick:async()=>{
     open.disabled=true;open.textContent='Opening workbooks…';
     try {
@@ -7079,10 +7196,10 @@ function renderConnect(info={}) {
   const fresh=missing.length ? h('div',{class:'connection-card starter-card'},
     h('div',{class:'lbl'},missing.length===2 ? 'Don’t have these files yet?' : 'Don’t have the '+missing[0]+' file?'),
     h('p',{class:'tip',style:'margin:4px 0 10px'},missing.length===2
-      ? 'Choose a folder and the dashboard creates a blank workforce file ('+STARTER_NAMES.workforce+') and a blank attendance file ('+STARTER_NAMES.attendance+') in it, then opens. Everything you add is saved into those files.'
+      ? 'Choose a folder and the dashboard creates one blank workbook ('+STARTER_NAMES.combined+') with an Employees sheet and an Attendance Tracker sheet, then opens it. Everything you add is saved into that file.'
       : 'Choose a folder and the dashboard creates a blank '+missing[0]+' file ('+STARTER_NAMES[missing[0]]+') there and opens it with your '+(missing[0]==='workforce'?'attendance':'workforce')+' file.'),
-    h('button',{class:missing.length===2?'btn primary':'btn',onclick:createStarterFiles},'Choose folder and create '+(missing.length===2?'files':'the file'))) : null;
-  box.replaceChildren(cloudCard,localTitle,card('workforce','01 · Workforce / employees'),card('attendance','02 · Attendance'),...[fresh,info.note ? h('p',{class:'tip',role:'status'},info.note) : null].filter(Boolean),
+    h('button',{class:missing.length===2?'btn primary':'btn',onclick:createStarterFiles},'Choose folder and create '+(missing.length===2?'the workbook':'the file'))) : null;
+  box.replaceChildren(cloudCard,localTitle,singleCard,twoTitle,card('workforce','01 · Workforce / employees'),card('attendance','02 · Attendance'),...[fresh,info.note ? h('p',{class:'tip',role:'status'},info.note) : null].filter(Boolean),
     h('p',{class:'err',role:'alert'},info.error || ''),open,h('button',{class:'btn ghost',onclick:doPick},'Or select both together'),
     ...[reconnect].filter(Boolean),
     h('p',{class:'tip'},'Select files one at a time from any location. Your selections are remembered on this browser, including after refresh. Allow editing when asked.'),
@@ -7189,7 +7306,7 @@ document.addEventListener("visibilitychange", () => { if (!document.hidden) poll
   try {
     if(CLOUD.mode()==='cloud'){
       try{ if(!(await CLOUD.resume()))showConnect({}); return; }
-      catch(e){showConnect({error:e.message});return;}
+      catch(e){showConnect({});return;}
     }
     if(!BE.supported()){showConnect({});return;}
     const saved=await BE.restore();

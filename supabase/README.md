@@ -1,44 +1,60 @@
-# Supabase setup
+# Supabase setup (passcode sign-in)
 
-With Supabase, the two workbooks live in a private online bucket instead of on each person's computer. Everyone signs in with their own account and works on the same data from any browser, including Firefox, Safari and phones.
+The team's workbook is stored in your Supabase database. People sign in with a **passcode** only.
 
-## One-time setup (project owner)
+- **Admin passcode:** opens the dashboard with admin rights. The admin can manage everyone's passcodes, see sign-in and save history, download daily backups, and replace the workbook.
+- **User passcodes:** open the dashboard to view and edit the data. Users can't see or change passcodes.
 
-1. **Create a project.** Sign in at [supabase.com](https://supabase.com), click **New project**, and pick a region close to your team (for example Mumbai). The free plan is enough.
-2. **Run the setup script.**
-   1. Open **SQL Editor** → **New query**.
-   2. Paste the contents of [`setup.sql`](setup.sql).
-   3. Replace `you@yourcompany.com` with your email, and add your colleagues' emails.
-   4. Click **Run**.
-3. **Create the user accounts.**
-   1. Go to **Authentication** → **Users** → **Add user** → **Create new user**.
-   2. Enter each person's email and a password, and tick **Auto Confirm User**.
-   3. Recommended: under **Authentication** → **Sign In / Providers**, turn off **Allow new users to sign up**, so only people you add can create accounts.
+## One-time setup (admin)
+
+1. **Create a project.** At [supabase.com](https://supabase.com), click **New project** and pick a region near your team (for example Mumbai). The free plan is enough.
+2. **Choose your admin passcode.** Open [`setup.sql`](setup.sql) in a text editor. At the very bottom, replace `CHANGE-ME-2468` with your own admin passcode (at least 4 characters; longer is safer).
+3. **Run the setup.** In Supabase, go to **SQL Editor** → **New query**, paste the whole file, and click **Run**. It should finish with "Success. No rows returned".
 4. **Copy the project details.** In **Project Settings** → **API**, copy the **Project URL** and the **anon public** key.
-5. **Put them in the dashboard.** You can do this either way:
-   - **In the file:** open `index.html` in a text editor, find `const SUPABASE_CONFIG`, paste the URL and key between the quotes, and save. Everyone who gets this file only needs to type their email and password.
-   - **On screen:** leave the file as it is. Each person types the Project URL and key the first time they sign in, and the browser remembers them.
+5. **Put them in the dashboard.** Open `index.html` in a text editor, find `const SUPABASE_CONFIG`, paste the URL and key between the quotes, and save. Now the start screen shows only the passcode box. (If you skip this, each person types the URL and key the first time; the browser remembers them.)
+6. **Put your workbook online.**
+   1. Open `index.html` and sign in with the admin passcode.
+   2. Click **Upload my workbook** and choose your Excel file. It needs a workforce sheet and a sheet named **Attendance Tracker**.
+   3. Or click **Create a blank workbook** to start fresh.
+7. **Add your team.** In the sidebar, click **Manage passcodes**, then add each person with a name and passcode. **New** suggests a random 6-digit code. Give each person their own passcode.
 
-## First sign-in
+## Managing passcodes (admin only)
 
-1. Open `index.html`, then fill in the **Supabase · shared online** box and click **Sign in**.
-2. If the files aren't in Supabase yet, the dashboard asks what to do for each one:
-   - **Upload my existing file** moves your current Excel data online.
-   - **Create blank** starts fresh.
-3. From then on, it opens straight into the dashboard.
+In the sidebar, click **Manage passcodes**:
+
+| Task | How |
+|---|---|
+| See passcodes | **Show** reveals one; **Show all passcodes** reveals every one |
+| Add a person | Fill in name, role (User or Admin) and passcode, then **Add person** |
+| Change a passcode or name | **Edit**, change it, **Save**. The old passcode stops working immediately and that person is signed out. |
+| Change your own admin passcode | **Edit** on your own row |
+| Stop someone signing in | **Disable** (reversible with **Enable**) or **Delete** |
+
+Rules the database enforces:
+- Passcodes need at least 4 characters and must all be different.
+- There must always be at least one active admin, and you can't delete yourself.
+
+The panel also shows recent sign-ins (including wrong-passcode attempts), recent saves, and the daily backups.
+
+## Security notes
+
+- **All checks run in the database.** The dashboard can't read the tables directly; every request goes through functions that check the passcode session first. Only the admin functions return passcodes.
+- **Passcodes are stored readable** so the admin can see them, as requested. Anyone with access to your Supabase account (the owner login) can see them too, so protect that account with a strong password and two-factor sign-in.
+- **Guessing is limited.** After 10 wrong passcodes from one network within 10 minutes, sign-in is blocked from that network for 10 minutes. Use passcodes of 6 or more characters.
+- **Sessions last 12 hours** of inactivity, then the passcode is asked again. **Sign out** ends the session at once.
+- **The anon key is safe to put in the file.** It only allows calling these functions. Never put the **service_role** key in the dashboard.
 
 ## How saving works
 
-- **Every save uploads the workbook to the bucket.** A reload or the next check picks up other people's changes.
-- **Simultaneous saves are caught.** If someone else saved the same file since you loaded it, your save is refused with a message instead of overwriting their work. The latest version loads, and you redo your change.
-- **Daily backups.** The first save of each day copies the previous version to `backups/YYYY-MM-DD/` in the bucket. Restore by downloading a copy from **Storage** in the Supabase dashboard.
-- **Save log.** Every save is recorded in the `save_log` table: who saved which file, and when.
-- **Local backups too.** Recovery copies are also kept in each browser, as before.
+- **One workbook, both sheets.** Employee changes and attendance changes are saved into the same workbook.
+- **Simultaneous saves are caught.** If two people save at the same moment, the database accepts the first and refuses the second with a message, so nobody silently overwrites anyone. The dashboard reloads the latest version.
+- **Daily backups.** The first save of each day keeps a backup of the previous version for 30 days. The admin can download any backup from **Manage passcodes** → **Daily backups**, and restore it with **Replace workbook…**.
+- **Download a copy anytime.** Admins can use **Download current workbook** to get the file for Excel.
 
-## Getting your Excel files out
+## Forgot the admin passcode?
 
-In the Supabase dashboard, open **Storage** → **team-dashboard** and download either workbook at any time. They're normal `.xlsx` files.
+In Supabase, go to **SQL Editor** and run:
 
-## Is the anon key safe in the file?
-
-Yes. The anon key is designed to be public. Access to the data is controlled by the rules in `setup.sql`: only signed-in users whose email is in `dashboard_members` can read or save the files. Never put the **service_role** key in the dashboard.
+```sql
+update public.td_users set passcode = 'NEW-PASSCODE' where role = 'admin' and name = 'Admin';
+```

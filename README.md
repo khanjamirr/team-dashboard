@@ -1,18 +1,17 @@
 # Team Dashboard
 
-A single-file HTML dashboard for managing a team's workforce and attendance in two Excel workbooks. It runs entirely in the browser, with nothing to install. The workbooks can be local files on your computer or files in a private Supabase bucket shared with your team.
+A single-file HTML dashboard for managing a team's workforce and attendance in one Excel workbook (a workforce sheet and an Attendance Tracker sheet). It runs entirely in the browser, with nothing to install. The workbook can be a file on your computer, or stored in your Supabase database with passcode sign-in for the whole team.
 
 ## Quick start
 
-Open `index.html` in a browser. You can work in one of two ways:
+Open `index.html` in a browser.
 
-**A. Supabase (shared online, recommended for teams).** The workbooks live in your private Supabase project, everyone signs in with their own account, and it works in any modern browser. Set it up once with [supabase/README.md](supabase/README.md), then sign in on the first screen.
+**A. Passcode sign-in with Supabase (recommended for teams).** The workbook lives in your Supabase database. Everyone signs in with their own passcode, and one admin passcode manages all the others. Works in any modern browser. Set it up once with [supabase/README.md](supabase/README.md).
 
-**B. Excel files on this computer.** Requires Edge or Chrome on a computer. On the setup screen, either:
-- select your existing **workforce** and **attendance** workbooks, or
-- click **Choose folder and create files** to start fresh. The dashboard creates `Team Workforce.xlsx` and `Team Attendance.xlsx` in the folder you pick and saves everything there.
-
-Allow editing when the browser asks. Your file choices are remembered in this browser.
+**B. An Excel workbook on this computer.** Requires Edge or Chrome on a computer. On the start screen, either:
+- **Select workbook** for one Excel file that holds both a workforce sheet and an **Attendance Tracker** sheet, or
+- select two separate files (workforce and attendance), or
+- click **Choose folder and create the workbook** to start with a blank `Team Dashboard.xlsx`.
 
 ## Features
 
@@ -22,15 +21,17 @@ Allow editing when the browser asks. Your file choices are remembered in this br
 - **Action center:** data health checks and pending items.
 - **Reports:** frozen header, click-to-filter bar charts with multi-select (Ctrl+click), age bands, tenure, clients, locations, joiners and leavers, plus an attendance timeline with its own filters (date range, leave types, day / week / month grouping, hide weekends, single employee). Every chart has Copy table and Copy chart buttons.
 
-## The two workbooks
+## The workbook
 
-**Workforce file.** One sheet with a header row. Column names the dashboard recognises:
+One Excel workbook with two sheets. Two separate files also still work when using local files.
+
+**Workforce sheet.** Any sheet name except "Attendance Tracker", with a header row. Column names the dashboard recognises:
 
 `Emp Code`, `Employee Name`, `Status`, `Designation`, `Client`, `Sub Client/Type`, `Phone`, `WhatsApp`, `Gender`, `DOB`, `DOJ`, `Left Date`, `Notice Period`, `Current Area`, `Distance to Office`, `Cab`, `Status2` (work mode), `Column1` (language), `Asset?`, `Dual Monitor`, `From City`, `From State`, `Remarks`, `Pseudo Names`.
 
 Similar names are usually detected too (for example `Employee ID`, `Date of Joining`).
 
-**Attendance file.** A sheet named **`Attendance Tracker`**:
+**Attendance sheet.** A sheet named **`Attendance Tracker`**:
 
 | Row / column | Content |
 |---|---|
@@ -48,7 +49,10 @@ The dashboard edits only the sheet data it needs. Styles, pivots, other sheets a
 
 ## Sharing with a team
 
-**Best option: Supabase.** See [supabase/README.md](supabase/README.md). Each person signs in, and all saves go to the same online files. If two people save the same file at the same moment, the second save is refused, so nobody silently overwrites anyone. The first save each day also makes a backup copy.
+**Best option: Supabase with passcodes.** See [supabase/README.md](supabase/README.md). Everyone signs in with their own passcode and works on the same online workbook:
+- If two people save at the same moment, the second save is refused, so nobody silently overwrites anyone.
+- The first save each day keeps a backup for 30 days.
+- The admin manages all passcodes from inside the dashboard.
 
 **Alternative: OneDrive-synced files.** The page can only open files that exist on the computer, so each person needs the workbooks synced locally:
 
@@ -70,12 +74,12 @@ These values live near the top of the relevant script blocks in `index.html`:
 | Title and version | `const APP = { title, version, released }` |
 | Column names | `const CFG = { key, name, status, … }` |
 | Office address for distance estimates | `const GOOGLE_OFFICE = '…'` |
-| Supabase project, bucket and file names | `const SUPABASE_CONFIG = { url, anonKey, bucket, … }` |
+| Supabase project and workbook name | `const SUPABASE_CONFIG = { url, anonKey, workbookFile }` |
 
 ## Privacy
 
 - **Local mode:** employee data stays in your Excel files and in the browser's private storage (for backups and the activity log). Nothing is uploaded.
-- **Supabase mode:** the workbooks are stored in your own Supabase project, in a private bucket. Only signed-in members listed in `dashboard_members` can read or save them.
+- **Supabase mode:** the workbook is stored in your own Supabase database. Only someone with a valid passcode can read or save it, and only the admin can see or change passcodes.
 - **Other network calls:** the optional distance tool looks up addresses via OpenStreetMap's Photon service, and "open in Google Maps" links open in a new tab.
 - **Never commit your workbooks to this repository.** `.gitignore` blocks `.xlsx`, `.xlsm`, `.xls` and `.csv` files.
 - **Never put the Supabase `service_role` key in `index.html`.** Only the anon key belongs there.
