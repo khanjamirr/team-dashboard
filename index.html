@@ -4,7 +4,7 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <link rel="icon" href="data:,">
-<title>Team Dashboard · 3.13.0</title>
+<title>Team Dashboard · 3.14.1</title>
 <style>
 :root {
   color-scheme: light;
@@ -989,6 +989,46 @@ table.data td { padding:9px 10px; font-size:12px; }
 #customFieldControls { display:flex; flex-wrap:wrap; gap:6px; margin-top:6px; }
 #customFieldControls .msel { min-width:150px; max-width:260px; flex:1 1 150px; }
 @media(max-width:650px){.field-picker { position:static; margin-top:6px; } }
+/* v3.14: saved filters. Customize sits on the right before Default view; Delete lives in the ⋯ menu */
+.saved-filter-row .field-customizer { margin-left:4px; }
+.saved-filter-row .field-picker { left:auto; right:0; }
+.filter-more { position:relative; }
+.filter-more > summary { list-style:none; cursor:pointer; min-width:30px; justify-content:center; letter-spacing:1px; }
+.filter-more > summary::-webkit-details-marker { display:none; }
+.filter-more-menu { position:absolute; z-index:61; top:34px; left:0; min-width:210px; background:var(--surface); border:1px solid var(--border); border-radius:10px; box-shadow:var(--shadow); padding:6px; }
+.filter-more-menu .btn { width:100%; justify-content:flex-start; color:var(--danger); }
+@media(max-width:650px){ .filter-more-menu { left:auto; right:0; } }
+/* v3.14: Overview. Attendance and Coming up share the width equally; Leave watch spans both */
+#pageSummary { grid-template-columns:minmax(0,1fr) minmax(0,1fr); align-items:stretch; }
+#pageSummary > .card { min-width:0; }
+#pageSummary > #cardWatch { grid-column:1 / -1; }
+@media(max-width:1100px) { #pageSummary { grid-template-columns:minmax(0,1fr); } }
+.watch-head { display:flex; flex-wrap:wrap; gap:10px; align-items:flex-start; }
+.watch-head .grow { flex:1 1 260px; }
+.watch-head select { height:30px; width:auto; min-width:0; }
+.watch-cols { display:grid; grid-template-columns:minmax(0,1fr) minmax(0,1fr); gap:16px; margin-top:12px; }
+@media(max-width:900px) { .watch-cols { grid-template-columns:minmax(0,1fr); } }
+.watch-col h3 { margin:0 0 2px; font-size:14px; }
+.watch-col .sub { font-size:12px; color:var(--ink-2); margin-bottom:8px; }
+.watch-list { list-style:none; margin:0; padding:0; max-height:340px; overflow:auto; border:1px solid var(--border); border-radius:10px; }
+.watch-list li { display:flex; gap:10px; align-items:flex-start; padding:9px 12px; border-top:1px solid var(--border); }
+.watch-list li:first-child { border-top:0; }
+.watch-list .who { flex:1; min-width:0; }
+.watch-list .who b { display:block; font-size:13px; }
+.watch-list .who small { display:block; color:var(--ink-2); font-size:11.5px; line-height:1.4; }
+.flag { flex:none; font-size:11px; font-weight:650; border-radius:999px; padding:2px 9px; white-space:nowrap; }
+.flag.red { background:color-mix(in srgb, var(--danger) 14%, transparent); color:var(--danger); }
+.flag.amber { background:color-mix(in srgb, var(--c-yellow, #d9a400) 22%, transparent); color:var(--ink); }
+.flag.blue { background:var(--accent-soft); color:var(--accent); }
+.watch-empty { padding:18px 12px; color:var(--ink-2); font-size:12.5px; border:1px dashed var(--border); border-radius:10px; }
+/* v3.14: activity bell in the header, on every page */
+.bell { position:relative; width:34px; padding:0 !important; justify-content:center; }
+.bell svg { width:18px; height:18px; }
+.bell-n { position:absolute; top:-4px; right:-5px; min-width:17px; height:17px; padding:0 4px; border-radius:9px; background:var(--danger); color:#fff; font-size:10px; font-weight:700; line-height:17px; text-align:center; }
+.drawer.activity-drawer .body { padding-top:4px; }
+/* v3.14: reports toggle and hidden export buttons */
+.report-controls .rep-toggle { margin-left:auto; }
+body.no-report-export .report-copy, body.no-report-export .report-copy-buttons { display:none !important; }
 </style><style>#pageReports,.charts,.charts > .card,#attReportsWrap,#slotReports,#attHost { min-width:0; max-width:100%; } .chart-body svg { max-width:100%; overflow:hidden; }</style><style>.report-selection { display:flex; flex-wrap:wrap; gap:8px; align-items:center; padding:10px 0 16px; font-size:12px; } .fact:focus-visible { outline:2px solid var(--accent); } </style><style>
 /* ---------- v3.11 start screen: passcode only ---------- */
 #connect { min-height:100vh; display:grid; place-items:center; align-content:center; gap:14px; padding:24px; background:var(--bg); }
@@ -1128,6 +1168,22 @@ div.rmod-head { cursor:default; }
 .rmod.off .rmod-items { opacity:.45; }
 .rmod-extra { border-top:1px solid var(--border); margin-top:6px; padding-top:8px; }
 .rmod-note { margin:0 0 8px; font-size:12px; line-height:1.45; color:var(--ink-2); }
+/* v3.14.1: the Filters card spans the full width so fixed filters can be chosen right here */
+.rmod.rmod-wide { grid-column:1 / -1; }
+.ff-editor { margin:10px 0 8px; }
+.ff-q { display:flex; align-items:center; gap:8px; margin-bottom:10px; font-size:12px; color:var(--ink-2); }
+.ff-q .input { max-width:340px; height:30px; }
+.ff-grid { display:grid; grid-template-columns:repeat(auto-fill,minmax(210px,1fr)); gap:8px; align-items:start; }
+.ff-dim { border:1px solid var(--border); border-radius:8px; background:var(--surface); }
+.ff-dim > summary { display:flex; align-items:center; gap:8px; padding:7px 10px; cursor:pointer; font-size:12.5px; }
+.ff-dim > summary b { flex:1; }
+.ff-count { color:var(--accent); font-weight:600; font-size:11px; }
+.ff-tools { display:flex; gap:6px; align-items:center; padding:0 10px 6px; font-size:11px; color:var(--ink-2); }
+.ff-tools small { margin-left:auto; }
+.ff-list { max-height:200px; overflow:auto; padding:0 10px 8px; }
+.ff-list .chk-line { display:flex; align-items:center; gap:8px; padding:3px 0; font-size:12px; }
+.ff-list .chk-line span { flex:1; min-width:0; overflow-wrap:anywhere; }
+.ff-list .chk-line small { color:var(--ink-3, var(--ink-2)); font-size:10.5px; }
 .rights.is-admin .rmods { opacity:.55; }
 body.filters-locked #cleanFilters, body.filters-locked #xchips, body.filters-locked .saved-filter-row, body.filters-locked #customFieldControls { display:none !important; }
 </style></head>
@@ -1143,10 +1199,10 @@ body.filters-locked #cleanFilters, body.filters-locked #xchips, body.filters-loc
     <p class="gate-sub">One place for your people, priorities and team insights.</p>
     <div id="connectBody"><div class="empty">Loading…</div></div>
   </div>
-  <p class="gate-ver">3.13.0</p>
+  <p class="gate-ver">3.14.1</p>
 </section>
 
-<div id="app" hidden><aside class="sidebar" aria-label="Workspace navigation"><div class="brand dashboard-identity">      <h1><span id="title">Team Dashboard</span><span class="ver" id="ver" title="Version 3.13.0">3.13.0</span></h1><p class="brand-tag">One place for your people, priorities and team insights.</p>      <span class="sync" id="sync" role="status"><i></i><span id="syncText">Loading…</span></span></div><div class="nav-label">WORKSPACE</div>      <nav class="tabs" role="tablist" aria-label="Pages" aria-orientation="vertical">
+<div id="app" hidden><aside class="sidebar" aria-label="Workspace navigation"><div class="brand dashboard-identity">      <h1><span id="title">Team Dashboard</span><span class="ver" id="ver" title="Version 3.14.1">3.14.1</span></h1><p class="brand-tag">One place for your people, priorities and team insights.</p>      <span class="sync" id="sync" role="status"><i></i><span id="syncText">Loading…</span></span></div><div class="nav-label">WORKSPACE</div>      <nav class="tabs" role="tablist" aria-label="Pages" aria-orientation="vertical">
         <button class="tab on" role="tab" aria-controls="pageSummary" data-view="summary" aria-selected="true">Overview</button>
         <button class="tab" role="tab" aria-controls="pageEmployees" data-view="employees" aria-selected="false">Employees</button>
       <button class="tab" role="tab" aria-controls="pageAttendance" data-view="attendance" aria-selected="false">Attendance</button>
@@ -1166,6 +1222,7 @@ body.filters-locked #cleanFilters, body.filters-locked #xchips, body.filters-loc
       <button class="btn ghost" id="btnLogout" title="Connect your two workbooks">Linked files</button>
       <button class="btn ghost autosync" id="btnAutoSync" hidden></button>
       <button class="btn ghost" id="btnSaveNow" hidden></button>
+      <button class="btn ghost bell" id="btnBell" type="button" aria-label="Activity" title="Activity: every change, newest first" hidden><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M6 8a6 6 0 0 1 12 0c0 7 3 9 3 9H3s3-2 3-9"/><path d="M10.3 21a1.94 1.94 0 0 0 3.4 0"/></svg><span class="bell-n" id="bellN" hidden></span></button>
     </header>
   <div class="workspace-heading overview-heading"><div><p class="eyebrow">TEAM WORKSPACE</p><h2 id="cleanPageTitle">Overview</h2><p>Your people and priorities, at a glance.</p></div></div>
   </div>
@@ -1196,9 +1253,10 @@ body.filters-locked #cleanFilters, body.filters-locked #xchips, body.filters-loc
           </div>
           <div class="coming" id="coming"></div>
         </div>
+        <div class="card c-watch" id="cardWatch" aria-label="Leave watch" hidden></div>
     </div>
 
-    <div id="pageReports" hidden><div id="reportSticky"><div class="report-controls"><label for="reportGroup">Explore</label><select class="input" id="reportGroup"><option value="team" selected>Team composition</option><option value="growth">Tenure & growth</option><option value="location">Location & travel</option><option value="attendance">Attendance</option></select></div></div>      <section class="charts" id="charts" aria-label="Charts">
+    <div id="pageReports" hidden><div id="reportSticky"><div class="report-controls"><label for="reportGroup">Explore</label><select class="input" id="reportGroup"><option value="team" selected>Team composition</option><option value="growth">Tenure & growth</option><option value="location">Location & travel</option><option value="attendance">Attendance</option></select><button class="btn mini rep-toggle" id="repTables" type="button" aria-pressed="false" title="Show every chart on this page as a table, or back">Show all as tables</button></div></div>      <section class="charts" id="charts" aria-label="Charts">
         <div class="card chart" id="cardStatus"></div>
         <div class="card chart" id="cardTenure"></div>
         <div class="card chart" id="cardTrend"></div>
@@ -1235,6 +1293,7 @@ body.filters-locked #cleanFilters, body.filters-locked #xchips, body.filters-loc
           <span class="spacer"></span>
           <button class="btn" id="btnFill" title="Fill or correct one field for many people in one table, then save once">Fill in bulk</button>
           <button class="btn" id="btnCols" aria-haspopup="true" data-pop="1">Columns</button>
+          <button class="btn" id="btnAddField" type="button" hidden title="Capture something new for everyone. It becomes a new column in the Excel workbook.">+ Add field</button>
           <button class="btn primary" id="btnAdd">+ Add employee</button>
         </div>
         <div class="tools row2">
@@ -1554,8 +1613,16 @@ function buildSchema(book) {
     return { nf, numFrac: nf ? nums.length / nf : 0, dateStyleFrac: nf ? dstyle / nf : 0, dateRangeFrac: nf ? inRange / nf : 0, distinct, maxNum: nums.length ? Math.max(...nums) : 0 };
   });
   const dateCols = new Set(), numCols = new Set(), autoCols = new Set(), selCols = new Set();
+  /* v3.14: fields added from the dashboard keep the type chosen for them (Settings: custom_fields) */
+  const CF = new Map((((typeof window !== "undefined" && window.TD_SETTINGS) || {}).custom_fields || []).filter(f => f && f.name).map(f => [f.name, f]));
   H.forEach((h, i) => {
-    const s = stat[i];
+    const s = stat[i], cf = CF.get(h);
+    if (cf && !CFG.autoCols.includes(h)) {
+      if (cf.type === "date") { dateCols.add(h); return; }
+      if (cf.type === "number") { numCols.add(h); return; }
+      if (cf.type === "yesno" || cf.type === "choice") { selCols.add(h); return; }
+      if (cf.type === "text") return;
+    }
     if (CFG.autoCols.includes(h) || h === tenureHdr || /tomm\.?$/i.test(h)) { autoCols.add(h); return; }
     if (h === roles.key || h === roles.name || h === roles.phone) return;
     if (CFG.dateCols.includes(h) || [roles.dob, roles.doj, roles.left].includes(h) || (s.nf >= 3 && s.numFrac >= 0.8 && (s.dateStyleFrac >= 0.5 || (dateHint.test(h) && s.dateRangeFrac >= 0.6)))) { dateCols.add(h); return; }
@@ -1567,7 +1634,7 @@ function buildSchema(book) {
   const columns = H.map(h => ({
     name: h, label: CFG.labels[h] || h,
     type: dateCols.has(h) ? "date" : numCols.has(h) ? "number" : "text",
-    auto: autoCols.has(h), select: selCols.has(h), group: groupOf[h] || "Other", pos: posOf[h] ?? 999,
+    auto: autoCols.has(h), select: selCols.has(h), group: groupOf[h] || (CF.has(h) ? "Additional details" : "Other"), pos: posOf[h] ?? 999,
   }));
   const inactiveRe = /^(left|moved|resign(ed|ation)?|terminated|exited|absconded|inactive|separated|relieved)$/i;
   const stIdx = H.indexOf(roles.status);
@@ -1576,7 +1643,7 @@ function buildSchema(book) {
   let tableCols = CFG.tableCols.filter(c => H.includes(c));
   if (tableCols.length < 3) tableCols = H.slice(0, 8);
   const addDefaults = {}; for (const [k, v] of Object.entries(CFG.addDefaults)) if (H.includes(k)) addDefaults[k] = v;
-  const groups = [...Object.keys(CFG.groups), "Other"];
+  const groups = [...Object.keys(CFG.groups), ...(H.some(x => CF.has(x) && !groupOf[x]) ? ["Additional details"] : []), "Other"];
   return {
     title: CFG.title, columns, groups, table_columns: tableCols, inactive_statuses: inactive, add_defaults: addDefaults,
     key_column: roles.key, name_column: roles.name, status_column: roles.status, designation_column: roles.designation,
@@ -2212,7 +2279,8 @@ const routes = {
     try {
       const need = method === "POST" && path === "/api/rows" ? "emp.add" : method === "PUT" ? "emp.edit" : method === "DELETE" ? "emp.delete"
         : method === "POST" && (path === "/api/bulk" || path === "/api/columns") ? "emp.bulk" : null;
-      if (need && window.PERM && !PERM.can(need)) throw new ApiErr(403, "Your passcode doesn't allow this change. Ask the admin for the right in Settings.");
+      if (need === "emp.bulk" && path === "/api/columns" && window.PERM && PERM.can("emp.fields")) { /* v3.14: the Add new fields right is enough to add a column */ }
+      else if (need && window.PERM && !PERM.can(need)) throw new ApiErr(403, "Your passcode doesn't allow this change. Ask the admin for the right in Settings.");
       if (path === "/api/data" && method === "GET") return await snapshot();
       if (path === "/api/version" && method === "GET") { const fh = await fileHandle(); const f = await fh.getFile(); return { version: sigOf(f), locked: await lockedByExcel() }; }
       if (path === "/api/activity" && method === "GET") {
@@ -2531,28 +2599,33 @@ const CLOUD = (() => {
 (() => {
 /* v3.13: rights are grouped by module. A module with a page has a "can open" box; its items sit underneath. */
 const PERM_GROUPS = [
-  { name: 'Overview', page: 'page.overview', items: [] },
-  { name: 'Employees', page: 'page.employees', items: [['emp.edit', 'Edit employee details'], ['emp.add', 'Add employees'], ['emp.delete', 'Delete employees'], ['emp.bulk', 'Fill in bulk and add columns']] },
-  { name: 'Attendance', page: 'page.attendance', items: [['att.who', 'See Who’s out'], ['att.grid', 'See the attendance grid and People'], ['att.log', 'Log leave applications (LA)'], ['att.edit', 'Mark and edit attendance'], ['att.approve', 'Approve or reject leave (AL, CL, SL, RJ)'], ['att.holidays', 'Mark holidays for everyone']] },
-  { name: 'Action center', page: 'page.actions', items: [] },
-  { name: 'Reports', page: 'page.reports', items: [] },
+  { name: 'Overview', page: 'page.overview', items: [['ov.attendance', 'See the attendance card'], ['ov.coming', 'See birthdays and work anniversaries'], ['ov.watch', 'See leave red flags and day patterns']] },
+  { name: 'Employees', page: 'page.employees', items: [['emp.edit', 'Edit employee details'], ['emp.add', 'Add employees'], ['emp.delete', 'Delete employees'], ['emp.bulk', 'Fill in bulk and add columns'], ['emp.fields', 'Add new fields (new Excel columns)']] },
+  { name: 'Attendance', page: 'page.attendance', items: [['att.who', 'See Who’s out'], ['att.grid', 'See the attendance grid and People'], ['att.log', 'Log leave applications (LA)'], ['att.edit', 'Mark and edit attendance'], ['att.approve', 'Approve or reject leave (AL, CL, SL, RJ)'], ['att.holidays', 'Mark holidays for everyone'], ['att.fields', 'Add fields to the attendance tracker']] },
+  { name: 'Action center', page: 'page.actions', items: [['act.items', 'See Action items'], ['act.review', 'See Designation reviews'], ['act.health', 'See Attendance data health']] },
+  { name: 'Reports', page: 'page.reports', items: [['rep.team', 'Team composition'], ['rep.growth', 'Tenure & growth'], ['rep.location', 'Location & travel'], ['rep.attendance', 'Attendance reports'], ['rep.export', 'Copy report tables and charts']] },
+  { name: 'Save & sync', items: [['sync.view', 'Open the Save & sync settings'], ['sync.auto', 'Start or stop auto-sync'], ['sync.save', 'Save now and undo']] },
+  { name: 'Notifications', items: [['activity.view', 'See the activity bell (every change)']] },
   { name: 'Filters', items: [['filters.custom', 'Change the filters (search, status, client…)']] },
-  { name: 'Settings', items: [['activity.view', 'See the activity log'], ['set.fields', 'Choose the mandatory fields'], ['set.workbook', 'Backups, sign-in history and replacing the workbook'], ['workbook.download', 'Download a copy of the workbook'], ['tools.distance', 'Use the distance tool']] },
+  { name: 'Settings', items: [['set.fields', 'Choose the mandatory fields'], ['set.workbook', 'Backups, sign-in history and replacing the workbook'], ['workbook.download', 'Download a copy of the workbook'], ['tools.distance', 'Use the distance tool']] },
 ];
+const PERM_VERSION = 4;
 const PAGES = PERM_GROUPS.filter(g => g.page).map(g => g.page);
 const PERM_KEYS = [...PAGES, ...PERM_GROUPS.flatMap(g => g.items.map(i => i[0]))];
 const PAGE_OF = { summary: 'page.overview', employees: 'page.employees', attendance: 'page.attendance', actions: 'page.actions', reports: 'page.reports' };
-const pick = keys => Object.fromEntries([['_v', 3], ...PERM_KEYS.map(k => [k, keys.includes(k)])]);
+const pick = keys => Object.fromEntries([['_v', PERM_VERSION], ...PERM_KEYS.map(k => [k, keys.includes(k)])]);
 const ROLE_NAMES = { superadmin: 'Super admin', admin: 'Admin', user: 'User' };
+/* v3.14: what a page shows by default once someone may open it (red flags and new fields stay off until ticked) */
+const VIEW_KEYS = ['ov.attendance', 'ov.coming', 'act.items', 'act.review', 'act.health', 'rep.team', 'rep.growth', 'rep.location', 'rep.attendance', 'rep.export'];
 window.PERM = {
   groups: PERM_GROUPS, keys: PERM_KEYS, roleNames: ROLE_NAMES,
   presets: {
     'Full access': pick(PERM_KEYS),
-    'Admin': pick([...PAGES, 'emp.edit', 'emp.add', 'emp.delete', 'emp.bulk', 'att.who', 'att.grid', 'att.log', 'att.edit', 'att.approve', 'att.holidays', 'filters.custom', 'activity.view', 'set.fields', 'set.workbook', 'workbook.download', 'tools.distance']),
-    'Editor': pick([...PAGES, 'emp.edit', 'emp.add', 'emp.bulk', 'att.who', 'att.grid', 'att.log', 'att.edit', 'filters.custom', 'activity.view', 'tools.distance']),
-    'Leave approver': pick([...PAGES, 'att.who', 'att.grid', 'att.log', 'att.edit', 'att.approve', 'filters.custom', 'activity.view']),
-    'Leave logger': pick(['page.overview', 'page.attendance', 'att.who', 'att.log']),
-    'View only': pick([...PAGES, 'att.who', 'att.grid']),
+    'Admin': pick(PERM_KEYS),
+    'Editor': pick([...PAGES, ...VIEW_KEYS, 'emp.edit', 'emp.add', 'emp.bulk', 'att.who', 'att.grid', 'att.log', 'att.edit', 'filters.custom', 'activity.view', 'tools.distance', 'sync.view', 'sync.auto', 'sync.save']),
+    'Leave approver': pick([...PAGES, ...VIEW_KEYS, 'ov.watch', 'att.who', 'att.grid', 'att.log', 'att.edit', 'att.approve', 'filters.custom', 'activity.view', 'sync.view', 'sync.auto', 'sync.save']),
+    'Leave logger': pick(['page.overview', 'page.attendance', 'ov.attendance', 'ov.coming', 'att.who', 'att.log', 'sync.save']),
+    'View only': pick([...PAGES, ...VIEW_KEYS, 'att.who', 'att.grid']),
   },
   online: () => CLOUD.mode() === 'cloud' && !!CLOUD.user(),
   /* the super admin (or anyone on Excel files on this computer) manages people, rights and fixed filters */
@@ -2565,6 +2638,8 @@ window.PERM = {
     const q = { ...p };
     if (q._v < 2) { q['att.who'] = !!q['page.attendance']; q['att.grid'] = !!q['page.attendance']; q['att.log'] = !!q['att.edit']; }
     if (q._v < 3) { q['filters.custom'] = true; q['set.fields'] = false; q['set.workbook'] = false; }
+    /* v3.14: new rights keep today's behaviour; red flags and adding fields must be given on purpose */
+    if (q._v < 4) { for (const k of VIEW_KEYS) q[k] = true; q['ov.watch'] = false; q['emp.fields'] = false; q['att.fields'] = false; q['sync.view'] = true; q['sync.auto'] = true; q['sync.save'] = true; }
     return q;
   },
   can(k) {
@@ -2577,7 +2652,7 @@ window.PERM = {
   linkedEmp() { const u = this.online() ? CLOUD.user() : null; const p = (u && u.permissions) || {}; return p._emp ? { code: String(p._emp), name: p._empName || '' } : null; },
   /* filters the super admin fixed for this passcode (optional) */
   fixedFilters() { const u = this.online() ? CLOUD.user() : null; const f = u && u.permissions && u.permissions._filters; return f && typeof f === 'object' ? f : null; },
-  canWrite() { return ['emp.edit', 'emp.add', 'emp.delete', 'emp.bulk', 'att.log', 'att.edit', 'att.approve', 'att.holidays'].some(k => this.can(k)); },
+  canWrite() { return ['emp.edit', 'emp.add', 'emp.delete', 'emp.bulk', 'emp.fields', 'att.log', 'att.edit', 'att.approve', 'att.holidays', 'att.fields'].some(k => this.can(k)); },
   canView(view) { return view === 'settings' || this.can(PAGE_OF[view] || 'page.overview'); },
   firstView() { return Object.keys(PAGE_OF).find(v => this.canView(v)) || 'summary'; },
 };
@@ -2594,7 +2669,7 @@ window.PERM = {
 window.ATT = (() => {
 "use strict";
 let ROOT = null;
-const ATT_CSS = ":host {\n  display: block; color: var(--ink); font-size: 14px; line-height: 1.45;\n  /* palette and surfaces come from the Team Dashboard theme, so light / dark follow it automatically */\n  --line: var(--grid); --line-2: var(--axis); --ink-3: var(--muted);\n  --blue: var(--c-blue); --orange: var(--c-orange); --aqua: var(--c-aqua); --yellow: var(--c-yellow);\n  --magenta: var(--c-magenta); --green: var(--c-green); --violet: var(--c-violet); --red: var(--c-red);\n  --accent-soft: color-mix(in srgb, var(--accent) 13%, var(--surface));\n  --good-ink: var(--good); --crit: var(--danger); --crit-ink: var(--danger); --warn: var(--c-yellow); --gray: var(--c-gray);\n  --wknd: color-mix(in srgb, var(--ink) 5%, var(--surface)); --today: var(--accent);\n  --shadow: 0 1px 2px rgba(20,40,110,.06), 0 6px 18px -10px rgba(20,40,110,.18);\n}\n* { box-sizing: border-box; }\n[hidden] { display: none !important; }\nbutton, input, select, textarea { font: inherit; color: inherit; }\nbutton { cursor: pointer; }\n.num { font-variant-numeric: tabular-nums; }\n.muted { color: var(--ink-3); } .sm { font-size: 12px; }\n.sr { position: absolute; width: 1px; height: 1px; overflow: hidden; clip: rect(0 0 0 0); }\n.linkbtn { all: unset; color: var(--accent); cursor: pointer; text-decoration: underline; }\n\n/* ---------- section chrome (the Team Dashboard already provides the sidebar and page header) ---------- */\n.topbar { position: sticky; top: 0; z-index: 8; display: flex; align-items: center; gap: 10px; padding: 8px 0 10px; background: var(--bg); flex-wrap: wrap; }\n.subnav { display: inline-flex; gap: 2px; padding: 3px; border-radius: 10px; background: var(--surface); border: 1px solid var(--line); flex-wrap: wrap; }\n.subnav button.tab { display: inline-flex; align-items: center; gap: 7px; border: 0; background: transparent; padding: 6px 12px; border-radius: 8px; color: var(--ink-2); font-weight: 500; }\n.subnav button.tab:hover { background: var(--wash); }\n.subnav button.tab[aria-current=\"page\"] { background: var(--accent-soft); color: var(--ink); font-weight: 650; box-shadow: inset 0 0 0 1px color-mix(in srgb, var(--accent) 35%, transparent); }\n.subnav button.tab svg { width: 16px; height: 16px; flex: none; }\n.subnav .badge { font-size: 11px; background: var(--crit); color: #fff; border-radius: 10px; padding: 0 6px; min-width: 18px; text-align: center; }\n.scope { display: inline-flex; align-items: center; gap: 6px; color: var(--ink-2); font-size: 12px; font-weight: 600; }\n.scope select { max-width: 250px; font-weight: 500; }\n.fileline { display: flex; align-items: center; gap: 10px; flex-wrap: wrap; margin: 0 0 14px; }\n.syncbtn { font-weight: 600; }\n.syncbtn.s-ok { color: var(--ink); }\n.syncbtn.s-dirty { color: #9a6700; border-color: color-mix(in srgb, var(--warn) 55%, var(--line)); background: color-mix(in srgb, var(--warn) 16%, transparent); }\n.syncbtn.s-warn { color: var(--danger); border-color: color-mix(in srgb, var(--danger) 45%, var(--line)); background: color-mix(in srgb, var(--danger) 10%, transparent); }\n.syncbtn.s-busy { color: var(--ink-2); }\n.filechip { display: inline-flex; align-items: center; gap: 6px; padding: 3px 10px; border: 1px solid var(--line); border-radius: 999px; font-size: 12px; color: var(--ink-2); max-width: 340px; background: var(--surface); }\n.filechip svg { width: 14px; height: 14px; flex: none; }\n.filechip span { overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }\n.pill { display: inline-flex; align-items: center; gap: 6px; padding: 3px 10px; border-radius: 999px; font-size: 12px; font-weight: 600; }\n.pill.ok { background: color-mix(in srgb, var(--c-aqua) 16%, var(--surface)); color: var(--ink); }\n.pill.dirty { background: color-mix(in srgb, var(--warn) 28%, var(--surface)); color: var(--ink); }\n.grow { flex: 1; }\n.gate { text-align: center; padding: 34px 24px; }\n.gate .filelist { text-align: left; }\n.filelist { display: flex; flex-direction: column; gap: 6px; margin: 12px 0 14px; max-height: 260px; overflow: auto; }\n.fileopt { display: flex; align-items: center; gap: 10px; justify-content: space-between; width: 100%; text-align: left; padding: 9px 12px; border: 1px solid var(--line-2); border-radius: 8px; background: var(--surface); }\n.fileopt:hover { background: var(--wash); border-color: var(--accent); }\n.fileopt span { display: inline-flex; align-items: center; gap: 8px; } .fileopt svg { width: 16px; height: 16px; }\n.rosterline { display: flex; align-items: center; gap: 8px; flex-wrap: wrap; margin-top: 8px; }\n.form label.chk, label.chk { flex-direction: row; align-items: center; gap: 8px; font-weight: 500; }\n\n/* ---------- controls ---------- */\n.btn { display: inline-flex; align-items: center; gap: 6px; border: 1px solid var(--line-2); background: var(--surface); padding: 6px 12px; border-radius: 8px; font-weight: 550; line-height: 1.3; white-space: nowrap; }\n.btn:hover:not(:disabled) { background: var(--surface-2); }\n.btn:disabled { opacity: .45; cursor: not-allowed; }\n.btn.primary { background: linear-gradient(135deg, var(--band-2, var(--accent)), var(--band-3, var(--accent))); border-color: transparent; color: var(--accent-ink, #fff); }\n.btn.primary:hover:not(:disabled) { filter: brightness(1.12); }\n.btn.danger { color: var(--crit-ink); border-color: color-mix(in srgb, var(--crit) 45%, var(--line-2)); }\n.btn.danger.armed { background: var(--crit); color: #fff; border-color: var(--crit); }\n.btn.ghost { border-color: transparent; background: transparent; }\n.btn.sm { padding: 3px 8px; font-size: 12px; border-radius: 6px; }\n.btn svg { width: 16px; height: 16px; }\ninput[type=text], input[type=search], input[type=number], input[type=date], select, textarea { border: 1px solid var(--line-2); background: var(--surface); border-radius: 8px; padding: 6px 10px; min-width: 0; }\ninput:focus-visible, select:focus-visible, button:focus-visible, textarea:focus-visible { outline: 2px solid var(--accent); outline-offset: 1px; }\n.toolbar { display: flex; gap: 8px; align-items: center; flex-wrap: wrap; margin-bottom: 14px; }\n.toolbar label { display: inline-flex; align-items: center; gap: 6px; color: var(--ink-2); font-size: 13px; }\n.seg { display: inline-flex; border: 1px solid var(--line-2); border-radius: 8px; overflow: hidden; }\n.seg button { border: 0; background: var(--surface); padding: 5px 10px; font-size: 13px; color: var(--ink-2); }\n.seg button + button { border-left: 1px solid var(--line-2); }\n.seg button[aria-pressed=\"true\"] { background: var(--accent-soft); color: var(--ink); font-weight: 600; }\n\n/* ---------- cards / tiles ---------- */\n.card { background: var(--surface); border: 1px solid var(--line); border-radius: 12px; padding: 16px; box-shadow: var(--shadow); min-width: 0; }\n.card h2 { font-size: 14px; margin: 0 0 2px; font-weight: 650; } .card .sub { color: var(--ink-3); font-size: 12px; margin-bottom: 12px; }\n.grid { display: grid; gap: 14px; } .g6 { grid-template-columns: repeat(6, 1fr); } .g2 { grid-template-columns: 1.5fr 1fr; } .g2e { grid-template-columns: 1fr 1fr; }\n@media (max-width: 1250px) { .g6 { grid-template-columns: repeat(3, 1fr); } .g2, .g2e { grid-template-columns: 1fr; } }\n@media (max-width: 800px) { .g6 { grid-template-columns: repeat(2, 1fr); } }\n.tile { padding: 14px 16px; }\n.tile .lbl { font-size: 12px; color: var(--ink-3); font-weight: 600; letter-spacing: .02em; }\n.tile .val { font-size: 28px; font-weight: 680; line-height: 1.15; margin-top: 4px; font-variant-numeric: tabular-nums; }\n.tile .delta { font-size: 12px; margin-top: 4px; color: var(--ink-3); }\n.delta .up, .delta .down { font-weight: 650; } .delta .up { color: var(--crit-ink); } .delta .down { color: var(--good-ink); }\n.tile.click { cursor: pointer; } .tile.click:hover { border-color: var(--accent); }\n\n/* ---------- charts ---------- */\n.legend { display: flex; gap: 14px; flex-wrap: wrap; font-size: 12px; color: var(--ink-2); margin: 0 0 8px; }\n.legend i { display: inline-block; width: 10px; height: 10px; border-radius: 3px; margin-right: 6px; vertical-align: -1px; }\nsvg.chart { width: 100%; height: auto; display: block; overflow: visible; }\nsvg.chart text { fill: var(--ink-3); font-size: 11px; font-family: inherit; }\nsvg.chart .grid { stroke: var(--line); stroke-width: 1; }\nsvg.chart .hit { fill: transparent; } svg.chart .hit:hover { fill: color-mix(in srgb, var(--ink) 5%, transparent); }\n.hbar { display: grid; grid-template-columns: minmax(90px, 34%) 1fr 44px; align-items: center; gap: 10px; padding: 4px 0; font-size: 13px; border-radius: 6px; }\n.hbar.link { cursor: pointer; } .hbar.link:hover { background: var(--surface-2); }\n.hbar .nm { overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }\n.hbar .trk { height: 12px; background: transparent; position: relative; }\n.hbar .fill { position: absolute; left: 0; top: 0; bottom: 0; background: var(--blue); border-radius: 0 4px 4px 0; min-width: 2px; }\n.hbar .v { text-align: right; font-weight: 600; }\n.tip { position: fixed; z-index: 100; pointer-events: none; background: var(--ink); color: var(--surface); padding: 6px 9px; border-radius: 6px; font-size: 12px; max-width: 280px; box-shadow: var(--shadow); opacity: 0; transition: opacity .08s; line-height: 1.4; }\n.tip.on { opacity: 1; } .tip b { font-weight: 650; }\n\n/* ---------- lists ---------- */\n.list { display: flex; flex-direction: column; }\n.li { display: flex; align-items: center; gap: 10px; padding: 8px 6px; border-bottom: 1px solid var(--line); }\n.li:last-child { border-bottom: 0; }\n.li .main-t { flex: 1; min-width: 0; } .li .main-t b { font-weight: 600; } .li .main-t .sm { display: block; }\n.tag { display: inline-block; font-size: 11px; font-weight: 650; padding: 1px 7px; border-radius: 999px; background: var(--surface-2); border: 1px solid var(--line); color: var(--ink-2); }\n.tag.crit { background: color-mix(in srgb, var(--orange) 16%, var(--surface)); border-color: color-mix(in srgb, var(--orange) 40%, var(--line)); color: var(--ink); }\n.empty { padding: 26px 10px; text-align: center; color: var(--ink-3); }\n\n/* ---------- attendance grid ---------- */\n.gridwrap { border: 1px solid var(--line); border-radius: 12px; background: var(--surface); overflow: auto; max-height: calc(100vh - 230px); box-shadow: var(--shadow); }\ntable.att { border-collapse: separate; border-spacing: 0; font-size: 12px; min-width: 100%; }\ntable.att th, table.att td { padding: 0; height: 30px; border-bottom: 1px solid var(--line); text-align: center; background: var(--surface); }\ntable.att thead th { position: sticky; top: 0; z-index: 3; height: 40px; font-weight: 600; color: var(--ink-2); background: var(--surface-2); }\ntable.att th.d small { display: block; font-weight: 500; color: var(--ink-3); font-size: 10px; line-height: 1; margin-top: 2px; }\ntable.att .wk { background: var(--wknd); } table.att thead th.wk { background: var(--wknd); }\ntable.att .tdy { box-shadow: inset 2px 0 0 var(--today), inset -2px 0 0 var(--today); }\ntable.att thead th.tdy { color: var(--today); }\ntable.att .c-name { position: sticky; left: 0; z-index: 2; text-align: left; padding: 0 10px; min-width: 190px; max-width: 220px; border-right: 1px solid var(--line); }\ntable.att thead .c-name { z-index: 4; }\ntable.att .c-name b { display: block; font-weight: 600; font-size: 13px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; line-height: 1.15; }\ntable.att .c-name span { display: block; font-size: 11px; color: var(--ink-3); overflow: hidden; text-overflow: ellipsis; white-space: nowrap; line-height: 1.15; }\ntable.att td.c-name { cursor: pointer; } table.att td.c-name:hover b { color: var(--accent); }\ntable.att .c-id { min-width: 84px; color: var(--ink-3); padding: 0 6px; }\ntable.att td.cell { min-width: 34px; width: 34px; cursor: pointer; position: relative; padding: 2px; }\ntable.att td.cell:hover .chip { outline: 2px solid var(--accent); outline-offset: -1px; }\ntable.att td.cell.selected { box-shadow: inset 0 0 0 2px var(--accent); }\ntable.att td.beyond { background: var(--surface-2); }\ntable.att .c-tot { min-width: 54px; font-weight: 650; padding: 0 6px; }\ntable.att .c-act { min-width: 74px; padding: 0 4px; }\ntable.att tbody tr:hover td:not(.cell) { background: var(--surface-2); }\ntable.att tbody tr:hover td.wk:not(.cell) { background: var(--wknd); }\n.note-dot { position: absolute; top: 2px; right: 2px; width: 0; height: 0; border-left: 6px solid transparent; border-top: 6px solid var(--red); }\n\n.chip { display: flex; align-items: center; justify-content: center; height: 24px; border-radius: 4px; font-weight: 650; font-size: 11px; letter-spacing: .01em;\n  --c: var(--gray); background: color-mix(in srgb, var(--c) 24%, var(--surface)); border: 1px solid color-mix(in srgb, var(--c) 55%, var(--surface)); color: var(--ink); }\n.cat-approved { --c: var(--blue); } .cat-sick { --c: var(--aqua); } .cat-unplanned { --c: var(--orange); } .cat-half { --c: var(--yellow); }\n.cat-applied { --c: var(--violet); } .cat-late { --c: var(--magenta); } .cat-remote { --c: var(--green); }\n.cat-off { --c: var(--gray); } .cat-off.chip { background: color-mix(in srgb, var(--gray) 14%, var(--surface)); border-color: transparent; color: var(--ink-3); font-weight: 600; }\n.cat-moved.chip, .cat-na.chip, .cat-present.chip { --c: var(--gray); background: transparent; border-style: dashed; color: var(--ink-3); font-weight: 600; }\n.cat-na.chip { border-color: transparent; opacity: .7; }\n.cat-unknown.chip { --c: var(--red); background: transparent; border: 1px dashed var(--red); }\n.cat-applied.chip { background: transparent; border: 1.5px solid var(--violet); }\n.cat-half.chip { background: linear-gradient(135deg, color-mix(in srgb, var(--yellow) 45%, var(--surface)) 50%, color-mix(in srgb, var(--yellow) 12%, var(--surface)) 50%); }\n.sw { display: inline-block; width: 12px; height: 12px; border-radius: 3px; vertical-align: -2px; margin-right: 6px; background: color-mix(in srgb, var(--c) 30%, var(--surface)); border: 1px solid var(--c); }\n\n/* ---------- popover / modal ---------- */\n.pop { position: fixed; z-index: 60; background: var(--surface); border: 1px solid var(--line-2); border-radius: 12px; box-shadow: 0 8px 30px rgba(0,0,0,.22); padding: 10px; width: 262px; }\n.pop h4 { margin: 0 0 6px; font-size: 12px; color: var(--ink-3); font-weight: 600; }\n.pop input { width: 100%; margin-bottom: 8px; }\n.pop .codes { display: grid; grid-template-columns: repeat(4, 1fr); gap: 5px; }\n.pop .codes button { border: 0; background: transparent; padding: 0; text-align: center; }\n.pop .codes button .chip { height: 30px; font-size: 12px; } .pop .codes button:hover .chip, .pop .codes button.sel .chip { outline: 2px solid var(--accent); }\n.pop .foot { display: flex; justify-content: space-between; margin-top: 8px; gap: 6px; }\n.veil { position: fixed; inset: 0; background: rgba(10,10,10,.45); z-index: 70; display: grid; place-items: center; padding: 20px; }\n.modal { background: var(--surface); border-radius: 14px; box-shadow: 0 20px 60px rgba(0,0,0,.35); width: min(760px, 100%); max-height: calc(100vh - 40px); display: flex; flex-direction: column; border: 1px solid var(--line); }\n.modal.wide { width: min(940px, 100%); }\n.modal header { padding: 16px 20px 8px; display: flex; align-items: center; gap: 10px; } .modal header h3 { margin: 0; font-size: 16px; flex: 1; }\n.modal .body { padding: 8px 20px 12px; overflow: auto; }\n.modal footer { padding: 12px 20px 16px; display: flex; gap: 8px; align-items: center; border-top: 1px solid var(--line); }\n.form { display: grid; grid-template-columns: repeat(2, 1fr); gap: 12px 14px; }\n.form .full { grid-column: 1 / -1; }\n.form label { display: flex; flex-direction: column; gap: 4px; font-size: 12px; font-weight: 600; color: var(--ink-2); }\n.form label input, .form label select { font-weight: 400; color: var(--ink); font-size: 14px; }\n.err { color: var(--crit-ink); font-size: 13px; margin-top: 6px; }\n.dayedit { display: grid; grid-template-columns: repeat(auto-fill, minmax(52px, 1fr)); gap: 6px; }\n.dayedit label { font-size: 10px; align-items: stretch; gap: 2px; text-align: center; }\n.dayedit input { padding: 4px; text-align: center; text-transform: uppercase; font-size: 13px; }\n.dayedit label.wk input { background: var(--wknd); } .dayedit label.off input { opacity: .35; }\n\n/* ---------- misc ---------- */\n.toast { position: fixed; bottom: 22px; left: 50%; transform: translateX(-50%); background: var(--ink); color: var(--surface); padding: 10px 16px; border-radius: 10px; z-index: 120; box-shadow: var(--shadow); font-weight: 550; max-width: 90vw; }\n.toast button { margin-left: 12px; background: transparent; border: 0; color: inherit; text-decoration: underline; font-weight: 600; }\n.welcome { max-width: 640px; margin: 6vh auto 0; text-align: center; }\n.welcome .drop { border: 2px dashed var(--line-2); border-radius: 16px; padding: 42px 24px; background: var(--surface); }\n.welcome .drop.over { border-color: var(--accent); background: var(--accent-soft); }\n.welcome h2 { margin: 0 0 6px; font-size: 22px; } .welcome p { color: var(--ink-2); margin: 6px 0 16px; }\n.steps { text-align: left; margin: 20px auto 0; max-width: 460px; color: var(--ink-2); font-size: 13px; }\n.kv { display: grid; grid-template-columns: auto 1fr; gap: 4px 14px; font-size: 13px; }\n.issue { border: 1px solid var(--line); border-radius: 10px; margin-bottom: 10px; background: var(--surface); }\n.issue > summary { list-style: none; display: flex; align-items: center; gap: 10px; padding: 11px 14px; cursor: pointer; }\n.issue > summary::-webkit-details-marker { display: none; }\n.issue > summary .ttl { flex: 1; } .issue > summary .ttl b { font-weight: 650; } .issue > summary .ttl span { display: block; font-size: 12px; color: var(--ink-3); }\n.issue .inner { padding: 4px 14px 12px; border-top: 1px solid var(--line); }\n.issue .inner table { width: 100%; border-collapse: collapse; font-size: 13px; } .issue .inner td, .issue .inner th { padding: 5px 8px; border-bottom: 1px solid var(--line); text-align: left; }\n.score { width: 56px; height: 56px; }\n.people-layout { display: grid; grid-template-columns: 260px 1fr; gap: 14px; align-items: start; }\n.people-list { max-height: calc(100vh - 190px); overflow: auto; padding: 8px; }\n.people-list .p { display: flex; flex-direction: column; align-items: flex-start; gap: 1px; width: 100%; min-width: 0; padding: 7px 10px; border: 0; background: transparent; border-radius: 8px; text-align: left; }\n.people-list .p > span, .people-list .p > small { max-width: 100%; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }\n.people-list .p > small { font-size: 11.5px; line-height: 1.3; }\n.people-list .p:hover { background: var(--surface-2); } .people-list .p[aria-current=\"true\"] { background: var(--accent-soft); font-weight: 600; }\n.people-list .p small { color: var(--ink-3); }\n@media (max-width: 1000px) { .people-layout { grid-template-columns: 1fr; } .people-list { max-height: 240px; } }\nkbd { border: 1px solid var(--line-2); border-bottom-width: 2px; border-radius: 4px; padding: 0 5px; font-size: 11px; background: var(--surface-2); }\n\n.people-layout > div { min-width: 0; }\n\ntable.att tbody tr { height: 46px; }\n\n/* blank cells: present (P) on weekdays, week off (WO) on Saturday / Sunday. Shown faintly because nothing is stored in Excel. */\n.chip.implied { background: transparent; border-color: transparent; color: var(--ink-3); font-weight: 600; opacity: .5; }\n.chip.implied.p { opacity: .38; }\ntable.att td.cell:hover .chip.implied { opacity: 1; }\n.grid-note { display: flex; gap: 14px; align-items: center; flex-wrap: wrap; }\n.stchips { display: flex; flex-wrap: wrap; gap: 6px 16px; }\n.stchips label.chk { flex-direction: row; align-items: center; gap: 6px; font-weight: 500; font-size: 13px; color: var(--ink); }\n\n/* Left / Moved, and the activity log */\n.chip.implied.gone { background:transparent; color:var(--muted); opacity:.5; border:1px dashed var(--line); }\ntr.gone .c-name span { color:var(--orange, #b45309); }\n.act-list { max-width:100%; }\n.act-day { padding:10px 16px 6px; font-size:12px; font-weight:700; color:var(--ink-2); text-transform:uppercase; letter-spacing:.04em; background:var(--surface-2); border-top:1px solid var(--line); border-bottom:1px solid var(--line); }\n.act-day:first-child { border-top:0; }\n.act-item { padding:10px 16px; border-bottom:1px solid var(--line); }\n.act-item:last-child { border-bottom:0; }\n.act-line { display:flex; justify-content:space-between; gap:12px; align-items:baseline; }\n.act-line .linkbtn { font-weight:700; }\n.chgs { display:flex; flex-wrap:wrap; gap:4px 6px; margin-top:6px; align-items:center; }\n.cchg { display:inline-flex; gap:5px; align-items:baseline; font-size:12px; padding:2px 8px; border:1px solid var(--line); border-radius:999px; background:var(--surface-2); }\n.cchg i { color:var(--muted); font-style:normal; }\n.xbadge, .wbadge { margin-left:6px; font-size:10px; font-weight:700; letter-spacing:.04em; padding:1px 6px; border-radius:6px; vertical-align:1px; }\n.xbadge { background:color-mix(in srgb, var(--orange, #d97706) 20%, var(--surface)); color:var(--ink); border:1px solid color-mix(in srgb, var(--orange, #d97706) 55%, var(--surface)); }\n.wbadge { background:color-mix(in srgb, var(--blue, #2563eb) 16%, var(--surface)); color:var(--ink); border:1px solid color-mix(in srgb, var(--blue, #2563eb) 45%, var(--surface)); }\n\n.marktbl { width:100%; min-width:0 !important; } .marktbl th, .marktbl td { text-align:left; } .marktbl td.num { text-align:right; } .marktbl th:last-child { text-align:right; }\n\n/* ---------- v3.3: health tabs, Fix people, auto-save ---------- */\n.btn.sm.on { background: var(--accent-soft); border-color: color-mix(in srgb, var(--accent) 45%, var(--line-2)); }\n.htabs { display: inline-flex; gap: 2px; padding: 3px; border-radius: 10px; background: var(--surface); border: 1px solid var(--line); margin-bottom: 14px; flex-wrap: wrap; }\n.htab { border: 0; background: transparent; padding: 6px 14px; border-radius: 8px; color: var(--ink-2); font-weight: 500; }\n.htab:hover { background: var(--wash); }\n.htab[aria-selected=\"true\"] { background: var(--accent-soft); color: var(--ink); font-weight: 650; box-shadow: inset 0 0 0 1px color-mix(in srgb, var(--accent) 35%, transparent); }\n.htab b { font-size: 11px; background: var(--crit); color: #fff; border-radius: 10px; padding: 0 6px; margin-left: 4px; }\n.tag.ok { background: color-mix(in srgb, var(--c-aqua) 16%, var(--surface)); border-color: color-mix(in srgb, var(--c-aqua) 40%, var(--line)); color: var(--ink); }\n.tag.warn { background: color-mix(in srgb, var(--warn) 28%, var(--surface)); border-color: color-mix(in srgb, var(--warn) 55%, var(--line)); color: var(--ink); }\n.warn-t { color: var(--orange); font-size: 12px; }\n.fixtools { display: flex; align-items: center; gap: 8px; flex-wrap: wrap; margin-bottom: 12px; }\n.fchip { display: inline-flex; align-items: center; gap: 6px; border: 1px solid var(--line-2); background: var(--surface); border-radius: 999px; padding: 3px 11px; font-size: 12.5px; color: var(--ink-2); }\n.fchip b { font-variant-numeric: tabular-nums; font-size: 11px; background: var(--surface-2); border-radius: 10px; padding: 0 6px; }\n.fchip.on { background: var(--accent-soft); color: var(--ink); border-color: color-mix(in srgb, var(--accent) 45%, var(--line-2)); font-weight: 650; }\n.fixwrap { border: 1px solid var(--line); border-radius: 10px; overflow: auto; max-height: calc(100vh - 360px); min-height: 160px; background: var(--surface); }\ntable.fixtbl { border-collapse: separate; border-spacing: 0; width: 100%; min-width: 860px; font-size: 13px; }\ntable.fixtbl th { position: sticky; top: 0; z-index: 2; background: var(--surface-2); text-align: left; padding: 8px 10px; font-weight: 600; color: var(--ink-2); border-bottom: 1px solid var(--line); font-size: 12px; }\ntable.fixtbl td { padding: 6px 10px; border-bottom: 1px solid var(--line); vertical-align: top; }\ntable.fixtbl tr.on td { background: color-mix(in srgb, var(--accent) 6%, var(--surface)); }\ntable.fixtbl td input[type=text] { width: 100%; padding: 4px 8px; }\ntable.fixtbl td input:disabled { opacity: .6; }\ntable.fixtbl td [data-fix-state] { margin-top: 3px; }\n.fixbar { position: sticky; bottom: 0; z-index: 4; display: flex; align-items: center; gap: 8px; flex-wrap: wrap; margin: 12px -16px -16px; padding: 10px 16px; background: var(--surface); border-top: 1px solid var(--line); border-radius: 0 0 12px 12px; box-shadow: 0 -6px 14px -10px rgba(20,40,110,.25); }\n\n/* holiday: click a day number to mark it for everyone */\ntable.att thead th.hd { cursor: pointer; }\ntable.att thead th.hd:hover { background: var(--accent-soft); color: var(--ink); }\n";
+const ATT_CSS = ":host {\n  display: block; color: var(--ink); font-size: 14px; line-height: 1.45;\n  /* palette and surfaces come from the Team Dashboard theme, so light / dark follow it automatically */\n  --line: var(--grid); --line-2: var(--axis); --ink-3: var(--muted);\n  --blue: var(--c-blue); --orange: var(--c-orange); --aqua: var(--c-aqua); --yellow: var(--c-yellow);\n  --magenta: var(--c-magenta); --green: var(--c-green); --violet: var(--c-violet); --red: var(--c-red);\n  --accent-soft: color-mix(in srgb, var(--accent) 13%, var(--surface));\n  --good-ink: var(--good); --crit: var(--danger); --crit-ink: var(--danger); --warn: var(--c-yellow); --gray: var(--c-gray);\n  --wknd: color-mix(in srgb, var(--ink) 5%, var(--surface)); --today: var(--accent);\n  --shadow: 0 1px 2px rgba(20,40,110,.06), 0 6px 18px -10px rgba(20,40,110,.18);\n}\n* { box-sizing: border-box; }\n[hidden] { display: none !important; }\nbutton, input, select, textarea { font: inherit; color: inherit; }\nbutton { cursor: pointer; }\n.num { font-variant-numeric: tabular-nums; }\n.muted { color: var(--ink-3); } .sm { font-size: 12px; }\n.sr { position: absolute; width: 1px; height: 1px; overflow: hidden; clip: rect(0 0 0 0); }\n.linkbtn { all: unset; color: var(--accent); cursor: pointer; text-decoration: underline; }\n\n/* ---------- section chrome (the Team Dashboard already provides the sidebar and page header) ---------- */\n.topbar { position: sticky; top: 0; z-index: 8; display: flex; align-items: center; gap: 10px; padding: 8px 0 10px; background: var(--bg); flex-wrap: wrap; }\n.subnav { display: inline-flex; gap: 2px; padding: 3px; border-radius: 10px; background: var(--surface); border: 1px solid var(--line); flex-wrap: wrap; }\n.subnav button.tab { display: inline-flex; align-items: center; gap: 7px; border: 0; background: transparent; padding: 6px 12px; border-radius: 8px; color: var(--ink-2); font-weight: 500; }\n.subnav button.tab:hover { background: var(--wash); }\n.subnav button.tab[aria-current=\"page\"] { background: var(--accent-soft); color: var(--ink); font-weight: 650; box-shadow: inset 0 0 0 1px color-mix(in srgb, var(--accent) 35%, transparent); }\n.subnav button.tab svg { width: 16px; height: 16px; flex: none; }\n.subnav .badge { font-size: 11px; background: var(--crit); color: #fff; border-radius: 10px; padding: 0 6px; min-width: 18px; text-align: center; }\n.scope { display: inline-flex; align-items: center; gap: 6px; color: var(--ink-2); font-size: 12px; font-weight: 600; }\n.scope select { max-width: 250px; font-weight: 500; }\n.fileline { display: flex; align-items: center; gap: 10px; flex-wrap: wrap; margin: 0 0 14px; }\n.syncbtn { font-weight: 600; }\n.syncbtn.s-ok { color: var(--ink); }\n.syncbtn.s-dirty { color: #9a6700; border-color: color-mix(in srgb, var(--warn) 55%, var(--line)); background: color-mix(in srgb, var(--warn) 16%, transparent); }\n.syncbtn.s-warn { color: var(--danger); border-color: color-mix(in srgb, var(--danger) 45%, var(--line)); background: color-mix(in srgb, var(--danger) 10%, transparent); }\n.syncbtn.s-busy { color: var(--ink-2); }\n.filechip { display: inline-flex; align-items: center; gap: 6px; padding: 3px 10px; border: 1px solid var(--line); border-radius: 999px; font-size: 12px; color: var(--ink-2); max-width: 340px; background: var(--surface); }\n.filechip svg { width: 14px; height: 14px; flex: none; }\n.filechip span { overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }\n.pill { display: inline-flex; align-items: center; gap: 6px; padding: 3px 10px; border-radius: 999px; font-size: 12px; font-weight: 600; }\n.pill.ok { background: color-mix(in srgb, var(--c-aqua) 16%, var(--surface)); color: var(--ink); }\n.pill.dirty { background: color-mix(in srgb, var(--warn) 28%, var(--surface)); color: var(--ink); }\n.grow { flex: 1; }\n.gate { text-align: center; padding: 34px 24px; }\n.gate .filelist { text-align: left; }\n.filelist { display: flex; flex-direction: column; gap: 6px; margin: 12px 0 14px; max-height: 260px; overflow: auto; }\n.fileopt { display: flex; align-items: center; gap: 10px; justify-content: space-between; width: 100%; text-align: left; padding: 9px 12px; border: 1px solid var(--line-2); border-radius: 8px; background: var(--surface); }\n.fileopt:hover { background: var(--wash); border-color: var(--accent); }\n.fileopt span { display: inline-flex; align-items: center; gap: 8px; } .fileopt svg { width: 16px; height: 16px; }\n.rosterline { display: flex; align-items: center; gap: 8px; flex-wrap: wrap; margin-top: 8px; }\n.form label.chk, label.chk { flex-direction: row; align-items: center; gap: 8px; font-weight: 500; }\n\n/* ---------- controls ---------- */\n.btn { display: inline-flex; align-items: center; gap: 6px; border: 1px solid var(--line-2); background: var(--surface); padding: 6px 12px; border-radius: 8px; font-weight: 550; line-height: 1.3; white-space: nowrap; }\n.btn:hover:not(:disabled) { background: var(--surface-2); }\n.btn:disabled { opacity: .45; cursor: not-allowed; }\n.btn.primary { background: linear-gradient(135deg, var(--band-2, var(--accent)), var(--band-3, var(--accent))); border-color: transparent; color: var(--accent-ink, #fff); }\n.btn.primary:hover:not(:disabled) { filter: brightness(1.12); }\n.btn.danger { color: var(--crit-ink); border-color: color-mix(in srgb, var(--crit) 45%, var(--line-2)); }\n.btn.danger.armed { background: var(--crit); color: #fff; border-color: var(--crit); }\n.btn.ghost { border-color: transparent; background: transparent; }\n.btn.sm { padding: 3px 8px; font-size: 12px; border-radius: 6px; }\n.btn svg { width: 16px; height: 16px; }\ninput[type=text], input[type=search], input[type=number], input[type=date], select, textarea { border: 1px solid var(--line-2); background: var(--surface); border-radius: 8px; padding: 6px 10px; min-width: 0; }\ninput:focus-visible, select:focus-visible, button:focus-visible, textarea:focus-visible { outline: 2px solid var(--accent); outline-offset: 1px; }\n.toolbar { display: flex; gap: 8px; align-items: center; flex-wrap: wrap; margin-bottom: 14px; }\n.toolbar label { display: inline-flex; align-items: center; gap: 6px; color: var(--ink-2); font-size: 13px; }\n.seg { display: inline-flex; border: 1px solid var(--line-2); border-radius: 8px; overflow: hidden; }\n.seg button { border: 0; background: var(--surface); padding: 5px 10px; font-size: 13px; color: var(--ink-2); }\n.seg button + button { border-left: 1px solid var(--line-2); }\n.seg button[aria-pressed=\"true\"] { background: var(--accent-soft); color: var(--ink); font-weight: 600; }\n\n/* ---------- cards / tiles ---------- */\n.card { background: var(--surface); border: 1px solid var(--line); border-radius: 12px; padding: 16px; box-shadow: var(--shadow); min-width: 0; }\n.card h2 { font-size: 14px; margin: 0 0 2px; font-weight: 650; } .card .sub { color: var(--ink-3); font-size: 12px; margin-bottom: 12px; }\n.grid { display: grid; gap: 14px; } .g6 { grid-template-columns: repeat(6, 1fr); } .g2 { grid-template-columns: 1.5fr 1fr; } .g2e { grid-template-columns: 1fr 1fr; }\n@media (max-width: 1250px) { .g6 { grid-template-columns: repeat(3, 1fr); } .g2, .g2e { grid-template-columns: 1fr; } }\n@media (max-width: 800px) { .g6 { grid-template-columns: repeat(2, 1fr); } }\n.tile { padding: 14px 16px; }\n.tile .lbl { font-size: 12px; color: var(--ink-3); font-weight: 600; letter-spacing: .02em; }\n.tile .val { font-size: 28px; font-weight: 680; line-height: 1.15; margin-top: 4px; font-variant-numeric: tabular-nums; }\n.tile .delta { font-size: 12px; margin-top: 4px; color: var(--ink-3); }\n.delta .up, .delta .down { font-weight: 650; } .delta .up { color: var(--crit-ink); } .delta .down { color: var(--good-ink); }\n.tile.click { cursor: pointer; } .tile.click:hover { border-color: var(--accent); }\n\n/* ---------- charts ---------- */\n.legend { display: flex; gap: 14px; flex-wrap: wrap; font-size: 12px; color: var(--ink-2); margin: 0 0 8px; }\n.legend i { display: inline-block; width: 10px; height: 10px; border-radius: 3px; margin-right: 6px; vertical-align: -1px; }\nsvg.chart { width: 100%; height: auto; display: block; overflow: visible; }\nsvg.chart text { fill: var(--ink-3); font-size: 11px; font-family: inherit; }\nsvg.chart .grid { stroke: var(--line); stroke-width: 1; }\nsvg.chart .hit { fill: transparent; } svg.chart .hit:hover { fill: color-mix(in srgb, var(--ink) 5%, transparent); }\n.hbar { display: grid; grid-template-columns: minmax(90px, 34%) 1fr 44px; align-items: center; gap: 10px; padding: 4px 0; font-size: 13px; border-radius: 6px; }\n.hbar.link { cursor: pointer; } .hbar.link:hover { background: var(--surface-2); }\n.hbar .nm { overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }\n.hbar .trk { height: 12px; background: transparent; position: relative; }\n.hbar .fill { position: absolute; left: 0; top: 0; bottom: 0; background: var(--blue); border-radius: 0 4px 4px 0; min-width: 2px; }\n.hbar .v { text-align: right; font-weight: 600; }\n.tip { position: fixed; z-index: 100; pointer-events: none; background: var(--ink); color: var(--surface); padding: 6px 9px; border-radius: 6px; font-size: 12px; max-width: 280px; box-shadow: var(--shadow); opacity: 0; transition: opacity .08s; line-height: 1.4; }\n.tip.on { opacity: 1; } .tip b { font-weight: 650; }\n\n/* ---------- lists ---------- */\n.list { display: flex; flex-direction: column; }\n.li { display: flex; align-items: center; gap: 10px; padding: 8px 6px; border-bottom: 1px solid var(--line); }\n.li:last-child { border-bottom: 0; }\n.li .main-t { flex: 1; min-width: 0; } .li .main-t b { font-weight: 600; } .li .main-t .sm { display: block; }\n.tag { display: inline-block; font-size: 11px; font-weight: 650; padding: 1px 7px; border-radius: 999px; background: var(--surface-2); border: 1px solid var(--line); color: var(--ink-2); }\n.tag.crit { background: color-mix(in srgb, var(--orange) 16%, var(--surface)); border-color: color-mix(in srgb, var(--orange) 40%, var(--line)); color: var(--ink); }\n.empty { padding: 26px 10px; text-align: center; color: var(--ink-3); }\n\n/* ---------- attendance grid ---------- */\n.gridwrap { border: 1px solid var(--line); border-radius: 12px; background: var(--surface); overflow: auto; max-height: calc(100vh - 230px); box-shadow: var(--shadow); }\ntable.att { border-collapse: separate; border-spacing: 0; font-size: 12px; min-width: 100%; }\ntable.att th, table.att td { padding: 0; height: 30px; border-bottom: 1px solid var(--line); text-align: center; background: var(--surface); }\ntable.att thead th { position: sticky; top: 0; z-index: 3; height: 40px; font-weight: 600; color: var(--ink-2); background: var(--surface-2); }\ntable.att th.d small { display: block; font-weight: 500; color: var(--ink-3); font-size: 10px; line-height: 1; margin-top: 2px; }\ntable.att .wk { background: var(--wknd); } table.att thead th.wk { background: var(--wknd); }\ntable.att .tdy { box-shadow: inset 2px 0 0 var(--today), inset -2px 0 0 var(--today); }\ntable.att thead th.tdy { color: var(--today); }\ntable.att .c-name { position: sticky; left: 0; z-index: 2; text-align: left; padding: 0 10px; min-width: 190px; max-width: 220px; border-right: 1px solid var(--line); }\ntable.att thead .c-name { z-index: 4; }\ntable.att .c-name b { display: block; font-weight: 600; font-size: 13px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; line-height: 1.15; }\ntable.att .c-name span { display: block; font-size: 11px; color: var(--ink-3); overflow: hidden; text-overflow: ellipsis; white-space: nowrap; line-height: 1.15; }\ntable.att td.c-name { cursor: pointer; } table.att td.c-name:hover b { color: var(--accent); }\ntable.att .c-id { min-width: 84px; color: var(--ink-3); padding: 0 6px; }\ntable.att td.cell { min-width: 34px; width: 34px; cursor: pointer; position: relative; padding: 2px; }\ntable.att td.cell:hover .chip { outline: 2px solid var(--accent); outline-offset: -1px; }\ntable.att td.cell.selected { box-shadow: inset 0 0 0 2px var(--accent); }\ntable.att td.beyond { background: var(--surface-2); }\ntable.att .c-tot { min-width: 54px; font-weight: 650; padding: 0 6px; }\ntable.att .c-act { min-width: 74px; padding: 0 4px; }\ntable.att tbody tr:hover td:not(.cell) { background: var(--surface-2); }\ntable.att tbody tr:hover td.wk:not(.cell) { background: var(--wknd); }\n.note-dot { position: absolute; top: 2px; right: 2px; width: 0; height: 0; border-left: 6px solid transparent; border-top: 6px solid var(--red); }\n\n.chip { display: flex; align-items: center; justify-content: center; height: 24px; border-radius: 4px; font-weight: 650; font-size: 11px; letter-spacing: .01em;\n  --c: var(--gray); background: color-mix(in srgb, var(--c) 24%, var(--surface)); border: 1px solid color-mix(in srgb, var(--c) 55%, var(--surface)); color: var(--ink); }\n.cat-approved { --c: var(--blue); } .cat-sick { --c: var(--aqua); } .cat-unplanned { --c: var(--orange); } .cat-half { --c: var(--yellow); }\n.cat-applied { --c: var(--violet); } .cat-late { --c: var(--magenta); } .cat-remote { --c: var(--green); }\n.cat-off { --c: var(--gray); } .cat-off.chip { background: color-mix(in srgb, var(--gray) 14%, var(--surface)); border-color: transparent; color: var(--ink-3); font-weight: 600; }\n.cat-moved.chip, .cat-na.chip, .cat-present.chip { --c: var(--gray); background: transparent; border-style: dashed; color: var(--ink-3); font-weight: 600; }\n.cat-na.chip { border-color: transparent; opacity: .7; }\n.cat-unknown.chip { --c: var(--red); background: transparent; border: 1px dashed var(--red); }\n.cat-applied.chip { background: transparent; border: 1.5px solid var(--violet); }\n.cat-half.chip { background: linear-gradient(135deg, color-mix(in srgb, var(--yellow) 45%, var(--surface)) 50%, color-mix(in srgb, var(--yellow) 12%, var(--surface)) 50%); }\n.sw { display: inline-block; width: 12px; height: 12px; border-radius: 3px; vertical-align: -2px; margin-right: 6px; background: color-mix(in srgb, var(--c) 30%, var(--surface)); border: 1px solid var(--c); }\n\n/* ---------- popover / modal ---------- */\n.pop { position: fixed; z-index: 60; background: var(--surface); border: 1px solid var(--line-2); border-radius: 12px; box-shadow: 0 8px 30px rgba(0,0,0,.22); padding: 10px; width: 262px; }\n.pop h4 { margin: 0 0 6px; font-size: 12px; color: var(--ink-3); font-weight: 600; }\n.pop input { width: 100%; margin-bottom: 8px; }\n.pop .codes { display: grid; grid-template-columns: repeat(4, 1fr); gap: 5px; }\n.pop .codes button { border: 0; background: transparent; padding: 0; text-align: center; }\n.pop .codes button .chip { height: 30px; font-size: 12px; } .pop .codes button:hover .chip, .pop .codes button.sel .chip { outline: 2px solid var(--accent); }\n.pop .foot { display: flex; justify-content: space-between; margin-top: 8px; gap: 6px; }\n.veil { position: fixed; inset: 0; background: rgba(10,10,10,.45); z-index: 70; display: grid; place-items: center; padding: 20px; }\n.modal { background: var(--surface); border-radius: 14px; box-shadow: 0 20px 60px rgba(0,0,0,.35); width: min(760px, 100%); max-height: calc(100vh - 40px); display: flex; flex-direction: column; border: 1px solid var(--line); }\n.modal.wide { width: min(940px, 100%); }\n.modal header { padding: 16px 20px 8px; display: flex; align-items: center; gap: 10px; } .modal header h3 { margin: 0; font-size: 16px; flex: 1; }\n.modal .body { padding: 8px 20px 12px; overflow: auto; }\n.modal footer { padding: 12px 20px 16px; display: flex; gap: 8px; align-items: center; border-top: 1px solid var(--line); }\n.form { display: grid; grid-template-columns: repeat(2, 1fr); gap: 12px 14px; }\n.form .full { grid-column: 1 / -1; }\n.form label { display: flex; flex-direction: column; gap: 4px; font-size: 12px; font-weight: 600; color: var(--ink-2); }\n.form label input, .form label select { font-weight: 400; color: var(--ink); font-size: 14px; }\n.err { color: var(--crit-ink); font-size: 13px; margin-top: 6px; }\n.dayedit { display: grid; grid-template-columns: repeat(auto-fill, minmax(52px, 1fr)); gap: 6px; }\n.dayedit label { font-size: 10px; align-items: stretch; gap: 2px; text-align: center; }\n.dayedit input { padding: 4px; text-align: center; text-transform: uppercase; font-size: 13px; }\n.dayedit label.wk input { background: var(--wknd); } .dayedit label.off input { opacity: .35; }\n\n/* ---------- misc ---------- */\n.toast { position: fixed; bottom: 22px; left: 50%; transform: translateX(-50%); background: var(--ink); color: var(--surface); padding: 10px 16px; border-radius: 10px; z-index: 120; box-shadow: var(--shadow); font-weight: 550; max-width: 90vw; }\n.toast button { margin-left: 12px; background: transparent; border: 0; color: inherit; text-decoration: underline; font-weight: 600; }\n.welcome { max-width: 640px; margin: 6vh auto 0; text-align: center; }\n.welcome .drop { border: 2px dashed var(--line-2); border-radius: 16px; padding: 42px 24px; background: var(--surface); }\n.welcome .drop.over { border-color: var(--accent); background: var(--accent-soft); }\n.welcome h2 { margin: 0 0 6px; font-size: 22px; } .welcome p { color: var(--ink-2); margin: 6px 0 16px; }\n.steps { text-align: left; margin: 20px auto 0; max-width: 460px; color: var(--ink-2); font-size: 13px; }\n.kv { display: grid; grid-template-columns: auto 1fr; gap: 4px 14px; font-size: 13px; }\n.issue { border: 1px solid var(--line); border-radius: 10px; margin-bottom: 10px; background: var(--surface); }\n.issue > summary { list-style: none; display: flex; align-items: center; gap: 10px; padding: 11px 14px; cursor: pointer; }\n.issue > summary::-webkit-details-marker { display: none; }\n.issue > summary .ttl { flex: 1; } .issue > summary .ttl b { font-weight: 650; } .issue > summary .ttl span { display: block; font-size: 12px; color: var(--ink-3); }\n.issue .inner { padding: 4px 14px 12px; border-top: 1px solid var(--line); }\n.issue .inner table { width: 100%; border-collapse: collapse; font-size: 13px; } .issue .inner td, .issue .inner th { padding: 5px 8px; border-bottom: 1px solid var(--line); text-align: left; }\n.score { width: 56px; height: 56px; }\n.people-layout { display: grid; grid-template-columns: 260px 1fr; gap: 14px; align-items: start; }\n.people-list { max-height: calc(100vh - 190px); overflow: auto; padding: 8px; }\n.people-list .p { display: flex; flex-direction: column; align-items: flex-start; gap: 1px; width: 100%; min-width: 0; padding: 7px 10px; border: 0; background: transparent; border-radius: 8px; text-align: left; }\n.people-list .p > span, .people-list .p > small { max-width: 100%; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }\n.people-list .p > small { font-size: 11.5px; line-height: 1.3; }\n.people-list .p:hover { background: var(--surface-2); } .people-list .p[aria-current=\"true\"] { background: var(--accent-soft); font-weight: 600; }\n.people-list .p small { color: var(--ink-3); }\n@media (max-width: 1000px) { .people-layout { grid-template-columns: 1fr; } .people-list { max-height: 240px; } }\nkbd { border: 1px solid var(--line-2); border-bottom-width: 2px; border-radius: 4px; padding: 0 5px; font-size: 11px; background: var(--surface-2); }\n\n.people-layout > div { min-width: 0; }\n\ntable.att tbody tr { height: 46px; }\n\n/* blank cells: present (P) on weekdays, week off (WO) on Saturday / Sunday. Shown faintly because nothing is stored in Excel. */\n.chip.implied { background: transparent; border-color: transparent; color: var(--ink-3); font-weight: 600; opacity: .5; }\n.chip.implied.p { opacity: .38; }\ntable.att td.cell:hover .chip.implied { opacity: 1; }\n.grid-note { display: flex; gap: 14px; align-items: center; flex-wrap: wrap; }\n.stchips { display: flex; flex-wrap: wrap; gap: 6px 16px; }\n.stchips label.chk { flex-direction: row; align-items: center; gap: 6px; font-weight: 500; font-size: 13px; color: var(--ink); }\n\n/* Left / Moved, and the activity log */\n.chip.implied.gone { background:transparent; color:var(--muted); opacity:.5; border:1px dashed var(--line); }\ntr.gone .c-name span { color:var(--orange, #b45309); }\n.act-list { max-width:100%; }\n.act-day { padding:10px 16px 6px; font-size:12px; font-weight:700; color:var(--ink-2); text-transform:uppercase; letter-spacing:.04em; background:var(--surface-2); border-top:1px solid var(--line); border-bottom:1px solid var(--line); }\n.act-day:first-child { border-top:0; }\n.act-item { padding:10px 16px; border-bottom:1px solid var(--line); }\n.act-item:last-child { border-bottom:0; }\n.act-line { display:flex; justify-content:space-between; gap:12px; align-items:baseline; }\n.act-line .linkbtn { font-weight:700; }\n.chgs { display:flex; flex-wrap:wrap; gap:4px 6px; margin-top:6px; align-items:center; }\n.cchg { display:inline-flex; gap:5px; align-items:baseline; font-size:12px; padding:2px 8px; border:1px solid var(--line); border-radius:999px; background:var(--surface-2); }\n.cchg i { color:var(--muted); font-style:normal; }\n.xbadge, .wbadge { margin-left:6px; font-size:10px; font-weight:700; letter-spacing:.04em; padding:1px 6px; border-radius:6px; vertical-align:1px; }\n.xbadge { background:color-mix(in srgb, var(--orange, #d97706) 20%, var(--surface)); color:var(--ink); border:1px solid color-mix(in srgb, var(--orange, #d97706) 55%, var(--surface)); }\n.wbadge { background:color-mix(in srgb, var(--blue, #2563eb) 16%, var(--surface)); color:var(--ink); border:1px solid color-mix(in srgb, var(--blue, #2563eb) 45%, var(--surface)); }\n\n.marktbl { width:100%; min-width:0 !important; } .marktbl th, .marktbl td { text-align:left; } .marktbl td.num { text-align:right; } .marktbl th:last-child { text-align:right; }\n\n/* ---------- v3.3: health tabs, Fix people, auto-save ---------- */\n.btn.sm.on { background: var(--accent-soft); border-color: color-mix(in srgb, var(--accent) 45%, var(--line-2)); }\n.htabs { display: inline-flex; gap: 2px; padding: 3px; border-radius: 10px; background: var(--surface); border: 1px solid var(--line); margin-bottom: 14px; flex-wrap: wrap; }\n.htab { border: 0; background: transparent; padding: 6px 14px; border-radius: 8px; color: var(--ink-2); font-weight: 500; }\n.htab:hover { background: var(--wash); }\n.htab[aria-selected=\"true\"] { background: var(--accent-soft); color: var(--ink); font-weight: 650; box-shadow: inset 0 0 0 1px color-mix(in srgb, var(--accent) 35%, transparent); }\n.htab b { font-size: 11px; background: var(--crit); color: #fff; border-radius: 10px; padding: 0 6px; margin-left: 4px; }\n.tag.ok { background: color-mix(in srgb, var(--c-aqua) 16%, var(--surface)); border-color: color-mix(in srgb, var(--c-aqua) 40%, var(--line)); color: var(--ink); }\n.tag.warn { background: color-mix(in srgb, var(--warn) 28%, var(--surface)); border-color: color-mix(in srgb, var(--warn) 55%, var(--line)); color: var(--ink); }\n.warn-t { color: var(--orange); font-size: 12px; }\n.fixtools { display: flex; align-items: center; gap: 8px; flex-wrap: wrap; margin-bottom: 12px; }\n.fchip { display: inline-flex; align-items: center; gap: 6px; border: 1px solid var(--line-2); background: var(--surface); border-radius: 999px; padding: 3px 11px; font-size: 12.5px; color: var(--ink-2); }\n.fchip b { font-variant-numeric: tabular-nums; font-size: 11px; background: var(--surface-2); border-radius: 10px; padding: 0 6px; }\n.fchip.on { background: var(--accent-soft); color: var(--ink); border-color: color-mix(in srgb, var(--accent) 45%, var(--line-2)); font-weight: 650; }\n.fixwrap { border: 1px solid var(--line); border-radius: 10px; overflow: auto; max-height: calc(100vh - 360px); min-height: 160px; background: var(--surface); }\ntable.fixtbl { border-collapse: separate; border-spacing: 0; width: 100%; min-width: 860px; font-size: 13px; }\ntable.fixtbl th { position: sticky; top: 0; z-index: 2; background: var(--surface-2); text-align: left; padding: 8px 10px; font-weight: 600; color: var(--ink-2); border-bottom: 1px solid var(--line); font-size: 12px; }\ntable.fixtbl td { padding: 6px 10px; border-bottom: 1px solid var(--line); vertical-align: top; }\ntable.fixtbl tr.on td { background: color-mix(in srgb, var(--accent) 6%, var(--surface)); }\ntable.fixtbl td input[type=text] { width: 100%; padding: 4px 8px; }\ntable.fixtbl td input:disabled { opacity: .6; }\ntable.fixtbl td [data-fix-state] { margin-top: 3px; }\n.fixbar { position: sticky; bottom: 0; z-index: 4; display: flex; align-items: center; gap: 8px; flex-wrap: wrap; margin: 12px -16px -16px; padding: 10px 16px; background: var(--surface); border-top: 1px solid var(--line); border-radius: 0 0 12px 12px; box-shadow: 0 -6px 14px -10px rgba(20,40,110,.25); }\n\n/* holiday: click a day number to mark it for everyone */\ntable.att thead th.hd { cursor: pointer; }\ntable.att thead th.hd:hover { background: var(--accent-soft); color: var(--ink); }\n@media (max-width: 1250px) { .who3 { grid-template-columns: minmax(0,1fr) minmax(0,1fr) !important; } .who3 > .card:first-child { grid-column: 1 / -1; } }\n@media (max-width: 760px) { .who3 { grid-template-columns: minmax(0,1fr) !important; } }\n.dlbl { font-size: 10px; font-weight: 650; fill: var(--ink-2); pointer-events: none; }\ntable.rtab { width: 100%; border-collapse: collapse; font-size: 12.5px; }\ntable.rtab th, table.rtab td { padding: 6px 10px; border-bottom: 1px solid var(--line); text-align: left; }\ntable.rtab th { font-size: 11px; color: var(--ink-3); font-weight: 650; background: var(--surface-2, transparent); position: sticky; top: 0; }\ntable.rtab td.n, table.rtab th.n { text-align: right; font-variant-numeric: tabular-nums; }\ntable.rtab tr.tot td { font-weight: 700; border-top: 2px solid var(--line-2); }\n.rtab-wrap { max-height: 420px; overflow: auto; border: 1px solid var(--line); border-radius: 10px; margin-top: 8px; }\n.xf-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(200px, 1fr)); gap: 8px 12px; }\n.fld-list { list-style: none; margin: 0 0 10px; padding: 0; border: 1px solid var(--line); border-radius: 10px; }\n.fld-list li { display: flex; gap: 10px; align-items: center; padding: 8px 12px; border-top: 1px solid var(--line); }\n.fld-list li:first-child { border-top: 0; }\n.fld-fill { max-height: 50vh; overflow: auto; border: 1px solid var(--line); border-radius: 10px; }\n.fld-fill table { width: 100%; border-collapse: collapse; }\n.fld-fill td, .fld-fill th { padding: 5px 10px; border-bottom: 1px solid var(--line); text-align: left; font-size: 12.5px; }\n.fld-fill input { width: 100%; }\n";
 /* ==========================================================================
    ZIP SHIM: gives the engine the few zip calls it needs (file / remove / generate),
    on top of the Team Dashboard's own zip reader/writer. Untouched parts are copied
@@ -2711,6 +2786,19 @@ const Engine = (() => {
     return { list, plain };
   }
 
+  function readRowCells(rawRow, sst) {
+    const out = {}; if (!rawRow) return out;
+    const cre = /<c\b([^>]*?)(?:\/>|>([\s\S]*?)<\/c>)/g; let cm;
+    while ((cm = cre.exec(rawRow))) {
+      const ref = attr(cm[1], 'r'); if (!ref) continue; const cn = colNum(ref.replace(/\d+/g, '')), t = attr(cm[1], 't'), inner = cm[2] || '';
+      const vm = inner.match(/<v>([\s\S]*?)<\/v>/); let val = null;
+      if (t === 's' && vm) val = sst.list[parseInt(vm[1], 10)];
+      else if (t === 'inlineStr') { let s = ''; for (const m of inner.matchAll(/<t\b[^>]*>([\s\S]*?)<\/t>/g)) s += decode(m[1]); val = s; }
+      else if (vm) val = decode(vm[1]);
+      if (val != null) out[cn] = val;
+    }
+    return out;
+  }
   async function load(bytes) {
     const zip = await ZipShim.loadAsync(bytes);
     const wbXml = await readText(zip, 'xl/workbook.xml');
@@ -2770,6 +2858,7 @@ const Engine = (() => {
         else if (cn === 4) row.client = String(val);
         else if (cn >= DAY_COL0 && cn < DAY_COL0 + 31) row.days[cn - DAY_COL0] = val;
         else if (cn === COL_REG) row.reg = typeof val === 'number' ? val : parseFloat(val);
+        else if (cn > COL_REG) (row.x || (row.x = {}))[cn] = val;   // v3.14: extra fields after AM
       }
       const empty = row.month == null && !row.name && !row.client && row.empId == null && row.days.every(d => d == null) && row.reg == null;
       if (empty) { skippedBlank++; continue; }
@@ -2788,12 +2877,24 @@ const Engine = (() => {
       }
     }
     if (!/Recruiter Name/.test(rawRow2) && rows.length === 0) throw new Error('The tracker sheet looks empty or has a different layout than expected.');
-    return { zip, bytes, sheetPath, prefix, suffix, rawRow1, rawRow2, sst, sstXml, sstRefs, rows, skippedBlank };
+    /* v3.14: row 2 holds the headings; anything after AM is a field added from the dashboard (or in Excel) */
+    const headers = readRowCells(rawRow2, sst), extraCols = [];
+    for (const [cn, v] of Object.entries(headers)) if (+cn > COL_REG && String(v ?? '').trim()) extraCols.push({ cn: +cn, name: String(v).trim() });
+    extraCols.sort((a, b) => a.cn - b.cn);
+    const byCn = new Map(extraCols.map(c => [c.cn, c.name]));
+    for (const row of rows) { row.extra = {}; if (row.x) { for (const [cn, v] of Object.entries(row.x)) { const nm = byCn.get(+cn); if (nm) row.extra[nm] = v; } delete row.x; } }
+    const headerNames = Object.values(headers).map(v => String(v ?? '').trim()).filter(Boolean);
+    return { zip, bytes, sheetPath, prefix, suffix, rawRow1, rawRow2, sst, sstXml, sstRefs, rows, skippedBlank, extraCols, headerNames };
   }
 
   /* ---- Writing ---- */
-  async function build(ctx, rows) {
+  async function build(ctx, rows, fieldNames = []) {
     const zip = await ZipShim.loadAsync(ctx.bytes);      // start clean from the last saved bytes
+    /* v3.14: extra fields after AM. Existing ones keep their column; new ones are added after the last one. */
+    const extra = (ctx.extraCols || []).map(c => ({ ...c }));
+    let nextCol = Math.max(COL_REG, ...extra.map(c => c.cn)) + 1; const addedCols = [];
+    for (const nm of fieldNames) if (nm && !extra.some(c => c.name.toLowerCase() === String(nm).toLowerCase())) { const c = { cn: nextCol++, name: String(nm) }; extra.push(c); addedCols.push(c); }
+    const lastColNum = Math.max(COL_REG, ...extra.map(c => c.cn)), lastCol = colName(lastColNum);
     // shared-strings: reuse existing plain strings, append new ones
     const map = new Map(); ctx.sst.list.forEach((s, i) => { if (ctx.sst.plain[i] && !map.has(s)) map.set(s, i); });
     let nextIdx = ctx.sst.list.length; const added = [];
@@ -2832,17 +2933,32 @@ const Engine = (() => {
       cells.push(`<c r="AL${r}" s="${st(COL_UPC) ?? DEF_STYLE.calc}"><f>${encode(f.upc)}</f><v>${c.upc}</v></c>`);
       if (row.reg != null && !Number.isNaN(row.reg)) cells.push(numCell('AM' + r, st(COL_REG) ?? DEF_STYLE.calc, row.reg));
       else cells.push(emptyCell('AM' + r, st(COL_REG) ?? DEF_STYLE.calc));
+      for (const c of extra) {
+        const v = row.extra ? row.extra[c.name] : null, ref = colName(c.cn) + r;
+        if (v != null && v !== '') cells.push(typeof v === 'number' ? numCell(ref, st(c.cn) ?? st(4) ?? DEF_STYLE.D, v) : strCell(ref, st(c.cn) ?? st(4) ?? DEF_STYLE.D, v));
+        else if (st(c.cn) != null && st(c.cn) !== DEF_STYLE.D) cells.push(emptyCell(ref, st(c.cn)));
+      }
       rowsXml.push(`<row r="${r}">${cells.join('')}</row>`);
     });
     const last = rows.length + 2;
 
     // ---- worksheet ----
     let prefix = ctx.prefix
-      .replace(/<dimension ref="[^"]*"\/>/, `<dimension ref="A1:AM${last}"/>`)
+      .replace(/<dimension ref="[^"]*"\/>/, `<dimension ref="A1:${lastCol}${last}"/>`)
       .replace(/(<pane\b[^>]*?)topLeftCell="[^"]*"/, '$1topLeftCell="G3"')
       .replace(/(<selection pane="bottomRight"[^>]*?)activeCell="[^"]*"/, '$1activeCell="C3"')
       .replace(/(<selection pane="bottomRight"[^>]*?)sqref="[^"]*"/, '$1sqref="C3"');
-    const sheetXml = prefix + '<sheetData>' + ctx.rawRow1 + ctx.rawRow2 + rowsXml.join('') + '</sheetData>' + ctx.suffix;
+    /* new field headings go into row 2, styled like the AM heading */
+    let row2 = ctx.rawRow2;
+    if (addedCols.length) {
+      const hs = (row2.match(/<c r="AM2"[^>]*?\ss="(\d+)"/) || [])[1];
+      const cellsXml = addedCols.map(c => `<c r="${colName(c.cn)}2"${hs ? ` s="${hs}"` : ''} t="inlineStr"><is><t>${encode(c.name)}</t></is></c>`).join('');
+      if (!row2) row2 = `<row r="2">${cellsXml}</row>`;
+      else if (/\/>$/.test(row2) && !/<\/row>$/.test(row2)) row2 = row2.replace(/\s*\/>$/, '>') + cellsXml + '</row>';
+      else row2 = row2.replace(/<\/row>$/, cellsXml + '</row>');
+      row2 = row2.replace(/^<row\b([^>]*?)\sspans="[^"]*"/, '<row$1');
+    }
+    const sheetXml = prefix + '<sheetData>' + ctx.rawRow1 + row2 + rowsXml.join('') + '</sheetData>' + ctx.suffix;
     zip.file(ctx.sheetPath, sheetXml);
 
     // ---- shared strings ----
@@ -2863,7 +2979,16 @@ const Engine = (() => {
     if (tablePath && zip.file(tablePath)) {
       let tx = await readText(zip, tablePath);
       tableName = attr(tx.match(/<table\b[^>]*>/)[0], 'name');
-      tx = tx.replace(/(<table\b[^>]*?\sref=")[^"]*(")/, `$1A2:AM${last}$2`).replace(/<sortState\b[\s\S]*?<\/sortState>/, '');
+      tx = tx.replace(/(<table\b[^>]*?\sref=")[^"]*(")/, `$1A2:${lastCol}${last}$2`).replace(/<sortState\b[\s\S]*?<\/sortState>/, '');
+      tx = tx.replace(/(<autoFilter\b[^>]*?\sref=")[^"]*(")/, `$1A2:${lastCol}${last}$2`);
+      /* v3.14: a table needs one tableColumn per column; add the new fields */
+      const tcM = tx.match(/<tableColumns\b[^>]*>([\s\S]*?)<\/tableColumns>/);
+      if (tcM) {
+        const have = [...tcM[1].matchAll(/<tableColumn\b[^>]*?\sid="(\d+)"/g)].map(m => +m[1]);
+        let add = '', id = Math.max(0, ...have);
+        for (let cn = have.length + 1; cn <= lastColNum; cn++) { const c = extra.find(x => x.cn === cn); add += `<tableColumn id="${++id}" name="${encode(c ? c.name : 'Column' + cn).replace(/"/g, '&quot;')}"/>`; }
+        if (add) tx = tx.replace(/<tableColumns\b[^>]*>[\s\S]*?<\/tableColumns>/, m => m.replace(/\scount="\d+"/, ` count="${have.length + add.split('<tableColumn ').length - 1}"`).replace('</tableColumns>', add + '</tableColumns>'));
+      }
       zip.file(tablePath, tx);
     }
 
@@ -3083,11 +3208,11 @@ function trackedOn(row, i) {
 }
 /* The status boxes and filters at the top of the Team Dashboard drive every attendance view (grid, who's out, people, Overview card, Reports).
    People the workforce file does not know have no status, so they only show when asked for ("Not in the workforce file"). */
-const hostSig = () => { try { if(state.view === 'reports')return 'reports:'+reportScope.revision;if(state.view === 'actions')return 'unfiltered:actions'; const f = state.filters; return (f.q || '') + '|' + Object.keys(f.sel).sort().map(k => k + '=' + [...f.sel[k]].sort().join(',')).join(';'); } catch { return ''; } };
+const hostSig = () => { try { if(state.view === 'reports'){const f0=state.filters;return 'reports:'+reportScope.revision+'|'+(f0.q||'')+'|'+Object.keys(f0.sel).sort().map(k=>k+'='+[...f0.sel[k]].sort().join(',')).join(';');}if(state.view === 'actions')return 'unfiltered:actions'; const f = state.filters; return (f.q || '') + '|' + Object.keys(f.sel).sort().map(k => k + '=' + [...f.sel[k]].sort().join(',')).join(';'); } catch { return ''; } };
 const curSig = () => hostSig() + '|' + rosterVer() + (S.ui.showUnmatched ? 'u' : '');
 const hostSummary = () => { try { return filterSummary() || 'All statuses'; } catch { return ''; } };
 function inScope(r) {
-  try { if(state.view === "actions")return true;if(state.view === "reports"){const match=rowRoster(r);return match?reportPass(match):!reportScope.cohort&&!Object.values(reportScope.sel).some(v=>v.size);} } catch {}
+  try { if(state.view === "actions")return true;if(state.view === "reports"){const match=rowRoster(r),f0=state.filters,filtered=!!f0.q||Object.values(f0.sel).some(v=>v.size);return match?(passes(match)&&reportPass(match)):!filtered&&!reportScope.cohort&&!Object.values(reportScope.sel).some(v=>v.size);} } catch {}
   if (!hasRoster()) return true;
   const x = rosterMatch(r.empId, r.name); if (!x) return !!S.ui.showUnmatched;
   try { return passes(x.row); } catch { return true; }
@@ -3113,7 +3238,9 @@ function D(all = false) {
 }
 
 /* ------------ mutations with undo + change log ------------ */
-function snapshot() { return S.rows.map(r => ({ ...r, days: r.days.slice() })); }
+function snapshot() { return S.rows.map(r => ({ ...r, days: r.days.slice(), extra: { ...(r.extra || {}) } })); }
+/* v3.14: fields added to the tracker (columns after AM). New ones wait in S.newFields until the next save writes them. */
+const attFieldNames = () => { const out = [...((S.ctx && S.ctx.extraCols) || []).map(c => c.name)]; for (const n of (S.newFields || [])) if (!out.some(x => x.toLowerCase() === n.toLowerCase())) out.push(n); return out; };
 /* v3.11: rights. Approving or rejecting leave (AL, CL, SL, RJ) needs "Approve leave"; other codes need "Edit attendance". */
 const can = k => !window.PERM || PERM.can(k);
 const APPROVAL_CODES = new Set(['AL', 'CL', 'SL', 'RJ']);
@@ -3131,8 +3258,8 @@ const permError = msg => Object.assign(new Error(msg), { perm: true });
 const allowedInLog = (o, n) => { const was = LOG_CTX; LOG_CTX = true; try { return codeAllowed(o, n); } finally { LOG_CTX = was; } };
 function mutate(desc, fn, opts = {}) {
   if (S.saving) { toast("Saving to Excel. Please wait a moment."); return false; }
-  if (!(can('att.edit') || (opts.cells && can('att.approve')) || (opts.holiday && can('att.holidays')) || (opts.log && can('att.log')))) { toast('Your passcode can view attendance but not change this. Ask the admin for the right in Settings.'); return false; }
-  S.undo.push({ rows: snapshot(), log: S.changes.length });
+  if (!(can('att.edit') || (opts.cells && can('att.approve')) || (opts.holiday && can('att.holidays')) || (opts.log && can('att.log')) || (opts.fields && can('att.fields')))) { toast('Your passcode can view attendance but not change this. Ask the admin for the right in Settings.'); return false; }
+  S.undo.push({ rows: snapshot(), log: S.changes.length, nf: (S.newFields || []).length });
   if (S.undo.length > 60) S.undo.shift();
   const before = S.rows.length;
   let res;
@@ -3155,13 +3282,13 @@ function mutate(desc, fn, opts = {}) {
 function undo() {
   if (S.saving) return;
   const u = S.undo.pop(); if (!u) return;
-  S.rows = u.rows.map(r => ({ ...r, _s: null, _dp: null })); S.changes.length = u.log; S.ver++; S.lastChange = Date.now(); render(); toast('Undone');
+  S.rows = u.rows.map(r => ({ ...r, _s: null, _dp: null })); S.changes.length = u.log; if (S.newFields && u.nf != null) S.newFields.length = Math.min(S.newFields.length, u.nf); S.ver++; S.lastChange = Date.now(); render(); toast('Undone');
   if (S.changes.length) schedulePendingSave(); else clearPending();
 }
 function newRow(month, name, opts = {}) {
   const days = new Array(31).fill(null); const dim = Engine.daysInMonth(month);
   if (opts.weekends !== false) for (let i = 0; i < dim; i++) { const w = dow(month, i); if (w === 0 || w === 6) days[i] = 'WO'; }
-  return { uid: S.uid++, r0: null, month, empId: opts.empId ?? null, name, client: opts.client || '', days, reg: null, styles: {}, variant: 'LA' };
+  return { uid: S.uid++, r0: null, month, empId: opts.empId ?? null, name, client: opts.client || '', days, reg: null, styles: {}, variant: 'LA', extra: {} };
 }
 function setDay(row, i, code) {
   if (!codeAllowed(row.days[i], code)) throw permError(APPROVAL_CODES.has(String(code || '').toUpperCase()) || APPROVAL_CODES.has(String(row.days[i] || '').toUpperCase()) ? 'Only people with the "Approve leave" right can set or change AL, CL, SL or RJ. Mark the day as LA (leave applied) instead.' : 'Your passcode can’t change attendance. Ask the admin for the right in Settings.');
@@ -3222,8 +3349,8 @@ function schedulePendingSave() { clearTimeout(pendingTimer); pendingTimer = setT
 function flushPendingNow() { clearTimeout(pendingTimer); return persistPending(); }
 async function persistPending() {
     if (!S.ctx || !S.changes.length) { await clearPending(); return; }
-    const rows = S.rows.map(r => ({ uid: r.uid, r0: r.r0, month: r.month, empId: r.empId, name: r.name, client: r.client, days: r.days.slice(), reg: r.reg, styles: { ...r.styles }, variant: r.variant }));
-    await queuePending({ fileName: S.fileName, mtime: S.mtime, savedAt: Date.now(), n: S.changes.length, rows });
+    const rows = S.rows.map(r => ({ uid: r.uid, r0: r.r0, month: r.month, empId: r.empId, name: r.name, client: r.client, days: r.days.slice(), reg: r.reg, styles: { ...r.styles }, variant: r.variant, extra: { ...(r.extra || {}) } }));
+    await queuePending({ fileName: S.fileName, mtime: S.mtime, savedAt: Date.now(), n: S.changes.length, rows, fields: (S.newFields || []).slice() });
 }
 async function clearPending() { clearTimeout(pendingTimer); await queuePending(null); }
 async function prepareSignOut() {
@@ -3236,7 +3363,8 @@ async function restorePendingIfAny() {
   if (!pending || !pending.rows || !pending.rows.length) return;
   if (pending.fileName !== S.fileName || pending.mtime !== S.mtime) { await clearPending(); return; }   // the file moved on since then: too risky to merge
   const diskRows = snapshot();
-  S.rows = pending.rows.map(r => ({ ...r, _s: null, _dp: null }));
+  S.rows = pending.rows.map(r => ({ ...r, extra: r.extra || {}, _s: null, _dp: null }));
+  S.newFields = Array.isArray(pending.fields) ? pending.fields.slice() : [];
   S.uid = Math.max(S.uid, ...S.rows.map(r => (r.uid || 0) + 1));
   S.undo = [{ rows: diskRows, log: 0 }];
   S.changes = [{ t: new Date(), desc: `Restored ${pending.n || 1} unsaved change${(pending.n || 1) === 1 ? '' : 's'} from before the page reloaded` }];
@@ -3246,7 +3374,8 @@ async function restorePendingIfAny() {
 }
 
 async function adopt(ctx, { recover = false } = {}) {
-  ctx.rows.forEach(r => { r.uid = S.uid++; });
+  ctx.rows.forEach(r => { r.uid = S.uid++; if (!r.extra) r.extra = {}; });
+  S.newFields = [];
   S.ctx = ctx; S.rows = ctx.rows; S.changes = []; S.undo = []; S.ver++; S.diskChanged = false; S.base = snapshot();
   const d = D(true);
   const has = ms => d.byMonth.has(ms);
@@ -3400,9 +3529,14 @@ async function save(opts = {}) {
       if (!auto || Date.now() - S.lastBackup > 600000) { try { await BE.backup(S.ctx.bytes, S.fileName); S.lastBackup = Date.now(); } catch (e) { if (!auto) downloadBytes(S.ctx.bytes, `${base}_backup_${stamp()}.xlsx`); else console.error(e); } }
       const n = S.changes.length, diff = diffRows(S.base, S.rows, r => 'u' + r.uid);
       /* in a shared workbook, build on top of the latest file so the workforce sheet's newest edits are kept */
-      const out = await Engine.build(BE.single() ? await Engine.load(new Uint8Array(await f.arrayBuffer())) : S.ctx, S.rows);
+      const out = await Engine.build(BE.single() ? await Engine.load(new Uint8Array(await f.arrayBuffer())) : S.ctx, S.rows, attFieldNames());
       if (!force && !S.handle.cloud && (await S.handle.getFile()).lastModified !== f.lastModified) { if (attempt < 2) continue; throw new Error('The workbook changed during saving. Try again in a moment.'); }
       const entries = entriesFromDiff(diff, { user: BE.userName(), time: BE.nowText(), external: false });
+      /* v3.14: new tracker fields and their values are logged too */
+      for (const nm of (S.newFields || [])) entries.push({ time: BE.nowText(), user: BE.userName(), action: 'settings', att: S.fileName, key: '', name: 'Attendance tracker', details: { note: 'Added the field “' + nm + '” (a new column after AM)' } });
+      { const baseBy = new Map(S.base.map(r => [r.uid, r])), per = {};
+        for (const r of S.rows) { const o = baseBy.get(r.uid), a = (o && o.extra) || {}, b = r.extra || {}; for (const k of new Set([...Object.keys(a), ...Object.keys(b)])) if ((a[k] ?? null) !== (b[k] ?? null)) (per[k] = per[k] || []).push(r.name.trim()); }
+        for (const [k, names] of Object.entries(per)) entries.push({ time: BE.nowText(), user: BE.userName(), action: 'att-edit', att: S.fileName, key: '', name: k, details: { note: k + ' filled or changed for ' + names.length + (names.length === 1 ? ' row: ' : ' rows: ') + names.slice(0, 6).join(', ') + (names.length > 6 ? ' +' + (names.length - 6) + ' more' : '') } }); }
       if (force) entries.unshift({ time: BE.nowText(), user: BE.userName(), action: 'overwrite', att: S.fileName, key: '', name: 'Attendance', details: { note: 'Saved over attendance changes someone else had made (a backup of their version is kept)' } });
       try { await BE.writeBlob(S.handle, new Blob([out], { type: 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet' }), entries, { force }); }
       catch (e) { if ((e.code === 'CONFLICT' || e.status === 409) && attempt < 2) { await new Promise(r => setTimeout(r, 400 + attempt * 600)); continue; } throw e; }   // the workforce sheet moved on: rebuild on top of it
@@ -3413,6 +3547,7 @@ async function save(opts = {}) {
       S.autoErr = ''; S.autoRetry = 0; S.conflictAsked = false; if (auto) S.autoAt = new Date(); else toast(`Saved ${n} change${n === 1 ? '' : 's'} to ${S.fileName}`);
       if (force && !S.auto) setAuto(true);
       await clearPending();
+      S.newFields = [];
       await adopt(ctx); notify(); if (S.act) S.act.items = null;
       break;
     }
@@ -3674,6 +3809,7 @@ function shellHtml() {
   return `<div class="topbar">
       ${left}
       <span class="grow"></span>
+      ${can('att.fields') || attFieldNames().length ? `<button class="btn" data-act="att-fields" id="btnAttFields" title="Extra fields in the attendance tracker (columns after AM)">${ic('plus')} Fields</button>` : ''}
       <button class="btn" data-act="undo" id="btnUndo">${ic('undo')} Undo</button>
       <button class="btn ghost syncbtn" data-act="sync-panel" id="btnSync" title="Save to Excel, file connections and shared-copy status">${ic('save')} <span id="syncBtnText">Save &amp; sync</span></button>
     </div>
@@ -3753,6 +3889,7 @@ function stackChart(series, { selectable = false, sel = null, height = 240 } = {
     const tip = `<b>${monthLabel(m.month)}</b><br>` + SERIES.map((s, j) => `${s.name}: ${fmt(vals[i][j])}`).join('<br>') + `<br><b>Total ${fmt(tot)}</b> (${grandTotal?(tot/grandTotal*100).toFixed(1):"0.0"}% of leave days shown) · ${new Set(m.rows.map(r => personKey(r.name))).size} people`;
     const hit = `<rect class="hit" x="${l + band * i}" y="${t}" width="${band}" height="${H - t - b}" data-tip="${esc(tip)}" ${selectable ? `data-act="pick-month" data-m="${m.month}" role="button" tabindex="0" aria-label="Select ${monthLabel(m.month)}" style="cursor:pointer"` : ''}/>`;
     let segs = ''; SERIES.forEach((s, j) => { const v = vals[i][j]; if (v <= 0) return; const h = y(acc) - y(acc + v); segs += `<rect x="${x0}" y="${y(acc + v)}" width="${bw}" height="${Math.max(h, 1)}" rx="2" fill="${s.c}" stroke="var(--surface)" stroke-width="2" pointer-events="none"/>`; acc += v; });
+    if (tot > 0) segs += `<text class="dlbl" x="${x0 + bw / 2}" y="${y(tot) - 5}" text-anchor="middle">${fmt(tot)}</text>`;   // v3.14: total on top of every bar
     bars += segs + hit;
     const isSel = sel === m.month; const jan = monthShort(m.month) === 'Jan' || i === 0;
     xl += `<text x="${x0 + bw / 2}" y="${H - b + 14}" text-anchor="middle" ${isSel ? 'style="fill:var(--ink);font-weight:700"' : ''}>${monthShort(m.month)}</text>` + (jan ? `<text x="${x0 + bw / 2}" y="${H - b + 26}" text-anchor="middle">${monthYear(m.month)}</text>` : '') + (isSel ? `<rect x="${x0}" y="${H - b + 30}" width="${bw}" height="3" rx="1.5" fill="var(--accent)"/>` : '');
@@ -3768,6 +3905,7 @@ function dailyChart(month, rows) {
   for (let i = 0; i < dim; i++) {
     const x0 = l + band * i + (band - bw) / 2, w = dow(month, i), wk = w === 0 || w === 6, isT = month === TODAY_MS && i === TODAY_IDX;
     const tip = `<b>${longDate(dateOf(month, i))}</b><br>${cnt[i]} out (${rows.length?(cnt[i]/rows.length*100).toFixed(1):"0.0"}% of tracked rows)${who[i].length ? '<br>' + who[i].slice(0, 10).map(esc).join('<br>') + (who[i].length > 10 ? `<br>+${who[i].length - 10} more` : '') : ''}`;
+    if (cnt[i]) bars += `<text class="dlbl" x="${x0 + bw / 2}" y="${y(cnt[i]) - 4}" text-anchor="middle" style="font-size:${band >= 18 ? 10 : 8}px">${cnt[i]}</text>`;
     bars += `<rect x="${x0}" y="${y(cnt[i])}" width="${bw}" height="${Math.max(y(0) - y(cnt[i]), cnt[i] ? 1 : 0)}" rx="2" fill="${wk ? 'var(--gray)' : 'var(--blue)'}" ${isT ? 'stroke="var(--ink)" stroke-width="1.5"' : ''} pointer-events="none"/><rect class="hit" x="${l + band * i}" y="${t}" width="${band}" height="${H - t - b}" data-tip="${esc(tip)}" ${S.mode==='reports' ? `data-act="report-select" data-kind="day" data-value="${month}:${i}" role="button" tabindex="0" aria-label="Select people out on ${longDate(dateOf(month,i))}" style="cursor:pointer"` : ''}/>`;
 
     if (dim <= 31 && (i % 2 === 0 || band > 20)) xl += `<text x="${x0 + bw / 2}" y="${H - b + 13}" text-anchor="middle" ${isT ? 'style="fill:var(--ink);font-weight:700"' : ''}>${i + 1}</text>`;
@@ -3885,7 +4023,8 @@ function attTimelineCard(periodRowsList) {
   window.attendanceTimelineExport = null;
   if (!buckets.length || !series.length) return `<div class="card" style="margin-bottom:14px">${head}${sub}${tlFilterBar(range)}<div class="empty">${!series.length ? 'Pick at least one type to show.' : 'No attendance rows for these dates.'}</div></div>`;
   const step = u.by === 'month' ? 44 : u.by === 'week' ? 26 : buckets.length > 200 ? 7 : buckets.length > 70 ? 9 : buckets.length > 35 ? 14 : 20;
-  const bw = Math.max(4, Math.round(step * 0.68)), l = 34, r = 12, t = 14, b = 40, H = 220;
+  const bw = Math.max(4, Math.round(step * 0.68)), l = 34, r = 12, t = 22, b = 40, H = 228;
+  const lblSize = step >= 20 ? 10 : step >= 14 ? 9 : step >= 9 ? 7.5 : 6;
   const W = l + r + buckets.length * step, max = niceMax4(Math.max(1, ...buckets.map(x => x.total)));
   const y = v => t + (H - t - b) * (1 - v / max);
   let g = '', bars = '', xl = '', todayX = null, prevM = null, lastMX = -1e9;
@@ -3894,6 +4033,7 @@ function attTimelineCard(periodRowsList) {
     const x = l + n * step;
     if (unitDay && bk.wk) bars += `<rect x="${x}" y="${t}" width="${step}" height="${H - t - b}" fill="var(--line)" opacity=".45" pointer-events="none"/>`;
     let acc = 0; bk.c.forEach((v, j) => { if (!v) return; const hh = y(acc) - y(acc + v); bars += `<rect x="${x + (step - bw) / 2}" y="${y(acc + v)}" width="${bw}" height="${Math.max(hh, 1)}" rx="1.5" fill="${series[j].c}" ${bk.future ? 'opacity=".45"' : ''} pointer-events="none"/>`; acc += v; });
+    if (bk.total) bars += `<text class="dlbl" x="${x + step / 2}" y="${y(bk.total) - 4}" text-anchor="middle" style="font-size:${lblSize}px">${bk.total}</text>`;
     const when = unitDay ? longDate(bk.start) : longDate(bk.start) + ' – ' + longDate(bk.end);
     const names = [...bk.names.entries()].sort((a, c) => c[1] - a[1] || a[0].localeCompare(c[0]));
     const tip = `<b>${esc(when)}</b>${bk.today && unitDay ? ' (today)' : bk.future ? ' (planned)' : ''}<br>` + (unitDay ? `${bk.total} out of ${bk.tracked} tracked (${bk.tracked ? (bk.total / bk.tracked * 100).toFixed(1) : '0.0'}%)` : `${bk.total} days · ${bk.people.size} people`)
@@ -3914,7 +4054,17 @@ function attTimelineCard(periodRowsList) {
   const summary = past.length ? `Average <b>${fmt(Math.round(avg * 10) / 10)}</b> per ${unitName} · <b>${people.size}</b> people in total` + (peak && peak.total ? ` · busiest <b>${esc(unitDay ? longDate(peak.start) : peak.label)}</b> (${peak.total})` : '') : `<b>${people.size}</b> people in total`;
   window.attendanceTimelineExport = { title: 'Attendance timeline · ' + (range ? isoDate(range[0]) + ' to ' + isoDate(range[1]) : ''), headers: [unitDay ? 'Date' : u.by === 'week' ? 'Week starting' : 'Month', ...series.map(s => s.name), 'Total', 'People'], rows: buckets.map(bk => [u.by === 'month' ? bk.label : isoDate(bk.start), ...bk.c, bk.total, bk.people.size]) };
   return `<div class="card" style="margin-bottom:14px">${head.replace('<span class="sm muted" id="tlSummary"></span>', `<span class="sm muted">${summary}</span>`)}${sub}${tlFilterBar(range)}
-    <div class="tl-scroll" data-key="${esc(u.range + u.from + u.to + u.by + u.hideWk)}" style="overflow-x:auto;overflow-y:hidden;padding-bottom:4px"><svg class="chart tl" viewBox="0 0 ${W} ${H}" width="${W}" height="${H}" style="width:${W}px;max-width:none;min-width:${W}px" role="img" aria-label="Attendance timeline">${g}${bars}${xl}</svg></div></div>`;
+    ${asTables() ? rtable(window.attendanceTimelineExport, ['People']) : `<div class="tl-scroll" data-key="${esc(u.range + u.from + u.to + u.by + u.hideWk)}" style="overflow-x:auto;overflow-y:hidden;padding-bottom:4px"><svg class="chart tl" viewBox="0 0 ${W} ${H}" width="${W}" height="${H}" style="width:${W}px;max-width:none;min-width:${W}px" role="img" aria-label="Attendance timeline">${g}${bars}${xl}</svg></div>`}</div>`;
+}
+/* v3.14: one switch on the Reports page shows every chart as its table */
+const asTables = () => { try { return !!window.REPORT_TABLES; } catch { return false; } };
+function rtable(exp, noSum = []) {
+  if (!exp || !exp.rows || !exp.rows.length) return '<div class="empty">No data for this selection.</div>';
+  const num = v => typeof v === 'number' && Number.isFinite(v);
+  const cols = exp.headers.map((hd, j) => j > 0 && exp.rows.every(r => r[j] == null || r[j] === '' || num(r[j])));
+  const sums = exp.headers.map((hd, j) => cols[j] && !noSum.includes(hd) ? exp.rows.reduce((a, r) => a + (num(r[j]) ? r[j] : 0), 0) : null);
+  const cell = (v, j) => `<td class="${cols[j] ? 'n' : ''}">${num(v) ? fmt(v) : esc(v ?? '')}</td>`;
+  return `<div class="rtab-wrap"><table class="rtab"><thead><tr>${exp.headers.map((hd, j) => `<th class="${cols[j] ? 'n' : ''}">${esc(hd)}</th>`).join('')}</tr></thead><tbody>${exp.rows.map(r => `<tr>${r.map(cell).join('')}</tr>`).join('')}${exp.rows.length > 1 && sums.some(s => s != null) ? `<tr class="tot"><td>Total</td>${sums.slice(1).map((s, j) => `<td class="${cols[j + 1] ? 'n' : ''}">${s == null ? '' : fmt(s)}</td>`).join('')}</tr>` : ''}</tbody></table></div>`;
 }
 function reportsView() {
   const d = D(), rows = periodRows(), a = agg(rows), p = S.ui.period, isMonth = p.startsWith('m:');
@@ -3952,6 +4102,8 @@ function reportsView() {
  ];
  if(isMonth){const m=+p.slice(2);window.attendanceExportData.push({title:'People out each day · '+periodLabel(),headers:['Date','People out'],rows:Array.from({length:Engine.daysInMonth(m)},(_,i)=>[isoDate(dateOf(m,i)),rows.filter(r=>isLeaveCode(r.days[i])).length])});}
  else window.attendanceExportData.push({title:'Leave mix',headers:['Leave type','Days'],rows:SERIES.map(s=>[s.name,rows.reduce((a,r)=>a+s.f(rowStats(r)),0)])});
+  const EX = pre => (window.attendanceExportData || []).find(x => x.title.startsWith(pre));
+  const T = asTables();
   return `<div class="toolbar">
       <label>Period <select data-bind="period">${monthOptions(p, true)}</select></label>
       <label>Client group <select data-bind="oclient">${clientOptions(S.ui.client)}</select></label>
@@ -3959,12 +4111,12 @@ function reportsView() {
     </div>
     ${timelineHtml}
     <div class="grid g2" style="margin-bottom:14px">
-      <div class="card"><h2>Leave days by month</h2><div class="sub">Click a month to focus the whole dashboard on it.</div>${stackChart(monthly, { selectable: true, sel: isMonth ? +p.slice(2) : null })}</div>
-      <div class="card"><h2>Most leave days · ${esc(periodLabel())}</h2><div class="sub">Top 10 people. Click a bar to filter all reports to that person.</div>${hbars(top, { link: true })}</div>
+      <div class="card"><h2>Leave days by month</h2><div class="sub">Click a month to focus the whole dashboard on it.</div>${T ? rtable(EX('Leave days by month')) : stackChart(monthly, { selectable: true, sel: isMonth ? +p.slice(2) : null })}</div>
+      <div class="card"><h2>Most leave days · ${esc(periodLabel())}</h2><div class="sub">Top 10 people. Click a bar to filter all reports to that person.</div>${T ? rtable(EX('Most leave days')) : hbars(top, { link: true })}</div>
     </div>
     <div class="grid g2e" style="margin-bottom:14px">
-      <div class="card"><h2>${isMonth ? 'People out each day · ' + esc(periodLabel()) : 'Leave days by client group'}</h2><div class="sub">${isMonth ? 'Approved, sick, unplanned and half-day absences.' : 'Sum over the selected period.'}</div>${isMonth ? dailyChart(+p.slice(2), rows) : hbars(cl, { reportKind:'client', color: 'var(--aqua)' })}</div>
-      <div class="card"><h2>${isMonth ? 'Leave days by client group' : 'Leave mix'}</h2><div class="sub">${isMonth ? 'Total leave days per group this month.' : 'Days by type across the period.'}</div>${isMonth ? hbars(cl, { reportKind:'client', color: 'var(--aqua)' }) : hbars(SERIES.map(s => ({ label: s.name, v: rows.reduce((t, r) => t + s.f(rowStats(r)), 0) })), { reportKind:'mix', color: 'var(--blue)' })}</div>
+      <div class="card"><h2>${isMonth ? 'People out each day · ' + esc(periodLabel()) : 'Leave days by client group'}</h2><div class="sub">${isMonth ? 'Approved, sick, unplanned and half-day absences.' : 'Sum over the selected period.'}</div>${T ? rtable(isMonth ? EX('People out each day') : EX('Leave days by client group'), ['People']) : isMonth ? dailyChart(+p.slice(2), rows) : hbars(cl, { reportKind:'client', color: 'var(--aqua)' })}</div>
+      <div class="card"><h2>${isMonth ? 'Leave days by client group' : 'Leave mix'}</h2><div class="sub">${isMonth ? 'Total leave days per group this month.' : 'Days by type across the period.'}</div>${T ? rtable(isMonth ? EX('Leave days by client group') : EX('Leave mix'), ['People']) : isMonth ? hbars(cl, { reportKind:'client', color: 'var(--aqua)' }) : hbars(SERIES.map(s => ({ label: s.name, v: rows.reduce((t, r) => t + s.f(rowStats(r)), 0) })), { reportKind:'mix', color: 'var(--blue)' })}</div>
     </div>
     <div class="card"><div style="display:flex;gap:12px;align-items:baseline;flex-wrap:wrap"><h2 style="margin:0">Needs attention · ${esc(periodLabel())}</h2><span class="grow"></span>
       <label class="sm muted">Flag unplanned ≥ <input type="number" min="1" style="width:56px;padding:2px 6px" value="${thr.ul}" data-bind="thr-ul"></label>
@@ -4104,12 +4256,12 @@ function whoView() {
       <div class="seg" role="group" aria-label="Window length">${[7, 14, 21, 30].map(n => `<button data-act="who-days" data-n="${n}" aria-pressed="${w.days === n}">${n} days</button>`).join('')}</div>
       <button class="btn" data-act="who-today">Today</button><button class="btn" data-act="who-picture">Copy as picture</button><span class="sm muted">Show:</span>${chk('leave', 'Leaves')}${chk('applied', 'Applied (LA)')}${chk('late', 'Late')}${chk('remote', 'Remote')}
       <span class="grow"></span>${canLog() ? `<button class="btn primary" data-act="log-leave">${ic('plus')} Log leave</button>` : ''}</div>
-    <div class="grid g2" style="align-items:start">
-      <div class="card" style="padding:0;overflow:hidden">${list.length ? `<div class="gridwrap" style="border:0;box-shadow:none;max-height:calc(100vh - 330px)"><table class="att" data-picture-timeline><thead><tr><th class="c-name">Team member</th>${head}</tr></thead><tbody>${body}</tbody></table></div>` : `<div class="empty">Nothing recorded in this window (${longDate(dates[0])} to ${longDate(dates[dates.length - 1])}). The sheet may not have entries this far ahead yet.<br><button class="btn sm" style="margin-top:10px" data-act="who-back">Show the last 14 days instead</button></div>`}</div>
-      <div style="display:flex;flex-direction:column;gap:14px;min-width:0"><div class="card"><h2>Applications ahead · ${pend.length}</h2><div class="sub">${can('att.approve') ? 'Approve each date or a consecutive group. ✕ records RJ (rejected) in the tracker; it does not record attendance.' : 'Leave applied for and waiting for someone with the Approve leave right.'}</div>
-        ${pend.length ? `<div class="list" style="max-height:300px;overflow:auto">${applicationList(pend)}</div>` : '<div class="empty">No pending applications from today onward.</div>'}</div>
-        <div class="card"><h2>Applications never closed · ${stale.length}</h2><div class="sub">These dates have passed but the cell still says LA, so they are not counted as leave. ${can('att.approve') ? 'Pick what actually happened.' : 'Someone with the Approve leave right needs to close them.'}</div>
-        ${stale.length ? `<div class="list" style="max-height:340px;overflow:auto">${applicationList(stale)}</div>` : '<div class="empty">Nothing outstanding. Every past application has been closed.</div>'}</div></div></div>`;
+    <div class="grid who3" style="display:grid;grid-template-columns:minmax(0,1.5fr) minmax(0,1fr) minmax(0,1fr);gap:14px;align-items:start">
+      <div class="card" style="padding:0;overflow:hidden;min-width:0">${list.length ? `<div class="gridwrap" style="border:0;box-shadow:none;max-height:calc(100vh - 330px)"><table class="att" data-picture-timeline><thead><tr><th class="c-name">Team member</th>${head}</tr></thead><tbody>${body}</tbody></table></div>` : `<div class="empty">Nothing recorded in this window (${longDate(dates[0])} to ${longDate(dates[dates.length - 1])}). The sheet may not have entries this far ahead yet.<br><button class="btn sm" style="margin-top:10px" data-act="who-back">Show the last 14 days instead</button></div>`}</div>
+      <div class="card" style="min-width:0"><h2>Applications ahead · ${pend.length}</h2><div class="sub">${can('att.approve') ? 'Approve each date or a consecutive group. ✕ records RJ (rejected) in the tracker; it does not record attendance.' : 'Leave applied for and waiting for someone with the Approve leave right.'}</div>
+        ${pend.length ? `<div class="list" style="max-height:calc(100vh - 380px);min-height:220px;overflow:auto">${applicationList(pend)}</div>` : '<div class="empty">No pending applications from today onward.</div>'}</div>
+        <div class="card" style="min-width:0"><h2>Applications never closed · ${stale.length}</h2><div class="sub">These dates have passed but the cell still says LA, so they are not counted as leave. ${can('att.approve') ? 'Pick what actually happened.' : 'Someone with the Approve leave right needs to close them.'}</div>
+        ${stale.length ? `<div class="list" style="max-height:calc(100vh - 380px);min-height:220px;overflow:auto">${applicationList(stale)}</div>` : '<div class="empty">Nothing outstanding. Every past application has been closed.</div>'}</div></div>`;
 }
 
 /* ---------- ATTENDANCE GRID ---------- */
@@ -4699,6 +4851,7 @@ function openRowEditor(uid, preset = {}) {
       <div class="full sm" id="f-src"></div>
       <label>Client<input type="text" id="f-client" list="clientlist" value="${esc(base.client)}" autocomplete="off"></label>
       <label>Regularizations<input type="number" id="f-reg" min="0" step="1" value="${base.reg ?? ''}"></label>
+      ${attFieldNames().length ? `<div class="full"><b style="font-size:12px;color:var(--ink-2)">Extra fields</b><div class="xf-grid" style="margin-top:6px">${attFieldNames().map((n, k) => `<label>${esc(n)}<input type="text" data-xf="${k}" value="${esc((base.extra || {})[n] ?? '')}" autocomplete="off" ${can('att.edit') || can('att.fields') ? '' : 'disabled'}></label>`).join('')}</div></div>` : ''}
       <div class="full"><div style="display:flex;align-items:center;gap:8px;margin:2px 0 6px"><b style="font-size:12px;color:var(--ink-2)">Daily codes</b><span class="grow"></span><button class="btn sm" id="f-wo" type="button">Fill weekends with WO</button><button class="btn sm" id="f-clr" type="button">Clear all days</button></div><div class="dayedit" id="f-days"></div>
       <div class="sm muted" style="margin-top:6px">Leave empty for a normal working day. Codes: ${['AL', 'CL', 'SL', 'UL', 'AB', 'HD1', 'HD2', 'LA', 'L', 'C', 'R', 'WO', 'H', 'M', 'P', 'X', 'NA'].join(', ')}.</div></div></div>
       <datalist id="namelist">${names.map(n => `<option value="${esc(n.name)}">${esc(n.hint)}</option>`).join('')}</datalist><datalist id="clientlist">${clients.map(n => `<option value="${esc(n)}">`).join('')}</datalist><datalist id="codelist">${PICK.map(c => `<option value="${c}">`).join('')}</datalist>
@@ -4738,12 +4891,46 @@ function openRowEditor(uid, preset = {}) {
     if (bad.length) return err('Not in your legend: ' + bad.slice(0, 4).join(', ') + '. Use a listed code or leave it empty.');
     const stray = days.map((v, i) => (i >= dim && v != null && v !== '' && !(row && row.days[i] === v)) ? i + 1 : 0).filter(Boolean); if (stray.length) return err(`${monthLabel(ms)} has only ${dim} days, but day ${stray[0]} has an entry.`);
     const f = { name, empId: parseId($('#f-id', m).value), client: $('#f-client', m).value.trim(), reg: $('#f-reg', m).value === '' ? null : Number($('#f-reg', m).value), month: ms, days: days.slice() };
+    const fn = attFieldNames(); if (fn.length) { const ex = { ...((row && row.extra) || {}) }; $$('[data-xf]', m).forEach(inp => { const nm = fn[+inp.dataset.xf], v = inp.value.trim(); if (v === '') delete ex[nm]; else ex[nm] = /^-?\d+(\.\d+)?$/.test(v) ? Number(v) : v; }); f.extra = ex; }
     closeModal();
     if (row) mutate(`Edited ${rowLabel(row)}`, () => { Object.assign(row, f); });
     else mutate(`Added ${name} · ${monthLabel(ms)}`, () => { const nr = newRow(ms, name, { weekends: false }); Object.assign(nr, f); insertRow(nr); });
     if (!row) { S.ui.grid.month = ms; if (S.ui.view === 'grid') render(); }
   };
   m.addEventListener('keydown', e => { if (e.key === 'Enter' && e.target.tagName === 'INPUT' && !e.target.list) $('#f-save', m).click(); });
+}
+/* ---------- v3.14: attendance fields manager: add a field, fill it for a month ---------- */
+function openFieldsManager(sel) {
+  const names = attFieldNames(), canAdd = can('att.fields'), canFill = can('att.fields') || can('att.edit');
+  const d = D(), month = S.ui.grid.month || d.latestMonth, fieldSel = sel && names.includes(sel) ? sel : names[0];
+  const monthRows = (d.byMonth.get(month) || []).slice().sort((a, b) => a.name.localeCompare(b.name));
+  const pendingNote = n => (S.newFields || []).some(x => x.toLowerCase() === n.toLowerCase()) ? ' <span class="tag">added · saves with the next sync</span>' : '';
+  const list = names.length ? `<ul class="fld-list">${names.map(n => { const filled = S.rows.filter(r => r.extra && r.extra[n] != null && r.extra[n] !== '').length; return `<li><b>${esc(n)}</b>${pendingNote(n)}<span class="grow"></span><span class="sm muted">${filled} of ${S.rows.length} rows filled</span></li>`; }).join('')}</ul>` : '<div class="empty" style="padding:14px">No extra fields yet.</div>';
+  const add = canAdd ? `<div style="display:flex;gap:8px;align-items:flex-end;flex-wrap:wrap;margin:6px 0 14px"><label style="flex:1;min-width:220px">New field name<input type="text" id="xf-new" maxlength="60" placeholder="e.g. Shift, Laptop returned, Manager" autocomplete="off"></label><button class="btn primary" id="xf-add" type="button">${ic('plus')} Add field</button></div><div class="sm muted" style="margin:-6px 0 14px">It becomes a new column after AM in the “Attendance Tracker” sheet, for every month.</div>` : '<div class="sm muted" style="margin-bottom:12px">Only people with the “Add fields to the attendance tracker” right can add fields.</div>';
+  const fill = names.length && canFill ? `<div style="display:flex;gap:10px;align-items:center;flex-wrap:wrap;margin:6px 0 8px"><b style="font-size:13px">Fill in</b><select id="xf-pick">${names.map(n => `<option${n === fieldSel ? ' selected' : ''}>${esc(n)}</option>`).join('')}</select><span class="sm muted">for ${monthLabel(month)} · ${monthRows.length} people (follows the filters at the top)</span></div>
+    <div class="fld-fill"><table><thead><tr><th>Employee</th><th>Client</th><th>${esc(fieldSel)}</th></tr></thead><tbody>${monthRows.map(r => `<tr><td>${esc(r.name.trim())}</td><td class="sm muted">${esc(r.client || '')}</td><td><input type="text" data-xfr="${r.uid}" value="${esc((r.extra || {})[fieldSel] ?? '')}" aria-label="${esc(fieldSel)} for ${esc(r.name.trim())}"></td></tr>`).join('')}</tbody></table></div>` : '';
+  const m = openModal({ title: 'Attendance tracker fields', wide: true,
+    body: `${add}${list}${fill}<div class="err" id="xf-err" role="alert"></div>`,
+    footer: `<span class="grow"></span><button class="btn" data-close>Close</button>${fill ? '<button class="btn primary" id="xf-save" type="button">Save values</button>' : ''}` });
+  const err = t => { $('#xf-err', m).textContent = t; };
+  $('#xf-add', m)?.addEventListener('click', () => {
+    const nm = ($('#xf-new', m).value || '').replace(/\s+/g, ' ').trim();
+    if (!nm) return err('Enter a name for the field.');
+    if (/^[=+@-]/.test(nm)) return err('A field name can’t start with =, +, - or @.');
+    const taken = [...((S.ctx && S.ctx.headerNames) || []), ...attFieldNames()].some(x => x.toLowerCase() === nm.toLowerCase());
+    if (taken) return err(`The tracker already has a column called “${nm}”.`);
+    const ok = mutate(`Added the field “${nm}” to the attendance tracker`, () => { (S.newFields || (S.newFields = [])).push(nm); }, { fields: true });
+    if (ok !== false) { toast(`Added “${nm}”. It is written to Excel with the next save.`); openFieldsManager(nm); }
+  });
+  $('#xf-new', m)?.addEventListener('keydown', e => { if (e.key === 'Enter') $('#xf-add', m).click(); });
+  $('#xf-pick', m)?.addEventListener('change', e => openFieldsManager(e.target.value));
+  $('#xf-save', m)?.addEventListener('click', () => {
+    const changes = [];
+    $$('[data-xfr]', m).forEach(inp => { const r = rowByUid(inp.dataset.xfr); if (!r) return; const v = inp.value.trim(), old = (r.extra || {})[fieldSel]; const nv = v === '' ? null : /^-?\d+(\.\d+)?$/.test(v) ? Number(v) : v; if ((old ?? null) !== nv) changes.push([r, nv]); });
+    if (!changes.length) { closeModal(); return; }
+    closeModal();
+    mutate(`${fieldSel}: filled for ${changes.length} ${changes.length === 1 ? 'person' : 'people'} · ${monthLabel(month)}`, () => { for (const [r, v] of changes) { r.extra = { ...(r.extra || {}) }; if (v == null) delete r.extra[fieldSel]; else r.extra[fieldSel] = v; } }, { fields: true });
+  });
 }
 function deleteRows(uids) {
   const rs = uids.map(rowByUid).filter(Boolean); if (!rs.length) return;
@@ -5088,6 +5275,7 @@ const ACTIONS = {
   nav(el) { navTo(el.dataset.v); },
   save() { save(); }, undo() { undo(); }, autosave() { setAuto(!S.auto); if (S.auto) autoTick(); },
   'sync-panel'() { window.openSyncPanel && window.openSyncPanel(); },
+  'att-fields'() { openFieldsManager(); },
   retry() { S.folderKey = null; connect(); }, browse() { browseExternal(); }, reconnect() { reconnectExternal(); },
   'use-file'(el) { chooseFolderFile(el.dataset.n); },
   async 'change-file'() { closePop(); try { await scanFolder(); } catch { } S.picking = true; render(); },
@@ -5374,6 +5562,84 @@ function renderCard(el) {
 }
 const C_set = iso => { S.ui.card.date = iso && iso !== isoDate(TODAY) ? iso : null; };
 
+/* ---- v3.14: Leave watch (Overview). Back-to-back leave in a recent window, and leave that keeps landing on the same weekday ----
+   Follows the filters at the top like the rest of the Overview. Full-day leave codes build a streak (AL, CL, SL, UL, AB);
+   week offs, holidays and blank weekends in between do not break it, so Friday + Monday counts as back to back. */
+const WATCH_KEY = 'td_watch_v1';
+const watchUi = () => { if (!S.ui.watch) { let saved = {}; try { saved = JSON.parse(localStorage.getItem(WATCH_KEY) || '{}') || {}; } catch { } S.ui.watch = { days: [15, 30, 45, 60].includes(saved.days) ? saved.days : 30, min: [2, 3, 5].includes(saved.min) ? saved.min : 2, look: [60, 90, 180].includes(saved.look) ? saved.look : 90 }; } return S.ui.watch; };
+const FULL_LEAVE = new Set(['approved', 'sick', 'unplanned']);
+const DAY_MS = 86400000;
+const shortDate = dt => `${dt.getUTCDate()} ${MONTHS[dt.getUTCMonth()]}`;
+function personDayReader(p) {
+  const byMonth = new Map(); for (const r of p.rows) byMonth.set(r.month, r);   // rows are sorted, so the newest row of a month wins
+  return dt => { const r = byMonth.get(Engine.monthSerial(dt.getUTCFullYear(), dt.getUTCMonth())); return r ? r.days[dt.getUTCDate() - 1] : null; };
+}
+function leaveWatchData() {
+  const u = watchUi(), d = D(), streaks = [], patterns = [];
+  const from = new Date(TODAY.getTime() - (u.days - 1) * DAY_MS), lookFrom = new Date(TODAY.getTime() - (u.look - 1) * DAY_MS);
+  const WD = ['Sundays', 'Mondays', 'Tuesdays', 'Wednesdays', 'Thursdays', 'Fridays', 'Saturdays'];
+  for (const p of d.people.values()) {
+    const at = personDayReader(p);
+    /* 1. streaks inside the chosen window */
+    const runs = []; let cur = null, windowDays = 0;
+    for (let t = from.getTime(); t <= TODAY.getTime(); t += DAY_MS) {
+      const dt = new Date(t), v = at(dt), c = catOf(v), wk = dt.getUTCDay() === 0 || dt.getUTCDay() === 6;
+      if (FULL_LEAVE.has(c)) { windowDays++; if (!cur) cur = { start: dt, end: dt, n: 0, codes: {}, bridged: false }; cur.end = dt; cur.n++; const k = up(v).trim(); cur.codes[k] = (cur.codes[k] || 0) + 1; }
+      else if (c === 'half') windowDays += 0.5;
+      if (FULL_LEAVE.has(c)) continue;
+      if (cur && (c === 'off' || (!c && wk))) { cur.bridged = true; continue; }   // a week off or holiday in between keeps the streak going
+      if (cur) { runs.push(cur); cur = null; }
+    }
+    if (cur) runs.push(cur);
+    const hits = runs.filter(r => r.n >= u.min);
+    if (hits.length) {
+      const longest = Math.max(...hits.map(r => r.n));
+      const aroundWk = hits.some(r => r.end.getTime() - r.start.getTime() >= r.n * DAY_MS && (r.start.getUTCDay() === 5 || r.end.getUTCDay() === 1));
+      const sev = longest >= Math.max(3, u.min + 1) || hits.length >= 2 ? 'red' : 'amber';
+      streaks.push({ k: p.key, name: p.name, client: p.latest ? p.latest.client : '', hits, longest, total: windowDays, sev, aroundWk });
+    }
+    /* 2. weekday pattern over the look-back period (weekdays only; each leave or half day counts once) */
+    const wd = [0, 0, 0, 0, 0, 0, 0]; let n = 0; const dates = [];
+    for (let t = lookFrom.getTime(); t <= TODAY.getTime(); t += DAY_MS) {
+      const dt = new Date(t), w = dt.getUTCDay(); if (w === 0 || w === 6) continue;
+      const c = catOf(at(dt)); if (!FULL_LEAVE.has(c) && c !== 'half') continue;
+      wd[w]++; n++; dates.push(dt);
+    }
+    if (n >= 3) {
+      let top = 1; for (let w = 2; w <= 5; w++) if (wd[w] > wd[top]) top = w;
+      const monFri = wd[1] + wd[5];
+      let kind = null, text = '';
+      if (wd[top] >= 3 && wd[top] / n >= 0.6) { kind = 'day'; text = `Mostly on ${WD[top]}: ${wd[top]} of ${n} leave days`; }
+      else if (n >= 4 && monFri >= 3 && monFri / n >= 0.75) { kind = 'weekend'; text = `Next to weekends: ${monFri} of ${n} leave days on a Monday or Friday`; }
+      if (kind) patterns.push({ k: p.key, name: p.name, client: p.latest ? p.latest.client : '', kind, text, share: (kind === 'day' ? wd[top] : monFri) / n, n, day: kind === 'day' ? WD[top] : 'Mon / Fri', recent: dates.slice(-4).map(shortDate) });
+    }
+  }
+  streaks.sort((a, b) => (a.sev === b.sev ? 0 : a.sev === 'red' ? -1 : 1) || b.longest - a.longest || b.hits.length - a.hits.length || a.name.localeCompare(b.name));
+  patterns.sort((a, b) => b.share - a.share || b.n - a.n || a.name.localeCompare(b.name));
+  return { streaks, patterns, u };
+}
+function renderWatch(el) {
+  if (!el) return; renderWatch.el = el;
+  const u = watchUi();
+  const opt = (vals, cur, lab) => vals.map(v => `<option value="${v}"${v === cur ? ' selected' : ''}>${lab(v)}</option>`).join('');
+  const head = sub => `<div class="watch-head"><div class="grow"><h2>Leave watch</h2><div class="sub">${sub}</div></div>
+    <label class="hint" style="display:flex;align-items:center;gap:6px">Past <select class="input mini" data-w="days" aria-label="Window for back-to-back leave">${opt([15, 30, 45, 60], u.days, v => v + ' days')}</select></label>
+    <label class="hint" style="display:flex;align-items:center;gap:6px">Streak <select class="input mini" data-w="min" aria-label="Shortest streak to flag">${opt([2, 3, 5], u.min, v => v + '+ days')}</select></label></div>`;
+  if (S.status !== 'ready' || !S.ctx) { el.innerHTML = head('Back-to-back leave and repeat-day patterns') + '<div class="watch-empty">The attendance workbook isn’t connected yet.</div>'; return; }
+  const { streaks, patterns } = leaveWatchData();
+  const reds = streaks.filter(s => s.sev === 'red').length;
+  const runText = r => r.n + ' days · ' + (r.start.getTime() === r.end.getTime() ? shortDate(r.start) : shortDate(r.start) + ' – ' + shortDate(r.end)) + ' (' + Object.entries(r.codes).map(([c, k]) => c + (k > 1 ? ' ×' + k : '')).join(', ') + ')';
+  const sList = streaks.length ? `<ul class="watch-list">${streaks.map(s => `<li><span class="flag ${s.sev}">${s.sev === 'red' ? '⚑ Red flag' : 'Watch'}</span><div class="who"><b>${esc(s.name)}</b><small>${s.hits.length} streak${s.hits.length === 1 ? '' : 's'} · longest ${s.longest} days · ${fmt(s.total)} leave days in the past ${u.days} days${s.aroundWk ? ' · spans a weekend' : ''}</small><small>${s.hits.slice(-3).map(runText).map(esc).join('<br>')}</small></div><button class="btn mini" data-w-open="${esc(s.k)}">Open</button></li>`).join('')}</ul>`
+    : `<div class="watch-empty">Nobody took ${u.min} or more working days of leave in a row in the past ${u.days} days.</div>`;
+  const pList = patterns.length ? `<ul class="watch-list">${patterns.map(p => `<li><span class="flag ${p.kind === 'day' ? 'blue' : 'amber'}">${esc(p.day)}</span><div class="who"><b>${esc(p.name)}</b><small>${esc(p.text)}</small><small>Latest: ${esc(p.recent.join(', '))}</small></div><button class="btn mini" data-w-open="${esc(p.k)}">Open</button></li>`).join('')}</ul>`
+    : `<div class="watch-empty">No one’s leave keeps falling on the same weekday in the past ${u.look} days.</div>`;
+  el.innerHTML = head(`${streaks.length ? `<b style="color:var(--danger)">${reds} red flag${reds === 1 ? '' : 's'}</b> · ${streaks.length} ${streaks.length === 1 ? 'person' : 'people'} with back-to-back leave` : 'No back-to-back leave'} · ${patterns.length} repeat-day pattern${patterns.length === 1 ? '' : 's'} · follows the filters at the top`)
+    + `<div class="watch-cols"><section class="watch-col" aria-label="Back-to-back leave"><h3>Back-to-back leave · past ${u.days} days</h3><div class="sub">Red flag: a streak longer than ${Math.max(2, u.min)} days, or two or more streaks. Weekends and holidays in between don’t break a streak.</div>${sList}</section>
+      <section class="watch-col" aria-label="Leave on particular days"><h3 style="display:flex;align-items:center;gap:8px;flex-wrap:wrap">Leave on particular days <label class="hint" style="display:flex;align-items:center;gap:6px;font-weight:400">over <select class="input mini" data-w="look" aria-label="Look-back for day patterns">${opt([60, 90, 180], u.look, v => v + ' days')}</select></label></h3><div class="sub">People with 3+ leave days where most fall on one weekday, or on Mondays and Fridays.</div>${pList}</section></div>`;
+  el.querySelectorAll('[data-w]').forEach(s => s.addEventListener('change', () => { u[s.dataset.w] = +s.value; try { localStorage.setItem(WATCH_KEY, JSON.stringify(u)); } catch { } renderWatch(el); }));
+  el.querySelectorAll('[data-w-open]').forEach(b => b.addEventListener('click', () => { if (can('att.grid')) go('people', b.dataset.wOpen); else toast('Your passcode can’t open the People view.'); }));
+}
+
 /* ---- Employee drawer panel ---- */
 const DP_SERIES = [['approved', 'Approved', 'var(--c-blue)', s => s.approved], ['unpl', 'Unplanned', 'var(--c-orange)', s => s.unpl], ['sick', 'Sick', 'var(--c-aqua)', s => s.sick], ['half', 'Half days', 'var(--c-yellow)', s => s.half * 0.5]];
 function drawerPanel(row) {
@@ -5458,7 +5724,7 @@ const healthCount = () => (S.status === 'ready' && S.ctx ? healthIssues().filter
 
 mount();
 return {
-  hasTracker: Engine.hasTracker, refresh, init: () => { mount(); return connect(); }, askName, decorateTable, healthCount, chooseFileEarly, savedFile: async () => (await kv.get('file')) || ((await kv.get('handle')) || {}).name || '', show, leave, renderCard, drawerPanel, go, state: () => S, dirty: () => S.changes.length,
+  hasTracker: Engine.hasTracker, refresh, init: () => { mount(); return connect(); }, askName, decorateTable, healthCount, chooseFileEarly, savedFile: async () => (await kv.get('file')) || ((await kv.get('handle')) || {}).name || '', show, leave, renderCard, renderWatch, drawerPanel, go, redraw: () => { if (active()) render(); }, state: () => S, dirty: () => S.changes.length,
   prepareSignOut, save: () => save(), undo: () => undo(), toggleAuto: () => { setAuto(!S.auto); if (S.auto) autoTick(); }, setAutoSync: on => { setAuto(on); if (S.auto) autoTick(); }, canWrite: attCanWrite,
   syncInfo: () => { const d = D(true), sc = scopeCounts(); return { fileName: S.fileName, changes: S.changes.length, undoLen: S.undo.length, saving: S.saving, auto: S.auto, autoErr: S.autoErr, autoAt: S.autoAt, diskChanged: S.diskChanged, rows: S.rows.length, people: d.people.size, monthFrom: d.months[0], monthTo: d.latestMonth, unmatched: sc.unmatched, hasRoster: hasRoster() }; },
 };
@@ -5636,7 +5902,7 @@ async function poll() {
 }
 
 /* ============================== filtering ============================== */
-const APP = { title: "Team Dashboard", version: "3.13.0", released: "23 Sep 2026" };
+const APP = { title: "Team Dashboard", version: "3.14.1", released: "24 Sep 2026" };
 const BASE_DIMS = { status: "status_column", desig: "designation_column", client: "client_column", mode: "mode_column" };
 const STANDARD_STATUSES = ["Active", "Manager", "OJT", "Bench", "New", "Projected", "Left", "Moved"];
 const TILE_ORDER = ["Active", "Manager", "OJT", "Bench", "New", "Projected"];
@@ -5926,8 +6192,9 @@ async function copyReportPictures(items){
    try{downloadReportBlob(await promise,'Team report charts.png');toast('Clipboard unavailable. Charts downloaded as a PNG.');}catch(e){toast('Could not export charts: '+e.message,true);}
  }
 }
-function reportCopyButtons(data){return [h('button',{class:'btn mini',onclick:()=>copyReportTables([data])},'Copy table'),h('button',{class:'btn mini',onclick:()=>copyReportPictures([data])},'Copy chart')];}
+function reportCopyButtons(data){return [h('button',{class:'btn mini report-copy',onclick:()=>copyReportTables([data])},'Copy table'),h('button',{class:'btn mini report-copy',onclick:()=>copyReportPictures([data])},'Copy chart')];}
 window.installAttendanceReportCopies=()=>{
+ if(window.PERM&&!PERM.can('rep.export'))return;
  for(const data of reportExportItems().filter(x=>x.card)){
    if(data.card.querySelector('.report-copy-buttons'))continue;
    const box=h('div',{class:'report-copy-buttons',style:'display:flex;gap:6px;margin:8px 0'},...reportCopyButtons(data));data.card.querySelector('h2').after(box);
@@ -6122,6 +6389,57 @@ function renderCat(spec) {
     W => barChart(items, { aria: spec.title, unit: "people", total, onClick: (it, ev) => { if(state.view === "reports" && it.key==null)reportPeople(spec.title+": "+it.label,it.people);else pick(spec.fkey, it.key, isMulti(ev)); } }, W),
     [spec.title.replace("Headcount by ", ""), "People", "Share"], items.map(i => [i.label, { n: i.value, people: i.people, title: spec.title + " – " + i.label, label: "people", color: i.color }, total ? Math.round((i.value / total) * 100) + "%" : ""]), null, action, "var(--c-" + spec.hue + ")");
 }
+/* ---------- v3.14: add a new field (a new column in the workforce sheet of the workbook) ---------- */
+const FIELD_TYPES = [["text", "Text"], ["number", "Number"], ["date", "Date"], ["yesno", "Yes / No"], ["choice", "Choice list"]];
+function openAddField() {
+  if (window.PERM && !PERM.can("emp.fields")) { toast("Your passcode can’t add fields. Ask the admin for the right.", true); return; }
+  if (!state.schema) return;
+  const name = h("input", { class: "input", id: "nfName", maxlength: "60", placeholder: "e.g. Laptop serial number", autocomplete: "off" });
+  const type = h("select", { class: "input", id: "nfType" }, FIELD_TYPES.map(([v, l]) => h("option", { value: v }, l)));
+  const opts = h("input", { class: "input", id: "nfOpts", placeholder: "Morning, Evening, Night", autocomplete: "off" });
+  const optsWrap = h("div", { class: "field", hidden: true }, h("label", { for: "nfOpts" }, "Choices (separate with commas)"), opts);
+  const showCol = h("input", { type: "checkbox", checked: true, id: "nfShow" });
+  const err = h("p", { class: "err", role: "alert" });
+  type.addEventListener("change", () => { optsWrap.hidden = type.value !== "choice"; });
+  const save = h("button", { class: "btn primary", type: "button", onclick: async () => {
+    err.textContent = "";
+    const nm = name.value.replace(/\s+/g, " ").trim(), tp = type.value;
+    const options = tp === "choice" ? [...new Set(opts.value.split(",").map(x => x.trim()).filter(Boolean))] : [];
+    if (!nm) { err.textContent = "Enter a name for the field."; name.focus(); return; }
+    if (/^[=+@-]/.test(nm)) { err.textContent = "A field name can’t start with =, +, - or @."; return; }
+    if (state.cols.some(c => c.name.toLowerCase() === nm.toLowerCase() || c.label.toLowerCase() === nm.toLowerCase())) { err.textContent = "There is already a field called “" + nm + "”."; return; }
+    if (tp === "choice" && options.length < 2) { err.textContent = "Enter at least two choices, separated by commas."; opts.focus(); return; }
+    save.disabled = true; save.textContent = "Adding…";
+    let typeNote = "";
+    try {
+      if (tp !== "text") {
+        try { await loadTeamSettings(); const cur = ((window.TD_SETTINGS || {}).custom_fields || []).filter(f => f && f.name !== nm); await window.saveSharedSetting("custom_fields", [...cur, { name: nm, type: tp, options, added: new Date().toISOString().slice(0, 10) }]); }
+        catch (e) { typeNote = " Its type couldn’t be saved (" + e.message + "), so it works as a text field."; }
+      }
+      await api("POST", "/api/columns", { name: nm });
+      await loadData(true);
+      if (showCol.checked && state.visible && !state.visible.includes(nm)) { state.visible.push(nm); lsSet("td_cols", JSON.stringify(state.visible)); }
+      closeDrawer(); renderAll();
+      toast("Added “" + nm + "” as a new column in the workbook. Fill it in from any employee, or with Fill in bulk." + typeNote, !!typeNote);
+    } catch (e) { err.textContent = e.message; save.disabled = false; save.textContent = "Add field"; }
+  } }, "Add field");
+  const existing = ((window.TD_SETTINGS || {}).custom_fields || []).filter(f => f && state.idx[f.name] != null);
+  mountDrawer(h("aside", { class: "drawer", role: "dialog", "aria-modal": "true", "aria-label": "Add a field" },
+    h("header", {}, h("h2", {}, "Add a field"), h("button", { class: "btn ghost", onclick: closeDrawer, "aria-label": "Close" }, "✕")),
+    h("div", { class: "body" },
+      h("p", { class: "hint" }, "A field is something new you want to capture for every employee. It is added as a new column at the end of the workforce sheet in " + (state.file || "the workbook") + ", so it also shows in Excel and in the Supabase copy."),
+      h("div", { class: "field" }, h("label", { for: "nfName" }, "Field name"), name),
+      h("div", { class: "field" }, h("label", { for: "nfType" }, "Type"), type),
+      optsWrap,
+      h("label", { class: "chk-line", style: "display:flex;gap:8px;align-items:center;margin:10px 0" }, showCol, h("span", {}, "Show it as a column in the employee table")),
+      err,
+      h("div", { style: "display:flex;gap:8px;margin-top:8px" }, save, h("button", { class: "btn", type: "button", onclick: closeDrawer }, "Cancel")),
+      existing.length ? h("div", { style: "margin-top:22px" }, h("h3", { style: "font-size:13px;margin:0 0 6px" }, "Fields added so far"),
+        h("ul", { class: "td-hist" }, existing.map(f => h("li", {}, h("b", {}, f.name), " · " + (FIELD_TYPES.find(t => t[0] === f.type) || ["", "Text"])[1] + (f.options && f.options.length ? " (" + f.options.join(", ") + ")" : ""))))) : null)));
+  setTimeout(() => name.focus(), 30);
+}
+$("#btnAddField").addEventListener("click", openAddField);
+
 async function addSubClientColumn(btn) {
   btn.disabled = true; btn.textContent = "Adding…";
   try {
@@ -6136,8 +6454,17 @@ async function addSubClientColumn(btn) {
   } catch (e) { toast(e.message, true); btn.disabled = false; btn.textContent = "Add “" + state.schema.subclient_name + "” column to Excel"; }
 }
 
+/* v3.14: one toggle for every report chart (workforce charts and attendance) */
+try { window.REPORT_TABLES = localStorage.getItem("td_report_tables") === "1"; } catch { window.REPORT_TABLES = false; }
+function syncReportToggle() { const b = $("#repTables"); if (!b) return; b.setAttribute("aria-pressed", window.REPORT_TABLES ? "true" : "false"); b.textContent = window.REPORT_TABLES ? "Show all as charts" : "Show all as tables"; }
+$("#repTables").addEventListener("click", () => {
+  window.REPORT_TABLES = !window.REPORT_TABLES; try { localStorage.setItem("td_report_tables", window.REPORT_TABLES ? "1" : "0"); } catch { }
+  for (const c of document.querySelectorAll("#charts > .card")) state.chartView[c.id] = window.REPORT_TABLES ? "table" : "chart";
+  syncReportToggle(); ppHide(); renderCharts(); if (window.ATT && ATT.redraw) ATT.redraw();
+});
 function renderCharts() {
-  renderReportSelection();
+  renderReportSelection(); syncReportToggle();
+  if (window.REPORT_TABLES && !renderCharts._init) { renderCharts._init = true; for (const c of document.querySelectorAll("#charts > .card")) if (!state.chartView[c.id]) state.chartView[c.id] = "table"; }
   
   const groups = { team: ["cardStatus","cardClient","cardSub","cardDesig","cardMode","cardGender","cardLang","cardAge"], growth: ["cardTenure","cardTrend"], location: ["cardArea","cardDist"], attendance: [] };
   const chosen = $("#reportGroup").value; $("#charts").hidden = chosen === "attendance";
@@ -6442,13 +6769,16 @@ function actionCounts() {
 }
 function syncActionTabs() {
   if (!state.schema) return;
+  /* v3.14: a tab the passcode may not see is hidden; fall back to the first visible one */
+  const visTab = t => { const b = document.querySelector('.atab[data-atab="' + t + '"]'); return !!b && !b.hidden; };
+  if (!visTab(actionTab)) actionTab = ACT_TABS.find(visTab) || "none";
   const c = actionCounts();
   for (const t of document.querySelectorAll(".atab")) { const on = t.dataset.atab === actionTab; t.classList.toggle("on", on); t.setAttribute("aria-selected", on ? "true" : "false"); }
   const set = (id, n) => { const el = $(id); if (el) { el.textContent = n ? String(n) : ""; el.hidden = !n; } };
   set("#cntActions", c.actions); set("#cntReview", c.review); set("#cntHealth", c.health);
   $("#cardActions").hidden = actionTab !== "actions"; $("#cardReview").hidden = actionTab !== "review"; $("#slotHealth").hidden = actionTab !== "health";
   $("#cardFill").hidden = actionTab !== "fill"; syncFillBadge(); if (actionTab === "fill") renderFill();
-  set("#tabActionsN", (c.actions || 0) + (c.review || 0) + (c.health || 0));
+  set("#tabActionsN", (visTab("actions") ? c.actions || 0 : 0) + (visTab("review") ? c.review || 0 : 0) + (visTab("health") ? c.health || 0 : 0));
 }
 function openActionCenter(tab) { if (ACT_TABS.includes(tab)) actionTab = tab; if (state.view === "actions") renderAll(); else setView("actions"); }
 function openReports(group) { const sel = $("#reportGroup"); if (group && sel && group !== "all") sel.value = group; if (state.view === "reports") renderAll(); else setView("reports"); }
@@ -7088,7 +7418,7 @@ function renderAll() {
   renderFilters(); renderCustomFieldFilters(); renderChips(); window.syncFilterSaveActions?.();
   $("#scopeLine").textContent = fmtN(rowsFor(null).length) + " of " + fmtN(state.rows.length) + " employees · " + (filterSummary() || "All statuses · no filters");
   $("#todayLabel").textContent = new Date().toLocaleDateString(undefined,{weekday:"short",month:"short",day:"numeric"});
-  if (state.view === "summary") { renderComing(); renderStrip(); if (window.ATT) ATT.renderCard($("#cardAttendance")); } else if (state.view === "reports") renderCharts(); else if (state.view === "actions") { renderActions(); renderReview(); } else if (state.view === "attendance" || state.view === "settings") { /* these pages draw themselves */ } else renderTable();
+  if (state.view === "summary") { renderComing(); renderStrip(); if (window.ATT) { ATT.renderCard($("#cardAttendance")); if (window.PERM && PERM.can("ov.watch")) ATT.renderWatch($("#cardWatch")); } } else if (state.view === "reports") renderCharts(); else if (state.view === "actions") { renderActions(); renderReview(); } else if (state.view === "attendance" || state.view === "settings") { /* these pages draw themselves */ } else renderTable();
   syncActionTabs(); attSync();
 }
 
@@ -7257,6 +7587,8 @@ function buildField(c, value, isNew) {
     get = () => (control.value ? isoToSerial(control.value) : null);
   } else if (c.select) {
     const cur = S(value), list = sug.slice();
+    const cfDef = ((window.TD_SETTINGS || {}).custom_fields || []).find(f => f && f.name === name);
+    if (cfDef) for (const o of (cfDef.type === "yesno" ? ["Yes", "No"] : cfDef.options || [])) if (!list.includes(o)) list.push(o);
     if (name === sch.status_column) for (const st of STANDARD_STATUSES) if (!list.some(x => x.toLowerCase() === st.toLowerCase())) list.push(st);
     if (cur && !list.includes(cur)) list.unshift(cur);
     control = h("select", { class: "input", id },
@@ -7432,7 +7764,7 @@ function applyRow(res) {
 /* ============================== activity ============================== */
 /* v3.11: the activity is read from the "Activity Log" sheet of the workbook (past 30 days). It is shown in Settings > Activity log. */
 async function openActivity(container) {
-  if (!container || !(container instanceof Element)) { if (window.openSettings) window.openSettings("activity"); return; }
+  if (!container || !(container instanceof Element)) { if (window.openBell) window.openBell(); return; }
   const body = container;
   body.replaceChildren(h("div", { class: "empty" }, "Loading activity…"));
   try {
@@ -7466,12 +7798,13 @@ async function openActivity(container) {
       if (items.length > shown) list.append(h("button", { class: "btn", onclick: () => { shown += 100; draw(); } }, "Show more (" + (items.length - shown) + " remaining)"));
     };
     draw();
-    const refresh = h("button", { class: "btn mini", onclick: () => openActivity(body) }, "Refresh");
+    const refresh = h("button", { class: "btn mini", onclick: () => openActivity(body).then(items => { if (items && window.bellSeen) window.bellSeen(items); }) }, "Refresh");
     body.replaceChildren(
       h("div", { class: "activity-controls" }, search, h("span", { class: "spacer" }), refresh),
       h("p", { class: "set-hint" }, "Every change is written to the “Activity Log” sheet of " + (state.file || "the workbook") + ", newest first. Entries older than 30 days are removed automatically."),
       ...(d.warning ? [h("div", { class: "banner", role: "status" }, d.warning)] : []), list);
-  } catch (e) { body.replaceChildren(h("div", { class: "banner" }, e.message)); }
+    return d.items;
+  } catch (e) { body.replaceChildren(h("div", { class: "banner" }, e.message)); return null; }
 }
 
 /* ============================== boot & events ============================== */
@@ -7695,7 +8028,7 @@ $("#btnLogout").addEventListener("click", async () => {
   await gotoFiles(false);
 });
 $("#quickAdd").addEventListener("click", () => openDrawer(null));
-$("#reportGroup").addEventListener("change", () => { renderCharts(); attSync(); });
+$("#reportGroup").addEventListener("change", () => { renderCharts(); attSync(); window.placeSavedFilters?.(); });
 
 document.addEventListener("keydown", e => {
   if (e.key === "/" && !e.ctrlKey && !e.metaKey && !e.altKey && !(e.composedPath()[0] || e.target).closest("input,textarea,select,[contenteditable=true]") && state.view !== "attendance" && state.view !== "actions" && !$("#app").hidden && !document.querySelector(".drawer")) { e.preventDefault(); $("#fq").focus(); }
@@ -7711,7 +8044,7 @@ $("#btnTheme").addEventListener("click", () => {
 });
 { const t = lsGet("td_theme"); if (t === "dark" || t === "light") document.documentElement.setAttribute("data-theme", t); }
 
-addEventListener("att:data", () => { if (!state.schema) return; if (state.view === "summary") { renderStrip(); ATT.renderCard($("#cardAttendance")); } else if (state.view === "employees") renderTable(); syncActionTabs(); });
+addEventListener("att:data", () => { if (!state.schema) return; if (state.view === "summary") { renderStrip(); ATT.renderCard($("#cardAttendance")); if (window.PERM && PERM.can("ov.watch")) ATT.renderWatch($("#cardWatch")); } else if (state.view === "employees") renderTable(); syncActionTabs(); });
 let qTimer = null;
 $("#fq").addEventListener("input", e => { clearTimeout(qTimer); qTimer = setTimeout(() => { state.filters.q = e.target.value.trim(); state.page = 1; renderAll(); }, 120); });
 for (const [id, key] of [["#fStatus", "status"], ["#fDesig", "desig"], ["#fClient", "client"], ["#fMode", "mode"]]) $(id).addEventListener("click", ev => openMultiSelect(ev, key));
@@ -7917,9 +8250,10 @@ function syncRowsBody() {
 }
 function filesSectionBody() {
   const a = (window.ATT && window.ATT.syncInfo) ? ATT.syncInfo() : null;
-  const saveBtn = h('button', { class: 'btn primary', disabled: !a || a.saving || !a.changes, onclick: async () => { await ATT.save(); watchOpenPanel(); } }, a && a.saving ? 'Saving…' : 'Save to Excel');
-  const undoBtn = h('button', { class: 'btn', disabled: !a || !a.undoLen, onclick: () => { ATT.undo(); watchOpenPanel(); } }, 'Undo');
-  const autoBtn = h('button', { class: 'btn ' + (a && a.auto ? 'on' : ''), disabled: !a, onclick: () => { ATT.toggleAuto(); watchOpenPanel(); } }, a && a.auto ? 'Auto-save on' : 'Auto-save off');
+  const syncCan = k => !window.PERM || PERM.can(k);
+  const saveBtn = h('button', { class: 'btn primary', disabled: !a || a.saving || !a.changes || !syncCan('sync.save'), onclick: async () => { await ATT.save(); watchOpenPanel(); } }, a && a.saving ? 'Saving…' : 'Save to Excel');
+  const undoBtn = h('button', { class: 'btn', disabled: !a || !a.undoLen || !syncCan('sync.save'), onclick: () => { ATT.undo(); watchOpenPanel(); } }, 'Undo');
+  const autoBtn = h('button', { class: 'btn ' + (a && a.auto ? 'on' : ''), disabled: !a || !syncCan('sync.auto'), onclick: () => { ATT.toggleAuto(); watchOpenPanel(); } }, a && a.auto ? 'Auto-save on' : 'Auto-save off');
   return h('div', { class: 'watchsection' }, h('h3', {}, 'Your files'), ...syncRowsBody(), h('div', { style: 'margin-top:10px;display:flex;gap:8px;flex-wrap:wrap' }, saveBtn, undoBtn, autoBtn));
 }
 async function watchOpenPanel() {
@@ -7966,6 +8300,7 @@ async function saveSharedSetting(key, value) {
   } else { const all = JSON.parse(localStorage.getItem(LOCAL_KEY) || '{}'); all[key] = value; localStorage.setItem(LOCAL_KEY, JSON.stringify(all)); }
   window.TD_SETTINGS = { ...window.TD_SETTINGS, [key]: value };
 }
+window.saveSharedSetting = saveSharedSetting;
 window.setClientNotNeeded = async (person, on) => {
   await loadTeamSettings();   // start from the latest list so two people don't undo each other
   const cur = Array.isArray(TD_SETTINGS.client_not_needed) ? TD_SETTINGS.client_not_needed : [];
@@ -7990,13 +8325,58 @@ window.applyAccess = () => {
   show('#btnAdd', PERM.can('emp.add'));
   show('#btnFill', PERM.can('emp.bulk'));
   show('.atab[data-atab="fill"]', PERM.can('emp.bulk'));
-  show('.atab[data-atab="health"]', PERM.canView('attendance'));
-  show('#cardAttendance', PERM.canView('attendance'));
-  const opt = document.querySelector('#reportGroup option[value="attendance"]'); if (opt) { opt.hidden = opt.disabled = !PERM.canView('attendance'); }
+  show('.atab[data-atab="health"]', PERM.canView('attendance') && PERM.can('act.health'));
+  show('.atab[data-atab="actions"]', PERM.can('act.items'));
+  show('.atab[data-atab="review"]', PERM.can('act.review'));
+  show('#cardAttendance', PERM.canView('attendance') && PERM.can('ov.attendance'));
+  show('#cardComing', PERM.can('ov.coming'));
+  show('#cardWatch', PERM.can('ov.watch'));
+  show('#btnAddField', PERM.can('emp.fields'));
+  show('#btnBell', PERM.can('activity.view'));
+  document.body.classList.toggle('no-report-export', !PERM.can('rep.export'));
+  /* v3.14: each report group has its own right */
+  const rg = el('reportGroup');
+  if (rg) {
+    const need = { team: 'rep.team', growth: 'rep.growth', location: 'rep.location', attendance: 'rep.attendance' };
+    for (const o of rg.options) { const ok = PERM.can(need[o.value] || 'page.reports') && (o.value !== 'attendance' || PERM.canView('attendance')); o.hidden = o.disabled = !ok; }
+    if (rg.selectedOptions[0] && rg.selectedOptions[0].disabled) { const f = [...rg.options].find(o => !o.disabled); if (f) { rg.value = f.value; if (typeof state !== 'undefined' && state.view === 'reports' && state.schema) { renderCharts(); attSync(); window.placeSavedFilters?.(); } } }
+  }
+  if (typeof state !== 'undefined' && state.schema && state.view === 'actions') syncActionTabs();
   if (typeof state !== 'undefined' && state.schema && !PERM.canView(state.view)) setView(PERM.firstView());
   renderSyncButtons();
 };
 setInterval(async () => { if (PERM.online() && !el('app').hidden && !document.hidden) { await CLOUD.refreshMe(); applyAccess(); } }, 60000);
+
+/* ---------- v3.14: activity bell (top right, every page) ---------- */
+const BELL_SEEN = 'td_bell_seen_v1';
+const bellSig = it => [it.time, it.user, it.action, it.key, it.name].join('|');
+function bellCount(items) {
+  let seen = null; try { seen = localStorage.getItem(BELL_SEEN); } catch { }
+  if (!items || !items.length) return 0;
+  if (!seen) { try { localStorage.setItem(BELL_SEEN, bellSig(items[0])); } catch { } return 0; }   // first visit: start counting from now
+  let i = items.findIndex(it => bellSig(it) === seen); if (i < 0) i = items.length;
+  const me = BE.userName();
+  return items.slice(0, i).filter(it => it.user !== me).length;
+}
+function bellShow(n) { const b = el('bellN'), btn = el('btnBell'); if (!b || !btn) return; b.hidden = !n; b.textContent = n > 99 ? '99+' : String(n); btn.setAttribute('aria-label', n ? 'Activity: ' + n + ' new change' + (n === 1 ? '' : 's') : 'Activity'); }
+window.bellSeen = items => { if (items && items.length) { try { localStorage.setItem(BELL_SEEN, bellSig(items[0])); } catch { } } bellShow(0); };
+let bellBusy = false;
+async function bellCheck() {
+  if (bellBusy || el('app').hidden || document.hidden || !PERM.can('activity.view') || typeof state === 'undefined' || !state.schema) return;
+  bellBusy = true;
+  try { const d = await api('GET', '/api/activity'); bellShow(bellCount(d.items)); } catch { } finally { bellBusy = false; }
+}
+window.openBell = () => {
+  if (!PERM.can('activity.view')) { toast('Your passcode can’t see the activity. Ask the admin for the right.', true); return; }
+  const body = h('div', { class: 'body' });
+  mountDrawer(h('aside', { class: 'drawer activity-drawer', role: 'dialog', 'aria-modal': 'true', 'aria-label': 'Activity' },
+    h('header', {}, h('h2', {}, 'Activity'), h('button', { class: 'btn ghost', onclick: closeDrawer, 'aria-label': 'Close' }, '✕')), body));
+  openActivity(body).then(items => { if (items) window.bellSeen(items); });
+};
+el('btnBell').addEventListener('click', () => window.openBell());
+setTimeout(bellCheck, 4000);
+setInterval(bellCheck, 90000);
+addEventListener('att:sync', () => setTimeout(bellCheck, 1500));
 
 /* ---------- header: Start / Stop auto-sync, Save now, Settings ---------- */
 const attS = () => { try { return window.ATT && ATT.state ? ATT.state() : null; } catch { return null; } };
@@ -8005,12 +8385,12 @@ function renderSyncButtons() {
   const a = attS(), ready = a && a.status === 'ready' && a.ctx;
   if (!ready || !PERM.canWrite()) { b.hidden = true; sv.hidden = true; return; }
   const n = a.changes.length;
-  b.hidden = false;
+  b.hidden = !PERM.can('sync.auto');
   b.className = 'btn ghost autosync ' + (a.autoErr ? 'as-warn' : a.auto ? 'as-on' : 'as-off');
   b.textContent = a.auto ? 'Stop auto-sync' : 'Start auto-sync';
   b.title = a.autoErr ? 'Auto-sync needs you: ' + a.autoErr + '.' : a.auto ? 'Auto-sync is on: attendance changes save a moment after you make them. Click to stop.' : 'Auto-sync is off: attendance changes wait until you press Save now. Click to start.';
   const showSave = a.saving || (n > 0 && (!a.auto || !!a.autoErr));
-  sv.hidden = !showSave; sv.disabled = !!a.saving;
+  sv.hidden = !showSave || !PERM.can('sync.save'); sv.disabled = !!a.saving;
   sv.textContent = a.saving ? 'Saving…' : 'Save now (' + n + ')';
 }
 el('btnAutoSync').addEventListener('click', () => { const a = attS(); if (!a) return; ATT.setAutoSync(!a.auto); toast(a.auto ? 'Auto-sync started. Attendance changes save by themselves.' : 'Auto-sync stopped. Press Save now when you are ready.'); renderSyncButtons(); });
@@ -8048,8 +8428,7 @@ const checkLine = (text, checked, attrs = {}) => { const c = h('input', { type: 
 const MODULES = [
   { id: 'people', name: 'People & access', show: () => PERM.online() && PERM.isSuper(), draw: drawPeople },
   { id: 'fields', name: 'Mandatory fields', show: () => PERM.isSuper() || PERM.can('set.fields'), draw: drawFields },
-  { id: 'sync', name: 'Save & sync', show: () => true, draw: drawSync },
-  { id: 'activity', name: 'Activity log', show: () => PERM.can('activity.view'), draw: pane => openActivity(pane) },
+  { id: 'sync', name: 'Save & sync', show: () => PERM.can('sync.view'), draw: drawSync },
   { id: 'workbook', name: 'Workbook & backups', show: () => PERM.can('set.workbook') || PERM.can('workbook.download'), draw: drawWorkbook },
   { id: 'tools', name: 'Tools', show: () => PERM.can('tools.distance'), draw: drawTools },
   { id: 'prefs', name: 'Preferences', show: () => true, draw: drawPrefs },
@@ -8104,7 +8483,7 @@ function currentFilters() {
 }
 function filterText(f) {
   if (!f) return '';
-  const label = k => FILTER_NAMES[k] || (k.startsWith('field:') ? ((state.idx[k.slice(6)] != null && state.cols[state.idx[k.slice(6)]].label) || k.slice(6)) : k);
+  const label = k => FILTER_NAMES[k] || (typeof XDIMS !== 'undefined' && XDIMS[k] ? XDIMS[k].label : null) || (k.startsWith('field:') ? ((state.idx[k.slice(6)] != null && state.cols[state.idx[k.slice(6)]].label) || k.slice(6)) : k);
   const parts = Object.entries(f.sel || {}).filter(([, v]) => v && v.length).map(([k, v]) => label(k) + ': ' + v.join(', '));
   if (f.q) parts.unshift('search “' + f.q + '”');
   return parts.join(' · ') || 'no filters (everyone)';
@@ -8133,10 +8512,58 @@ function drawEditor(box, u, reload) {
   const fsum = h('p', { class: 'rmod-note' });
   const drawFixed = () => { fsum.textContent = fixed ? 'Fixed filters: ' + filterText(fixed) : 'No fixed filters: they start with everyone shown.'; };
   drawFixed();
+  /* v3.14.1: the super admin picks the fixed filters right here, value by value */
+  const dims = (() => {
+    const out = [], rows = (typeof state !== 'undefined' && state.schema) ? state.rows : [];
+    const add = (k, label) => {
+      const m = new Map();
+      for (const r of rows) { let v; try { v = dimVal(k, r); } catch { v = ''; } v = String(v ?? '').trim(); if (v) m.set(v, (m.get(v) || 0) + 1); }
+      if (m.size) out.push({ k, label, values: [...m.entries()].sort((a, b) => b[1] - a[1] || a[0].localeCompare(b[0])) });
+    };
+    for (const [k, label] of Object.entries(FILTER_NAMES)) add(k, label);
+    if (typeof XDIMS !== 'undefined') for (const [k, d] of Object.entries(XDIMS)) add(k, d.label);
+    return out;
+  })();
+  const editor = h('div', { class: 'ff-editor', hidden: true });
+  const fq = h('input', { class: 'input', type: 'search', placeholder: 'Search text (optional), e.g. a name or ID', 'aria-label': 'Fixed search text', value: (fixed && fixed.q) || '' });
+  const pickers = {};
+  const readEditor = () => {
+    const sel = {}; for (const [k, set] of Object.entries(pickers)) { const on = [...set.boxes].filter(b => b.checked).map(b => b.value); if (on.length) sel[k] = on; }
+    const q = fq.value.trim();
+    fixed = q || Object.keys(sel).length ? { fields: fixed && fixed.fields, q, sel } : null;
+    for (const [k, set] of Object.entries(pickers)) set.count.textContent = (sel[k] ? sel[k].length : 0) ? sel[k].length + ' of ' + set.boxes.length : 'Any';
+    drawFixed();
+  };
+  const fillEditor = () => {
+    fq.value = (fixed && fixed.q) || '';
+    const cur = (fixed && fixed.sel) || {};
+    for (const [k, set] of Object.entries(pickers)) { const chosen = new Set(cur[k] || []); for (const b of set.boxes) b.checked = chosen.has(b.value); set.count.textContent = chosen.size ? chosen.size + ' of ' + set.boxes.length : 'Any'; }
+  };
+  if (!dims.length) editor.append(h('p', { class: 'rmod-note' }, 'Open the workbook first to choose filter values here.'));
+  else {
+    fq.addEventListener('input', readEditor);
+    editor.append(h('label', { class: 'ff-q' }, h('span', {}, 'Search'), fq),
+      h('div', { class: 'ff-grid' }, ...dims.map(d => {
+        const boxes = d.values.map(([v, n]) => h('input', { type: 'checkbox', value: v }));
+        const count = h('small', { class: 'ff-count' }, 'Any');
+        pickers[d.k] = { boxes, count };
+        boxes.forEach(b => b.addEventListener('change', readEditor));
+        const all = h('button', { class: 'linkbtn', type: 'button', onclick: () => { boxes.forEach(b => { b.checked = true; }); readEditor(); } }, 'All');
+        const none = h('button', { class: 'linkbtn', type: 'button', onclick: () => { boxes.forEach(b => { b.checked = false; }); readEditor(); } }, 'Any');
+        return h('details', { class: 'ff-dim', open: !!(fixed && fixed.sel && fixed.sel[d.k] && fixed.sel[d.k].length) || null },
+          h('summary', {}, h('b', {}, d.label), count),
+          h('div', { class: 'ff-tools' }, all, h('span', {}, '·'), none, h('small', {}, 'None ticked = no limit')),
+          h('div', { class: 'ff-list' }, ...d.values.map(([v, n], i) => h('label', { class: 'chk-line' }, boxes[i], h('span', {}, v), h('small', {}, String(n))))));
+      })));
+    fillEditor();
+  }
+  const editBtn = h('button', { class: 'btn mini primary', type: 'button', onclick: () => { editor.hidden = !editor.hidden; editBtn.textContent = editor.hidden ? 'Choose filters here' : 'Hide filter choices'; if (!editor.hidden) fillEditor(); } }, 'Choose filters here');
   const fixedBox = h('div', { class: 'rmod-extra' }, fsum,
     h('div', { class: 'set-actions flat' },
-      h('button', { class: 'btn mini', type: 'button', onclick: () => { fixed = currentFilters(); drawFixed(); } }, 'Use the filters on my screen now'),
-      h('button', { class: 'btn mini', type: 'button', onclick: () => { fixed = null; drawFixed(); } }, 'Clear')),
+      editBtn,
+      h('button', { class: 'btn mini', type: 'button', onclick: () => { fixed = currentFilters(); if (!fixed.q && !Object.keys(fixed.sel).length) fixed = null; drawFixed(); fillEditor(); } }, 'Use the filters on my screen now'),
+      h('button', { class: 'btn mini', type: 'button', onclick: () => { fixed = null; drawFixed(); fillEditor(); } }, 'Clear')),
+    editor,
     h('p', { class: 'rmod-note' }, 'They start with these filters every time they sign in. Without “Change the filters” they can’t change or clear them.'));
   /* rights, one card per module: the module's page on top, what they can do in it underneath */
   const boxes = {}, syncs = [];
@@ -8146,7 +8573,7 @@ function drawEditor(box, u, reload) {
     let head;
     if (g.page) { const c = checkLine('', !!start[g.page], { 'data-k': g.page, 'aria-label': 'Can open ' + g.name }); boxes[g.page] = c.box; head = h('label', { class: 'rmod-head' }, c.box, h('b', {}, g.name), h('small', {}, 'can open this page')); }
     else head = h('div', { class: 'rmod-head' }, h('b', {}, g.name));
-    const card = h('div', { class: 'rmod' }, head, items.length ? h('div', { class: 'rmod-items' }, ...items.map(c => c.el)) : null, g.name === 'Filters' ? fixedBox : null);
+    const card = h('div', { class: 'rmod' + (g.name === 'Filters' ? ' rmod-wide' : '') }, head, items.length ? h('div', { class: 'rmod-items' }, ...items.map(c => c.el)) : null, g.name === 'Filters' ? fixedBox : null);
     const sync = () => { const off = g.page && !boxes[g.page].checked; card.classList.toggle('off', !!off); for (const c of items) c.box.disabled = isSuper() || !!off; if (g.page) boxes[g.page].disabled = isSuper(); };
     if (g.page) boxes[g.page].addEventListener('change', sync);
     syncs.push(sync);
@@ -8159,7 +8586,7 @@ function drawEditor(box, u, reload) {
   const syncRole = () => { const sup = isSuper(); rights.classList.toggle('is-admin', sup); superNote.hidden = !sup; roleNote.hidden = sup; presets.hidden = sup; fixedBox.hidden = sup; syncs.forEach(f => f()); };
   role.addEventListener('change', () => { if (isNew && role.value === 'admin') { for (const k of PERM.keys) boxes[k].checked = !!PERM.presets['Admin'][k]; } syncRole(); });
   syncRole();
-  const rightsNow = () => Object.fromEntries([['_v', 3], ...PERM.keys.map(k => [k, boxes[k].checked])]);
+  const rightsNow = () => Object.fromEntries([['_v', 4], ...PERM.keys.map(k => [k, boxes[k].checked])]);
   const save = h('button', { class: 'btn primary', type: 'button', onclick: async () => {
     err.textContent = ''; save.disabled = true; save.textContent = 'Saving…';
     try {
@@ -8247,9 +8674,9 @@ function drawSync(pane) {
   const draw = () => {
     const a = attS(), ready = a && a.status === 'ready' && a.ctx, n = ready ? a.changes.length : 0;
     const rows = typeof syncRowsBody === 'function' ? syncRowsBody() : [];
-    const toggle = h('button', { class: 'btn ' + (ready && a.auto ? '' : 'primary'), type: 'button', disabled: !ready || !PERM.canWrite(), onclick: () => { ATT.setAutoSync(!a.auto); draw(); } }, ready && a.auto ? 'Stop auto-sync' : 'Start auto-sync');
-    const saveNow = h('button', { class: 'btn', type: 'button', disabled: !ready || !n || a.saving, onclick: async () => { await ATT.save(); draw(); } }, ready && a.saving ? 'Saving…' : 'Save now' + (n ? ' (' + n + ')' : ''));
-    const undo = h('button', { class: 'btn', type: 'button', disabled: !ready || !a.undo.length, onclick: () => { ATT.undo(); draw(); } }, 'Undo');
+    const toggle = h('button', { class: 'btn ' + (ready && a.auto ? '' : 'primary'), type: 'button', disabled: !ready || !PERM.canWrite() || !PERM.can('sync.auto'), onclick: () => { ATT.setAutoSync(!a.auto); draw(); } }, ready && a.auto ? 'Stop auto-sync' : 'Start auto-sync');
+    const saveNow = h('button', { class: 'btn', type: 'button', disabled: !ready || !n || a.saving || !PERM.can('sync.save'), onclick: async () => { await ATT.save(); draw(); } }, ready && a.saving ? 'Saving…' : 'Save now' + (n ? ' (' + n + ')' : ''));
+    const undo = h('button', { class: 'btn', type: 'button', disabled: !ready || !a.undo.length || !PERM.can('sync.save'), onclick: () => { ATT.undo(); draw(); } }, 'Undo');
     fill(pane, 
       h('p', { class: 'set-hint' }, 'Employee changes are saved the moment you press Save. Attendance changes are saved by auto-sync a moment after you make them. If someone else saved attendance in between, you are asked once whether to overwrite their version or load it; nothing is overwritten without asking.'),
       h('div', { class: 'set-card' }, h('h4', {}, 'Status'), ...rows),
@@ -8330,7 +8757,7 @@ function drawPrefs(pane) {
  const box=document.querySelector('.workspace-filters'), header=document.getElementById('pinnedHeader');
  const anchor=document.createComment('filters location'); box.before(anchor);
  window.placeSavedFilters=()=>{
-   const pinned=['summary','employees','attendance'].includes(state.view);
+   const pinned=['summary','employees','attendance'].includes(state.view)||(state.view==='reports'&&document.getElementById('reportGroup')?.value==='attendance');
    if(pinned){header.append(box);document.getElementById('cleanFilters').open=true;}
    else anchor.after(box);
    box.classList.toggle('pinned-filters',pinned);box.hidden=!pinned;
@@ -8345,11 +8772,11 @@ function drawPrefs(pane) {
  let saved=[];
  try { const raw=JSON.parse(localStorage.getItem(key)||'[]'); if(Array.isArray(raw)) saved=raw.filter(p=>p&&typeof p.name==='string'&&p.filters&&typeof p.filters.q==='string'&&p.filters.sel&&Object.entries(p.filters.sel).every(([k,v])=>(k in BASE_COL||k in XDIMS||k.startsWith("field:"))&&Array.isArray(v)&&v.every(x=>typeof x==='string'))); } catch {}
  const row=document.createElement('div'); row.className='saved-filter-row';
- row.innerHTML='<label for="savedFilterSelect">Saved filters</label><select id="savedFilterSelect" class="input" aria-label="Apply saved filter"><option value="">Choose a filter…</option></select><input id="savedFilterName" class="input" maxlength="60" placeholder="Name your filter" aria-label="Saved filter name"><button class="btn mini" id="saveFilterNew" hidden>Save new</button><button class="btn mini" id="updateFilter" hidden disabled>Update</button><button class="btn mini" id="deleteFilter" disabled>Delete</button><span class="hint">Saved in this browser</span>';
+ row.innerHTML='<label for="savedFilterSelect">Saved filters</label><select id="savedFilterSelect" class="input" aria-label="Apply saved filter"><option value="">Choose a filter…</option></select><input id="savedFilterName" class="input" maxlength="60" placeholder="Name your filter" aria-label="Saved filter name"><button class="btn mini" id="saveFilterNew" hidden>Save new</button><button class="btn mini" id="updateFilter" hidden disabled>Update</button><details class="filter-more" hidden><summary class="btn mini" aria-label="More actions for this saved filter" title="More actions">⋯</summary><div class="filter-more-menu" role="menu"><button class="btn mini danger" id="deleteFilter" role="menuitem" disabled>Delete this saved filter…</button></div></details><span class="hint">Saved in this browser</span>';
  document.getElementById('cleanFilters').append(row);
  const defaultLabel=document.createElement('label');defaultLabel.htmlFor='defaultFilterView';defaultLabel.textContent='Default view';row.append(defaultLabel,defaultPicker);
  const select=row.querySelector('#savedFilterSelect'), name=row.querySelector('input');
- const redraw=(index='')=>{select.replaceChildren(new Option('Choose a filter…','')); saved.forEach((p,i)=>select.add(new Option(p.name,String(i))));select.value=index;row.querySelector('#updateFilter').disabled=index==='';row.querySelector('#deleteFilter').disabled=index==='';refreshDefault();window.syncFilterSaveActions?.();};
+ const redraw=(index='')=>{select.replaceChildren(new Option('Choose a filter…','')); saved.forEach((p,i)=>select.add(new Option(p.name,String(i))));select.value=index;row.querySelector('#updateFilter').disabled=index==='';row.querySelector('#deleteFilter').disabled=index==='';row.querySelector('.filter-more').hidden=index==='';if(index==='')row.querySelector('.filter-more').open=false;refreshDefault();window.syncFilterSaveActions?.();};
  const snapshot=()=>({fields:chosenFilterFields(),q:document.getElementById('fq').value.trim(),sel:Object.fromEntries(Object.entries(state.filters.sel).map(([k,v])=>[k,[...v]]))});
  let startupMatched=false;
  window.syncFilterSaveActions=()=>{
@@ -8366,12 +8793,13 @@ function drawPrefs(pane) {
    row.querySelector('#saveFilterNew').hidden=!canSave;row.querySelector('#saveFilterNew').disabled=!canSave;
    row.querySelector('#updateFilter').hidden=!canUpdate;row.querySelector('#updateFilter').disabled=!canUpdate;
    row.querySelector('#deleteFilter').disabled=!selected;
+   const more=row.querySelector('.filter-more');more.hidden=!selected;if(!selected)more.open=false;
  };
  name.addEventListener('input',()=>window.syncFilterSaveActions());
  document.getElementById('fq').addEventListener('input',()=>window.syncFilterSaveActions());
  const persist=next=>{try{localStorage.setItem(key,JSON.stringify(next));saved=next;return true;}catch{toast('Could not save filters. Browser storage is unavailable.',true);return false;}};
  select.onchange=()=>{
-   const p=saved[select.value];row.querySelector('#updateFilter').disabled=!p;row.querySelector('#deleteFilter').disabled=!p;if(!p){name.value='';window.syncFilterSaveActions();return;}
+   const p=saved[select.value];row.querySelector('#updateFilter').disabled=!p;row.querySelector('#deleteFilter').disabled=!p;row.querySelector('.filter-more').hidden=!p;row.querySelector('.filter-more').open=false;if(!p){name.value='';window.syncFilterSaveActions();return;}
    clearTimeout(qTimer);clearTimeout(tqTimer);name.value=p.name;
    state.filters={fields:Array.isArray(p.filters.fields)?p.filters.fields.filter(k=>typeof k==="string"):undefined,q:p.filters.q,sel:Object.fromEntries(Object.entries(p.filters.sel).map(([k,v])=>[k,new Set(v)])),inited:true};
    state.tf={q:'',cols:{}};document.getElementById('tq').value='';document.getElementById('fq').value=p.filters.q;state.page=1;closePops();renderAll();
@@ -8388,7 +8816,8 @@ function drawPrefs(pane) {
    if(saved.some((p,j)=>j!==i&&p.name.toLowerCase()===label.toLowerCase())){toast('Choose a unique filter name.',true);return;}
    const wasDefault=saved[i].name===defaultName;const next=saved.map((p,j)=>j===i?{name:label,filters:snapshot()}:p);if(persist(next)){if(wasDefault)storeDefault(label);redraw(String(i));toast('Filter updated.');}
  };
- row.querySelector('#deleteFilter').onclick=()=>{if(select.value==='')return;const i=Number(select.value),wasDefault=saved[i].name===defaultName;if(persist(saved.filter((_,j)=>j!==i))){if(wasDefault)storeDefault('');redraw();name.value='';window.syncFilterSaveActions();toast('Saved filter deleted. Current filters are unchanged.');}};
+ row.querySelector('#deleteFilter').onclick=()=>{if(select.value==='')return;const i=Number(select.value),wasDefault=saved[i].name===defaultName;row.querySelector('.filter-more').open=false;if(!confirm('Delete the saved filter “'+saved[i].name+'”?'+(wasDefault?' It is your default view, so the dashboard will open without filters.':'')+' The filters on your screen stay as they are.'))return;if(persist(saved.filter((_,j)=>j!==i))){if(wasDefault)storeDefault('');redraw();name.value='';window.syncFilterSaveActions();toast('Saved filter deleted. Current filters are unchanged.');}};
+ document.addEventListener('click',e=>{const m=row.querySelector('.filter-more');if(m&&m.open&&!m.contains(e.target))m.open=false;});
  redraw();placeSavedFilters();
 })();
 
@@ -8397,11 +8826,12 @@ function drawPrefs(pane) {
  const parent=document.getElementById('cleanFilters');
  const customize=document.createElement('details');customize.className='field-customizer';
  customize.innerHTML='<summary class="btn mini">Customize filters</summary><div class="field-picker"><strong>Choose fields to filter</strong><p>Select fields, then choose their values below. Save the combination as a named filter.</p><input class="input" id="customFieldSearch" type="search" placeholder="Find a field…" aria-label="Find filter fields"><div id="customFieldList"></div><button class="btn mini" type="button">Done</button></div>';
- parent.querySelector('.saved-filter-row').prepend(customize);
+ { const sr=parent.querySelector('.saved-filter-row'), anchor=sr.querySelector('label[for="defaultFilterView"]'); sr.insertBefore(customize, anchor || null); }
  const controls=document.createElement('div');controls.id='customFieldControls';parent.querySelector('.bar').after(controls);
  customize.querySelector('button').onclick=()=>customize.open=false;
  document.getElementById('customFieldSearch').oninput=renderCustomFieldFilters;
- document.addEventListener('keydown',e=>{if(e.key==='Escape')customize.open=false;});
+ document.addEventListener('keydown',e=>{if(e.key==='Escape'){customize.open=false;const m=document.querySelector('.filter-more');if(m)m.open=false;}});
+ document.addEventListener('click',e=>{if(customize.open&&!customize.contains(e.target))customize.open=false;});
  renderCustomFieldFilters();
 })();</script></body>
 </html>
