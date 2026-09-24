@@ -4,7 +4,7 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <link rel="icon" href="data:,">
-<title>Team Dashboard · 3.16.0</title>
+<title>Team Dashboard · 3.16.1</title>
 <style>
 :root {
   color-scheme: light;
@@ -1209,10 +1209,10 @@ body.filters-locked #cleanFilters, body.filters-locked #xchips, body.filters-loc
     <p class="gate-sub">One place for your people, priorities and team insights.</p>
     <div id="connectBody"><div class="empty">Loading…</div></div>
   </div>
-  <p class="gate-ver">3.16.0</p>
+  <p class="gate-ver">3.16.1</p>
 </section>
 
-<div id="app" hidden><aside class="sidebar" aria-label="Workspace navigation"><div class="brand dashboard-identity">      <h1><span id="title">Team Dashboard</span><span class="ver" id="ver" title="Version 3.16.0">3.16.0</span></h1><p class="brand-tag">One place for your people, priorities and team insights.</p>      <span class="sync" id="sync" role="status"><i></i><span id="syncText">Loading…</span></span></div><div class="nav-label">WORKSPACE</div>      <nav class="tabs" role="tablist" aria-label="Pages" aria-orientation="vertical">
+<div id="app" hidden><aside class="sidebar" aria-label="Workspace navigation"><div class="brand dashboard-identity">      <h1><span id="title">Team Dashboard</span><span class="ver" id="ver" title="Version 3.16.1">3.16.1</span></h1><p class="brand-tag">One place for your people, priorities and team insights.</p>      <span class="sync" id="sync" role="status"><i></i><span id="syncText">Loading…</span></span></div><div class="nav-label">WORKSPACE</div>      <nav class="tabs" role="tablist" aria-label="Pages" aria-orientation="vertical">
         <button class="tab on" role="tab" aria-controls="pageSummary" data-view="summary" aria-selected="true">Overview</button>
         <button class="tab" role="tab" aria-controls="pageEmployees" data-view="employees" aria-selected="false">Employees</button>
       <button class="tab" role="tab" aria-controls="pageAttendance" data-view="attendance" aria-selected="false">Attendance</button>
@@ -4281,7 +4281,7 @@ function whoView() {
   const chk = (k, l) => `<label><input type="checkbox" data-bind="who-show" data-k="${k}" ${w.show[k] ? 'checked' : ''}> ${l}</label>`;
   const head = dates.map((dt, j) => { const wk = dt.getUTCDay() === 0 || dt.getUTCDay() === 6, isT = isoDate(dt) === isoDate(TODAY); return `<th class="d ${wk ? 'wk' : ''} ${isT ? 'tdy' : ''}" style="min-width:44px" data-tip="${longDate(dt)}<br>${perDay[j].out} out · ${perDay[j].la} applied">${dt.getUTCDate()}<small>${WEEKDAYS[dt.getUTCDay()]}</small><small style="color:${perDay[j].out ? 'var(--ink)' : 'var(--ink-3)'};font-weight:650">${perDay[j].out || '·'}</small></th>`; }).join('');
   const body = list.map(o => `<tr><td class="c-name" data-act="person" data-k="${esc(o.k)}"><b>${esc(o.name)}</b><span>${esc(o.cells.find(Boolean).r.client || '—')}</span></td>${o.cells.map((c, j) => { const wk = dates[j].getUTCDay() % 6 === 0, isT = isoDate(dates[j]) === isoDate(TODAY); return c ? `<td class="cell ${wk ? 'wk' : ''} ${isT ? 'tdy' : ''}" data-act="cell" data-r="${c.r.uid}" data-d="${c.i}" data-tip="${esc(cellTip(c.r, c.i))}">${chip(c.v)}</td>` : `<td class="${wk ? 'wk' : ''} ${isT ? 'tdy' : ''}"></td>`; }).join('')}</tr>`).join('');
-  return `${requestsCardHtml()}<div class="grid g6" style="grid-template-columns:repeat(4,1fr);margin-bottom:14px">
+  return `<div class="grid g6" style="grid-template-columns:repeat(4,1fr);margin-bottom:14px">
       <div class="card tile"><div class="lbl">OUT TODAY</div><div class="val">${dayOut(TODAY)}</div><div class="delta">${longDate(TODAY)}</div></div>
       <div class="card tile"><div class="lbl">OUT TOMORROW</div><div class="val">${dayOut(tomorrow)}</div><div class="delta">${longDate(tomorrow)}</div></div>
       <div class="card tile"><div class="lbl">BUSIEST DAY IN WINDOW</div><div class="val">${perDay[peak].out}</div><div class="delta">${longDate(dates[peak])}</div></div>
@@ -4371,7 +4371,7 @@ function gridView() {
   const kinds = g.kinds || [], hl = kinds.length ? leaveFilterCodes(kinds) : null, kindDays = hl ? rows.reduce((a, r) => a + rowCodeDays(r, hl), 0) : 0;
   const kindNames = LEAVE_FILTERS.filter(f => kinds.includes(f.k)).map(f => f.label.toLowerCase() + ' (' + f.codes.join('/') + ')').join(' or ');
   const legend = ['AL', 'CL', 'SL', 'UL', 'AB', 'HD1', 'LA', 'RJ', 'L', 'C', 'R', 'WO', 'H'].map(c => `<span style="display:inline-flex;align-items:center;gap:4px"><span style="display:inline-block;width:32px">${chip(c)}</span><span class="sm muted">${CODES[c].label}</span></span>`).join('');
-  return `${can('att.who') ? '' : requestsCardHtml()}<div class="toolbar">
+  return `<div class="toolbar">
       <label>Year <select data-bind="gyear">${gridYearOptions(g.month)}</select></label>
       <label>Month <select data-bind="gmonth">${gridMonthOptions(g.month)}</select></label>
       <input type="search" placeholder="Search name, ID or client" value="${esc(g.q)}" data-bind="gq" style="width:230px">
@@ -5207,20 +5207,6 @@ function renderApprovalRequests() {
   root.querySelectorAll('[data-approve]').forEach(b => { b.onclick = async () => { b.disabled = true; try { await approveRequest(b.dataset.approve, b.parentElement.querySelector('select').value); } finally { renderApprovalRequests(); } }; });
   root.querySelectorAll('[data-reject]').forEach(b => { b.onclick = () => openRejectBox(b.dataset.reject); });
 }
-function requestsCardHtml() {
-  const decide = can('requests.approvals') ? requestsToDecide() : [], me = myId();
-  const mine = me && can('requests.own') ? reqList().filter(r => String(r.byId) === me).sort((a, b) => (b.at || '').localeCompare(a.at || '')) : [];
-  if (!decide.length && !mine.length && !(can('requests.own') && needsApproval())) return '';
-  const typeSel = r => `<select data-req-code aria-label="Leave type to approve">${LOG_TYPES.map(c => `<option value="${c}"${c === r.code ? ' selected' : ''}>${c}</option>`).join('')}</select>`;
-  const who = r => `<b>${esc(r.name)}</b><span class="sm muted">${esc(r.code)} · ${esc(CODES[r.code] ? CODES[r.code].label : '')} · ${esc(reqDatesText(r.dates || []))}</span><span class="sm muted">Asked by ${esc(r.by)} · ${esc(reqWhen(r.at))}${r.note ? ' · “' + esc(r.note) + '”' : ''}</span>`;
-  const decideHtml = can('requests.approvals') && canDecide() ? `<div style="min-width:0"><h2>Waiting for your approval · ${decide.length}</h2><div class="sub">Logged leave is added to attendance only after you approve it. You can change the type before approving.</div>
-      ${decide.length ? `<div class="list" style="max-height:320px;overflow:auto">${decide.map(r => `<div class="li" style="flex-wrap:wrap;gap:6px"><div class="main-t" style="flex:1 1 260px">${who(r)}</div>${typeSel(r)}<button class="btn sm primary" data-act="req-approve" data-id="${esc(r.id)}">Approve</button><button class="btn sm" data-act="req-reject" data-id="${esc(r.id)}">Reject</button></div>`).join('')}</div>` : '<div class="empty">No leave requests are waiting.</div>'}</div>` : '';
-  const badge = r => r.status === 'pending' ? '<span class="tag">Waiting for approval</span>' : r.status === 'approved' ? `<span class="tag ok">Approved${r.asked && r.asked !== r.code ? ' as ' + esc(r.code) : ''}</span>` : r.status === 'rejected' ? '<span class="tag crit">Rejected</span>' : '<span class="tag">Cancelled</span>';
-  const mineHtml = can('requests.own') && (mine.length || needsApproval()) ? `<div style="min-width:0"><h2>Your leave requests · ${mine.filter(r => r.status === 'pending').length} waiting</h2><div class="sub">${needsApproval() ? 'Leave you log is sent to a manager first. It shows in attendance once approved.' : 'Requests you sent earlier.'}</div>
-      ${mine.length ? `<div class="list" style="max-height:320px;overflow:auto">${mine.map(r => `<div class="li" style="flex-wrap:wrap;gap:6px"><div class="main-t" style="flex:1 1 240px"><b>${esc(r.name)}</b><span class="sm muted">${esc(r.code)} · ${esc(reqDatesText(r.dates || []))}</span>${r.status !== 'pending' && r.decidedBy ? `<span class="sm muted">${r.status === 'cancelled' ? 'Cancelled' : (r.status === 'approved' ? 'Approved' : 'Rejected') + ' by ' + esc(r.decidedBy)} · ${esc(reqWhen(r.decidedAt))}${r.reason ? ' · “' + esc(r.reason) + '”' : ''}</span>` : ''}</div>${badge(r)}${r.status === 'pending' ? `<button class="btn sm" data-act="req-cancel" data-id="${esc(r.id)}">Cancel</button>` : ''}</div>`).join('')}</div>` : '<div class="empty">You have not sent any leave requests yet. Use Log leave to send one.</div>'}</div>` : '';
-  return `<div class="card" style="margin-bottom:14px"><div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(320px,1fr));gap:18px">${decideHtml}${mineHtml}</div></div>`;
-}
-
 /* ---------- a tracker row built from a workforce person ---------- */
 /* Emp ID, name and client come from the workforce file. Before the Date of Joining, and after the Left Date, the days are NA (as the tracker already does). */
 function newRosterRow(ms, rr, opts = {}) {
@@ -6116,7 +6102,7 @@ async function poll() {
 }
 
 /* ============================== filtering ============================== */
-const APP = { title: "Team Dashboard", version: "3.16.0", released: "24 Sep 2026" };
+const APP = { title: "Team Dashboard", version: "3.16.1", released: "24 Sep 2026" };
 const BASE_DIMS = { status: "status_column", desig: "designation_column", client: "client_column", mode: "mode_column" };
 const STANDARD_STATUSES = ["Active", "Manager", "OJT", "Bench", "New", "Projected", "Left", "Moved"];
 const TILE_ORDER = ["Active", "Manager", "OJT", "Bench", "New", "Projected"];
