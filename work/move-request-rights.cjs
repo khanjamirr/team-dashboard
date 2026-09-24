@@ -1,0 +1,10 @@
+const fs=require('fs');let s=fs.readFileSync('outputs/index.html','utf8');
+const group="  { name: 'Request Center', items: [['requests.own', 'See Your requests'], ['requests.rejected', 'See Rejected request log (within notification audience)'], ['requests.approvals', 'See Approval requests'], ['att.approve', 'Approve or reject leave requests and edit approved leave']] },";
+const overview="['ov.watch', 'See leave red flags and day patterns']] },";
+if(!s.includes(group)||!s.includes(overview))throw Error('Missing rights group');
+s=s.replace(group,'').replace(overview,"['ov.watch', 'See leave red flags and day patterns']], sub: { title: 'Request Center', items: [['requests.own', 'See Your requests'], ['requests.rejected', 'See Rejected request log (within notification audience)'], ['requests.approvals', 'See Approval requests'], ['att.approve', 'Approve or reject leave requests and edit approved leave']] } },");
+const note="h('p', { class: 'rmod-note' }, 'Only these types appear in the Type list of Log leave.";
+if(!s.includes(note))throw Error('Missing sub-group note');
+s=s.replace(note,"h('p', { class: 'rmod-note' }, g.name === 'Overview' ? 'Choose which Request Center cards this person can see and whether they can approve or reject requests.' : 'Only these types appear in the Type list of Log leave.");
+for(const m of s.matchAll(/<script\b[^>]*>([\s\S]*?)<\/script>/gi))new(require('vm').Script)(m[1]);
+fs.writeFileSync('outputs/index.html',s);console.log('Request Center rights moved under Overview; scripts parse.');

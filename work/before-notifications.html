@@ -4,7 +4,7 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <link rel="icon" href="data:,">
-<title>Team Dashboard · 3.16.2</title>
+<title>Team Dashboard · 3.15.0</title>
 <style>
 :root {
   color-scheme: light;
@@ -883,10 +883,6 @@ table.data td { padding:9px 10px; font-size:12px; }
 @media(max-width:1250px) { #app { padding-left:190px; padding-right:16px; } .sidebar { width:174px; } .brand { font-size:12px; gap:7px; } .brand small { font-size:8px; } .sticky-top .filters { grid-template-columns:repeat(4,minmax(0,1fr)) auto; } .sticky-top .filters .search { grid-column:1/-1; } .att-cols { grid-template-columns:repeat(2,minmax(0,1fr)); } .att-cols > div:last-child { grid-column:1/-1; } }
 @media(max-width:950px) { .pinned-top header.top h1 { font-size:18px; flex-basis:100%; } .pinned-top header.top { padding:8px 0; } .sticky-top .filters { grid-template-columns:repeat(2,minmax(0,1fr)); } .att-cols { grid-template-columns:minmax(0,1fr); } .att-cols > div:last-child { grid-column:auto; } }
 @media(max-width:650px) { #app { padding:0 12px 22px; } .sidebar { position:static; width:auto; margin:0 -12px; padding:12px; } .brand { padding:0 0 10px; } .tabs { flex-direction:row; overflow-x:auto; gap:4px; } .tab { flex:none; min-height:34px; font-size:11px; padding:8px; } .sticky-top.pinned-top { margin:0 -12px 9px; padding:0 12px; } .pinned-top header.top h1 { font-size:17px; } .pinned-top .btn { padding:0 7px; height:28px; min-height:28px; font-size:10px; } .card,#cardAttendance,#cardComing { padding:12px; } .att-kpis { grid-template-columns:repeat(3,minmax(0,1fr)); gap:5px; } .att-kpi,.att-kpi.hot { padding:8px; } .att-kpi b { font-size:22px; } .att-kpi span { font-size:9px; } .tablewrap { max-height:55vh; } }
-.request-cards { grid-column:1 / -1; display:grid; grid-template-columns:repeat(auto-fit,minmax(min(100%,260px),1fr)); gap:12px; align-items:stretch; min-width:0; }
-#requestCenterTitle {grid-column:1 / -1;margin:0;font-size:15px;font-weight:650;}
-.request-cards > section { grid-column:auto !important; min-width:0; }
-.request-cards:not(:has(> section:not([hidden]))) { display:none; }
 </style>
 <style>
 /* Simplified workspace: progressive disclosure keeps daily priorities visible. */
@@ -1209,10 +1205,10 @@ body.filters-locked #cleanFilters, body.filters-locked #xchips, body.filters-loc
     <p class="gate-sub">One place for your people, priorities and team insights.</p>
     <div id="connectBody"><div class="empty">Loading…</div></div>
   </div>
-  <p class="gate-ver">3.16.2</p>
+  <p class="gate-ver">3.15.0</p>
 </section>
 
-<div id="app" hidden><aside class="sidebar" aria-label="Workspace navigation"><div class="brand dashboard-identity">      <h1><span id="title">Team Dashboard</span><span class="ver" id="ver" title="Version 3.16.2">3.16.2</span></h1><p class="brand-tag">One place for your people, priorities and team insights.</p>      <span class="sync" id="sync" role="status"><i></i><span id="syncText">Loading…</span></span></div><div class="nav-label">WORKSPACE</div>      <nav class="tabs" role="tablist" aria-label="Pages" aria-orientation="vertical">
+<div id="app" hidden><aside class="sidebar" aria-label="Workspace navigation"><div class="brand dashboard-identity">      <h1><span id="title">Team Dashboard</span><span class="ver" id="ver" title="Version 3.15.0">3.15.0</span></h1><p class="brand-tag">One place for your people, priorities and team insights.</p>      <span class="sync" id="sync" role="status"><i></i><span id="syncText">Loading…</span></span></div><div class="nav-label">WORKSPACE</div>      <nav class="tabs" role="tablist" aria-label="Pages" aria-orientation="vertical">
         <button class="tab on" role="tab" aria-controls="pageSummary" data-view="summary" aria-selected="true">Overview</button>
         <button class="tab" role="tab" aria-controls="pageEmployees" data-view="employees" aria-selected="false">Employees</button>
       <button class="tab" role="tab" aria-controls="pageAttendance" data-view="attendance" aria-selected="false">Attendance</button>
@@ -1256,7 +1252,7 @@ body.filters-locked #cleanFilters, body.filters-locked #xchips, body.filters-loc
   </div>
 
   <main id="mainContent" tabindex="-1">
-    <div id="pageSummary"><section class="request-cards" aria-labelledby="requestCenterTitle"><h2 id="requestCenterTitle">Request Center</h2><section id="cardMyRequests" style="grid-column:1 / -1;min-width:0" aria-label="Your requests" hidden></section><section id="cardRejectedRequests" style="grid-column:1 / -1;min-width:0" aria-label="Rejected request log" hidden></section><section id="cardApprovalRequests" style="grid-column:1 / -1;min-width:0" aria-label="Approval requests" hidden></section></section>        <div class="card c-att" id="cardAttendance" aria-label="Attendance"></div><div class="card c-coming" id="cardComing" aria-label="Upcoming birthdays and work anniversaries">
+    <div id="pageSummary"><section id="cardApprovalRequests" style="grid-column:1 / -1;min-width:0" aria-label="Approval requests" hidden></section>        <div class="card c-att" id="cardAttendance" aria-label="Attendance"></div><div class="card c-coming" id="cardComing" aria-label="Upcoming birthdays and work anniversaries">
           <div class="card-head">
             <div class="grow"><h2 id="comingTitle">Coming up in the next 14 days</h2><div class="sub">Birthdays and work anniversaries of current team members</div></div>
             <label class="hint" style="display:flex;align-items:center;gap:6px">Show <select class="input mini" id="comingDays" style="width:auto;min-width:0;height:28px"><option value="7">7 days</option><option value="14" selected>14 days</option><option value="30">30 days</option></select></label>
@@ -1841,10 +1837,10 @@ const serial = fn => { const p = chain.then(fn); chain = p.catch(() => {}); retu
    change), so the "Activity Log" sheet is updated in the same save. opts.force: the person chose "Overwrite". */
 async function writeBlob(fh, blob, extra, opts) {
   let taken = [];
-  const more = (Array.isArray(extra) ? extra : []).map(stampActivity);
+  const more = Array.isArray(extra) ? extra : [];
   if (fh && Conn.fileName && fh.name === Conn.fileName && (LOGQ.length || more.length)) {
     try { taken = LOGQ.slice(); blob = await withActivity(blob, [...taken, ...more]); }
-    catch (e) { throw new Error("Save stopped because the Activity Log could not be updated: " + e.message); }
+    catch (e) { console.warn("Activity Log sheet was not updated:", e); taken = []; }
   }
   let w;
   for (let i = 0; i < 3; i++) {
@@ -1886,7 +1882,7 @@ function backup(u8, fileName) {
    Everything the dashboard logs goes to an "Activity Log" sheet in the same workbook, newest first, and only the
    past 30 days are kept. Entries wait in LOGQ until the next save of the workbook; if nothing else is saved within a
    few seconds, the log is written on its own. */
-const ACT_SHEET = "Activity Log", ACT_DAYS = Infinity, ACT_MAX = Infinity;
+const ACT_SHEET = "Activity Log", ACT_DAYS = 30, ACT_MAX = 20000;
 const ACT_HEAD = ["Date & time", "User", "Area", "Action", "Emp Code", "Name", "Details", "Data (used by the dashboard)"];
 const LOGQ = [];
 let logTimer = null;
@@ -1894,7 +1890,7 @@ const ACT_VERBS = { add: "Added", edit: "Edited", delete: "Deleted", bulk: "Bulk
   "external-edit": "Edited in Excel", "external-add": "Added in Excel", "external-delete": "Removed in Excel", "external-columns": "Columns changed in Excel", "external-summary": "Changed in Excel",
   "att-edit": "Attendance updated", "att-add": "Added to tracker", "att-delete": "Removed from tracker", "external-att-edit": "Attendance updated in Excel",
   "external-att-add": "Added to tracker in Excel", "external-att-delete": "Removed from tracker in Excel", "att-link": "Linked tracker name", "att-unlink": "Unlinked tracker name",
-  "request-submitted": "Submitted request", "request-approved": "Approved request", "request-rejected": "Rejected request", "request-cancelled": "Cancelled request", "overwrite": "Overwrote newer changes", "settings": "Changed settings" };
+  "overwrite": "Overwrote newer changes", "settings": "Changed settings" };
 const actArea = e => (e.att || /^(att-|external-att-)/.test(e.action || "") ? "Attendance" : e.action === "settings" ? "Settings" : "Workforce");
 const actText = v => (v == null || v === "" ? "(empty)" : typeof v === "number" && v > 20000 && v < 80000 && Number.isInteger(v) ? new Date(Date.UTC(1899, 11, 30) + v * 86400000).toISOString().slice(0, 10) : String(v));
 function actDetails(e) {
@@ -1977,21 +1973,16 @@ async function withActivity(blob, entries) {
   await actWrite(zip, loc, items);
   return zip.build();
 }
-function stampActivity(e) {
-  const u = typeof CLOUD !== 'undefined' ? CLOUD.user() : null;
-  return { ...e, eventId: e.eventId || crypto.randomUUID(), ...(u && e.user === u.name && !e.userId ? { userId: String(u.id) } : {}) };
-}
 function appendActivity(entries) {
-  for (const e of entries || []) if (e && typeof e === "object") LOGQ.push(stampActivity(e));
+  for (const e of entries || []) if (e && typeof e === "object") LOGQ.push({ ...e });
   scheduleLogFlush();
-  window.dispatchEvent(new CustomEvent('activity:changed'));
   return Promise.resolve();
 }
 function scheduleLogFlush(ms = 4000) { clearTimeout(logTimer); logTimer = setTimeout(() => { flushActivity().catch(() => {}); }, ms); }
 async function flushActivity() {
   if (!LOGQ.length || !Conn.dir || !Conn.fileName) return;
   if (window.ATT && ATT.state && ATT.state().saving) { scheduleLogFlush(3000); return; }
-  if (window.PERM && !PERM.canWrite()) return;
+  if (window.PERM && !PERM.canWrite()) { LOGQ.length = 0; return; }
   try { await serial(async () => { if (!LOGQ.length) return; const { fh, u8 } = await readFile(); await writeBlob(fh, new Blob([u8]), []); Conn.cache = null; }); }
   catch (_) { scheduleLogFlush(30000); }
 }
@@ -2074,14 +2065,13 @@ function activityTime(entry) {
   return Date.parse(raw.includes("T") ? raw : raw.replace(" ", "T"));
 }
 function activityWindow(items, file, now = Date.now()) {
-  const since = -Infinity;
+  const since = now - 30 * 86400000;
   return items.filter(it => it && typeof it === "object" && (!file || !it.file || it.file === file) && Number.isFinite(activityTime(it)) && activityTime(it) >= since && activityTime(it) <= now)
     .sort((a,b) => activityTime(b) - activityTime(a));
 }
 async function readActivity() {
   const { u8 } = await readFile(), zip = await Zip.open(u8), loc = await actLocate(zip);
-  const requestEvents = window.requestAuditEntries ? window.requestAuditEntries() : [];
-  return activityWindow([...await actRead(zip, loc), ...LOGQ, ...requestEvents], null, Date.now() + 60000);
+  return activityWindow([...await actRead(zip, loc), ...LOGQ], null, Date.now() + 60000);
 }
 
 /* ------------------------------ data operations ------------------------------ */
@@ -2417,10 +2407,6 @@ const CLOUD = (() => {
     TOO_MANY_ATTEMPTS: 'Too many wrong passcodes from this network. Wait 10 minutes and try again.',
     SESSION_EXPIRED: 'Your session has ended. Enter your passcode again.',
     ADMIN_ONLY: 'Only the super admin can do that, or someone they gave that right to.',
-    REQUEST_CONFLICT: 'This request changed while you were working. Refresh Request Center before trying again.',
-    REQUEST_NOT_OWNER: 'Only the person who submitted this request can cancel it.',
-    BAD_REQUEST: 'The request is invalid. Check the employee, leave type and dates.',
-    INVALID_REQUEST_STORE: 'The saved request list needs administrator attention.',
     CONFLICT: 'Someone else saved the workbook a moment ago, so your change was not saved. The latest version will load; please redo your change.',
     PASSCODE_TAKEN: 'Someone else already has that passcode. Choose a different one.',
     PASSCODE_TOO_SHORT: 'Passcodes need at least 4 characters.',
@@ -2519,7 +2505,6 @@ const CLOUD = (() => {
   const getSettings = () => rpc('td_get_settings', { p_token: tok() });
   const setSetting = (key, value) => rpc('td_admin_set_setting', { p_token: tok(), p_key: key, p_value: value });
   const setShared = (key, value) => rpc('td_set_shared_setting', { p_token: tok(), p_key: key, p_value: value });
-  const saveLeaveRequest = (request, expected) => rpc('td_save_leave_request', { p_token: tok(), p_request: request, p_expected: expected });
   const admin = {
     users: () => rpc('td_admin_list_users', { p_token: tok() }),
     save: (id, name, code, role, active, permissions) => rpc('td_admin_save_user', { p_token: tok(), p_id: id, p_name: name, p_passcode: code, p_role: role, p_active: active, p_permissions: permissions ?? null }),
@@ -2609,7 +2594,7 @@ const CLOUD = (() => {
   }
   /* v3.11: "Manage passcodes" is now Settings > People & access */
   function openAdmin() { if (session && session.role === 'superadmin' && window.openSettings) window.openSettings('people'); }
-  return { SUPABASE_CONFIG, card, resume, mode, decorate, signOut, useLocalFiles, openAdmin, configured, isAdmin, refreshMe, user, getSettings, setSetting, setShared, saveLeaveRequest, admin, _rpc: rpc };
+  return { SUPABASE_CONFIG, card, resume, mode, decorate, signOut, useLocalFiles, openAdmin, configured, isAdmin, refreshMe, user, getSettings, setSetting, setShared, admin, _rpc: rpc };
 })();
 
 /* =====================================================================
@@ -2620,27 +2605,26 @@ const CLOUD = (() => {
 (() => {
 /* v3.13: rights are grouped by module. A module with a page has a "can open" box; its items sit underneath. */
 const PERM_GROUPS = [
-  { name: 'Overview', page: 'page.overview', items: [['ov.attendance', 'See the attendance card'], ['ov.coming', 'See birthdays and work anniversaries'], ['ov.watch', 'See leave red flags and day patterns']], sub: { title: 'Request Center', items: [['requests.own', 'See Your requests'], ['requests.rejected', 'See Rejected request log (within notification audience)'], ['requests.approvals', 'See Approval requests'], ['att.approve', 'Approve or reject leave requests and edit approved leave']] } },
+  { name: 'Overview', page: 'page.overview', items: [['ov.attendance', 'See the attendance card'], ['ov.coming', 'See birthdays and work anniversaries'], ['ov.watch', 'See leave red flags and day patterns']] },
   { name: 'Employees', page: 'page.employees', items: [['emp.edit', 'Edit employee details'], ['emp.add', 'Add employees'], ['emp.delete', 'Delete employees'], ['emp.bulk', 'Fill in bulk and add columns'], ['emp.fields', 'Add new fields (new Excel columns)']] },
-  { name: 'Attendance', page: 'page.attendance', items: [['att.who', 'See Who’s out'], ['att.grid', 'See the attendance grid and People'], ['att.log', 'Use Log leave (with the leave types ticked below)'], ['att.direct', 'Log leave straight into attendance (no manager approval)'], ['att.edit', 'Mark and edit attendance'], ['att.holidays', 'Mark holidays for everyone'], ['att.fields', 'Add fields to the attendance tracker']],
+  { name: 'Attendance', page: 'page.attendance', items: [['att.who', 'See Who’s out'], ['att.grid', 'See the attendance grid and People'], ['att.log', 'Use Log leave (with the leave types ticked below)'], ['att.direct', 'Log leave straight into attendance (no manager approval)'], ['att.edit', 'Mark and edit attendance'], ['att.approve', 'Approve or reject leave (AL, CL, SL, RJ)'], ['att.holidays', 'Mark holidays for everyone'], ['att.fields', 'Add fields to the attendance tracker']],
     /* v3.14.2: which leave types appear in the Log leave “Type” list */
     sub: { title: 'Leave types in Log leave', items: [['log.LA', 'LA · Leave application (pending)'], ['log.AL', 'AL · Approved leave'], ['log.CL', 'CL · Casual leave'], ['log.SL', 'SL · Sick leave'], ['log.UL', 'UL · Unplanned leave'], ['log.AB', 'AB · Absent'], ['log.HD1', 'HD1 · Half day, 1st half'], ['log.HD2', 'HD2 · Half day, 2nd half'], ['log.R', 'R · Remote'], ['log.L', 'L · Late coming'], ['log.C', 'C · Cab late']] } },
   { name: 'Action center', page: 'page.actions', items: [['act.items', 'See Action items'], ['act.review', 'See Designation reviews'], ['act.health', 'See Attendance data health']] },
   { name: 'Reports', page: 'page.reports', items: [['rep.team', 'Team composition'], ['rep.growth', 'Tenure & growth'], ['rep.location', 'Location & travel'], ['rep.attendance', 'Attendance reports'], ['rep.export', 'Copy report tables and charts']] },
   { name: 'Save & sync', items: [['sync.view', 'Open the Save & sync settings'], ['sync.auto', 'Start or stop auto-sync'], ['sync.save', 'Save now and undo']] },
-
-  { name: 'Notifications', items: [['notifications.view', 'Open notifications and receive request updates'], ['activity.view', 'See the activity log for all users']] },
+  { name: 'Notifications', items: [['activity.view', 'See the activity bell (every change)']] },
   { name: 'Filters', items: [['filters.custom', 'Change the filters (search, status, client…)']] },
   { name: 'Settings', items: [['set.fields', 'Choose the mandatory fields'], ['set.workbook', 'Backups, sign-in history and replacing the workbook'], ['workbook.download', 'Download a copy of the workbook'], ['tools.distance', 'Use the distance tool']] },
 ];
-const PERM_VERSION = 8;
+const PERM_VERSION = 6;
 const LOG_CODES = ['AL', 'CL', 'SL', 'UL', 'AB', 'HD1', 'HD2', 'LA', 'R', 'L', 'C'];
 /* the leave types a passcode could log before 3.14.2 (approval codes with Approve leave, LA always, the rest with Mark and edit) */
 const oldLogKeys = p => LOG_CODES.filter(c => ['AL', 'CL', 'SL'].includes(c) ? p['att.approve'] : c === 'LA' ? true : p['att.edit']).map(c => 'log.' + c);
 const PAGES = PERM_GROUPS.filter(g => g.page).map(g => g.page);
 const PERM_KEYS = [...PAGES, ...PERM_GROUPS.flatMap(g => [...g.items, ...((g.sub && g.sub.items) || [])].map(i => i[0]))];
 const PAGE_OF = { summary: 'page.overview', employees: 'page.employees', attendance: 'page.attendance', actions: 'page.actions', reports: 'page.reports' };
-const pick = keys => Object.fromEntries([['_v', PERM_VERSION], ...PERM_KEYS.map(k => [k, ['notifications.view', 'requests.own', 'requests.rejected'].includes(k) || (k === 'requests.approvals' && keys.includes('att.approve')) || keys.includes(k)])]);
+const pick = keys => Object.fromEntries([['_v', PERM_VERSION], ...PERM_KEYS.map(k => [k, keys.includes(k)])]);
 const ROLE_NAMES = { superadmin: 'Super admin', admin: 'Admin', user: 'User' };
 /* v3.14: what a page shows by default once someone may open it (red flags and new fields stay off until ticked) */
 const VIEW_KEYS = ['ov.attendance', 'ov.coming', 'act.items', 'act.review', 'act.health', 'rep.team', 'rep.growth', 'rep.location', 'rep.attendance', 'rep.export'];
@@ -2663,8 +2647,6 @@ window.PERM = {
   upgrade(p) {
     if (!p || !p._v) return p;
     const q = { ...p };
-    if (q._v < 7) q['notifications.view'] = true;
-    if (q._v < 8) { q['requests.own'] = true; q['requests.rejected'] = true; q['requests.approvals'] = !!q['att.approve']; }
     if (q._v < 2) { q['att.who'] = !!q['page.attendance']; q['att.grid'] = !!q['page.attendance']; q['att.log'] = !!q['att.edit']; }
     if (q._v < 3) { q['filters.custom'] = true; q['set.fields'] = false; q['set.workbook'] = false; }
     /* v3.14: new rights keep today's behaviour; red flags and adding fields must be given on purpose */
@@ -3588,7 +3570,7 @@ async function save(opts = {}) {
       await clearPending();
       S.newFields = [];
       await adopt(ctx); notify(); if (S.act) S.act.items = null;
-      S.saving = false; render(); return true;
+      break;
     }
   } catch (e) {
     if (!e.busy && e.status !== 423) console.error(e);
@@ -4286,7 +4268,7 @@ function whoView() {
   const chk = (k, l) => `<label><input type="checkbox" data-bind="who-show" data-k="${k}" ${w.show[k] ? 'checked' : ''}> ${l}</label>`;
   const head = dates.map((dt, j) => { const wk = dt.getUTCDay() === 0 || dt.getUTCDay() === 6, isT = isoDate(dt) === isoDate(TODAY); return `<th class="d ${wk ? 'wk' : ''} ${isT ? 'tdy' : ''}" style="min-width:44px" data-tip="${longDate(dt)}<br>${perDay[j].out} out · ${perDay[j].la} applied">${dt.getUTCDate()}<small>${WEEKDAYS[dt.getUTCDay()]}</small><small style="color:${perDay[j].out ? 'var(--ink)' : 'var(--ink-3)'};font-weight:650">${perDay[j].out || '·'}</small></th>`; }).join('');
   const body = list.map(o => `<tr><td class="c-name" data-act="person" data-k="${esc(o.k)}"><b>${esc(o.name)}</b><span>${esc(o.cells.find(Boolean).r.client || '—')}</span></td>${o.cells.map((c, j) => { const wk = dates[j].getUTCDay() % 6 === 0, isT = isoDate(dates[j]) === isoDate(TODAY); return c ? `<td class="cell ${wk ? 'wk' : ''} ${isT ? 'tdy' : ''}" data-act="cell" data-r="${c.r.uid}" data-d="${c.i}" data-tip="${esc(cellTip(c.r, c.i))}">${chip(c.v)}</td>` : `<td class="${wk ? 'wk' : ''} ${isT ? 'tdy' : ''}"></td>`; }).join('')}</tr>`).join('');
-  return `<div class="grid g6" style="grid-template-columns:repeat(4,1fr);margin-bottom:14px">
+  return `${requestsCardHtml()}<div class="grid g6" style="grid-template-columns:repeat(4,1fr);margin-bottom:14px">
       <div class="card tile"><div class="lbl">OUT TODAY</div><div class="val">${dayOut(TODAY)}</div><div class="delta">${longDate(TODAY)}</div></div>
       <div class="card tile"><div class="lbl">OUT TOMORROW</div><div class="val">${dayOut(tomorrow)}</div><div class="delta">${longDate(tomorrow)}</div></div>
       <div class="card tile"><div class="lbl">BUSIEST DAY IN WINDOW</div><div class="val">${perDay[peak].out}</div><div class="delta">${longDate(dates[peak])}</div></div>
@@ -4376,7 +4358,7 @@ function gridView() {
   const kinds = g.kinds || [], hl = kinds.length ? leaveFilterCodes(kinds) : null, kindDays = hl ? rows.reduce((a, r) => a + rowCodeDays(r, hl), 0) : 0;
   const kindNames = LEAVE_FILTERS.filter(f => kinds.includes(f.k)).map(f => f.label.toLowerCase() + ' (' + f.codes.join('/') + ')').join(' or ');
   const legend = ['AL', 'CL', 'SL', 'UL', 'AB', 'HD1', 'LA', 'RJ', 'L', 'C', 'R', 'WO', 'H'].map(c => `<span style="display:inline-flex;align-items:center;gap:4px"><span style="display:inline-block;width:32px">${chip(c)}</span><span class="sm muted">${CODES[c].label}</span></span>`).join('');
-  return `<div class="toolbar">
+  return `${can('att.who') ? '' : requestsCardHtml()}<div class="toolbar">
       <label>Year <select data-bind="gyear">${gridYearOptions(g.month)}</select></label>
       <label>Month <select data-bind="gmonth">${gridMonthOptions(g.month)}</select></label>
       <input type="search" placeholder="Search name, ID or client" value="${esc(g.q)}" data-bind="gq" style="width:230px">
@@ -4841,15 +4823,13 @@ function employeeNames() {
 }
 
 /* ---------- modal infra ---------- */
-function closeModal() { $('#modalRoot')?.remove(); document.getElementById('attModalPortal')?.remove(); }
+function closeModal() { $('#modalRoot')?.remove(); }
 function openModal({ title, body, footer, wide }) {
   closeModal();
   const v = document.createElement('div'); v.className = 'veil'; v.id = 'modalRoot';
   v.innerHTML = `<div class="modal ${wide ? 'wide' : ''}" role="dialog" aria-modal="true" aria-label="${esc(title)}"><header><h3>${esc(title)}</h3><button class="btn ghost sm" data-close aria-label="Close">${ic('x')}</button></header><div class="body">${body}</div><footer>${footer}</footer></div>`;
   v.addEventListener('mousedown', e => { if (e.target === v) v._down = true; }); v.addEventListener('click', e => { if (e.target === v && v._down) closeModal(); if (e.target.closest('[data-close]')) closeModal(); });
-  if (active()) ROOT.appendChild(v);
-  else { const portal = document.createElement('div'); portal.id = 'attModalPortal'; document.body.append(portal); const shadow = portal.attachShadow({mode:'open'}); const style = document.createElement('style'); style.textContent = ATT_CSS; shadow.append(style, v); }
-  return v;
+  ROOT.appendChild(v); return v;
 }
 
 /* ---------- day-cell popover ---------- */
@@ -5067,22 +5047,10 @@ function inMyScope(r) { try { const x = rosterMatch(r.empId ?? null, r.name); if
 const requestsToDecide = () => canDecide() ? reqList().filter(r => r.status === 'pending' && inMyScope(r)) : [];
 const notifyReq = () => { try { window.dispatchEvent(new CustomEvent('att:requests')); } catch { } };
 async function saveRequests(change) {
-  await window.loadTeamSettings(true);                      // start from the latest list so two people don't undo each other
-  const before = reqList().map(r => ({ ...r }));
-  const next = change(before.map(r => ({ ...r })));
-  if (window.PERM && PERM.online()) {
-    const originals = new Map(before.map(r => [r.id, r]));
-    const updates = next.filter(r => JSON.stringify(r) !== JSON.stringify(originals.get(r.id)));
-    if (updates.length !== 1 || before.some(r => !next.some(n => n.id === r.id))) throw new Error('Only one request can be changed at a time.');
-    let saved;
-    try { saved = await CLOUD.saveLeaveRequest(updates[0], originals.get(updates[0].id) || null); }
-    catch (e) {
-      if (/function|schema cache|not set up/i.test(e.message || '')) throw new Error('The request database update is missing. Ask the super admin to run supabase-request-fix.sql, then try again.');
-      throw e;
-    }
-    const current = reqList();
-    window.TD_SETTINGS = { ...window.TD_SETTINGS, leave_requests: current.some(r => r.id === saved.id) ? current.map(r => r.id === saved.id ? saved : r) : [...current, saved] };
-  } else await window.saveSharedSetting('leave_requests', next);
+  await window.loadTeamSettings();                      // start from the latest list so two people don't undo each other
+  const cutoff = Date.now() - 45 * 86400000;
+  const next = change(reqList().map(r => ({ ...r }))).filter(r => r.status === 'pending' || (Date.parse(r.decidedAt || r.at) || 0) > cutoff);
+  await window.saveSharedSetting('leave_requests', next);
   render(); notifyReq();
 }
 const reqWhen = iso => { const d = new Date(iso); return isNaN(d) ? '' : d.toLocaleString(undefined, { day: 'numeric', month: 'short', hour: '2-digit', minute: '2-digit' }); };
@@ -5116,34 +5084,18 @@ function applyApproved(p, code, dates, desc) {
     }, { cells: true });
   } finally { APPROVE_CTX = false; }
 }
-let requestDecisionBusy = false;
 async function approveRequest(id, code) {
-  if (requestDecisionBusy) { toast('Another request decision is being saved.'); return; }
-  requestDecisionBusy = true;
-  try { return await approveRequestOnce(id, code); }
-  finally { requestDecisionBusy = false; renderApprovalRequests(); }
-}
-async function approveRequestOnce(id, code) {
   if (S.status !== 'ready' || !S.ctx) { toast('Connect the attendance tracker before approving requests.'); return; }
   if (!canDecide()) { toast('Only people with “Approve or reject leave” can approve requests.'); return; }
-  try { await window.loadTeamSettings(true); } catch (e) { toast('Could not refresh requests: ' + e.message); return; }
+  try { await window.loadTeamSettings(); } catch { }
   const req = reqList().find(r => r.id === id);
   if (!req || req.status !== 'pending') { toast('This request was already handled by someone else.'); render(); notifyReq(); return; }
-  if (!inMyScope(req)) { toast('This request is outside your employee filters.'); return; }
-  if (S.saving) { toast('Wait for the tracker save to finish.'); return; }
-  if (S.changes.length) { toast('Save or undo your pending tracker edits before approving a request.'); return; }
   const p = resolvePerson(req.name); if (!p) { toast(`${req.name} is no longer in the workforce file or the tracker.`); return; }
-  const requestedCode = LOG_TYPES.includes(code) ? code : req.code;
-  const use = requestedCode === 'LA' ? 'AL' : requestedCode;
-  const previous = snapshot(), undoLength = S.undo.length;
+  const use = LOG_TYPES.includes(code) ? code : req.code;
   const ok = applyApproved(p, use, req.dates, `Approved ${use} for ${req.name} · ${reqDatesText(req.dates)} (asked by ${req.by})`);
   if (ok === false) return;
-  if (await save() !== true) {
-    if (S.changes.length) { S.rows = previous; S.changes = []; S.undo.length = undoLength; S.ver++; await clearPending(); render(); }
-    toast('Approval was not completed. The request is still pending.'); return;
-  }
   try {
-    await saveRequests(l => l.map(r => r.id === id ? { ...r, status: 'approved', trackerSavedAt: new Date().toISOString(), code: use, asked: req.code, decidedBy: BE.userName(), decidedById: myId(), decidedAt: new Date().toISOString() } : r));
+    await saveRequests(l => l.map(r => r.id === id ? { ...r, status: 'approved', code: use, asked: req.code, decidedBy: BE.userName(), decidedAt: new Date().toISOString() } : r));
     BE.appendActivity([{ time: BE.nowText(), user: BE.userName(), action: 'settings', att: S.fileName, key: req.empId || '', name: req.name, details: { note: 'Approved ' + use + (use !== req.code ? ' (asked for ' + req.code + ')' : '') + ' · ' + reqDatesText(req.dates) + ' · asked by ' + req.by } }]);
     toast(`Approved. ${req.name}'s ${use} is now in attendance.`);
   } catch (e) { toast('Approved in attendance, but the request list could not be updated: ' + e.message); }
@@ -5156,75 +5108,61 @@ function openRejectBox(id) {
     footer: `<span class="grow"></span><button class="btn" data-close>Cancel</button><button class="btn danger" id="rj-go">Reject request</button>` });
   $('#rj-why', m).focus();
   $('#rj-go', m).onclick = async () => {
-    if (requestDecisionBusy) { toast('Another request decision is being saved.'); return; }
-    requestDecisionBusy = true;
     const why = $('#rj-why', m).value.trim().slice(0, 200); closeModal();
     try {
-      await window.loadTeamSettings(true); const cur = reqList().find(r => r.id === id);
+      await window.loadTeamSettings(); const cur = reqList().find(r => r.id === id);
       if (!cur || cur.status !== 'pending') { toast('This request was already handled by someone else.'); render(); return; }
-      if (!canDecide() || !inMyScope(cur)) { toast('You no longer have access to decide this request.'); return; }
-      await saveRequests(l => l.map(r => r.id === id ? { ...r, status: 'rejected', reason: why, decidedBy: BE.userName(), decidedById: myId(), decidedAt: new Date().toISOString() } : r));
+      await saveRequests(l => l.map(r => r.id === id ? { ...r, status: 'rejected', reason: why, decidedBy: BE.userName(), decidedAt: new Date().toISOString() } : r));
       BE.appendActivity([{ time: BE.nowText(), user: BE.userName(), action: 'settings', att: S.fileName, key: req.empId || '', name: req.name, details: { note: 'Rejected ' + req.code + ' · ' + reqDatesText(req.dates) + ' · asked by ' + req.by + (why ? ' · “' + why + '”' : '') } }]);
       toast('Request rejected. Nothing was added to attendance.');
-    } catch (e) { toast('Could not reject: ' + e.message); } finally { requestDecisionBusy = false; renderApprovalRequests(); }
+    } catch (e) { toast('Could not reject: ' + e.message); }
   };
 }
 async function cancelRequest(id) {
   const ok = await confirmBox('Cancel this request?', 'It is withdrawn and will not reach attendance.', 'Cancel request'); if (!ok) return;
   try {
-    await window.loadTeamSettings(true); const cur = reqList().find(r => r.id === id);
+    await window.loadTeamSettings(); const cur = reqList().find(r => r.id === id);
     if (!cur || cur.status !== 'pending') { toast('A manager already handled this request.'); render(); return; }
-    if (String(cur.byId) !== myId()) { toast('Only the requester can cancel this request.'); return; }
-    await saveRequests(l => l.map(r => r.id === id ? { ...r, status: 'cancelled', decidedBy: BE.userName(), decidedById: myId(), decidedAt: new Date().toISOString() } : r));
-    await BE.appendActivity([{ time: BE.nowText(), user: BE.userName(), action: 'request-cancelled', name: cur.name, key: cur.empId || '', details: { note: 'Cancelled request ' + cur.code + ' · ' + reqDatesText(cur.dates) } }]);
+    await saveRequests(l => l.map(r => r.id === id ? { ...r, status: 'cancelled', decidedBy: BE.userName(), decidedAt: new Date().toISOString() } : r));
     toast('Request cancelled.');
   } catch (e) { toast('Could not cancel: ' + e.message); }
 }
-window.requestAuditEntries = () => reqList().flatMap(r => {
-  const common = {name:r.name,key:r.empId || '',att:'attendance',details:{note:r.code + ' · ' + reqDatesText(r.dates || [])}};
-  const events = [{...common,eventId:'request:'+r.id+':pending',time:r.at,user:r.by,userId:r.byId,action:'request-submitted'}];
-  if (r.status !== 'pending') events.push({...common,eventId:'request:'+r.id+':'+r.status+':'+r.decidedAt,time:r.decidedAt,user:r.decidedBy || r.by,userId:r.decidedById || r.byId,action:'request-'+r.status,details:{note:common.details.note+(r.reason ? ' · Reason: '+r.reason : '')}});
-  return events;
-});
-const REQUEST_CARD_CSS = ":host {height:100%;font-size:13px;} .card {height:100%;max-height:260px;display:flex;flex-direction:column;padding:12px 14px;border-radius:10px;} .card h2 {font-size:13px;} .card .sub {font-size:11px;line-height:1.4;margin-bottom:6px;} .card .empty {padding:10px 0;min-height:0;font-size:12px;} .card > div[style] {min-height:0;}";
-function renderRequestHistory() {
-  const me = myId();
-  const own = reqList().filter(r => me && String(r.byId) === me).sort((a,b) => (b.at || '').localeCompare(a.at || ''));
-  const rejected = reqList().filter(r => r.status === 'rejected' && (String(r.byId) === me || window.requestNotificationVisible?.(r))).sort((a,b) => (b.decidedAt || '').localeCompare(a.decidedAt || ''));
-  const row = r => `<div class="request-history-row"><div><b>${esc(r.name)}</b><div class="sm">${esc(r.code)} · ${esc(reqDatesText(r.dates || []))}</div><div class="sm muted">Requested by ${esc(r.by)} · ${esc(reqWhen(r.at))}</div>${r.note ? `<div class="sm">Note: ${esc(r.note)}</div>` : ''}${r.decidedBy ? `<div class="sm muted">${esc(r.status)} by ${esc(r.decidedBy)} · ${esc(reqWhen(r.decidedAt))}</div>` : ''}${r.reason ? `<div class="sm">Reason: ${esc(r.reason)}</div>` : ''}</div><span class="pill ${r.status === 'approved' ? 'ok' : ''}">${r.status === 'pending' ? 'Pending approval' : esc(r.status[0].toUpperCase() + r.status.slice(1))}</span>${r.status === 'pending' && String(r.byId) === me ? `<button class="btn sm" data-cancel="${esc(r.id)}">Cancel request</button>` : ''}</div>`;
-  const draw = (id, title, description, items, visible) => {
-    const host = document.getElementById(id); if (!host) return;
-    host.hidden = !visible; const root = host.shadowRoot || host.attachShadow({mode:'open'});
-    if (!visible) { root.innerHTML = ''; return; }
-    root.innerHTML = `<style>${ATT_CSS}${REQUEST_CARD_CSS}.request-history-row { display:flex;flex-wrap:wrap;align-items:center;gap:8px;padding:8px 0;border-bottom:1px solid var(--line); } .request-history-row>div { flex:1 1 240px;min-width:0;overflow-wrap:anywhere; }</style><div class="card"><h2>${esc(title)}</h2><div class="sub">${esc(description)}</div><div style="max-height:180px;overflow:auto">${items.length ? items.map(row).join('') : '<div class="empty">No requests to show.</div>'}</div></div>`;
-    root.querySelectorAll('[data-cancel]').forEach(b => { b.onclick = async () => { b.disabled = true; try { await cancelRequest(b.dataset.cancel); } finally { renderRequestHistory(); } }; });
-  };
-  draw('cardMyRequests', `Your requests · ${own.filter(r => r.status === 'pending').length} pending`, 'Your pending requests and decisions.', own, !!me && can('requests.own'));
-  draw('cardRejectedRequests', `Rejected request log · ${rejected.length}`, 'Decision history and rejection reasons.', rejected, !!me && can('requests.rejected') && (!!rejected.length || !!window.PERM?.can('notifications.view')));
-}
-
 function renderApprovalRequests() {
-  renderRequestHistory();
   const host = document.getElementById('cardApprovalRequests'); if (!host) return;
-  host.hidden = !can('requests.approvals');
+  const admin = window.PERM && (!PERM.online() || ['admin', 'superadmin'].includes(CLOUD.user()?.role));
+  host.hidden = !(admin || canDecide());
   if (host.hidden) { host.replaceChildren(); return; }
   const root = host.shadowRoot || host.attachShadow({ mode: 'open' });
   const pending = reqList().filter(r => r.status === 'pending' && inMyScope(r)).sort((a,b) => (a.at || '').localeCompare(b.at || ''));
   const ready = S.status === 'ready' && !!S.ctx;
-  root.innerHTML = `<style>${ATT_CSS}${REQUEST_CARD_CSS}
-    .request-row { display:flex; flex-wrap:wrap; align-items:center; gap:8px; padding:8px 0; border-bottom:1px solid var(--line); }
+  root.innerHTML = `<style>${ATT_CSS}
+    .request-row { display:flex; flex-wrap:wrap; align-items:center; gap:10px; padding:14px 0; border-bottom:1px solid var(--line); }
     .request-row:last-child { border-bottom:0; } .request-details { flex:1 1 260px; min-width:0; overflow-wrap:anywhere; }
     .request-details span { display:block; } .request-actions { display:flex; flex-wrap:wrap; gap:6px; }
-    .request-heading { display:flex; flex-wrap:wrap; align-items:center; gap:6px; margin-bottom:6px; }
+    .request-heading { display:flex; flex-wrap:wrap; align-items:center; gap:10px; margin-bottom:8px; }
     </style><div class="card"><div class="request-heading"><h2>Approval requests · ${pending.length} pending</h2><span class="grow"></span><button class="btn sm" data-refresh>Refresh</button></div>
-    <div class="sub">Approve logs before they reach the tracker.</div>
+    <div class="sub">Review user log requests before they are added to the tracker. Requests shown follow your current employee filters.</div>
     ${!canDecide() ? '<p class="sm">Ask a super admin to enable “Approve or reject leave” for your account to process these requests.</p>' : !ready ? '<p class="sm">Connect the attendance tracker in Settings → Save & sync to approve requests.</p>' : ''}
-    ${pending.length ? '<div style="max-height:180px;overflow:auto">' + pending.map(r => `<div class="request-row"><div class="request-details"><b>${esc(r.name)}</b><span>${esc(r.code)} · ${esc(reqDatesText(r.dates || []))}</span><span class="sm muted">Requested by ${esc(r.by)} · ${esc(reqWhen(r.at))}</span>${r.note ? '<span class="sm">Note: ' + esc(r.note) + '</span>' : ''}</div>
-    ${canDecide() ? `<div class="request-actions"><select aria-label="Approve leave type for ${esc(r.name)}" ${!ready ? 'disabled' : ''}>${LOG_TYPES.map(c => `<option value="${c}"${c === r.code ? ' selected' : ''}>${c}</option>`).join('')}</select><button class="btn sm primary" data-approve="${esc(r.id)}" ${!ready || S.saving ? 'disabled' : ''}>Approve</button><button class="btn sm" data-reject="${esc(r.id)}">Reject</button></div>` : ''}</div>`).join('') + '</div>' : '<div class="empty">No pending requests in your filters.</div>'}</div>`;
-  root.querySelector('[data-refresh]').onclick = async e => { e.target.disabled = true; try { await window.loadTeamSettings(true); notifyReq(); } finally { renderApprovalRequests(); } };
+    ${pending.length ? '<div style="max-height:420px;overflow:auto">' + pending.map(r => `<div class="request-row"><div class="request-details"><b>${esc(r.name)}</b><span>${esc(r.code)} · ${esc(reqDatesText(r.dates || []))}</span><span class="sm muted">Requested by ${esc(r.by)} · ${esc(reqWhen(r.at))}</span>${r.note ? '<span class="sm">Note: ' + esc(r.note) + '</span>' : ''}</div>
+    ${canDecide() ? `<div class="request-actions"><select aria-label="Approve leave type for ${esc(r.name)}" ${!ready ? 'disabled' : ''}>${LOG_TYPES.map(c => `<option value="${c}"${c === r.code ? ' selected' : ''}>${c}</option>`).join('')}</select><button class="btn sm primary" data-approve="${esc(r.id)}" ${!ready || S.saving ? 'disabled' : ''}>Approve</button><button class="btn sm" data-reject="${esc(r.id)}">Reject</button></div>` : ''}</div>`).join('') + '</div>' : '<div class="empty">No pending requests in your current employee filters.</div>'}</div>`;
+  root.querySelector('[data-refresh]').onclick = async e => { e.target.disabled = true; try { await window.loadTeamSettings(); notifyReq(); } finally { renderApprovalRequests(); } };
   root.querySelectorAll('[data-approve]').forEach(b => { b.onclick = async () => { b.disabled = true; try { await approveRequest(b.dataset.approve, b.parentElement.querySelector('select').value); } finally { renderApprovalRequests(); } }; });
   root.querySelectorAll('[data-reject]').forEach(b => { b.onclick = () => openRejectBox(b.dataset.reject); });
 }
+function requestsCardHtml() {
+  const decide = requestsToDecide(), me = myId();
+  const mine = me ? reqList().filter(r => r.byId === me).sort((a, b) => (b.at || '').localeCompare(a.at || '')).slice(0, 12) : [];
+  if (!decide.length && !mine.length && !needsApproval()) return '';
+  const typeSel = r => `<select data-req-code aria-label="Leave type to approve">${LOG_TYPES.map(c => `<option value="${c}"${c === r.code ? ' selected' : ''}>${c}</option>`).join('')}</select>`;
+  const who = r => `<b>${esc(r.name)}</b><span class="sm muted">${esc(r.code)} · ${esc(CODES[r.code] ? CODES[r.code].label : '')} · ${esc(reqDatesText(r.dates || []))}</span><span class="sm muted">Asked by ${esc(r.by)} · ${esc(reqWhen(r.at))}${r.note ? ' · “' + esc(r.note) + '”' : ''}</span>`;
+  const decideHtml = canDecide() ? `<div style="min-width:0"><h2>Waiting for your approval · ${decide.length}</h2><div class="sub">Logged leave is added to attendance only after you approve it. You can change the type before approving.</div>
+      ${decide.length ? `<div class="list" style="max-height:320px;overflow:auto">${decide.map(r => `<div class="li" style="flex-wrap:wrap;gap:6px"><div class="main-t" style="flex:1 1 260px">${who(r)}</div>${typeSel(r)}<button class="btn sm primary" data-act="req-approve" data-id="${esc(r.id)}">Approve</button><button class="btn sm" data-act="req-reject" data-id="${esc(r.id)}">Reject</button></div>`).join('')}</div>` : '<div class="empty">No leave requests are waiting.</div>'}</div>` : '';
+  const badge = r => r.status === 'pending' ? '<span class="tag">Waiting for approval</span>' : r.status === 'approved' ? `<span class="tag ok">Approved${r.asked && r.asked !== r.code ? ' as ' + esc(r.code) : ''}</span>` : r.status === 'rejected' ? '<span class="tag crit">Rejected</span>' : '<span class="tag">Cancelled</span>';
+  const mineHtml = (mine.length || needsApproval()) ? `<div style="min-width:0"><h2>Your leave requests · ${mine.filter(r => r.status === 'pending').length} waiting</h2><div class="sub">${needsApproval() ? 'Leave you log is sent to a manager first. It shows in attendance once approved.' : 'Requests you sent earlier.'}</div>
+      ${mine.length ? `<div class="list" style="max-height:320px;overflow:auto">${mine.map(r => `<div class="li" style="flex-wrap:wrap;gap:6px"><div class="main-t" style="flex:1 1 240px"><b>${esc(r.name)}</b><span class="sm muted">${esc(r.code)} · ${esc(reqDatesText(r.dates || []))}</span>${r.status !== 'pending' && r.decidedBy ? `<span class="sm muted">${r.status === 'cancelled' ? 'Cancelled' : (r.status === 'approved' ? 'Approved' : 'Rejected') + ' by ' + esc(r.decidedBy)} · ${esc(reqWhen(r.decidedAt))}${r.reason ? ' · “' + esc(r.reason) + '”' : ''}</span>` : ''}</div>${badge(r)}${r.status === 'pending' ? `<button class="btn sm" data-act="req-cancel" data-id="${esc(r.id)}">Cancel</button>` : ''}</div>`).join('')}</div>` : '<div class="empty">You have not sent any leave requests yet. Use Log leave to send one.</div>'}</div>` : '';
+  return `<div class="card" style="margin-bottom:14px"><div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(320px,1fr));gap:18px">${decideHtml}${mineHtml}</div></div>`;
+}
+
 /* ---------- a tracker row built from a workforce person ---------- */
 /* Emp ID, name and client come from the workforce file. Before the Date of Joining, and after the Left Date, the days are NA (as the tracker already does). */
 function newRosterRow(ms, rr, opts = {}) {
@@ -5942,7 +5880,7 @@ const healthCount = () => (S.status === 'ready' && S.ctx ? healthIssues().filter
 
 mount();
 return {
-  hasTracker: Engine.hasTracker, refresh, init: () => { mount(); return connect(); }, askName, decorateTable, healthCount, chooseFileEarly, savedFile: async () => (await kv.get('file')) || ((await kv.get('handle')) || {}).name || '', show, leave, renderCard, renderWatch, drawerPanel, go, renderApprovalRequests, renderRequestHistory, requestsToDecide: () => requestsToDecide().length, redraw: () => { if (active()) render(); }, state: () => S, dirty: () => S.changes.length,
+  hasTracker: Engine.hasTracker, refresh, init: () => { mount(); return connect(); }, askName, decorateTable, healthCount, chooseFileEarly, savedFile: async () => (await kv.get('file')) || ((await kv.get('handle')) || {}).name || '', show, leave, renderCard, renderWatch, drawerPanel, go, renderApprovalRequests, requestsToDecide: () => requestsToDecide().length, redraw: () => { if (active()) render(); }, state: () => S, dirty: () => S.changes.length,
   prepareSignOut, save: () => save(), undo: () => undo(), toggleAuto: () => { setAuto(!S.auto); if (S.auto) autoTick(); }, setAutoSync: on => { setAuto(on); if (S.auto) autoTick(); }, canWrite: attCanWrite,
   syncInfo: () => { const d = D(true), sc = scopeCounts(); return { fileName: S.fileName, changes: S.changes.length, undoLen: S.undo.length, saving: S.saving, auto: S.auto, autoErr: S.autoErr, autoAt: S.autoAt, diskChanged: S.diskChanged, rows: S.rows.length, people: d.people.size, monthFrom: d.months[0], monthTo: d.latestMonth, unmatched: sc.unmatched, hasRoster: hasRoster() }; },
 };
@@ -6120,7 +6058,7 @@ async function poll() {
 }
 
 /* ============================== filtering ============================== */
-const APP = { title: "Team Dashboard", version: "3.16.2", released: "24 Sep 2026" };
+const APP = { title: "Team Dashboard", version: "3.15.0", released: "24 Sep 2026" };
 const BASE_DIMS = { status: "status_column", desig: "designation_column", client: "client_column", mode: "mode_column" };
 const STANDARD_STATUSES = ["Active", "Manager", "OJT", "Bench", "New", "Projected", "Left", "Moved"];
 const TILE_ORDER = ["Active", "Manager", "OJT", "Bench", "New", "Projected"];
@@ -8012,14 +7950,14 @@ async function openActivity(container) {
           h("span", { class: "time" }, it.time)),
           it.details && it.details.note ? h("div", { class: "note" }, it.details.note) : null,
           ch.length ? h("div", { class: "chg" }, ch.slice(0, cap).map(([c, v]) => label(c) + ": " + fmt(c, v && v.from) + " → " + fmt(c, v && v.to)).join(" · ") + (ch.length > cap ? " · +" + (ch.length - cap) + " more" : "")) : null);
-      })) : h("div", { class: "empty" }, "No activities recorded yet."));
+      })) : h("div", { class: "empty" }, "Nothing recorded here in the past 30 days."));
       if (items.length > shown) list.append(h("button", { class: "btn", onclick: () => { shown += 100; draw(); } }, "Show more (" + (items.length - shown) + " remaining)"));
     };
     draw();
-    const refresh = h("button", { class: "btn mini", onclick: () => openActivity(body) }, "Refresh");
+    const refresh = h("button", { class: "btn mini", onclick: () => openActivity(body).then(items => { if (items && window.bellSeen) window.bellSeen(items); }) }, "Refresh");
     body.replaceChildren(
       h("div", { class: "activity-controls" }, search, h("span", { class: "spacer" }), refresh),
-      h("p", { class: "set-hint" }, "Every change is written to the “Activity Log” sheet of " + (state.file || "the workbook") + ", newest first. History is retained for all users; notification audience settings do not filter this audit log."),
+      h("p", { class: "set-hint" }, "Every change is written to the “Activity Log” sheet of " + (state.file || "the workbook") + ", newest first. Entries older than 30 days are removed automatically."),
       ...(d.warning ? [h("div", { class: "banner", role: "status" }, d.warning)] : []), list);
     return d.items;
   } catch (e) { body.replaceChildren(h("div", { class: "banner" }, e.message)); return null; }
@@ -8502,9 +8440,9 @@ document.addEventListener('keydown', e => { if (e.key === '/' && !/INPUT|TEXTARE
 
 /* ---------- team settings (mandatory fields, ...) ---------- */
 const LOCAL_KEY = 'td_settings_v1';
-window.loadTeamSettings = async (strict = false) => {
+window.loadTeamSettings = async () => {
   try { window.TD_SETTINGS = PERM.online() ? ((await CLOUD.getSettings()) || {}) : JSON.parse(localStorage.getItem(LOCAL_KEY) || '{}'); }
-  catch (e) { if (strict) throw e; window.TD_SETTINGS = window.TD_SETTINGS || {}; }
+  catch (e) { window.TD_SETTINGS = window.TD_SETTINGS || {}; }
 };
 /* lists that anyone with an editing right may change (needs setup.sql from 3.12; the admin can still save without it) */
 async function saveSharedSetting(key, value) {
@@ -8551,8 +8489,7 @@ window.applyAccess = () => {
   show('#cardComing', PERM.can('ov.coming'));
   show('#cardWatch', PERM.can('ov.watch'));
   show('#btnAddField', PERM.can('emp.fields'));
-  show('#btnBell', PERM.can('notifications.view') || PERM.can('activity.view'));
-  window.refreshNotifications?.();
+  show('#btnBell', PERM.can('activity.view'));
   document.body.classList.toggle('no-report-export', !PERM.can('rep.export'));
   /* v3.14: each report group has its own right */
   const rg = el('reportGroup');
@@ -8592,97 +8529,35 @@ addEventListener('att:sync', updateReqBadge);
 setTimeout(updateReqBadge, 3000);
 
 /* ---------- v3.14: activity bell (top right, every page) ---------- */
-// Read state is separate for each signed-in account and team on this browser.
-const notificationKey = () => 'td_notification_reads_v2:' + JSON.stringify([CLOUD.SUPABASE_CONFIG?.url || localStorage.getItem('td_supabase_url') || BE.dir()?.name || 'local', CLOUD.user()?.id ?? BE.userName()]);
-const notificationReads = () => { try { const a = JSON.parse(localStorage.getItem(notificationKey()) || '[]'); return new Set(Array.isArray(a) ? a : []); } catch { return new Set(); } };
-const notificationPermission = () => PERM.can('notifications.view');
-window.requestNotificationVisible = r => {
-  if (!notificationPermission()) return false;
-  if (PERM.isSuper()) return true;
-  const u = CLOUD.user(), me = String(u?.id ?? '');
-  if (me && String(r.byId) === me) return true;
-  const audience = u?.permissions?._notificationAudience || {mode:'all'};
-  return audience.mode === 'all' || (audience.mode === 'selected' && (audience.users || []).map(String).includes(String(r.byId)));
-};
-const notificationRequestEvents = () => {
-  const all = (window.TD_SETTINGS || {}).leave_requests || [];
-  return (Array.isArray(all) ? all : []).filter(requestNotificationVisible).flatMap(r => {
-    const detail = `${r.name} · ${r.code} · ${(r.dates || []).join(', ')}`;
-    const common = {requestId:r.id, user:r.by, userId:r.byId, name:r.name};
-    const events = [{...common,id:'request:'+r.id+':pending',time:r.at,title:'Request submitted',detail:detail+' · Requested by '+r.by,type:'request'}];
-    if (r.status !== 'pending') events.push({...common,id:'request:'+r.id+':'+r.status+':'+r.decidedAt,time:r.decidedAt,title:r.status === 'approved' ? 'Request approved'+(r.trackerSavedAt ? ' · saved to tracker' : '') : r.status === 'rejected' ? 'Request rejected' : 'Request cancelled',detail:detail+' · '+(r.decidedBy || r.by)+(r.reason ? ' · Reason: '+r.reason : ''),type:'request'});
-    return events;
-  });
-};
-const activityNotification = it => ({id:'activity:'+(it.eventId || JSON.stringify([it.time,it.user,it.action,it.key,it.name,it.details])),time:it.time,title:(BE.ACT_VERBS[it.action] || it.action || 'Activity')+' · '+(it.name || ''),detail:(it.user || 'Unknown user')+' · '+BE.actDetails(it),type:'activity'});
-let notificationItems = [], notificationOwner = '', notificationBody = null, bellBusy = false, activityError = '';
-function bellShow(n) {
-  const b=el('bellN'), btn=el('btnBell'); if (!b || !btn) return;
-  b.hidden=!n; b.textContent=''; b.style.cssText='width:9px;min-width:9px;height:9px;padding:0;top:1px;right:1px;border-radius:50%;background:#e34948';
-  btn.title=n ? `${n} unread notifications` : 'Notifications';
-  btn.setAttribute('aria-label', n ? `Notifications: ${n} unread` : 'Notifications');
+const BELL_SEEN = 'td_bell_seen_v1';
+const bellSig = it => [it.time, it.user, it.action, it.key, it.name].join('|');
+function bellCount(items) {
+  let seen = null; try { seen = localStorage.getItem(BELL_SEEN); } catch { }
+  if (!items || !items.length) return 0;
+  if (!seen) { try { localStorage.setItem(BELL_SEEN, bellSig(items[0])); } catch { } return 0; }   // first visit: start counting from now
+  let i = items.findIndex(it => bellSig(it) === seen); if (i < 0) i = items.length;
+  const me = BE.userName();
+  return items.slice(0, i).filter(it => it.user !== me).length;
 }
-function unreadCount() { const read=notificationReads(); return notificationItems.filter(it=>!read.has(it.id)).length; }
-function markNotificationsRead(ids) {
-  const read=notificationReads(); ids.forEach(id=>read.add(id));
-  try { localStorage.setItem(notificationKey(),JSON.stringify([...read])); }
-  catch { toast('Could not save read status in this browser.',true); return; }
-  bellShow(unreadCount()); drawNotifications();
-}
-function drawNotifications() {
-  if (!notificationBody?.isConnected) return;
-  const read=notificationReads(), unread=unreadCount();
-  const allRead=h('button',{class:'btn mini',disabled:!unread,onclick:()=>markNotificationsRead(notificationItems.map(it=>it.id))},'Mark all read');
-  notificationBody.replaceChildren(
-    h('div',{class:'activity-controls'},h('b',{},`${unread} unread`),h('span',{class:'spacer'}),allRead,h('button',{class:'btn mini',onclick:()=>bellCheck()},'Refresh')),
-    h('p',{class:'set-hint'},'Read status is saved for your account on this browser. Opening this panel does not mark notifications as read.'),
-    ...(activityError ? [h('p',{class:'err',role:'status'},activityError)] : []),
-    notificationItems.length ? h('ul',{class:'act'},...notificationItems.map(it=>h('li',{style:read.has(it.id)?'':'border-left:3px solid var(--danger);padding-left:12px'},
-      h('div',{class:'line'},h('b',{},it.title),h('span',{class:'time'},new Date(it.time).toLocaleString())),
-      h('p',{},it.detail),read.has(it.id)?h('span',{class:'hint'},'Read'):h('button',{class:'btn mini',onclick:()=>markNotificationsRead([it.id])},'Mark as read')))) : h('div',{class:'empty'},'No notifications to show.'),
-    PERM.can('activity.view') ? h('button',{class:'btn',onclick:()=>openActivity(notificationBody)},'Open activity log · all users') : null);
-}
+function bellShow(n) { const b = el('bellN'), btn = el('btnBell'); if (!b || !btn) return; b.hidden = !n; b.textContent = n > 99 ? '99+' : String(n); btn.setAttribute('aria-label', n ? 'Activity: ' + n + ' new change' + (n === 1 ? '' : 's') : 'Activity'); }
+window.bellSeen = items => { if (items && items.length) { try { localStorage.setItem(BELL_SEEN, bellSig(items[0])); } catch { } } bellShow(0); };
+let bellBusy = false;
 async function bellCheck() {
-  if (bellBusy || el('app').hidden || document.hidden) return;
-  const owner=notificationKey();
-  if (notificationOwner !== owner) { notificationOwner=owner; notificationItems=[]; activityError=''; }
-  if (!notificationPermission() && !PERM.can('activity.view')) { notificationItems=[];bellShow(0);drawNotifications();return; }
-  bellBusy=true;
-  try {
-    await loadTeamSettings(true);
-    let activity=[];activityError='';
-    if (PERM.can('activity.view')) {
-      try { const d=await api('GET','/api/activity'); activity=(d.items || []).filter(it=>!String(it.action || '').startsWith('request-')).map(activityNotification); }
-      catch(e) { activityError='Activity could not be loaded: '+e.message; }
-    }
-    if (owner !== notificationKey()) return;
-    // Recheck access after asynchronous reads so changed permissions take effect.
-    notificationItems=[...notificationRequestEvents(),...(PERM.can('activity.view')?activity:[])].sort((a,b)=>(Date.parse(b.time)||0)-(Date.parse(a.time)||0));
-    bellShow(unreadCount());drawNotifications();window.ATT?.renderApprovalRequests();
-  } catch(e) { activityError='Notifications could not be refreshed: '+e.message;drawNotifications(); }
-  finally { bellBusy=false; }
+  if (bellBusy || el('app').hidden || document.hidden || !PERM.can('activity.view') || typeof state === 'undefined' || !state.schema) return;
+  bellBusy = true;
+  try { const d = await api('GET', '/api/activity'); bellShow(bellCount(d.items)); } catch { } finally { bellBusy = false; }
 }
-window.refreshNotifications=()=>{
-  if (notificationOwner !== notificationKey()) notificationItems=[];
-  const allowedIds=new Set(notificationRequestEvents().map(it=>it.id));
-  notificationItems=notificationItems.filter(it=>it.type==='request'?allowedIds.has(it.id):PERM.can('activity.view'));
-  bellShow(unreadCount());drawNotifications();bellCheck();
+window.openBell = () => {
+  if (!PERM.can('activity.view')) { toast('Your passcode can’t see the activity. Ask the admin for the right.', true); return; }
+  const body = h('div', { class: 'body' });
+  mountDrawer(h('aside', { class: 'drawer activity-drawer', role: 'dialog', 'aria-modal': 'true', 'aria-label': 'Activity' },
+    h('header', {}, h('h2', {}, 'Activity'), h('button', { class: 'btn ghost', onclick: closeDrawer, 'aria-label': 'Close' }, '✕')), body));
+  openActivity(body).then(items => { if (items) window.bellSeen(items); });
 };
-window.openBell=()=>{
-  if (!notificationPermission() && !PERM.can('activity.view')) { toast('Notification access is disabled for your account.',true);return; }
-  notificationBody=h('div',{class:'body'},h('div',{class:'empty'},'Loading notifications…'));
-  mountDrawer(h('aside',{class:'drawer activity-drawer',role:'dialog','aria-modal':'true','aria-label':'Notifications'},h('header',{},h('h2',{},'Notifications'),h('button',{class:'btn ghost',onclick:closeDrawer,'aria-label':'Close'},'✕')),notificationBody));
-  bellCheck();
-};
-el('btnBell').addEventListener('click',()=>window.openBell());
-setTimeout(bellCheck,4000);
-setInterval(bellCheck,45000);
-addEventListener('att:requests',bellCheck);
-addEventListener('att:sync',bellCheck);
-addEventListener('activity:changed',bellCheck);
-addEventListener('focus',bellCheck);
-addEventListener('storage',e=>{if(e.key===notificationKey()){bellShow(unreadCount());drawNotifications();}});
-
+el('btnBell').addEventListener('click', () => window.openBell());
+setTimeout(bellCheck, 4000);
+setInterval(bellCheck, 90000);
+addEventListener('att:sync', () => setTimeout(bellCheck, 1500));
 
 /* ---------- header: Start / Stop auto-sync, Save now, Settings ---------- */
 const attS = () => { try { return window.ATT && ATT.state ? ATT.state() : null; } catch { return null; } };
@@ -8772,7 +8647,7 @@ async function drawPeople(pane, selectId) {
   const list = h('div', { class: 'ppl-list' }), editor = h('div', { class: 'ppl-editor' });
   const select = u => {
     list.querySelectorAll('.ppl-item').forEach(b => b.setAttribute('aria-current', b.dataset.id === String(u ? u.id : 'new') ? 'true' : 'false'));
-    drawEditor(editor, u, id => drawPeople(pane, id), users);
+    drawEditor(editor, u, id => drawPeople(pane, id));
   };
   for (const u of users) list.append(h('button', { class: 'ppl-item' + (u.active ? '' : ' off'), type: 'button', 'data-id': String(u.id), onclick: () => select(u) },
     h('b', {}, u.name + (u.id === me.id ? ' (you)' : '')), h('small', {}, rightsSummary(u) + (u.active ? '' : ' · can’t sign in'))));
@@ -8795,7 +8670,7 @@ function filterText(f) {
   return parts.join(' · ') || 'no filters (everyone)';
 }
 window.filterText = filterText;
-function drawEditor(box, u, reload, users = []) {
+function drawEditor(box, u, reload) {
   const me = CLOUD.user(), isNew = !u, self = u && u.id === me.id;
   const err = h('p', { class: 'err', role: 'alert' });
   const name = h('input', { class: 'input', value: u ? u.name : '', 'aria-label': 'Name', autocomplete: 'off' });
@@ -8813,14 +8688,6 @@ function drawEditor(box, u, reload, users = []) {
   const empList = h('datalist', { id: 'setEmpList' }, ...empOpts.map(x => h('option', { value: labelOf(x) })));
   const empPick = () => { const v = emp.value.trim(); if (!v) return null; return empOpts.find(x => labelOf(x) === v) || empOpts.find(x => x.code === v) || empOpts.find(x => x.name.toLowerCase() === v.toLowerCase()); };
   const start = u && u.permissions && u.permissions._v ? PERM.upgrade(u.permissions) : u ? PERM.presets['Full access'] : PERM.presets['Editor'];
-  const audience = u?.permissions?._notificationAudience || { mode: 'all', users: [] };
-  const audienceMode = h('select', { class: 'input', 'aria-label': 'Whose request notifications this person can see' },
-    ...[['all','All users'],['own','Only their own requests'],['selected','Their own + selected users']].map(([value,label]) => h('option',{value,selected:audience.mode === value},label)));
-  const audienceChecks = users.map(person => ({ id: String(person.id), ...checkLine(person.name, (audience.users || []).map(String).includes(String(person.id))) }));
-  const audienceList = h('div', {class:'rmod-items',hidden:audienceMode.value !== 'selected'}, ...audienceChecks.map(c => c.el));
-  audienceMode.onchange = () => { audienceList.hidden = audienceMode.value !== 'selected'; };
-  const audienceBox = h('div', {class:'rmod-extra'}, h('label',{},'Request notifications from',audienceMode), audienceList,
-    h('p',{class:'rmod-note'},'Applies to request notifications and rejected-request history. Their own requests are always included. All users receive approved-request notifications by default. Activity log access is separate.'));
   /* fixed filters for this person */
   let fixed = u && u.permissions && u.permissions._filters ? u.permissions._filters : null;
   const fsum = h('p', { class: 'rmod-note' });
@@ -8888,11 +8755,11 @@ function drawEditor(box, u, reload, users = []) {
     const subBox = subItems.length ? h('div', { class: 'rmod-sub' }, h('p', { class: 'rmod-subt' }, g.sub.title),
       h('div', { class: 'rmod-subtools' }, h('button', { class: 'linkbtn', type: 'button', onclick: () => { subItems.forEach(c => { if (!c.box.disabled) c.box.checked = true; }); } }, 'All'), ' · ', h('button', { class: 'linkbtn', type: 'button', onclick: () => { subItems.forEach(c => { if (!c.box.disabled) c.box.checked = false; }); } }, 'None')),
       h('div', { class: 'rmod-chips' }, ...subItems.map(c => c.el)),
-      h('p', { class: 'rmod-note' }, g.name === 'Overview' ? 'Choose which Request Center cards this person can see and whether they can approve or reject requests.' : 'Only these types appear in the Type list of Log leave. A ticked type can be logged even without “Approve or reject leave” or “Mark and edit attendance”; changing a day that already holds approved leave still needs “Approve or reject leave”.')) : null;
+      h('p', { class: 'rmod-note' }, 'Only these types appear in the Type list of Log leave. A ticked type can be logged even without “Approve or reject leave” or “Mark and edit attendance”; changing a day that already holds approved leave still needs “Approve or reject leave”.')) : null;
     let head;
     if (g.page) { const c = checkLine('', !!start[g.page], { 'data-k': g.page, 'aria-label': 'Can open ' + g.name }); boxes[g.page] = c.box; head = h('label', { class: 'rmod-head' }, c.box, h('b', {}, g.name), h('small', {}, 'can open this page')); }
     else head = h('div', { class: 'rmod-head' }, h('b', {}, g.name));
-    const card = h('div', { class: 'rmod' + (g.name === 'Filters' ? ' rmod-wide' : '') }, head, items.length ? h('div', { class: 'rmod-items' }, ...items.map(c => c.el)) : null, subBox, g.name === 'Filters' ? fixedBox : g.name === 'Notifications' ? audienceBox : null);
+    const card = h('div', { class: 'rmod' + (g.name === 'Filters' ? ' rmod-wide' : '') }, head, items.length ? h('div', { class: 'rmod-items' }, ...items.map(c => c.el)) : null, subBox, g.name === 'Filters' ? fixedBox : null);
     const sync = () => { const off = g.page && !boxes[g.page].checked; card.classList.toggle('off', !!off); for (const c of items) c.box.disabled = isSuper() || !!off; for (const c of subItems) c.box.disabled = isSuper() || !!off; if (g.page) boxes[g.page].disabled = isSuper(); };
     if (g.page) boxes[g.page].addEventListener('change', sync);
     syncs.push(sync);
@@ -8902,17 +8769,17 @@ function drawEditor(box, u, reload, users = []) {
   const superNote = h('p', { class: 'set-hint' }, 'Super admins have every right, and only they can manage people, rights and fixed filters.');
   const roleNote = h('p', { class: 'set-hint' }, 'Admins and users get exactly the rights ticked below; only a super admin can change them.');
   const rights = h('div', { class: 'rights' }, h('h4', {}, 'What they can do'), superNote, roleNote, presets, h('div', { class: 'rmods' }, ...modules));
-  const syncRole = () => { const sup = isSuper(); rights.classList.toggle('is-admin', sup); superNote.hidden = !sup; roleNote.hidden = sup; presets.hidden = sup; fixedBox.hidden = sup; audienceBox.hidden = sup; syncs.forEach(f => f()); };
+  const syncRole = () => { const sup = isSuper(); rights.classList.toggle('is-admin', sup); superNote.hidden = !sup; roleNote.hidden = sup; presets.hidden = sup; fixedBox.hidden = sup; syncs.forEach(f => f()); };
   role.addEventListener('change', () => { if (isNew && role.value === 'admin') { for (const k of PERM.keys) boxes[k].checked = !!PERM.presets['Admin'][k]; } syncRole(); });
   syncRole();
-  const rightsNow = () => Object.fromEntries([['_v', 8], ...PERM.keys.map(k => [k, boxes[k].checked])]);
+  const rightsNow = () => Object.fromEntries([['_v', 6], ...PERM.keys.map(k => [k, boxes[k].checked])]);
   const save = h('button', { class: 'btn primary', type: 'button', onclick: async () => {
     err.textContent = ''; save.disabled = true; save.textContent = 'Saving…';
     try {
       const nm = name.value.trim(), pc = code.value.trim(), linked = empPick();
       if (linked === undefined) throw new Error('Pick the linked employee from the list, or leave it empty.');
       const link = linked ? { _emp: linked.code, _empName: linked.name } : {};
-      const perms = isSuper() ? link : { ...rightsNow(), ...link, _notificationAudience: { mode: audienceMode.value, users: audienceChecks.filter(c => c.box.checked).map(c => c.id) }, ...(fixed ? { _filters: fixed } : {}) };
+      const perms = isSuper() ? link : { ...rightsNow(), ...link, ...(fixed ? { _filters: fixed } : {}) };
       const r = await CLOUD.admin.save(u ? u.id : null, nm, pc, role.value, active.box.checked, perms);
       if (self) { CLOUD.admin.selfUpdated(nm); await CLOUD.refreshMe(); applyAccess(); }
       BE.appendActivity([{ time: BE.nowText(), user: BE.userName(), action: 'settings', key: '', name: nm, details: { note: (isNew ? 'Added ' : 'Updated access for ') + nm + ' · ' + rightsSummary({ role: role.value, permissions: perms }) + (fixed && !isSuper() ? ' · fixed filters: ' + filterText(fixed) : '') + (active.box.checked ? '' : ' · sign-in disabled') } }]);
