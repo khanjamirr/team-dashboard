@@ -1243,6 +1243,7 @@ body.filters-locked #cleanFilters, body.filters-locked #xchips, body.filters-loc
 #pageSummary.ov #cardAttendance { padding:18px 20px !important; border-top:3px solid var(--accent) !important; }
 #pageSummary.ov #cardWatch { padding:16px 20px !important; }
 .ov-off { display:none !important; }
+#pageSummary.ov[hidden], #pageSummary.ov > .ov-glance[hidden], #pageSummary.ov [hidden] { display:none !important; }
 /* glance tiles */
 .ov-tile { display:flex; align-items:center; gap:12px; min-width:0; padding:14px 16px; border:1px solid var(--border); border-radius:14px; background:var(--surface); color:var(--ink); font:inherit; text-align:left; cursor:pointer; transition:border-color .15s, transform .15s, box-shadow .15s; }
 .ov-tile:hover { border-color:color-mix(in srgb,var(--accent) 45%,var(--border)); box-shadow:0 4px 14px rgba(15,23,42,.07); transform:translateY(-1px); }
@@ -2885,6 +2886,7 @@ const ROLE_NAMES = { superadmin: 'Super admin', admin: 'Admin', user: 'User' };
 const VIEW_KEYS = ['ov.attendance', 'ov.coming', 'ov.holidays', 'act.items', 'act.review', 'act.health', 'rep.team', 'rep.growth', 'rep.location', 'rep.attendance', 'rep.export'];
 /* v3.17: rights that change data; everything else only lets someone see things. Used by the None / View / Edit switch per module. */
 const EDIT_KEYS = new Set(['att.approve', 'emp.edit', 'emp.add', 'emp.delete', 'emp.bulk', 'emp.fields', 'att.log', 'att.direct', 'att.edit', 'att.rows', 'att.holidays', 'att.fields', 'att.addemp', ...LOG_CODES.map(c => 'log.' + c), 'sync.auto', 'sync.save', 'filters.custom', 'set.fields', 'set.workbook']);
+const UPG = new WeakMap();
 window.PERM = {
   groups: PERM_GROUPS, keys: PERM_KEYS, roleNames: ROLE_NAMES, version: PERM_VERSION, isEditKey: k => EDIT_KEYS.has(k),
   presets: {
@@ -2923,7 +2925,9 @@ window.PERM = {
     if (!this.online()) return true; const u = CLOUD.user(); if (u.role === 'superadmin') return true;
     const p = u.permissions || {};
     if (!p._v) return true;   // rights never set: full access, as before
-    return !!this.upgrade(p)[k];
+    /* v3.18: upgrade once per rights object instead of on every check (this runs thousands of times per screen) */
+    let q = UPG.get(p); if (!q) { q = this.upgrade(p); UPG.set(p, q); }
+    return !!q[k];
   },
   /* the employee this passcode is linked to (optional): the default person in Log leave */
   linkedEmp() { const u = this.online() ? CLOUD.user() : null; const p = (u && u.permissions) || {}; return p._emp ? { code: String(p._emp), name: p._empName || '' } : null; },
@@ -7306,9 +7310,8 @@ function renderGlance() {
   box.replaceChildren(...tiles); box.hidden = !tiles.length;
   box.style.setProperty("--n", Math.max(1, tiles.length));
 }
-function organizeOverview() { for (const f of [organizeRequests, organizeUpcoming, renderGlance]) { try { f(); } catch (e) { console.warn(e); } } }
+function organizeOverview() { if (typeof state === "undefined" || state.view !== "summary" || document.getElementById("pageSummary")?.hidden) return; for (const f of [organizeRequests, organizeUpcoming, renderGlance]) { try { f(); } catch (e) { console.warn(e); } } }
 window.organizeOverview = organizeOverview;
-setInterval(() => { if (typeof state !== "undefined" && state.view === "summary" && !document.hidden) organizeOverview(); }, 4000);
 
 /* ---------- v3.17: USA federal and India gazetted holidays ---------- */
 const HOL_IN = {
@@ -9074,7 +9077,7 @@ window.applyAccess = () => {
   show('#cardAttendance', PERM.canView('attendance') && PERM.can('ov.attendance'));
   window.ATT?.renderApprovalRequests();
   show('#cardComing', PERM.can('ov.coming'));
-  show('#cardHolidays', PERM.can('ov.holidays')); window.organizeOverview?.(); if (typeof renderHolidays === 'function' && typeof state !== 'undefined' && state.view === 'summary') renderHolidays();
+  show('#cardHolidays', PERM.can('ov.holidays')); if (typeof renderHolidays === 'function' && typeof state !== 'undefined' && state.view === 'summary') { renderHolidays(); window.organizeOverview?.(); }
   show('#cardWatch', PERM.can('ov.watch'));
   show('#btnAddField', PERM.can('emp.fields'));
   show('#btnBell', PERM.can('notifications.view') || PERM.can('activity.view'));
