@@ -1192,6 +1192,13 @@ div.rmod-head { cursor:default; }
 .rmod-note { margin:0 0 8px; font-size:12px; line-height:1.45; color:var(--ink-2); }
 /* v3.14.1: the Filters card spans the full width so fixed filters can be chosen right here */
 .rmod.rmod-wide { grid-column:1 / -1; }
+.rseg { display:flex; align-items:center; gap:0; margin:0 0 8px; }
+.rseg-b { border:1px solid var(--border); background:var(--surface); color:var(--ink-2); font:inherit; font-size:11.5px; padding:3px 10px; cursor:pointer; margin-left:-1px; }
+.rseg-b:first-child { border-radius:6px 0 0 6px; margin-left:0; } .rseg-b:nth-last-child(2) { border-radius:0 6px 6px 0; }
+.rseg-b[aria-pressed="true"] { background:var(--accent); border-color:var(--accent); color:#fff; font-weight:600; }
+.rseg-b:disabled { cursor:default; opacity:.6; }
+.rseg-custom { margin-left:8px; font-size:11px; color:var(--ink-3); }
+.rmod-kind { margin:6px 0 1px; font-size:10.5px; font-weight:650; letter-spacing:.04em; text-transform:uppercase; color:var(--ink-3); }
 .rmod-sub { margin:8px 0 0 26px; padding:8px 10px; border:1px solid var(--border); border-radius:8px; background:var(--surface-2, transparent); }
 .rmod-subt { margin:0 0 2px; font-size:12px; font-weight:650; color:var(--ink); }
 .rmod-subtools { font-size:11px; color:var(--ink-2); margin-bottom:4px; }
@@ -1214,6 +1221,74 @@ div.rmod-head { cursor:default; }
 .ff-list .chk-line small { color:var(--ink-3, var(--ink-2)); font-size:10.5px; }
 .rights.is-admin .rmods { opacity:.55; }
 body.filters-locked #cleanFilters, body.filters-locked #xchips, body.filters-locked .saved-filter-row, body.filters-locked #customFieldControls { display:none !important; }
+
+/* v3.17: USA and India holidays card */
+#cardHolidays { margin-bottom:20px; padding:18px 22px; border-radius:14px; background:var(--surface); border:1px solid var(--border); }
+#cardHolidays .card-head { margin-bottom:10px; gap:8px; flex-wrap:wrap; }
+#cardHolidays .card-head h2 { font-size:15px; }
+#cardHolidays .coming { display:grid; grid-template-columns:1fr 1fr; gap:28px; }
+#cardHolidays.one .coming { grid-template-columns:1fr; }
+#cardHolidays .coming h3 { font-size:11px; color:var(--ink-2); margin:0 0 4px; }
+#cardHolidays .coming-list { list-style:none; margin:0; padding:0; max-height:220px; overflow:auto; }
+.coming-avatar.hol { background:var(--surface-2); font-size:17px; }
+.hol-obs { color:var(--ink-3); }
+@media(max-width:650px) { #cardHolidays .coming { grid-template-columns:1fr; gap:14px; } #cardHolidays { padding:14px; } }
+
+/* ================= v3.18: Overview — one organized dashboard ================= */
+#pageSummary.ov { display:grid !important; grid-template-columns:minmax(0,1fr) minmax(340px,420px) !important; grid-template-areas:"glance glance" "main side"; gap:16px !important; align-items:start !important; }
+#pageSummary.ov > .ov-glance { grid-area:glance; display:grid; grid-template-columns:repeat(var(--n,4),minmax(0,1fr)); gap:12px; }
+#pageSummary.ov > .ov-main { grid-area:main; display:flex; flex-direction:column; gap:16px; min-width:0; }
+#pageSummary.ov > .ov-side { grid-area:side; display:flex; flex-direction:column; gap:16px; min-width:0; position:sticky; top:12px; }
+#pageSummary.ov .card { margin:0 !important; grid-column:auto !important; grid-row:auto !important; border-radius:14px !important; border:1px solid var(--border) !important; box-shadow:0 1px 2px rgba(15,23,42,.04) !important; background:var(--surface) !important; }
+#pageSummary.ov #cardAttendance { padding:18px 20px !important; border-top:3px solid var(--accent) !important; }
+#pageSummary.ov #cardWatch { padding:16px 20px !important; }
+.ov-off { display:none !important; }
+/* glance tiles */
+.ov-tile { display:flex; align-items:center; gap:12px; min-width:0; padding:14px 16px; border:1px solid var(--border); border-radius:14px; background:var(--surface); color:var(--ink); font:inherit; text-align:left; cursor:pointer; transition:border-color .15s, transform .15s, box-shadow .15s; }
+.ov-tile:hover { border-color:color-mix(in srgb,var(--accent) 45%,var(--border)); box-shadow:0 4px 14px rgba(15,23,42,.07); transform:translateY(-1px); }
+.ov-tile:focus-visible { outline:2px solid var(--accent); outline-offset:2px; }
+.ov-ic { flex:none; width:40px; height:40px; border-radius:12px; display:flex; align-items:center; justify-content:center; font-size:20px; background:var(--surface-2); }
+.ov-tile.t-leave .ov-ic { background:color-mix(in srgb,var(--c-aqua) 18%,var(--surface)); }
+.ov-tile.t-req .ov-ic { background:color-mix(in srgb,var(--c-blue) 16%,var(--surface)); }
+.ov-tile.t-req.hot { border-color:color-mix(in srgb,var(--c-orange) 55%,var(--border)); }
+.ov-tile.t-cel .ov-ic { background:color-mix(in srgb,var(--c-violet) 16%,var(--surface)); }
+.ov-tile.t-hol .ov-ic { background:color-mix(in srgb,var(--c-yellow) 22%,var(--surface)); }
+.ov-tx { display:flex; flex-direction:column; min-width:0; gap:1px; }
+.ov-tx small { font-size:11px; font-weight:600; letter-spacing:.03em; text-transform:uppercase; color:var(--ink-2); }
+.ov-tx b { font-size:21px; font-weight:700; line-height:1.2; white-space:nowrap; overflow:hidden; text-overflow:ellipsis; font-variant-numeric:tabular-nums; }
+.ov-tile.t-hol .ov-tx b { font-size:15px; line-height:1.5; }
+.ov-tx em { font-style:normal; font-size:12px; color:var(--ink-2); white-space:nowrap; overflow:hidden; text-overflow:ellipsis; }
+/* side cards: Request Center and Coming up */
+#pageSummary.ov .request-cards { display:block !important; padding:14px 16px !important; }
+#pageSummary.ov .request-cards[hidden] { display:none !important; }
+#pageSummary.ov .request-cards > section { margin:0; }
+.ov-up-head { display:flex; flex-direction:column; gap:10px; margin-bottom:10px; }
+.ov-up-head h2 { margin:0; font-size:15px; font-weight:700; }
+#pageSummary.ov #requestCenterTitle { margin:0 !important; padding:0 !important; border:0 !important; font-size:15px !important; }
+.ov-tabs { display:flex; gap:4px; padding:3px; border-radius:10px; background:var(--surface-2); overflow-x:auto; }
+.ov-tabs[hidden] { display:none; }
+.ov-tab { flex:1 1 auto; min-width:0; display:inline-flex; align-items:center; justify-content:center; gap:5px; padding:6px 8px; border:0; border-radius:8px; background:transparent; color:var(--ink-2); font:inherit; font-size:12.5px; font-weight:600; white-space:nowrap; cursor:pointer; }
+.ov-tab[aria-selected="true"] { background:var(--surface); color:var(--ink); box-shadow:0 1px 3px rgba(15,23,42,.12); }
+.ov-tl { min-width:0; overflow:hidden; text-overflow:ellipsis; }
+.ov-n { flex:none; min-width:20px; padding:0 6px; border-radius:999px; background:color-mix(in srgb,var(--ink-2) 14%,transparent); font-size:11px; line-height:18px; text-align:center; font-variant-numeric:tabular-nums; }
+.ov-n.hot { background:var(--c-orange); color:#fff; }
+#pageSummary.ov .ov-up { padding:14px 16px !important; }
+#pageSummary.ov .ov-up[hidden] { display:none !important; }
+#pageSummary.ov .ov-up > .card { padding:0 !important; border:0 !important; box-shadow:none !important; background:transparent !important; border-radius:0 !important; }
+#pageSummary.ov .ov-up > .card .card-head { margin:0 0 8px !important; display:flex; justify-content:flex-end; }
+#pageSummary.ov .ov-up > .card .card-head .grow { display:none; }
+#pageSummary.ov .ov-up .coming { display:block !important; }
+#pageSummary.ov .ov-up .coming-group + .coming-group { margin-top:12px; }
+#pageSummary.ov .ov-up .coming-list { max-height:300px !important; }
+#pageSummary.ov #coming[data-show="bday"] > .coming-group:nth-child(2), #pageSummary.ov #coming[data-show="anniv"] > .coming-group:nth-child(1) { display:none; }
+#pageSummary.ov #coming > .coming-group > h3 { display:none; }
+#pageSummary.ov #holidays > .coming-group > h3 { font-size:11px; font-weight:700; letter-spacing:.03em; text-transform:uppercase; color:var(--ink-2); margin:0 0 4px; }
+@media (max-width:1180px) {
+  #pageSummary.ov { grid-template-columns:minmax(0,1fr) !important; grid-template-areas:"glance" "main" "side"; }
+  #pageSummary.ov > .ov-side { position:static; display:grid; grid-template-columns:repeat(auto-fit,minmax(min(100%,320px),1fr)); align-items:start; }
+  #pageSummary.ov > .ov-glance { grid-template-columns:repeat(auto-fit,minmax(min(100%,300px),1fr)); }
+}
+@media (max-width:650px) { .ov-tile { padding:12px; } .ov-ic { width:34px; height:34px; font-size:17px; } .ov-tx b { font-size:18px; } }
 </style></head>
 
 
@@ -1274,14 +1349,32 @@ body.filters-locked #cleanFilters, body.filters-locked #xchips, body.filters-loc
   </div>
 
   <main id="mainContent" tabindex="-1">
-    <div id="pageSummary"><section class="request-cards" aria-labelledby="requestCenterTitle"><h2 id="requestCenterTitle">Request Center</h2><section id="cardMyRequests" style="grid-column:1 / -1;min-width:0" aria-label="Your requests" hidden></section><section id="cardRejectedRequests" style="grid-column:1 / -1;min-width:0" aria-label="Rejected request log" hidden></section><section id="cardApprovalRequests" style="grid-column:1 / -1;min-width:0" aria-label="Approval requests" hidden></section></section>        <div class="card c-att" id="cardAttendance" aria-label="Attendance"></div><div class="card c-coming" id="cardComing" aria-label="Upcoming birthdays and work anniversaries">
+    <div id="pageSummary" class="ov">
+      <div class="ov-glance" id="ovGlance" aria-label="Today at a glance"></div>
+      <div class="ov-main">
+        <div class="card c-att" id="cardAttendance" aria-label="Attendance"></div>
+        <div class="card c-watch" id="cardWatch" aria-label="Leave watch" hidden></div>
+      </div>
+      <aside class="ov-side">
+        <section class="request-cards card" id="ovRequests" aria-labelledby="requestCenterTitle"><div class="ov-up-head"><h2 id="requestCenterTitle">Request Center</h2><div class="ov-tabs" id="rcTabs" role="tablist" aria-label="Request Center"></div></div><section id="cardMyRequests" style="grid-column:1 / -1;min-width:0" aria-label="Your requests" hidden></section><section id="cardRejectedRequests" style="grid-column:1 / -1;min-width:0" aria-label="Rejected request log" hidden></section><section id="cardApprovalRequests" style="grid-column:1 / -1;min-width:0" aria-label="Approval requests" hidden></section></section>
+        <section class="card ov-up" id="ovUpcoming" aria-labelledby="ovUpTitle">
+          <div class="ov-up-head"><h2 id="ovUpTitle">Coming up</h2><div class="ov-tabs" id="ovUpTabs" role="tablist" aria-label="Coming up"></div></div>
+        <div class="card c-coming" id="cardComing" aria-label="Upcoming birthdays and work anniversaries">
           <div class="card-head">
             <div class="grow"><h2 id="comingTitle">Coming up in the next 14 days</h2><div class="sub">Birthdays and work anniversaries of current team members</div></div>
-            <label class="hint" style="display:flex;align-items:center;gap:6px">Show <select class="input mini" id="comingDays" style="width:auto;min-width:0;height:28px"><option value="7">7 days</option><option value="14" selected>14 days</option><option value="30">30 days</option></select></label>
+            <label class="hint" style="display:flex;align-items:center;gap:6px">Show <select class="input mini" id="comingDays" style="width:auto;min-width:0;height:28px"><option value="7">7 days</option><option value="14" selected>14 days</option><option value="30">30 days</option><option value="60">60 days</option><option value="90">90 days</option><option value="180">180 days</option></select></label>
           </div>
           <div class="coming" id="coming"></div>
         </div>
-        <div class="card c-watch" id="cardWatch" aria-label="Leave watch" hidden></div>
+        <div class="card c-coming" id="cardHolidays" aria-label="USA and India holidays">
+          <div class="card-head">
+            <div class="grow"><h2 id="holTitle">Holidays · next 90 days</h2><div class="sub">🇺🇸 USA federal holidays and 🇮🇳 India gazetted holidays</div></div>
+            <label class="hint" style="display:flex;align-items:center;gap:6px"><select class="input mini" id="holCountry" style="width:auto;min-width:0;height:28px" aria-label="Country"><option value="both">Both</option><option value="US">🇺🇸 USA</option><option value="IN">🇮🇳 India</option></select><select class="input mini" id="holDays" style="width:auto;min-width:0;height:28px" aria-label="How far ahead"><option value="30">30 days</option><option value="90" selected>90 days</option><option value="180">180 days</option><option value="365">1 year</option></select></label>
+          </div>
+          <div class="coming" id="holidays"></div>
+        </div>
+        </section>
+      </aside>
     </div>
 
     <div id="pageReports" hidden><div id="reportSticky"><div class="report-controls"><label for="reportGroup">Explore</label><select class="input" id="reportGroup"><option value="team" selected>Team composition</option><option value="growth">Tenure & growth</option><option value="location">Location & travel</option><option value="attendance">Attendance</option></select><button class="btn mini rep-toggle" id="repTables" type="button" aria-pressed="false" title="Show every chart on this page as a table, or back">Show all as tables</button></div></div>      <section class="charts" id="charts" aria-label="Charts">
@@ -2766,9 +2859,9 @@ const CLOUD = (() => {
 (() => {
 /* v3.13: rights are grouped by module. A module with a page has a "can open" box; its items sit underneath. */
 const PERM_GROUPS = [
-  { name: 'Overview', page: 'page.overview', items: [['ov.attendance', 'See the attendance card'], ['ov.coming', 'See birthdays and work anniversaries'], ['ov.watch', 'See leave red flags and day patterns']], sub: { title: 'Request Center', items: [['requests.own', 'See Your requests'], ['requests.rejected', 'See Rejected request log (within notification audience)'], ['requests.approvals', 'See Approval requests'], ['att.approve', 'Approve or reject leave requests and edit approved leave']] } },
+  { name: 'Overview', page: 'page.overview', items: [['ov.attendance', 'See the attendance card'], ['ov.openatt', 'See the “Open attendance →” button on the attendance card'], ['ov.coming', 'See birthdays and work anniversaries'], ['ov.holidays', 'See USA and India holidays'], ['ov.watch', 'See leave red flags and day patterns']], sub: { title: 'Request Center', items: [['requests.own', 'See Your requests'], ['requests.rejected', 'See Rejected request log (within notification audience)'], ['requests.approvals', 'See Approval requests'], ['att.approve', 'Approve or reject leave requests and edit approved leave']] } },
   { name: 'Employees', page: 'page.employees', items: [['emp.edit', 'Edit employee details'], ['emp.add', 'Add employees'], ['emp.delete', 'Delete employees'], ['emp.bulk', 'Fill in bulk and add columns'], ['emp.fields', 'Add new fields (new Excel columns)']] },
-  { name: 'Attendance', page: 'page.attendance', items: [['att.who', 'See Who’s out'], ['att.grid', 'See the attendance grid and People'], ['att.log', 'Use Log leave (with the leave types ticked below)'], ['att.direct', 'Log leave straight into attendance (no manager approval)'], ['att.edit', 'Mark and edit attendance'], ['att.holidays', 'Mark holidays for everyone'], ['att.fields', 'Add fields to the attendance tracker']],
+  { name: 'Attendance', page: 'page.attendance', items: [['att.who', 'See Who’s out'], ['att.grid', 'See the attendance grid and People'], ['att.log', 'Use Log leave (with the leave types ticked below)'], ['att.direct', 'Log leave straight into attendance (no manager approval)'], ['att.edit', 'Mark attendance in day cells'], ['att.rows', 'Edit any cell or row in the tracker (names, Emp IDs, clients, days) and delete rows'], ['att.holidays', 'Add holidays for everyone'], ['att.fields', 'Add fields to the attendance tracker'], ['att.addemp', 'Add employees to the attendance tracker (new rows, start a month)']],
     /* v3.14.2: which leave types appear in the Log leave “Type” list */
     sub: { title: 'Leave types in Log leave', items: [['log.LA', 'LA · Leave application (pending)'], ['log.AL', 'AL · Approved leave'], ['log.CL', 'CL · Casual leave'], ['log.SL', 'SL · Sick leave'], ['log.UL', 'UL · Unplanned leave'], ['log.AB', 'AB · Absent'], ['log.HD1', 'HD1 · Half day, 1st half'], ['log.HD2', 'HD2 · Half day, 2nd half'], ['log.R', 'R · Remote'], ['log.L', 'L · Late coming'], ['log.C', 'C · Cab late']] } },
   { name: 'Action center', page: 'page.actions', items: [['act.items', 'See Action items'], ['act.review', 'See Designation reviews'], ['act.health', 'See Attendance data health']] },
@@ -2779,7 +2872,7 @@ const PERM_GROUPS = [
   { name: 'Filters', items: [['filters.custom', 'Change the filters (search, status, client…)']] },
   { name: 'Settings', items: [['set.fields', 'Choose the mandatory fields'], ['set.workbook', 'Backups, sign-in history and replacing the workbook'], ['workbook.download', 'Download a copy of the workbook'], ['tools.distance', 'Use the distance tool']] },
 ];
-const PERM_VERSION = 8;
+const PERM_VERSION = 10;
 const LOG_CODES = ['AL', 'CL', 'SL', 'UL', 'AB', 'HD1', 'HD2', 'LA', 'R', 'L', 'C'];
 /* the leave types a passcode could log before 3.14.2 (approval codes with Approve leave, LA always, the rest with Mark and edit) */
 const oldLogKeys = p => LOG_CODES.filter(c => ['AL', 'CL', 'SL'].includes(c) ? p['att.approve'] : c === 'LA' ? true : p['att.edit']).map(c => 'log.' + c);
@@ -2789,14 +2882,16 @@ const PAGE_OF = { summary: 'page.overview', employees: 'page.employees', attenda
 const pick = keys => Object.fromEntries([['_v', PERM_VERSION], ...PERM_KEYS.map(k => [k, ['notifications.view', 'requests.own', 'requests.rejected'].includes(k) || (k === 'requests.approvals' && keys.includes('att.approve')) || keys.includes(k)])]);
 const ROLE_NAMES = { superadmin: 'Super admin', admin: 'Admin', user: 'User' };
 /* v3.14: what a page shows by default once someone may open it (red flags and new fields stay off until ticked) */
-const VIEW_KEYS = ['ov.attendance', 'ov.coming', 'act.items', 'act.review', 'act.health', 'rep.team', 'rep.growth', 'rep.location', 'rep.attendance', 'rep.export'];
+const VIEW_KEYS = ['ov.attendance', 'ov.coming', 'ov.holidays', 'act.items', 'act.review', 'act.health', 'rep.team', 'rep.growth', 'rep.location', 'rep.attendance', 'rep.export'];
+/* v3.17: rights that change data; everything else only lets someone see things. Used by the None / View / Edit switch per module. */
+const EDIT_KEYS = new Set(['att.approve', 'emp.edit', 'emp.add', 'emp.delete', 'emp.bulk', 'emp.fields', 'att.log', 'att.direct', 'att.edit', 'att.rows', 'att.holidays', 'att.fields', 'att.addemp', ...LOG_CODES.map(c => 'log.' + c), 'sync.auto', 'sync.save', 'filters.custom', 'set.fields', 'set.workbook']);
 window.PERM = {
-  groups: PERM_GROUPS, keys: PERM_KEYS, roleNames: ROLE_NAMES,
+  groups: PERM_GROUPS, keys: PERM_KEYS, roleNames: ROLE_NAMES, version: PERM_VERSION, isEditKey: k => EDIT_KEYS.has(k),
   presets: {
     'Full access': pick(PERM_KEYS),
     'Admin': pick(PERM_KEYS),
-    'Editor': pick([...PAGES, ...VIEW_KEYS, ...oldLogKeys({ 'att.edit': true }), 'emp.edit', 'emp.add', 'emp.bulk', 'att.who', 'att.grid', 'att.log', 'att.edit', 'filters.custom', 'activity.view', 'tools.distance', 'sync.view', 'sync.auto', 'sync.save']),
-    'Leave approver': pick([...PAGES, ...VIEW_KEYS, ...LOG_CODES.map(c => 'log.' + c), 'att.direct', 'ov.watch', 'att.who', 'att.grid', 'att.log', 'att.edit', 'att.approve', 'filters.custom', 'activity.view', 'sync.view', 'sync.auto', 'sync.save']),
+    'Editor': pick([...PAGES, ...VIEW_KEYS, 'ov.openatt', ...oldLogKeys({ 'att.edit': true }), 'emp.edit', 'emp.add', 'emp.bulk', 'att.who', 'att.grid', 'att.log', 'att.edit', 'att.rows', 'att.addemp', 'filters.custom', 'activity.view', 'tools.distance', 'sync.view', 'sync.auto', 'sync.save']),
+    'Leave approver': pick([...PAGES, ...VIEW_KEYS, 'ov.openatt', ...LOG_CODES.map(c => 'log.' + c), 'att.direct', 'ov.watch', 'att.who', 'att.grid', 'att.log', 'att.edit', 'att.rows', 'att.approve', 'filters.custom', 'activity.view', 'sync.view', 'sync.auto', 'sync.save']),
     'Leave logger': pick(['page.overview', 'page.attendance', 'ov.attendance', 'ov.coming', 'att.who', 'att.log', 'log.LA', 'sync.save']),
     'View only': pick([...PAGES, ...VIEW_KEYS, 'att.who', 'att.grid']),
   },
@@ -2810,6 +2905,10 @@ window.PERM = {
     if (!p || !p._v) return p;
     const q = { ...p };
     if (q._v < 7) q['notifications.view'] = true;
+    /* v3.16: editing rows and adding employees in the tracker became their own rights; keep what Mark and edit used to allow */
+    if (q._v < 9) { q['att.rows'] = !!q['att.edit']; q['att.addemp'] = !!q['att.edit']; }
+    /* v3.17: the Open attendance button must be given on purpose; the holidays card is shown to anyone who sees the Overview */
+    if (q._v < 10) { q['ov.openatt'] = false; q['ov.holidays'] = !!q['page.overview']; }
     if (q._v < 8) { q['requests.own'] = true; q['requests.rejected'] = true; q['requests.approvals'] = !!q['att.approve']; }
     if (q._v < 2) { q['att.who'] = !!q['page.attendance']; q['att.grid'] = !!q['page.attendance']; q['att.log'] = !!q['att.edit']; }
     if (q._v < 3) { q['filters.custom'] = true; q['set.fields'] = false; q['set.workbook'] = false; }
@@ -2830,7 +2929,7 @@ window.PERM = {
   linkedEmp() { const u = this.online() ? CLOUD.user() : null; const p = (u && u.permissions) || {}; return p._emp ? { code: String(p._emp), name: p._empName || '' } : null; },
   /* filters the super admin fixed for this passcode (optional) */
   fixedFilters() { const u = this.online() ? CLOUD.user() : null; const f = u && u.permissions && u.permissions._filters; return f && typeof f === 'object' ? f : null; },
-  canWrite() { return (this.online() && Array.isArray(CLOUD.user()?.permissions?._attendanceFields) && CLOUD.user().permissions._attendanceFields.length > 0) || ['emp.edit', 'emp.add', 'emp.delete', 'emp.bulk', 'emp.fields', 'att.log', 'att.edit', 'att.approve', 'att.holidays', 'att.fields'].some(k => this.can(k)); },
+  canWrite() { return (this.online() && Array.isArray(CLOUD.user()?.permissions?._attendanceFields) && CLOUD.user().permissions._attendanceFields.length > 0) || ['emp.edit', 'emp.add', 'emp.delete', 'emp.bulk', 'emp.fields', 'att.log', 'att.edit', 'att.rows', 'att.addemp', 'att.approve', 'att.holidays', 'att.fields'].some(k => this.can(k)); },
   canView(view) { return view === 'settings' || this.can(PAGE_OF[view] || 'page.overview'); },
   firstView() { return Object.keys(PAGE_OF).find(v => this.canView(v)) || 'summary'; },
 };
@@ -3438,14 +3537,17 @@ function codeAllowed(oldC, newC) {
   /* in Log leave, a type the super admin ticked may be logged; replacing approved leave or a holiday still needs the usual right */
   if (LOG_CTX && LOG_TYPES.includes(n) && logTypeAllowed(n)) { if (APPROVAL_CODES.has(o)) return can('att.approve'); if (o === 'H') return can('att.edit') || can('att.holidays'); return true; }
   if (APPROVAL_CODES.has(n) || APPROVAL_CODES.has(o)) return can('att.approve');
-  if (n === 'H' || o === 'H') return can('att.edit') || can('att.holidays');
-  return can('att.edit') || (LOG_CTX && can('att.log'));
+  if (n === 'H' || o === 'H') return can('att.edit') || can('att.rows') || can('att.holidays');
+  return can('att.edit') || can('att.rows') || (LOG_CTX && can('att.log'));
 }
 const permError = msg => Object.assign(new Error(msg), { perm: true });
 const allowedInLog = (o, n) => { const was = LOG_CTX; LOG_CTX = true; try { return codeAllowed(o, n); } finally { LOG_CTX = was; } };
 function mutate(desc, fn, opts = {}) {
   if (S.saving) { toast("Saving to Excel. Please wait a moment."); return false; }
-  if (!(can('att.edit') || (opts.cells && can('att.approve')) || (opts.holiday && can('att.holidays')) || (opts.log && can('att.log')) || (opts.fields && can('att.fields')) || (opts.fieldName && canFillField(opts.fieldName)))) { toast('Your passcode can view attendance but not change this. Ask the admin for the right in Settings.'); return false; }
+  /* v3.16: row edits and new employees need their own rights; everything else keeps the old checks */
+  if (opts.addEmp && !can('att.addemp')) { toast('Your passcode can’t add employees to the attendance tracker. Ask the admin for the right in Settings.'); return false; }
+  if (opts.rows && !can('att.rows')) { toast('Your passcode can’t edit or delete rows in the attendance tracker. Ask the admin for the right in Settings.'); return false; }
+  if (!(opts.addEmp || opts.rows || can('att.edit') || (opts.cells && can('att.approve')) || (opts.holiday && can('att.holidays')) || (opts.log && can('att.log')) || (opts.fields && can('att.fields')) || (opts.fieldName && canFillField(opts.fieldName)))) { toast('Your passcode can view attendance but not change this. Ask the admin for the right in Settings.'); return false; }
   S.undo.push({ rows: snapshot(), log: S.changes.length, nf: (S.newFields || []).length });
   if (S.undo.length > 60) S.undo.shift();
   const before = S.rows.length;
@@ -3514,7 +3616,7 @@ const APP_VIEWS = ['who', 'grid', 'people'];
 const viewAllowed = v => v === 'who' ? can('att.who') : (v === 'grid' || v === 'people') ? can('att.grid') : true;
 const viewOf = () => { if (S.mode === 'health') return 'health'; if (S.mode === 'reports') return 'reports'; let v = APP_VIEWS.includes(S.ui.view) ? S.ui.view : 'grid'; if (!viewAllowed(v)) v = APP_VIEWS.find(viewAllowed) || v; return v; };
 const CARD_KEY = 'att_card_ui_v1';
-try { const c = JSON.parse(localStorage.getItem(CARD_KEY) || '{}'); for (const k of ['past', 'next']) if (c[k] >= 1 && c[k] <= 90) S.ui.card[k] = c[k]; if (['all', 'approved', 'applied', 'sick', 'unplanned', 'half'].includes(c.kind)) S.ui.card.kind = c.kind; if (['today', 'history'].includes(c.view)) S.ui.card.view = c.view; if (['real', 'pseudo'].includes(c.names)) S.ui.card.names = c.names; } catch { }
+try { const c = JSON.parse(localStorage.getItem(CARD_KEY) || '{}'); for (const k of ['past', 'next']) if (c[k] >= 1 && c[k] <= 180) S.ui.card[k] = c[k]; if (['all', 'approved', 'applied', 'sick', 'unplanned', 'half'].includes(c.kind)) S.ui.card.kind = c.kind; if (['today', 'history'].includes(c.view)) S.ui.card.view = c.view; if (['real', 'pseudo'].includes(c.names)) S.ui.card.names = c.names; } catch { }
 const saveCardUi = () => { try { const { past, next, kind, view, names } = S.ui.card; localStorage.setItem(CARD_KEY, JSON.stringify({ past, next, kind, view, names })); } catch { } };
 const notify = () => { try { window.dispatchEvent(new CustomEvent('att:data')); } catch { } };
 
@@ -3906,7 +4008,7 @@ async function addLink(trackerName, rr, rewrite) {
   try { await saveLinks(); } catch (e) { toast('The link works for now but could not be saved in this browser: ' + e.message); }
   await BE.appendActivity([{ time: BE.nowText(), user: BE.userName(), action: 'att-link', key: code, name: rname, att: S.fileName || 'attendance', details: { note: `Linked the tracker name “${tname}” to “${rname}” (${code || 'no Emp Code'}) in the workforce file` } }]);
   resetMatch();
-  if (rewrite) mutate(`Renamed ${tname} to match the workforce (${rname}, ${code})`, () => { for (const r of S.rows) if (personKey(r.name) === k) { r.name = rname; const id = parseId(code); if (id != null) r.empId = id; } });
+  if (rewrite) mutate(`Renamed ${tname} to match the workforce (${rname}, ${code})`, () => { for (const r of S.rows) if (personKey(r.name) === k) { r.name = rname; const id = parseId(code); if (id != null) r.empId = id; } }, { rows: true });
   if (S.act) S.act.items = null; render(); notify();
   toast(`Linked “${tname}” to “${rname}”.${rewrite ? ' The tracker rows were renamed. Review, then Save to Excel.' : ''}`);
 }
@@ -3998,7 +4100,7 @@ function shellHtml() {
   return `<div class="topbar">
       ${left}
       <span class="grow"></span>
-      ${can('att.fields') || attFieldNames().length ? `<button class="btn" data-act="att-fields" id="btnAttFields" title="Extra fields in the attendance tracker (columns after AM)">${ic('plus')} Fields</button>` : ''}
+      ${can('att.fields') || attFieldNames().some(canFillField) ? `<button class="btn" data-act="att-fields" id="btnAttFields" title="Extra fields in the attendance tracker (columns after AM)">${ic('plus')} Fields</button>` : ''}
       <button class="btn" data-act="undo" id="btnUndo">${ic('undo')} Undo</button>
       <button class="btn ghost syncbtn" data-act="sync-panel" id="btnSync" title="Save to Excel, file connections and shared-copy status">${ic('save')} <span id="syncBtnText">Save &amp; sync</span></button>
     </div>
@@ -4240,7 +4342,7 @@ function attTimelineCard(periodRowsList) {
   const past = buckets.filter(x => !x.future && !(unitDay && x.wk)), avg = past.length ? past.reduce((a, x) => a + x.total, 0) / past.length : 0, peak = past.reduce((p, x) => (!p || x.total > p.total ? x : p), null);
   const people = new Set(); buckets.forEach(bk => bk.people.forEach(r => people.add(personKey(r.name))));
   const unitName = unitDay ? 'working day' : u.by;
-  const summary = past.length ? `Average <b>${fmt(Math.round(avg * 10) / 10)}</b> per ${unitName} · <b>${people.size}</b> people in total` + (peak && peak.total ? ` · busiest <b>${esc(unitDay ? longDate(peak.start) : peak.label)}</b> (${peak.total})` : '') : `<b>${people.size}</b> people in total`;
+  const summary = past.length ? `Average <b>${fmt(Math.round(avg * 10) / 10)}</b> per ${unitName} · <b>${people.size}</b> people in total` + (peak && peak.total ? ` · <span title="The ${unitName} in this range with the most people on leave">busiest ${unitName} (most people out)</span> <b>${esc(unitDay ? longDate(peak.start) : peak.label)}</b> (${peak.total})` : '') : `<b>${people.size}</b> people in total`;
   window.attendanceTimelineExport = { title: 'Attendance timeline · ' + (range ? isoDate(range[0]) + ' to ' + isoDate(range[1]) : ''), headers: [unitDay ? 'Date' : u.by === 'week' ? 'Week starting' : 'Month', ...series.map(s => s.name), 'Total', 'People'], rows: buckets.map(bk => [u.by === 'month' ? bk.label : isoDate(bk.start), ...bk.c, bk.total, bk.people.size]) };
   return `<div class="card" style="margin-bottom:14px">${head.replace('<span class="sm muted" id="tlSummary"></span>', `<span class="sm muted">${summary}</span>`)}${sub}${tlFilterBar(range)}
     ${asTables() ? rtable(window.attendanceTimelineExport, ['People']) : `<div class="tl-scroll" data-key="${esc(u.range + u.from + u.to + u.by + u.hideWk)}" style="overflow-x:auto;overflow-y:hidden;padding-bottom:4px"><svg class="chart tl" viewBox="0 0 ${W} ${H}" width="${W}" height="${H}" style="width:${W}px;max-width:none;min-width:${W}px" role="img" aria-label="Attendance timeline">${g}${bars}${xl}</svg></div>`}</div>`;
@@ -4254,6 +4356,51 @@ function rtable(exp, noSum = []) {
   const sums = exp.headers.map((hd, j) => cols[j] && !noSum.includes(hd) ? exp.rows.reduce((a, r) => a + (num(r[j]) ? r[j] : 0), 0) : null);
   const cell = (v, j) => `<td class="${cols[j] ? 'n' : ''}">${num(v) ? fmt(v) : esc(v ?? '')}</td>`;
   return `<div class="rtab-wrap"><table class="rtab"><thead><tr>${exp.headers.map((hd, j) => `<th class="${cols[j] ? 'n' : ''}">${esc(hd)}</th>`).join('')}</tr></thead><tbody>${exp.rows.map(r => `<tr>${r.map(cell).join('')}</tr>`).join('')}${exp.rows.length > 1 && sums.some(s => s != null) ? `<tr class="tot"><td>Total</td>${sums.slice(1).map((s, j) => `<td class="${cols[j + 1] ? 'n' : ''}">${s == null ? '' : fmt(s)}</td>`).join('')}</tr>` : ''}</tbody></table></div>`;
+}
+/* v3.17: leave seasonality — which calendar month people usually take the most leave, from every past month in the tracker */
+function leaveSeasonality() {
+  const d = D(), MONTH_FULL = ['January', 'February', 'March', 'April', 'May', 'June', 'July', 'August', 'September', 'October', 'November', 'December'];
+  const cal = Array.from({ length: 12 }, (_, i) => ({ i, name: MONTH_FULL[i], short: MONTHS[i], days: 0, rows: 0, years: new Set() }));
+  const people = new Map();
+  for (const m of d.months) {
+    if (m > TODAY_MS) continue;
+    const dt = dateOf(m, 0), ci = dt.getUTCMonth();
+    const rows = (d.byMonth.get(m) || []).filter(r => S.ui.client === 'all' || clientGroup(r.client) === S.ui.client);
+    if (!rows.length) continue;
+    const c = cal[ci]; c.years.add(dt.getUTCFullYear());
+    for (const r of rows) {
+      const v = rowStats(r).total; c.days += v; c.rows++;
+      const k = personKey(r.name), o = people.get(k) || { label: r.name.trim(), total: 0, by: new Array(12).fill(0) };
+      o.total += v; o.by[ci] += v; people.set(k, o);
+    }
+  }
+  for (const c of cal) c.avg = c.rows ? c.days / c.rows : 0;
+  const withData = cal.filter(c => c.rows), overall = withData.length ? withData.reduce((a, c) => a + c.days, 0) / withData.reduce((a, c) => a + c.rows, 0) : 0;
+  const ranked = [...withData].sort((a, b) => b.avg - a.avg);
+  const ppl = [...people.values()].filter(o => o.total >= 3).map(o => { const top = o.by.indexOf(Math.max(...o.by)); return { ...o, top, share: o.total ? o.by[top] / o.total : 0 }; }).sort((a, b) => b.total - a.total);
+  return { cal, withData, ranked, overall, ppl, MONTH_FULL };
+}
+function seasonalityCard() {
+  const z = leaveSeasonality();
+  if (z.withData.length < 2) return `<div class="card" style="margin-bottom:14px"><h2>When people take leave</h2><div class="sub">Needs at least two months of attendance history.</div></div>`;
+  const max = Math.max(...z.cal.map(c => c.avg), 0.01), top3 = z.ranked.slice(0, 3).filter(c => c.avg > 0), low = z.ranked[z.ranked.length - 1];
+  const pct = c => z.overall ? Math.round((c.avg / z.overall - 1) * 100) : 0;
+  const cols = z.cal.map(c => { const hot = top3.includes(c), hgt = c.rows ? Math.max(3, Math.round(c.avg / max * 120)) : 0;
+    const tip = c.rows ? `<b>${c.name}</b><br>${fmt(Math.round(c.avg * 100) / 100)} leave days per person<br>${fmt(c.days)} leave days · ${c.rows} person-months<br>${[...c.years].sort().join(', ')}` : `<b>${c.name}</b><br>No history yet`;
+    return `<div data-tip="${esc(tip)}" style="flex:1;min-width:0;display:flex;flex-direction:column;align-items:center;justify-content:flex-end;gap:4px;height:160px">
+      <span style="font-size:10.5px;font-variant-numeric:tabular-nums;color:var(--ink-2)">${c.rows ? (Math.round(c.avg * 10) / 10) : '–'}</span>
+      <div style="width:70%;max-width:34px;height:${hgt}px;border-radius:4px 4px 0 0;background:${hot ? 'var(--accent)' : 'color-mix(in srgb, var(--accent) 30%, transparent)'}"></div>
+      <span style="font-size:11px;${hot ? 'font-weight:700;color:var(--ink)' : 'color:var(--ink-2)'}">${c.short}</span></div>`; }).join('');
+  const insight = top3.length ? `People usually take the most leave in <b>${top3.map(c => c.name).join('</b>, <b>')}</b>. ${esc(top3[0].name)} averages <b>${fmt(Math.round(top3[0].avg * 10) / 10)}</b> leave days per person, ${pct(top3[0]) >= 0 ? pct(top3[0]) + '% above' : -pct(top3[0]) + '% below'} a typical month (${fmt(Math.round(z.overall * 10) / 10)}). Quietest: <b>${esc(low.name)}</b> (${fmt(Math.round(low.avg * 10) / 10)}).` : 'No leave recorded yet.';
+  const missing = z.cal.filter(c => !c.rows).map(c => c.short);
+  const rowsHtml = z.ppl.slice(0, 12).map(o => `<tr><td>${esc(o.label)}</td><td><b>${z.MONTH_FULL[o.top]}</b></td><td class="n">${fmt(o.by[o.top])} of ${fmt(o.total)}</td><td class="n">${Math.round(o.share * 100)}%</td></tr>`).join('');
+  window.attendanceExportData = window.attendanceExportData || [];
+  return `<div class="card" style="margin-bottom:14px"><h2>When people take leave · by month of the year</h2>
+    <div class="sub">Average leave days per person in each calendar month, across all attendance history${S.ui.client !== 'all' ? ' for ' + esc(S.ui.client) : ''}. Months after today are left out. Hover a bar for details.</div>
+    <p style="margin:8px 0 12px;font-size:13px;line-height:1.5">💡 ${insight}${missing.length ? ` <span class="sm muted">No history yet for ${missing.join(', ')}.</span>` : ''}</p>
+    <div style="display:flex;gap:4px;align-items:flex-end;padding:0 4px;border-bottom:1px solid var(--line)">${cols}</div>
+    ${rowsHtml ? `<h3 style="margin:16px 0 6px;font-size:13px">Each person’s usual leave month</h3><div class="sub">People with 3+ leave days in the history, most leave first. “Share” is how much of their leave falls in that month.</div>
+    <div class="rtab-wrap" style="max-height:260px;overflow:auto"><table class="rtab" style="width:100%"><thead><tr><th>Employee</th><th>Usually takes leave in</th><th class="n">Days that month</th><th class="n">Share</th></tr></thead><tbody>${rowsHtml}</tbody></table></div>` : ''}</div>`;
 }
 function reportsView() {
   const d = D(), rows = periodRows(), a = agg(rows), p = S.ui.period, isMonth = p.startsWith('m:');
@@ -4287,6 +4434,7 @@ function reportsView() {
  {title:'Leave days by month',headers:['Month',...SERIES.map(s=>s.name),'Total'],rows:monthly.map(m=>{const v=SERIES.map(s=>m.rows.reduce((a,r)=>a+s.f(rowStats(r)),0));return [monthLabel(m.month),...v,v.reduce((a,b)=>a+b,0)];})},
  {title:'Most leave days · '+periodLabel(),headers:['Employee','Leave days','Unplanned','Late'],rows:top.map(x=>[x.label,x.v,x.u,x.late])},
  {title:'Leave days by client group',headers:['Client group','Leave days','People'],rows:cl.map(x=>[x.label,x.v,x.people.size])},
+ (()=>{const z=leaveSeasonality();return {title:'Leave by month of the year',headers:['Month','Leave days per person','Leave days','Person-months'],rows:z.cal.map(c=>[c.name,Math.round(c.avg*100)/100,c.days,c.rows])};})(),
  {title:'Needs attention · '+periodLabel(),headers:['Employee','Unplanned','Leave days','Late','Applications'],rows:flags.map(o=>[o.x.label,o.x.u,o.x.v,o.x.late,o.x.la])}
  ];
  if(isMonth){const m=+p.slice(2);window.attendanceExportData.push({title:'People out each day · '+periodLabel(),headers:['Date','People out'],rows:Array.from({length:Engine.daysInMonth(m)},(_,i)=>[isoDate(dateOf(m,i)),rows.filter(r=>isLeaveCode(r.days[i])).length])});}
@@ -4299,6 +4447,7 @@ function reportsView() {
       <span class="grow"></span><span class="sm muted">${isMonth && +p.slice(2) === TODAY_MS ? '<b>This month is still in progress</b>, so it will read low against full months. ' : ''}Leave days follow the sheet’s “Total Leaves” formula (UL, AL, SL, CL, AB + 0.5 per half day).</span>
     </div>
     ${timelineHtml}
+    ${seasonalityCard()}
     <div class="grid g2" style="margin-bottom:14px">
       <div class="card"><h2>Leave days by month</h2><div class="sub">Click a month to focus the whole dashboard on it.</div>${T ? rtable(EX('Leave days by month')) : stackChart(monthly, { selectable: true, sel: isMonth ? +p.slice(2) : null })}</div>
       <div class="card"><h2>Most leave days · ${esc(periodLabel())}</h2><div class="sub">Top 10 people. Click a bar to filter all reports to that person.</div>${T ? rtable(EX('Most leave days')) : hbars(top, { link: true })}</div>
@@ -4484,7 +4633,7 @@ function gridTable(rows, { mode = 'month', month = null, hl = null } = {}) {
     const first = mode === 'month' ? `<b>${esc(r.name.trim() || '(no name)')}</b><span>${esc(r.client || '—')}${hasRoster() ? ' · ' + (wr ? esc(rosterStatus(wr) || 'no status') + esc(dpText) : `not in workforce · <span class="linkbtn" data-act="link-person" data-k="${esc(personKey(r.name))}">link</span>`) : ''}</span>` : `<b>${monthLabel(r.month)}</b><span>${esc(r.client || '—')}</span>`;
     return `<tr${dp ? ' class="gone"' : ''}><td class="c-name" data-act="${mode === 'month' ? 'person' : 'edit-row'}" data-k="${esc(personKey(r.name))}" data-r="${r.uid}">${first}</td><td class="c-id sm">${r.empId ?? '<span class="muted">—</span>'}</td>${extraFields.map(n => { const v = (r.extra || {})[n], has = v != null && v !== '', ok = mode === 'month' && canFillField(n); return `<td class="c-fld${has ? '' : ' blank'}${ok ? ' can' : ''}"${ok ? ` data-act="log-field" data-field="${esc(n)}" data-r="${r.uid}" data-tip="${esc(n)} · ${esc(r.name.trim())}<br>Click to log or change the value"` : ''}>${has ? esc(String(v)) : (ok ? '+ log' : '—')}</td>`; }).join('')}${cells}
       <td class="c-tot num" data-tip="Total Leaves (sheet formula)">${fmt(s.total)}</td><td class="c-tot num" data-tip="Unapproved Leaves (UL)">${s.ul || '<span class="muted">0</span>'}</td><td class="c-tot num" data-tip="Upcoming Leaves">${s.upc || '<span class="muted">0</span>'}</td><td class="c-tot num muted" data-tip="Days present so far: blank weekdays count as P, plus P, R, L and C. Not stored in Excel.">${s.present}</td>
-      <td class="c-act"><button class="btn sm ghost" data-act="edit-row" data-r="${r.uid}" title="Edit row">${ic('edit')}</button><button class="btn sm ghost" data-act="del-row" data-r="${r.uid}" title="Delete row">${ic('trash')}</button></td></tr>`;
+      <td class="c-act">${can('att.rows') ? `<button class="btn sm ghost" data-act="edit-row" data-r="${r.uid}" title="Edit row">${ic('edit')}</button><button class="btn sm ghost" data-act="del-row" data-r="${r.uid}" title="Delete row">${ic('trash')}</button>` : ''}</td></tr>`;
   }).join('');
   return `<table class="att"><thead><tr><th class="c-name">${mode === 'month' ? 'Employee' : 'Month'}</th><th class="c-id">Emp ID</th>${extraFields.map(n => `<th class="c-fld" data-tip="Attendance field · a column after AM in the Excel sheet">${esc(n)}</th>`).join('')}${head}<th class="c-tot" data-tip="Total Leaves">Total</th><th class="c-tot" data-tip="Unapproved Leaves (UL)">UL</th><th class="c-tot" data-tip="Upcoming Leaves">Upcoming</th><th class="c-tot" data-tip="Days present so far: blank weekdays count as P, plus P, R, L and C. Not stored in Excel.">Present</th><th class="c-act"></th></tr></thead><tbody>${body || `<tr><td colspan="${dim + 7 + extraFields.length}" class="empty" style="height:auto">No rows match.</td></tr>`}</tbody></table>`;
 }
@@ -4542,10 +4691,10 @@ function gridView() {
       <select data-bind="gsort"><option value="file">File order</option><option value="name"${g.sort === 'name' ? ' selected' : ''}>Sort: name</option><option value="leaves"${g.sort === 'leaves' ? ' selected' : ''}>Sort: most leaves</option>${kinds.length ? `<option value="kind"${g.sort === 'kind' ? ' selected' : ''}>Sort: most of chosen type</option>` : ''}</select>
       <span class="grow"></span>
       ${hasRoster() && gonePlan().list.length ? `<button class="btn" data-act="mark-gone" data-tip="Left / Moved people whose remaining days are not marked yet">${ic('users')} Mark Left / Moved <span class="badge">${gonePlan().list.length}</span></button>` : ''}
-      <button class="btn" data-act="holiday" data-tip="Mark a whole day as a holiday (H) for everyone in one go">${ic('cal')} Add holiday</button>
-      <button class="btn" data-act="new-month">${ic('cal')} Start / update month</button>
-      <button class="btn" data-act="log-leave">${ic('plus')} Log leave</button>
-      <button class="btn primary" data-act="add-row">${ic('plus')} Add employee</button></div>
+      ${can('att.holidays') ? `<button class="btn" data-act="holiday" data-tip="Mark a whole day as a holiday (H) for everyone in one go">${ic('cal')} Add holiday</button>` : ''}
+      ${can('att.addemp') ? `<button class="btn" data-act="new-month">${ic('cal')} Start / update month</button>` : ''}
+      ${canLog() ? `<button class="btn" data-act="log-leave">${ic('plus')} Log leave</button>` : ''}
+      ${can('att.addemp') ? `<button class="btn primary" data-act="add-row">${ic('plus')} Add employee</button>` : ''}</div>
     ${fieldBar()}
     ${leaveFilterBar(gridBaseRows())}
     <div class="sm muted" style="margin-bottom:8px"><b class="num">${rows.length}</b> employees${hl ? ` with ${esc(kindNames)} · <b class="num">${fmt(kindDays)}</b> days of that type (other codes faded)` : ''} · <b class="num">${fmt(tot)}</b> leave days · <b>Click any day</b> to set its code, or a day number at the top to mark a holiday for everyone. A blank day counts as present (P), and blank Saturdays / Sundays are week offs.</div>
@@ -4957,7 +5106,7 @@ async function fixApply(saveNow) {
     }
     nId = idDone.size; nCl = clDone.size; nRn = rnDone.size;
     if (!nId && !nCl && !nRn) return false;
-  });
+  }, { rows: true });
   for (const p of plan) FIX.edits.delete(p.x.key);
   fixRows.c = null; notify(); render();
   const bits = [links.length && `${links.length} linked`, nId && `${nId} Emp ID${nId === 1 ? '' : 's'} set`, nCl && `${nCl} client${nCl === 1 ? '' : 's'} filled`, nRn && `${nRn} renamed`].filter(Boolean).join(', ');
@@ -5016,10 +5165,18 @@ function openPop(td) {
   closePop(); tipEl().classList.remove('on'); const row = rowByUid(td.dataset.r), i = +td.dataset.d; if (!row) return; td.classList.add('selected');
   const cur = row.days[i] == null ? '' : String(row.days[i]).trim().toUpperCase();
   const p = document.createElement('div'); p.className = 'pop'; p.id = 'pop';
+  /* v3.17: people with view rights only see what the cell says; nothing can be changed from here */
+  const okCodes = [...PICK, ''].filter(c => codeAllowed(cur, c) && c !== cur);
+  if (!okCodes.length) {
+    p.innerHTML = `<h4>${esc(row.name.trim())} · ${longDate(dateOf(row.month, i))}</h4><div style="display:flex;align-items:center;gap:8px;margin:6px 0 4px">${cur ? chip(cur) : ''}<span class="sm">${cur ? esc(labelOf(cur)) : (impliedCode(row.month, i) === 'WO' ? 'Blank: week off (Sat / Sun)' : 'Blank: counts as present (P)')}</span></div><div class="foot"><span class="sm muted">View only · ask the admin for editing rights</span></div>`;
+    ROOT.appendChild(p);
+    const r0 = td.getBoundingClientRect(), w0 = p.offsetWidth, h0 = p.offsetHeight; let x0 = Math.min(Math.max(8, r0.left + r0.width / 2 - w0 / 2), innerWidth - w0 - 8), y0 = r0.bottom + 6; if (y0 + h0 > innerHeight - 8) y0 = Math.max(8, r0.top - h0 - 6); p.style.left = x0 + 'px'; p.style.top = y0 + 'px';
+    return;
+  }
   p.innerHTML = `<h4>${esc(row.name.trim())} · ${longDate(dateOf(row.month, i))}</h4>
     <input type="text" id="popIn" placeholder="Type a code, then Enter" autocomplete="off" value="${esc(cur)}" aria-label="Attendance code">
-    <div class="codes">${PICK.map(c => `<button data-code="${c}" class="${c === cur ? 'sel' : ''}" title="${esc(CODES[c].label)}">${chip(c)}</button>`).join('')}<button data-code="" title="Clear the cell. Blank means present (P), or week off on Sat / Sun"><div class="chip cat-present">Clear</div></button></div>
-    <div class="foot"><span class="sm muted" id="popMsg">${cur ? esc(labelOf(cur)) : (impliedCode(row.month, i) === 'WO' ? 'Blank: week off (Sat / Sun)' : 'Blank: counts as present (P)')}</span><button class="btn sm" data-edit="${row.uid}">Edit row…</button></div>`;
+    <div class="codes">${PICK.map(c => `<button data-code="${c}" class="${c === cur ? 'sel' : ''}" title="${esc(CODES[c].label)}"${c === cur || okCodes.includes(c) ? '' : ' disabled style="opacity:.3;cursor:not-allowed"'}>${chip(c)}</button>`).join('')}<button data-code=""${okCodes.includes('') || !cur ? '' : ' disabled style="opacity:.3;cursor:not-allowed"'} title="Clear the cell. Blank means present (P), or week off on Sat / Sun"><div class="chip cat-present">Clear</div></button></div>
+    <div class="foot"><span class="sm muted" id="popMsg">${cur ? esc(labelOf(cur)) : (impliedCode(row.month, i) === 'WO' ? 'Blank: week off (Sat / Sun)' : 'Blank: counts as present (P)')}</span>${can('att.rows') ? `<button class="btn sm" data-edit="${row.uid}">Edit row…</button>` : ''}</div>`;
   ROOT.appendChild(p);
   const r = td.getBoundingClientRect(), w = p.offsetWidth, h = p.offsetHeight; let x = Math.min(Math.max(8, r.left + r.width / 2 - w / 2), innerWidth - w - 8), y = r.bottom + 6; if (y + h > innerHeight - 8) y = Math.max(8, r.top - h - 6); p.style.left = x + 'px'; p.style.top = y + 'px';
   const inp = $('#popIn', p); inp.focus(); inp.select();
@@ -5027,7 +5184,7 @@ function openPop(td) {
     const old = row.days[i]; const nv = code === '' ? null : code; if ((old ?? null) === nv) { closePop(); return; }
     closePop(); mutate(`${row.name.trim()} · ${longDate(dateOf(row.month, i))}: ${old ?? 'blank'} → ${nv ?? 'blank'}`, () => setDay(row, i, code), { cells: true });
   };
-  p.addEventListener('click', e => { const b = e.target.closest('[data-code]'); if (b) apply(b.dataset.code); const ed = e.target.closest('[data-edit]'); if (ed) { closePop(); openRowEditor(+ed.dataset.edit); } });
+  p.addEventListener('click', e => { const b = e.target.closest('[data-code]'); if (b) apply(b.dataset.code); const ed = e.target.closest('[data-edit]'); if (ed) { closePop(); if (!can('att.rows')) return toast('Your passcode can’t edit rows in the attendance tracker. Ask the admin for the right in Settings.'); openRowEditor(+ed.dataset.edit); } });
   inp.addEventListener('input', () => { const v = inp.value.trim().toUpperCase(); $('#popMsg', p).textContent = !v ? 'Enter clears the cell (blank = present)' : knownCode(v) ? labelOf(v) : 'Unknown code'; });
   inp.addEventListener('keydown', e => { if (e.key === 'Enter') { const v = inp.value.trim().toUpperCase(); if (!v || knownCode(v)) apply(v); else $('#popMsg', p).textContent = `“${v}” isn’t in your legend`; } });
 }
@@ -5092,8 +5249,8 @@ function openRowEditor(uid, preset = {}) {
     const f = { name, empId: parseId($('#f-id', m).value), client: $('#f-client', m).value.trim(), reg: $('#f-reg', m).value === '' ? null : Number($('#f-reg', m).value), month: ms, days: days.slice() };
     const fn = attFieldNames(); if (fn.length) { const ex = { ...((row && row.extra) || {}) }; $('[data-xf]', m).forEach(inp => { if (inp.disabled) return; const nm = fn[+inp.dataset.xf], v = inp.value.trim(); if (v === '') delete ex[nm]; else ex[nm] = /^-?\d+(\.\d+)?$/.test(v) ? Number(v) : v; }); f.extra = ex; }
     closeModal();
-    if (row) mutate(`Edited ${rowLabel(row)}`, () => { Object.assign(row, f); });
-    else mutate(`Added ${name} · ${monthLabel(ms)}`, () => { const nr = newRow(ms, name, { weekends: false }); Object.assign(nr, f); insertRow(nr); });
+    if (row) mutate(`Edited ${rowLabel(row)}`, () => { Object.assign(row, f); }, { rows: true });
+    else mutate(`Added ${name} · ${monthLabel(ms)}`, () => { const nr = newRow(ms, name, { weekends: false }); Object.assign(nr, f); insertRow(nr); }, { addEmp: true });
     if (!row) { S.ui.grid.month = ms; if (S.ui.view === 'grid') render(); }
   };
   m.addEventListener('keydown', e => { if (e.key === 'Enter' && e.target.tagName === 'INPUT' && !e.target.list) $('#f-save', m).click(); });
@@ -5215,7 +5372,7 @@ function openFieldsManager(sel) {
 }
 function deleteRows(uids) {
   const rs = uids.map(rowByUid).filter(Boolean); if (!rs.length) return;
-  mutate(rs.length === 1 ? `Deleted ${rowLabel(rs[0])}` : `Deleted ${rs.length} rows`, () => { S.rows = S.rows.filter(r => !uids.includes(r.uid)); });
+  mutate(rs.length === 1 ? `Deleted ${rowLabel(rs[0])}` : `Deleted ${rs.length} rows`, () => { S.rows = S.rows.filter(r => !uids.includes(r.uid)); }, { rows: true });
   toast(`Deleted ${rs.length === 1 ? rowLabel(rs[0]) : rs.length + ' rows'}. Nothing is written to Excel until you Save.`, { act: 'undo', label: 'Undo' });
 }
 function confirmDelete(uid) {
@@ -5242,14 +5399,14 @@ function openLogLeave(preKey) {
       <label>Type<select id="l-code">${codesAllowed.map(c => `<option value="${c}" ${c === 'LA' && (!can('att.approve') || !codesAllowed.includes('AL')) ? 'selected' : ''}>${c} · ${CODES[c].label}</option>`).join('')}</select></label><span></span>
       <label>From<input type="date" id="l-from" value="${today}"></label><label>To<input type="date" id="l-to" value="${today}"></label>
       <label class="full" style="flex-direction:row;align-items:center;gap:8px;font-weight:500"><input type="checkbox" id="l-skip" checked> Keep week offs and holidays (don’t overwrite WO / H)</label>
-      ${needsApproval() ? `<label class="full">Note for your manager (optional)<input type="text" id="l-note" maxlength="200" placeholder="e.g. family function, doctor’s appointment" autocomplete="off"></label><div class="full sm" style="padding:8px 10px;border-radius:8px;background:var(--accent-soft)">This leave goes to a manager for approval first. It is added to attendance only after they approve it.</div>` : ''}</div>
+      ${needsApproval() ? `<label class="full">Note for your manager <span style="color:var(--bad,#c0392b)">*</span> (required)<input type="text" id="l-note" maxlength="200" required aria-required="true" placeholder="e.g. family function, doctor’s appointment" autocomplete="off"></label><div class="full sm" style="padding:8px 10px;border-radius:8px;background:var(--accent-soft)">This leave goes to a manager for approval first. It is added to attendance only after they approve it.</div>` : ''}</div>
       <div id="l-prev" class="sm" style="margin-top:12px;padding:10px 12px;border:1px solid var(--line);border-radius:8px;background:var(--surface-2)"></div><div class="err" id="l-err"></div>`,
     footer: `<span class="grow"></span><button class="btn" data-close>Cancel</button><button class="btn primary" id="l-go">${needsApproval() ? 'Send for approval' : 'Apply'}</button>`,
   });
   const plan = () => {
     const name = $('#l-name', m).value, p = resolvePerson(name), from = new Date($('#l-from', m).value + 'T00:00:00Z'), to = new Date($('#l-to', m).value + 'T00:00:00Z');
     if (!p) return { err: name.trim() ? 'No employee with that name in the workforce file or the tracker.' : 'Pick an employee.' };
-    if (isNaN(from) || isNaN(to)) return { err: 'Choose both dates.' }; if (to < from) return { err: '“To” is before “From”.' }; if ((to - from) / 86400000 > 92) return { err: 'That range is longer than 3 months. Split it up.' };
+    if (isNaN(from) || isNaN(to)) return { err: 'Choose both dates.' }; if (to < from) return { err: '“To” is before “From”.' }; if ((to - from) / 86400000 > 92) return { err: 'That range is longer than 3 months. Split it up.' }; if (needsApproval() && ((($('#l-note', m) || {}).value || '').trim().length < 3)) return { err: 'Write a note for your manager: it is required (e.g. family function, doctor’s appointment).' };
     const code = $('#l-code', m).value, skip = $('#l-skip', m).checked; const set = [], skipped = [], blocked = [], create = new Set(); let overwrite = 0;
     for (let t = from; t <= to; t = new Date(t.getTime() + 86400000)) {
       const ms = Engine.monthSerial(t.getUTCFullYear(), t.getUTCMonth()), i = t.getUTCDate() - 1; const row = p.rows.find(r => r.month === ms);
@@ -5333,6 +5490,7 @@ function reqDatesText(dates) {
   return range + ' · ' + ds.length + ' day' + (ds.length === 1 ? '' : 's') + (ds.length > 1 && span !== ds.length ? ' (week offs skipped)' : '');
 }
 async function sendLeaveRequest(pl, note) {
+  if (String(note || '').trim().length < 3) { toast('Write a note for your manager before sending the request.'); return false; }
   const idn = identityOf(pl.p);
   const req = { id: Date.now().toString(36) + Math.random().toString(36).slice(2, 7), status: 'pending', at: new Date().toISOString(), by: BE.userName(), byId: myId(),
     name: idn.name || pl.p.name, key: pl.p.key, empId: idn.empId ?? null, client: idn.client || '', code: pl.code, dates: pl.set.map(s => isoDate(s.t)), note: String(note || '').slice(0, 200) };
@@ -5426,7 +5584,7 @@ window.requestAuditEntries = () => reqList().flatMap(r => {
   if (r.status !== 'pending') events.push({...common,eventId:'request:'+r.id+':'+r.status+':'+r.decidedAt,time:r.decidedAt,user:r.decidedBy || r.by,userId:r.decidedById || r.byId,action:'request-'+r.status,details:{note:common.details.note+(r.reason ? ' · Reason: '+r.reason : '')}});
   return events;
 });
-const REQUEST_CARD_CSS = ":host {height:100%;font-size:13px;} .card {height:100%;max-height:260px;display:flex;flex-direction:column;padding:12px 14px;border-radius:10px;} .card h2 {font-size:13px;} .card .sub {font-size:11px;line-height:1.4;margin-bottom:6px;} .card .empty {padding:10px 0;min-height:0;font-size:12px;} .card > div[style] {min-height:0;}";
+const REQUEST_CARD_CSS = ":host {height:100%;font-size:13px;} .card {height:100%;max-height:none;display:flex;flex-direction:column;padding:0 !important;border:0 !important;border-radius:0;box-shadow:none !important;background:transparent !important;} .card > h2 {display:none;} .card > div[style*=max-height] {max-height:300px !important;} .request-heading h2 {font-size:12px !important;color:var(--ink-2);font-weight:600;} .card h2 {font-size:13px;} .card .sub {font-size:11px;line-height:1.4;margin-bottom:6px;} .card .empty {padding:10px 0;min-height:0;font-size:12px;} .card > div[style] {min-height:0;}";
 function renderRequestHistory() {
   const me = myId();
   const own = reqList().filter(r => me && String(r.byId) === me).sort((a,b) => (b.at || '').localeCompare(a.at || ''));
@@ -5502,7 +5660,7 @@ async function trackRoster(rrs) {
   const people = [...new Set(plan.map(x => x.rr))], months = [...new Set(plan.map(x => x.ms))].sort((a, b) => a - b);
   const nm = people.length === 1 ? gs(people[0], 'name_column').trim() : people.length + ' employees', ml = months.map(monthLabel).join(', ');
   if (S.changes.length && !(await confirmBox('Save your other changes too?', `The attendance tracker already has ${S.changes.length} unsaved change${S.changes.length === 1 ? '' : 's'}. Tracking ${nm} saves everything together.`, 'Track and save'))) return false;
-  mutate(`Started tracking ${nm} · ${ml}`, () => { for (const { rr, ms } of plan) insertRow(newRosterRow(ms, rr)); });
+  mutate(`Started tracking ${nm} · ${ml}`, () => { for (const { rr, ms } of plan) insertRow(newRosterRow(ms, rr)); }, { addEmp: true });
   S.ui.grid.month = months[0]; S.ui.grid.status = 'all'; S.ui.grid.q = '';
   await save();
   if (S.changes.length) { toast(`${nm} ${people.length === 1 ? 'was' : 'were'} added in the dashboard but not saved to Excel yet. Fix the problem above, then press Save to Excel on the Attendance page.`, false); return false; }
@@ -5627,7 +5785,7 @@ function openNewMonth() {
     const pl = plan(), wo = $('#n-wo', m).checked, wp = $('#n-p', m).checked; closeModal();
     mutate(`${d.byMonth.has(pl.to) ? 'Updated' : 'Started'} ${monthLabel(pl.to)} from the workforce file (${pl.add.length} row${pl.add.length === 1 ? '' : 's'})`, () => {
       for (const r of pl.add) insertRow(newRosterRow(pl.to, r, { weekends: wo, p: wp }));
-    });
+    }, { addEmp: true });
     S.ui.grid.month = pl.to; S.ui.grid.status = 'all'; S.ui.period = 'm:' + pl.to; S.ui.view = 'grid'; render(); toast(`${monthLabel(pl.to)}: ${pl.add.length} employee${pl.add.length === 1 ? '' : 's'} added from the workforce file. Review, then Save to Excel.`);
   };
 }
@@ -5675,12 +5833,12 @@ function openHoliday(ms, i0) {
   m.addEventListener('change', e => { if (e.target.name === 'h-s') { all = e.target.value === 'all'; draw(); } });
   $('#h-go', m).onclick = () => {
     const p = plan(); if (!p.set.length) return; closeModal();
-    mutate(`Holiday (H) on ${longDate(dateOf(ms, day))} for ${p.set.length} people`, () => { if (!can('att.holidays')) throw permError('Only people with the "Manage holidays" right can mark a holiday for everyone.'); for (const r of p.set) setDay(r, day, 'H'); }, { holiday: true });
+    mutate(`Holiday (H) on ${longDate(dateOf(ms, day))} for ${p.set.length} people`, () => { if (!can('att.holidays')) throw permError('Only people with the "Add holidays" right can mark a holiday for everyone.'); for (const r of p.set) setDay(r, day, 'H'); }, { holiday: true });
     toast(`Holiday marked on ${longDate(dateOf(ms, day))} for ${p.set.length} ${p.set.length === 1 ? 'person' : 'people'}. ${S.auto ? 'Saving to Excel in a few seconds.' : 'Press Save to Excel to keep it.'}`, { act: 'undo', label: 'Undo' });
   };
   $('#h-clear', m).onclick = () => {
     const p = plan(); if (!p.has.length) return; closeModal();
-    mutate(`Removed the holiday on ${longDate(dateOf(ms, day))} for ${p.has.length} people`, () => { if (!can('att.holidays')) throw permError('Only people with the "Manage holidays" right can remove a holiday for everyone.'); for (const r of p.has) setDay(r, day, ''); }, { holiday: true });
+    mutate(`Removed the holiday on ${longDate(dateOf(ms, day))} for ${p.has.length} people`, () => { if (!can('att.holidays')) throw permError('Only people with the "Add holidays" right can remove a holiday for everyone.'); for (const r of p.has) setDay(r, day, ''); }, { holiday: true });
     toast(`Holiday removed on ${longDate(dateOf(ms, day))}.`, { act: 'undo', label: 'Undo' });
   };
   draw(); $('#h-go', m).focus();
@@ -5693,7 +5851,7 @@ function fixRenameLinked() {
   mutate(`Renamed ${links.length} tracker names to the workforce spelling`, () => {
     for (const l of links) { const id = parseId(l.code); for (const r of S.rows) if (personKey(r.name) === l.k) { r.name = l.rname; if (id != null) r.empId = id; n++; } }
     if (!n) return false;
-  });
+  }, { rows: true });
   if (n) toast(`Renamed ${links.length} names in ${n} rows. ${S.auto ? 'Saving to Excel in a few seconds.' : 'Review, then Save to Excel.'}`, { act: 'undo', label: 'Undo' });
 }
 
@@ -5702,12 +5860,12 @@ const FIXES = {
   'fix-codes'() { let n = 0; mutate('Tidied attendance codes', () => { S.rows.forEach(r => r.days.forEach((v, i) => { if (v == null || i >= Engine.daysInMonth(r.month)) return; const s = String(v), c = s.trim().toUpperCase(); if (CODES[c] && s !== c) { r.days[i] = c; n++; } })); if (!n) return false; }); if (n) toast(`Tidied ${n} codes. Review, then Save.`, { act: 'undo', label: 'Undo' }); },
   'fix-ids'() {
     const idBy = new Map(); S.rows.forEach(r => { if (r.empId != null && r.empId !== '') { const k = personKey(r.name); (idBy.get(k) || idBy.set(k, new Map()).get(k)).set(String(r.empId), r.empId); } });
-    let n = 0; mutate('Filled missing Emp IDs from other months', () => { S.rows.forEach(r => { if (r.empId != null && r.empId !== '') return; const m = idBy.get(personKey(r.name)); if (m && m.size === 1) { r.empId = [...m.values()][0]; n++; } }); if (!n) return false; }); if (n) toast(`Filled ${n} Emp IDs. Review, then Save.`, { act: 'undo', label: 'Undo' });
+    let n = 0; mutate('Filled missing Emp IDs from other months', () => { S.rows.forEach(r => { if (r.empId != null && r.empId !== '') return; const m = idBy.get(personKey(r.name)); if (m && m.size === 1) { r.empId = [...m.values()][0]; n++; } }); if (!n) return false; }, { rows: true }); if (n) toast(`Filled ${n} Emp IDs. Review, then Save.`, { act: 'undo', label: 'Undo' });
   },
-  'fix-names'() { let n = 0; mutate('Trimmed extra spaces in names', () => { S.rows.forEach(r => { const t = r.name.trim().replace(/\s+/g, ' '); if (t !== r.name) { r.name = t; n++; } }); if (!n) return false; }); if (n) toast(`Trimmed ${n} names.`, { act: 'undo', label: 'Undo' }); },
+  'fix-names'() { let n = 0; mutate('Trimmed extra spaces in names', () => { S.rows.forEach(r => { const t = r.name.trim().replace(/\s+/g, ' '); if (t !== r.name) { r.name = t; n++; } }); if (!n) return false; }, { rows: true }); if (n) toast(`Trimmed ${n} names.`, { act: 'undo', label: 'Undo' }); },
   'fix-sync-roster'() {
     const items = rosterGaps().sync; if (!items.length) return;
-    mutate(`Updated ${items.length} row${items.length === 1 ? '' : 's'} from the workforce file (names and Emp IDs)`, () => { for (const x of items) { x.r.name = x.name; const id = parseId(x.id); if (id != null) x.r.empId = id; } });
+    mutate(`Updated ${items.length} row${items.length === 1 ? '' : 's'} from the workforce file (names and Emp IDs)`, () => { for (const x of items) { x.r.name = x.name; const id = parseId(x.id); if (id != null) x.r.empId = id; } }, { rows: true });
     toast(`Updated ${items.length} row${items.length === 1 ? '' : 's'} from the workforce file. Review, then Save.`, { act: 'undo', label: 'Undo' });
   },
   'fix-variant'() { let n = 0; mutate('Upcoming Leaves formula now counts LA in all rows', () => { S.rows.forEach(r => { if (r.variant === 'AL') { r.variant = 'LA'; n++; } }); if (!n) return false; }); if (n) toast(`Switched ${n} rows to count LA. Excel will recalculate on open.`, { act: 'undo', label: 'Undo' }); },
@@ -5731,7 +5889,7 @@ const ACTIONS = {
   save() { save(); }, undo() { undo(); }, autosave() { setAuto(!S.auto); if (S.auto) autoTick(); },
   'sync-panel'() { window.openSyncPanel && window.openSyncPanel(); },
   'log-field'(el) { openFieldLog(el.dataset.field, el.dataset.r); },
-  'att-fields'() { openFieldsManager(); },
+  'att-fields'() { if (!(can('att.fields') || attFieldNames().some(canFillField))) return toast('Your passcode can’t add or fill attendance fields. Ask the admin for the right in Settings.'); openFieldsManager(); },
   retry() { S.folderKey = null; connect(); }, browse() { browseExternal(); }, reconnect() { reconnectExternal(); },
   'use-file'(el) { chooseFolderFile(el.dataset.n); },
   async 'change-file'() { closePop(); try { await scanFolder(); } catch { } S.picking = true; render(); },
@@ -5792,8 +5950,8 @@ const ACTIONS = {
   'req-reject'(el) { openRejectBox(el.dataset.id); },
   'req-cancel'(el) { cancelRequest(el.dataset.id); },
   'log-leave'(el) { openLogLeave(el.dataset.k || (S.ui.view === 'people' ? S.ui.people.sel : null)); },
-  'new-month'() { openNewMonth(); }, 'add-row'() { openRowEditor(null); },
-  'edit-row'(el) { openRowEditor(+el.dataset.r); }, 'del-row'(el) { confirmDelete(+el.dataset.r); },
+  'new-month'() { if (!can('att.addemp')) return toast('Your passcode can’t add employees to the attendance tracker. Ask the admin for the right in Settings.'); openNewMonth(); }, 'add-row'() { if (!can('att.addemp')) return toast('Your passcode can’t add employees to the attendance tracker. Ask the admin for the right in Settings.'); openRowEditor(null); },
+  'edit-row'(el) { if (!can('att.rows')) return toast('Your passcode can’t edit rows in the attendance tracker. Ask the admin for the right in Settings.'); openRowEditor(+el.dataset.r); }, 'del-row'(el) { if (!can('att.rows')) return toast('Your passcode can’t delete rows in the attendance tracker. Ask the admin for the right in Settings.'); confirmDelete(+el.dataset.r); },
   cell(el) { if ($('#pop') && el.classList.contains('selected')) { closePop(); return; } openPop(el); },
   ...FIXES,
 };
@@ -5922,7 +6080,7 @@ const pillHtml = (name, code, c) => `<span class="att-pill ${catClass(c)}" title
 
 /* ---- Overview card: attendance for any day, who was absent lately, who is off soon ---- */
 const KIND_LABELS = { all: 'All leave types', approved: 'Approved leave (AL, CL)', applied: 'Awaiting approval (LA)', sick: 'Sick leave (SL)', unplanned: 'Unplanned / absent (UL, AB)', half: 'Half days' };
-const CARD_PAST = [3, 7, 14, 30, 60, 90], CARD_NEXT = [7, 15, 30, 45, 60, 90];
+const CARD_PAST = [3, 7, 14, 30, 60, 90, 180], CARD_NEXT = [7, 15, 30, 45, 60, 90, 180];
 const addDays = (d, n) => new Date(d.getTime() + n * 86400000);
 function refDay() { const c = S.ui.card.date; if (c && /^\d{4}-\d\d-\d\d$/.test(c)) { const d = new Date(c + 'T00:00:00Z'); if (!isNaN(d)) return d; } return TODAY; }
 const kindOk = c => S.ui.card.kind === 'all' || S.ui.card.kind === c;
@@ -5936,7 +6094,7 @@ const rangeEntries = (d, from, to) => { const out = []; for (let t = from.getTim
 
 function renderCard(el) {
   if (!el) return; renderCard.el = el;
-  const C = S.ui.card, goBtns = `<button class="btn mini" data-att-go="grid">Open attendance →</button>`;
+  const C = S.ui.card, goBtns = can('ov.openatt') && can('page.attendance') ? `<button class="btn mini" data-att-go="grid">Open attendance →</button>` : '';
   const head = sub => `<div class="card-head"><div class="grow"><h2>Attendance</h2><div class="sub">${sub}</div></div>${goBtns}</div>`;
   let html;
   if (S.status === 'loading' || S.status === 'idle') html = head('Looking for the attendance workbook…') + '<div class="empty">Loading…</div>';
@@ -6183,7 +6341,8 @@ const healthCount = () => (S.status === 'ready' && S.ctx ? healthIssues().filter
 
 mount();
 return {
-  fieldNames: attFieldNames, hasTracker: Engine.hasTracker, refresh, init: () => { mount(); return connect(); }, askName, decorateTable, healthCount, chooseFileEarly, savedFile: async () => (await kv.get('file')) || ((await kv.get('handle')) || {}).name || '', show, leave, renderCard, renderWatch, drawerPanel, go, renderApprovalRequests, renderRequestHistory, requestsToDecide: () => requestsToDecide().length, redraw: () => { if (active()) render(); }, state: () => S, dirty: () => S.changes.length,
+  fieldNames: attFieldNames, hasTracker: Engine.hasTracker, refresh, init: () => { mount(); return connect(); }, askName, decorateTable, healthCount, chooseFileEarly, savedFile: async () => (await kv.get('file')) || ((await kv.get('handle')) || {}).name || '', show, leave, renderCard, renderWatch, drawerPanel, go, renderApprovalRequests, renderRequestHistory, requestsToDecide: () => requestsToDecide().length,
+  todayStats: () => { if (S.status !== 'ready' || !S.ctx) return null; const rows = D().byMonth.get(TODAY_MS) || [], i = TODAY.getUTCDate() - 1, cats = rows.map(r => catOf(r.days[i])); return { full: cats.filter(c => c === 'approved' || c === 'sick' || c === 'unplanned').length, half: cats.filter(c => c === 'half').length, late: cats.filter(c => c === 'late').length, tracked: rows.length }; }, redraw: () => { if (active()) render(); }, state: () => S, dirty: () => S.changes.length,
   prepareSignOut, save: () => save(), undo: () => undo(), toggleAuto: () => { setAuto(!S.auto); if (S.auto) autoTick(); }, setAutoSync: on => { setAuto(on); if (S.auto) autoTick(); }, canWrite: attCanWrite,
   syncInfo: () => { const d = D(true), sc = scopeCounts(); return { fileName: S.fileName, changes: S.changes.length, undoLen: S.undo.length, saving: S.saving, auto: S.auto, autoErr: S.autoErr, autoAt: S.autoAt, diskChanged: S.diskChanged, rows: S.rows.length, people: d.people.size, monthFrom: d.months[0], monthTo: d.latestMonth, unmatched: sc.unmatched, hasRoster: hasRoster() }; },
 };
@@ -6979,7 +7138,7 @@ function renderInsights() {
   }
   if (state.schema.dob_column) {
     const t = dayOf(today0), bd = rows.filter(r => { const x = serialOf(r, "dob_column"); return x != null && !isInactive(r) && dayOf(x).getUTCMonth() === t.getUTCMonth(); }).sort((a, b) => dayOf(serialOf(a, "dob_column")).getUTCDate() - dayOf(serialOf(b, "dob_column")).getUTCDate());
-    facts.push({ hue: "magenta", label: "Birthdays in " + MON[t.getUTCMonth()], value: fmtN(bd.length) + " people", note: bd.length ? firstNames(bd.map(r => gs(r, "name_column") + " (" + fmtD(serialOf(r, "dob_column")) + ")")) : "No birthdays this month", rows: bd });
+    facts.push({ hue: "magenta", label: "Birthdays in " + MON[t.getUTCMonth()], value: fmtN(bd.length) + " people", note: bd.length ? firstNames(bd.map(r => gs(r, "name_column") + " (" + dayOf(serialOf(r, "dob_column")).getUTCDate() + " " + MON[dayOf(serialOf(r, "dob_column")).getUTCMonth()] + ")")) : "No birthdays this month", rows: bd });
   }
   if (state.schema.gender_column) {
     const gv = rows.map(r => gs(r, "gender_column")), m = gv.filter(x => /^m/i.test(x)).length, f = gv.filter(x => /^f/i.test(x)).length;
@@ -7087,6 +7246,116 @@ function upcoming(colKey, kind, days) {
   }
   return out.sort((a, b) => a.diff - b.diff || a.name.localeCompare(b.name));
 }
+
+/* ---------- v3.18: Overview layout — glance tiles, tabbed Request Center and tabbed Coming up ---------- */
+const OV = { rc: null, up: null };
+function ovCount(host, sel) { const r = host && host.shadowRoot; return r ? r.querySelectorAll(sel).length : 0; }
+function ovTabs(bar, tabs, active, onPick) {
+  bar.replaceChildren(...tabs.map(t => h("button", { type: "button", class: "ov-tab", role: "tab", "aria-selected": String(t.id === active), onclick: () => onPick(t.id) }, h("span", { class: "ov-tl" }, t.label), t.n != null ? h("span", { class: "ov-n" + (t.hot ? " hot" : "") }, String(t.n)) : null)));
+  bar.hidden = tabs.length < 2;
+}
+function organizeRequests() {
+  const wrap = $("#ovRequests"), bar = $("#rcTabs"); if (!wrap || !bar) return;
+  const defs = [
+    { id: "approvals", host: $("#cardApprovalRequests"), label: "Approvals", sel: ".request-row" },
+    { id: "own", host: $("#cardMyRequests"), label: "My requests", sel: ".request-history-row" },
+    { id: "rejected", host: $("#cardRejectedRequests"), label: "Rejected", sel: ".request-history-row" },
+  ].filter(d => d.host);
+  const vis = defs.filter(d => !d.host.hidden).map(d => ({ ...d, n: ovCount(d.host, d.sel) }));
+  wrap.hidden = !vis.length; if (!vis.length) return;
+  if (!OV.rc || !vis.some(d => d.id === OV.rc)) OV.rc = (vis.find(d => d.id === "approvals" && d.n) || vis[0]).id;
+  for (const d of defs) d.host.classList.toggle("ov-off", d.id !== OV.rc);
+  ovTabs(bar, vis.map(d => ({ ...d, hot: d.id === "approvals" && d.n > 0 })), OV.rc, id => { OV.rc = id; organizeRequests(); });
+}
+function organizeUpcoming() {
+  const wrap = $("#ovUpcoming"), bar = $("#ovUpTabs"), com = $("#cardComing"), hol = $("#cardHolidays"); if (!wrap || !bar) return;
+  const groups = [...$("#coming").querySelectorAll(":scope > .coming-group")];
+  const num = g => { const m = g && /\((\d+)\)\s*$/.exec(g.querySelector("h3")?.textContent || ""); return m ? +m[1] : 0; };
+  const tabs = [];
+  if (com && !com.hidden) tabs.push({ id: "bday", label: "Birthdays", n: num(groups[0]) }, { id: "anniv", label: "Anniversaries", n: num(groups[1]) });
+  if (hol && !hol.hidden) tabs.push({ id: "hol", label: "Holidays", n: [...$("#holidays").querySelectorAll(":scope > .coming-group")].reduce((a, g) => a + num(g), 0) });
+  wrap.hidden = !tabs.length; if (!tabs.length) return;
+  if (!OV.up || !tabs.some(t => t.id === OV.up)) OV.up = tabs[0].id;
+  if (com) { com.classList.toggle("ov-off", OV.up === "hol"); $("#coming").dataset.show = OV.up; }
+  if (hol) hol.classList.toggle("ov-off", OV.up !== "hol");
+  ovTabs(bar, tabs, OV.up, id => { OV.up = id; organizeUpcoming(); });
+}
+function renderGlance() {
+  const box = $("#ovGlance"); if (!box) return;
+  const can = k => !window.PERM || PERM.can(k), tiles = [];
+  const tile = (icon, tone, label, value, sub, go) => h("button", { type: "button", class: "ov-tile " + tone, onclick: go }, h("span", { class: "ov-ic", "aria-hidden": "true" }, icon), h("span", { class: "ov-tx" }, h("small", {}, label), h("b", {}, value), h("em", {}, sub)));
+  const jump = (sel, fn) => () => { if (fn) fn(); const e = $(sel); if (e) e.scrollIntoView({ behavior: "smooth", block: "start" }); };
+  if (can("ov.attendance") && window.ATT && (!window.PERM || PERM.canView("attendance"))) {
+    const t = ATT.todayStats && ATT.todayStats();
+    tiles.push(tile("🏖️", "t-leave", "On leave today", t ? String(t.full) : "–", t ? (t.half + " half day · " + t.late + " late") : "attendance not connected", jump("#cardAttendance")));
+  }
+  if (can("requests.approvals") && window.ATT) {
+    const n = ATT.requestsToDecide ? ATT.requestsToDecide() : 0;
+    tiles.push(tile("📝", "t-req" + (n ? " hot" : ""), "Waiting for approval", String(n), n ? "open Request Center" : "all caught up", jump("#ovRequests", () => { OV.rc = "approvals"; organizeRequests(); })));
+  }
+  if (can("ov.coming") && state.schema) {
+    let b = 0, a = 0; try { b = upcoming("dob_column", "bday", 7).length; a = upcoming("doj_column", "anniv", 7).length; } catch { }
+    tiles.push(tile("🎉", "t-cel", "Celebrations this week", String(b + a), b + " birthday" + (b === 1 ? "" : "s") + " · " + a + " anniversar" + (a === 1 ? "y" : "ies"), jump("#ovUpcoming", () => { OV.up = b || !a ? "bday" : "anniv"; organizeUpcoming(); })));
+  }
+  if (can("ov.holidays")) {
+    const t = new Date(), today = Date.UTC(t.getFullYear(), t.getMonth(), t.getDate()), ys = [t.getFullYear(), t.getFullYear() + 1];
+    const all = [...ys.flatMap(usHolidays).map(x => ({ ...x, f: "🇺🇸" })), ...ys.flatMap(inHolidays).map(x => ({ ...x, f: "🇮🇳" }))].filter(x => x.obs.getTime() >= today).sort((a, b) => a.obs - b.obs);
+    const nx = all[0];
+    if (nx) { const n = Math.round((nx.obs.getTime() - today) / 86400000); tiles.push(tile("🗓️", "t-hol", "Next holiday", nx.f + " " + nx.name, (n === 0 ? "today" : n === 1 ? "tomorrow" : "in " + n + " days") + " · " + DOW[nx.obs.getUTCDay()] + " " + nx.obs.getUTCDate() + " " + MON[nx.obs.getUTCMonth()], jump("#ovUpcoming", () => { OV.up = "hol"; organizeUpcoming(); }))); }
+  }
+  box.replaceChildren(...tiles); box.hidden = !tiles.length;
+  box.style.setProperty("--n", Math.max(1, tiles.length));
+}
+function organizeOverview() { for (const f of [organizeRequests, organizeUpcoming, renderGlance]) { try { f(); } catch (e) { console.warn(e); } } }
+window.organizeOverview = organizeOverview;
+setInterval(() => { if (typeof state !== "undefined" && state.view === "summary" && !document.hidden) organizeOverview(); }, 4000);
+
+/* ---------- v3.17: USA federal and India gazetted holidays ---------- */
+const HOL_IN = {
+  2026: [['01-26', 'Republic Day'], ['03-04', 'Holi'], ['03-21', 'Id-ul-Fitr'], ['03-26', 'Ram Navami'], ['03-31', 'Mahavir Jayanti'], ['04-03', 'Good Friday'], ['05-01', 'Buddha Purnima'], ['05-27', 'Id-ul-Zuha (Bakrid)'], ['06-26', 'Muharram'], ['08-15', 'Independence Day'], ['08-26', 'Milad-un-Nabi'], ['09-04', 'Janmashtami'], ['10-02', 'Gandhi Jayanti'], ['10-20', 'Dussehra'], ['11-08', 'Diwali'], ['11-24', 'Guru Nanak Jayanti'], ['12-25', 'Christmas Day']],
+  2027: [['01-26', 'Republic Day'], ['03-10', 'Id-ul-Fitr'], ['03-23', 'Holi'], ['03-26', 'Good Friday'], ['04-15', 'Ram Navami'], ['04-19', 'Mahavir Jayanti'], ['05-17', 'Id-ul-Zuha (Bakrid)'], ['05-20', 'Buddha Purnima'], ['06-16', 'Muharram'], ['08-15', 'Independence Day · Milad-un-Nabi'], ['08-25', 'Janmashtami'], ['10-02', 'Gandhi Jayanti'], ['10-09', 'Dussehra'], ['10-29', 'Diwali'], ['11-14', 'Guru Nanak Jayanti'], ['12-25', 'Christmas Day']],
+};
+const HOL_IN_FIXED = [['01-26', 'Republic Day'], ['08-15', 'Independence Day'], ['10-02', 'Gandhi Jayanti'], ['12-25', 'Christmas Day']];
+function usHolidays(y) {
+  const U = (m, d) => new Date(Date.UTC(y, m, d));
+  const nth = (m, wd, n) => { const f = U(m, 1).getUTCDay(); return U(m, 1 + ((wd - f + 7) % 7) + (n - 1) * 7); };
+  const last = (m, wd) => { const l = new Date(Date.UTC(y, m + 1, 0)); return U(m, l.getUTCDate() - ((l.getUTCDay() - wd + 7) % 7)); };
+  const list = [[U(0, 1), 'New Year’s Day', 1], [nth(0, 1, 3), 'Martin Luther King Jr. Day'], [nth(1, 1, 3), 'Presidents’ Day'], [last(4, 1), 'Memorial Day'], [U(5, 19), 'Juneteenth', 1], [U(6, 4), 'Independence Day', 1], [nth(8, 1, 1), 'Labor Day'], [nth(9, 1, 2), 'Columbus Day'], [U(10, 11), 'Veterans Day', 1], [nth(10, 4, 4), 'Thanksgiving Day'], [U(11, 25), 'Christmas Day', 1]];
+  /* fixed-date holidays on a weekend are observed on the Friday before or the Monday after */
+  return list.map(([d, name, fixed]) => { let obs = d; if (fixed) { const w = d.getUTCDay(); if (w === 6) obs = new Date(d.getTime() - 86400000); else if (w === 0) obs = new Date(d.getTime() + 86400000); } return { date: d, obs, name }; });
+}
+function inHolidays(y) {
+  const src = HOL_IN[y] || HOL_IN_FIXED;
+  return src.map(([md, name]) => { const d = new Date(Date.UTC(y, +md.slice(0, 2) - 1, +md.slice(3))); return { date: d, obs: d, name }; });
+}
+function renderHolidays() {
+  const card = $("#cardHolidays"); if (!card || card.hidden) return;
+  const days = state.holDays || 90, ctry = state.holCountry || "both";
+  const t = new Date(), today = Date.UTC(t.getFullYear(), t.getMonth(), t.getDate()), end = today + days * 86400000;
+  const years = [t.getFullYear(), t.getFullYear() + 1, t.getFullYear() + 2];
+  const pickUp = list => list.filter(x => { const k = Math.max(x.date.getTime(), x.obs.getTime()); return k >= today && Math.min(x.date.getTime(), x.obs.getTime()) <= end; }).sort((a, b) => a.obs - b.obs);
+  const us = pickUp(years.flatMap(usHolidays)), ind = pickUp(years.flatMap(inHolidays));
+  $("#holTitle").textContent = "Holidays · next " + (days === 365 ? "year" : days + " days");
+  card.classList.toggle("one", ctry !== "both");
+  const fmtD = d => DOW[d.getUTCDay()] + " " + d.getUTCDate() + " " + MON[d.getUTCMonth()] + (d.getUTCFullYear() !== t.getFullYear() ? " " + d.getUTCFullYear() : "");
+  const inDays = d => { const n = Math.round((d.getTime() - today) / 86400000); return n <= 0 ? "Today" : n === 1 ? "Tomorrow" : "in " + n + " days"; };
+  const weekend = d => d.getUTCDay() === 0 || d.getUTCDay() === 6;
+  const mk = (flag, title, list, note) => h("div", { class: "coming-group" }, h("h3", {}, flag + " " + title + " (" + list.length + ")"),
+    list.length ? h("ul", { class: "coming-list" }, list.map(x => {
+      const moved = x.obs.getTime() !== x.date.getTime(), n = Math.round((x.obs.getTime() - today) / 86400000);
+      return h("li", { class: "coming-row" },
+        h("span", { class: "coming-avatar hol", "aria-hidden": "true" }, flag),
+        h("span", { class: "coming-main" }, h("b", { title: x.name }, x.name), h("small", {}, fmtD(x.date) + (moved ? " · observed " + fmtD(x.obs) : weekend(x.date) ? " · falls on a weekend" : ""))),
+        h("span", { class: "coming-when" + (n <= 7 ? " soon" : "") }, inDays(x.obs)));
+    })) : h("div", { class: "empty", style: "padding:10px 0;text-align:left" }, "No holidays in the next " + days + " days."),
+    note ? h("small", { class: "hol-obs" }, note) : null);
+  const lastIn = Math.max(...Object.keys(HOL_IN).map(Number));
+  const inNote = years.some(y => y > lastIn && Date.UTC(y, 0, 1) <= end) ? "After " + lastIn + " only fixed-date holidays are listed until the official list is out." : "";
+  const parts = [];
+  if (ctry !== "IN") parts.push(mk("🇺🇸", "USA", us, ""));
+  if (ctry !== "US") parts.push(mk("🇮🇳", "India", ind, inNote));
+  $("#holidays").replaceChildren(...parts);
+}
 function renderComing() {
   const days = state.comingDays;
   $("#comingTitle").textContent = "Coming up in the next " + days + " days";
@@ -7095,12 +7364,12 @@ function renderComing() {
   const mk = (kind, title, list, note) => h("div", { class: "coming-group" }, h("h3", {}, title + " (" + list.length + ")"),
     list.length ? h("ul", { class: "coming-list" }, list.map(x => h("li", { class: "coming-row" },
       h("span", { class: "coming-avatar " + kind }, initials(x.name)),
-      h("span", { class: "coming-main" }, h("b", { title: x.name }, x.name), h("small", {}, note(x))),
+      h("span", { class: "coming-main" }, h("b", { title: x.name }, x.name + (kind === "bday" ? " 🎂" : " 🏆")), h("small", {}, note(x))),
       h("span", { class: "coming-when" + (x.diff <= 1 ? " soon" : "") }, whenLabel(x)))))
       : h("div", { class: "empty", style: "padding:10px 0;text-align:left" }, "Nothing in the next " + days + " days."));
   $("#coming").replaceChildren(
-    mk("bday", "Birthdays", upcoming("dob_column", "bday", days), x => "turns " + x.years),
-    mk("anniv", "Work anniversaries", upcoming("doj_column", "anniv", days), x => x.years + (x.years === 1 ? " year" : " years")));
+    mk("bday", "🎂 Birthdays", upcoming("dob_column", "bday", days), () => "🎉 Birthday"),
+    mk("anniv", "🏆 Work anniversaries", upcoming("doj_column", "anniv", days), x => "🎊 " + x.years + (x.years === 1 ? " year" : " years")));
 }
 
 /* ============================== action items (missing details) ============================== */
@@ -7877,7 +8146,7 @@ function renderAll() {
   renderFilters(); renderCustomFieldFilters(); renderChips(); window.syncFilterSaveActions?.();
   $("#scopeLine").textContent = fmtN(rowsFor(null).length) + " of " + fmtN(state.rows.length) + " employees · " + (filterSummary() || "All statuses · no filters");
   $("#todayLabel").textContent = new Date().toLocaleDateString(undefined,{weekday:"short",month:"short",day:"numeric"});
-  if (state.view === "summary") { window.ATT?.renderApprovalRequests(); renderComing(); renderStrip(); if (window.ATT) { ATT.renderCard($("#cardAttendance")); if (window.PERM && PERM.can("ov.watch")) ATT.renderWatch($("#cardWatch")); } } else if (state.view === "reports") renderCharts(); else if (state.view === "actions") { renderActions(); renderReview(); } else if (state.view === "attendance" || state.view === "settings") { /* these pages draw themselves */ } else renderTable();
+  if (state.view === "summary") { window.ATT?.renderApprovalRequests(); renderComing(); renderHolidays(); setTimeout(organizeOverview, 0); renderStrip(); if (window.ATT) { ATT.renderCard($("#cardAttendance")); if (window.PERM && PERM.can("ov.watch")) ATT.renderWatch($("#cardWatch")); } } else if (state.view === "reports") renderCharts(); else if (state.view === "actions") { renderActions(); renderReview(); } else if (state.view === "attendance" || state.view === "settings") { /* these pages draw themselves */ } else renderTable();
   syncActionTabs(); attSync();
 }
 
@@ -8516,7 +8785,7 @@ $("#btnTheme").addEventListener("click", () => {
 });
 { const t = lsGet("td_theme"); if (t === "dark" || t === "light") document.documentElement.setAttribute("data-theme", t); }
 
-addEventListener("att:data", () => { if (!state.schema) return; if (state.view === "summary") { renderStrip(); ATT.renderCard($("#cardAttendance")); if (window.PERM && PERM.can("ov.watch")) ATT.renderWatch($("#cardWatch")); } else if (state.view === "employees") renderTable(); syncActionTabs(); });
+addEventListener("att:data", () => { if (!state.schema) return; if (state.view === "summary") { renderStrip(); ATT.renderCard($("#cardAttendance")); if (window.PERM && PERM.can("ov.watch")) ATT.renderWatch($("#cardWatch")); organizeOverview(); } else if (state.view === "employees") renderTable(); syncActionTabs(); });
 let qTimer = null;
 $("#fq").addEventListener("input", e => { clearTimeout(qTimer); qTimer = setTimeout(() => { state.filters.q = e.target.value.trim(); state.page = 1; renderAll(); }, 120); });
 for (const [id, key] of [["#fStatus", "status"], ["#fDesig", "desig"], ["#fClient", "client"], ["#fMode", "mode"]]) $(id).addEventListener("click", ev => openMultiSelect(ev, key));
@@ -8531,7 +8800,9 @@ $("#tq").addEventListener("input", e => { clearTimeout(tqTimer); tqTimer = setTi
 $("#sortBy").addEventListener("change", e => { state.sort = e.target.value ? { key: e.target.value, dir: state.sort.dir } : { key: null, dir: 1 }; renderTable(); });
 $("#sortDir").addEventListener("click", () => { if (state.sort.key) { state.sort.dir *= -1; renderTable(); } });
 $("#btnFilter").addEventListener("click", openFilterPicker);
-$("#comingDays").addEventListener("change", e => { state.comingDays = Number(e.target.value); renderComing(); });
+$("#comingDays").addEventListener("change", e => { state.comingDays = Number(e.target.value); renderComing(); organizeUpcoming(); });
+$("#holDays").addEventListener("change", e => { state.holDays = Number(e.target.value); renderHolidays(); organizeUpcoming(); });
+$("#holCountry").addEventListener("change", e => { state.holCountry = e.target.value; renderHolidays(); organizeUpcoming(); });
 $(".tablewrap").addEventListener("scroll", closePops, { passive: true });
 
 let lastW = 0, rT = null;
@@ -8803,6 +9074,7 @@ window.applyAccess = () => {
   show('#cardAttendance', PERM.canView('attendance') && PERM.can('ov.attendance'));
   window.ATT?.renderApprovalRequests();
   show('#cardComing', PERM.can('ov.coming'));
+  show('#cardHolidays', PERM.can('ov.holidays')); window.organizeOverview?.(); if (typeof renderHolidays === 'function' && typeof state !== 'undefined' && state.view === 'summary') renderHolidays();
   show('#cardWatch', PERM.can('ov.watch'));
   show('#btnAddField', PERM.can('emp.fields'));
   show('#btnBell', PERM.can('notifications.view') || PERM.can('activity.view'));
@@ -8823,7 +9095,7 @@ setInterval(async () => { if (PERM.online() && !el('app').hidden && !document.hi
 
 /* ---------- v3.15: leave requests waiting for a manager: badge on Attendance, refreshed every 45 seconds ---------- */
 function updateReqBadge() {
-  window.ATT?.renderApprovalRequests();
+  window.ATT?.renderApprovalRequests(); window.organizeOverview?.();
   const t = document.querySelector('.tab[data-view="attendance"]'); if (!t) return;
   let b = t.querySelector('.tabn.req'); const n = window.ATT && ATT.requestsToDecide ? ATT.requestsToDecide() : 0;
   if (!b) { b = h('span', { class: 'tabn req', title: 'Leave requests waiting for your approval' }); t.append(b); }
@@ -9182,10 +9454,35 @@ function drawEditor(box, u, reload, users = [], template = null) {
     let head;
     if (g.page) { const c = checkLine('', !!start[g.page], { 'data-k': g.page, 'aria-label': 'Can open ' + g.name }); boxes[g.page] = c.box; head = h('label', { class: 'rmod-head' }, c.box, h('b', {}, g.name), h('small', {}, 'can open this page')); }
     else head = h('div', { class: 'rmod-head' }, h('b', {}, g.name));
-    const card = h('div', { class: 'rmod' + (g.name === 'Filters' ? ' rmod-wide' : '') }, head, items.length ? h('div', { class: 'rmod-items' }, ...items.map(c => c.el)) : null, subBox, g.name === 'Filters' ? fixedBox : g.name === 'Notifications' ? audienceBox : g.name === 'Attendance' ? fieldBox : null);
+    /* v3.17: items split into what they can see and what they can change, with a quick None / View / Edit switch */
+    const allIt = [...g.items.map(i => i[0]).map((k, i) => [k, items[i]]), ...((g.sub && g.sub.items) || []).map((i, j) => [i[0], subItems[j]])];
+    const viewIt = items.filter((c, i) => !PERM.isEditKey(g.items[i][0])), editIt = items.filter((c, i) => PERM.isEditKey(g.items[i][0]));
+    const itemsBox = items.length ? h('div', { class: 'rmod-items' },
+      viewIt.length && editIt.length ? h('p', { class: 'rmod-kind' }, 'Can see') : null, ...viewIt.map(c => c.el),
+      viewIt.length && editIt.length ? h('p', { class: 'rmod-kind' }, 'Can change') : null, ...editIt.map(c => c.el)) : null;
+    const hasEdit = allIt.some(([k]) => PERM.isEditKey(k)), hasView = !!g.page || allIt.some(([k]) => !PERM.isEditKey(k));
+    const levelOf = () => {
+      const on = k => boxes[k].checked, pageOn = !g.page || on(g.page);
+      const vOn = allIt.filter(([k]) => !PERM.isEditKey(k)).map(([k]) => on(k)), eOn = allIt.filter(([k]) => PERM.isEditKey(k)).map(([k]) => on(k));
+      if ((g.page && !pageOn) || (!g.page && ![...vOn, ...eOn].some(Boolean))) return 'none';
+      if (vOn.every(Boolean) && eOn.every(Boolean)) return hasEdit ? 'edit' : 'view';
+      if (vOn.every(Boolean) && !eOn.some(Boolean)) return 'view';
+      return 'custom';
+    };
+    const setLevel = lv => {
+      if (g.page) boxes[g.page].checked = lv !== 'none';
+      for (const [k] of allIt) boxes[k].checked = lv === 'edit' || (lv === 'view' && !PERM.isEditKey(k));
+      sync(); paintSeg();
+    };
+    const segBtns = [['none', 'None'], ...(hasView ? [['view', 'View']] : []), ...(hasEdit ? [['edit', 'Edit']] : [])].map(([lv, t]) => h('button', { type: 'button', class: 'rseg-b', 'data-lv': lv, title: lv === 'none' ? 'Hide this module' : lv === 'view' ? 'Can see, but not change anything' : 'Can see and change everything here', onclick: () => setLevel(lv) }, t));
+    const segHint = h('small', { class: 'rseg-custom' }, 'custom');
+    const seg = h('div', { class: 'rseg', role: 'group', 'aria-label': g.name + ' access' }, ...segBtns, segHint);
+    const paintSeg = () => { const lv = levelOf(); segBtns.forEach(b => b.setAttribute('aria-pressed', String(b.dataset.lv === lv))); segHint.hidden = lv !== 'custom'; };
+    const card = h('div', { class: 'rmod' + (g.name === 'Filters' ? ' rmod-wide' : '') }, head, seg, itemsBox, subBox, g.name === 'Filters' ? fixedBox : g.name === 'Notifications' ? audienceBox : g.name === 'Attendance' ? fieldBox : null);
     const sync = () => { const off = g.page && !boxes[g.page].checked; card.classList.toggle('off', !!off); for (const c of items) c.box.disabled = isSuper() || !!off; for (const c of subItems) c.box.disabled = isSuper() || !!off; if (g.page) boxes[g.page].disabled = isSuper(); };
     if (g.page) boxes[g.page].addEventListener('change', sync);
-    syncs.push(sync);
+    card.addEventListener('change', () => setTimeout(paintSeg));
+    syncs.push(() => { sync(); paintSeg(); segBtns.forEach(b => { b.disabled = isSuper(); }); });
     return card;
   });
   const presets = h('div', { class: 'rights-presets' }, h('span', {}, 'Start from:'), ...Object.entries(PERM.presets).map(([n, p]) => h('button', { class: 'btn mini', type: 'button', onclick: () => { for (const k of PERM.keys) boxes[k].checked = !!p[k]; syncs.forEach(f => f()); } }, n)));
@@ -9195,7 +9492,7 @@ function drawEditor(box, u, reload, users = [], template = null) {
   const syncRole = () => { const sup = isSuper(); rights.classList.toggle('is-admin', sup); superNote.hidden = !sup; roleNote.hidden = sup; presets.hidden = sup; fixedBox.hidden = sup; audienceBox.hidden = sup; fieldBox.hidden = sup; syncs.forEach(f => f()); };
   role.addEventListener('change', () => { if (isNew && role.value === 'admin') { for (const k of PERM.keys) boxes[k].checked = !!PERM.presets['Admin'][k]; } syncRole(); });
   syncRole();
-  const rightsNow = () => Object.fromEntries([['_v', 8], ...PERM.keys.map(k => [k, boxes[k].checked])]);
+  const rightsNow = () => Object.fromEntries([['_v', PERM.version], ...PERM.keys.map(k => [k, boxes[k].checked])]);
   /* v3.16: copy rights between people, duplicate a person, or hand these rights to several people at once */
   const permsNow = () => isSuper() ? {} : { ...rightsNow(), _attendanceFields: fieldChecks.filter(c => c.box.checked).map(c => c.field), _notificationAudience: { mode: audienceMode.value, users: audienceChecks.filter(c => c.box.checked).map(c => c.id) }, ...(fixed ? { _filters: fixed } : {}) };
   const others = users.filter(x => !u || x.id !== u.id);
