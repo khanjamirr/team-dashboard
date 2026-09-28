@@ -755,6 +755,10 @@ dialog.td-admin::backdrop { background:rgba(15,23,42,.45); }
 #cardFill .fill-more { margin: 10px 0 0; display: flex; gap: 8px; align-items: center; }
 #cardFill .filltbl-wrap { max-height: 62vh; }
 table.filltbl { border-collapse: separate; border-spacing: 0; width: 100%; font-size: 13px; }
+table.filltbl th .fth { display:inline-flex; align-items:center; gap:4px; }
+table.filltbl th .fthf { border:0; background:transparent; color:var(--muted); cursor:pointer; font-size:11px; line-height:1; padding:3px 5px; border-radius:5px; }
+table.filltbl th .fthf:hover { background:color-mix(in srgb, var(--accent) 12%, transparent); color:var(--ink); }
+table.filltbl th .fthf.on { color:var(--accent); font-weight:700; background:color-mix(in srgb, var(--accent) 16%, transparent); }
 table.filltbl th { position: sticky; top: 0; z-index: 2; background: var(--surface-2); text-align: left; padding: 8px 10px; font-size: 12px; color: var(--ink-2); border-bottom: 1px solid var(--grid); white-space: nowrap; }
 table.filltbl td { padding: 5px 10px; border-bottom: 1px solid var(--grid); vertical-align: middle; white-space: nowrap; }
 table.filltbl td.n { color: var(--muted); font-size: 11px; width: 32px; }
@@ -1290,6 +1294,57 @@ body.filters-locked #cleanFilters, body.filters-locked #xchips, body.filters-loc
   #pageSummary.ov > .ov-glance { grid-template-columns:repeat(auto-fit,minmax(min(100%,300px),1fr)); }
 }
 @media (max-width:650px) { .ov-tile { padding:12px; } .ov-ic { width:34px; height:34px; font-size:17px; } .ov-tx b { font-size:18px; } }
+
+/* ================= v3.19: team chat ================= */
+.pd { position:relative; display:inline-flex; align-items:center; justify-content:center; flex:none; width:10px; height:10px; border-radius:50%; background:#9ca3af; box-shadow:0 0 0 2px var(--surface); color:#fff; font-size:7px; font-weight:800; line-height:1; }
+.pd.big { width:12px; height:12px; font-size:8px; }
+.pd-on { background:#22c55e; }
+.pd-on::after { content:""; position:absolute; inset:-3px; border-radius:50%; border:2px solid #22c55e; opacity:0; animation:pdPulse 2.4s ease-out infinite; }
+@keyframes pdPulse { 0% { opacity:.55; transform:scale(.7); } 100% { opacity:0; transform:scale(1.35); } }
+@media (prefers-reduced-motion: reduce) { .pd-on::after { animation:none; } }
+.pd-away { background:#9ca3af; }
+.pd-off { background:#9ca3af; }
+.chat-fab { position:fixed; right:20px; bottom:20px; z-index:60; display:flex; align-items:center; gap:8px; height:48px; padding:0 16px 0 14px; border:0; border-radius:999px; background:var(--accent); color:#fff; font:inherit; font-weight:650; box-shadow:0 8px 24px rgba(15,23,42,.22); cursor:pointer; }
+.chat-fab:hover { filter:brightness(1.08); } .chat-fab.on { filter:brightness(.92); }
+.chat-fab[hidden] { display:none; }
+.chat-fab-ic { font-size:18px; }
+.chat-fab .chat-me-dot { box-shadow:0 0 0 2px var(--accent); }
+.chat-badge { position:absolute; top:-6px; right:-4px; min-width:20px; height:20px; padding:0 5px; border-radius:10px; background:var(--danger,#dc2626); color:#fff; font-size:11px; line-height:20px; text-align:center; box-shadow:0 0 0 2px var(--surface); }
+.chat-badge[hidden] { display:none; }
+.chat-panel { position:fixed; right:20px; bottom:80px; z-index:61; width:min(390px,calc(100vw - 24px)); height:min(580px,calc(100vh - 110px)); display:flex; flex-direction:column; background:var(--surface); color:var(--ink); border:1px solid var(--border); border-radius:16px; box-shadow:0 18px 50px rgba(15,23,42,.25); overflow:hidden; }
+.chat-panel[hidden] { display:none; }
+.chat-head { display:flex; align-items:center; gap:10px; padding:12px 14px; border-bottom:1px solid var(--border); background:var(--surface-2); }
+.chat-head > div { flex:1; min-width:0; display:flex; flex-direction:column; }
+.chat-head b { font-size:14px; } .chat-head small { font-size:11.5px; color:var(--ink-2); white-space:nowrap; overflow:hidden; text-overflow:ellipsis; }
+.chat-head .chat-who { flex-direction:row; align-items:center; gap:10px; } .chat-who > div { display:flex; flex-direction:column; min-width:0; }
+.chat-x, .chat-back { flex:none; width:30px; height:30px; border:0; border-radius:8px; background:transparent; color:var(--ink-2); font:inherit; font-size:15px; cursor:pointer; }
+.chat-x:hover, .chat-back:hover { background:var(--surface); color:var(--ink); }
+.chat-legend { display:flex; gap:14px; padding:8px 14px 0; font-size:11px; color:var(--ink-2); } .chat-legend > span { display:inline-flex; align-items:center; gap:6px; }
+.chat-searchbox { padding:10px 14px 6px; } .chat-search { width:100%; }
+.chat-list { flex:1; overflow:auto; padding:4px 8px 10px; }
+.chat-row { width:100%; display:flex; align-items:center; gap:10px; padding:8px 8px; border:0; border-radius:10px; background:transparent; color:var(--ink); font:inherit; text-align:left; cursor:pointer; }
+.chat-row:hover, .chat-row:focus-visible { background:var(--surface-2); }
+.chat-row-t { flex:1; min-width:0; display:flex; flex-direction:column; } .chat-row-t b { font-size:13px; font-weight:600; white-space:nowrap; overflow:hidden; text-overflow:ellipsis; } .chat-row-t small { font-size:11.5px; color:var(--ink-2); white-space:nowrap; overflow:hidden; text-overflow:ellipsis; }
+.chat-av { position:relative; flex:none; width:34px; height:34px; border-radius:50%; display:flex; align-items:center; justify-content:center; background:color-mix(in srgb,var(--accent) 16%,var(--surface)); color:var(--accent); font-size:12px; font-weight:700; }
+.chat-av.all { background:color-mix(in srgb,var(--c-violet,#7c3aed) 16%,var(--surface)); color:var(--c-violet,#7c3aed); font-size:15px; }
+.chat-av .pd { position:absolute; right:-1px; bottom:-1px; }
+.chat-unread { flex:none; min-width:22px; height:22px; padding:0 6px; border-radius:11px; background:var(--accent); color:#fff; font-size:11.5px; font-weight:700; line-height:22px; text-align:center; }
+.chat-msgs { flex:1; overflow:auto; padding:12px 14px; display:flex; flex-direction:column; gap:2px; background:var(--bg,var(--surface)); }
+.chat-day { text-align:center; margin:10px 0 6px; } .chat-day span { font-size:11px; color:var(--ink-2); background:var(--surface-2); padding:2px 10px; border-radius:999px; }
+.chat-msg { display:flex; flex-direction:column; align-items:flex-start; max-width:82%; margin-top:8px; }
+.chat-msg.cont { margin-top:2px; } .chat-msg.mine { align-self:flex-end; align-items:flex-end; }
+.chat-from { font-size:11px; font-weight:600; color:var(--ink-2); margin:0 0 2px 10px; }
+.chat-bubble { padding:8px 12px; border-radius:14px 14px 14px 4px; background:var(--surface-2); color:var(--ink); font-size:13.5px; line-height:1.45; white-space:pre-wrap; overflow-wrap:anywhere; }
+.chat-msg.mine .chat-bubble { background:var(--accent); color:#fff; border-radius:14px 14px 4px 14px; }
+.chat-msg time { font-size:10.5px; color:var(--ink-3,var(--ink-2)); margin:2px 6px 0; }
+.chat-more { align-self:center; font-size:12px; margin-bottom:6px; }
+.chat-compose { display:flex; align-items:flex-end; gap:8px; padding:10px 12px; border-top:1px solid var(--border); background:var(--surface); }
+.chat-in { flex:1; min-height:38px; max-height:120px; resize:none; padding:9px 12px; border:1px solid var(--border); border-radius:12px; background:var(--surface-2); color:var(--ink); font:inherit; font-size:13.5px; line-height:1.4; }
+.chat-in:focus { outline:2px solid color-mix(in srgb,var(--accent) 45%,transparent); outline-offset:0; background:var(--surface); }
+.chat-send { height:38px; border-radius:12px; }
+.chat-empty { padding:24px 16px; text-align:center; color:var(--ink-2); } .chat-empty p { margin:0 0 8px; }
+.chat-warn { padding:6px 12px; font-size:11.5px; color:#92400e; background:#fef3c7; }
+@media (max-width:650px) { .chat-fab { right:12px; bottom:12px; } .chat-fab-t { display:none; } .chat-panel { right:8px; left:8px; width:auto; bottom:70px; height:calc(100vh - 90px); } }
 </style></head>
 
 
@@ -2733,6 +2788,13 @@ const CLOUD = (() => {
   const setSetting = (key, value) => rpc('td_admin_set_setting', { p_token: tok(), p_key: key, p_value: value });
   const setShared = (key, value) => rpc('td_set_shared_setting', { p_token: tok(), p_key: key, p_value: value });
   const saveLeaveRequest = (request, expected) => rpc('td_save_leave_request', { p_token: tok(), p_request: request, p_expected: expected });
+  /* v3.19: team chat and online status (supabase/chat.sql) */
+  const chat = {
+    sync: (state, idle, withId, after) => rpc('td_chat_sync', { p_token: tok(), p_state: state, p_idle: Math.max(0, Math.round(idle || 0)), p_with: withId ?? null, p_after: after || 0 }),
+    send: (withId, body) => rpc('td_chat_send', { p_token: tok(), p_with: withId, p_body: body }),
+    read: (withId, lastId) => rpc('td_chat_read', { p_token: tok(), p_with: withId, p_last_id: lastId || 0 }),
+    history: (withId, before) => rpc('td_chat_history', { p_token: tok(), p_with: withId, p_before: before }),
+  };
   const admin = {
     users: () => rpc('td_admin_list_users', { p_token: tok() }),
     save: (id, name, code, role, active, permissions, loginId) => rpc('td_admin_save_user', { p_token: tok(), p_id: id, p_name: name, p_passcode: code, p_role: role, p_active: active, p_permissions: permissions ?? null, p_login_id: loginId ?? null }),
@@ -2759,6 +2821,8 @@ const CLOUD = (() => {
     dropSession();
     const controller = new AbortController();
     const timeout = setTimeout(() => controller.abort(), 3000);
+    /* v3.19: show everyone this person signed out (grey with ✕) */
+    try { if (token) await rpc('td_chat_sync', { p_token: token, p_state: 'offline', p_idle: 0, p_with: null, p_after: 0 }, controller.signal); } catch { }
     try { if (token) await rpc('td_logout', { p_token: token }, controller.signal); } catch { }
     finally { clearTimeout(timeout); location.reload(); }
   }
@@ -2849,7 +2913,7 @@ const CLOUD = (() => {
   }
   /* v3.11: "Manage passcodes" is now Settings > People & access */
   function openAdmin() { if (session && session.role === 'superadmin' && window.openSettings) window.openSettings('people'); }
-  return { SUPABASE_CONFIG, changeMyPasscode, card, resume, mode, decorate, signOut, useLocalFiles, openAdmin, configured, isAdmin, refreshMe, user, getSettings, setSetting, setShared, saveLeaveRequest, admin, _rpc: rpc };
+  return { SUPABASE_CONFIG, chat, changeMyPasscode, card, resume, mode, decorate, signOut, useLocalFiles, openAdmin, configured, isAdmin, refreshMe, user, getSettings, setSetting, setShared, saveLeaveRequest, admin, _rpc: rpc };
 })();
 
 /* =====================================================================
@@ -2869,11 +2933,12 @@ const PERM_GROUPS = [
   { name: 'Reports', page: 'page.reports', items: [['rep.team', 'Team composition'], ['rep.growth', 'Tenure & growth'], ['rep.location', 'Location & travel'], ['rep.attendance', 'Attendance reports'], ['rep.export', 'Copy report tables and charts']] },
   { name: 'Save & sync', items: [['sync.view', 'Open the Save & sync settings'], ['sync.auto', 'Start or stop auto-sync'], ['sync.save', 'Save now and undo']] },
 
+  { name: 'Chat', items: [['chat.use', 'Use team chat and see who is online'], ['chat.all', 'Post in the Everyone room']] },
   { name: 'Notifications', items: [['notifications.view', 'Open notifications and receive request updates'], ['activity.view', 'See the activity log for all users']] },
   { name: 'Filters', items: [['filters.custom', 'Change the filters (search, status, client…)']] },
   { name: 'Settings', items: [['set.fields', 'Choose the mandatory fields'], ['set.workbook', 'Backups, sign-in history and replacing the workbook'], ['workbook.download', 'Download a copy of the workbook'], ['tools.distance', 'Use the distance tool']] },
 ];
-const PERM_VERSION = 10;
+const PERM_VERSION = 11;
 const LOG_CODES = ['AL', 'CL', 'SL', 'UL', 'AB', 'HD1', 'HD2', 'LA', 'R', 'L', 'C'];
 /* the leave types a passcode could log before 3.14.2 (approval codes with Approve leave, LA always, the rest with Mark and edit) */
 const oldLogKeys = p => LOG_CODES.filter(c => ['AL', 'CL', 'SL'].includes(c) ? p['att.approve'] : c === 'LA' ? true : p['att.edit']).map(c => 'log.' + c);
@@ -2883,18 +2948,18 @@ const PAGE_OF = { summary: 'page.overview', employees: 'page.employees', attenda
 const pick = keys => Object.fromEntries([['_v', PERM_VERSION], ...PERM_KEYS.map(k => [k, ['notifications.view', 'requests.own', 'requests.rejected'].includes(k) || (k === 'requests.approvals' && keys.includes('att.approve')) || keys.includes(k)])]);
 const ROLE_NAMES = { superadmin: 'Super admin', admin: 'Admin', user: 'User' };
 /* v3.14: what a page shows by default once someone may open it (red flags and new fields stay off until ticked) */
-const VIEW_KEYS = ['ov.attendance', 'ov.coming', 'ov.holidays', 'act.items', 'act.review', 'act.health', 'rep.team', 'rep.growth', 'rep.location', 'rep.attendance', 'rep.export'];
+const VIEW_KEYS = ['chat.use', 'ov.attendance', 'ov.coming', 'ov.holidays', 'act.items', 'act.review', 'act.health', 'rep.team', 'rep.growth', 'rep.location', 'rep.attendance', 'rep.export'];
 /* v3.17: rights that change data; everything else only lets someone see things. Used by the None / View / Edit switch per module. */
-const EDIT_KEYS = new Set(['att.approve', 'emp.edit', 'emp.add', 'emp.delete', 'emp.bulk', 'emp.fields', 'att.log', 'att.direct', 'att.edit', 'att.rows', 'att.holidays', 'att.fields', 'att.addemp', ...LOG_CODES.map(c => 'log.' + c), 'sync.auto', 'sync.save', 'filters.custom', 'set.fields', 'set.workbook']);
+const EDIT_KEYS = new Set(['att.approve', 'emp.edit', 'emp.add', 'emp.delete', 'emp.bulk', 'emp.fields', 'att.log', 'att.direct', 'att.edit', 'att.rows', 'att.holidays', 'att.fields', 'att.addemp', ...LOG_CODES.map(c => 'log.' + c), 'sync.auto', 'sync.save', 'filters.custom', 'set.fields', 'set.workbook', 'chat.all']);
 const UPG = new WeakMap();
 window.PERM = {
   groups: PERM_GROUPS, keys: PERM_KEYS, roleNames: ROLE_NAMES, version: PERM_VERSION, isEditKey: k => EDIT_KEYS.has(k),
   presets: {
     'Full access': pick(PERM_KEYS),
     'Admin': pick(PERM_KEYS),
-    'Editor': pick([...PAGES, ...VIEW_KEYS, 'ov.openatt', ...oldLogKeys({ 'att.edit': true }), 'emp.edit', 'emp.add', 'emp.bulk', 'att.who', 'att.grid', 'att.log', 'att.edit', 'att.rows', 'att.addemp', 'filters.custom', 'activity.view', 'tools.distance', 'sync.view', 'sync.auto', 'sync.save']),
-    'Leave approver': pick([...PAGES, ...VIEW_KEYS, 'ov.openatt', ...LOG_CODES.map(c => 'log.' + c), 'att.direct', 'ov.watch', 'att.who', 'att.grid', 'att.log', 'att.edit', 'att.rows', 'att.approve', 'filters.custom', 'activity.view', 'sync.view', 'sync.auto', 'sync.save']),
-    'Leave logger': pick(['page.overview', 'page.attendance', 'ov.attendance', 'ov.coming', 'att.who', 'att.log', 'log.LA', 'sync.save']),
+    'Editor': pick([...PAGES, ...VIEW_KEYS, 'chat.all', 'ov.openatt', ...oldLogKeys({ 'att.edit': true }), 'emp.edit', 'emp.add', 'emp.bulk', 'att.who', 'att.grid', 'att.log', 'att.edit', 'att.rows', 'att.addemp', 'filters.custom', 'activity.view', 'tools.distance', 'sync.view', 'sync.auto', 'sync.save']),
+    'Leave approver': pick([...PAGES, ...VIEW_KEYS, 'chat.all', 'ov.openatt', ...LOG_CODES.map(c => 'log.' + c), 'att.direct', 'ov.watch', 'att.who', 'att.grid', 'att.log', 'att.edit', 'att.rows', 'att.approve', 'filters.custom', 'activity.view', 'sync.view', 'sync.auto', 'sync.save']),
+    'Leave logger': pick(['chat.use', 'page.overview', 'page.attendance', 'ov.attendance', 'ov.coming', 'att.who', 'att.log', 'log.LA', 'sync.save']),
     'View only': pick([...PAGES, ...VIEW_KEYS, 'att.who', 'att.grid']),
   },
   online: () => CLOUD.mode() === 'cloud' && !!CLOUD.user(),
@@ -2910,6 +2975,7 @@ window.PERM = {
     /* v3.16: editing rows and adding employees in the tracker became their own rights; keep what Mark and edit used to allow */
     if (q._v < 9) { q['att.rows'] = !!q['att.edit']; q['att.addemp'] = !!q['att.edit']; }
     /* v3.17: the Open attendance button must be given on purpose; the holidays card is shown to anyone who sees the Overview */
+    if (q._v < 11) { q['chat.use'] = true; q['chat.all'] = true; }
     if (q._v < 10) { q['ov.openatt'] = false; q['ov.holidays'] = !!q['page.overview']; }
     if (q._v < 8) { q['requests.own'] = true; q['requests.rejected'] = true; q['requests.approvals'] = !!q['att.approve']; }
     if (q._v < 2) { q['att.who'] = !!q['page.attendance']; q['att.grid'] = !!q['page.attendance']; q['att.log'] = !!q['att.edit']; }
@@ -7551,7 +7617,8 @@ for (const t of document.querySelectorAll(".atab")) t.addEventListener("click", 
 const FILL = {
   fields: [], mode: "missing", scope: "all", preset: null, ids: null, idsLabel: "", client: "", q: "", sort: "name", limit: 150,
   edits: new Map(),            // row id -> Map(column name -> { val: input text, base: cell value when the edit began })
-  fillCol: "", fillVal: "", blanksOnly: true, saving: false, sig: "", byId: new Map()
+  fillCol: "", fillVal: "", blanksOnly: true, saving: false, sig: "", byId: new Map(),
+  colf: {}                     // v3.18: column filters in the table header: key -> Set of values to show
 };
 const fillCols = () => state.cols.filter(c => !c.auto && c.name !== state.schema.key_column);
 const fillCol = n => (state.idx[n] == null ? null : state.cols[state.idx[n]]);
@@ -7582,7 +7649,18 @@ function fillPruneEdits() {
   }
   if (lost) toast(lost + " typed value" + (lost === 1 ? " was" : "s were") + " dropped because that cell changed in Excel in the meantime.", true);
 }
-function fillRows() {
+/* v3.18: the value a column shows for a row, as text (used by the header filters) */
+function fillKeyVal(r, key) {
+  let v;
+  if (key === "id") v = String(r.id ?? "");
+  else if (key === "name") v = gs(r, "name_column");
+  else if (key === "status") v = gs(r, "status_column");
+  else if (key === "client") v = gs(r, "client_column");
+  else { const c = fillCol(key.slice(2)); if (!c) return BLANK; const t = String(fillCell(r, c) ?? "").trim(); v = t && c.type === "date" && /^\d{4}-\d\d-\d\d$/.test(t) ? fmtDate(isoToSerial(t)) : t; }
+  v = String(v ?? "").trim(); return v || BLANK;
+}
+const fillColfOn = () => Object.keys(FILL.colf).length > 0;
+function fillRows(skipKey) {
   const P = FILL.preset ? fillPresets().find(p => p.id === FILL.preset) : null;
   const fields = FILL.fields.map(fillCol).filter(Boolean), q = FILL.q.trim().toLowerCase();
   let rows = state.rows.filter(r => r.id != null && String(r.id) !== "");
@@ -7594,6 +7672,7 @@ function fillRows() {
   if (FILL.client) rows = rows.filter(r => gs(r, "client_column") === FILL.client);
   if (q) rows = rows.filter(r => r._s.includes(q));
   if (FILL.mode === "missing" && fields.length) rows = rows.filter(r => FILL.edits.has(r.id) || fields.some(c => fillBlankCell(r, c)));
+  for (const [k, set] of Object.entries(FILL.colf)) { if (k === skipKey || (k.startsWith("f:") && !FILL.fields.includes(k.slice(2)))) continue; rows = rows.filter(r => set.has(fillKeyVal(r, k))); }
   const nm = r => gs(r, "name_column");
   const cmp = FILL.sort === "id" ? (a, b) => String(a.id).localeCompare(String(b.id), undefined, { numeric: true })
     : FILL.sort === "client" ? (a, b) => gs(a, "client_column").localeCompare(gs(b, "client_column")) || nm(a).localeCompare(nm(b))
@@ -7739,11 +7818,13 @@ function fillTable() {
   if (!fields.length) { box.replaceChildren(h("div", { class: "allclear" }, h("span", { "aria-hidden": "true" }, "☝"), "Choose a field above, or one of the quick starts, to begin.")); fillFooter(); return; }
   const all = fillRows(), rows = all.slice(0, FILL.limit);
   const P = FILL.preset ? fillPresets().find(p => p.id === FILL.preset) : null;
-  const head = h("div", { class: "fill-count" }, "Showing ", h("b", {}, fmtN(rows.length)), all.length > rows.length ? " of " + fmtN(all.length) : "", " " + (all.length === 1 ? "person" : "people") + (FILL.mode === "missing" ? " with a missing value" : ""));
+  const head = h("div", { class: "fill-count" }, "Showing ", h("b", {}, fmtN(rows.length)), all.length > rows.length ? " of " + fmtN(all.length) : "", " " + (all.length === 1 ? "person" : "people") + (FILL.mode === "missing" ? " with a missing value" : ""),
+    fillColfOn() ? h("span", {}, " · column filters on (" + Object.keys(FILL.colf).length + ") ", h("button", { class: "linkbtn", onclick: () => { FILL.colf = {}; FILL.sig = ""; fillTable(); } }, "Clear column filters")) : null);
   if (!all.length) { box.replaceChildren(head, h("div", { class: "allclear" }, h("span", { "aria-hidden": "true" }, "✓"), FILL.mode === "missing" ? "Nobody here is missing " + fields.map(c => c.label).join(" or ") + "." : "Nobody matches these filters.")); fillFooter(); return; }
   const th = t => h("th", {}, t);
+  const thF = (label, key) => h("th", {}, h("span", { class: "fth" }, h("span", {}, label), h("button", { type: "button", class: "fthf" + (FILL.colf[key] ? " on" : ""), "data-pop": "1", title: "Filter " + label, "aria-label": "Filter " + label, onclick: ev => { ev.stopPropagation(); openFillColFilter(ev.currentTarget, key, label); } }, FILL.colf[key] ? "▼" : "▾")));
   const table = h("table", { class: "filltbl" },
-    h("thead", {}, h("tr", {}, th("#"), th("Emp ID"), th("Name"), th("Status"), th("Client"), fields.map(c => th(c.label)), th(""))),
+    h("thead", {}, h("tr", {}, th("#"), thF("Emp ID", "id"), thF("Name", "name"), thF("Status", "status"), thF("Client", "client"), fields.map(c => thF(c.label, "f:" + c.name)), th(""))),
     h("tbody", {}, rows.map((r, i) => {
       const m = FILL.edits.get(r.id);
       const tr = h("tr", { "data-id": r.id, class: m ? "edited" : "" },
@@ -7755,7 +7836,7 @@ function fillTable() {
     })));
   const more = all.length > rows.length ? h("div", { class: "fill-more" }, h("button", { class: "btn", onclick: () => { FILL.limit += 150; fillTable(); } }, "Show " + Math.min(150, all.length - rows.length) + " more"), h("span", { class: "hint" }, " " + (all.length - rows.length) + " more not shown yet")) : null;
   const wrap = h("div", { class: "tablewrap filltbl-wrap" }, table);
-  box.replaceChildren(head, wrap, more);
+  box.replaceChildren(...[head, wrap, more].filter(Boolean));
   wrap.scrollTop = scrollTop;
   const rowOf = el => FILL.byId.get(el.closest("tr").dataset.id);
   const onEdit = e => { const el = e.target.closest(".fc"); if (!el) return; const r = rowOf(el), c = fillCol(el.dataset.col); fillSet(r.id, c, el.value); fillMark(el, r, c); el.closest("tr").classList.toggle("edited", FILL.edits.has(r.id)); fillFooter(); };
@@ -7767,6 +7848,40 @@ function fillTable() {
     if (nx) { e.preventDefault(); const t = nx.querySelector('.fc[data-col="' + CSS.escape(el.dataset.col) + '"]'); if (t) { t.focus(); if (t.select) t.select(); } }
   });
   fillFooter();
+}
+/* v3.18: Excel-style filter for a column of the Fill in bulk table */
+function openFillColFilter(anchor, key, label) {
+  const rows = fillRows(key), counts = new Map();
+  for (const r of rows) { const v = fillKeyVal(r, key); counts.set(v, (counts.get(v) || 0) + 1); }
+  for (const v of FILL.colf[key] || []) if (!counts.has(v)) counts.set(v, 0);
+  const allVals = [...counts.keys()].sort((a, b) => (a === BLANK ? 1 : b === BLANK ? -1 : a.localeCompare(b, undefined, { numeric: true })));
+  const pop = h("div", { class: "colf", role: "dialog", "aria-label": "Filter " + label });
+  const sortKey = { id: "id", name: "name", client: "client" }[key];
+  pop.append(h("div", { class: "colf-h" }, label));
+  if (sortKey) pop.append(h("div", { class: "colf-row" }, h("button", { class: "btn mini", onclick: () => { FILL.sort = sortKey; closePops(); fillTable(); } }, "↑ Sort A → Z")));
+  let sel = FILL.colf[key] ? new Set(FILL.colf[key]) : null;   // null = everything shown
+  const apply = () => { if (!sel || allVals.every(v => sel.has(v))) delete FILL.colf[key]; else FILL.colf[key] = new Set(sel); FILL.sig = ""; fillTable(); };
+  const search = h("input", { class: "input", type: "search", placeholder: "Search " + allVals.length + " values…", "aria-label": "Search values", style: "height:30px;margin:8px 0" });
+  const list = h("div", { class: "colf-list" });
+  const draw = () => {
+    const q = search.value.trim().toLowerCase(), shown = allVals.filter(v => !q || v.toLowerCase().includes(q));
+    list.replaceChildren(...shown.slice(0, 300).map(v => h("label", {}, h("input", { type: "checkbox", checked: !sel || sel.has(v), onchange: e => { sel = sel || new Set(allVals); if (e.target.checked) sel.add(v); else sel.delete(v); apply(); } }), h("span", { class: "colf-v" }, v), h("small", {}, String(counts.get(v))))));
+    if (shown.length > 300) list.append(h("div", { class: "hint", style: "padding:6px 8px" }, "Showing the first 300 of " + shown.length + " – type to narrow down."));
+    if (!shown.length) list.append(h("div", { class: "hint", style: "padding:6px 8px" }, "No values match."));
+  };
+  search.addEventListener("input", draw);
+  pop.append(search,
+    h("div", { class: "colf-row" },
+      h("button", { class: "linkbtn", onclick: () => { sel = null; apply(); draw(); } }, "Select all"),
+      h("button", { class: "linkbtn", onclick: () => { const q = search.value.trim().toLowerCase(); sel = new Set(q ? allVals.filter(v => !v.toLowerCase().includes(q) && (!sel || sel.has(v))) : []); apply(); draw(); } }, "Clear"),
+      h("button", { class: "linkbtn", onclick: () => { sel = new Set([BLANK]); apply(); draw(); } }, "Only blanks")),
+    list,
+    h("div", { class: "colf-row", style: "margin-top:8px" },
+      h("button", { class: "btn mini", onclick: () => { delete FILL.colf[key]; FILL.sig = ""; closePops(); fillTable(); } }, "Clear filter"),
+      h("button", { class: "btn mini primary", onclick: closePops }, "Done")));
+  draw();
+  openPopNode(anchor, pop);
+  setTimeout(() => search.focus(), 0);
 }
 function fillMark(el, row, c) {
   const m = FILL.edits.get(row.id), e = m && m.get(c.name), err = e ? fillCheck(row, c, e.val) : "";
@@ -9095,6 +9210,157 @@ window.applyAccess = () => {
   renderSyncButtons();
 };
 setInterval(async () => { if (PERM.online() && !el('app').hidden && !document.hidden) { await CLOUD.refreshMe(); applyAccess(); } }, 60000);
+
+/* ============================== v3.19: team chat and online status ==============================
+   Green = signed in with the dashboard open in the last 5 minutes · grey = signed in but the tab has not been
+   open for 5+ minutes (or the browser was closed) · grey with ✕ = signed out. Messages and presence go through
+   supabase/chat.sql; the window checks for news every 3 s while a chat is open and every 20 s otherwise. */
+const CHAT = { open: false, withId: null, people: [], unread: {}, me: null, skew: 0, msgs: new Map(), last: new Map(), busy: false, timer: null, broken: '', brokenAt: 0, blocked: false, notified: {}, extra: new Map(), extraAt: 0, q: '', activeSince: Date.now(), inactiveSince: null };
+const chatOnline = () => window.PERM && PERM.online() && !el('app').hidden && PERM.can('chat.use') && !CHAT.blocked;
+/* how long this tab has not been in front of the person */
+function chatIdle() { const on = document.visibilityState === 'visible' && document.hasFocus(); if (on) { CHAT.inactiveSince = null; return 0; } if (!CHAT.inactiveSince) CHAT.inactiveSince = Date.now(); return (Date.now() - CHAT.inactiveSince) / 1000; }
+function presenceOf(p) {
+  if (!p || p.state === 'offline' || p.never) return 'off';
+  const now = Date.now() + CHAT.skew, ping = now - Date.parse(p.last_ping), act = now - Date.parse(p.last_active);
+  if (ping > 12 * 3600e3) return 'off';
+  if (ping <= 120e3 && act < 5 * 60e3) return 'on';
+  return 'away';
+}
+const agoText = ms => { const m = Math.round(ms / 60000); return m < 1 ? 'just now' : m < 60 ? m + ' min' : m < 1440 ? Math.round(m / 60) + ' h' : Math.round(m / 1440) + ' d'; };
+function presenceText(p) {
+  const st = presenceOf(p), now = Date.now() + CHAT.skew;
+  if (st === 'on') return 'Online';
+  if (st === 'away') return 'Away · last active ' + agoText(now - Date.parse(p.last_active)) + ' ago';
+  if (p && p.never) return 'Not signed in yet';
+  return 'Signed out' + (p && p.last_ping ? ' · ' + agoText(now - Date.parse(p.last_ping)) + ' ago' : '');
+}
+const pdot = (p, big) => h('span', { class: 'pd pd-' + presenceOf(p) + (big ? ' big' : ''), title: presenceText(p), 'aria-label': presenceText(p) }, presenceOf(p) === 'off' ? '✕' : '');
+const chatName = id => id === 'all' ? 'Everyone' : ((CHAT.people.find(p => String(p.id) === String(id)) || CHAT.extra.get(String(id)) || {}).name || 'Someone');
+function chatPeople() {
+  const map = new Map(CHAT.people.map(p => [String(p.id), p]));
+  for (const [id, p] of CHAT.extra) if (!map.has(id)) map.set(id, p);
+  const rank = { on: 0, away: 1, off: 2 };
+  return [...map.values()].filter(p => String(p.id) !== String(CHAT.me)).sort((a, b) => (CHAT.unread[b.id] ? 1 : 0) - (CHAT.unread[a.id] ? 1 : 0) || rank[presenceOf(a)] - rank[presenceOf(b)] || String(a.name).localeCompare(String(b.name)));
+}
+function chatMount() {
+  if (el('chatFab')) return;
+  const fab = h('button', { id: 'chatFab', type: 'button', class: 'chat-fab', 'aria-label': 'Team chat', title: 'Team chat', onclick: () => chatToggle() }, h('span', { class: 'chat-fab-ic', 'aria-hidden': 'true' }, '💬'), h('span', { class: 'chat-fab-t' }, 'Chat'), h('span', { class: 'pd pd-on chat-me-dot', id: 'chatMeDot' }), h('b', { class: 'chat-badge', id: 'chatBadge', hidden: true }));
+  const panel = h('section', { id: 'chatPanel', class: 'chat-panel', hidden: true, role: 'dialog', 'aria-label': 'Team chat' });
+  document.body.append(fab, panel);
+  document.addEventListener('visibilitychange', () => { if (document.visibilityState === 'visible') chatSync(true); else chatSync(); });
+  addEventListener('focus', () => chatSync(true)); addEventListener('blur', () => { chatIdle(); });
+  addEventListener('keydown', e => { if (e.key === 'Escape' && CHAT.open) chatToggle(false); });
+}
+function chatToggle(on = !CHAT.open) {
+  CHAT.open = on; el('chatPanel').hidden = !on; el('chatFab').classList.toggle('on', on);
+  if (on) { chatDraw(); chatSync(true); setTimeout(() => (el('chatPanel').querySelector('.chat-in') || el('chatPanel').querySelector('.chat-search'))?.focus(), 30); }
+}
+function chatOpenWith(id) { CHAT.withId = id == null ? null : String(id); CHAT.q = ''; chatDraw(); chatSync(true); setTimeout(() => el('chatPanel').querySelector('.chat-in')?.focus(), 30); }
+function chatSchedule() {
+  clearTimeout(CHAT.timer);
+  const ms = document.visibilityState !== 'visible' ? 60000 : CHAT.open && CHAT.withId ? 3000 : CHAT.open ? 6000 : 20000;
+  CHAT.timer = setTimeout(() => chatSync(), ms);
+}
+async function chatSync(force) {
+  const fab = el('chatFab');
+  if (!chatOnline()) { if (fab) fab.hidden = true; if (el('chatPanel')) el('chatPanel').hidden = true; CHAT.open = false; clearTimeout(CHAT.timer); CHAT.timer = setTimeout(() => chatSync(), 5000); return; }
+  chatMount(); el('chatFab').hidden = false;
+  if (CHAT.busy) { chatSchedule(); return; }
+  if (CHAT.broken && Date.now() - CHAT.brokenAt < 300000 && !force) { chatSchedule(); return; }
+  CHAT.busy = true;
+  const withId = CHAT.open ? CHAT.withId : null;
+  try {
+    const r = await CLOUD.chat.sync('online', chatIdle(), withId, withId ? (CHAT.last.get(withId) || 0) : 0);
+    CHAT.broken = ''; CHAT.me = String(r.me); CHAT.skew = Date.parse(r.now) - Date.now(); CHAT.people = r.people || [];
+    const before = CHAT.unread; CHAT.unread = r.unread || {};
+    if (withId && r.messages && r.messages.length) {
+      const list = CHAT.msgs.get(withId) || []; const seen = new Set(list.map(m => m.id));
+      for (const m of r.messages) if (!seen.has(m.id)) list.push(m);
+      CHAT.msgs.set(withId, list); CHAT.last.set(withId, list[list.length - 1].id);
+    }
+    /* anything new in the conversation on screen counts as read */
+    if (withId && CHAT.unread[withId] && document.visibilityState === 'visible') { const lid = CHAT.last.get(withId) || 0; delete CHAT.unread[withId]; CLOUD.chat.read(withId, lid).catch(() => { }); }
+    for (const [k, n] of Object.entries(CHAT.unread)) if (n > (before[k] || 0) && n > (CHAT.notified[k] || 0) && !(CHAT.open && CHAT.withId === k)) { toast('💬 New message ' + (k === 'all' ? 'in Everyone' : 'from ' + chatName(k))); CHAT.notified[k] = n; }
+    for (const k of Object.keys(CHAT.notified)) if (!CHAT.unread[k]) delete CHAT.notified[k];
+    /* the super admin also sees people who have not signed in since chat was added */
+    if (PERM.isSuper() && Date.now() - CHAT.extraAt > 300000) { CHAT.extraAt = Date.now(); CLOUD.admin.users().then(us => { CHAT.extra = new Map((us || []).filter(u => u.active !== false).map(u => [String(u.id), { id: String(u.id), name: u.name, role: u.role, login_id: u.login_id, never: true }])); if (CHAT.open) chatDraw(); }).catch(() => { }); }
+  } catch (e) {
+    const m = String(e && e.message || e);
+    if (/NO_CHAT$/.test(m)) { CHAT.blocked = true; }
+    else if (/not set up|function|schema cache/i.test(m)) { CHAT.broken = 'setup'; CHAT.brokenAt = Date.now(); }
+    else if (!/SESSION_EXPIRED/.test(m)) { CHAT.broken = m; CHAT.brokenAt = Date.now(); }
+  } finally { CHAT.busy = false; }
+  chatBadge(); if (CHAT.open) chatDraw(); chatSchedule();
+}
+function chatBadge() {
+  const n = Object.values(CHAT.unread).reduce((a, b) => a + (+b || 0), 0), b = el('chatBadge'); if (!b) return;
+  b.textContent = n > 99 ? '99+' : String(n); b.hidden = !n;
+  const me = el('chatMeDot'); if (me) { const off = CHAT.broken; me.className = 'pd chat-me-dot ' + (off ? 'pd-off' : 'pd-on'); me.title = off ? 'Chat is not connected' : 'You are online'; }
+  document.title = document.title.replace(/^\(\d+\+?\) /, '') ; if (n) document.title = '(' + (n > 99 ? '99+' : n) + ') ' + document.title;
+}
+const chatTime = iso => { const d = new Date(iso); return d.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }); };
+const chatDay = iso => { const d = new Date(iso), t = new Date(); const same = (a, b) => a.toDateString() === b.toDateString(); if (same(d, t)) return 'Today'; const y = new Date(t); y.setDate(t.getDate() - 1); if (same(d, y)) return 'Yesterday'; return d.toLocaleDateString([], { weekday: 'short', day: 'numeric', month: 'short', year: d.getFullYear() !== t.getFullYear() ? 'numeric' : undefined }); };
+const chatFill = (el0, ...kids) => el0.replaceChildren(...kids.filter(k => k != null && k !== false));
+function chatDraw() {
+  const panel = el('chatPanel'); if (!panel || panel.hidden) return;
+  const keepScroll = panel.querySelector('.chat-msgs'), atBottom = !keepScroll || keepScroll.scrollHeight - keepScroll.scrollTop - keepScroll.clientHeight < 60, oldTop = keepScroll ? keepScroll.scrollTop : 0;
+  const draft = panel.querySelector('.chat-in')?.value || '', focusIn = document.activeElement && document.activeElement.classList.contains('chat-in'), focusSearch = document.activeElement && document.activeElement.classList.contains('chat-search');
+  const close = h('button', { type: 'button', class: 'chat-x', 'aria-label': 'Close chat', onclick: () => chatToggle(false) }, '✕');
+  if (CHAT.broken === 'setup') { chatFill(panel, h('header', { class: 'chat-head' }, h('b', {}, 'Team chat'), close), h('div', { class: 'chat-empty' }, h('p', {}, 'Chat needs a one-time database update.'), h('p', { class: 'sm' }, PERM.isSuper() ? 'Open Supabase → SQL Editor, paste supabase/chat.sql and press Run. Then reopen this window.' : 'Ask the super admin to run supabase/chat.sql in Supabase.'), h('button', { class: 'btn mini', type: 'button', onclick: () => { CHAT.broken = ''; chatSync(true); } }, 'Try again'))); return; }
+  if (!CHAT.withId) {
+    const q = CHAT.q.trim().toLowerCase(), ppl = chatPeople().filter(p => !q || (String(p.name) + ' ' + (p.login_id || '')).toLowerCase().includes(q));
+    const counts = { on: 0, away: 0, off: 0 }; chatPeople().forEach(p => counts[presenceOf(p)]++);
+    const row = (id, name, sub, dot, n) => h('button', { type: 'button', class: 'chat-row', onclick: () => chatOpenWith(id) }, dot, h('span', { class: 'chat-row-t' }, h('b', {}, name), h('small', {}, sub)), n ? h('span', { class: 'chat-unread' }, String(n)) : null);
+    const search = h('input', { class: 'input chat-search', type: 'search', placeholder: 'Search people', value: CHAT.q, 'aria-label': 'Search people' });
+    search.addEventListener('input', () => { CHAT.q = search.value; chatDraw(); });
+    chatFill(panel, 
+      h('header', { class: 'chat-head' }, h('div', {}, h('b', {}, 'Team chat'), h('small', {}, counts.on + ' online · ' + counts.away + ' away · ' + counts.off + ' signed out')), close),
+      h('div', { class: 'chat-legend' }, h('span', {}, pdot({ state: 'online', last_ping: new Date(Date.now() + CHAT.skew).toISOString(), last_active: new Date(Date.now() + CHAT.skew).toISOString() }), 'Online'), h('span', {}, h('span', { class: 'pd pd-away' }), 'Away 5+ min'), h('span', {}, h('span', { class: 'pd pd-off' }, '✕'), 'Signed out')),
+      h('div', { class: 'chat-searchbox' }, search),
+      h('div', { class: 'chat-list' },
+        !q ? row('all', '👥 Everyone', 'Message the whole team', h('span', { class: 'chat-av all', 'aria-hidden': 'true' }, '#'), CHAT.unread.all) : null,
+        ...ppl.map(p => row(String(p.id), p.name || 'Unknown', presenceText(p), h('span', { class: 'chat-av' }, (p.name || '?').trim().split(/\s+/).slice(0, 2).map(x => x[0]).join('').toUpperCase(), pdot(p)), CHAT.unread[p.id])),
+        !ppl.length ? h('div', { class: 'chat-empty sm' }, q ? 'No one matches.' : 'People appear here once they sign in.') : null),
+      CHAT.broken ? h('div', { class: 'chat-warn' }, 'Can’t reach chat right now. Retrying…') : null);
+    if (focusSearch) { search.focus(); search.setSelectionRange(search.value.length, search.value.length); }
+    return;
+  }
+  const id = CHAT.withId, isAll = id === 'all', p = CHAT.people.find(x => String(x.id) === id) || CHAT.extra.get(id), list = CHAT.msgs.get(id) || [];
+  const back = h('button', { type: 'button', class: 'chat-back', 'aria-label': 'Back to people', onclick: () => chatOpenWith(null) }, '←');
+  const msgs = h('div', { class: 'chat-msgs', role: 'log', 'aria-live': 'polite' });
+  if (list.length >= 200 || (list.length && list[0].id > 1 && list.more !== false)) msgs.append(h('button', { type: 'button', class: 'linkbtn chat-more', onclick: async () => { try { const older = await CLOUD.chat.history(id, list[0].id); if (!older.length) list.more = false; list.unshift(...older); chatDraw(); } catch (e) { toast(e.message, true); } } }, 'Load earlier messages'));
+  let day = '', prev = null;
+  for (const m of list) {
+    const d = chatDay(m.at); if (d !== day) { day = d; prev = null; msgs.append(h('div', { class: 'chat-day' }, h('span', {}, d))); }
+    const mine = String(m.from_id) === CHAT.me, cont = prev && prev.from_id === m.from_id && Date.parse(m.at) - Date.parse(prev.at) < 5 * 60e3;
+    msgs.append(h('div', { class: 'chat-msg' + (mine ? ' mine' : '') + (cont ? ' cont' : '') }, isAll && !mine && !cont ? h('small', { class: 'chat-from' }, m.from_name || chatName(m.from_id)) : null, h('div', { class: 'chat-bubble' }, m.body), h('time', { datetime: m.at }, chatTime(m.at))));
+    prev = m;
+  }
+  if (!list.length) msgs.append(h('div', { class: 'chat-empty sm' }, isAll ? 'Say hello to the team 👋' : 'No messages yet. Say hi 👋'));
+  const canPost = !isAll || PERM.can('chat.all');
+  const input = h('textarea', { class: 'chat-in', rows: 1, maxlength: 2000, placeholder: canPost ? 'Write a message… (Enter to send, Shift+Enter for a new line)' : 'You can read the Everyone room but not post in it', disabled: !canPost, 'aria-label': 'Message' });
+  input.value = draft;
+  const grow = () => { input.style.height = 'auto'; input.style.height = Math.min(120, input.scrollHeight) + 'px'; };
+  const send = async () => {
+    const body = input.value.trim(); if (!body) return;
+    input.value = ''; grow(); sendBtn.disabled = true;
+    try { const m = await CLOUD.chat.send(id, body); const l = CHAT.msgs.get(id) || []; if (!l.some(x => x.id === m.id)) l.push(m); CHAT.msgs.set(id, l); CHAT.last.set(id, Math.max(CHAT.last.get(id) || 0, m.id)); chatDraw(); el('chatPanel').querySelector('.chat-msgs')?.scrollTo(0, 1e9); }
+    catch (e) { input.value = body; grow(); toast(/NO_CHAT_ALL/.test(e.message) ? 'You can’t post in the Everyone room. Ask the admin for the right.' : 'Message not sent: ' + e.message, true); }
+    finally { sendBtn.disabled = false; el('chatPanel').querySelector('.chat-in')?.focus(); }
+  };
+  input.addEventListener('keydown', e => { if (e.key === 'Enter' && !e.shiftKey && !e.isComposing) { e.preventDefault(); send(); } });
+  input.addEventListener('input', grow);
+  const sendBtn = h('button', { type: 'button', class: 'btn primary chat-send', disabled: !canPost, onclick: send, 'aria-label': 'Send' }, 'Send');
+  chatFill(panel, 
+    h('header', { class: 'chat-head' }, back, h('div', { class: 'chat-who' }, isAll ? h('span', { class: 'chat-av all' }, '#') : h('span', { class: 'chat-av' }, (chatName(id) || '?').trim().split(/\s+/).slice(0, 2).map(x => x[0]).join('').toUpperCase(), pdot(p)), h('div', {}, h('b', {}, isAll ? 'Everyone' : chatName(id)), h('small', {}, isAll ? CHAT.people.filter(x => presenceOf(x) === 'on').length + ' online now' : presenceText(p)))), close),
+    msgs,
+    h('div', { class: 'chat-compose' }, input, sendBtn),
+    CHAT.broken ? h('div', { class: 'chat-warn' }, 'Can’t reach chat right now. Retrying…') : null);
+  requestAnimationFrame(() => { grow(); msgs.scrollTop = atBottom ? msgs.scrollHeight : oldTop; });
+  if (focusIn) { input.focus(); input.setSelectionRange(input.value.length, input.value.length); }
+}
+window.openChat = id => { chatMount(); chatToggle(true); if (id !== undefined) chatOpenWith(id); };
+setTimeout(() => chatSync(), 1500);
 
 /* ---------- v3.15: leave requests waiting for a manager: badge on Attendance, refreshed every 45 seconds ---------- */
 function updateReqBadge() {
