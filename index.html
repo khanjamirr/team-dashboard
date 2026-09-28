@@ -1345,6 +1345,39 @@ body.filters-locked #cleanFilters, body.filters-locked #xchips, body.filters-loc
 .chat-empty { padding:24px 16px; text-align:center; color:var(--ink-2); } .chat-empty p { margin:0 0 8px; }
 .chat-warn { padding:6px 12px; font-size:11.5px; color:#92400e; background:#fef3c7; }
 @media (max-width:650px) { .chat-fab { right:12px; bottom:12px; } .chat-fab-t { display:none; } .chat-panel { right:8px; left:8px; width:auto; bottom:70px; height:calc(100vh - 90px); } }
+
+/* ================= v3.19: custom dashboards ================= */
+.cd-page { display:flex; flex-direction:column; gap:16px; margin-top:4px; }
+.cd-page[hidden] { display:none !important; }
+.cd-head { display:flex; flex-wrap:wrap; align-items:center; gap:14px; padding:16px 20px !important; }
+.cd-title { flex:1 1 280px; min-width:0; } .cd-title h2 { margin:0; font-size:17px; } .cd-title p { margin:4px 0 0; font-size:12.5px; color:var(--ink-2); }
+.cd-tools { display:flex; flex-wrap:wrap; align-items:center; gap:8px; } .cd-tools select.input { min-width:200px; max-width:320px; height:34px; }
+.cd-more { position:relative; } .cd-more > summary { list-style:none; cursor:pointer; } .cd-more > summary::-webkit-details-marker { display:none; }
+.cd-menu { position:absolute; right:0; top:calc(100% + 6px); z-index:30; min-width:210px; padding:6px; border:1px solid var(--border); border-radius:10px; background:var(--surface); box-shadow:var(--shadow); display:flex; flex-direction:column; }
+.cd-menu button { text-align:left; border:0; background:transparent; color:var(--ink); font:inherit; font-size:13px; padding:8px 10px; border-radius:7px; cursor:pointer; } .cd-menu button:hover { background:var(--surface-2); } .cd-menu button.danger { color:var(--danger, #c0392b); }
+.cd-grid { display:grid; grid-template-columns:repeat(2,minmax(0,1fr)); gap:16px; align-items:start; }
+.cd-card { padding:16px 18px !important; margin:0 !important; min-width:0; border-radius:14px !important; } .cd-card.full { grid-column:1 / -1; }
+.cd-chead { display:flex; align-items:flex-start; gap:10px; margin-bottom:10px; } .cd-chead h3 { margin:0; font-size:14.5px; } .cd-chead .sub { font-size:11.5px; color:var(--ink-2); margin-top:2px; }
+.cd-ctools { display:flex; gap:6px; align-items:center; flex:none; }
+.cd-body { min-width:0; } .cd-svg { width:100%; height:auto; display:block; overflow:visible; }
+.cd-lab { font-size:11px; fill:var(--ink-2); } .cd-val { font-size:11px; font-weight:650; fill:var(--ink); } .cd-ax { font-size:10px; fill:var(--ink-2); } line.cd-grid { stroke:var(--grid, var(--border)); stroke-width:1; }
+.cd-legend { display:flex; flex-wrap:wrap; gap:6px 14px; margin:0 0 8px; font-size:12px; color:var(--ink-2); } .cd-legend i, .cd-dleg i { display:inline-block; width:10px; height:10px; border-radius:3px; margin-right:6px; vertical-align:-1px; }
+.cd-donut-wrap { display:flex; align-items:center; gap:18px; flex-wrap:wrap; } .cd-donut { width:170px; height:170px; flex:none; } .cd-dnum { font-size:20px; font-weight:700; fill:var(--ink); }
+.cd-dleg { list-style:none; margin:0; padding:0; flex:1 1 180px; min-width:0; max-height:220px; overflow:auto; font-size:12.5px; }
+.cd-dleg li { display:flex; align-items:center; gap:6px; padding:4px 0; border-bottom:1px solid var(--border); } .cd-dleg span { flex:1; min-width:0; overflow:hidden; text-overflow:ellipsis; white-space:nowrap; } .cd-dleg b { font-variant-numeric:tabular-nums; } .cd-dleg small { width:38px; text-align:right; color:var(--ink-2); }
+.cd-tablewrap { max-height:320px; overflow:auto; }
+.cd-kpi { display:flex; flex-direction:column; align-items:flex-start; padding:8px 0 4px; } .cd-kpi b { font-size:40px; line-height:1.1; font-variant-numeric:tabular-nums; } .cd-kpi span { color:var(--ink-2); font-size:13px; }
+.cd-empty { text-align:center; padding:36px 20px !important; } .cd-empty-ic { font-size:34px; } .cd-empty h3 { margin:8px 0 4px; } .cd-empty p { color:var(--ink-2); margin:0 0 14px; }
+.cd-tpls { display:flex; flex-direction:column; gap:8px; } .cd-tpl { display:flex; gap:10px; align-items:flex-start; padding:10px 12px; border:1px solid var(--border); border-radius:10px; cursor:pointer; } .cd-tpl:has(input:checked) { border-color:var(--accent); background:color-mix(in srgb,var(--accent) 7%,var(--surface)); } .cd-tpl span { display:flex; flex-direction:column; gap:2px; } .cd-tpl small { color:var(--ink-2); }
+.drawer.cd-drawer { width:min(1000px,100vw) !important; }
+.cd-edit { display:grid; grid-template-columns:minmax(0,1fr) minmax(0,1.1fr); gap:20px; align-items:start; }
+.cd-form .field { margin-bottom:10px; } .cd-form .field > label { display:block; font-size:12px; font-weight:600; margin-bottom:4px; } .cd-form .input { width:100%; } .cd-form .hint { display:block; margin-top:3px; }
+.cd-2 { display:grid; grid-template-columns:1fr 1fr; gap:10px; }
+.cd-filters { display:flex; flex-direction:column; gap:8px; align-items:flex-start; } .cd-filter { width:100%; padding:8px; border:1px solid var(--border); border-radius:8px; } .cd-frow { display:flex; gap:6px; margin-bottom:6px; } .cd-multi { width:100%; }
+.cd-preview { position:sticky; top:0; } .cd-ptitle { font-size:11px; font-weight:700; letter-spacing:.04em; text-transform:uppercase; color:var(--ink-2); margin-bottom:6px; }
+.cd-actions { display:flex; gap:8px; margin-top:14px; }
+@media (max-width:900px) { .cd-grid, .cd-edit { grid-template-columns:1fr; } .cd-preview { position:static; } }
+@media (max-width:520px) { .cd-2 { grid-template-columns:1fr; } .cd-tools select.input { min-width:0; width:100%; } }
 </style></head>
 
 
@@ -1433,7 +1466,7 @@ body.filters-locked #cleanFilters, body.filters-locked #xchips, body.filters-loc
       </aside>
     </div>
 
-    <div id="pageReports" hidden><div id="reportSticky"><div class="report-controls"><label for="reportGroup">Explore</label><select class="input" id="reportGroup"><option value="team" selected>Team composition</option><option value="growth">Tenure & growth</option><option value="location">Location & travel</option><option value="attendance">Attendance</option></select><button class="btn mini rep-toggle" id="repTables" type="button" aria-pressed="false" title="Show every chart on this page as a table, or back">Show all as tables</button></div></div>      <section class="charts" id="charts" aria-label="Charts">
+    <div id="pageReports" hidden><div id="reportSticky"><div class="report-controls"><label for="reportGroup">Explore</label><select class="input" id="reportGroup"><option value="team" selected>Team composition</option><option value="growth">Tenure & growth</option><option value="location">Location & travel</option><option value="attendance">Attendance</option><option value="custom">📊 Custom dashboards</option></select><button class="btn mini rep-toggle" id="repTables" type="button" aria-pressed="false" title="Show every chart on this page as a table, or back">Show all as tables</button></div></div>      <section class="charts" id="charts" aria-label="Charts">
         <div class="card chart" id="cardStatus"></div>
         <div class="card chart" id="cardTenure"></div>
         <div class="card chart" id="cardTrend"></div>
@@ -1446,7 +1479,7 @@ body.filters-locked #cleanFilters, body.filters-locked #xchips, body.filters-loc
         <div class="card chart" id="cardDist"></div>
         <div class="card chart" id="cardArea"></div>
         <div class="card chart" id="cardAge"></div>
-      </section><div id="attReportsWrap" hidden><div class="section-heading"><div><h2>Attendance</h2><p>Leave, unplanned absences and who is out · from the attendance workbook · linked to your report selection</p></div></div><div id="slotReports"></div></div></div>
+      </section><div id="customDash" class="cd-page" hidden></div><div id="attReportsWrap" hidden><div class="section-heading"><div><h2>Attendance</h2><p>Leave, unplanned absences and who is out · from the attendance workbook · linked to your report selection</p></div></div><div id="slotReports"></div></div></div>
     <div id="pageAttendance" hidden><div id="slotAttendance"><div id="attHost"></div></div></div>
     <div id="pageActions" hidden>
       <div class="section-heading"><div><h2>Action center</h2><p>Everything that needs a decision or a fix, in one place · independent of search and report filters</p></div><span id="todayLabel"></span></div>
@@ -2930,7 +2963,7 @@ const PERM_GROUPS = [
     /* v3.14.2: which leave types appear in the Log leave “Type” list */
     sub: { title: 'Leave types in Log leave', items: [['log.LA', 'LA · Leave application (pending)'], ['log.AL', 'AL · Approved leave'], ['log.CL', 'CL · Casual leave'], ['log.SL', 'SL · Sick leave'], ['log.UL', 'UL · Unplanned leave'], ['log.AB', 'AB · Absent'], ['log.HD1', 'HD1 · Half day, 1st half'], ['log.HD2', 'HD2 · Half day, 2nd half'], ['log.R', 'R · Remote'], ['log.L', 'L · Late coming'], ['log.C', 'C · Cab late']] } },
   { name: 'Action center', page: 'page.actions', items: [['act.items', 'See Action items'], ['act.review', 'See Designation reviews'], ['act.health', 'See Attendance data health']] },
-  { name: 'Reports', page: 'page.reports', items: [['rep.team', 'Team composition'], ['rep.growth', 'Tenure & growth'], ['rep.location', 'Location & travel'], ['rep.attendance', 'Attendance reports'], ['rep.export', 'Copy report tables and charts']] },
+  { name: 'Reports', page: 'page.reports', items: [['rep.team', 'Team composition'], ['rep.growth', 'Tenure & growth'], ['rep.location', 'Location & travel'], ['rep.attendance', 'Attendance reports'], ['rep.custom', 'See custom dashboards (their own and shared ones)'], ['rep.export', 'Copy report tables and charts'], ['rep.build', 'Create and edit custom dashboards']] },
   { name: 'Save & sync', items: [['sync.view', 'Open the Save & sync settings'], ['sync.auto', 'Start or stop auto-sync'], ['sync.save', 'Save now and undo']] },
 
   { name: 'Chat', items: [['chat.use', 'Use team chat and see who is online'], ['chat.all', 'Post in the Everyone room']] },
@@ -2938,7 +2971,7 @@ const PERM_GROUPS = [
   { name: 'Filters', items: [['filters.custom', 'Change the filters (search, status, client…)']] },
   { name: 'Settings', items: [['set.fields', 'Choose the mandatory fields'], ['set.workbook', 'Backups, sign-in history and replacing the workbook'], ['workbook.download', 'Download a copy of the workbook'], ['tools.distance', 'Use the distance tool']] },
 ];
-const PERM_VERSION = 11;
+const PERM_VERSION = 12;
 const LOG_CODES = ['AL', 'CL', 'SL', 'UL', 'AB', 'HD1', 'HD2', 'LA', 'R', 'L', 'C'];
 /* the leave types a passcode could log before 3.14.2 (approval codes with Approve leave, LA always, the rest with Mark and edit) */
 const oldLogKeys = p => LOG_CODES.filter(c => ['AL', 'CL', 'SL'].includes(c) ? p['att.approve'] : c === 'LA' ? true : p['att.edit']).map(c => 'log.' + c);
@@ -2948,16 +2981,16 @@ const PAGE_OF = { summary: 'page.overview', employees: 'page.employees', attenda
 const pick = keys => Object.fromEntries([['_v', PERM_VERSION], ...PERM_KEYS.map(k => [k, ['notifications.view', 'requests.own', 'requests.rejected'].includes(k) || (k === 'requests.approvals' && keys.includes('att.approve')) || keys.includes(k)])]);
 const ROLE_NAMES = { superadmin: 'Super admin', admin: 'Admin', user: 'User' };
 /* v3.14: what a page shows by default once someone may open it (red flags and new fields stay off until ticked) */
-const VIEW_KEYS = ['chat.use', 'ov.attendance', 'ov.coming', 'ov.holidays', 'act.items', 'act.review', 'act.health', 'rep.team', 'rep.growth', 'rep.location', 'rep.attendance', 'rep.export'];
+const VIEW_KEYS = ['chat.use', 'ov.attendance', 'ov.coming', 'ov.holidays', 'act.items', 'act.review', 'act.health', 'rep.team', 'rep.growth', 'rep.location', 'rep.attendance', 'rep.custom', 'rep.export'];
 /* v3.17: rights that change data; everything else only lets someone see things. Used by the None / View / Edit switch per module. */
-const EDIT_KEYS = new Set(['att.approve', 'emp.edit', 'emp.add', 'emp.delete', 'emp.bulk', 'emp.fields', 'att.log', 'att.direct', 'att.edit', 'att.rows', 'att.holidays', 'att.fields', 'att.addemp', ...LOG_CODES.map(c => 'log.' + c), 'sync.auto', 'sync.save', 'filters.custom', 'set.fields', 'set.workbook', 'chat.all']);
+const EDIT_KEYS = new Set(['att.approve', 'emp.edit', 'emp.add', 'emp.delete', 'emp.bulk', 'emp.fields', 'att.log', 'att.direct', 'att.edit', 'att.rows', 'att.holidays', 'att.fields', 'att.addemp', ...LOG_CODES.map(c => 'log.' + c), 'sync.auto', 'sync.save', 'filters.custom', 'set.fields', 'set.workbook', 'chat.all', 'rep.build']);
 const UPG = new WeakMap();
 window.PERM = {
   groups: PERM_GROUPS, keys: PERM_KEYS, roleNames: ROLE_NAMES, version: PERM_VERSION, isEditKey: k => EDIT_KEYS.has(k),
   presets: {
     'Full access': pick(PERM_KEYS),
     'Admin': pick(PERM_KEYS),
-    'Editor': pick([...PAGES, ...VIEW_KEYS, 'chat.all', 'ov.openatt', ...oldLogKeys({ 'att.edit': true }), 'emp.edit', 'emp.add', 'emp.bulk', 'att.who', 'att.grid', 'att.log', 'att.edit', 'att.rows', 'att.addemp', 'filters.custom', 'activity.view', 'tools.distance', 'sync.view', 'sync.auto', 'sync.save']),
+    'Editor': pick([...PAGES, ...VIEW_KEYS, 'chat.all', 'ov.openatt', 'rep.build', ...oldLogKeys({ 'att.edit': true }), 'emp.edit', 'emp.add', 'emp.bulk', 'att.who', 'att.grid', 'att.log', 'att.edit', 'att.rows', 'att.addemp', 'filters.custom', 'activity.view', 'tools.distance', 'sync.view', 'sync.auto', 'sync.save']),
     'Leave approver': pick([...PAGES, ...VIEW_KEYS, 'chat.all', 'ov.openatt', ...LOG_CODES.map(c => 'log.' + c), 'att.direct', 'ov.watch', 'att.who', 'att.grid', 'att.log', 'att.edit', 'att.rows', 'att.approve', 'filters.custom', 'activity.view', 'sync.view', 'sync.auto', 'sync.save']),
     'Leave logger': pick(['chat.use', 'page.overview', 'page.attendance', 'ov.attendance', 'ov.coming', 'att.who', 'att.log', 'log.LA', 'sync.save']),
     'View only': pick([...PAGES, ...VIEW_KEYS, 'att.who', 'att.grid']),
@@ -2975,6 +3008,8 @@ window.PERM = {
     /* v3.16: editing rows and adding employees in the tracker became their own rights; keep what Mark and edit used to allow */
     if (q._v < 9) { q['att.rows'] = !!q['att.edit']; q['att.addemp'] = !!q['att.edit']; }
     /* v3.17: the Open attendance button must be given on purpose; the holidays card is shown to anyone who sees the Overview */
+    /* v3.19: custom dashboards: anyone who can open Reports sees them; building them must be given on purpose */
+    if (q._v < 12) { q['rep.custom'] = !!q['page.reports']; q['rep.build'] = false; }
     if (q._v < 11) { q['chat.use'] = true; q['chat.all'] = true; }
     if (q._v < 10) { q['ov.openatt'] = false; q['ov.holidays'] = !!q['page.overview']; }
     if (q._v < 8) { q['requests.own'] = true; q['requests.rejected'] = true; q['requests.approvals'] = !!q['att.approve']; }
@@ -6412,6 +6447,8 @@ const healthCount = () => (S.status === 'ready' && S.ctx ? healthIssues().filter
 mount();
 return {
   fieldNames: attFieldNames, hasTracker: Engine.hasTracker, refresh, init: () => { mount(); return connect(); }, askName, decorateTable, healthCount, chooseFileEarly, savedFile: async () => (await kv.get('file')) || ((await kv.get('handle')) || {}).name || '', show, leave, renderCard, renderWatch, drawerPanel, go, renderApprovalRequests, renderRequestHistory, requestsToDecide: () => requestsToDecide().length,
+  /* v3.19: every recorded code between two dates (UTC ms, null = open), for custom dashboards; follows the attendance scope */
+  entries: (from, to) => { if (S.status !== 'ready' || !S.ctx) return null; const d = D(), out = []; for (const m of d.months) { const dim = Engine.daysInMonth(m); for (const r of d.byMonth.get(m) || []) for (let i = 0; i < dim; i++) { const v = r.days[i]; if (v == null || v === '') continue; const dt = dateOf(m, i), t = dt.getTime(); if ((from != null && t < from) || (to != null && t > to)) continue; const cat = catOf(v); out.push({ name: r.name.trim(), empId: r.empId, client: r.client ? String(r.client).trim() : '', date: dt, code: String(v).trim().toUpperCase(), cat, catLabel: CATS[cat] || 'Other' }); } } return out; },
   todayStats: () => { if (S.status !== 'ready' || !S.ctx) return null; const rows = D().byMonth.get(TODAY_MS) || [], i = TODAY.getUTCDate() - 1, cats = rows.map(r => catOf(r.days[i])); return { full: cats.filter(c => c === 'approved' || c === 'sick' || c === 'unplanned').length, half: cats.filter(c => c === 'half').length, late: cats.filter(c => c === 'late').length, tracked: rows.length }; }, redraw: () => { if (active()) render(); }, state: () => S, dirty: () => S.changes.length,
   prepareSignOut, save: () => save(), undo: () => undo(), toggleAuto: () => { setAuto(!S.auto); if (S.auto) autoTick(); }, setAutoSync: on => { setAuto(on); if (S.auto) autoTick(); }, canWrite: attCanWrite,
   syncInfo: () => { const d = D(true), sc = scopeCounts(); return { fileName: S.fileName, changes: S.changes.length, undoLen: S.undo.length, saving: S.saving, auto: S.auto, autoErr: S.autoErr, autoAt: S.autoAt, diskChanged: S.diskChanged, rows: S.rows.length, people: d.people.size, monthFrom: d.months[0], monthTo: d.latestMonth, unmatched: sc.unmatched, hasRoster: hasRoster() }; },
@@ -7150,12 +7187,380 @@ $("#repTables").addEventListener("click", () => {
   for (const c of document.querySelectorAll("#charts > .card")) state.chartView[c.id] = window.REPORT_TABLES ? "table" : "chart";
   syncReportToggle(); ppHide(); renderCharts(); if (window.ATT && ATT.redraw) ATT.redraw();
 });
+/* ============================== v3.19: Custom dashboards (Reports → Custom dashboards) ============================== */
+/* People with the "Create and edit custom dashboards" right build their own charts from the workforce file or the
+   attendance tracker. Dashboards are stored with the team settings; each one is private to its owner unless shared. */
+const CD = { cur: null, view: {} };
+const CD_COLORS = ["var(--c-blue)", "var(--c-aqua)", "var(--c-violet)", "var(--c-orange)", "var(--c-green)", "var(--c-magenta)", "var(--c-yellow)", "var(--c-red)", "var(--c-gray)"];
+const CD_TYPES = [["bar", "Bar (horizontal)"], ["column", "Column (vertical)"], ["donut", "Donut"], ["line", "Line (trend)"], ["table", "Table"], ["kpi", "Single number"]];
+const CD_PERIODS = [["last30", "Last 30 days"], ["last90", "Last 90 days"], ["last180", "Last 180 days"], ["last365", "Last 12 months"], ["month", "This month"], ["year", "This year"], ["all", "All history"], ["next30", "Next 30 days"], ["next90", "Next 90 days"]];
+const CD_CODESETS = [["leave", "All leave (AL, CL, SL, UL, AB, half days)"], ["approved", "Approved leave (AL, CL)"], ["sick", "Sick leave (SL)"], ["unplanned", "Unplanned / absent (UL, AB)"], ["half", "Half days (HD1, HD2)"], ["applied", "Pending applications (LA)"], ["late", "Late / cab late (L, C)"], ["remote", "Remote (R)"], ["any", "Every recorded code"]];
+const cdMe = () => { try { return window.PERM && PERM.online() ? String(CLOUD.user().id) : "local"; } catch { return "local"; } };
+const cdMeName = () => { try { return window.PERM && PERM.online() ? CLOUD.user().name : "You"; } catch { return "You"; } };
+const cdCanBuild = () => !window.PERM || PERM.can("rep.build");
+const cdAll = () => { const l = (window.TD_SETTINGS || {}).custom_dashboards; return Array.isArray(l) ? l : []; };
+const cdVisible = () => cdAll().filter(d => d && (d.shared || String(d.ownerId) === cdMe() || (window.PERM && PERM.isSuper())));
+const cdMine = d => d && (String(d.ownerId) === cdMe() || (window.PERM && PERM.isSuper()));
+const cdId = () => Date.now().toString(36) + Math.random().toString(36).slice(2, 7);
+async function cdSave(dash, remove) {
+  try { await window.loadTeamSettings(); } catch { }
+  const list = cdAll().filter(d => d.id !== dash.id);
+  if (!remove) list.push({ ...dash, updated: new Date().toISOString() });
+  await window.saveSharedSetting("custom_dashboards", list);
+}
+async function cdPersist(dash, msg) {
+  try { await cdSave(dash); if (msg) toast(msg); }
+  catch (e) { toast("Couldn’t save the dashboard: " + (e.message || e), true); }
+  renderCustomDash();
+}
+
+/* ---------- what can be charted ---------- */
+const cdMonthKey = d => d.getUTCFullYear() + "-" + String(d.getUTCMonth() + 1).padStart(2, "0");
+const cdMonthLabel = k => { const [y, m] = k.split("-"); return MON[+m - 1] + " " + y; };
+function cdEmpDims() {
+  if (!state.schema) return [];
+  const cols = state.cols.filter(c => !c.auto), out = [];
+  for (const c of cols) if (c.type !== "date") out.push({ id: "c:" + c.name, label: c.label, val: r => S(g(r, c.name)) || "(Blank)" });
+  for (const c of cols) if (c.type === "date") {
+    out.push({ id: "m:" + c.name, label: c.label + " · by month", time: true, val: r => { const v = g(r, c.name); return isNum(v) ? cdMonthKey(serialToDate(v)) : null; }, fmt: cdMonthLabel });
+    out.push({ id: "y:" + c.name, label: c.label + " · by year", time: true, val: r => { const v = g(r, c.name); return isNum(v) ? String(serialToDate(v).getUTCFullYear()) : null; } });
+  }
+  out.push({ id: "x:tenure", label: "Tenure band", val: r => tenureBucket(r) }, { id: "x:age", label: "Age band", val: r => ageBucket(r) }, { id: "x:distance", label: "Distance band", val: r => distBucket(r) }, { id: "x:area", label: "Area (cleaned)", val: r => { const a = gs(r, "current_area_column"); return a ? areaCanon(a) : "Not set"; } });
+  return out;
+}
+const CD_ATT_DIMS = [
+  { id: "a:month", label: "Month", time: true, val: e => cdMonthKey(e.date), fmt: cdMonthLabel },
+  { id: "a:week", label: "Week (starting Monday)", time: true, val: e => { const d = new Date(e.date.getTime() - ((e.date.getUTCDay() + 6) % 7) * 86400000); return d.toISOString().slice(0, 10); }, fmt: k => { const d = new Date(k + "T00:00:00Z"); return d.getUTCDate() + " " + MON[d.getUTCMonth()]; } },
+  { id: "a:date", label: "Date", time: true, val: e => e.date.toISOString().slice(0, 10), fmt: k => { const d = new Date(k + "T00:00:00Z"); return d.getUTCDate() + " " + MON[d.getUTCMonth()]; } },
+  { id: "a:weekday", label: "Weekday", time: true, val: e => String((e.date.getUTCDay() + 6) % 7), fmt: k => ["Mon", "Tue", "Wed", "Thu", "Fri", "Sat", "Sun"][+k] },
+  { id: "a:client", label: "Client", val: e => e.client || "(Blank)" },
+  { id: "a:emp", label: "Employee", val: e => e.name || "(Blank)" },
+  { id: "a:code", label: "Leave code", val: e => e.code },
+  { id: "a:cat", label: "Leave category", val: e => e.catLabel },
+];
+const cdDims = src => src === "att" ? CD_ATT_DIMS : cdEmpDims();
+const cdNumCols = () => state.schema ? state.cols.filter(c => !c.auto && c.type === "number") : [];
+function cdMeasures(src) {
+  if (src === "att") return [["days", "Leave days (half day = 0.5)"], ["entries", "Number of entries"], ["people", "Number of people"]];
+  return [["count", "Number of people"], ...cdNumCols().flatMap(c => [["sum:" + c.name, "Sum of " + c.label], ["avg:" + c.name, "Average of " + c.label]])];
+}
+function cdPeriod(p) {
+  const t = new Date(), T = Date.UTC(t.getFullYear(), t.getMonth(), t.getDate()), D = 86400000;
+  const r = { last30: [T - 29 * D, T], last90: [T - 89 * D, T], last180: [T - 179 * D, T], last365: [T - 364 * D, T], month: [Date.UTC(t.getFullYear(), t.getMonth(), 1), Date.UTC(t.getFullYear(), t.getMonth() + 1, 0)], year: [Date.UTC(t.getFullYear(), 0, 1), Date.UTC(t.getFullYear(), 11, 31)], all: [null, null], next30: [T, T + 29 * D], next90: [T, T + 89 * D] }[p] || [T - 89 * D, T];
+  return r;
+}
+const cdCodeOk = (set, cat) => set === "leave" ? ["approved", "sick", "unplanned", "half"].includes(cat) : set === "any" ? !["present", "off", "na", "moved", "unknown"].includes(cat) : cat === set;
+
+/* ---------- turn a chart definition into numbers ---------- */
+function cdCompute(sp) {
+  const dims = cdDims(sp.src), dim = dims.find(d => d.id === sp.group), split = sp.split ? dims.find(d => d.id === sp.split) : null;
+  let recs, note = "";
+  if (sp.src === "att") {
+    if (!window.ATT || !ATT.entries) return { err: "The attendance tracker isn’t available." };
+    const [from, to] = cdPeriod(sp.period), all = ATT.entries(from, to);
+    if (!all) return { err: "The attendance workbook isn’t connected yet." };
+    recs = all.filter(e => cdCodeOk(sp.codes || "leave", e.cat));
+    note = (CD_PERIODS.find(p => p[0] === sp.period) || ["", ""])[1] + " · " + ((CD_CODESETS.find(c => c[0] === (sp.codes || "leave")) || ["", ""])[1]).replace(/ \(.*\)$/, "");
+  } else {
+    if (!state.schema) return { err: "The workforce file isn’t loaded yet." };
+    recs = sp.who === "all" ? state.rows.slice() : sp.who === "current" ? state.rows.filter(isCurrent) : rowsFor(null);
+    note = sp.who === "all" ? "Everyone in the file" : sp.who === "current" ? "Current employees" : "Follows the report filters";
+  }
+  for (const f of sp.filters || []) {
+    const fd = dims.find(d => d.id === f.dim); if (!fd || !f.vals || !f.vals.length) continue;
+    const set = new Set(f.vals); recs = recs.filter(r => { const v = fd.val(r); return set.has(v == null ? "(Blank)" : v); });
+    note += " · " + fd.label + ": " + f.vals.slice(0, 3).map(v => fd.fmt && v !== "(Blank)" ? fd.fmt(v) : v).join(", ") + (f.vals.length > 3 ? " +" + (f.vals.length - 3) : "");
+  }
+  const m = sp.measure || (sp.src === "att" ? "days" : "count");
+  const numCol = m.includes(":") ? m.split(":").slice(1).join(":") : null;
+  const agg = list => {
+    if (sp.src === "att") return m === "entries" ? list.length : m === "people" ? new Set(list.map(e => (e.name || "").toLowerCase())).size : list.reduce((a, e) => a + (e.cat === "half" ? 0.5 : ["approved", "sick", "unplanned"].includes(e.cat) ? 1 : 0), 0);
+    if (m === "count") return list.length;
+    const vals = list.map(r => g(r, numCol)).filter(isNum);
+    if (m.startsWith("sum:")) return vals.reduce((a, b) => a + b, 0);
+    return vals.length ? vals.reduce((a, b) => a + b, 0) / vals.length : 0;
+  };
+  if (sp.type === "kpi" || !dim) return { kpi: agg(recs), n: recs.length, note };
+  const groups = new Map();
+  for (const r of recs) { const k = dim.val(r); if (k == null && dim.time) continue; const kk = k == null ? "(Blank)" : k; if (!groups.has(kk)) groups.set(kk, []); groups.get(kk).push(r); }
+  let keys = [...groups.keys()];
+  const total = agg(recs);
+  const value = k => agg(groups.get(k));
+  if (dim.time || sp.sort === "label") keys.sort((a, b) => dim.time && dim.id === "a:weekday" ? +a - +b : String(a).localeCompare(String(b), undefined, { numeric: true }));
+  else keys.sort((a, b) => value(b) - value(a) || String(a).localeCompare(String(b)));
+  if (dim.time && sp.fillGaps !== false && keys.length > 1 && (dim.id === "a:month" || dim.id.startsWith("m:"))) {
+    const out = []; let [y, mo] = keys[0].split("-").map(Number); const [ey, em] = keys[keys.length - 1].split("-").map(Number);
+    while (y < ey || (y === ey && mo <= em)) { out.push(y + "-" + String(mo).padStart(2, "0")); mo++; if (mo > 12) { mo = 1; y++; } if (out.length > 240) break; }
+    keys = out;
+  }
+  const lim = +sp.limit || 0; let other = null;
+  if (lim && keys.length > lim && !dim.time) { const rest = keys.slice(lim); keys = keys.slice(0, lim); if (sp.other !== false) other = rest.flatMap(k => groups.get(k)); }
+  const labels = keys.map(k => dim.fmt && k !== "(Blank)" ? dim.fmt(k) : k); if (other) labels.push("Other");
+  const listOf = i => i < keys.length ? (groups.get(keys[i]) || []) : other;
+  let series;
+  if (split && sp.type !== "donut") {
+    const sk = new Map(); for (const r of recs) { const v = split.val(r); const kk = v == null ? "(Blank)" : v; sk.set(kk, (sk.get(kk) || 0) + 1); }
+    let skeys = [...sk.keys()].sort((a, b) => split.time ? String(a).localeCompare(String(b), undefined, { numeric: true }) : sk.get(b) - sk.get(a));
+    let sOther = null; if (skeys.length > 8) { sOther = new Set(skeys.slice(7)); skeys = skeys.slice(0, 7); }
+    series = skeys.map(s => ({ name: split.fmt && s !== "(Blank)" ? split.fmt(s) : s, values: labels.map((_, i) => agg(listOf(i).filter(r => { const v = split.val(r); return (v == null ? "(Blank)" : v) === s; }))) }));
+    if (sOther) series.push({ name: "Other", values: labels.map((_, i) => agg(listOf(i).filter(r => { const v = split.val(r); return sOther.has(v == null ? "(Blank)" : v); }))) });
+  } else series = [{ name: (cdMeasures(sp.src).find(x => x[0] === m) || ["", "Value"])[1], values: labels.map((_, i) => agg(listOf(i))) }];
+  return { labels, series, total, note, avg: m.startsWith("avg:") };
+}
+
+/* ---------- drawing ---------- */
+const cdFmt = v => (Math.round(v * 10) / 10).toLocaleString(undefined, { maximumFractionDigits: 1 });
+const cdAxis = v => { v = Math.max(v, 1); const p = Math.pow(10, Math.floor(Math.log10(v / 5))); for (const m of [1, 2, 2.5, 5, 10, 20]) { const st = m * p; if (Math.ceil(v / st) <= 5) { const n = Math.max(1, Math.ceil(v / st)); return { max: n * st, step: st, n }; } } return { max: v, step: v / 4, n: 4 }; };
+const cdTrunc = (s, n) => (s = String(s), s.length > n ? s.slice(0, n - 1) + "…" : s);
+function cdLegend(series) { return series.length > 1 ? h("div", { class: "cd-legend" }, series.map((s, i) => h("span", {}, h("i", { style: "background:" + CD_COLORS[i % CD_COLORS.length] }), s.name))) : null; }
+function cdBar(res, W) {
+  const n = res.labels.length, rowH = 26, labelW = Math.min(180, Math.round(W * 0.38)), valW = 56, area = Math.max(40, W - labelW - valW);
+  const tot = i => res.series.reduce((a, s) => a + s.values[i], 0), max = Math.max(...res.labels.map((_, i) => tot(i)), 1);
+  const H = n * rowH + 4, svg = sv("svg", { viewBox: "0 0 " + W + " " + H, class: "cd-svg", role: "img" });
+  res.labels.forEach((l, i) => {
+    const y = i * rowH + 4; let x = labelW;
+    svg.append(sv("text", { x: labelW - 8, y: y + 13, "text-anchor": "end", class: "cd-lab" }, cdTrunc(l, Math.floor(labelW / 6.6))));
+    res.series.forEach((s, j) => { const w = (s.values[i] / max) * area; if (w > 0) svg.append(sv("rect", { x, y: y + 2, width: Math.max(1, w), height: 15, rx: 3, fill: CD_COLORS[j % CD_COLORS.length] }, sv("title", {}, l + (res.series.length > 1 ? " · " + s.name : "") + ": " + cdFmt(s.values[i])))); x += w; });
+    svg.append(sv("text", { x: x + 6, y: y + 13, class: "cd-val" }, cdFmt(tot(i))));
+  });
+  return svg;
+}
+function cdColumn(res, W) {
+  const n = res.labels.length, H = 240, ml = 36, mb = 46, mt = 14, pw = W - ml - 8, ph = H - mt - mb;
+  const tot = i => res.series.reduce((a, s) => a + s.values[i], 0), ax = cdAxis(Math.max(...res.labels.map((_, i) => tot(i)), 1)), max = ax.max, step = pw / Math.max(n, 1), bw = Math.max(3, Math.min(46, step * 0.66));
+  const svg = sv("svg", { viewBox: "0 0 " + W + " " + H, class: "cd-svg", role: "img" });
+  for (let k = 0; k <= ax.n; k++) { const y = mt + ph - (ph * k) / ax.n; svg.append(sv("line", { x1: ml, x2: W - 8, y1: y, y2: y, class: "cd-grid" }), sv("text", { x: ml - 6, y: y + 4, "text-anchor": "end", class: "cd-ax" }, cdFmt(ax.step * k))); }
+  const every = Math.ceil(n / Math.max(1, Math.floor(pw / 46)));
+  res.labels.forEach((l, i) => {
+    const cx = ml + step * i + step / 2; let y = mt + ph;
+    res.series.forEach((s, j) => { const hgt = (s.values[i] / max) * ph; if (hgt > 0) { y -= hgt; svg.append(sv("rect", { x: cx - bw / 2, y, width: bw, height: Math.max(1, hgt), rx: 2, fill: CD_COLORS[j % CD_COLORS.length] }, sv("title", {}, l + (res.series.length > 1 ? " · " + s.name : "") + ": " + cdFmt(s.values[i])))); } });
+    if (n <= 24 && tot(i)) svg.append(sv("text", { x: cx, y: y - 4, "text-anchor": "middle", class: "cd-val" }, cdFmt(tot(i))));
+    if (i % every === 0) svg.append(sv("text", { x: cx, y: mt + ph + 14, "text-anchor": "middle", class: "cd-lab" }, cdTrunc(l, Math.max(4, Math.floor((step * every) / 6.4)))));
+  });
+  return svg;
+}
+function cdLine(res, W) {
+  const n = res.labels.length, H = 240, ml = 36, mr = 12, mb = 32, mt = 14, pw = W - ml - mr, ph = H - mt - mb;
+  const ax = cdAxis(Math.max(1, ...res.series.flatMap(s => s.values))), max = ax.max, X = i => ml + (n > 1 ? (pw * i) / (n - 1) : pw / 2), Y = v => mt + ph - (v / max) * ph;
+  const svg = sv("svg", { viewBox: "0 0 " + W + " " + H, class: "cd-svg", role: "img" });
+  for (let k = 0; k <= ax.n; k++) { const y = mt + ph - (ph * k) / ax.n; svg.append(sv("line", { x1: ml, x2: W - mr, y1: y, y2: y, class: "cd-grid" }), sv("text", { x: ml - 6, y: y + 4, "text-anchor": "end", class: "cd-ax" }, cdFmt(ax.step * k))); }
+  const every = Math.ceil(n / Math.max(1, Math.floor(pw / 56)));
+  res.labels.forEach((l, i) => { if (i % every === 0 || i === n - 1) svg.append(sv("text", { x: X(i), y: H - 10, "text-anchor": "middle", class: "cd-lab" }, cdTrunc(l, 10))); });
+  res.series.forEach((s, j) => {
+    const c = CD_COLORS[j % CD_COLORS.length];
+    svg.append(sv("polyline", { points: s.values.map((v, i) => X(i) + "," + Y(v)).join(" "), fill: "none", stroke: c, "stroke-width": 2.2, "stroke-linejoin": "round" }));
+    s.values.forEach((v, i) => svg.append(sv("circle", { cx: X(i), cy: Y(v), r: n > 40 ? 1.8 : 3.2, fill: c }, sv("title", {}, res.labels[i] + (res.series.length > 1 ? " · " + s.name : "") + ": " + cdFmt(v)))));
+  });
+  return svg;
+}
+function cdDonut(res) {
+  const vals = res.series[0].values, sum = vals.reduce((a, b) => a + b, 0) || 1, R = 70, r = 44, C = 90;
+  const svg = sv("svg", { viewBox: "0 0 180 180", class: "cd-donut", role: "img" });
+  let a0 = -Math.PI / 2;
+  vals.forEach((v, i) => {
+    if (!v) return; const a1 = a0 + (v / sum) * Math.PI * 2 - (vals.filter(Boolean).length > 1 ? 0.012 : 0.0001), big = a1 - a0 > Math.PI ? 1 : 0;
+    const p = (ang, rad) => (C + rad * Math.cos(ang)).toFixed(2) + " " + (C + rad * Math.sin(ang)).toFixed(2);
+    svg.append(sv("path", { d: "M " + p(a0, R) + " A " + R + " " + R + " 0 " + big + " 1 " + p(a1, R) + " L " + p(a1, r) + " A " + r + " " + r + " 0 " + big + " 0 " + p(a0, r) + " Z", fill: CD_COLORS[i % CD_COLORS.length] }, sv("title", {}, res.labels[i] + ": " + cdFmt(v) + " (" + Math.round((v / sum) * 100) + "%)")));
+    a0 += (v / sum) * Math.PI * 2;
+  });
+  svg.append(sv("text", { x: C, y: C + 2, "text-anchor": "middle", class: "cd-dnum" }, cdFmt(res.avg ? sum / vals.length : sum)), sv("text", { x: C, y: C + 18, "text-anchor": "middle", class: "cd-ax" }, "total"));
+  return h("div", { class: "cd-donut-wrap" }, svg, h("ul", { class: "cd-dleg" }, res.labels.map((l, i) => h("li", {}, h("i", { style: "background:" + CD_COLORS[i % CD_COLORS.length] }), h("span", { title: l }, l), h("b", {}, cdFmt(vals[i])), h("small", {}, Math.round((vals[i] / sum) * 100) + "%")))));
+}
+function cdTable(res) {
+  const multi = res.series.length > 1;
+  return h("div", { class: "cd-tablewrap" }, h("table", { class: "mtable" },
+    h("thead", {}, h("tr", {}, h("th", {}, ""), res.series.map(s => h("th", { class: "n" }, s.name)), multi ? h("th", { class: "n" }, "Total") : null)),
+    h("tbody", {}, res.labels.map((l, i) => h("tr", {}, h("td", {}, l), res.series.map(s => h("td", { class: "n" }, cdFmt(s.values[i]))), multi ? h("td", { class: "n" }, h("b", {}, cdFmt(res.series.reduce((a, s) => a + s.values[i], 0)))) : null)))));
+}
+function cdToTsv(res, title) {
+  if (res.kpi != null) return title + "\t" + cdFmt(res.kpi);
+  const multi = res.series.length > 1;
+  return [["", ...res.series.map(s => s.name), ...(multi ? ["Total"] : [])].join("\t"), ...res.labels.map((l, i) => [l, ...res.series.map(s => cdFmt(s.values[i])), ...(multi ? [cdFmt(res.series.reduce((a, s) => a + s.values[i], 0))] : [])].join("\t"))].join("\n");
+}
+function cdDraw(sp, W, asTable) {
+  const res = cdCompute(sp);
+  if (res.err) return { el: h("div", { class: "empty" }, res.err), res };
+  if (res.kpi != null) return { el: h("div", { class: "cd-kpi" }, h("b", {}, cdFmt(res.kpi)), h("span", {}, (cdMeasures(sp.src).find(x => x[0] === (sp.measure || (sp.src === "att" ? "days" : "count"))) || ["", ""])[1])), res };
+  if (!res.labels.length) return { el: h("div", { class: "empty" }, "No data for these settings."), res };
+  const t = asTable ? "table" : sp.type;
+  const body = t === "table" ? cdTable(res) : t === "donut" ? cdDonut({ ...res, series: [res.series.reduce((a, s) => ({ name: a.name, values: a.values.map((v, i) => v + s.values[i]) }))] }) : t === "line" ? cdLine(res, W) : t === "column" ? cdColumn(res, W) : cdBar(res, W);
+  return { el: h("div", {}, t === "donut" || t === "table" ? null : cdLegend(res.series), body), res };
+}
+function cdDescribe(sp) {
+  const dims = cdDims(sp.src), d = dims.find(x => x.id === sp.group), s = sp.split && dims.find(x => x.id === sp.split);
+  const m = (cdMeasures(sp.src).find(x => x[0] === (sp.measure || (sp.src === "att" ? "days" : "count"))) || ["", ""])[1];
+  return (sp.src === "att" ? "Attendance · " : "Employees · ") + m + (sp.type !== "kpi" && d ? " by " + d.label.toLowerCase() : "") + (s ? ", split by " + s.label.toLowerCase() : "");
+}
+
+/* ---------- the page ---------- */
+function renderCustomDash() {
+  const box = $("#customDash"); if (!box || box.hidden) return;
+  const list = cdVisible(), build = cdCanBuild();
+  if (!CD.cur || !list.some(d => d.id === CD.cur)) CD.cur = (list.find(d => String(d.ownerId) === cdMe()) || list[0] || {}).id || null;
+  const dash = list.find(d => d.id === CD.cur);
+  const mine = dash && cdMine(dash) && build;
+  const picker = list.length ? h("select", { class: "input", "aria-label": "Choose a dashboard", onchange: e => { CD.cur = e.target.value; renderCustomDash(); } },
+    list.map(d => h("option", { value: d.id, selected: d.id === CD.cur }, d.name + (String(d.ownerId) === cdMe() ? "" : " · by " + (d.owner || "someone")) + (d.shared ? " · shared" : "")))) : null;
+  const head = h("div", { class: "card cd-head" },
+    h("div", { class: "cd-title" }, h("h2", {}, "Custom dashboards"), h("p", {}, "Build your own charts from the workforce file or the attendance tracker. Private to you unless you share them.")),
+    h("div", { class: "cd-tools" }, picker,
+      build ? h("button", { class: "btn", onclick: cdNewDashboard }, "+ New dashboard") : null,
+      mine ? h("button", { class: "btn primary", onclick: () => cdEditChart(dash, null) }, "+ Add chart") : null,
+      mine ? h("details", { class: "cd-more" }, h("summary", { class: "btn", "aria-label": "More dashboard options" }, "⋯"),
+        h("div", { class: "cd-menu" },
+          h("button", { onclick: () => { const n = prompt("Dashboard name", dash.name); if (n && n.trim()) cdPersist({ ...dash, name: n.trim() }, "Renamed."); } }, "Rename"),
+          h("button", { onclick: () => cdPersist({ ...dash, shared: !dash.shared }, dash.shared ? "Only you can see this dashboard now." : "Everyone who can open Reports can now see this dashboard (read-only).") }, dash.shared ? "Stop sharing" : "Share with the team (view only)"),
+          h("button", { onclick: () => { const copy = { ...JSON.parse(JSON.stringify(dash)), id: cdId(), name: dash.name + " (copy)", ownerId: cdMe(), owner: cdMeName(), shared: false }; CD.cur = copy.id; cdPersist(copy, "Duplicated."); } }, "Duplicate"),
+          h("button", { class: "danger", onclick: async () => { if (!confirm("Delete the dashboard “" + dash.name + "”? This can’t be undone.")) return; try { await cdSave(dash, true); CD.cur = null; toast("Dashboard deleted."); } catch (e) { toast(e.message, true); } renderCustomDash(); } }, "Delete dashboard"))) : null));
+  if (!dash) {
+    box.replaceChildren(head, h("div", { class: "card cd-empty" }, h("div", { class: "cd-empty-ic", "aria-hidden": "true" }, "📊"), h("h3", {}, build ? "No dashboards yet" : "No dashboards shared with you yet"),
+      h("p", {}, build ? "Start from a template or a blank dashboard, then add charts: pick the data, how to group it and the chart type." : "Ask someone who builds dashboards to share one with the team."),
+      build ? h("button", { class: "btn primary", onclick: cdNewDashboard }, "Create a dashboard") : null));
+    return;
+  }
+  const charts = dash.charts || [];
+  const grid = h("div", { class: "cd-grid" });
+  box.replaceChildren(head, charts.length ? grid : h("div", { class: "card cd-empty" }, h("div", { class: "cd-empty-ic", "aria-hidden": "true" }, "➕"), h("h3", {}, "This dashboard is empty"), mine ? h("button", { class: "btn primary", onclick: () => cdEditChart(dash, null) }, "Add your first chart") : h("p", {}, "Nothing here yet.")));
+  const move = (i, d) => { const c = charts.slice(); const [x] = c.splice(i, 1); c.splice(i + d, 0, x); cdPersist({ ...dash, charts: c }); };
+  charts.forEach((sp, i) => {
+    const card = h("div", { class: "card cd-card" + (sp.size === "full" ? " full" : "") });
+    grid.append(card);
+    const asTable = CD.view[sp.id] === "table";
+    const W = Math.max(280, (card.clientWidth || 520) - 36);
+    const { el, res } = cdDraw(sp, W, asTable);
+    const tools = h("div", { class: "cd-ctools" },
+      sp.type !== "table" && sp.type !== "kpi" ? h("button", { class: "btn mini", onclick: () => { CD.view[sp.id] = asTable ? "chart" : "table"; renderCustomDash(); } }, asTable ? "Chart" : "Table") : null,
+      h("button", { class: "btn mini", title: "Copy the numbers (paste into Excel or email)", onclick: async () => { await copyText(cdToTsv(res, sp.title)); toast("Copied the table."); } }, "Copy"),
+      mine ? h("button", { class: "btn mini", title: "Edit chart", onclick: () => cdEditChart(dash, i) }, "Edit") : null,
+      mine ? h("details", { class: "cd-more" }, h("summary", { class: "btn mini", "aria-label": "More chart options" }, "⋯"), h("div", { class: "cd-menu" },
+        i > 0 ? h("button", { onclick: () => move(i, -1) }, "Move earlier") : null,
+        i < charts.length - 1 ? h("button", { onclick: () => move(i, 1) }, "Move later") : null,
+        h("button", { onclick: () => { const c = charts.slice(); c[i] = { ...sp, size: sp.size === "full" ? "half" : "full" }; cdPersist({ ...dash, charts: c }); } }, sp.size === "full" ? "Make half width" : "Make full width"),
+        h("button", { onclick: () => { const c = charts.slice(); c.splice(i + 1, 0, { ...JSON.parse(JSON.stringify(sp)), id: cdId(), title: sp.title + " (copy)" }); cdPersist({ ...dash, charts: c }); } }, "Duplicate"),
+        h("button", { class: "danger", onclick: () => { if (!confirm("Remove the chart “" + sp.title + "”?")) return; cdPersist({ ...dash, charts: charts.filter((_, j) => j !== i) }, "Chart removed."); } }, "Remove chart"))) : null);
+    card.append(h("div", { class: "cd-chead" }, h("div", { class: "grow" }, h("h3", {}, sp.title || "Untitled chart"), h("div", { class: "sub" }, cdDescribe(sp) + (res.note ? " · " + res.note : ""))), tools), h("div", { class: "cd-body" }, el));
+  });
+}
+
+/* ---------- new dashboard (blank or template) ---------- */
+function cdTemplates() {
+  const sch = state.schema || {}, has = k => sch[k] && state.idx[sch[k]] != null;
+  return [
+    { id: "blank", name: "Blank dashboard", desc: "Start empty and add your own charts.", charts: [] },
+    { id: "people", name: "Team overview", desc: "Headcount by status, client and designation, joiners by month, tenure.", charts: [
+      has("status_column") && { title: "Headcount by status", src: "emp", type: "donut", group: "c:" + sch.status_column, measure: "count", who: "report", limit: 8 },
+      has("client_column") && { title: "Headcount by client", src: "emp", type: "bar", group: "c:" + sch.client_column, measure: "count", who: "report", limit: 10 },
+      has("doj_column") && { title: "Joiners by month", src: "emp", type: "column", group: "m:" + sch.doj_column, measure: "count", who: "all", size: "full" },
+      { title: "Tenure bands", src: "emp", type: "column", group: "x:tenure", measure: "count", who: "report" },
+      has("designation_column") && { title: "Designations", src: "emp", type: "bar", group: "c:" + sch.designation_column, measure: "count", who: "report", limit: 10 },
+    ].filter(Boolean) },
+    { id: "leave", name: "Leave overview", desc: "Leave days by month and type, top clients and people, weekdays.", charts: [
+      { title: "Leave days · last 12 months", src: "att", type: "column", group: "a:month", split: "a:cat", measure: "days", period: "last365", codes: "leave", size: "full" },
+      { title: "Leave by type", src: "att", type: "donut", group: "a:cat", measure: "days", period: "last90", codes: "leave" },
+      { title: "Leave by weekday", src: "att", type: "column", group: "a:weekday", measure: "days", period: "last180", codes: "leave" },
+      { title: "Top 10 · most leave days", src: "att", type: "bar", group: "a:emp", measure: "days", period: "last90", codes: "leave", limit: 10, other: false },
+      { title: "Leave days by client", src: "att", type: "bar", group: "a:client", measure: "days", period: "last90", codes: "leave", limit: 10 },
+    ] },
+  ];
+}
+function cdNewDashboard() {
+  if (!cdCanBuild()) return toast("Your passcode can’t create dashboards. Ask the admin for the right in Settings.", true);
+  const name = h("input", { class: "input", placeholder: "e.g. Monthly leave review", maxlength: "60" });
+  let pick = "blank";
+  const cards = cdTemplates().map(t => h("label", { class: "cd-tpl" }, h("input", { type: "radio", name: "cdtpl", value: t.id, checked: t.id === "blank", onchange: () => { pick = t.id; if (!name.value.trim() || cdTemplates().some(x => x.name === name.value)) name.value = t.id === "blank" ? "" : t.name; } }), h("span", {}, h("b", {}, t.name), h("small", {}, t.desc))));
+  const err = h("p", { class: "err" });
+  mountDrawer(h("aside", { class: "drawer", role: "dialog", "aria-modal": "true", "aria-label": "New dashboard" },
+    h("header", {}, h("h2", {}, "New dashboard"), h("button", { class: "btn ghost", onclick: closeDrawer, "aria-label": "Close" }, "✕")),
+    h("div", { class: "body" },
+      h("div", { class: "field" }, h("label", {}, "Name"), name),
+      h("div", { class: "field" }, h("label", {}, "Start from"), h("div", { class: "cd-tpls" }, cards)),
+      err,
+      h("div", { style: "display:flex;gap:8px;margin-top:12px" },
+        h("button", { class: "btn primary", onclick: async ev => {
+          const t = cdTemplates().find(x => x.id === pick), nm = name.value.trim() || (t.id === "blank" ? "My dashboard" : t.name);
+          const dash = { id: cdId(), name: nm, ownerId: cdMe(), owner: cdMeName(), shared: false, created: new Date().toISOString(), charts: t.charts.map(c => ({ size: "half", ...c, id: cdId() })) };
+          ev.currentTarget.disabled = true;
+          try { await cdSave(dash); CD.cur = dash.id; closeDrawer(); toast("Dashboard created."); renderCustomDash(); if (!dash.charts.length) cdEditChart(dash, null); }
+          catch (e) { err.textContent = "Couldn’t save: " + (e.message || e); ev.currentTarget.disabled = false; }
+        } }, "Create"),
+        h("button", { class: "btn", onclick: closeDrawer }, "Cancel")))));
+  setTimeout(() => name.focus(), 30);
+}
+
+/* ---------- chart editor with live preview ---------- */
+function cdEditChart(dash, index) {
+  const orig = index == null ? null : dash.charts[index];
+  const sp = orig ? JSON.parse(JSON.stringify(orig)) : { id: cdId(), title: "", src: "emp", type: "bar", group: "", measure: "count", who: "report", period: "last90", codes: "leave", limit: 10, sort: "value", size: "half", filters: [] };
+  sp.filters = sp.filters || [];
+  let autoTitle = !orig || !sp.title;
+  const form = h("div", { class: "cd-form" }), preview = h("div", { class: "cd-preview" }), err = h("p", { class: "err" });
+  const sel = (opts, val, fn, extra) => { const s = h("select", { class: "input", ...(extra || {}) }, opts.map(([v, l]) => h("option", { value: v, selected: String(v) === String(val ?? "") }, l))); s.addEventListener("change", () => fn(s.value)); return s; };
+  const fld = (label, ctl, hint) => h("div", { class: "field" }, h("label", {}, label), ctl, hint ? h("small", { class: "hint" }, hint) : null);
+  const suggest = () => { const d = cdDims(sp.src).find(x => x.id === sp.group), m = (cdMeasures(sp.src).find(x => x[0] === sp.measure) || ["", ""])[1]; return sp.type === "kpi" ? m : d ? m.replace(/ \(.*\)$/, "") + " by " + d.label.replace(/ · by /, " per ").toLowerCase() : "New chart"; };
+  const draw = () => {
+    const dims = cdDims(sp.src);
+    if (!dims.some(d => d.id === sp.group)) sp.group = (dims.find(d => /status|client/i.test(d.label)) || dims[0] || {}).id || "";
+    if (sp.split && !dims.some(d => d.id === sp.split)) sp.split = "";
+    if (!cdMeasures(sp.src).some(m => m[0] === sp.measure)) sp.measure = cdMeasures(sp.src)[0][0];
+    if (autoTitle) sp.title = suggest();
+    const title = h("input", { class: "input", value: sp.title, maxlength: "80", oninput: e => { sp.title = e.target.value; autoTitle = false; } });
+    const dimOpts = dims.map(d => [d.id, d.label]);
+    const filters = h("div", { class: "cd-filters" }, sp.filters.map((f, fi) => {
+      const fd = dims.find(d => d.id === f.dim);
+      let vals = [];
+      if (fd) { const src = sp.src === "att" ? (window.ATT && ATT.entries ? (ATT.entries(...cdPeriod(sp.period)) || []) : []) : state.rows; const cnt = new Map(); for (const r of src) { const v = fd.val(r); const k = v == null ? "(Blank)" : v; cnt.set(k, (cnt.get(k) || 0) + 1); } vals = [...cnt.keys()].sort((a, b) => String(a).localeCompare(String(b), undefined, { numeric: true })).slice(0, 400); }
+      const ms = h("select", { class: "input cd-multi", multiple: true, size: Math.min(6, Math.max(3, vals.length)), "aria-label": "Values to keep", onchange: e => { f.vals = [...e.target.selectedOptions].map(o => o.value); refresh(); } }, vals.map(v => h("option", { value: v, selected: (f.vals || []).includes(v) }, fd && fd.fmt && v !== "(Blank)" ? fd.fmt(v) : v)));
+      return h("div", { class: "cd-filter" }, h("div", { class: "cd-frow" }, sel(dimOpts, f.dim, v => { f.dim = v; f.vals = []; draw(); }), h("button", { class: "btn mini", type: "button", onclick: () => { sp.filters.splice(fi, 1); draw(); } }, "Remove")), ms, h("small", { class: "hint" }, "Ctrl / Cmd + click to pick several. Nothing picked = no filter."));
+    }), h("button", { class: "btn mini", type: "button", onclick: () => { sp.filters.push({ dim: dims[0] ? dims[0].id : "", vals: [] }); draw(); } }, "+ Add a filter"));
+    const isKpi = sp.type === "kpi", isTime = (dims.find(d => d.id === sp.group) || {}).time;
+    form.replaceChildren(...[
+      fld("Chart title", title),
+      h("div", { class: "cd-2" },
+        fld("Data", sel([["emp", "Employees (workforce file)"], ["att", "Attendance tracker"]], sp.src, v => { sp.src = v; sp.filters = []; sp.group = ""; sp.split = ""; sp.measure = ""; draw(); })),
+        fld("Chart type", sel(CD_TYPES, sp.type, v => { sp.type = v; draw(); }))),
+      h("div", { class: "cd-2" },
+        isKpi ? null : fld("Group by", sel(dimOpts, sp.group, v => { sp.group = v; draw(); })),
+        fld("Show", sel(cdMeasures(sp.src), sp.measure, v => { sp.measure = v; draw(); }))),
+      isKpi || sp.type === "donut" ? null : fld("Split each bar by (optional)", sel([["", "No split"], ...dimOpts.filter(d => d[0] !== sp.group)], sp.split || "", v => { sp.split = v; draw(); }), "Shows stacked bars, or one line per value."),
+      sp.src === "att" ? h("div", { class: "cd-2" },
+        fld("Period", sel(CD_PERIODS, sp.period, v => { sp.period = v; draw(); })),
+        fld("Which codes", sel(CD_CODESETS, sp.codes || "leave", v => { sp.codes = v; refresh(); }))) :
+        fld("Which people", sel([["report", "Follow the report filters at the top"], ["current", "Current employees"], ["all", "Everyone in the file"]], sp.who || "report", v => { sp.who = v; refresh(); })),
+      isKpi || isTime ? null : h("div", { class: "cd-2" },
+        fld("Show", sel([["0", "All values"], ["5", "Top 5"], ["10", "Top 10"], ["15", "Top 15"], ["20", "Top 20"]], String(sp.limit || 0), v => { sp.limit = +v; refresh(); })),
+        fld("Order", sel([["value", "Largest first"], ["label", "A → Z"]], sp.sort || "value", v => { sp.sort = v; refresh(); }))),
+      fld("Filters (optional)", filters),
+      fld("Width on the dashboard", sel([["half", "Half width"], ["full", "Full width"]], sp.size || "half", v => { sp.size = v; })),
+      sp.src === "att" ? h("p", { class: "hint" }, "Attendance charts also follow the client / status filters used by the attendance pages.") : null].filter(Boolean));
+    refresh();
+  };
+  const refresh = () => {
+    preview.replaceChildren(h("div", { class: "cd-ptitle" }, "Preview"), h("div", { class: "card cd-card" }, h("div", { class: "cd-chead" }, h("div", { class: "grow" }, h("h3", {}, sp.title || "Untitled chart"), h("div", { class: "sub" }, cdDescribe(sp)))), h("div", { class: "cd-body" }, cdDraw(sp, 420, false).el)));
+  };
+  const save = async ev => {
+    if (!sp.title.trim()) sp.title = suggest();
+    sp.filters = sp.filters.filter(f => f.dim && f.vals && f.vals.length);
+    const charts = (dash.charts || []).slice(); if (index == null) charts.push(sp); else charts[index] = sp;
+    ev.currentTarget.disabled = true;
+    try { await cdSave({ ...dash, charts }); closeDrawer(); toast(index == null ? "Chart added." : "Chart updated."); renderCustomDash(); }
+    catch (e) { err.textContent = "Couldn’t save: " + (e.message || e); ev.currentTarget.disabled = false; }
+  };
+  mountDrawer(h("aside", { class: "drawer cd-drawer", role: "dialog", "aria-modal": "true", "aria-label": index == null ? "Add a chart" : "Edit chart" },
+    h("header", {}, h("h2", {}, index == null ? "Add a chart" : "Edit chart"), h("button", { class: "btn ghost", onclick: closeDrawer, "aria-label": "Close" }, "✕")),
+    h("div", { class: "body" }, h("div", { class: "cd-edit" }, form, preview), err,
+      h("div", { class: "cd-actions" }, h("button", { class: "btn primary", onclick: save }, index == null ? "Add to dashboard" : "Save chart"), h("button", { class: "btn", onclick: closeDrawer }, "Cancel")))));
+  draw();
+}
+window.renderCustomDash = renderCustomDash;
+
 function renderCharts() {
   renderReportSelection(); syncReportToggle();
   if (window.REPORT_TABLES && !renderCharts._init) { renderCharts._init = true; for (const c of document.querySelectorAll("#charts > .card")) if (!state.chartView[c.id]) state.chartView[c.id] = "table"; }
   
-  const groups = { team: ["cardStatus","cardClient","cardSub","cardDesig","cardMode","cardGender","cardLang","cardAge"], growth: ["cardTenure","cardTrend"], location: ["cardArea","cardDist"], attendance: [] };
-  const chosen = $("#reportGroup").value; $("#charts").hidden = chosen === "attendance";
+  const groups = { team: ["cardStatus","cardClient","cardSub","cardDesig","cardMode","cardGender","cardLang","cardAge"], growth: ["cardTenure","cardTrend"], location: ["cardArea","cardDist"], attendance: [], custom: [] };
+  const chosen = $("#reportGroup").value; $("#charts").hidden = chosen === "attendance" || chosen === "custom";
+  const rt = $("#repTables"); if (rt) rt.hidden = chosen === "custom";
+  const cdBox = $("#customDash"); if (cdBox) { cdBox.hidden = chosen !== "custom"; if (chosen === "custom") { renderCustomDash(); return; } }
   const visible = id => chosen === "all" || groups[chosen].includes(id);
   document.querySelectorAll('#charts > .card').forEach(c => c.hidden = !visible(c.id));
   for (const spec of CAT_CARDS) if (visible(spec.id)) renderCat(spec);
@@ -9201,7 +9606,7 @@ window.applyAccess = () => {
   /* v3.14: each report group has its own right */
   const rg = el('reportGroup');
   if (rg) {
-    const need = { team: 'rep.team', growth: 'rep.growth', location: 'rep.location', attendance: 'rep.attendance' };
+    const need = { team: 'rep.team', growth: 'rep.growth', location: 'rep.location', attendance: 'rep.attendance', custom: 'rep.custom' };
     for (const o of rg.options) { const ok = PERM.can(need[o.value] || 'page.reports') && (o.value !== 'attendance' || PERM.canView('attendance')); o.hidden = o.disabled = !ok; }
     if (rg.selectedOptions[0] && rg.selectedOptions[0].disabled) { const f = [...rg.options].find(o => !o.disabled); if (f) { rg.value = f.value; if (typeof state !== 'undefined' && state.view === 'reports' && state.schema) { renderCharts(); attSync(); window.placeSavedFilters?.(); } } }
   }
