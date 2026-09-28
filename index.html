@@ -1358,7 +1358,12 @@ body.filters-locked #cleanFilters, body.filters-locked #xchips, body.filters-loc
 .cd-grid { display:grid; grid-template-columns:repeat(2,minmax(0,1fr)); gap:16px; align-items:start; }
 .cd-card { padding:16px 18px !important; margin:0 !important; min-width:0; border-radius:14px !important; } .cd-card.full { grid-column:1 / -1; }
 .cd-chead { display:flex; align-items:flex-start; gap:10px; margin-bottom:10px; } .cd-chead h3 { margin:0; font-size:14.5px; } .cd-chead .sub { font-size:11.5px; color:var(--ink-2); margin-top:2px; }
-.cd-ctools { display:flex; gap:6px; align-items:center; flex:none; }
+.cd-ctools { display:flex; gap:6px; align-items:center; flex:none; flex-wrap:wrap; justify-content:flex-end; }
+.cd-seg { display:inline-flex; padding:2px; border-radius:8px; background:var(--surface-2); border:1px solid var(--border); }
+.cd-seg button { border:0; background:transparent; color:var(--ink-2); font:inherit; font-size:12px; font-weight:600; padding:3px 9px; border-radius:6px; cursor:pointer; white-space:nowrap; }
+.cd-seg button[aria-pressed="true"] { background:var(--surface); color:var(--ink); box-shadow:0 1px 2px rgba(15,23,42,.14); }
+.cd-tablewrap td.copynum { cursor:pointer; color:var(--accent); text-decoration:underline dotted; text-underline-offset:3px; }
+.cd-tablewrap td.copynum:hover, .cd-tablewrap td.copynum:focus { background:color-mix(in srgb, var(--accent) 10%, transparent); outline:none; }
 .cd-body { min-width:0; } .cd-svg { width:100%; height:auto; display:block; overflow:visible; }
 .cd-lab { font-size:11px; fill:var(--ink-2); } .cd-val { font-size:11px; font-weight:650; fill:var(--ink); } .cd-ax { font-size:10px; fill:var(--ink-2); } line.cd-grid { stroke:var(--grid, var(--border)); stroke-width:1; }
 .cd-legend { display:flex; flex-wrap:wrap; gap:6px 14px; margin:0 0 8px; font-size:12px; color:var(--ink-2); } .cd-legend i, .cd-dleg i { display:inline-block; width:10px; height:10px; border-radius:3px; margin-right:6px; vertical-align:-1px; }
@@ -4507,9 +4512,58 @@ function seasonalityCard() {
     ${rowsHtml ? `<h3 style="margin:16px 0 6px;font-size:13px">Each person’s usual leave month</h3><div class="sub">People with 3+ leave days in the history, most leave first. “Share” is how much of their leave falls in that month.</div>
     <div class="rtab-wrap" style="max-height:260px;overflow:auto"><table class="rtab" style="width:100%"><thead><tr><th>Employee</th><th>Usually takes leave in</th><th class="n">Days that month</th><th class="n">Share</th></tr></thead><tbody>${rowsHtml}</tbody></table></div>` : ''}</div>`;
 }
+/* v3.19: which weekdays each person takes leave on (Mon–Fri), over a look-back period, with a team summary */
+const wdUi = () => S.ui.wd || (S.ui.wd = { look: 180, only: 'pattern', q: '' });
+function weekdayLeaveData() {
+  const u = wdUi(), d = D(), end = TODAY.getTime(), start = u.look ? end - (u.look - 1) * DAY_MS : null;
+  const team = [0, 0, 0, 0, 0, 0, 0], people = [];
+  for (const p of d.people.values()) {
+    if (S.ui.client !== 'all' && !p.rows.some(r => clientGroup(r.client) === S.ui.client)) continue;
+    const at = personDayReader(p), wd = [0, 0, 0, 0, 0, 0, 0], dates = [[], [], [], [], [], [], []];
+    const first = start != null ? start : Math.min(...p.rows.map(r => dateOf(r.month, 0).getTime()));
+    for (let t = first; t <= end; t += DAY_MS) {
+      const dt = new Date(t), w = dt.getUTCDay(); if (w === 0 || w === 6) continue;
+      const c = catOf(at(dt)); const v = FULL_LEAVE.has(c) ? 1 : c === 'half' ? 0.5 : 0; if (!v) continue;
+      wd[w] += v; dates[w].push(shortDate(dt) + (v < 1 ? ' (½)' : ''));
+    }
+    const n = wd.reduce((a, b) => a + b, 0); if (!n) continue;
+    for (let w = 1; w <= 5; w++) team[w] += wd[w];
+    let top = 1; for (let w = 2; w <= 5; w++) if (wd[w] > wd[top]) top = w;
+    const monFri = wd[1] + wd[5];
+    let kind = '', text = 'Spread across the week', strength = 0;
+    if (n >= 3 && wd[top] >= 2 && wd[top] / n >= 0.5) { kind = 'day'; strength = wd[top] / n; text = `Mostly ${['', 'Mondays', 'Tuesdays', 'Wednesdays', 'Thursdays', 'Fridays'][top]} · ${fmt(wd[top])} of ${fmt(n)}`; }
+    else if (n >= 4 && monFri / n >= 0.6) { kind = 'weekend'; strength = monFri / n; text = `Next to weekends (Mon + Fri) · ${fmt(monFri)} of ${fmt(n)}`; }
+    people.push({ k: p.key, name: p.name, client: p.latest ? p.latest.client : '', wd, dates, n, top, kind, text, strength });
+  }
+  people.sort((a, b) => (!!b.kind - !!a.kind) || b.strength - a.strength || b.n - a.n || a.name.localeCompare(b.name));
+  return { people, team, u };
+}
+function weekdayLeaveCard() {
+  const { people, team, u } = weekdayLeaveData();
+  const DAYN = ['', 'Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday'];
+  const tTot = team.reduce((a, b) => a + b, 0), q = (u.q || '').trim().toLowerCase();
+  const flagged = people.filter(p => p.kind), list = people.filter(p => (u.only === 'pattern' ? p.kind : p.n >= 3) && (!q || p.name.toLowerCase().includes(q)));
+  const lookSel = `<select data-bind="wd-look">${[[90, 'Last 90 days'], [180, 'Last 180 days'], [365, 'Last 12 months'], [0, 'All history']].map(([v, l]) => `<option value="${v}"${u.look === v ? ' selected' : ''}>${l}</option>`).join('')}</select>`;
+  const onlySel = `<select data-bind="wd-only"><option value="pattern"${u.only === 'pattern' ? ' selected' : ''}>People with a pattern</option><option value="all"${u.only === 'all' ? ' selected' : ''}>Everyone with 3+ leave days</option></select>`;
+  let teamTop = 1; for (let w = 2; w <= 5; w++) if (team[w] > team[teamTop]) teamTop = w;
+  const mf = tTot ? Math.round(((team[1] + team[5]) / tTot) * 100) : 0;
+  const insight = tTot ? `Across the team, <b>${DAYN[teamTop]}</b> is the most common leave day (${Math.round(team[teamTop] / tTot * 100)}% of weekday leave). Mondays + Fridays make up <b>${mf}%</b> (an even spread would be 40%).${mf >= 50 ? ' That leans towards long weekends.' : ''} <b>${flagged.length}</b> ${flagged.length === 1 ? 'person has' : 'people have'} a clear day pattern.` : 'No leave recorded in this period.';
+  const bars = [1, 2, 3, 4, 5].map(w => { const pc = tTot ? team[w] / tTot : 0, hot = w === teamTop && tTot; return `<div style="flex:1;min-width:0" data-tip="${esc(DAYN[w] + ': ' + fmt(team[w]) + ' leave days (' + Math.round(pc * 100) + '%)')}"><div style="height:8px;border-radius:4px;background:var(--line);overflow:hidden"><div style="height:100%;width:${Math.round(pc * 100)}%;background:${hot ? 'var(--orange)' : 'var(--blue)'}"></div></div><div class="sm" style="display:flex;justify-content:space-between;margin-top:3px"><span${hot ? ' style="font-weight:700"' : ''}>${WEEKDAYS[w]}</span><span class="muted">${Math.round(pc * 100)}%</span></div></div>`; }).join('');
+  const cell = (p, w) => { const v = p.wd[w]; if (!v) return `<td class="n muted" style="text-align:center">·</td>`; const a = Math.max(0.12, v / Math.max(...p.wd)); const isTop = w === p.top && p.kind === 'day' || (p.kind === 'weekend' && (w === 1 || w === 5));
+    return `<td class="n" style="text-align:center;background:color-mix(in srgb, var(--orange) ${Math.round(a * 45)}%, transparent);${isTop ? 'font-weight:800' : ''}" data-tip="${esc(p.name + ' · ' + DAYN[w] + 's: ' + fmt(v) + ' leave day' + (v === 1 ? '' : 's') + '<br>' + p.dates[w].slice(-12).join(', ') + (p.dates[w].length > 12 ? ' …' : ''))}">${fmt(v)}</td>`; };
+  const rowsHtml = list.slice(0, 200).map(p => `<tr><td><b>${esc(p.name)}</b>${p.client ? `<div class="sm muted">${esc(p.client)}</div>` : ''}</td>${[1, 2, 3, 4, 5].map(w => cell(p, w)).join('')}<td class="n" style="text-align:center">${fmt(p.n)}</td><td>${p.kind ? `<span class="tag ${p.kind === 'weekend' ? 'crit' : ''}" style="white-space:nowrap">${p.kind === 'weekend' ? '🗓️ ' : '📌 '}${esc(p.text)}</span>` : `<span class="sm muted">${esc(p.text)}</span>`}</td></tr>`).join('');
+  window.attendanceWeekdayExport = { title: 'Leave by weekday per employee', headers: ['Employee', 'Client', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Total', 'Pattern'], rows: list.map(p => [p.name, p.client, p.wd[1], p.wd[2], p.wd[3], p.wd[4], p.wd[5], p.n, p.text]) };
+  return `<div class="card" style="margin-bottom:14px"><div style="display:flex;gap:10px;align-items:baseline;flex-wrap:wrap"><h2 style="margin:0">Which weekdays people take leave</h2><span class="grow"></span>
+      <label class="sm muted">Period ${lookSel}</label><label class="sm muted">Show ${onlySel}</label><input type="search" data-bind="wdq" placeholder="Search a name" value="${esc(u.q || '')}" style="width:170px"></div>
+    <div class="sub" style="margin-top:2px">Weekday leave only (AL, CL, SL, UL, AB = 1 day · half day = ½). A “pattern” is half or more of someone’s leave on one weekday, or 60%+ on Mondays and Fridays. Hover a number for the dates.</div>
+    <p style="margin:10px 0;font-size:13px;line-height:1.5">💡 ${insight}</p>
+    <div style="display:flex;gap:10px;margin:0 0 14px">${bars}</div>
+    ${list.length ? `<div style="max-height:440px;overflow:auto;border:1px solid var(--line);border-radius:8px"><table class="rtab" style="width:100%"><thead><tr><th>Employee</th><th class="n" style="text-align:center">Mon</th><th class="n" style="text-align:center">Tue</th><th class="n" style="text-align:center">Wed</th><th class="n" style="text-align:center">Thu</th><th class="n" style="text-align:center">Fri</th><th class="n" style="text-align:center">Total</th><th>Pattern</th></tr></thead><tbody>${rowsHtml}</tbody></table></div>${list.length > 200 ? `<p class="sm muted">Showing the first 200 of ${list.length}. Search to narrow down.</p>` : ''}` : `<div class="empty">${u.only === 'pattern' ? 'Nobody has a clear weekday pattern in this period. Switch “Show” to everyone to see the full breakdown.' : 'No one matches.'}</div>`}
+  </div>`;
+}
 function reportsView() {
   const d = D(), rows = periodRows(), a = agg(rows), p = S.ui.period, isMonth = p.startsWith('m:');
-  const timelineHtml = attTimelineCard(rows);
+  const timelineHtml = attTimelineCard(rows), weekdayHtml = weekdayLeaveCard();
   const thr = S.ui.thr[isMonth ? 'month' : 'long'];
   let prev = null; if (isMonth) { const i = d.months.indexOf(+p.slice(2)); if (i > 0) { const pr = d.byMonth.get(d.months[i - 1]); prev = { a: agg(S.ui.client === 'all' ? pr : pr.filter(r => clientGroup(r.client) === S.ui.client)), label: monthLabel(d.months[i - 1]) }; } }
   const dl = (cur, old, label) => { if (!prev) return `<div class="delta">&nbsp;</div>`; const x = cur - old; const cls = x > 0 ? 'up' : x < 0 ? 'down' : ''; return `<div class="delta"><span class="${cls}">${x > 0 ? '▲' : x < 0 ? '▼' : '='} ${x > 0 ? '+' : ''}${fmt(x)}</span> vs ${prev.label.slice(0, 3)}</div>`; };
@@ -4539,6 +4593,7 @@ function reportsView() {
  {title:'Leave days by month',headers:['Month',...SERIES.map(s=>s.name),'Total'],rows:monthly.map(m=>{const v=SERIES.map(s=>m.rows.reduce((a,r)=>a+s.f(rowStats(r)),0));return [monthLabel(m.month),...v,v.reduce((a,b)=>a+b,0)];})},
  {title:'Most leave days · '+periodLabel(),headers:['Employee','Leave days','Unplanned','Late'],rows:top.map(x=>[x.label,x.v,x.u,x.late])},
  {title:'Leave days by client group',headers:['Client group','Leave days','People'],rows:cl.map(x=>[x.label,x.v,x.people.size])},
+ ...(window.attendanceWeekdayExport ? [window.attendanceWeekdayExport] : []),
  (()=>{const z=leaveSeasonality();return {title:'Leave by month of the year',headers:['Month','Leave days per person','Leave days','Person-months'],rows:z.cal.map(c=>[c.name,Math.round(c.avg*100)/100,c.days,c.rows])};})(),
  {title:'Needs attention · '+periodLabel(),headers:['Employee','Unplanned','Leave days','Late','Applications'],rows:flags.map(o=>[o.x.label,o.x.u,o.x.v,o.x.late,o.x.la])}
  ];
@@ -4553,6 +4608,7 @@ function reportsView() {
     </div>
     ${timelineHtml}
     ${seasonalityCard()}
+    ${weekdayHtml}
     <div class="grid g2" style="margin-bottom:14px">
       <div class="card"><h2>Leave days by month</h2><div class="sub">Click a month to focus the whole dashboard on it.</div>${T ? rtable(EX('Leave days by month')) : stackChart(monthly, { selectable: true, sel: isMonth ? +p.slice(2) : null })}</div>
       <div class="card"><h2>Most leave days · ${esc(periodLabel())}</h2><div class="sub">Top 10 people. Click a bar to filter all reports to that person.</div>${T ? rtable(EX('Most leave days')) : hbars(top, { link: true })}</div>
@@ -6080,7 +6136,7 @@ function refocus(sel, caret) { render(); const i = $(sel); if (i) { i.focus(); c
 function onBind(e) {
   const fx = e.target.closest('[data-fix]'); if (fx) { fixInput(fx, e); return; }
   const el = e.target.closest('[data-bind]'); if (!el) return; const b = el.dataset.bind, v = el.value, isInput = e.type === 'input';
-  if (isInput && !['gq', 'pq', 'aq', 'hq', 'tlq'].includes(b) && el.type !== 'number') return; if (!isInput && ['gq', 'pq', 'aq', 'hq', 'tlq'].includes(b)) return;
+  if (isInput && !['gq', 'pq', 'aq', 'hq', 'tlq', 'wdq'].includes(b) && el.type !== 'number') return; if (!isInput && ['gq', 'pq', 'aq', 'hq', 'tlq', 'wdq'].includes(b)) return;
   const u = S.ui;
   switch (b) {
     case 'period': if(S.mode==='reports'){selectAttendanceReport('period',v);break;}u.period = v; render(); break; case 'oclient': if(S.mode==='reports'){if(v==='all'){reportScope.cohort=null;reportScope.label='';u.client='all';reportChanged();}else selectAttendanceReport('client',v);break;}u.client = v; render(); break;
@@ -6089,6 +6145,9 @@ function onBind(e) {
     case 'gyear': { const mIdx = Engine.serialToDate(u.grid.month).getUTCMonth(), ms = Engine.monthSerial(+v, mIdx); u.grid.month = ms; render(); break; }
     case 'gq': u.grid.q = v; refocus('[data-bind="gq"]'); break;
     case 'tlq': tlUi().q = v; refocus('[data-bind="tlq"]'); break;
+    case 'wd-look': wdUi().look = +v; render(); break;
+    case 'wd-only': wdUi().only = v; render(); break;
+    case 'wdq': wdUi().q = v; refocus('[data-bind="wdq"]'); break;
     case 'tl-range': { const t = tlUi(); t.range = v; if (v === 'custom' && !t.from) { const pr = tlRange(periodRows()); if (pr) { t.from = isoDate(pr[0]); t.to = isoDate(pr[1]); } } render(); break; }
     case 'tl-from': if (v) { tlUi().from = v; render(); } break; case 'tl-to': if (v) { tlUi().to = v; render(); } break;
     case 'tl-wk': tlUi().hideWk = el.checked; render(); break;
@@ -7302,13 +7361,43 @@ function cdCompute(sp) {
     const sk = new Map(); for (const r of recs) { const v = split.val(r); const kk = v == null ? "(Blank)" : v; sk.set(kk, (sk.get(kk) || 0) + 1); }
     let skeys = [...sk.keys()].sort((a, b) => split.time ? String(a).localeCompare(String(b), undefined, { numeric: true }) : sk.get(b) - sk.get(a));
     let sOther = null; if (skeys.length > 8) { sOther = new Set(skeys.slice(7)); skeys = skeys.slice(0, 7); }
-    series = skeys.map(s => ({ name: split.fmt && s !== "(Blank)" ? split.fmt(s) : s, values: labels.map((_, i) => agg(listOf(i).filter(r => { const v = split.val(r); return (v == null ? "(Blank)" : v) === s; }))) }));
-    if (sOther) series.push({ name: "Other", values: labels.map((_, i) => agg(listOf(i).filter(r => { const v = split.val(r); return sOther.has(v == null ? "(Blank)" : v); }))) });
-  } else series = [{ name: (cdMeasures(sp.src).find(x => x[0] === m) || ["", "Value"])[1], values: labels.map((_, i) => agg(listOf(i))) }];
-  return { labels, series, total, note, avg: m.startsWith("avg:") };
+    const mk = (name, test) => { const recs = labels.map((_, i) => listOf(i).filter(r => { const v = split.val(r); return test(v == null ? "(Blank)" : v); })); return { name, recs, values: recs.map(agg) }; };
+    series = skeys.map(s => mk(split.fmt && s !== "(Blank)" ? split.fmt(s) : s, v => v === s));
+    if (sOther) series.push(mk("Other", v => sOther.has(v)));
+  } else { const recs = labels.map((_, i) => listOf(i)); series = [{ name: (cdMeasures(sp.src).find(x => x[0] === m) || ["", "Value"])[1], recs, values: recs.map(agg) }]; }
+  return { labels, series, total, note, avg: m.startsWith("avg:"), src: sp.src, title: sp.title };
 }
 
 /* ---------- drawing ---------- */
+/* v3.19: the people behind a number (Emp ID + name), for the hover list and one-click copy */
+function cdPeople(src, recs) {
+  if (!recs || !recs.length) return [];
+  if (src !== "att") return peopleOf(recs);
+  const by = new Map();
+  for (const e of recs) { const k = (e.name || "").toLowerCase(); if (!by.has(k)) by.set(k, { id: e.empId == null ? "" : String(e.empId), name: e.name || "(no name)", n: 0 }); const o = by.get(k); o.n += e.cat === "half" ? 0.5 : 1; if (!o.id && e.empId != null) o.id = String(e.empId); }
+  for (const o of by.values()) if (!o.id) { const r = state.rows.find(x => (gs(x, "name_column") || "").toLowerCase() === o.name.toLowerCase()); if (r) o.id = gs(r, "key_column"); }
+  return [...by.values()].sort((a, b) => b.n - a.n || a.name.localeCompare(b.name)).map(o => ({ id: o.id || "—", name: o.name }));
+}
+function cdPeopleGroups(res, i, j) {
+  const pick = j == null ? res.series.map((s, k) => [s, k]) : [[res.series[j], j]];
+  return pick.map(([s, k]) => ({ color: CD_COLORS[k % CD_COLORS.length], label: (res.series.length > 1 ? s.name + " · " : "") + res.labels[i], value: s.values[i], people: cdPeople(res.src, s.recs && s.recs[i]), what: "people" })).filter(g => g.value);
+}
+function cdShowPeople(el, res, i, j) {
+  const groups = cdPeopleGroups(res, i, j); if (!groups.length) return;
+  const b = el.getBoundingClientRect();
+  ppShow(el, { left: b.left, top: b.top, bottom: b.bottom }, (res.title || "Chart") + " – " + res.labels[i], groups, res.src === "att" ? "People with at least one matching entry, most first." : "");
+}
+function cdNumCell(res, i, j, text, bold) {
+  const has = (j == null ? res.series.some(s => s.values[i]) : res.series[j].values[i]);
+  const td = h("td", { class: "n" + (has ? " copynum" : ""), tabindex: has ? 0 : null, role: has ? "button" : null, title: has ? "Hover to see who · click to copy Emp ID and name" : null }, bold ? h("b", {}, text) : text);
+  if (has) {
+    td.addEventListener("pointerenter", () => cdShowPeople(td, res, i, j)); td.addEventListener("focus", () => cdShowPeople(td, res, i, j));
+    td.addEventListener("pointerleave", () => ppHideSoon()); td.addEventListener("blur", () => ppHideSoon());
+    const copy = () => { const all = new Map(); for (const g of cdPeopleGroups(res, i, j)) for (const p of g.people) all.set(p.id + "|" + p.name, p); copyPeople([...all.values()], "people"); };
+    td.addEventListener("click", copy); td.addEventListener("keydown", e => { if (e.key === "Enter" || e.key === " ") { e.preventDefault(); copy(); } });
+  }
+  return td;
+}
 const cdFmt = v => (Math.round(v * 10) / 10).toLocaleString(undefined, { maximumFractionDigits: 1 });
 const cdAxis = v => { v = Math.max(v, 1); const p = Math.pow(10, Math.floor(Math.log10(v / 5))); for (const m of [1, 2, 2.5, 5, 10, 20]) { const st = m * p; if (Math.ceil(v / st) <= 5) { const n = Math.max(1, Math.ceil(v / st)); return { max: n * st, step: st, n }; } } return { max: v, step: v / 4, n: 4 }; };
 const cdTrunc = (s, n) => (s = String(s), s.length > n ? s.slice(0, n - 1) + "…" : s);
@@ -7320,7 +7409,7 @@ function cdBar(res, W) {
   res.labels.forEach((l, i) => {
     const y = i * rowH + 4; let x = labelW;
     svg.append(sv("text", { x: labelW - 8, y: y + 13, "text-anchor": "end", class: "cd-lab" }, cdTrunc(l, Math.floor(labelW / 6.6))));
-    res.series.forEach((s, j) => { const w = (s.values[i] / max) * area; if (w > 0) svg.append(sv("rect", { x, y: y + 2, width: Math.max(1, w), height: 15, rx: 3, fill: CD_COLORS[j % CD_COLORS.length] }, sv("title", {}, l + (res.series.length > 1 ? " · " + s.name : "") + ": " + cdFmt(s.values[i])))); x += w; });
+    res.series.forEach((s, j) => { const w = (s.values[i] / max) * area; if (w > 0) svg.append(sv("rect", { x, y: y + 2, width: Math.max(1, w), height: 15, rx: 3, fill: CD_COLORS[j % CD_COLORS.length], style: "cursor:pointer", onclick: ev => cdShowPeople(ev.currentTarget, res, i, j) }, sv("title", {}, l + (res.series.length > 1 ? " · " + s.name : "") + ": " + cdFmt(s.values[i]) + " · click to see who"))); x += w; });
     svg.append(sv("text", { x: x + 6, y: y + 13, class: "cd-val" }, cdFmt(tot(i))));
   });
   return svg;
@@ -7333,7 +7422,7 @@ function cdColumn(res, W) {
   const every = Math.ceil(n / Math.max(1, Math.floor(pw / 46)));
   res.labels.forEach((l, i) => {
     const cx = ml + step * i + step / 2; let y = mt + ph;
-    res.series.forEach((s, j) => { const hgt = (s.values[i] / max) * ph; if (hgt > 0) { y -= hgt; svg.append(sv("rect", { x: cx - bw / 2, y, width: bw, height: Math.max(1, hgt), rx: 2, fill: CD_COLORS[j % CD_COLORS.length] }, sv("title", {}, l + (res.series.length > 1 ? " · " + s.name : "") + ": " + cdFmt(s.values[i])))); } });
+    res.series.forEach((s, j) => { const hgt = (s.values[i] / max) * ph; if (hgt > 0) { y -= hgt; svg.append(sv("rect", { x: cx - bw / 2, y, width: bw, height: Math.max(1, hgt), rx: 2, fill: CD_COLORS[j % CD_COLORS.length], style: "cursor:pointer", onclick: ev => cdShowPeople(ev.currentTarget, res, i, j) }, sv("title", {}, l + (res.series.length > 1 ? " · " + s.name : "") + ": " + cdFmt(s.values[i]) + " · click to see who"))); } });
     if (n <= 24 && tot(i)) svg.append(sv("text", { x: cx, y: y - 4, "text-anchor": "middle", class: "cd-val" }, cdFmt(tot(i))));
     if (i % every === 0) svg.append(sv("text", { x: cx, y: mt + ph + 14, "text-anchor": "middle", class: "cd-lab" }, cdTrunc(l, Math.max(4, Math.floor((step * every) / 6.4)))));
   });
@@ -7370,7 +7459,7 @@ function cdTable(res) {
   const multi = res.series.length > 1;
   return h("div", { class: "cd-tablewrap" }, h("table", { class: "mtable" },
     h("thead", {}, h("tr", {}, h("th", {}, ""), res.series.map(s => h("th", { class: "n" }, s.name)), multi ? h("th", { class: "n" }, "Total") : null)),
-    h("tbody", {}, res.labels.map((l, i) => h("tr", {}, h("td", {}, l), res.series.map(s => h("td", { class: "n" }, cdFmt(s.values[i]))), multi ? h("td", { class: "n" }, h("b", {}, cdFmt(res.series.reduce((a, s) => a + s.values[i], 0)))) : null)))));
+    h("tbody", {}, res.labels.map((l, i) => h("tr", {}, h("td", {}, l), res.series.map((s, j) => cdNumCell(res, i, j, cdFmt(s.values[i]))), multi ? cdNumCell(res, i, null, cdFmt(res.series.reduce((a, s) => a + s.values[i], 0)), true) : null)))));
 }
 function cdToTsv(res, title) {
   if (res.kpi != null) return title + "\t" + cdFmt(res.kpi);
@@ -7382,7 +7471,7 @@ function cdDraw(sp, W, asTable) {
   if (res.err) return { el: h("div", { class: "empty" }, res.err), res };
   if (res.kpi != null) return { el: h("div", { class: "cd-kpi" }, h("b", {}, cdFmt(res.kpi)), h("span", {}, (cdMeasures(sp.src).find(x => x[0] === (sp.measure || (sp.src === "att" ? "days" : "count"))) || ["", ""])[1])), res };
   if (!res.labels.length) return { el: h("div", { class: "empty" }, "No data for these settings."), res };
-  const t = asTable ? "table" : sp.type;
+  const t = asTable ? "table" : sp.type === "table" ? ((cdDims(sp.src).find(d => d.id === sp.group) || {}).time ? "column" : "bar") : sp.type;
   const body = t === "table" ? cdTable(res) : t === "donut" ? cdDonut({ ...res, series: [res.series.reduce((a, s) => ({ name: a.name, values: a.values.map((v, i) => v + s.values[i]) }))] }) : t === "line" ? cdLine(res, W) : t === "column" ? cdColumn(res, W) : cdBar(res, W);
   return { el: h("div", {}, t === "donut" || t === "table" ? null : cdLegend(res.series), body), res };
 }
@@ -7425,11 +7514,13 @@ function renderCustomDash() {
   charts.forEach((sp, i) => {
     const card = h("div", { class: "card cd-card" + (sp.size === "full" ? " full" : "") });
     grid.append(card);
-    const asTable = CD.view[sp.id] === "table";
+    const asTable = (CD.view[sp.id] || (sp.type === "table" ? "table" : "chart")) === "table";
     const W = Math.max(280, (card.clientWidth || 520) - 36);
     const { el, res } = cdDraw(sp, W, asTable);
     const tools = h("div", { class: "cd-ctools" },
-      sp.type !== "table" && sp.type !== "kpi" ? h("button", { class: "btn mini", onclick: () => { CD.view[sp.id] = asTable ? "chart" : "table"; renderCustomDash(); } }, asTable ? "Chart" : "Table") : null,
+      sp.type !== "kpi" ? h("div", { class: "cd-seg", role: "group", "aria-label": "Chart or table" },
+        h("button", { type: "button", "aria-pressed": String(!asTable), title: "Chart view", onclick: () => { CD.view[sp.id] = "chart"; renderCustomDash(); } }, "📊 Chart"),
+        h("button", { type: "button", "aria-pressed": String(asTable), title: "Table view: hover a number to see who, click to copy", onclick: () => { CD.view[sp.id] = "table"; renderCustomDash(); } }, "▦ Table")) : null,
       h("button", { class: "btn mini", title: "Copy the numbers (paste into Excel or email)", onclick: async () => { await copyText(cdToTsv(res, sp.title)); toast("Copied the table."); } }, "Copy"),
       mine ? h("button", { class: "btn mini", title: "Edit chart", onclick: () => cdEditChart(dash, i) }, "Edit") : null,
       mine ? h("details", { class: "cd-more" }, h("summary", { class: "btn mini", "aria-label": "More chart options" }, "⋯"), h("div", { class: "cd-menu" },
