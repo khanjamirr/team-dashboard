@@ -7257,15 +7257,31 @@ const CD_CODESETS = [["leave", "All leave (AL, CL, SL, UL, AB, half days)"], ["a
 const cdMe = () => { try { return window.PERM && PERM.online() ? String(CLOUD.user().id) : "local"; } catch { return "local"; } };
 const cdMeName = () => { try { return window.PERM && PERM.online() ? CLOUD.user().name : "You"; } catch { return "You"; } };
 const cdCanBuild = () => !window.PERM || PERM.can("rep.build");
-const cdAll = () => { const l = (window.TD_SETTINGS || {}).custom_dashboards; return Array.isArray(l) ? l : []; };
+/* v3.19.1: dashboards the database would not accept yet are kept in this browser until sharing is switched on */
+const CD_LOCAL = () => "td_custom_dash_local_" + cdMe();
+const cdLocal = () => { try { const l = JSON.parse(localStorage.getItem(CD_LOCAL()) || "[]"); return Array.isArray(l) ? l.map(d => ({ ...d, local: true })) : []; } catch { return []; } };
+const cdAll = () => { const l = (window.TD_SETTINGS || {}).custom_dashboards, srv = Array.isArray(l) ? l : [], loc = cdLocal().filter(d => !srv.some(x => x.id === d.id)); return [...srv, ...loc]; };
 const cdVisible = () => cdAll().filter(d => d && (d.shared || String(d.ownerId) === cdMe() || (window.PERM && PERM.isSuper())));
 const cdMine = d => d && (String(d.ownerId) === cdMe() || (window.PERM && PERM.isSuper()));
 const cdId = () => Date.now().toString(36) + Math.random().toString(36).slice(2, 7);
 async function cdSave(dash, remove) {
   try { await window.loadTeamSettings(); } catch { }
-  const list = cdAll().filter(d => d.id !== dash.id);
-  if (!remove) list.push({ ...dash, updated: new Date().toISOString() });
-  await window.saveSharedSetting("custom_dashboards", list);
+  const clean = d => { const { local, ...rest } = d; return rest; };
+  const srvList = (Array.isArray((window.TD_SETTINGS || {}).custom_dashboards) ? window.TD_SETTINGS.custom_dashboards : []).filter(d => d.id !== dash.id);
+  if (!remove) srvList.push(clean({ ...dash, updated: new Date().toISOString() }));
+  const dropLocal = () => { try { const l = JSON.parse(localStorage.getItem(CD_LOCAL()) || "[]").filter(d => d.id !== dash.id); localStorage.setItem(CD_LOCAL(), JSON.stringify(l)); } catch { } };
+  try { await window.saveSharedSetting("custom_dashboards", srvList); dropLocal(); return; }
+  catch (e) {
+    const refused = e && (e.status === 403 || /ADMIN_ONLY|super admin can do that/i.test(e.message || ""));
+    if (!refused) throw e;
+    /* the database only lets a few lists be shared: the super admin can still save through the admin setting */
+    if (window.PERM && PERM.isSuper()) { await CLOUD.setSetting("custom_dashboards", srvList); window.TD_SETTINGS = { ...window.TD_SETTINGS, custom_dashboards: srvList }; dropLocal(); return; }
+    /* anyone else: keep it in this browser for now */
+    try { const l = JSON.parse(localStorage.getItem(CD_LOCAL()) || "[]").filter(d => d.id !== dash.id); if (!remove) l.push(clean({ ...dash, shared: false, updated: new Date().toISOString() })); localStorage.setItem(CD_LOCAL(), JSON.stringify(l)); }
+    catch { throw new Error("This browser blocked saving."); }
+    if (!cdSave.warned) { cdSave.warned = true; toast("Saved on this computer only. To keep dashboards online and share them, ask the super admin to allow “custom_dashboards” as a shared setting in Supabase.", true); }
+    if (dash.shared && !remove) toast("Sharing needs the online save, so this dashboard stays private for now.", true);
+  }
 }
 async function cdPersist(dash, msg) {
   try { await cdSave(dash); if (msg) toast(msg); }
@@ -7489,7 +7505,7 @@ function renderCustomDash() {
   const dash = list.find(d => d.id === CD.cur);
   const mine = dash && cdMine(dash) && build;
   const picker = list.length ? h("select", { class: "input", "aria-label": "Choose a dashboard", onchange: e => { CD.cur = e.target.value; renderCustomDash(); } },
-    list.map(d => h("option", { value: d.id, selected: d.id === CD.cur }, d.name + (String(d.ownerId) === cdMe() ? "" : " · by " + (d.owner || "someone")) + (d.shared ? " · shared" : "")))) : null;
+    list.map(d => h("option", { value: d.id, selected: d.id === CD.cur }, d.name + (String(d.ownerId) === cdMe() ? "" : " · by " + (d.owner || "someone")) + (d.shared ? " · shared" : "") + (d.local ? " · this computer only" : "")))) : null;
   const head = h("div", { class: "card cd-head" },
     h("div", { class: "cd-title" }, h("h2", {}, "Custom dashboards"), h("p", {}, "Build your own charts from the workforce file or the attendance tracker. Private to you unless you share them.")),
     h("div", { class: "cd-tools" }, picker,
