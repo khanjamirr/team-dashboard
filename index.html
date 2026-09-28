@@ -2951,7 +2951,9 @@ const CLOUD = (() => {
   }
   /* v3.11: "Manage passcodes" is now Settings > People & access */
   function openAdmin() { if (session && session.role === 'superadmin' && window.openSettings) window.openSettings('people'); }
-  return { SUPABASE_CONFIG, chat, changeMyPasscode, card, resume, mode, decorate, signOut, useLocalFiles, openAdmin, configured, isAdmin, refreshMe, user, getSettings, setSetting, setShared, saveLeaveRequest, admin, _rpc: rpc };
+  /* v3.19.1: custom dashboards are saved one at a time; the database checks who owns each one */
+  const saveDashboard = (dash, remove) => rpc('td_save_dashboard', { p_token: tok(), p_dash: dash, p_remove: !!remove });
+  return { SUPABASE_CONFIG, saveDashboard, chat, changeMyPasscode, card, resume, mode, decorate, signOut, useLocalFiles, openAdmin, configured, isAdmin, refreshMe, user, getSettings, setSetting, setShared, saveLeaveRequest, admin, _rpc: rpc };
 })();
 
 /* =====================================================================
@@ -7270,6 +7272,17 @@ async function cdSave(dash, remove) {
   const srvList = (Array.isArray((window.TD_SETTINGS || {}).custom_dashboards) ? window.TD_SETTINGS.custom_dashboards : []).filter(d => d.id !== dash.id);
   if (!remove) srvList.push(clean({ ...dash, updated: new Date().toISOString() }));
   const dropLocal = () => { try { const l = JSON.parse(localStorage.getItem(CD_LOCAL()) || "[]").filter(d => d.id !== dash.id); localStorage.setItem(CD_LOCAL(), JSON.stringify(l)); } catch { } };
+  /* online: the database function td_save_dashboard (setup.sql 3.19) saves just this dashboard and checks its owner */
+  if (window.PERM && PERM.online() && CLOUD.saveDashboard && !cdSave.noFn) {
+    try { const list = await CLOUD.saveDashboard(clean(dash), remove); window.TD_SETTINGS = { ...window.TD_SETTINGS, custom_dashboards: Array.isArray(list) ? list : srvList }; dropLocal(); return; }
+    catch (e) {
+      if (/NOT_OWNER/.test(e.message || "")) throw new Error("Only the person who made this dashboard (or the super admin) can change it.");
+      if (/DASHBOARD_LIMIT/.test(e.message || "")) throw new Error("You already have 30 dashboards. Delete one first.");
+      if (/DASHBOARD_TOO_BIG/.test(e.message || "")) throw new Error("This dashboard is too big to save. Split it into two.");
+      if (!/not set up|function|schema cache/i.test(e.message || "")) throw e;
+      cdSave.noFn = true;   // older database: fall back below
+    }
+  }
   try { await window.saveSharedSetting("custom_dashboards", srvList); dropLocal(); return; }
   catch (e) {
     const refused = e && (e.status === 403 || /ADMIN_ONLY|super admin can do that/i.test(e.message || ""));
