@@ -4,7 +4,7 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <link rel="icon" href="data:,">
-<title>Team Dashboard · 3.20.0</title>
+<title>Team Dashboard · 3.21.0</title>
 <style>
 :root {
   color-scheme: light;
@@ -1360,6 +1360,17 @@ body.filters-locked #cleanFilters, body.filters-locked #xchips, body.filters-loc
 #pageSummary.ov .request-cards > section { margin:0; }
 .ov-up-head { display:flex; flex-direction:column; gap:10px; margin-bottom:10px; }
 .ov-up-head h2 { margin:0; font-size:15px; font-weight:700; }
+.rc-headrow { display:flex; align-items:center; justify-content:space-between; gap:8px; flex-wrap:wrap; }
+.rc-record { height:30px; padding:0 12px; font-size:12.5px; }
+.rc-record[hidden] { display:none !important; }
+.fdel { margin-top:24px; padding-top:16px; border-top:1px solid var(--border); }
+.fdel > .input { width:100%; margin:4px 0 8px; }
+.fdel-list { list-style:none; margin:0; padding:0; max-height:44vh; overflow:auto; border:1px solid var(--border); border-radius:10px; }
+.fdel-list li { display:flex; align-items:center; gap:10px; padding:8px 12px; border-bottom:1px solid var(--border); font-size:13px; }
+.fdel-list li:last-child { border-bottom:0; }
+.fdel-main { flex:1; min-width:0; display:flex; flex-direction:column; }
+.fdel-main small { font-size:11.5px; color:var(--ink-2); }
+.fdel-list .btn.danger { background:#e34948; border-color:#e34948; color:#fff; }
 #pageSummary.ov #requestCenterTitle { margin:0 !important; padding:0 !important; border:0 !important; font-size:15px !important; }
 .ov-tabs { display:flex; gap:4px; padding:3px; border-radius:10px; background:var(--surface-2); overflow-x:auto; }
 .ov-tabs[hidden] { display:none; }
@@ -1487,10 +1498,10 @@ body.filters-locked #cleanFilters, body.filters-locked #xchips, body.filters-loc
     <p class="gate-sub">One place for your people, priorities and team insights.</p>
     <div id="connectBody"><div class="empty">Loading…</div></div>
   </div>
-  <p class="gate-ver">3.20.0</p>
+  <p class="gate-ver">3.21.0</p>
 </section>
 
-<div id="app" hidden><aside class="sidebar" aria-label="Workspace navigation"><div class="brand dashboard-identity">      <h1><span id="title">Team Dashboard</span><span class="ver" id="ver" title="Version 3.20.0">3.20.0</span></h1><p class="brand-tag">One place for your people, priorities and team insights.</p>      <span class="sync" id="sync" role="status"><i></i><span id="syncText">Loading…</span></span></div><div class="nav-label">WORKSPACE</div>      <nav class="tabs" role="tablist" aria-label="Pages" aria-orientation="vertical">
+<div id="app" hidden><aside class="sidebar" aria-label="Workspace navigation"><div class="brand dashboard-identity">      <h1><span id="title">Team Dashboard</span><span class="ver" id="ver" title="Version 3.21.0">3.21.0</span></h1><p class="brand-tag">One place for your people, priorities and team insights.</p>      <span class="sync" id="sync" role="status"><i></i><span id="syncText">Loading…</span></span></div><div class="nav-label">WORKSPACE</div>      <nav class="tabs" role="tablist" aria-label="Pages" aria-orientation="vertical">
         <button class="tab on" role="tab" aria-controls="pageSummary" data-view="summary" aria-selected="true">Overview</button>
         <button class="tab" role="tab" aria-controls="pageEmployees" data-view="employees" aria-selected="false">Employees</button>
       <button class="tab" role="tab" aria-controls="pageAttendance" data-view="attendance" aria-selected="false">Attendance</button>
@@ -1541,7 +1552,7 @@ body.filters-locked #cleanFilters, body.filters-locked #xchips, body.filters-loc
         <div class="card c-watch" id="cardWatch" aria-label="Leave watch" hidden></div>
       </div>
       <aside class="ov-side">
-        <section class="request-cards card" id="ovRequests" aria-labelledby="requestCenterTitle"><div class="ov-up-head"><h2 id="requestCenterTitle">Request Center</h2><div class="ov-tabs" id="rcTabs" role="tablist" aria-label="Request Center"></div></div><section id="cardMyRequests" style="grid-column:1 / -1;min-width:0" aria-label="Your requests" hidden></section><section id="cardRejectedRequests" style="grid-column:1 / -1;min-width:0" aria-label="Rejected request log" hidden></section><section id="cardApprovalRequests" style="grid-column:1 / -1;min-width:0" aria-label="Approval requests" hidden></section></section>
+        <section class="request-cards card" id="ovRequests" aria-labelledby="requestCenterTitle"><div class="ov-up-head"><div class="rc-headrow"><h2 id="requestCenterTitle">Request Center</h2><button class="btn primary rc-record" id="rcRecord" type="button" hidden title="Record leave, remote, late or half day. Without the manager right it goes to a manager for approval.">+ Record attendance</button></div><div class="ov-tabs" id="rcTabs" role="tablist" aria-label="Request Center"></div></div><section id="cardMyRequests" style="grid-column:1 / -1;min-width:0" aria-label="Your requests" hidden></section><section id="cardRejectedRequests" style="grid-column:1 / -1;min-width:0" aria-label="Rejected request log" hidden></section><section id="cardApprovalRequests" style="grid-column:1 / -1;min-width:0" aria-label="Approval requests" hidden></section></section>
         <section class="card ov-up" id="ovUpcoming" aria-labelledby="ovUpTitle">
           <div class="ov-up-head"><h2 id="ovUpTitle">Coming up</h2><div class="ov-tabs" id="ovUpTabs" role="tablist" aria-label="Coming up"></div></div>
         <div class="card c-coming" id="cardComing" aria-label="Upcoming birthdays and work anniversaries">
@@ -1599,7 +1610,7 @@ body.filters-locked #cleanFilters, body.filters-locked #xchips, body.filters-loc
           <span class="spacer"></span>
           <button class="btn" id="btnFill" title="Fill or correct one field for many people in one table, then save once">Fill in bulk</button>
           <button class="btn" id="btnCols" aria-haspopup="true" data-pop="1">Columns</button>
-          <button class="btn" id="btnAddField" type="button" hidden title="Capture something new for everyone. It becomes a new column in the Excel workbook.">+ Add field</button>
+          <button class="btn" id="btnAddField" type="button" hidden title="Add a new field (a new Excel column) or delete one">⚙ Fields</button>
           <button class="btn primary" id="btnAdd">+ Add employee</button>
         </div>
         <div class="tools row2">
@@ -2275,7 +2286,7 @@ const ACT_SHEET = "Activity Log", ACT_DAYS = Infinity, ACT_MAX = Infinity;
 const ACT_HEAD = ["Date & time", "User", "Area", "Action", "Emp Code", "Name", "Details", "Data (used by the dashboard)"];
 const LOGQ = [];
 let logTimer = null;
-const ACT_VERBS = { add: "Added", edit: "Edited", delete: "Deleted", bulk: "Bulk update", "add-column": "Added a column",
+const ACT_VERBS = { add: "Added", edit: "Edited", delete: "Deleted", bulk: "Bulk update", "add-column": "Added a column", "delete-column": "Deleted a column",
   "external-edit": "Edited in Excel", "external-add": "Added in Excel", "external-delete": "Removed in Excel", "external-columns": "Columns changed in Excel", "external-summary": "Changed in Excel",
   "att-edit": "Attendance updated", "att-add": "Added to tracker", "att-delete": "Removed from tracker", "external-att-edit": "Attendance updated in Excel",
   "external-att-add": "Added to tracker in Excel", "external-att-delete": "Removed from tracker in Excel", "att-link": "Linked tracker name", "att-unlink": "Unlinked tracker name",
@@ -2643,6 +2654,85 @@ async function addColumn(rawName) {
   return res;
 }
 
+/* v3.21: delete a field (a whole column) from the workforce sheet. Cells to the right move one column left, and every
+   reference that points at them (formulas, column widths, filters, merged cells, validations, links) moves with them. */
+function shiftColTok(tok, C) {
+  const parts = tok.split(":"); if (parts.length > 2) return tok;
+  const P = s => { const m = /^(\$?)([A-Z]{1,3})(\$?)(\d*)$/.exec(s); return m ? { d1: m[1], c: colToIdx(m[2]), d2: m[3], r: m[4] } : null; };
+  const a = P(parts[0]), b = parts.length === 2 ? P(parts[1]) : null;
+  if (!a || (parts.length === 2 && !b)) return tok;          // row-only ranges (1:1) and names stay as they are
+  const S = (p, c) => p.d1 + idxToCol(c) + p.d2 + p.r;
+  if (!b) return a.c === C ? null : S(a, a.c > C ? a.c - 1 : a.c);
+  const lo = Math.min(a.c, b.c), hi = Math.max(a.c, b.c);
+  if (lo === C && hi === C) return null;
+  return S(a, lo > C ? lo - 1 : lo) + ":" + S(b, hi >= C ? hi - 1 : hi);
+}
+const shiftColSqref = (s, C) => String(s || "").split(/\s+/).filter(Boolean).map(t => shiftColTok(t, C)).filter(Boolean).join(" ");
+/* refs without a sheet name (or naming this sheet) move; quoted text and other sheets are left alone */
+function shiftColFormula(f, C, sheetName, bareToo = true) {
+  const own = String(sheetName || "").toLowerCase();
+  return String(f).replace(/("(?:[^"]|"")*")|((?:'(?:[^']|'')+'|[A-Za-z0-9_.]+)!)?(\$?[A-Z]{1,3}\$?\d+(?::\$?[A-Z]{1,3}\$?\d+)?|\$?[A-Z]{1,3}:\$?[A-Z]{1,3})(?![A-Za-z0-9_(!])/g, (m, str, sh, ref, off, all) => {
+    if (str) return m;
+    if (!sh) { const prev = all[off - 1]; if (prev && /[A-Za-z0-9_.$]/.test(prev)) return m; if (!bareToo) return m; }
+    else if (sh.slice(0, -1).replace(/^'|'$/g, "").replace(/''/g, "'").toLowerCase() !== own) return m;
+    const n = shiftColTok(ref, C); return (sh || "") + (n == null ? "#REF!" : n);
+  });
+}
+async function deleteColumn(rawName) {
+  const name = String(rawName || "").trim();
+  if (!name) throw new ApiErr(400, "Choose the field to delete.");
+  let removed = 0;
+  const res = await mutate(async (book, schema) => {
+    const H = book.headers, i = H.indexOf(name);
+    if (i < 0) return { noWrite: true, res: { ok: true, missing: true, name } };
+    if (name === schema.key_column || name === schema.name_column) throw new ApiErr(400, "“" + name + "” identifies every employee, so it can’t be deleted.");
+    if ((await sheetTables(book)).length) throw new ApiErr(400, "This sheet is an Excel Table, so the column has to be deleted in Excel itself.");
+    const C = i + 1, root = book.root, sheetName = book.sheet.name;
+    /* formulas elsewhere that use this column would break: refuse instead */
+    const fEls = [...book.sd.getElementsByTagNameNS(NS_MAIN, "f")];
+    for (const f of fEls) {
+      const cell = f.parentNode, ref = splitRef(cell && cell.getAttribute("r"));
+      if (ref && ref.col === C) continue;
+      const nt = shiftColFormula(f.textContent, C, sheetName);
+      if (/#REF!/.test(nt) && !/#REF!/.test(f.textContent)) throw new ApiErr(400, "Other columns calculate from “" + name + "” with Excel formulas (for example cell " + (cell && cell.getAttribute("r")) + "), so it can’t be deleted here. Change those formulas in Excel first.");
+    }
+    const keep = book.rows.map(r => ({ r: r.r, vals: r.vals.filter((_, k) => k !== i) })).filter(e => !e.vals.every(isBlank));
+    removed = book.rows.filter(r => !isBlank(r.vals[i])).length;
+    for (const row of kids(book.sd, "row")) {
+      row.removeAttribute("spans");
+      for (const c of kids(row, "c")) { const ref = splitRef(c.getAttribute("r")); if (!ref) continue; if (ref.col === C) c.remove(); else if (ref.col > C) c.setAttribute("r", idxToCol(ref.col - 1) + ref.row); }
+    }
+    for (const f of book.sd.getElementsByTagNameNS(NS_MAIN, "f")) { f.textContent = shiftColFormula(f.textContent, C, sheetName); if (f.getAttribute("ref")) { const n = shiftColSqref(f.getAttribute("ref"), C); if (n) f.setAttribute("ref", n); else f.removeAttribute("ref"); } }
+    const cols = firstKid(root, "cols");
+    if (cols) { for (const k of kids(cols, "col")) { const mn = +k.getAttribute("min"), mx = +k.getAttribute("max"); if (mx < C) continue; if (mn > C) { k.setAttribute("min", String(mn - 1)); k.setAttribute("max", String(mx - 1)); } else if (mn === mx) k.remove(); else k.setAttribute("max", String(mx - 1)); } if (!kids(cols, "col").length) cols.remove(); }
+    const dim = firstKid(root, "dimension"); if (dim && dim.getAttribute("ref")) dim.setAttribute("ref", shiftColTok(dim.getAttribute("ref"), C) || dim.getAttribute("ref"));
+    const af = firstKid(root, "autoFilter");
+    if (af && af.getAttribute("ref")) {
+      const start = colToIdx((/^\$?([A-Z]+)/.exec(af.getAttribute("ref")) || [, "A"])[1]);
+      for (const fc of kids(af, "filterColumn")) { const id = +fc.getAttribute("colId"), col = start + id; if (col === C) fc.remove(); else if (col > C) fc.setAttribute("colId", String(id - 1)); }
+      const n = shiftColTok(af.getAttribute("ref"), C); if (n) af.setAttribute("ref", n); else af.remove();
+    }
+    const mcs = firstKid(root, "mergeCells");
+    if (mcs) { for (const mc of kids(mcs, "mergeCell")) { const n = shiftColTok(mc.getAttribute("ref"), C); if (n && n.includes(":")) mc.setAttribute("ref", n); else mc.remove(); } const left = kids(mcs, "mergeCell").length; if (left) mcs.setAttribute("count", String(left)); else mcs.remove(); }
+    for (const cf of kids(root, "conditionalFormatting")) {
+      const n = shiftColSqref(cf.getAttribute("sqref"), C); if (!n) { cf.remove(); continue; } cf.setAttribute("sqref", n);
+      for (const fm of cf.getElementsByTagNameNS(NS_MAIN, "formula")) fm.textContent = shiftColFormula(fm.textContent, C, sheetName);
+    }
+    for (const dvs of kids(root, "dataValidations")) {
+      for (const dv of kids(dvs, "dataValidation")) { const n = shiftColSqref(dv.getAttribute("sqref"), C); if (!n) { dv.remove(); continue; } dv.setAttribute("sqref", n); for (const t of ["formula1", "formula2"]) { const fe = firstKid(dv, t); if (fe) fe.textContent = shiftColFormula(fe.textContent, C, sheetName); } }
+      const left = kids(dvs, "dataValidation").length; if (left) dvs.setAttribute("count", String(left)); else dvs.remove();
+    }
+    const hl = firstKid(root, "hyperlinks"); if (hl) { for (const x of kids(hl, "hyperlink")) { const n = shiftColSqref(x.getAttribute("ref"), C); if (n) x.setAttribute("ref", n); else x.remove(); } if (!kids(hl, "hyperlink").length) hl.remove(); }
+    /* named ranges (and the filter range Excel keeps for this sheet) */
+    const wbB = await book.zip.get("xl/workbook.xml");
+    if (wbB) { const wd = parseXml(wbB); let ch = false; for (const dn of wd.getElementsByTagNameNS(NS_MAIN, "definedName")) { const n = shiftColFormula(dn.textContent, C, sheetName, false); if (n !== dn.textContent) { dn.textContent = n; ch = true; } } if (ch) await book.zip.set("xl/workbook.xml", xmlBytes(wd)); }
+    const ki = H.filter((_, k) => k !== i).indexOf(schema.key_column);
+    return { res: { ok: true, name, removed }, log: [{ action: "delete-column", key: "", name, details: { note: "Deleted the column '" + name + "' from the sheet" + (removed ? " (it held values for " + removed + " employee" + (removed === 1 ? "" : "s") + ")" : " (it was empty)") } }],
+      verify: chk => !chk.headers.includes(name) && chk.headers.length === H.length - 1 && chk.rows.length === keep.length && keep.every(e => { const r = chk.rows.find(x => x.r === e.r); return !!r && e.vals.every((v, k) => v === r.vals[k] || (isBlank(v) && isBlank(r.vals[k]))); }) && ki >= 0 };
+  });
+  return res;
+}
+
 async function bulkUpdate(updates, note) {
   if (!Array.isArray(updates) || !updates.length) throw new ApiErr(400, "Nothing to update.");
   let logs = [];
@@ -2679,6 +2769,7 @@ const routes = {
   async call(method, path, body) {
     try {
       const need = method === "POST" && path === "/api/rows" ? "emp.add" : method === "PUT" ? "emp.edit" : method === "DELETE" ? "emp.delete"
+        : method === "POST" && path === "/api/columns/delete" ? "emp.fields"
         : method === "POST" && (path === "/api/bulk" || path === "/api/columns") ? "emp.bulk" : null;
       if (need === "emp.bulk" && path === "/api/columns" && window.PERM && PERM.can("emp.fields")) { /* v3.14: the Add new fields right is enough to add a column */ }
       else if (need && window.PERM && !PERM.can(need)) throw new ApiErr(403, "Your passcode doesn't allow this change. Ask the admin for the right in Settings.");
@@ -2691,6 +2782,7 @@ const routes = {
       }
       if (path === "/api/rows" && method === "POST") { if (!body || typeof body.values !== "object") throw new ApiErr(400, "Missing values."); return await addRow(body.values); }
       if (path === "/api/columns" && method === "POST") return await addColumn(body && body.name);
+      if (path === "/api/columns/delete" && method === "POST") return await deleteColumn(body && body.name);
       if (path === "/api/bulk" && method === "POST") return await bulkUpdate(body && body.updates, body && body.note);
       const m = /^\/api\/rows\/([^?]+)(?:\?(.*))?$/.exec(path);
       if (m) {
@@ -3055,11 +3147,11 @@ const CLOUD = (() => {
 (() => {
 /* v3.13: rights are grouped by module. A module with a page has a "can open" box; its items sit underneath. */
 const PERM_GROUPS = [
-  { name: 'Overview', page: 'page.overview', items: [['ov.attendance', 'See the attendance card'], ['ov.openatt', 'See the “Open attendance →” button on the attendance card'], ['ov.coming', 'See birthdays and work anniversaries'], ['ov.holidays', 'See USA and India holidays'], ['ov.watch', 'See leave red flags and day patterns']], sub: { title: 'Request Center', items: [['requests.own', 'See Waiting and History (their own and their group’s requests)'], ['requests.rejected', 'Also see rejected requests from their notification audience in History'], ['requests.approvals', 'See the To approve tab'], ['att.approve', 'Approve or reject leave requests and edit approved leave']] } },
-  { name: 'Employees', page: 'page.employees', items: [['emp.edit', 'Edit employee details'], ['emp.add', 'Add employees'], ['emp.delete', 'Delete employees'], ['emp.bulk', 'Fill in bulk and add columns'], ['emp.fields', 'Add new fields (new Excel columns)']] },
-  { name: 'Attendance', page: 'page.attendance', items: [['att.who', 'See Who’s out'], ['att.grid', 'See the attendance grid and People'], ['att.log', 'Use Log leave (with the leave types ticked below)'], ['att.direct', 'Log leave straight into attendance (no manager approval)'], ['att.edit', 'Mark attendance in day cells'], ['att.rows', 'Edit any cell or row in the tracker (names, Emp IDs, clients, days) and delete rows'], ['att.holidays', 'Add holidays for everyone'], ['att.fields', 'Add fields to the attendance tracker'], ['att.addemp', 'Add employees to the attendance tracker (new rows, start a month)']],
+  { name: 'Overview', page: 'page.overview', items: [['ov.attendance', 'See the attendance card'], ['ov.openatt', 'See the “Open attendance →” button on the attendance card'], ['ov.coming', 'See birthdays and work anniversaries'], ['ov.holidays', 'See USA and India holidays'], ['ov.watch', 'See leave red flags and day patterns']], sub: { title: 'Request Center', items: [['requests.own', 'See Waiting and History (their own and their group’s requests)'], ['requests.rejected', 'Also see rejected requests from their notification audience in History'], ['att.approve', 'Manager: approve or reject leave requests (shows the To approve tab) and edit approved leave']] } },
+  { name: 'Employees', page: 'page.employees', items: [['emp.edit', 'Edit employee details'], ['emp.add', 'Add employees'], ['emp.delete', 'Delete employees'], ['emp.bulk', 'Fill in bulk and add columns'], ['emp.fields', 'Add or delete fields (Excel columns)']] },
+  { name: 'Attendance', page: 'page.attendance', items: [['att.who', 'See Who’s out'], ['att.grid', 'See the attendance grid and People'], ['att.log', 'Use Record attendance (with the types ticked below)'], ['att.direct', 'Record attendance straight into the tracker (no manager approval)'], ['att.edit', 'Mark attendance in day cells'], ['att.rows', 'Edit any cell or row in the tracker (names, Emp IDs, clients, days) and delete rows'], ['att.holidays', 'Add holidays for everyone'], ['att.fields', 'Add or delete fields in the attendance tracker'], ['att.addemp', 'Add employees to the attendance tracker (new rows, start a month)']],
     /* v3.14.2: which leave types appear in the Log leave “Type” list */
-    sub: { title: 'Leave types in Log leave', items: [['log.LA', 'LA · Leave application (pending)'], ['log.AL', 'AL · Approved leave'], ['log.CL', 'CL · Casual leave'], ['log.SL', 'SL · Sick leave'], ['log.UL', 'UL · Unplanned leave'], ['log.AB', 'AB · Absent'], ['log.HD1', 'HD1 · Half day, 1st half'], ['log.HD2', 'HD2 · Half day, 2nd half'], ['log.R', 'R · Remote'], ['log.L', 'L · Late coming'], ['log.C', 'C · Cab late']] } },
+    sub: { title: 'Types in Record attendance', items: [['log.LA', 'LA · Leave application (pending)'], ['log.AL', 'AL · Approved leave'], ['log.CL', 'CL · Casual leave'], ['log.SL', 'SL · Sick leave'], ['log.UL', 'UL · Unplanned leave'], ['log.AB', 'AB · Absent'], ['log.HD1', 'HD1 · Half day, 1st half'], ['log.HD2', 'HD2 · Half day, 2nd half'], ['log.R', 'R · Remote'], ['log.L', 'L · Late coming'], ['log.C', 'C · Cab late']] } },
   { name: 'Action center', page: 'page.actions', items: [['act.items', 'See Action items'], ['act.review', 'See Designation reviews'], ['act.health', 'See Attendance data health']] },
   { name: 'Reports', page: 'page.reports', items: [['rep.team', 'Team composition'], ['rep.growth', 'Tenure & growth'], ['rep.location', 'Location & travel'], ['rep.attendance', 'Attendance reports'], ['rep.custom', 'See custom dashboards (their own and shared ones)'], ['rep.export', 'Copy report tables and charts'], ['rep.build', 'Create and edit custom dashboards']] },
   { name: 'Save & sync', items: [['sync.view', 'Open the Save & sync settings'], ['sync.auto', 'Start or stop auto-sync'], ['sync.save', 'Save now and undo']] },
@@ -3378,10 +3470,14 @@ const Engine = (() => {
   }
 
   /* ---- Writing ---- */
-  async function build(ctx, rows, fieldNames = []) {
+  async function build(ctx, rows, fieldNames = [], removedFields = []) {
     const zip = await ZipShim.loadAsync(ctx.bytes);      // start clean from the last saved bytes
-    /* v3.14: extra fields after AM. Existing ones keep their column; new ones are added after the last one. */
-    const extra = (ctx.extraCols || []).map(c => ({ ...c }));
+    /* v3.14: extra fields after AM. Existing ones keep their column; new ones are added after the last one.
+       v3.21: deleted fields are dropped and the fields after them move left, so no empty columns are left behind. */
+    const gone = new Set((removedFields || []).map(n => String(n).toLowerCase()));
+    const dropping = (ctx.extraCols || []).some(c => gone.has(c.name.toLowerCase()));
+    const extra = dropping ? ctx.extraCols.filter(c => !gone.has(c.name.toLowerCase())).map((c, i) => ({ cn: COL_REG + 1 + i, name: c.name, from: c.cn }))
+      : (ctx.extraCols || []).map(c => ({ ...c, from: c.cn }));
     let nextCol = Math.max(COL_REG, ...extra.map(c => c.cn)) + 1; const addedCols = [];
     for (const nm of fieldNames) if (nm && !extra.some(c => c.name.toLowerCase() === String(nm).toLowerCase())) { const c = { cn: nextCol++, name: String(nm) }; extra.push(c); addedCols.push(c); }
     const lastColNum = Math.max(COL_REG, ...extra.map(c => c.cn)), lastCol = colName(lastColNum);
@@ -3424,9 +3520,9 @@ const Engine = (() => {
       if (row.reg != null && !Number.isNaN(row.reg)) cells.push(numCell('AM' + r, st(COL_REG) ?? DEF_STYLE.calc, row.reg));
       else cells.push(emptyCell('AM' + r, st(COL_REG) ?? DEF_STYLE.calc));
       for (const c of extra) {
-        const v = row.extra ? row.extra[c.name] : null, ref = colName(c.cn) + r;
-        if (v != null && v !== '') cells.push(typeof v === 'number' ? numCell(ref, st(c.cn) ?? st(4) ?? DEF_STYLE.D, v) : strCell(ref, st(c.cn) ?? st(4) ?? DEF_STYLE.D, v));
-        else if (st(c.cn) != null && st(c.cn) !== DEF_STYLE.D) cells.push(emptyCell(ref, st(c.cn)));
+        const v = row.extra ? row.extra[c.name] : null, ref = colName(c.cn) + r, sc = c.from != null ? st(c.from) : null;
+        if (v != null && v !== '') cells.push(typeof v === 'number' ? numCell(ref, sc ?? st(4) ?? DEF_STYLE.D, v) : strCell(ref, sc ?? st(4) ?? DEF_STYLE.D, v));
+        else if (sc != null && sc !== DEF_STYLE.D) cells.push(emptyCell(ref, sc));
       }
       rowsXml.push(`<row r="${r}">${cells.join('')}</row>`);
     });
@@ -3440,6 +3536,14 @@ const Engine = (() => {
       .replace(/(<selection pane="bottomRight"[^>]*?)sqref="[^"]*"/, '$1sqref="C3"');
     /* new field headings go into row 2, styled like the AM heading */
     let row2 = ctx.rawRow2;
+    if (dropping && row2) {
+      /* rewrite the headings after AM: take out the old ones and put the kept fields back in their new columns */
+      const oldHead = new Map();
+      row2 = row2.replace(/<c r="([A-Z]+)2"[^>]*?(?:\/>|>[\s\S]*?<\/c>)/g, (m, col) => { const cn = colNum(col); if (cn <= COL_REG) return m; oldHead.set(cn, (m.match(/\ss="(\d+)"/) || [])[1]); return ''; });
+      const hs0 = (row2.match(/<c r="AM2"[^>]*?\ss="(\d+)"/) || [])[1];
+      const keptXml = extra.filter(c => !addedCols.includes(c)).map(c => { const hs = oldHead.get(c.from) ?? hs0; return `<c r="${colName(c.cn)}2"${hs ? ` s="${hs}"` : ''} t="inlineStr"><is><t>${encode(c.name)}</t></is></c>`; }).join('');
+      row2 = (/\/>$/.test(row2) && !/<\/row>$/.test(row2) ? row2.replace(/\s*\/>$/, '>') + '</row>' : row2).replace(/<\/row>$/, keptXml + '</row>').replace(/^<row\b([^>]*?)\sspans="[^"]*"/, '<row$1');
+    }
     if (addedCols.length) {
       const hs = (row2.match(/<c r="AM2"[^>]*?\ss="(\d+)"/) || [])[1];
       const cellsXml = addedCols.map(c => `<c r="${colName(c.cn)}2"${hs ? ` s="${hs}"` : ''} t="inlineStr"><is><t>${encode(c.name)}</t></is></c>`).join('');
@@ -3472,7 +3576,16 @@ const Engine = (() => {
       tx = tx.replace(/(<table\b[^>]*?\sref=")[^"]*(")/, `$1A2:${lastCol}${last}$2`).replace(/<sortState\b[\s\S]*?<\/sortState>/, '');
       tx = tx.replace(/(<autoFilter\b[^>]*?\sref=")[^"]*(")/, `$1A2:${lastCol}${last}$2`);
       /* v3.14: a table needs one tableColumn per column; add the new fields */
-      const tcM = tx.match(/<tableColumns\b[^>]*>([\s\S]*?)<\/tableColumns>/);
+      let tcM = tx.match(/<tableColumns\b[^>]*>([\s\S]*?)<\/tableColumns>/);
+      /* v3.21: after deleting fields, keep A–AM and list the remaining fields again */
+      if (tcM && dropping) {
+        const all = tcM[1].match(/<tableColumn\b[^>]*?(?:\/>|>[\s\S]*?<\/tableColumn>)/g) || [];
+        const base = all.slice(0, COL_REG); let id = Math.max(0, ...all.map(x => +(x.match(/\sid="(\d+)"/) || [, 0])[1]));
+        const kept = extra.filter(c => !addedCols.includes(c)).map(c => all[c.from - 1] || `<tableColumn id="${++id}" name="${encode(c.name).replace(/"/g, '&quot;')}"/>`);
+        const list = [...base, ...kept], open = (tx.match(/<tableColumns\b[^>]*>/) || ['<tableColumns>'])[0].replace(/\scount="\d+"/, ` count="${list.length}"`);
+        tx = tx.replace(/<tableColumns\b[^>]*>[\s\S]*?<\/tableColumns>/, () => open + list.join('') + '</tableColumns>');
+        tcM = tx.match(/<tableColumns\b[^>]*>([\s\S]*?)<\/tableColumns>/);
+      }
       if (tcM) {
         const have = [...tcM[1].matchAll(/<tableColumn\b[^>]*?\sid="(\d+)"/g)].map(m => +m[1]);
         let add = '', id = Math.max(0, ...have);
@@ -3730,7 +3843,9 @@ function D(all = false) {
 /* ------------ mutations with undo + change log ------------ */
 function snapshot() { return S.rows.map(r => ({ ...r, days: r.days.slice(), extra: { ...(r.extra || {}) } })); }
 /* v3.14: fields added to the tracker (columns after AM). New ones wait in S.newFields until the next save writes them. */
-const attFieldNames = () => { const out = [...((S.ctx && S.ctx.extraCols) || []).map(c => c.name)]; for (const n of (S.newFields || [])) if (!out.some(x => x.toLowerCase() === n.toLowerCase())) out.push(n); return out; };
+/* v3.21: deleted fields wait in S.removedFields and disappear from Excel with the next save */
+const attRemoved = n => (S.removedFields || []).some(x => x.toLowerCase() === String(n).toLowerCase());
+const attFieldNames = () => { const out = [...((S.ctx && S.ctx.extraCols) || []).map(c => c.name)].filter(n => !attRemoved(n)); for (const n of (S.newFields || [])) if (!out.some(x => x.toLowerCase() === n.toLowerCase())) out.push(n); return out; };
 /* v3.11: rights. Approving or rejecting leave (AL, CL, SL, RJ) needs "Approve leave"; other codes need "Edit attendance". */
 const can = k => !window.PERM || PERM.can(k);
 const APPROVAL_CODES = new Set(['AL', 'CL', 'SL', 'RJ']);
@@ -3761,7 +3876,7 @@ function mutate(desc, fn, opts = {}) {
   if (opts.addEmp && !can('att.addemp')) { toast('Your passcode can’t add employees to the attendance tracker. Ask the admin for the right in Settings.'); return false; }
   if (opts.rows && !can('att.rows')) { toast('Your passcode can’t edit or delete rows in the attendance tracker. Ask the admin for the right in Settings.'); return false; }
   if (!(opts.addEmp || opts.rows || can('att.edit') || (opts.cells && can('att.approve')) || (opts.holiday && can('att.holidays')) || (opts.log && can('att.log')) || (opts.fields && can('att.fields')) || (opts.fieldName && canFillField(opts.fieldName)))) { toast('Your passcode can view attendance but not change this. Ask the admin for the right in Settings.'); return false; }
-  S.undo.push({ rows: snapshot(), log: S.changes.length, nf: (S.newFields || []).length });
+  S.undo.push({ rows: snapshot(), log: S.changes.length, nf: (S.newFields || []).length, nfList: (S.newFields || []).slice(), rfList: (S.removedFields || []).slice() });
   if (S.undo.length > 60) S.undo.shift();
   const before = S.rows.length;
   let res;
@@ -3784,7 +3899,7 @@ function mutate(desc, fn, opts = {}) {
 function undo() {
   if (S.saving) return;
   const u = S.undo.pop(); if (!u) return;
-  S.rows = u.rows.map(r => ({ ...r, _s: null, _dp: null })); S.changes.length = u.log; if (S.newFields && u.nf != null) S.newFields.length = Math.min(S.newFields.length, u.nf); S.ver++; S.lastChange = Date.now(); render(); toast('Undone');
+  S.rows = u.rows.map(r => ({ ...r, _s: null, _dp: null })); S.changes.length = u.log; if (u.nfList) S.newFields = u.nfList.slice(); else if (S.newFields && u.nf != null) S.newFields.length = Math.min(S.newFields.length, u.nf); if (u.rfList) S.removedFields = u.rfList.slice(); S.ver++; S.lastChange = Date.now(); render(); toast('Undone');
   if (S.changes.length) schedulePendingSave(); else clearPending();
 }
 function newRow(month, name, opts = {}) {
@@ -3852,7 +3967,7 @@ function flushPendingNow() { clearTimeout(pendingTimer); return persistPending()
 async function persistPending() {
     if (!S.ctx || !S.changes.length) { await clearPending(); return; }
     const rows = S.rows.map(r => ({ uid: r.uid, r0: r.r0, month: r.month, empId: r.empId, name: r.name, client: r.client, days: r.days.slice(), reg: r.reg, styles: { ...r.styles }, variant: r.variant, extra: { ...(r.extra || {}) } }));
-    await queuePending({ fileName: S.fileName, mtime: S.mtime, savedAt: Date.now(), n: S.changes.length, rows, fields: (S.newFields || []).slice() });
+    await queuePending({ fileName: S.fileName, mtime: S.mtime, savedAt: Date.now(), n: S.changes.length, rows, fields: (S.newFields || []).slice(), removed: (S.removedFields || []).slice() });
 }
 async function clearPending() { clearTimeout(pendingTimer); await queuePending(null); }
 async function prepareSignOut() {
@@ -3866,7 +3981,7 @@ async function restorePendingIfAny() {
   if (pending.fileName !== S.fileName || pending.mtime !== S.mtime) { await clearPending(); return; }   // the file moved on since then: too risky to merge
   const diskRows = snapshot();
   S.rows = pending.rows.map(r => ({ ...r, extra: r.extra || {}, _s: null, _dp: null }));
-  S.newFields = Array.isArray(pending.fields) ? pending.fields.slice() : [];
+  S.newFields = Array.isArray(pending.fields) ? pending.fields.slice() : []; S.removedFields = Array.isArray(pending.removed) ? pending.removed.slice() : [];
   S.uid = Math.max(S.uid, ...S.rows.map(r => (r.uid || 0) + 1));
   S.undo = [{ rows: diskRows, log: 0 }];
   S.changes = [{ t: new Date(), desc: `Restored ${pending.n || 1} unsaved change${(pending.n || 1) === 1 ? '' : 's'} from before the page reloaded` }];
@@ -3877,7 +3992,7 @@ async function restorePendingIfAny() {
 
 async function adopt(ctx, { recover = false } = {}) {
   ctx.rows.forEach(r => { r.uid = S.uid++; if (!r.extra) r.extra = {}; });
-  S.newFields = [];
+  S.newFields = []; S.removedFields = [];
   S.ctx = ctx; S.rows = ctx.rows; S.changes = []; S.undo = []; S.ver++; S.diskChanged = false; S.base = snapshot();
   const d = D(true);
   const has = ms => d.byMonth.has(ms);
@@ -4031,10 +4146,11 @@ async function save(opts = {}) {
       if (!auto || Date.now() - S.lastBackup > 600000) { try { await BE.backup(S.ctx.bytes, S.fileName); S.lastBackup = Date.now(); } catch (e) { if (!auto) downloadBytes(S.ctx.bytes, `${base}_backup_${stamp()}.xlsx`); else console.error(e); } }
       const n = S.changes.length, diff = diffRows(S.base, S.rows, r => 'u' + r.uid);
       /* in a shared workbook, build on top of the latest file so the workforce sheet's newest edits are kept */
-      const out = await Engine.build(BE.single() ? await Engine.load(new Uint8Array(await f.arrayBuffer())) : S.ctx, S.rows, attFieldNames());
+      const out = await Engine.build(BE.single() ? await Engine.load(new Uint8Array(await f.arrayBuffer())) : S.ctx, S.rows, attFieldNames(), S.removedFields || []);
       if (!force && !S.handle.cloud && (await S.handle.getFile()).lastModified !== f.lastModified) { if (attempt < 2) continue; throw new Error('The workbook changed during saving. Try again in a moment.'); }
       const entries = entriesFromDiff(diff, { user: BE.userName(), time: BE.nowText(), external: false });
       /* v3.14: new tracker fields and their values are logged too */
+      for (const nm of (S.removedFields || [])) entries.push({ time: BE.nowText(), user: BE.userName(), action: 'settings', att: S.fileName, key: '', name: 'Attendance tracker', details: { note: 'Deleted the field “' + nm + '” (its column and values)' } });
       for (const nm of (S.newFields || [])) entries.push({ time: BE.nowText(), user: BE.userName(), action: 'settings', att: S.fileName, key: '', name: 'Attendance tracker', details: { note: 'Added the field “' + nm + '” (a new column after AM)' } });
       { const baseBy = new Map(S.base.map(r => [r.uid,r]));
         for (const r of S.rows) { const before=baseBy.get(r.uid)?.extra || {}, after=r.extra || {};
@@ -4051,7 +4167,7 @@ async function save(opts = {}) {
       S.autoErr = ''; S.autoRetry = 0; S.conflictAsked = false; if (auto) S.autoAt = new Date(); else toast(`Saved ${n} change${n === 1 ? '' : 's'} to ${S.fileName}`);
       if (force && !S.auto) setAuto(true);
       await clearPending();
-      S.newFields = [];
+      S.newFields = []; S.removedFields = [];
       await adopt(ctx); notify(); if (S.act) S.act.items = null;
       S.saving = false; render(); return true;
     }
@@ -4857,7 +4973,7 @@ function whoView() {
     <div class="toolbar"><label>From <input type="date" value="${w.start}" data-bind="who-start"></label>
       <div class="seg" role="group" aria-label="Window length">${[7, 14, 21, 30].map(n => `<button data-act="who-days" data-n="${n}" aria-pressed="${w.days === n}">${n} days</button>`).join('')}</div>
       <button class="btn" data-act="who-today">Today</button><button class="btn" data-act="who-picture">Copy as picture</button><span class="sm muted">Show:</span>${chk('leave', 'Leaves')}${chk('applied', 'Applied (LA)')}${chk('late', 'Late')}${chk('remote', 'Remote')}
-      <span class="grow"></span>${canLog() ? `<button class="btn primary" data-act="log-leave">${ic('plus')} Log leave</button>` : ''}</div>${fieldBar()}
+      <span class="grow"></span>${canLog() ? `<button class="btn primary" data-act="log-leave">${ic('plus')} Record attendance</button>` : ''}</div>${fieldBar()}
     <div class="grid who3" style="display:grid;grid-template-columns:minmax(0,1.5fr) minmax(0,1fr) minmax(0,1fr);gap:14px;align-items:start">
       <div class="card" style="padding:0;overflow:hidden;min-width:0">${list.length ? `<div class="gridwrap" style="border:0;box-shadow:none;max-height:calc(100vh - 330px)"><table class="att" data-picture-timeline><thead><tr><th class="c-name">Team member</th>${head}</tr></thead><tbody>${body}</tbody></table></div>` : `<div class="empty">Nothing recorded in this window (${longDate(dates[0])} to ${longDate(dates[dates.length - 1])}). The sheet may not have entries this far ahead yet.<br><button class="btn sm" style="margin-top:10px" data-act="who-back">Show the last 14 days instead</button></div>`}</div>
       <div class="card" style="min-width:0"><h2>Applications ahead · ${pend.length}</h2><div class="sub">${can('att.approve') ? 'Approve each date or a consecutive group. ✕ records RJ (rejected) in the tracker; it does not record attendance.' : 'Leave applied for and waiting for someone with the Approve leave right.'}</div>
@@ -4957,7 +5073,7 @@ function gridView() {
       ${hasRoster() && gonePlan().list.length ? `<button class="btn" data-act="mark-gone" data-tip="Left / Moved people whose remaining days are not marked yet">${ic('users')} Mark Left / Moved <span class="badge">${gonePlan().list.length}</span></button>` : ''}
       ${can('att.holidays') ? `<button class="btn" data-act="holiday" data-tip="Mark a whole day as a holiday (H) for everyone in one go">${ic('cal')} Add holiday</button>` : ''}
       ${can('att.addemp') ? `<button class="btn" data-act="new-month">${ic('cal')} Start / update month</button>` : ''}
-      ${canLog() ? `<button class="btn" data-act="log-leave">${ic('plus')} Log leave</button>` : ''}
+      ${canLog() ? `<button class="btn" data-act="log-leave">${ic('plus')} Record attendance</button>` : ''}
       ${can('att.addemp') ? `<button class="btn primary" data-act="add-row">${ic('plus')} Add employee</button>` : ''}</div>
     ${fieldBar()}
     ${leaveFilterBar(gridBaseRows())}
@@ -4995,7 +5111,7 @@ function peopleView() {
   return `<div class="people-layout">${side}<div>
       <div class="card" style="margin-bottom:14px"><div style="display:flex;gap:12px;align-items:center;flex-wrap:wrap"><div style="flex:1;min-width:220px"><h2 style="font-size:20px;margin:0">${esc(p.name)}</h2>
         <div class="sm muted">${ids.length ? 'ID ' + ids.map(esc).join(', ') : 'No employee ID recorded'} · ${esc(last.client || 'No client')} · ${p.rows.length} months tracked (${monthLabel(p.rows[0].month)} – ${monthLabel(last.month)})</div>${rosterLine(p)}</div>
-        <button class="btn" data-act="log-leave" data-k="${esc(p.key)}">${ic('plus')} Log leave</button></div></div>
+        <button class="btn" data-act="log-leave" data-k="${esc(p.key)}">${ic('plus')} Record attendance</button></div></div>
       <div class="grid g6" style="grid-template-columns:repeat(6,1fr);margin-bottom:14px">
         <div class="card tile"><div class="lbl">PRESENT · ${monthShort(cur.month).toUpperCase()}</div><div class="val">${rowStats(cur).present}</div><div class="delta">blank = present</div></div>
         <div class="card tile"><div class="lbl">LEAVE DAYS ${yr}</div><div class="val">${fmt(ya.total)}</div></div>
@@ -5120,7 +5236,7 @@ function checksView() {
 
 /* ---------- ACTIVITY (past 30 days) ---------- */
 const ACT_VERBS = { 'att-link': 'linked', 'att-unlink': 'unlinked', 'att-edit': 'updated attendance for', 'att-add': 'added to the tracker:', 'att-delete': 'removed from the tracker:', attendance: 'saved attendance changes to',
-  add: 'added', edit: 'edited', delete: 'deleted', bulk: 'updated', 'add-column': 'added a column', login: 'signed in', download: 'downloaded a copy of the Excel file',
+  add: 'added', edit: 'edited', delete: 'deleted', bulk: 'updated', 'add-column': 'added a column', 'delete-column': 'deleted a column', login: 'signed in', download: 'downloaded a copy of the Excel file',
   'external-edit': 'changed', 'external-add': 'added', 'external-delete': 'removed', 'external-columns': 'changed the columns', 'external-summary': 'changed' };
 const isExt = it => /^external-/.test(it.action || '');
 const isAtt = it => !!it.att || it.action === 'attendance' || /att-/.test(it.action || '');
@@ -5605,12 +5721,13 @@ function openFieldsManager(sel) {
   const d = D(), month = S.ui.grid.month || d.latestMonth, fieldSel = sel && fillNames.includes(sel) ? sel : fillNames[0];
   const monthRows = (d.byMonth.get(month) || []).slice().sort((a, b) => a.name.localeCompare(b.name));
   const pendingNote = n => (S.newFields || []).some(x => x.toLowerCase() === n.toLowerCase()) ? ' <span class="tag">added · saves with the next sync</span>' : '';
-  const list = names.length ? `<ul class="fld-list">${names.map(n => { const filled = S.rows.filter(r => r.extra && r.extra[n] != null && r.extra[n] !== '').length; return `<li><b>${esc(n)}</b>${pendingNote(n)}<span class="grow"></span><span class="sm muted">${filled} of ${S.rows.length} rows filled</span></li>`; }).join('')}</ul>` : '<div class="empty" style="padding:14px">No extra fields yet.</div>';
+  const list = names.length ? `<ul class="fld-list">${names.map(n => { const filled = S.rows.filter(r => r.extra && r.extra[n] != null && r.extra[n] !== '').length; return `<li><b>${esc(n)}</b>${pendingNote(n)}<span class="grow"></span><span class="sm muted">${filled} of ${S.rows.length} rows filled</span>${canAdd ? `<button class="btn sm" type="button" data-xf-del="${esc(n)}" title="Delete this field and its values from the tracker">Delete</button>` : ''}</li>`; }).join('')}</ul>` : '<div class="empty" style="padding:14px">No extra fields yet.</div>';
+  const gonePending = (S.removedFields || []).length ? `<div class="sm muted" style="margin:6px 0 10px">Deleted, removed from Excel with the next save: ${(S.removedFields || []).map(esc).join(', ')}</div>` : '';
   const add = canAdd ? `<div style="display:flex;gap:8px;align-items:flex-end;flex-wrap:wrap;margin:6px 0 14px"><label style="flex:1;min-width:220px">New field name<input type="text" id="xf-new" maxlength="60" placeholder="e.g. Shift, Laptop returned, Manager" autocomplete="off"></label><button class="btn primary" id="xf-add" type="button">${ic('plus')} Add field</button></div><div class="sm muted" style="margin:-6px 0 14px">It becomes a new column after AM in the “Attendance Tracker” sheet, for every month.</div>` : '<div class="sm muted" style="margin-bottom:12px">Only people with the “Add fields to the attendance tracker” right can add fields.</div>';
   const fill = names.length && canFill ? `<div style="display:flex;gap:10px;align-items:center;flex-wrap:wrap;margin:6px 0 8px"><b style="font-size:13px">Fill in</b><select id="xf-pick">${fillNames.map(n => `<option${n === fieldSel ? ' selected' : ''}>${esc(n)}</option>`).join('')}</select><span class="sm muted">for ${monthLabel(month)} · ${monthRows.length} people (follows the filters at the top)</span></div>
     <div class="fld-fill">${fieldValuesList(fieldSel, 'xf-vals')}<table><thead><tr><th>Employee</th><th>Emp ID</th><th>Client</th><th>${esc(fieldSel)}</th></tr></thead><tbody>${monthRows.map(r => `<tr><td>${esc(r.name.trim())}</td><td class="sm muted">${esc(String(r.empId ?? '—'))}</td><td class="sm muted">${esc(r.client || '')}</td><td><input type="text" list="xf-vals" data-xfr="${r.uid}" value="${esc((r.extra || {})[fieldSel] ?? '')}" aria-label="${esc(fieldSel)} for ${esc(r.name.trim())}"></td></tr>`).join('')}</tbody></table></div>` : '';
   const m = openModal({ title: 'Attendance tracker fields', wide: true,
-    body: `${add}${list}${superAccess ? '<div id="xf-acc"><p class="sm muted">Loading who can log each field…</p></div>' : ''}${fill}<div class="err" id="xf-err" role="alert"></div>`,
+    body: `${add}${list}${gonePending}${superAccess ? '<div id="xf-acc"><p class="sm muted">Loading who can log each field…</p></div>' : ''}${fill}<div class="err" id="xf-err" role="alert"></div>`,
     footer: `<span class="grow"></span><button class="btn" data-close>Close</button>${fill ? '<button class="btn primary" id="xf-save" type="button">Save values</button>' : ''}` });
   const err = t => { $('#xf-err', m).textContent = t; };
   if (superAccess) drawFieldAccess($('#xf-acc', m), names).catch(e => { const b = $('#xf-acc', m); if (b) b.innerHTML = `<p class="err">Could not load people: ${esc(e.message)}</p>`; });
@@ -5618,12 +5735,26 @@ function openFieldsManager(sel) {
     const nm = ($('#xf-new', m).value || '').replace(/\s+/g, ' ').trim();
     if (!nm) return err('Enter a name for the field.');
     if (/^[=+@-]/.test(nm)) return err('A field name can’t start with =, +, - or @.');
-    const taken = [...((S.ctx && S.ctx.headerNames) || []), ...attFieldNames()].some(x => x.toLowerCase() === nm.toLowerCase());
+    const taken = [...((S.ctx && S.ctx.headerNames) || []), ...attFieldNames()].filter(x => !attRemoved(x)).some(x => x.toLowerCase() === nm.toLowerCase());
     if (taken) return err(`The tracker already has a column called “${nm}”.`);
-    const ok = mutate(`Added the field “${nm}” to the attendance tracker`, () => { (S.newFields || (S.newFields = [])).push(nm); }, { fields: true });
+    const ok = mutate(`Added the field “${nm}” to the attendance tracker`, () => { if (attRemoved(nm)) S.removedFields = S.removedFields.filter(x => x.toLowerCase() !== nm.toLowerCase()); else (S.newFields || (S.newFields = [])).push(nm); }, { fields: true });
     if (ok !== false) { toast(`Added “${nm}”. It is written to Excel with the next save.`); openFieldsManager(nm); }
   });
   $('#xf-new', m)?.addEventListener('keydown', e => { if (e.key === 'Enter') $('#xf-add', m).click(); });
+  /* v3.21: delete a field: its column and every value in it (Undo works until the save) */
+  $$('[data-xf-del]', m).forEach(b => b.addEventListener('click', async () => {
+    const nm = b.dataset.xfDel, filled = S.rows.filter(r => r.extra && r.extra[nm] != null && r.extra[nm] !== '').length;
+    closeModal();
+    const ok = await confirmBox(`Delete the field “${nm}”?`, `Its column is removed from the “Attendance Tracker” sheet${filled ? `, with the values in ${filled} row${filled === 1 ? '' : 's'}` : ''}. Fields after it move one column left. It is written to Excel with the next save, and you can Undo until then.`, 'Delete field');
+    if (!ok) { openFieldsManager(); return; }
+    const lc = nm.toLowerCase();
+    const done = mutate(`Deleted the field “${nm}” from the attendance tracker`, () => {
+      if ((S.newFields || []).some(x => x.toLowerCase() === lc)) S.newFields = S.newFields.filter(x => x.toLowerCase() !== lc);
+      else if (!attRemoved(nm)) (S.removedFields || (S.removedFields = [])).push(nm);
+      for (const r of S.rows) if (r.extra && Object.keys(r.extra).some(k => k.toLowerCase() === lc)) { const ex = { ...r.extra }; for (const k of Object.keys(ex)) if (k.toLowerCase() === lc) delete ex[k]; r.extra = ex; }
+    }, { fields: true });
+    if (done !== false) { toast(`Deleted “${nm}”. It leaves Excel with the next save.`, { act: 'undo', label: 'Undo' }); openFieldsManager(); }
+  }));
   $('#xf-pick', m)?.addEventListener('change', e => openFieldsManager(e.target.value));
   $('#xf-save', m)?.addEventListener('click', () => {
     if (!canFillField(fieldSel)) { err('You no longer have access to this field.'); return; }
@@ -5646,8 +5777,9 @@ function confirmDelete(uid) {
 
 /* ---------- log leave ---------- */
 function openLogLeave(preKey) {
+  if (S.status !== 'ready' || !S.ctx) { toast('The attendance tracker isn’t connected yet. Open the Attendance page once, or ask the admin to connect it in Settings › Save & sync.'); return; }
   const d = D(true); const names = employeeNames();
-  if (!canLog()) { toast('Your passcode can’t log leave. Ask the admin for the right in Settings.'); return; }
+  if (!canLog()) { toast('Your passcode can’t record attendance. Ask the admin for the right in Settings.'); return; }
   const linked = window.PERM && PERM.linkedEmp && PERM.linkedEmp();
   const linkedName = linked ? ((rosterRows().find(r => idKey(gs(r, 'key_column')) === idKey(linked.code)) && gs(rosterRows().find(r => idKey(gs(r, 'key_column')) === idKey(linked.code)), 'name_column').trim()) || linked.name) : '';
   const pre = preKey ? d.people.get(preKey)?.name : linkedName;
@@ -5657,7 +5789,7 @@ function openLogLeave(preKey) {
   const openedAt = new Date();
   const today = isoDate(new Date(Date.UTC(openedAt.getFullYear(), openedAt.getMonth(), openedAt.getDate())));
   const m = openModal({
-    title: 'Log leave',
+    title: 'Record attendance',
     body: `<style>.cbx{position:relative}.cbx-list{position:absolute;left:0;right:0;top:calc(100% + 4px);z-index:5;max-height:260px;overflow:auto;background:var(--surface);border:1px solid var(--line-2);border-radius:10px;box-shadow:0 10px 30px rgba(0,0,0,.18);padding:4px}.cbx-opt{display:flex;justify-content:space-between;gap:12px;width:100%;border:0;background:transparent;text-align:left;padding:7px 10px;border-radius:7px;font-size:13px;color:var(--ink);font-weight:500}.cbx-opt small{color:var(--ink-3);font-weight:400}.cbx-opt.on,.cbx-opt:hover{background:var(--accent-soft)}.cbx-empty{padding:10px;color:var(--ink-3);font-size:12px}.cbx-caret{position:absolute;right:8px;top:50%;transform:translateY(-50%);border:0;background:transparent;color:var(--ink-3);padding:4px 6px}</style>
       <div class="form"><div class="full" style="display:flex;flex-direction:column;gap:4px"><span style="font-size:12px;font-weight:600;color:var(--ink-2)">Employee</span><div class="cbx"><input type="text" id="l-name" value="${esc(pre || '')}" placeholder="Pick or type a name" autocomplete="off" role="combobox" aria-expanded="false" aria-controls="l-list" aria-label="Employee" style="width:100%;padding-right:32px"><button type="button" class="cbx-caret" id="l-caret" tabindex="-1" aria-label="Show all employees">▾</button><div class="cbx-list" id="l-list" role="listbox" hidden></div></div></div>
       <label>Type<select id="l-code">${codesAllowed.map(c => `<option value="${c}" ${c === 'LA' && (!can('att.approve') || !codesAllowed.includes('AL')) ? 'selected' : ''}>${c} · ${CODES[c].label}</option>`).join('')}</select></label><span></span>
@@ -5858,7 +5990,7 @@ const rcGroup = r => rcMates().has(String(r.byId));
 function requestBuckets() {
   const me = myId(), mates = rcMates();
   const inScope = r => (me && String(r.byId) === me) || (RC.scope !== 'mine' && mates.has(String(r.byId)));
-  const approvals = can('requests.approvals') ? reqList().filter(r => r.status === 'pending' && inMyScope(r)).sort((a, b) => (a.at || '').localeCompare(b.at || '')) : [];
+  const approvals = canDecide() ? reqList().filter(r => r.status === 'pending' && inMyScope(r)).sort((a, b) => (a.at || '').localeCompare(b.at || '')) : [];
   const deciding = new Set(approvals.map(r => r.id));
   const waiting = can('requests.own') ? reqList().filter(r => r.status === 'pending' && !deciding.has(r.id) && inScope(r)).sort((a, b) => (b.at || '').localeCompare(a.at || '')) : [];
   const seeRejected = r => r.status === 'rejected' && can('requests.rejected') && (RC.scope !== 'mine' || rcMine(r)) && !!window.requestNotificationVisible?.(r);
@@ -5905,9 +6037,9 @@ function renderApprovalRequests() {
   renderRequestHistory();
   const { approvals: pending } = requestBuckets();
   const ready = S.status === 'ready' && !!S.ctx;
-  const warn = !canDecide() ? '<p class="rc-note">You can see these, but deciding needs “Approve or reject leave”. Ask the super admin.</p>' : !ready ? '<p class="rc-note">Connect the attendance tracker (Settings › Save & sync) to approve.</p>' : '';
+  const warn = !ready ? '<p class="rc-note">Connect the attendance tracker (Settings › Save & sync) to approve.</p>' : '';
   const acts = r => canDecide() ? `<select aria-label="Leave type to approve for ${esc(r.name)}" title="Approve as this leave type" ${!ready ? 'disabled' : ''}>${LOG_TYPES.map(c => `<option value="${c}"${c === r.code ? ' selected' : ''}>${c}</option>`).join('')}</select><button class="btn sm primary" data-approve="${esc(r.id)}" ${!ready || S.saving ? 'disabled' : ''}>Approve</button><button class="btn sm" data-reject="${esc(r.id)}">Reject</button>` : '<span class="rq-st pending">Pending</span>';
-  rcDraw('cardApprovalRequests', can('requests.approvals'),
+  rcDraw('cardApprovalRequests', canDecide(),
     `<div class="rc-top"><p class="rc-sub grow">Waiting for your decision. Approved leave goes straight into attendance.</p><button class="btn sm" data-refresh title="Check for new requests">↻ Refresh</button></div>${warn}
      <div class="rc-list">${pending.length ? pending.map(r => rqRow(r, acts(r))).join('') : '<div class="rc-empty">All caught up. Nothing to approve.</div>'}</div>`,
     root => {
@@ -6638,7 +6770,7 @@ const healthCount = () => (S.status === 'ready' && S.ctx ? healthIssues().filter
 
 mount();
 return {
-  fieldNames: attFieldNames, hasTracker: Engine.hasTracker, refresh, init: () => { mount(); return connect(); }, askName, decorateTable, healthCount, chooseFileEarly, savedFile: async () => (await kv.get('file')) || ((await kv.get('handle')) || {}).name || '', show, leave, renderCard, renderWatch, drawerPanel, go, renderApprovalRequests, renderRequestHistory, requestCounts, requestsToDecide: () => requestsToDecide().length,
+  fieldNames: attFieldNames, hasTracker: Engine.hasTracker, refresh, init: () => { mount(); return connect(); }, askName, decorateTable, healthCount, chooseFileEarly, savedFile: async () => (await kv.get('file')) || ((await kv.get('handle')) || {}).name || '', show, leave, renderCard, renderWatch, drawerPanel, go, renderApprovalRequests, renderRequestHistory, requestCounts, recordAttendance: () => openLogLeave(), canRecord: () => canLog(), requestsToDecide: () => requestsToDecide().length,
   /* v3.19: every recorded code between two dates (UTC ms, null = open), for custom dashboards; follows the attendance scope */
   entries: (from, to) => { if (S.status !== 'ready' || !S.ctx) return null; const d = D(), out = []; for (const m of d.months) { const dim = Engine.daysInMonth(m); for (const r of d.byMonth.get(m) || []) for (let i = 0; i < dim; i++) { const v = r.days[i]; if (v == null || v === '') continue; const dt = dateOf(m, i), t = dt.getTime(); if ((from != null && t < from) || (to != null && t > to)) continue; const cat = catOf(v); out.push({ name: r.name.trim(), empId: r.empId, client: r.client ? String(r.client).trim() : '', date: dt, code: String(v).trim().toUpperCase(), cat, catLabel: CATS[cat] || 'Other' }); } } return out; },
   todayStats: () => { if (S.status !== 'ready' || !S.ctx) return null; const rows = D().byMonth.get(TODAY_MS) || [], i = TODAY.getUTCDate() - 1, cats = rows.map(r => catOf(r.days[i])); return { full: cats.filter(c => c === 'approved' || c === 'sick' || c === 'unplanned').length, half: cats.filter(c => c === 'half').length, late: cats.filter(c => c === 'late').length, tracked: rows.length }; }, redraw: () => { if (active()) render(); }, state: () => S, dirty: () => S.changes.length,
@@ -6819,7 +6951,7 @@ async function poll() {
 }
 
 /* ============================== filtering ============================== */
-const APP = { title: "Team Dashboard", version: "3.20.0", released: "29 Sep 2026" };
+const APP = { title: "Team Dashboard", version: "3.21.0", released: "29 Sep 2026" };
 const BASE_DIMS = { status: "status_column", desig: "designation_column", client: "client_column", mode: "mode_column" };
 const STANDARD_STATUSES = ["Active", "Manager", "OJT", "Bench", "New", "Projected", "Left", "Moved"];
 const TILE_ORDER = ["Active", "Manager", "OJT", "Bench", "New", "Projected"];
@@ -7341,9 +7473,39 @@ function openAddField() {
     } catch (e) { err.textContent = e.message; save.disabled = false; save.textContent = "Add field"; }
   } }, "Add field");
   const existing = ((window.TD_SETTINGS || {}).custom_fields || []).filter(f => f && state.idx[f.name] != null);
-  mountDrawer(h("aside", { class: "drawer", role: "dialog", "aria-modal": "true", "aria-label": "Add a field" },
-    h("header", {}, h("h2", {}, "Add a field"), h("button", { class: "btn ghost", onclick: closeDrawer, "aria-label": "Close" }, "✕")),
+  /* v3.21: delete any field (the whole column) from the workforce sheet */
+  const typeOf = n => { const f = existing.find(x => x.name === n); return f ? (FIELD_TYPES.find(t => t[0] === f.type) || ["", "Text"])[1] : ""; };
+  const locked = new Set([state.schema.key_column, state.schema.name_column].filter(Boolean));
+  const delQ = h("input", { class: "input", type: "search", placeholder: "Find a field…", "aria-label": "Find a field to delete" });
+  const delList = h("ul", { class: "fdel-list" }), delErr = h("p", { class: "err", role: "alert" });
+  const drawDel = () => {
+    const q = delQ.value.trim().toLowerCase();
+    const cols = state.cols.filter(c => !c.auto && (!q || (c.label + " " + c.name).toLowerCase().includes(q)));
+    delList.replaceChildren(...cols.map(c => {
+      const filled = state.rows.filter(r => !isBlankVal(g(r, c.name))).length, lock = locked.has(c.name);
+      let armed = false, t = null;
+      const b = h("button", { class: "btn mini", type: "button", disabled: lock || null, title: lock ? "This field identifies every employee, so it can’t be deleted." : "Delete this column from the workbook" }, lock ? "Required" : "Delete");
+      b.addEventListener("click", async () => {
+        if (!armed) { armed = true; b.textContent = "Click again to delete"; b.classList.add("danger"); t = setTimeout(() => { armed = false; b.textContent = "Delete"; b.classList.remove("danger"); }, 4000); return; }
+        clearTimeout(t); b.disabled = true; b.textContent = "Deleting…"; delErr.textContent = "";
+        try {
+          await api("POST", "/api/columns/delete", { name: c.name });
+          try { await loadTeamSettings(); const cf = ((window.TD_SETTINGS || {}).custom_fields || []); if (cf.some(f => f && f.name === c.name)) await window.saveSharedSetting("custom_fields", cf.filter(f => f && f.name !== c.name)); } catch { }
+          if (state.visible && state.visible.includes(c.name)) { state.visible = state.visible.filter(x => x !== c.name); lsSet("td_cols", JSON.stringify(state.visible)); }
+          await loadData(true); renderAll();
+          toast("Deleted the field “" + (c.label || c.name) + "”" + (filled ? " and its values for " + filled + " employee" + (filled === 1 ? "" : "s") : "") + ". A backup of the workbook was kept.");
+          openAddField();
+        } catch (e) { delErr.textContent = e.message; b.disabled = false; b.textContent = "Delete"; b.classList.remove("danger"); armed = false; }
+      });
+      return h("li", {}, h("span", { class: "fdel-main" }, h("b", {}, c.label || c.name), h("small", {}, [c.label !== c.name ? c.name : "", typeOf(c.name), filled + " of " + state.rows.length + " filled"].filter(Boolean).join(" · "))), b);
+    }), cols.length ? null : h("li", { class: "muted" }, "No field matches."));
+  };
+  delQ.addEventListener("input", drawDel); drawDel();
+  const canDel = !window.PERM || PERM.can("emp.fields");
+  mountDrawer(h("aside", { class: "drawer", role: "dialog", "aria-modal": "true", "aria-label": "Employee fields" },
+    h("header", {}, h("h2", {}, "Employee fields"), h("button", { class: "btn ghost", onclick: closeDrawer, "aria-label": "Close" }, "✕")),
     h("div", { class: "body" },
+      h("h3", { style: "font-size:13px;margin:0 0 6px" }, "Add a field"),
       h("p", { class: "hint" }, "A field is something new you want to capture for every employee. It is added as a new column at the end of the workforce sheet in " + (state.file || "the workbook") + ", so it also shows in Excel and in the Supabase copy."),
       h("div", { class: "field" }, h("label", { for: "nfName" }, "Field name"), name),
       h("div", { class: "field" }, h("label", { for: "nfType" }, "Type"), type),
@@ -7351,8 +7513,9 @@ function openAddField() {
       h("label", { class: "chk-line", style: "display:flex;gap:8px;align-items:center;margin:10px 0" }, showCol, h("span", {}, "Show it as a column in the employee table")),
       err,
       h("div", { style: "display:flex;gap:8px;margin-top:8px" }, save, h("button", { class: "btn", type: "button", onclick: closeDrawer }, "Cancel")),
-      existing.length ? h("div", { style: "margin-top:22px" }, h("h3", { style: "font-size:13px;margin:0 0 6px" }, "Fields added so far"),
-        h("ul", { class: "td-hist" }, existing.map(f => h("li", {}, h("b", {}, f.name), " · " + (FIELD_TYPES.find(t => t[0] === f.type) || ["", "Text"])[1] + (f.options && f.options.length ? " (" + f.options.join(", ") + ")" : ""))))) : null)));
+      canDel ? h("div", { class: "fdel" }, h("h3", { style: "font-size:13px;margin:0 0 4px" }, "Delete a field"),
+        h("p", { class: "hint" }, "Removes the whole column and its values from the workbook for every employee. A backup is kept, but it can’t be undone here."),
+        delQ, delErr, delList) : null)));
   setTimeout(() => name.focus(), 30);
 }
 $("#btnAddField").addEventListener("click", openAddField);
@@ -7989,12 +8152,15 @@ function organizeRequests() {
     { id: "rejected", host: $("#cardRejectedRequests"), label: "History" },
   ].filter(d => d.host);
   let c = {}; try { c = (window.ATT && ATT.requestCounts) ? ATT.requestCounts() : {}; } catch { }
+  const rec = $("#rcRecord"); if (rec) { let ok = false; try { ok = !!(window.ATT && ATT.canRecord && ATT.canRecord()) && (!window.PERM || PERM.canView("attendance")); } catch { } rec.hidden = !ok; }
   const vis = defs.filter(d => !d.host.hidden).map(d => ({ ...d, n: c[d.id] || 0 }));
   wrap.hidden = !vis.length; if (!vis.length) return;
   if (!OV.rc || !vis.some(d => d.id === OV.rc)) OV.rc = (vis.find(d => d.id !== "rejected" && d.n) || vis.find(d => d.id === "rejected") || vis[0]).id;
   for (const d of defs) d.host.classList.toggle("ov-off", d.id !== OV.rc);
   ovTabs(bar, vis.map(d => ({ ...d, n: d.id === "rejected" ? null : d.n, hot: d.id === "approvals" && d.n > 0 })), OV.rc, id => { OV.rc = id; organizeRequests(); });
 }
+/* v3.21: Record attendance straight from the Request Center */
+document.addEventListener("click", e => { if (e.target.closest && e.target.closest("#rcRecord")) { if (window.ATT && ATT.recordAttendance) ATT.recordAttendance(); } });
 function organizeUpcoming() {
   const wrap = $("#ovUpcoming"), bar = $("#ovUpTabs"), com = $("#cardComing"), hol = $("#cardHolidays"); if (!wrap || !bar) return;
   const groups = [...$("#coming").querySelectorAll(":scope > .coming-group")];
@@ -8017,7 +8183,7 @@ function renderGlance() {
     const t = ATT.todayStats && ATT.todayStats();
     tiles.push(tile("🏖️", "t-leave", "On leave today", t ? String(t.full) : "–", t ? (t.half + " half day · " + t.late + " late") : "attendance not connected", jump("#cardAttendance")));
   }
-  if (can("requests.approvals") && window.ATT) {
+  if (can("att.approve") && window.ATT) {
     const n = ATT.requestsToDecide ? ATT.requestsToDecide() : 0;
     tiles.push(tile("📝", "t-req" + (n ? " hot" : ""), "Waiting for approval", String(n), n ? "open Request Center" : "all caught up", jump("#ovRequests", () => { OV.rc = "approvals"; organizeRequests(); })));
   }
@@ -10461,7 +10627,7 @@ function drawEditor(box, u, reload, users = [], template = null, groups = []) {
     const subBox = subItems.length ? h('div', { class: 'rmod-sub' }, h('p', { class: 'rmod-subt' }, g.sub.title),
       h('div', { class: 'rmod-subtools' }, h('button', { class: 'linkbtn', type: 'button', onclick: () => { subItems.forEach(c => { if (!c.box.disabled) c.box.checked = true; }); } }, 'All'), ' · ', h('button', { class: 'linkbtn', type: 'button', onclick: () => { subItems.forEach(c => { if (!c.box.disabled) c.box.checked = false; }); } }, 'None')),
       h('div', { class: 'rmod-chips' }, ...subItems.map(c => c.el)),
-      h('p', { class: 'rmod-note' }, g.name === 'Overview' ? 'Choose which Request Center cards this person can see and whether they can approve or reject requests.' : 'Only these types appear in the Type list of Log leave. A ticked type can be logged even without “Approve or reject leave” or “Mark and edit attendance”; changing a day that already holds approved leave still needs “Approve or reject leave”.')) : null;
+      h('p', { class: 'rmod-note' }, g.name === 'Overview' ? 'Choose which Request Center cards this person can see and whether they can approve or reject requests.' : 'Only these types appear in the Type list of Record attendance. A ticked type can be logged even without “Approve or reject leave” or “Mark and edit attendance”; changing a day that already holds approved leave still needs “Approve or reject leave”.')) : null;
     let head;
     if (g.page) { const c = checkLine('', !!start[g.page], { 'data-k': g.page, 'aria-label': 'Can open ' + g.name }); boxes[g.page] = c.box; head = h('label', { class: 'rmod-head' }, c.box, h('span', {}, 'Can open the ' + g.name + ' page')); }
     else head = null;
