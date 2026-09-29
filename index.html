@@ -4,7 +4,7 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <link rel="icon" href="data:,">
-<title>Team Dashboard · 3.21.0</title>
+<title>Team Dashboard · 3.24.1</title>
 <style>
 :root {
   color-scheme: light;
@@ -800,6 +800,36 @@ body { line-height:1.5; }
 .input { border-color:var(--border); }
 #cardAttendance { padding:24px; border-left:1px solid var(--border); border-top:3px solid var(--accent); }
 #cardAttendance .card-head { gap:10px; margin-bottom:20px; }
+/* v3.24: compact attendance card */
+#cardAttendance { padding:16px 18px !important; }
+#cardAttendance .card-head { margin-bottom:10px !important; }
+#cardAttendance .card-head h2 { font-size:16px !important; }
+.att-tabs { display:flex; flex-wrap:wrap; align-items:center; gap:6px; margin:0 0 8px; }
+.att-tab { display:inline-flex; align-items:baseline; gap:4px; padding:5px 11px; border:1px solid var(--border); border-radius:999px; background:var(--surface); color:var(--ink-2); font:inherit; font-size:12.5px; cursor:pointer; }
+.att-tab b { font-size:14px; color:var(--ink); }
+.att-tab em { font-style:normal; font-size:11px; color:#9a7400; }
+.att-tab.has b { color:var(--c-orange, #d9730d); }
+.att-tab[aria-pressed="true"] { background:var(--ink); border-color:var(--ink); color:var(--surface); }
+.att-tab[aria-pressed="true"] b, .att-tab[aria-pressed="true"] em { color:var(--surface); }
+.att-tabs .att-toggle button { padding:3px 8px; font-size:11.5px; }
+.att-tabs .copybtn { min-height:26px; font-size:11.5px; }
+.att-mini { list-style:none; margin:0; padding:0; max-height:188px; overflow:auto; border:1px solid var(--border); border-radius:10px; scrollbar-width:thin; }
+.att-mini li { display:grid; grid-template-columns:minmax(0,1.6fr) minmax(0,1fr) auto minmax(0,1fr); align-items:center; gap:10px; padding:6px 12px; border-bottom:1px solid var(--border); font-size:12.5px; }
+.att-mini li:last-child { border-bottom:0; }
+.att-mini li:nth-child(even) { background:color-mix(in srgb,var(--surface-2) 40%,var(--surface)); }
+.att-mini-n { font-weight:600; min-width:0; overflow:hidden; text-overflow:ellipsis; white-space:nowrap; }
+.att-mini-c, .att-mini-s { color:var(--ink-2); min-width:0; overflow:hidden; text-overflow:ellipsis; white-space:nowrap; }
+.att-mini-empty { padding:12px; border-radius:10px; background:var(--surface-2); color:var(--ink-2); font-size:12.5px; }
+@media (max-width:650px) { .att-mini li { grid-template-columns:minmax(0,1fr) auto; } .att-mini-c, .att-mini-s { display:none; } }
+.att-hist-drawer { width:min(1100px,96vw) !important; max-width:96vw !important; }
+.att-hist-body { display:flex; flex-direction:column; gap:10px; }
+.att-hist-top { display:flex; flex-wrap:wrap; align-items:center; gap:8px; }
+.watch-hr { display:flex; flex-wrap:wrap; align-items:center; gap:10px; margin:10px 0 12px; padding:9px 12px; border-radius:10px; border:1px solid color-mix(in srgb,#e34948 35%,var(--border)); background:color-mix(in srgb,#e34948 7%,var(--surface)); font-size:12.5px; }
+.watch-hr > span { flex:1; min-width:200px; }
+.watch-hr.done { border-color:color-mix(in srgb,#22a05a 35%,var(--border)); background:color-mix(in srgb,#22a05a 7%,var(--surface)); }
+.hr-told { color:#1c8a4c !important; font-weight:600; }
+.watch-acts { display:flex; flex-direction:column; gap:4px; flex:0 0 auto; }
+.watch-list li .who { flex:1 1 auto; min-width:0; }
 #cardAttendance .card-head h2 { font-size:19px; }
 #cardAttendance .sub { line-height:1.6; }
 .att-kpis { margin:18px 0 24px; gap:12px; }
@@ -1396,6 +1426,25 @@ body.filters-locked #cleanFilters, body.filters-locked #xchips, body.filters-loc
   #pageSummary.ov > .ov-glance { grid-template-columns:repeat(auto-fit,minmax(min(100%,300px),1fr)); }
 }
 @media (max-width:650px) { .ov-tile { padding:12px; } .ov-ic { width:34px; height:34px; font-size:17px; } .ov-tx b { font-size:18px; } }
+/* v3.24.1: Attendance, Request Center and Coming up side by side in one row; Leave watch full width below */
+#pageSummary.ov { grid-template-columns:minmax(0,1.45fr) minmax(0,1fr) minmax(0,1fr) !important; grid-template-areas:"glance glance glance" "att req up" "watch watch watch" !important; }
+#pageSummary.ov > .ov-main, #pageSummary.ov > .ov-side { display:contents !important; }
+#pageSummary.ov #cardAttendance { grid-area:att !important; grid-column:att !important; grid-row:att !important; align-self:stretch; min-width:0; }
+#pageSummary.ov #ovRequests { grid-area:req !important; grid-column:req !important; grid-row:req !important; align-self:stretch; min-width:0; }
+#pageSummary.ov #ovUpcoming { grid-area:up !important; grid-column:up !important; grid-row:up !important; align-self:stretch; min-width:0; }
+#pageSummary.ov #cardWatch { grid-area:watch !important; grid-column:watch !important; grid-row:watch !important; min-width:0; }
+#pageSummary.ov .att-mini { max-height:260px; }
+#pageSummary.ov .att-mini li { grid-template-columns:minmax(0,1.5fr) minmax(0,1fr) auto; }
+#pageSummary.ov .att-mini-s { display:none; }
+#pageSummary.ov #cardAttendance .card-head { flex-wrap:wrap; }
+@media (max-width:1280px) {
+  #pageSummary.ov { grid-template-columns:minmax(0,1fr) minmax(0,1fr) !important; grid-template-areas:"glance glance" "att att" "req up" "watch watch" !important; }
+  #pageSummary.ov .att-mini li { grid-template-columns:minmax(0,1.6fr) minmax(0,1fr) auto minmax(0,1fr); }
+  #pageSummary.ov .att-mini-s { display:block; }
+}
+@media (max-width:760px) {
+  #pageSummary.ov { grid-template-columns:minmax(0,1fr) !important; grid-template-areas:"glance" "att" "req" "up" "watch" !important; }
+}
 
 /* ================= v3.19: team chat ================= */
 .pd { position:relative; display:inline-flex; align-items:center; justify-content:center; flex:none; width:10px; height:10px; border-radius:50%; background:#9ca3af; box-shadow:0 0 0 2px var(--surface); color:#fff; font-size:7px; font-weight:800; line-height:1; }
@@ -1498,10 +1547,10 @@ body.filters-locked #cleanFilters, body.filters-locked #xchips, body.filters-loc
     <p class="gate-sub">One place for your people, priorities and team insights.</p>
     <div id="connectBody"><div class="empty">Loading…</div></div>
   </div>
-  <p class="gate-ver">3.21.0</p>
+  <p class="gate-ver">3.24.1</p>
 </section>
 
-<div id="app" hidden><aside class="sidebar" aria-label="Workspace navigation"><div class="brand dashboard-identity">      <h1><span id="title">Team Dashboard</span><span class="ver" id="ver" title="Version 3.21.0">3.21.0</span></h1><p class="brand-tag">One place for your people, priorities and team insights.</p>      <span class="sync" id="sync" role="status"><i></i><span id="syncText">Loading…</span></span></div><div class="nav-label">WORKSPACE</div>      <nav class="tabs" role="tablist" aria-label="Pages" aria-orientation="vertical">
+<div id="app" hidden><aside class="sidebar" aria-label="Workspace navigation"><div class="brand dashboard-identity">      <h1><span id="title">Team Dashboard</span><span class="ver" id="ver" title="Version 3.24.1">3.24.1</span></h1><p class="brand-tag">One place for your people, priorities and team insights.</p>      <span class="sync" id="sync" role="status"><i></i><span id="syncText">Loading…</span></span></div><div class="nav-label">WORKSPACE</div>      <nav class="tabs" role="tablist" aria-label="Pages" aria-orientation="vertical">
         <button class="tab on" role="tab" aria-controls="pageSummary" data-view="summary" aria-selected="true">Overview</button>
         <button class="tab" role="tab" aria-controls="pageEmployees" data-view="employees" aria-selected="false">Employees</button>
       <button class="tab" role="tab" aria-controls="pageAttendance" data-view="attendance" aria-selected="false">Attendance</button>
@@ -4855,7 +4904,8 @@ function staleApplications(all = false) {
   for (const r of (all ? S.rows : D().rows)) for (let i = 0; i < Engine.daysInMonth(r.month); i++) { if (up(r.days[i]) !== 'LA') continue; const dt = dateOf(r.month, i); if (dt < TODAY) out.push({ r, i, dt }); }
   return out.sort((a, b) => b.dt - a.dt || a.r.name.localeCompare(b.r.name));
 }
-const laRow = (x, older) => !can('att.approve') ? `<div class="li"><div class="main-t"><b>${esc(x.r.name.trim())}</b><span class="sm muted">${longDate(x.dt)}</span></div><span class="tag">Awaiting approval</span></div>` : `<div class="li"><div class="main-t"><b>${esc(x.r.name.trim())}</b><span class="sm muted">${longDate(x.dt)}</span></div>${['AL', 'CL', 'SL'].map(c => `<button class="btn sm" data-act="resolve-la" data-r="${x.r.uid}" data-d="${x.i}" data-c="${c}" title="Approve as ${CODES[c].label}">${c}</button>`).join('')}<button class="btn sm" data-act="resolve-la" data-r="${x.r.uid}" data-d="${x.i}" data-c="UL" title="Mark as unplanned leave">UL</button><button class="btn sm danger" data-act="resolve-la" data-r="${x.r.uid}" data-d="${x.i}" data-c="" title="Reject request · record RJ in tracker">✕</button></div>`;
+const laInfo = (x, on) => on ? `<button type="button" class="rq-i" data-lainfo="${esc(x.r.name.trim())}" aria-label="Past and upcoming leave of ${esc(x.r.name.trim())}">i</button>` : '';
+const laRow = (x, older, info) => !can('att.approve') ? `<div class="li"><div class="main-t"><b>${esc(x.r.name.trim())}${laInfo(x, info)}</b><span class="sm muted">${longDate(x.dt)}</span></div><span class="tag">Awaiting approval</span></div>` : `<div class="li"><div class="main-t"><b>${esc(x.r.name.trim())}${laInfo(x, info)}</b><span class="sm muted">${longDate(x.dt)}</span></div>${['AL', 'CL', 'SL'].map(c => `<button class="btn sm" data-act="resolve-la" data-r="${x.r.uid}" data-d="${x.i}" data-c="${c}" title="Approve as ${CODES[c].label}">${c}</button>`).join('')}<button class="btn sm" data-act="resolve-la" data-r="${x.r.uid}" data-d="${x.i}" data-c="UL" title="Mark as unplanned leave">UL</button><button class="btn sm danger" data-act="resolve-la" data-r="${x.r.uid}" data-d="${x.i}" data-c="" title="Reject request · record RJ in tracker">✕</button></div>`;
 /* One request group per employee and uninterrupted run of application dates.
    Only recorded off days, or blank weekend cells, may bridge a gap. */
 const applicationPerson = r => String(r.empId ?? '').trim() ? 'id:' + String(r.empId).trim().toLowerCase() : 'name:' + personKey(r.name);
@@ -4885,9 +4935,9 @@ function applicationGroups(entries) {
 }
 function applicationList(entries) {
   return applicationGroups(entries).map(group => {
-    if (group.length === 1) return laRow(group[0]);
+    if (group.length === 1) return laRow(group[0], false, true);
     const first = group[0], last = group[group.length - 1], cells = group.map(x => x.r.uid + ':' + x.i).join(',');
-    return '<div class="la-group"><div class="li"><div class="main-t"><b>' + esc(first.r.name.trim()) + '</b><span class="sm muted">' + longDate(first.dt) + ' – ' + longDate(last.dt) + ' · ' + group.length + ' requested days</span></div>' + (can('att.approve') ? '' : '<span class="tag">Awaiting approval</span>') + '</div>' + (!can('att.approve') ? '' : '<div class="la-bulk"><span class="sm muted">Approve all:</span>' + ['AL','CL','SL','UL'].map(c => '<button class="btn sm" data-act="resolve-la-group" data-cells="' + cells + '" data-c="' + c + '" title="Approve all ' + group.length + ' requested days as ' + esc(CODES[c].label) + '">' + c + '</button>').join('') + '<button class="btn sm danger" data-act="resolve-la-group" data-cells="' + cells + '" data-c="RJ">Reject all</button></div>') + '<details><summary>Review individual dates (' + group.length + ')</summary>' + group.map(x => laRow(x)).join('') + '</details></div>';
+    return '<div class="la-group"><div class="li"><div class="main-t"><b>' + esc(first.r.name.trim()) + '<button type="button" class="rq-i" data-lainfo="' + esc(first.r.name.trim()) + '" aria-label="Past and upcoming leave of ' + esc(first.r.name.trim()) + '">i</button></b><span class="sm muted">' + longDate(first.dt) + ' – ' + longDate(last.dt) + ' · ' + group.length + ' requested days</span></div>' + (can('att.approve') ? '' : '<span class="tag">Awaiting approval</span>') + '</div>' + (!can('att.approve') ? '' : '<div class="la-bulk"><span class="sm muted">Approve all:</span>' + ['AL','CL','SL','UL'].map(c => '<button class="btn sm" data-act="resolve-la-group" data-cells="' + cells + '" data-c="' + c + '" title="Approve all ' + group.length + ' requested days as ' + esc(CODES[c].label) + '">' + c + '</button>').join('') + '<button class="btn sm danger" data-act="resolve-la-group" data-cells="' + cells + '" data-c="RJ">Reject all</button></div>') + '<details><summary>Review individual dates (' + group.length + ')</summary>' + group.map(x => laRow(x)).join('') + '</details></div>';
   }).join('');
 }
 function resolveApplications(cells, code) {
@@ -5775,6 +5825,136 @@ function confirmDelete(uid) {
   confirmBox('Delete this row?', `${rowLabel(r)} will be removed from the tracker${s.total ? ` (it holds ${fmt(s.total)} leave days)` : ''}. It is only written to Excel when you Save, and you can Undo until then.`, 'Delete row').then(ok => { if (ok) deleteRows([uid]); });
 }
 
+/* ---------- v3.22: past leave of one person, for Record attendance and for managers deciding a request ---------- */
+let PAST_DAYS = 60;
+const PAST_OPTS = [[60, '60 days'], [90, '90 days'], [180, '180 days'], [365, '1 year']];
+/* people who can't see the attendance grid only see their own (linked) leave */
+function canSeeLeaveOf(p) {
+  if (!p) return false; if (can('att.grid') || can('att.approve') || (window.PERM && PERM.isSuper())) return true;
+  const ln = window.PERM && PERM.linkedEmp && PERM.linkedEmp(); if (!ln) return false;
+  const idn = identityOf(p); return idKey(idn.empId ?? '') === idKey(ln.code);
+}
+/* v3.23: leave in the tracker between two days (UTC ms), joined into runs */
+function leaveRuns(p, from, to, cats = null) {
+  const out = [];
+  for (const r of (p && p.rows) || []) {
+    const dim = Engine.daysInMonth(r.month);
+    for (let i = 0; i < dim; i++) {
+      const v = r.days[i], cat = catOf(v); if (!cat || !(cats ? cats.has(cat) : (LEAVE_CATS.has(cat) || cat === 'applied'))) continue;
+      const t = dateOf(r.month, i).getTime(); if (t < from || t > to) continue;
+      out.push({ t, code: String(v).trim().toUpperCase(), cat });
+    }
+  }
+  out.sort((a, b) => a.t - b.t);
+  const runs = [];
+  for (const e of out) { const last = runs[runs.length - 1]; if (last && last.code === e.code && (e.t - last.to) / 86400000 <= 4) { last.to = e.t; last.n++; } else runs.push({ code: e.code, cat: e.cat, from: e.t, to: e.t, n: 1 }); }
+  return { out, runs, days: out.filter(e => e.cat !== 'applied').reduce((a, e) => a + (e.cat === 'half' ? 0.5 : 1), 0) };
+}
+const liDay = t => { const z = new Date(t); return WEEKDAYS[z.getUTCDay()] + ' ' + z.getUTCDate() + ' ' + MONTHS[z.getUTCMonth()] + (z.getUTCFullYear() !== new Date().getFullYear() ? ' ' + z.getUTCFullYear() : ''); };
+const runLen = r => r.cat === 'half' ? fmt(r.n / 2) + 'd' : r.n + 'd';
+/* the hover card behind the ⓘ on a request: the last 60 days and what is coming up (tracker + requests not in it yet) */
+const LATE_CATS = new Set(['late']);
+const LI = { tab: 'leave' };
+function leaveInfoHTML(req) {
+  const p = resolvePerson(req.name);
+  if (!p) return `<b>${esc(req.name)}</b><div class="li-empty">Not in the attendance tracker yet, so there is no leave history.</div>`;
+  if (!canSeeLeaveOf(p)) return `<b>${esc(p.name)}</b><div class="li-empty">You can see leave history only for yourself.</div>`;
+  const now = new Date(), today = Date.UTC(now.getFullYear(), now.getMonth(), now.getDate());
+  const past = leaveRuns(p, today - 59 * 86400000, today - 86400000), next = leaveRuns(p, today, today + 180 * 86400000);
+  const inTracker = new Set(next.out.map(e => e.t));
+  const reqs = reqList().filter(r => r.id !== req.id && personKey(r.name) === p.key && (r.status === 'pending' || r.status === 'approved'))
+    .map(r => ({ r, ds: (r.dates || []).map(x => Date.parse(x + 'T00:00:00Z')).filter(t => t >= today && !inTracker.has(t)).sort((a, b) => a - b) })).filter(x => x.ds.length);
+  const planned = next.days + reqs.filter(x => x.r.status === 'approved').reduce((n, x) => n + x.ds.length * (catOf(x.r.code) === 'half' ? 0.5 : 1), 0);
+  const line = r => `<li><span class="ph-chip c-${esc(r.cat)}">${esc(r.code)}</span>${esc(r.from === r.to ? liDay(r.from) : liDay(r.from) + ' – ' + liDay(r.to))}<em>${runLen(r)}${r.cat === 'applied' ? ' · pending' : ''}</em></li>`;
+  const cap = (a, n) => a.length > n ? a.slice(0, n) : a;
+  /* v3.24: late comings (L, C) in their own tab: the last 60 days and a 6-month total */
+  const lateP = leaveRuns(p, today - 59 * 86400000, today, LATE_CATS), late6 = leaveRuns(p, today - 179 * 86400000, today, LATE_CATS);
+  const lateLine = e => `<li><span class="ph-chip c-late">${esc(e.code)}</span>${esc(liDay(e.t))}<em>${esc(labelOf(e.code))}</em></li>`;
+  const lateByCode = c => lateP.out.filter(e => e.code === c).length;
+  const tab = LI.tab === 'late' ? 'late' : 'leave';
+  const latePane = `<div class="li-sec"><div class="li-h">Last 60 days <span>${lateP.out.length} late coming${lateP.out.length === 1 ? '' : 's'}</span></div>
+    ${lateP.out.length ? `<div class="li-sum">${lateByCode('L')} late coming · ${lateByCode('C')} cab late · ${late6.out.length} in the last 6 months</div><ul>${cap(lateP.out.slice().reverse(), 8).map(lateLine).join('')}</ul>${lateP.out.length > 8 ? `<div class="li-more">+${lateP.out.length - 8} more</div>` : ''}` : `<div class="li-empty">No late comings.${late6.out.length ? ' ' + late6.out.length + ' in the last 6 months.' : ''}</div>`}</div>`;
+  return `<b>${esc(p.name)}</b>
+    <div class="li-tabs" role="tablist"><button type="button" role="tab" data-litab="leave" aria-selected="${tab === 'leave'}">Leaves <span>${fmt(past.days)}</span></button><button type="button" role="tab" data-litab="late" aria-selected="${tab === 'late'}">Late comings <span>${lateP.out.length}</span></button></div>
+    <div data-lipane="late"${tab === 'late' ? '' : ' hidden'}>${latePane}</div>
+    <div data-lipane="leave"${tab === 'leave' ? '' : ' hidden'}>
+    <div class="li-sec"><div class="li-h">Last 60 days <span>${fmt(past.days)} day${past.days === 1 ? '' : 's'} of leave</span></div>
+    ${past.runs.length ? `<ul>${cap(past.runs.slice().reverse(), 6).map(line).join('')}</ul>${past.runs.length > 6 ? `<div class="li-more">+${past.runs.length - 6} more</div>` : ''}` : '<div class="li-empty">No leave.</div>'}</div>
+    <div class="li-sec"><div class="li-h">Upcoming <span>${fmt(planned)} day${planned === 1 ? '' : 's'} planned</span></div>
+    ${next.runs.length || reqs.length ? `<ul>${cap(next.runs, 6).map(line).join('')}${reqs.map(x => `<li><span class="ph-chip c-${x.r.status === 'approved' ? 'approved' : 'applied'}">${esc(x.r.code)}</span>${esc(x.ds.length === 1 ? liDay(x.ds[0]) : liDay(x.ds[0]) + ' – ' + liDay(x.ds[x.ds.length - 1]))}<em>${x.ds.length}d · ${x.r.status === 'pending' ? 'request pending' : 'approved'}</em></li>`).join('')}</ul>` : '<div class="li-empty">Nothing planned.</div>'}</div></div>`;
+}
+/* v3.24: one hover card for every ⓘ (Request Center and Applications ahead). It carries its own styles, so it works in any panel. */
+const LI_CSS = `.li-tabs {display:flex;gap:3px;margin:8px 0 2px;padding:3px;border-radius:8px;background:var(--surface-2, rgba(127,127,127,.1));} .li-tabs button {flex:1;border:0;background:transparent;border-radius:6px;padding:4px 6px;font:inherit;font-size:11.5px;font-weight:650;color:var(--ink-2);cursor:pointer;} .li-tabs button span {margin-left:4px;padding:0 5px;border-radius:999px;background:rgba(127,127,127,.18);font-size:10.5px;} .li-tabs button[aria-selected=true] {background:var(--surface);color:var(--ink);box-shadow:0 1px 2px rgba(15,23,42,.15);} .li-sum {font-size:11.5px;color:var(--ink-2);margin:0 0 4px;} [data-lipane][hidden] {display:none;} .rq-i {display:inline-grid;place-items:center;width:17px;height:17px;margin-left:6px;padding:0;border:1.5px solid var(--ink-3, #888);border-radius:50%;background:transparent;color:var(--ink-2);font:italic 700 10.5px/1 Georgia, serif;cursor:help;vertical-align:1px;} .rq-i:hover, .rq-i:focus-visible {border-color:var(--accent, #3b6cf6);color:var(--accent, #3b6cf6);outline:none;} .li-tip {position:fixed;z-index:50;width:290px;max-width:calc(100vw - 16px);padding:10px 12px;border:1px solid var(--line);border-radius:10px;background:var(--surface);box-shadow:0 12px 32px rgba(15,23,42,.22);font-size:12px;color:var(--ink);} .li-tip > b {font-size:13px;} .li-sec {margin-top:8px;} .li-h {display:flex;justify-content:space-between;gap:8px;font-size:11px;font-weight:700;letter-spacing:.03em;text-transform:uppercase;color:var(--ink-3, #888);margin-bottom:3px;} .li-h span {text-transform:none;letter-spacing:0;font-weight:600;color:var(--ink-2);} .li-tip ul {list-style:none;margin:0;padding:0;} .li-tip li {display:flex;align-items:center;gap:7px;padding:3px 0;} .li-tip li em {margin-left:auto;font-style:normal;color:var(--ink-3, #888);font-size:11px;white-space:nowrap;} .li-empty, .li-more {color:var(--ink-3, #888);padding:2px 0;} .rc {display:flex;flex-direction:column;gap:8px;} .rc-top {display:flex;flex-wrap:wrap;align-items:center;gap:6px;} .rc-top .grow {flex:1;} .rc-sub {margin:0;font-size:11.5px;line-height:1.4;color:var(--ink-2);} .rc-chips {display:flex;flex-wrap:wrap;gap:4px;} .rc-chip {border:1px solid var(--line);background:transparent;color:var(--ink-2);border-radius:999px;padding:2px 9px;font:inherit;font-size:11.5px;cursor:pointer;} .rc-chip[aria-pressed=true] {background:var(--ink);border-color:var(--ink);color:var(--surface, #fff);} .rc-list {max-height:300px;overflow:auto;} .rq {display:flex;flex-wrap:wrap;align-items:flex-start;gap:6px 10px;padding:9px 0;border-bottom:1px solid var(--line);} .rq:last-child {border-bottom:0;} .rq-main {flex:1 1 220px;min-width:0;overflow-wrap:anywhere;} .rq-main b {font-weight:650;} .rq-code {display:inline-block;margin-left:6px;padding:0 6px;border-radius:5px;background:var(--wash, rgba(127,127,127,.12));font-size:11px;font-weight:650;} .rq-l {display:block;font-size:12px;color:var(--ink-2);margin-top:1px;} .rq-l.q {font-style:italic;} .rq-side {display:flex;flex-wrap:wrap;align-items:center;gap:6px;} .rq-st {font-size:11px;font-weight:650;padding:2px 8px;border-radius:999px;background:var(--wash, rgba(127,127,127,.12));color:var(--ink-2);white-space:nowrap;} .rq-st.approved {background:rgba(34,160,90,.14);color:#1c8a4c;} .rq-st.rejected {background:rgba(227,73,72,.13);color:#c63b3a;} .rq-st.pending {background:rgba(217,164,0,.16);color:#9a7400;} .rq-you {font-size:10.5px;font-weight:650;color:var(--accent, #3b6cf6);margin-left:6px;padding:0 6px;border:1px solid currentColor;border-radius:5px;} .rc-empty {padding:14px 0;text-align:center;font-size:12px;color:var(--ink-2);} .rc-note {margin:0;font-size:12px;color:var(--ink-2);} select {font:inherit;font-size:12px;height:28px;}`;
+function leaveTipDelegate(root) {
+  if (!root || root._liTip) return; root._liTip = true;
+  let tip = null, cur = null, hideT = null;
+  const SEL = '[data-info],[data-lainfo]';
+  const htmlFor = b => {
+    if (!(S.status === 'ready' && S.ctx)) return '<div class="li-empty">Connect the attendance tracker to see leave history.</div>';
+    if (b.dataset.info) { const r = reqList().find(x => x.id === b.dataset.info); return r ? leaveInfoHTML(r) : ''; }
+    return leaveInfoHTML({ name: b.dataset.lainfo, id: null });
+  };
+  const drop = () => { tip?.remove(); tip = null; cur = null; };
+  const hide = () => { clearTimeout(hideT); hideT = setTimeout(drop, 150); };
+  const show = b => {
+    clearTimeout(hideT); if (cur === b && tip && tip.isConnected) return; drop(); cur = b;
+    tip = document.createElement('div'); tip.className = 'li-tip'; tip.setAttribute('role', 'tooltip');
+    tip.innerHTML = `<style>${PAST_CSS}${LI_CSS}</style>` + htmlFor(b);
+    root.append(tip);
+    const a = b.getBoundingClientRect(), w = tip.offsetWidth, hh = tip.offsetHeight;
+    let top = a.bottom + 6; if (top + hh > innerHeight - 8) top = Math.max(8, a.top - hh - 6);
+    tip.style.left = Math.min(Math.max(8, a.left - 12), innerWidth - w - 8) + 'px'; tip.style.top = top + 'px';
+    tip.addEventListener('mouseenter', () => clearTimeout(hideT)); tip.addEventListener('mouseleave', hide);
+    tip.addEventListener('click', e => {
+      const t = e.target.closest('[data-litab]'); e.stopPropagation(); if (!t) return;
+      LI.tab = t.dataset.litab;
+      tip.querySelectorAll('[data-litab]').forEach(x => x.setAttribute('aria-selected', String(x === t)));
+      tip.querySelectorAll('[data-lipane]').forEach(x => { x.hidden = x.dataset.lipane !== LI.tab; });
+    });
+  };
+  const pick = e => e.target && e.target.closest ? e.target.closest(SEL) : null;
+  root.addEventListener('mouseover', e => { const b = pick(e); if (b) show(b); });
+  root.addEventListener('mouseout', e => { const b = pick(e); if (b && !b.contains(e.relatedTarget)) hide(); });
+  root.addEventListener('focusin', e => { const b = pick(e); if (b) show(b); });
+  root.addEventListener('focusout', e => { if (pick(e)) hide(); });
+  root.addEventListener('click', e => { const b = pick(e); if (!b) return; e.preventDefault(); e.stopPropagation(); if (cur === b && tip) drop(); else show(b); }, true);
+  addEventListener('scroll', drop, { passive: true, capture: true });
+}
+function pastLeave(p, days) {
+  const now = new Date(), today = Date.UTC(now.getFullYear(), now.getMonth(), now.getDate()), from = today - (days - 1) * 86400000;
+  const out = [];
+  for (const r of (p && p.rows) || []) {
+    const dim = Engine.daysInMonth(r.month);
+    for (let i = 0; i < dim; i++) {
+      const v = r.days[i], cat = catOf(v); if (!cat || !(LEAVE_CATS.has(cat) || cat === 'applied')) continue;
+      const t = dateOf(r.month, i).getTime(); if (t < from || t > today) continue;
+      out.push({ t, code: String(v).trim().toUpperCase(), cat });
+    }
+  }
+  out.sort((a, b) => a.t - b.t);
+  /* consecutive working days with the same code become one line (week offs and holidays in between don't break it) */
+  const runs = [];
+  for (const e of out) { const last = runs[runs.length - 1]; if (last && last.code === e.code && (e.t - last.to) / 86400000 <= 4) { last.to = e.t; last.n++; } else runs.push({ code: e.code, cat: e.cat, from: e.t, to: e.t, n: 1 }); }
+  const byCode = new Map(); for (const e of out) byCode.set(e.code, (byCode.get(e.code) || 0) + 1);
+  const total = out.filter(e => e.cat !== 'applied').reduce((a, e) => a + (e.cat === 'half' ? 0.5 : 1), 0);
+  return { runs: runs.reverse(), byCode, total, from, today };
+}
+function pastLeaveHTML(p, days = PAST_DAYS) {
+  const x = pastLeave(p, days), d = t => { const z = new Date(t); return WEEKDAYS[z.getUTCDay()] + ' ' + z.getUTCDate() + ' ' + MONTHS[z.getUTCMonth()] + (z.getUTCFullYear() !== new Date().getFullYear() ? ' ' + z.getUTCFullYear() : ''); };
+  const pend = reqList().filter(r => r.status === 'pending' && personKey(r.name) === p.key);
+  const sel = `<select data-ph-days aria-label="How far back">${PAST_OPTS.map(([v, l]) => `<option value="${v}"${v === days ? ' selected' : ''}>${l}</option>`).join('')}</select>`;
+  const chips = [...x.byCode.entries()].sort((a, b) => b[1] - a[1]).map(([c, n]) => `<span class="ph-chip c-${esc(CODES[c] ? CODES[c].cat : 'unknown')}" title="${esc(labelOf(c))}">${esc(c)} · ${n}</span>`).join('');
+  return `<div class="ph"><div class="ph-head"><b>Past leave · ${esc(p.name)}</b><span class="grow"></span><span class="sm muted">Last</span>${sel}</div>
+    <div class="ph-sum"><span class="ph-total">${fmt(x.total)} day${x.total === 1 ? '' : 's'}</span> of leave since ${esc(d(x.from))}${chips ? `<span class="ph-chips">${chips}</span>` : ''}</div>
+    ${x.runs.length ? `<ul class="ph-list">${x.runs.map(r => `<li><span class="ph-chip c-${esc(r.cat)}">${esc(r.code)}</span><span>${esc(r.from === r.to ? d(r.from) : d(r.from) + ' – ' + d(r.to))}</span><span class="grow"></span><span class="sm muted">${r.cat === 'half' ? fmt(r.n / 2) + ' day' + (r.n === 2 ? '' : 's') + ' (' + r.n + ' half)' : r.n + ' day' + (r.n === 1 ? '' : 's')}${r.cat === 'applied' ? ' · pending' : ''}</span></li>`).join('')}</ul>` : `<div class="sm muted" style="padding:6px 0">No leave in the last ${esc((PAST_OPTS.find(o => o[0] === days) || [0, days + ' days'])[1])}.</div>`}
+    ${pend.length ? `<div class="sm ph-pend">Waiting for approval: ${pend.map(r => esc(r.code + ' · ' + reqDatesText(r.dates || []))).join('; ')}</div>` : ''}</div>`;
+}
+function bindPastLeave(box, redraw) {
+  const s = box && box.querySelector('[data-ph-days]'); if (!s) return;
+  s.addEventListener('change', () => { PAST_DAYS = +s.value || 60; redraw(); });
+}
+const PAST_CSS = `.ph{border:1px solid var(--line);border-radius:10px;padding:10px 12px;background:var(--surface)}.ph-head{display:flex;align-items:center;gap:8px;margin-bottom:4px}.ph-head b{font-size:13px}.ph-head select{height:28px;font-size:12px;width:auto;padding:0 6px}.ph-sum{font-size:12px;color:var(--ink-2);display:flex;flex-wrap:wrap;align-items:center;gap:6px;margin-bottom:6px}.ph-total{font-weight:700;color:var(--ink)}.ph-chips{display:inline-flex;flex-wrap:wrap;gap:4px}.ph-chip{display:inline-block;min-width:30px;text-align:center;padding:1px 6px;border-radius:5px;font-size:11px;font-weight:700;background:rgba(127,127,127,.14);color:var(--ink-2)}.ph-chip.c-approved{background:rgba(34,160,90,.15);color:#1c8a4c}.ph-chip.c-sick{background:rgba(59,108,246,.14);color:#3558c8}.ph-chip.c-unplanned{background:rgba(227,73,72,.14);color:#c63b3a}.ph-chip.c-half{background:rgba(124,92,255,.14);color:#6a4be0}.ph-chip.c-applied{background:rgba(217,164,0,.18);color:#9a7400}.ph-chip.c-late{background:rgba(232,120,40,.16);color:#b8591a}.ph-list{list-style:none;margin:0;padding:0;max-height:170px;overflow:auto}.ph-list li{display:flex;align-items:center;gap:8px;padding:5px 0;border-top:1px solid var(--line);font-size:12.5px}.ph-pend{margin-top:6px;padding:6px 8px;border-radius:7px;background:rgba(217,164,0,.12)}`;
+
 /* ---------- log leave ---------- */
 function openLogLeave(preKey) {
   if (S.status !== 'ready' || !S.ctx) { toast('The attendance tracker isn’t connected yet. Open the Attendance page once, or ask the admin to connect it in Settings › Save & sync.'); return; }
@@ -5790,20 +5970,20 @@ function openLogLeave(preKey) {
   const today = isoDate(new Date(Date.UTC(openedAt.getFullYear(), openedAt.getMonth(), openedAt.getDate())));
   const m = openModal({
     title: 'Record attendance',
-    body: `<style>.cbx{position:relative}.cbx-list{position:absolute;left:0;right:0;top:calc(100% + 4px);z-index:5;max-height:260px;overflow:auto;background:var(--surface);border:1px solid var(--line-2);border-radius:10px;box-shadow:0 10px 30px rgba(0,0,0,.18);padding:4px}.cbx-opt{display:flex;justify-content:space-between;gap:12px;width:100%;border:0;background:transparent;text-align:left;padding:7px 10px;border-radius:7px;font-size:13px;color:var(--ink);font-weight:500}.cbx-opt small{color:var(--ink-3);font-weight:400}.cbx-opt.on,.cbx-opt:hover{background:var(--accent-soft)}.cbx-empty{padding:10px;color:var(--ink-3);font-size:12px}.cbx-caret{position:absolute;right:8px;top:50%;transform:translateY(-50%);border:0;background:transparent;color:var(--ink-3);padding:4px 6px}</style>
+    body: `<style>${PAST_CSS}.cbx{position:relative}.cbx-list{position:absolute;left:0;right:0;top:calc(100% + 4px);z-index:5;max-height:260px;overflow:auto;background:var(--surface);border:1px solid var(--line-2);border-radius:10px;box-shadow:0 10px 30px rgba(0,0,0,.18);padding:4px}.cbx-opt{display:flex;justify-content:space-between;gap:12px;width:100%;border:0;background:transparent;text-align:left;padding:7px 10px;border-radius:7px;font-size:13px;color:var(--ink);font-weight:500}.cbx-opt small{color:var(--ink-3);font-weight:400}.cbx-opt.on,.cbx-opt:hover{background:var(--accent-soft)}.cbx-empty{padding:10px;color:var(--ink-3);font-size:12px}.cbx-caret{position:absolute;right:8px;top:50%;transform:translateY(-50%);border:0;background:transparent;color:var(--ink-3);padding:4px 6px}</style>
       <div class="form"><div class="full" style="display:flex;flex-direction:column;gap:4px"><span style="font-size:12px;font-weight:600;color:var(--ink-2)">Employee</span><div class="cbx"><input type="text" id="l-name" value="${esc(pre || '')}" placeholder="Pick or type a name" autocomplete="off" role="combobox" aria-expanded="false" aria-controls="l-list" aria-label="Employee" style="width:100%;padding-right:32px"><button type="button" class="cbx-caret" id="l-caret" tabindex="-1" aria-label="Show all employees">▾</button><div class="cbx-list" id="l-list" role="listbox" hidden></div></div></div>
       <label>Type<select id="l-code">${codesAllowed.map(c => `<option value="${c}" ${c === 'LA' && (!can('att.approve') || !codesAllowed.includes('AL')) ? 'selected' : ''}>${c} · ${CODES[c].label}</option>`).join('')}</select></label><span></span>
       <label>From<input type="date" id="l-from" value="${today}"></label><label>To<input type="date" id="l-to" value="${today}"></label>
-      <label class="full" style="flex-direction:row;align-items:center;gap:8px;font-weight:500"><input type="checkbox" id="l-skip" checked> Keep week offs and holidays (don’t overwrite WO / H)</label>
       ${needsApproval() ? `<label class="full">Note for your manager <span style="color:var(--bad,#c0392b)">*</span> (required)<input type="text" id="l-note" maxlength="200" required aria-required="true" placeholder="e.g. family function, doctor’s appointment" autocomplete="off"></label><div class="full sm" style="padding:8px 10px;border-radius:8px;background:var(--accent-soft)">This leave goes to a manager for approval first. It is added to attendance only after they approve it.</div>` : ''}</div>
-      <div id="l-prev" class="sm" style="margin-top:12px;padding:10px 12px;border:1px solid var(--line);border-radius:8px;background:var(--surface-2)"></div><div class="err" id="l-err"></div>`,
+      <div id="l-prev" class="sm" style="margin-top:12px;padding:10px 12px;border:1px solid var(--line);border-radius:8px;background:var(--surface-2)"></div><div class="err" id="l-err"></div>
+      <div id="l-hist" class="ph-box" style="margin-top:12px"></div>`,
     footer: `<span class="grow"></span><button class="btn" data-close>Cancel</button><button class="btn primary" id="l-go">${needsApproval() ? 'Send for approval' : 'Apply'}</button>`,
   });
   const plan = () => {
     const name = $('#l-name', m).value, p = resolvePerson(name), from = new Date($('#l-from', m).value + 'T00:00:00Z'), to = new Date($('#l-to', m).value + 'T00:00:00Z');
     if (!p) return { err: name.trim() ? 'No employee with that name in the workforce file or the tracker.' : 'Pick an employee.' };
     if (isNaN(from) || isNaN(to)) return { err: 'Choose both dates.' }; if (to < from) return { err: '“To” is before “From”.' }; if ((to - from) / 86400000 > 92) return { err: 'That range is longer than 3 months. Split it up.' }; if (needsApproval() && ((($('#l-note', m) || {}).value || '').trim().length < 3)) return { err: 'Write a note for your manager: it is required (e.g. family function, doctor’s appointment).' };
-    const code = $('#l-code', m).value, skip = $('#l-skip', m).checked; const set = [], skipped = [], blocked = [], create = new Set(); let overwrite = 0;
+    const code = $('#l-code', m).value, skip = true; /* v3.22: week offs and holidays are always kept; only a direct edit in the tracker changes them */ const set = [], skipped = [], blocked = [], create = new Set(); let overwrite = 0;
     for (let t = from; t <= to; t = new Date(t.getTime() + 86400000)) {
       const ms = Engine.monthSerial(t.getUTCFullYear(), t.getUTCMonth()), i = t.getUTCDate() - 1; const row = p.rows.find(r => r.month === ms);
       const cur = row ? row.days[i] : (t.getUTCDay() % 6 === 0 ? 'WO' : null);
@@ -5815,6 +5995,13 @@ function openLogLeave(preKey) {
   };
   const show = () => { const pl = plan(); $('#l-err', m).textContent = pl.err || ''; $('#l-go', m).disabled = !!pl.err || !pl.set.length; $('#l-prev', m).innerHTML = pl.err ? 'Fill in the form to see a preview.' : `<b>${pl.set.length}</b> day${pl.set.length === 1 ? '' : 's'} will be set to <b>${pl.code}</b>${pl.skipped.length ? `, <b>${pl.skipped.length}</b> skipped (week off / holiday)` : ''}${pl.blocked && pl.blocked.length ? `, <b>${pl.blocked.length}</b> left as they are (already approved or decided leave, which needs the Approve leave right to change)` : ''}${pl.overwrite ? `, replacing <b>${pl.overwrite}</b> existing entr${pl.overwrite === 1 ? 'y' : 'ies'}` : ''}.${pl.create.length ? `<br>A new row will be created for ${pl.create.map(monthLabel).join(', ')}.` : ''}`; };
   bindLeaveDates($('#l-from', m), $('#l-to', m));
+  /* v3.22: past leave of the picked employee (60 days by default; 90, 180 days or 1 year) */
+  { let lastKey = null;
+    /* people who can't see the attendance grid only see their own (linked) history */
+    const maysee = canSeeLeaveOf;
+    const drawHist = force => { const p0 = resolvePerson($('#l-name', m).value), p = maysee(p0) ? p0 : null, k = p ? p.key : ''; if (!force && k === lastKey) return; lastKey = k; const box = $('#l-hist', m); box.innerHTML = p ? pastLeaveHTML(p) : ''; bindPastLeave(box, () => drawHist(true)); };
+    m.addEventListener('input', () => drawHist()); m.addEventListener('change', e => { if (!e.target.matches('[data-ph-days]')) drawHist(); }); m.addEventListener('click', () => setTimeout(() => drawHist(), 0));
+    setTimeout(() => drawHist(true), 0); }
   /* employee dropdown: every name, filtered as you type */
   { const inp = $('#l-name', m), list = $('#l-list', m); let cur = -1, shown = [];
     const open = all => {
@@ -5998,12 +6185,12 @@ function requestBuckets() {
     .sort((a, b) => (b.decidedAt || b.at || '').localeCompare(a.decidedAt || a.at || '')) : [];
   return { approvals, waiting, history, hasGroup: mates.size > 0 };
 }
-const REQUEST_CARD_CSS = ":host {display:block;font-size:13px;} .rc {display:flex;flex-direction:column;gap:8px;} .rc-top {display:flex;flex-wrap:wrap;align-items:center;gap:6px;} .rc-top .grow {flex:1;} .rc-sub {margin:0;font-size:11.5px;line-height:1.4;color:var(--ink-2);} .rc-chips {display:flex;flex-wrap:wrap;gap:4px;} .rc-chip {border:1px solid var(--line);background:transparent;color:var(--ink-2);border-radius:999px;padding:2px 9px;font:inherit;font-size:11.5px;cursor:pointer;} .rc-chip[aria-pressed=true] {background:var(--ink);border-color:var(--ink);color:var(--surface, #fff);} .rc-list {max-height:300px;overflow:auto;} .rq {display:flex;flex-wrap:wrap;align-items:flex-start;gap:6px 10px;padding:9px 0;border-bottom:1px solid var(--line);} .rq:last-child {border-bottom:0;} .rq-main {flex:1 1 220px;min-width:0;overflow-wrap:anywhere;} .rq-main b {font-weight:650;} .rq-code {display:inline-block;margin-left:6px;padding:0 6px;border-radius:5px;background:var(--wash, rgba(127,127,127,.12));font-size:11px;font-weight:650;} .rq-l {display:block;font-size:12px;color:var(--ink-2);margin-top:1px;} .rq-l.q {font-style:italic;} .rq-side {display:flex;flex-wrap:wrap;align-items:center;gap:6px;} .rq-st {font-size:11px;font-weight:650;padding:2px 8px;border-radius:999px;background:var(--wash, rgba(127,127,127,.12));color:var(--ink-2);white-space:nowrap;} .rq-st.approved {background:rgba(34,160,90,.14);color:#1c8a4c;} .rq-st.rejected {background:rgba(227,73,72,.13);color:#c63b3a;} .rq-st.pending {background:rgba(217,164,0,.16);color:#9a7400;} .rq-you {font-size:10.5px;font-weight:650;color:var(--accent, #3b6cf6);margin-left:6px;padding:0 6px;border:1px solid currentColor;border-radius:5px;} .rc-empty {padding:14px 0;text-align:center;font-size:12px;color:var(--ink-2);} .rc-note {margin:0;font-size:12px;color:var(--ink-2);} select {font:inherit;font-size:12px;height:28px;}";
+const REQUEST_CARD_CSS = ":host {display:block;font-size:13px;} .rq-hist {flex:1 1 100%;margin-top:4px;} ";
 function rqRow(r, actions) {
   const who = rcMine(r) ? 'you' : r.by, st = r.status === 'pending' ? 'Pending' : r.status[0].toUpperCase() + r.status.slice(1);
   const decided = r.status !== 'pending' && r.decidedBy ? (r.status === 'cancelled' ? 'Cancelled' : st) + ' by ' + (String(r.decidedById) === myId() ? 'you' : r.decidedBy) + ' · ' + reqWhen(r.decidedAt) : '';
   const changed = r.status === 'approved' && r.asked && r.asked !== r.code ? ' (asked for ' + r.asked + ')' : '';
-  return `<div class="rq"><div class="rq-main"><b>${esc(r.name)}</b><span class="rq-code">${esc(r.code)}</span>${changed ? `<span class="sm muted">${esc(changed)}</span>` : ''}${rcGroup(r) ? '<span class="rq-you" title="Sent by someone in your group">Group</span>' : ''}
+  return `<div class="rq"><div class="rq-main"><b>${esc(r.name)}</b><button type="button" class="rq-i" data-info="${esc(r.id)}" aria-label="Past and upcoming leave of ${esc(r.name)}">i</button><span class="rq-code">${esc(r.code)}</span>${changed ? `<span class="sm muted">${esc(changed)}</span>` : ''}${rcGroup(r) ? '<span class="rq-you" title="Sent by someone in your group">Group</span>' : ''}
     <span class="rq-l">${esc(reqDatesText(r.dates || []))}</span>
     <span class="rq-l">Sent by ${esc(who)} · ${esc(reqWhen(r.at))}${decided ? ' · ' + esc(decided) : ''}</span>
     ${r.note ? `<span class="rq-l q">“${esc(r.note)}”</span>` : ''}${r.reason ? `<span class="rq-l"><b>Reason:</b> ${esc(r.reason)}</span>` : ''}</div>
@@ -6013,9 +6200,10 @@ function rcDraw(id, visible, html, bind) {
   const host = document.getElementById(id); if (!host) return;
   host.hidden = !visible; const root = host.shadowRoot || host.attachShadow({ mode: 'open' });
   if (!visible) { root.innerHTML = ''; return; }
-  root.innerHTML = `<style>${ATT_CSS}${REQUEST_CARD_CSS}</style><div class="rc">${html}</div>`;
+  root.innerHTML = `<style>${ATT_CSS}${REQUEST_CARD_CSS}${PAST_CSS}${LI_CSS}</style><div class="rc">${html}</div>`;
   root.querySelectorAll('[data-rc-scope]').forEach(b => { b.onclick = () => { RC.scope = b.dataset.rcScope; renderApprovalRequests(); window.organizeOverview?.(); }; });
   root.querySelectorAll('[data-rc-hist]').forEach(b => { b.onclick = () => { RC.hist = b.dataset.rcHist; renderRequestHistory(); }; });
+  leaveTipDelegate(root);   /* v3.23: ⓘ hover card with past and upcoming leave */
   if (bind) bind(root);
 }
 const rcScopeChips = hasGroup => hasGroup ? `<div class="rc-chips" role="group" aria-label="Whose requests"><button class="rc-chip" data-rc-scope="group" aria-pressed="${RC.scope !== 'mine'}">Me + my group</button><button class="rc-chip" data-rc-scope="mine" aria-pressed="${RC.scope === 'mine'}">Only mine</button></div>` : '';
@@ -6038,7 +6226,7 @@ function renderApprovalRequests() {
   const { approvals: pending } = requestBuckets();
   const ready = S.status === 'ready' && !!S.ctx;
   const warn = !ready ? '<p class="rc-note">Connect the attendance tracker (Settings › Save & sync) to approve.</p>' : '';
-  const acts = r => canDecide() ? `<select aria-label="Leave type to approve for ${esc(r.name)}" title="Approve as this leave type" ${!ready ? 'disabled' : ''}>${LOG_TYPES.map(c => `<option value="${c}"${c === r.code ? ' selected' : ''}>${c}</option>`).join('')}</select><button class="btn sm primary" data-approve="${esc(r.id)}" ${!ready || S.saving ? 'disabled' : ''}>Approve</button><button class="btn sm" data-reject="${esc(r.id)}">Reject</button>` : '<span class="rq-st pending">Pending</span>';
+  const acts = r => canDecide() ? `<button class="btn sm" data-hist="${esc(r.id)}" title="Leave this person took before">Past leave</button><select aria-label="Leave type to approve for ${esc(r.name)}" title="Approve as this leave type" ${!ready ? 'disabled' : ''}>${LOG_TYPES.map(c => `<option value="${c}"${c === r.code ? ' selected' : ''}>${c}</option>`).join('')}</select><button class="btn sm primary" data-approve="${esc(r.id)}" ${!ready || S.saving ? 'disabled' : ''}>Approve</button><button class="btn sm" data-reject="${esc(r.id)}">Reject</button>` : '<span class="rq-st pending">Pending</span>';
   rcDraw('cardApprovalRequests', canDecide(),
     `<div class="rc-top"><p class="rc-sub grow">Waiting for your decision. Approved leave goes straight into attendance.</p><button class="btn sm" data-refresh title="Check for new requests">↻ Refresh</button></div>${warn}
      <div class="rc-list">${pending.length ? pending.map(r => rqRow(r, acts(r))).join('') : '<div class="rc-empty">All caught up. Nothing to approve.</div>'}</div>`,
@@ -6046,6 +6234,16 @@ function renderApprovalRequests() {
       root.querySelector('[data-refresh]').onclick = async e => { e.target.disabled = true; try { await window.loadTeamSettings(true); notifyReq(); } finally { renderApprovalRequests(); } };
       root.querySelectorAll('[data-approve]').forEach(b => { b.onclick = async () => { b.disabled = true; try { await approveRequest(b.dataset.approve, b.parentElement.querySelector('select').value); } finally { renderApprovalRequests(); } }; });
       root.querySelectorAll('[data-reject]').forEach(b => { b.onclick = () => openRejectBox(b.dataset.reject); });
+      /* v3.22: past leave of the person, shown under the request */
+      root.querySelectorAll('[data-hist]').forEach(b => { b.onclick = () => {
+        const row = b.closest('.rq'); let box = row.querySelector('.rq-hist');
+        if (box) { box.remove(); b.setAttribute('aria-expanded', 'false'); return; }
+        const r = reqList().find(x => x.id === b.dataset.hist), p = r && resolvePerson(r.name);
+        box = document.createElement('div'); box.className = 'rq-hist'; row.append(box); b.setAttribute('aria-expanded', 'true');
+        const draw = () => { box.innerHTML = p ? pastLeaveHTML(p) : '<div class="sm muted">This person isn’t in the attendance tracker yet, so there is no past leave to show.</div>'; bindPastLeave(box, draw); };
+        if (!ready) { box.innerHTML = '<div class="sm muted">Connect the attendance tracker to see past leave.</div>'; return; }
+        draw();
+      }; });
     });
 }
 const requestCounts = () => { const b = requestBuckets(); return { approvals: b.approvals.length, own: b.waiting.length, rejected: b.history.length }; };
@@ -6465,13 +6663,15 @@ table.att td { padding-top:5px; padding-bottom:5px; }
 
 .chip.cat-rejected { color:var(--crit-ink,var(--ink)); background:color-mix(in srgb,var(--c-red,#d03b3b) 12%,var(--surface)); border:1px dashed var(--c-red,#d03b3b); }
 .la-group { padding:8px 0; border-bottom:1px solid var(--line); }
+.rq-i {display:inline-grid;place-items:center;width:17px;height:17px;margin-left:6px;padding:0;border:1.5px solid var(--ink-3, #888);border-radius:50%;background:transparent;color:var(--ink-2);font:italic 700 10.5px/1 Georgia, serif;cursor:help;vertical-align:1px;} .rq-i:hover, .rq-i:focus-visible {border-color:var(--accent, #3b6cf6);color:var(--accent, #3b6cf6);outline:none;}
 .la-group > .li { border-bottom:0; padding-bottom:5px; }
 .la-bulk { display:flex; align-items:center; flex-wrap:wrap; gap:6px; padding:0 10px 8px; }
 .la-group details { padding:0 10px; }
 .la-group summary { cursor:pointer; font-size:12px; color:var(--ink-2); padding:4px 0; }
 .la-group details .li { flex-wrap:wrap; gap:5px; }
 </style><div id="app"></div>`;
-  wireTips(); wireEvents();
+  wireTips(); wireEvents(); leaveTipDelegate(ROOT);
+  if (!document.getElementById('liGlobalCss')) { const st = document.createElement('style'); st.id = 'liGlobalCss'; st.textContent = PAST_CSS + LI_CSS; document.head.append(st); }
   kv.get('user').then(n => { if (n) BE.setUser(n); updateWho(); });
   document.getElementById('btnWho')?.addEventListener('click', askName); updateWho();
   window.addEventListener('focus', () => { if (S.status === 'ready') checkDisk(); });
@@ -6521,8 +6721,8 @@ function entriesOn(d, dt) {
 }
 const rangeEntries = (d, from, to) => { const out = []; for (let t = from.getTime(); t <= to.getTime(); t += 86400000) out.push(...entriesOn(d, new Date(t)).filter(e => kindOk(e.c))); return out; };
 
-function renderCard(el) {
-  if (!el) return; renderCard.el = el;
+function renderCard(el, opts = {}) {
+  if (!el) return; if (!opts.hist) renderCard.el = el;
   const C = S.ui.card, goBtns = can('ov.openatt') && can('page.attendance') ? `<button class="btn mini" data-att-go="grid">Open attendance →</button>` : '';
   const head = sub => `<div class="card-head"><div class="grow"><h2>Attendance</h2><div class="sub">${sub}</div></div>${goBtns}</div>`;
   let html;
@@ -6581,12 +6781,29 @@ function renderCard(el) {
       <div class="att-legend"><span class="sm muted">Each day above: a darker dot means more people on leave. Hover or click a day for details.</span><span class="grow"></span>${kindSel}</div>
       <div class="att-cols hist-cols"><div><h3>Recent absences ${sel('past', CARD_PAST, C.past, n => n + ' days')}${copyBtn('past', pastCopy)}</h3>${col2}</div>
       <div><h3>Upcoming leave ${sel('next', CARD_NEXT, C.next, n => n + ' days')}${copyBtn('upcoming', upcomingCopy)}</h3>${col3}</div></div>`;
-    html = head2 + bar + kpis + (C.view === 'history' ? historyCols : todayCol);
+    if (opts.hist) html = `<div class="att-hist-top">${nav}<span class="grow"></span>${pseudoCol ? toggle('names', [['real', 'Real names'], ['pseudo', 'Pseudo names']]) : ''}</div>` + historyCols;
+    else {
+      /* v3.24: compact card. One row of tabs (on leave · half day · late), a short list, and History & upcoming in a side panel */
+      const dayAll = rows.map(r => ({ r, v: r.days[ri], c: catOf(r.days[ri]) })).filter(x => x.c);
+      const T = { leave: dayAll.filter(x => ['approved', 'sick', 'unplanned', 'applied'].includes(x.c)), half: dayAll.filter(x => x.c === 'half'), late: dayAll.filter(x => x.c === 'late') };
+      const nFull = T.leave.filter(x => x.c !== 'applied').length, nLa = T.leave.length - nFull;
+      if (!T[C.tab]) C.tab = T.leave.length ? 'leave' : T.late.length ? 'late' : T.half.length ? 'half' : 'leave';
+      const tabBtn = (k, n, l, extra) => `<button type="button" class="att-tab${n ? ' has' : ''}" data-att-tab="${k}" aria-pressed="${C.tab === k}"><b>${n}</b>${l}${extra || ''}</button>`;
+      const list = T[C.tab].slice().sort((a, b) => nm(a.r).localeCompare(nm(b.r)));
+      const listCopy = tableData(['Employee', 'Client', 'Code', 'Status'], list.map(x => [nm(x.r), cl(x.r), String(x.v).trim().toUpperCase(), x.c === 'applied' ? 'Awaiting approval' : labelOf(x.v)]), (C.tab === 'late' ? 'Late comings' : C.tab === 'half' ? 'Half days' : 'Out') + ' on ' + longDate(rd));
+      renderCard._copy = { ...renderCard._copy, today: listCopy };
+      const emptyTxt = !rows.length ? 'No attendance rows for this month.' : C.tab === 'late' ? 'No late comings ' + dayWord + '.' : C.tab === 'half' ? 'No half days ' + dayWord + '.' : 'Nobody is on leave ' + dayWord + '.';
+      const miniList = list.length ? `<ul class="att-mini">${list.map(x => `<li><span class="att-mini-n">${esc(nm(x.r))}<button type="button" class="rq-i" data-lainfo="${esc(x.r.name.trim())}" aria-label="Past and upcoming leave of ${esc(nm(x.r))}">i</button></span><span class="att-mini-c">${esc(cl(x.r))}</span><span class="ph-chip c-${esc(x.c)}">${esc(String(x.v).trim().toUpperCase())}</span><span class="att-mini-s">${esc(x.c === 'applied' ? 'Awaiting approval' : labelOf(x.v))}</span></li>`).join('')}</ul>` : `<div class="att-mini-empty">${emptyTxt}</div>`;
+      html = head2 + `<div class="att-tabs">${tabBtn('leave', nFull, ' on leave', nLa ? ` <em>+${nLa} awaiting</em>` : '')}${tabBtn('half', T.half.length, ' half day')}${tabBtn('late', T.late.length, ' late')}<span class="grow"></span>${copyBtn('today', listCopy)}${pseudoCol ? toggle('names', [['real', 'Real'], ['pseudo', 'Pseudo']]) : ''}<button type="button" class="btn mini" data-att-hist>History &amp; upcoming ↗</button></div>` + miniList;
+    }
   }
   if (S.status === 'ready' && S.ctx && hasRoster()) { const n = rosterGaps().missing.length, u = rosterGaps().notInRoster.length; const bits = []; if (n) bits.push(`${n} ${n === 1 ? 'person' : 'people'} in the workforce file ${n === 1 ? 'isn’t' : 'aren’t'} in the attendance tracker yet`); if (u) bits.push(`${u} tracker ${u === 1 ? 'name doesn’t' : 'names don’t'} match the workforce file`); if (bits.length) html += `<div class="hint" style="margin-top:12px">${bits.join(' · ')}. <button class="linkbtn" data-att-go="health">Fix in Action center</button></div>`; }
   el.innerHTML = html;
-  el.querySelectorAll('[data-att-view]').forEach(b => b.addEventListener('click', () => { S.ui.card.view = b.dataset.attView; saveCardUi(); renderCard(el); }));
-  el.querySelectorAll('[data-att-names]').forEach(b => b.addEventListener('click', () => { S.ui.card.names = b.dataset.attNames; saveCardUi(); renderCard(el); }));
+  const again = () => { renderCard(el, opts); if (opts.hist && renderCard.el && renderCard.el.isConnected) renderCard(renderCard.el); };
+  el.querySelectorAll('[data-att-tab]').forEach(b => b.addEventListener('click', () => { S.ui.card.tab = b.dataset.attTab; renderCard(el); }));
+  el.querySelector('[data-att-hist]')?.addEventListener('click', openAttHistory);
+  el.querySelectorAll('[data-att-names]').forEach(b => b.addEventListener('click', () => { S.ui.card.names = b.dataset.attNames; saveCardUi(); again(); }));
+  if (!opts.hist) leaveTipDelegate(el);
   el.querySelectorAll('[data-att-go]').forEach(b => b.addEventListener('click', () => { const v = b.dataset.attGo; if (v === 'who' && refDay().getTime() !== TODAY.getTime()) S.ui.who.start = isoDate(refDay()); go(v); if (b.dataset.attNew) setTimeout(() => ACTIONS['new-month'](), 60); }));
   el.querySelectorAll('[data-att-copy]').forEach(b => b.addEventListener('click', async () => {
     const text = (renderCard._copy || {})[b.dataset.attCopy];
@@ -6597,7 +6814,7 @@ function renderCard(el) {
       setTimeout(() => { if (b.isConnected) b.innerHTML = original; }, 1800);
     } else toast("Couldn't copy: the browser blocked clipboard access.", true);
   }));
-  const redraw = () => { saveCardUi(); renderCard(el); };
+  const redraw = () => { saveCardUi(); again(); };
   el.querySelectorAll('[data-att-day]').forEach(b => b.addEventListener('click', () => { C_set(b.dataset.attDay === 'today' ? null : b.dataset.attDay); redraw(); }));
   el.querySelectorAll('[data-att-step]').forEach(b => b.addEventListener('click', () => { C_set(isoDate(addDays(refDay(), +b.dataset.attStep))); redraw(); }));
   el.querySelector('[data-att-date]')?.addEventListener('change', e => { if (e.target.value) { C_set(e.target.value); redraw(); } });
@@ -6607,6 +6824,14 @@ function renderCard(el) {
   const sel = el.querySelector('.att-day.sel'), st = el.querySelector('#attStrip'); if (sel && st) st.scrollLeft = Math.max(0, sel.offsetLeft - st.clientWidth / 2 + sel.offsetWidth / 2);
 }
 const C_set = iso => { S.ui.card.date = iso && iso !== isoDate(TODAY) ? iso : null; };
+/* v3.24: History & upcoming opens in a wide side panel, so the Overview card stays small */
+function openAttHistory() {
+  const body = document.createElement('div'); body.className = 'body att-hist-body';
+  const close = document.createElement('button'); close.className = 'btn ghost'; close.setAttribute('aria-label', 'Close'); close.textContent = '✕'; close.onclick = () => closeDrawer();
+  const hd = document.createElement('header'); const h2 = document.createElement('h2'); h2.textContent = 'Attendance · history & upcoming'; hd.append(h2, close);
+  const aside = document.createElement('aside'); aside.className = 'drawer att-hist-drawer'; aside.setAttribute('role', 'dialog'); aside.setAttribute('aria-modal', 'true'); aside.setAttribute('aria-label', 'Attendance history and upcoming leave'); aside.append(hd, body);
+  mountDrawer(aside); renderCard(body, { hist: true });
+}
 
 /* ---- v3.14: Leave watch (Overview). Back-to-back leave in a recent window, and leave that keeps landing on the same weekday ----
    Follows the filters at the top like the rest of the Overview. Full-day leave codes build a streak (AL, CL, SL, UL, AB);
@@ -6624,7 +6849,11 @@ function leaveWatchData() {
   const u = watchUi(), d = D(), streaks = [], patterns = [];
   const from = new Date(TODAY.getTime() - (u.days - 1) * DAY_MS), lookFrom = new Date(TODAY.getTime() - (u.look - 1) * DAY_MS);
   const WD = ['Sundays', 'Mondays', 'Tuesdays', 'Wednesdays', 'Thursdays', 'Fridays', 'Saturdays'];
+  let checked = 0;
   for (const p of d.people.values()) {
+    /* v3.24: people who left or moved out are not watched */
+    { const hit = hasRoster() ? rosterOfPerson(p) : null; if (hit && goneKind(hit.row)) continue; }
+    checked++;
     const at = personDayReader(p);
     /* 1. streaks inside the chosen window */
     const runs = []; let cur = null, windowDays = 0;
@@ -6662,7 +6891,37 @@ function leaveWatchData() {
   }
   streaks.sort((a, b) => (a.sev === b.sev ? 0 : a.sev === 'red' ? -1 : 1) || b.longest - a.longest || b.hits.length - a.hits.length || a.name.localeCompare(b.name));
   patterns.sort((a, b) => b.share - a.share || b.n - a.n || a.name.localeCompare(b.name));
-  return { streaks, patterns, u };
+  return { streaks, patterns, u, checked };
+}
+/* v3.24: tell HR about red flags. The HR address is shared with the team; what was sent is remembered in this browser. */
+const HR_TOLD_KEY = 'td_hr_told_v1';
+const hrTold = () => { try { return JSON.parse(localStorage.getItem(HR_TOLD_KEY) || '{}') || {}; } catch { return {}; } };
+const hrKey = s => s.k + '|' + isoDate(s.hits[s.hits.length - 1].end);
+function hrText(list, u) {
+  const run = r => (r.start.getTime() === r.end.getTime() ? shortDate(r.start) : shortDate(r.start) + ' – ' + shortDate(r.end)) + ' (' + r.n + ' days: ' + Object.entries(r.codes).map(([c, k]) => c + (k > 1 ? ' ×' + k : '')).join(', ') + ')';
+  return 'Hi,\n\nThe team dashboard flagged back-to-back leave in the past ' + u.days + ' days for ' + (list.length === 1 ? 'this person' : 'these ' + list.length + ' people') + ':\n\n'
+    + list.map(s => '• ' + s.name + (s.client ? ' (' + s.client + ')' : '') + ': ' + s.hits.length + ' streak' + (s.hits.length === 1 ? '' : 's') + ', longest ' + s.longest + ' days, ' + fmt(s.total) + ' leave days in total' + (s.aroundWk ? ', spans a weekend' : '') + '\n   ' + s.hits.slice(-3).map(run).join('\n   ')).join('\n\n')
+    + '\n\nCould you please review and advise?\n\nThanks,\n' + (BE.userName() || '');
+}
+function openHrBox(list, u) {
+  const saved = String((window.TD_SETTINGS || {}).hr_email || localStorage.getItem('td_hr_email') || '');
+  const subj = 'Leave red flag' + (list.length === 1 ? ': ' + list[0].name : 's: ' + list.length + ' people') + ' · ' + longDate(TODAY);
+  const m = openModal({ title: 'Update HR about red flags', wide: true,
+    body: `<div class="form"><label class="full">HR email<input type="text" inputmode="email" id="hr-to" value="${esc(saved)}" placeholder="hr@company.com" autocomplete="off"></label>
+      <label class="full" style="flex-direction:row;align-items:center;gap:8px;font-weight:500"><input type="checkbox" id="hr-keep" ${saved ? '' : 'checked'}> Remember this HR address for everyone</label>
+      <label class="full">Subject<input type="text" id="hr-subj" value="${esc(subj)}"></label>
+      <label class="full">Message<textarea id="hr-body" rows="12" style="width:100%;resize:vertical;font:inherit;font-size:12.5px;font-weight:400">${esc(hrText(list, u))}</textarea></label></div><div class="err" id="hr-err"></div>`,
+    footer: `<span class="sm muted">Opens your email app with this message. Nothing is sent by the dashboard itself.</span><span class="grow"></span><button class="btn" id="hr-copy">Copy text</button><button class="btn primary" id="hr-go">Open in email</button>` });
+  const markTold = () => { const t = hrTold(); for (const s of list) t[hrKey(s)] = isoDate(TODAY); try { localStorage.setItem(HR_TOLD_KEY, JSON.stringify(t)); } catch { } };
+  const keepAddr = async to => { if (!$('#hr-keep', m).checked || !to || to === saved) return; try { localStorage.setItem('td_hr_email', to); } catch { } try { await window.saveSharedSetting('hr_email', to); } catch { } };
+  $('#hr-copy', m).onclick = async () => { try { await navigator.clipboard.writeText($('#hr-subj', m).value + '\n\n' + $('#hr-body', m).value); toast('Copied. Paste it into an email or chat to HR.'); markTold(); } catch { toast('The browser blocked copying. Select the text and copy it.'); } };
+  $('#hr-go', m).onclick = async () => {
+    const to = $('#hr-to', m).value.trim();
+    if (to && !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(to)) { $('#hr-err', m).textContent = 'That doesn’t look like an email address.'; return; }
+    await keepAddr(to); markTold();
+    const a = document.createElement('a'); a.href = 'mailto:' + encodeURIComponent(to).replace(/%40/g, '@') + '?subject=' + encodeURIComponent($('#hr-subj', m).value) + '&body=' + encodeURIComponent($('#hr-body', m).value); a.click();
+    closeModal(); toast('Your email app should open with the message. It’s marked as sent to HR on this browser.'); if (renderWatch.el) renderWatch(renderWatch.el);
+  };
 }
 function renderWatch(el) {
   if (!el) return; renderWatch.el = el;
@@ -6672,17 +6931,20 @@ function renderWatch(el) {
     <label class="hint" style="display:flex;align-items:center;gap:6px">Past <select class="input mini" data-w="days" aria-label="Window for back-to-back leave">${opt([15, 30, 45, 60], u.days, v => v + ' days')}</select></label>
     <label class="hint" style="display:flex;align-items:center;gap:6px">Streak <select class="input mini" data-w="min" aria-label="Shortest streak to flag">${opt([2, 3, 5], u.min, v => v + '+ days')}</select></label></div>`;
   if (S.status !== 'ready' || !S.ctx) { el.innerHTML = head('Back-to-back leave and repeat-day patterns') + '<div class="watch-empty">The attendance workbook isn’t connected yet.</div>'; return; }
-  const { streaks, patterns } = leaveWatchData();
-  const reds = streaks.filter(s => s.sev === 'red').length;
+  const { streaks, patterns, checked } = leaveWatchData();
+  const reds = streaks.filter(s => s.sev === 'red').length, told = hrTold();
+  const redList = streaks.filter(s => s.sev === 'red'), untold = redList.filter(s => !told[hrKey(s)]);
+  const hrBanner = redList.length ? `<div class="watch-hr${untold.length ? '' : ' done'}"><span>${untold.length ? `⚑ <b>${untold.length} red flag${untold.length === 1 ? '' : 's'}</b> not shared with HR yet. Consider letting HR know so they can follow up.` : `✓ HR has been told about every current red flag (from this browser).`}</span>${untold.length ? `<button class="btn mini primary" data-w-hr="all">Update HR…</button>` : ''}</div>` : '';
   const runText = r => r.n + ' days · ' + (r.start.getTime() === r.end.getTime() ? shortDate(r.start) : shortDate(r.start) + ' – ' + shortDate(r.end)) + ' (' + Object.entries(r.codes).map(([c, k]) => c + (k > 1 ? ' ×' + k : '')).join(', ') + ')';
-  const sList = streaks.length ? `<ul class="watch-list">${streaks.map(s => `<li><span class="flag ${s.sev}">${s.sev === 'red' ? '⚑ Red flag' : 'Watch'}</span><div class="who"><b>${esc(s.name)}</b><small>${s.hits.length} streak${s.hits.length === 1 ? '' : 's'} · longest ${s.longest} days · ${fmt(s.total)} leave days in the past ${u.days} days${s.aroundWk ? ' · spans a weekend' : ''}</small><small>${s.hits.slice(-3).map(runText).map(esc).join('<br>')}</small></div><button class="btn mini" data-w-open="${esc(s.k)}">Open</button></li>`).join('')}</ul>`
+  const sList = streaks.length ? `<ul class="watch-list">${streaks.map(s => `<li><span class="flag ${s.sev}">${s.sev === 'red' ? '⚑ Red flag' : 'Watch'}</span><div class="who"><b>${esc(s.name)}</b><small>${s.hits.length} streak${s.hits.length === 1 ? '' : 's'} · longest ${s.longest} days · ${fmt(s.total)} leave days in the past ${u.days} days${s.aroundWk ? ' · spans a weekend' : ''}</small><small>${s.hits.slice(-3).map(runText).map(esc).join('<br>')}</small>${s.sev === 'red' && told[hrKey(s)] ? `<small class="hr-told">✓ HR told ${esc(shortDate(new Date(told[hrKey(s)] + 'T00:00:00Z')))}</small>` : ''}</div><div class="watch-acts">${s.sev === 'red' ? `<button class="btn mini" data-w-hr="${esc(s.k)}" title="Draft an email to HR about ${esc(s.name)}">Tell HR</button>` : ''}<button class="btn mini" data-w-open="${esc(s.k)}">Open</button></div></li>`).join('')}</ul>`
     : `<div class="watch-empty">Nobody took ${u.min} or more working days of leave in a row in the past ${u.days} days.</div>`;
   const pList = patterns.length ? `<ul class="watch-list">${patterns.map(p => `<li><span class="flag ${p.kind === 'day' ? 'blue' : 'amber'}">${esc(p.day)}</span><div class="who"><b>${esc(p.name)}</b><small>${esc(p.text)}</small><small>Latest: ${esc(p.recent.join(', '))}</small></div><button class="btn mini" data-w-open="${esc(p.k)}">Open</button></li>`).join('')}</ul>`
     : `<div class="watch-empty">No one’s leave keeps falling on the same weekday in the past ${u.look} days.</div>`;
-  el.innerHTML = head(`${streaks.length ? `<b style="color:var(--danger)">${reds} red flag${reds === 1 ? '' : 's'}</b> · ${streaks.length} ${streaks.length === 1 ? 'person' : 'people'} with back-to-back leave` : 'No back-to-back leave'} · ${patterns.length} repeat-day pattern${patterns.length === 1 ? '' : 's'} · follows the filters at the top`)
-    + `<div class="watch-cols"><section class="watch-col" aria-label="Back-to-back leave"><h3>Back-to-back leave · past ${u.days} days</h3><div class="sub">Red flag: a streak longer than ${Math.max(2, u.min)} days, or two or more streaks. Weekends and holidays in between don’t break a streak.</div>${sList}</section>
+  el.innerHTML = head(`${streaks.length ? `<b style="color:var(--danger)">${reds} red flag${reds === 1 ? '' : 's'}</b> · ${streaks.length} ${streaks.length === 1 ? 'person' : 'people'} with back-to-back leave` : 'No back-to-back leave'} · ${patterns.length} repeat-day pattern${patterns.length === 1 ? '' : 's'} · checking ${checked} ${checked === 1 ? 'person' : 'people'} in ${esc(hostSummary() || 'all statuses')} (the filters at the top; people who left are skipped)`)
+    + hrBanner + `<div class="watch-cols"><section class="watch-col" aria-label="Back-to-back leave"><h3>Back-to-back leave · past ${u.days} days</h3><div class="sub">Red flag: a streak longer than ${Math.max(2, u.min)} days, or two or more streaks. Weekends and holidays in between don’t break a streak.</div>${sList}</section>
       <section class="watch-col" aria-label="Leave on particular days"><h3 style="display:flex;align-items:center;gap:8px;flex-wrap:wrap">Leave on particular days <label class="hint" style="display:flex;align-items:center;gap:6px;font-weight:400">over <select class="input mini" data-w="look" aria-label="Look-back for day patterns">${opt([60, 90, 180], u.look, v => v + ' days')}</select></label></h3><div class="sub">People with 3+ leave days where most fall on one weekday, or on Mondays and Fridays.</div>${pList}</section></div>`;
   el.querySelectorAll('[data-w]').forEach(s => s.addEventListener('change', () => { u[s.dataset.w] = +s.value; try { localStorage.setItem(WATCH_KEY, JSON.stringify(u)); } catch { } renderWatch(el); }));
+  el.querySelectorAll('[data-w-hr]').forEach(b => b.addEventListener('click', () => { const k = b.dataset.wHr; const list = k === 'all' ? untold : redList.filter(s => s.k === k); if (list.length) openHrBox(list, u); }));
   el.querySelectorAll('[data-w-open]').forEach(b => b.addEventListener('click', () => { if (can('att.grid')) go('people', b.dataset.wOpen); else toast('Your passcode can’t open the People view.'); }));
 }
 
@@ -6951,7 +7213,7 @@ async function poll() {
 }
 
 /* ============================== filtering ============================== */
-const APP = { title: "Team Dashboard", version: "3.21.0", released: "29 Sep 2026" };
+const APP = { title: "Team Dashboard", version: "3.24.1", released: "29 Sep 2026" };
 const BASE_DIMS = { status: "status_column", desig: "designation_column", client: "client_column", mode: "mode_column" };
 const STANDARD_STATUSES = ["Active", "Manager", "OJT", "Bench", "New", "Projected", "Left", "Moved"];
 const TILE_ORDER = ["Active", "Manager", "OJT", "Bench", "New", "Projected"];
