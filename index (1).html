@@ -4,7 +4,7 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <link rel="icon" href="data:,">
-<title>Team Dashboard · 3.18.0</title>
+<title>Team Dashboard · 3.20.1</title>
 <style>
 :root {
   color-scheme: light;
@@ -755,6 +755,10 @@ dialog.td-admin::backdrop { background:rgba(15,23,42,.45); }
 #cardFill .fill-more { margin: 10px 0 0; display: flex; gap: 8px; align-items: center; }
 #cardFill .filltbl-wrap { max-height: 62vh; }
 table.filltbl { border-collapse: separate; border-spacing: 0; width: 100%; font-size: 13px; }
+table.filltbl th .fth { display:inline-flex; align-items:center; gap:4px; }
+table.filltbl th .fthf { border:0; background:transparent; color:var(--muted); cursor:pointer; font-size:11px; line-height:1; padding:3px 5px; border-radius:5px; }
+table.filltbl th .fthf:hover { background:color-mix(in srgb, var(--accent) 12%, transparent); color:var(--ink); }
+table.filltbl th .fthf.on { color:var(--accent); font-weight:700; background:color-mix(in srgb, var(--accent) 16%, transparent); }
 table.filltbl th { position: sticky; top: 0; z-index: 2; background: var(--surface-2); text-align: left; padding: 8px 10px; font-size: 12px; color: var(--ink-2); border-bottom: 1px solid var(--grid); white-space: nowrap; }
 table.filltbl td { padding: 5px 10px; border-bottom: 1px solid var(--grid); vertical-align: middle; white-space: nowrap; }
 table.filltbl td.n { color: var(--muted); font-size: 11px; width: 32px; }
@@ -1220,6 +1224,97 @@ div.rmod-head { cursor:default; }
 .ff-list .chk-line span { flex:1; min-width:0; overflow-wrap:anywhere; }
 .ff-list .chk-line small { color:var(--ink-3, var(--ink-2)); font-size:10.5px; }
 .rights.is-admin .rmods { opacity:.55; }
+/* ================= v3.20: People & access — tabs, clear sections, one line per module; user groups ================= */
+.ppl-tabs { display:flex; gap:4px; padding:3px; margin:0 0 16px; border-radius:10px; background:var(--surface-2); width:max-content; max-width:100%; overflow-x:auto; }
+.ppl-tab { display:inline-flex; align-items:center; gap:6px; padding:7px 14px; border:0; border-radius:8px; background:transparent; color:var(--ink-2); font:inherit; font-size:13px; font-weight:600; cursor:pointer; white-space:nowrap; }
+.ppl-tab[aria-selected="true"] { background:var(--surface); color:var(--ink); box-shadow:0 1px 3px rgba(15,23,42,.12); }
+.ppl-tab-n { min-width:18px; padding:0 6px; border-radius:999px; background:var(--border); font-size:11px; line-height:18px; text-align:center; }
+.ppl-tab-n.hot { background:#e34948; color:#fff; }
+.ppl { grid-template-columns:290px minmax(0,1fr) !important; }
+@media (max-width:900px) { .ppl { grid-template-columns:1fr !important; } }
+.ppl-find { display:flex; gap:6px; }
+.ppl-find .input { height:32px; min-width:0; }
+.ppl-find input { flex:1 1 auto; } .ppl-find select { flex:0 0 118px; }
+.ppl-item { flex-direction:row !important; align-items:center; gap:10px !important; }
+.ppl-it { display:flex; flex-direction:column; gap:1px; min-width:0; flex:1; }
+.ppl-it b, .ppl-it small { overflow:hidden; text-overflow:ellipsis; white-space:nowrap; }
+.ppl-av { flex:0 0 auto; display:inline-grid; place-items:center; width:30px; height:30px; border-radius:50%; background:color-mix(in srgb,var(--accent) 14%,var(--surface)); color:var(--accent); font-size:11.5px; font-weight:700; }
+.ppl-av.r-superadmin { background:color-mix(in srgb,#d9a400 20%,var(--surface)); color:#9a7400; }
+.ppl-av.r-admin { background:color-mix(in srgb,#7c5cff 16%,var(--surface)); color:#6a4be0; }
+.ppl-av.sm { width:20px; height:20px; font-size:9px; }
+.ppl-av.lg { width:44px; height:44px; font-size:15px; }
+.ppl-role { flex:0 0 auto; font-size:10.5px; font-weight:650; padding:2px 7px; border-radius:999px; background:var(--surface-2); color:var(--ink-2); }
+.ppl-role.r-superadmin { color:#9a7400; } .ppl-role.r-admin { color:#6a4be0; }
+.ppl-gchips { display:flex; flex-wrap:wrap; gap:3px; margin-top:2px; }
+.ppl-gchips em { font-style:normal; font-size:10.5px; padding:0 6px; border-radius:5px; background:var(--surface-2); color:var(--ink-2); }
+.ppl-editor { padding:0 !important; overflow:hidden; }
+.ped-top { display:flex; align-items:center; gap:12px; padding:16px 20px; border-bottom:1px solid var(--border); background:var(--surface-2); }
+.ped-top .ppl-name { margin:0 0 2px !important; }
+.ped-id small { font-size:12px; color:var(--ink-2); }
+.ppl-editor > .set-hint { margin:12px 20px 0; }
+.ped-sec { padding:16px 20px; border-bottom:1px solid var(--border); }
+.ped-h { display:flex; align-items:flex-start; gap:10px; margin:0 0 12px; }
+.ped-h b { display:block; font-size:13.5px; }
+.ped-h small { font-size:12px; color:var(--ink-2); }
+.ped-n { display:inline-grid; place-items:center; width:22px; height:22px; border-radius:50%; background:var(--accent); color:#fff; font-size:11.5px; font-weight:700; flex:0 0 auto; }
+.ped-sec .rights { margin:0; padding:0; border:0; }
+.ped-sec .ppl-row:has(> label:only-child) { grid-template-columns:minmax(0,260px); }
+.ped-more { margin:0 !important; padding:12px 20px; border-bottom:1px solid var(--border); }
+.ped-more > summary { font-size:13px; }
+.ped-save { position:sticky; bottom:0; z-index:2; margin:0 !important; padding:12px 20px; background:var(--surface); border-top:1px solid var(--border); align-items:center; }
+.ped-save .err { margin:0; }
+.rights-presets .rpre { border:1px solid var(--border); background:var(--surface); color:var(--ink); border-radius:999px; padding:4px 11px; font:inherit; font-size:12px; cursor:pointer; }
+.rights-presets .rpre[aria-pressed="true"] { background:var(--accent); border-color:var(--accent); color:#fff; font-weight:600; }
+.rpre-now { margin-left:4px; font-size:11.5px; color:var(--ink-3); }
+.sup-note { padding:10px 12px; border-radius:8px; background:var(--surface-2); max-width:none; }
+.rights.is-admin .rrows { display:none; }
+.rrows { border:1px solid var(--border); border-radius:10px; overflow:hidden; }
+.rrow { border-bottom:1px solid var(--border); background:var(--surface); }
+.rrow:last-child { border-bottom:0; }
+.rrow > summary { display:flex; align-items:center; gap:12px; padding:9px 12px; cursor:pointer; list-style:none; }
+.rrow > summary::-webkit-details-marker { display:none; }
+.rrow > summary:hover { background:var(--surface-2); }
+.rrow-name { flex:1; min-width:0; display:flex; flex-direction:column; }
+.rrow-name b { font-size:13px; }
+.rrow-meta { display:flex; gap:6px; align-items:center; }
+.rrow-count { font-size:11px; color:var(--ink-3); }
+.rrow .rseg { margin:0; }
+.rrow .rseg-custom { margin:0; padding:0 6px; border-radius:5px; background:color-mix(in srgb,#d9a400 16%,var(--surface)); color:#9a7400; font-weight:600; }
+.rrow-more { font-size:11.5px; color:var(--accent); white-space:nowrap; }
+.rrow-more::after { content:" ▾"; }
+.rrow[open] .rrow-more::after { content:" ▴"; }
+.rrow[open] > summary { background:var(--surface-2); }
+.rrow-body { padding:10px 14px 12px 14px; border-top:1px solid var(--border); }
+.rrow-body > .rmod-head { padding:0 0 6px; }
+.rrow-body > .rmod-head span { font-size:12.5px; font-weight:600; }
+.rrow-body .rmod-items { border-top:0; padding-top:0; display:grid; grid-template-columns:repeat(auto-fill,minmax(260px,1fr)); column-gap:18px; }
+.rrow-body .rmod-kind { grid-column:1 / -1; }
+.rrow-body .rmod-sub { margin:10px 0 0; }
+.rrow-body .rmod-chips { grid-template-columns:repeat(auto-fill,minmax(220px,1fr)); column-gap:14px; }
+.rrow.off .rmod-items, .rrow.off .rmod-sub { opacity:.45; }
+.grp-picks { display:grid; grid-template-columns:repeat(auto-fill,minmax(220px,1fr)); gap:2px 16px; }
+.grp-intro { margin:0 0 14px; padding:12px 14px; border-radius:10px; background:var(--surface-2); font-size:12.5px; color:var(--ink-2); }
+.grp-intro b { color:var(--ink); }
+.grp-intro ul { margin:6px 0 0; padding-left:18px; }
+.grp-list { display:grid; grid-template-columns:repeat(auto-fill,minmax(min(100%,320px),1fr)); gap:12px; margin-top:12px; }
+.grp { border:1px solid var(--border); border-radius:12px; padding:12px 14px; background:var(--surface); display:flex; flex-direction:column; gap:10px; }
+.grp-head { display:flex; align-items:center; gap:8px; }
+.grp-head small { font-size:11.5px; color:var(--ink-3); white-space:nowrap; }
+.grp-name { flex:1; min-width:0; height:32px; font-weight:650; }
+.grp-members { display:flex; flex-wrap:wrap; gap:6px; }
+.grp-chip { display:inline-flex; align-items:center; gap:6px; padding:3px 4px 3px 4px; border:1px solid var(--border); border-radius:999px; font-size:12px; background:var(--surface-2); }
+.grp-chip.gone { opacity:.6; text-decoration:line-through; }
+.grp-chip button { border:0; background:transparent; color:var(--ink-3); font-size:15px; line-height:1; cursor:pointer; padding:0 5px; border-radius:50%; }
+.grp-chip button:hover { color:#e34948; }
+.grp-add select { height:32px; max-width:100%; }
+.grp-empty { grid-column:1 / -1; padding:26px; text-align:center; border:1px dashed var(--border); border-radius:12px; color:var(--ink-2); font-size:12.5px; }
+.grp-empty b { color:var(--ink); font-size:13.5px; } .grp-empty p { margin:4px 0 0; }
+.ppl-resets { list-style:none; margin:0; padding:0; }
+.ppl-resets li { display:flex; align-items:center; gap:10px; padding:8px 0; border-bottom:1px solid var(--border); }
+.ppl-resets li:last-child { border-bottom:0; }
+.ppl-rs-main { flex:1; min-width:0; display:flex; flex-direction:column; }
+.ppl-rs-main small { font-size:11.5px; color:var(--ink-2); }
+@media (max-width:640px) { .rrow > summary { flex-wrap:wrap; } .rrow-more { display:none; } .ped-sec, .ped-top, .ped-save, .ped-more { padding-left:14px; padding-right:14px; } }
 body.filters-locked #cleanFilters, body.filters-locked #xchips, body.filters-locked .saved-filter-row, body.filters-locked #customFieldControls { display:none !important; }
 
 /* v3.17: USA and India holidays card */
@@ -1290,6 +1385,95 @@ body.filters-locked #cleanFilters, body.filters-locked #xchips, body.filters-loc
   #pageSummary.ov > .ov-glance { grid-template-columns:repeat(auto-fit,minmax(min(100%,300px),1fr)); }
 }
 @media (max-width:650px) { .ov-tile { padding:12px; } .ov-ic { width:34px; height:34px; font-size:17px; } .ov-tx b { font-size:18px; } }
+
+/* ================= v3.19: team chat ================= */
+.pd { position:relative; display:inline-flex; align-items:center; justify-content:center; flex:none; width:10px; height:10px; border-radius:50%; background:#9ca3af; box-shadow:0 0 0 2px var(--surface); color:#fff; font-size:7px; font-weight:800; line-height:1; }
+.pd.big { width:12px; height:12px; font-size:8px; }
+.pd-on { background:#22c55e; }
+.pd-on::after { content:""; position:absolute; inset:-3px; border-radius:50%; border:2px solid #22c55e; opacity:0; animation:pdPulse 2.4s ease-out infinite; }
+@keyframes pdPulse { 0% { opacity:.55; transform:scale(.7); } 100% { opacity:0; transform:scale(1.35); } }
+@media (prefers-reduced-motion: reduce) { .pd-on::after { animation:none; } }
+.pd-away { background:#9ca3af; }
+.pd-off { background:#9ca3af; }
+.chat-fab { position:fixed; right:20px; bottom:20px; z-index:60; display:flex; align-items:center; gap:8px; height:48px; padding:0 16px 0 14px; border:0; border-radius:999px; background:var(--accent); color:#fff; font:inherit; font-weight:650; box-shadow:0 8px 24px rgba(15,23,42,.22); cursor:pointer; }
+.chat-fab:hover { filter:brightness(1.08); } .chat-fab.on { filter:brightness(.92); }
+.chat-fab[hidden] { display:none; }
+.chat-fab-ic { font-size:18px; }
+.chat-fab .chat-me-dot { box-shadow:0 0 0 2px var(--accent); }
+.chat-badge { position:absolute; top:-6px; right:-4px; min-width:20px; height:20px; padding:0 5px; border-radius:10px; background:var(--danger,#dc2626); color:#fff; font-size:11px; line-height:20px; text-align:center; box-shadow:0 0 0 2px var(--surface); }
+.chat-badge[hidden] { display:none; }
+.chat-panel { position:fixed; right:20px; bottom:80px; z-index:61; width:min(390px,calc(100vw - 24px)); height:min(580px,calc(100vh - 110px)); display:flex; flex-direction:column; background:var(--surface); color:var(--ink); border:1px solid var(--border); border-radius:16px; box-shadow:0 18px 50px rgba(15,23,42,.25); overflow:hidden; }
+.chat-panel[hidden] { display:none; }
+.chat-head { display:flex; align-items:center; gap:10px; padding:12px 14px; border-bottom:1px solid var(--border); background:var(--surface-2); }
+.chat-head > div { flex:1; min-width:0; display:flex; flex-direction:column; }
+.chat-head b { font-size:14px; } .chat-head small { font-size:11.5px; color:var(--ink-2); white-space:nowrap; overflow:hidden; text-overflow:ellipsis; }
+.chat-head .chat-who { flex-direction:row; align-items:center; gap:10px; } .chat-who > div { display:flex; flex-direction:column; min-width:0; }
+.chat-x, .chat-back { flex:none; width:30px; height:30px; border:0; border-radius:8px; background:transparent; color:var(--ink-2); font:inherit; font-size:15px; cursor:pointer; }
+.chat-x:hover, .chat-back:hover { background:var(--surface); color:var(--ink); }
+.chat-legend { display:flex; gap:14px; padding:8px 14px 0; font-size:11px; color:var(--ink-2); } .chat-legend > span { display:inline-flex; align-items:center; gap:6px; }
+.chat-searchbox { padding:10px 14px 6px; } .chat-search { width:100%; }
+.chat-list { flex:1; overflow:auto; padding:4px 8px 10px; }
+.chat-row { width:100%; display:flex; align-items:center; gap:10px; padding:8px 8px; border:0; border-radius:10px; background:transparent; color:var(--ink); font:inherit; text-align:left; cursor:pointer; }
+.chat-row:hover, .chat-row:focus-visible { background:var(--surface-2); }
+.chat-row-t { flex:1; min-width:0; display:flex; flex-direction:column; } .chat-row-t b { font-size:13px; font-weight:600; white-space:nowrap; overflow:hidden; text-overflow:ellipsis; } .chat-row-t small { font-size:11.5px; color:var(--ink-2); white-space:nowrap; overflow:hidden; text-overflow:ellipsis; }
+.chat-av { position:relative; flex:none; width:34px; height:34px; border-radius:50%; display:flex; align-items:center; justify-content:center; background:color-mix(in srgb,var(--accent) 16%,var(--surface)); color:var(--accent); font-size:12px; font-weight:700; }
+.chat-av.all { background:color-mix(in srgb,var(--c-violet,#7c3aed) 16%,var(--surface)); color:var(--c-violet,#7c3aed); font-size:15px; }
+.chat-av .pd { position:absolute; right:-1px; bottom:-1px; }
+.chat-unread { flex:none; min-width:22px; height:22px; padding:0 6px; border-radius:11px; background:var(--accent); color:#fff; font-size:11.5px; font-weight:700; line-height:22px; text-align:center; }
+.chat-msgs { flex:1; overflow:auto; padding:12px 14px; display:flex; flex-direction:column; gap:2px; background:var(--bg,var(--surface)); }
+.chat-day { text-align:center; margin:10px 0 6px; } .chat-day span { font-size:11px; color:var(--ink-2); background:var(--surface-2); padding:2px 10px; border-radius:999px; }
+.chat-msg { display:flex; flex-direction:column; align-items:flex-start; max-width:82%; margin-top:8px; }
+.chat-msg.cont { margin-top:2px; } .chat-msg.mine { align-self:flex-end; align-items:flex-end; }
+.chat-from { font-size:11px; font-weight:600; color:var(--ink-2); margin:0 0 2px 10px; }
+.chat-bubble { padding:8px 12px; border-radius:14px 14px 14px 4px; background:var(--surface-2); color:var(--ink); font-size:13.5px; line-height:1.45; white-space:pre-wrap; overflow-wrap:anywhere; }
+.chat-msg.mine .chat-bubble { background:var(--accent); color:#fff; border-radius:14px 14px 4px 14px; }
+.chat-msg time { font-size:10.5px; color:var(--ink-3,var(--ink-2)); margin:2px 6px 0; }
+.chat-more { align-self:center; font-size:12px; margin-bottom:6px; }
+.chat-compose { display:flex; align-items:flex-end; gap:8px; padding:10px 12px; border-top:1px solid var(--border); background:var(--surface); }
+.chat-in { flex:1; min-height:38px; max-height:120px; resize:none; padding:9px 12px; border:1px solid var(--border); border-radius:12px; background:var(--surface-2); color:var(--ink); font:inherit; font-size:13.5px; line-height:1.4; }
+.chat-in:focus { outline:2px solid color-mix(in srgb,var(--accent) 45%,transparent); outline-offset:0; background:var(--surface); }
+.chat-send { height:38px; border-radius:12px; }
+.chat-empty { padding:24px 16px; text-align:center; color:var(--ink-2); } .chat-empty p { margin:0 0 8px; }
+.chat-warn { padding:6px 12px; font-size:11.5px; color:#92400e; background:#fef3c7; }
+@media (max-width:650px) { .chat-fab { right:12px; bottom:12px; } .chat-fab-t { display:none; } .chat-panel { right:8px; left:8px; width:auto; bottom:70px; height:calc(100vh - 90px); } }
+
+/* ================= v3.19: custom dashboards ================= */
+.cd-page { display:flex; flex-direction:column; gap:16px; margin-top:4px; }
+.cd-page[hidden] { display:none !important; }
+.cd-head { display:flex; flex-wrap:wrap; align-items:center; gap:14px; padding:16px 20px !important; }
+.cd-title { flex:1 1 280px; min-width:0; } .cd-title h2 { margin:0; font-size:17px; } .cd-title p { margin:4px 0 0; font-size:12.5px; color:var(--ink-2); }
+.cd-tools { display:flex; flex-wrap:wrap; align-items:center; gap:8px; } .cd-tools select.input { min-width:200px; max-width:320px; height:34px; }
+.cd-more { position:relative; } .cd-more > summary { list-style:none; cursor:pointer; } .cd-more > summary::-webkit-details-marker { display:none; }
+.cd-menu { position:absolute; right:0; top:calc(100% + 6px); z-index:30; min-width:210px; padding:6px; border:1px solid var(--border); border-radius:10px; background:var(--surface); box-shadow:var(--shadow); display:flex; flex-direction:column; }
+.cd-menu button { text-align:left; border:0; background:transparent; color:var(--ink); font:inherit; font-size:13px; padding:8px 10px; border-radius:7px; cursor:pointer; } .cd-menu button:hover { background:var(--surface-2); } .cd-menu button.danger { color:var(--danger, #c0392b); }
+.cd-grid { display:grid; grid-template-columns:repeat(2,minmax(0,1fr)); gap:16px; align-items:start; }
+.cd-card { padding:16px 18px !important; margin:0 !important; min-width:0; border-radius:14px !important; } .cd-card.full { grid-column:1 / -1; }
+.cd-chead { display:flex; align-items:flex-start; gap:10px; margin-bottom:10px; } .cd-chead h3 { margin:0; font-size:14.5px; } .cd-chead .sub { font-size:11.5px; color:var(--ink-2); margin-top:2px; }
+.cd-ctools { display:flex; gap:6px; align-items:center; flex:none; flex-wrap:wrap; justify-content:flex-end; }
+.cd-seg { display:inline-flex; padding:2px; border-radius:8px; background:var(--surface-2); border:1px solid var(--border); }
+.cd-seg button { border:0; background:transparent; color:var(--ink-2); font:inherit; font-size:12px; font-weight:600; padding:3px 9px; border-radius:6px; cursor:pointer; white-space:nowrap; }
+.cd-seg button[aria-pressed="true"] { background:var(--surface); color:var(--ink); box-shadow:0 1px 2px rgba(15,23,42,.14); }
+.cd-tablewrap td.copynum { cursor:pointer; color:var(--accent); text-decoration:underline dotted; text-underline-offset:3px; }
+.cd-tablewrap td.copynum:hover, .cd-tablewrap td.copynum:focus { background:color-mix(in srgb, var(--accent) 10%, transparent); outline:none; }
+.cd-body { min-width:0; } .cd-svg { width:100%; height:auto; display:block; overflow:visible; }
+.cd-lab { font-size:11px; fill:var(--ink-2); } .cd-val { font-size:11px; font-weight:650; fill:var(--ink); } .cd-ax { font-size:10px; fill:var(--ink-2); } line.cd-grid { stroke:var(--grid, var(--border)); stroke-width:1; }
+.cd-legend { display:flex; flex-wrap:wrap; gap:6px 14px; margin:0 0 8px; font-size:12px; color:var(--ink-2); } .cd-legend i, .cd-dleg i { display:inline-block; width:10px; height:10px; border-radius:3px; margin-right:6px; vertical-align:-1px; }
+.cd-donut-wrap { display:flex; align-items:center; gap:18px; flex-wrap:wrap; } .cd-donut { width:170px; height:170px; flex:none; } .cd-dnum { font-size:20px; font-weight:700; fill:var(--ink); }
+.cd-dleg { list-style:none; margin:0; padding:0; flex:1 1 180px; min-width:0; max-height:220px; overflow:auto; font-size:12.5px; }
+.cd-dleg li { display:flex; align-items:center; gap:6px; padding:4px 0; border-bottom:1px solid var(--border); } .cd-dleg span { flex:1; min-width:0; overflow:hidden; text-overflow:ellipsis; white-space:nowrap; } .cd-dleg b { font-variant-numeric:tabular-nums; } .cd-dleg small { width:38px; text-align:right; color:var(--ink-2); }
+.cd-tablewrap { max-height:320px; overflow:auto; }
+.cd-kpi { display:flex; flex-direction:column; align-items:flex-start; padding:8px 0 4px; } .cd-kpi b { font-size:40px; line-height:1.1; font-variant-numeric:tabular-nums; } .cd-kpi span { color:var(--ink-2); font-size:13px; }
+.cd-empty { text-align:center; padding:36px 20px !important; } .cd-empty-ic { font-size:34px; } .cd-empty h3 { margin:8px 0 4px; } .cd-empty p { color:var(--ink-2); margin:0 0 14px; }
+.cd-tpls { display:flex; flex-direction:column; gap:8px; } .cd-tpl { display:flex; gap:10px; align-items:flex-start; padding:10px 12px; border:1px solid var(--border); border-radius:10px; cursor:pointer; } .cd-tpl:has(input:checked) { border-color:var(--accent); background:color-mix(in srgb,var(--accent) 7%,var(--surface)); } .cd-tpl span { display:flex; flex-direction:column; gap:2px; } .cd-tpl small { color:var(--ink-2); }
+.drawer.cd-drawer { width:min(1000px,100vw) !important; }
+.cd-edit { display:grid; grid-template-columns:minmax(0,1fr) minmax(0,1.1fr); gap:20px; align-items:start; }
+.cd-form .field { margin-bottom:10px; } .cd-form .field > label { display:block; font-size:12px; font-weight:600; margin-bottom:4px; } .cd-form .input { width:100%; } .cd-form .hint { display:block; margin-top:3px; }
+.cd-2 { display:grid; grid-template-columns:1fr 1fr; gap:10px; }
+.cd-filters { display:flex; flex-direction:column; gap:8px; align-items:flex-start; } .cd-filter { width:100%; padding:8px; border:1px solid var(--border); border-radius:8px; } .cd-frow { display:flex; gap:6px; margin-bottom:6px; } .cd-multi { width:100%; }
+.cd-preview { position:sticky; top:0; } .cd-ptitle { font-size:11px; font-weight:700; letter-spacing:.04em; text-transform:uppercase; color:var(--ink-2); margin-bottom:6px; }
+.cd-actions { display:flex; gap:8px; margin-top:14px; }
+@media (max-width:900px) { .cd-grid, .cd-edit { grid-template-columns:1fr; } .cd-preview { position:static; } }
+@media (max-width:520px) { .cd-2 { grid-template-columns:1fr; } .cd-tools select.input { min-width:0; width:100%; } }
 </style></head>
 
 
@@ -1303,10 +1487,10 @@ body.filters-locked #cleanFilters, body.filters-locked #xchips, body.filters-loc
     <p class="gate-sub">One place for your people, priorities and team insights.</p>
     <div id="connectBody"><div class="empty">Loading…</div></div>
   </div>
-  <p class="gate-ver">3.18.0</p>
+  <p class="gate-ver">3.20.1</p>
 </section>
 
-<div id="app" hidden><aside class="sidebar" aria-label="Workspace navigation"><div class="brand dashboard-identity">      <h1><span id="title">Team Dashboard</span><span class="ver" id="ver" title="Version 3.18.0">3.18.0</span></h1><p class="brand-tag">One place for your people, priorities and team insights.</p>      <span class="sync" id="sync" role="status"><i></i><span id="syncText">Loading…</span></span></div><div class="nav-label">WORKSPACE</div>      <nav class="tabs" role="tablist" aria-label="Pages" aria-orientation="vertical">
+<div id="app" hidden><aside class="sidebar" aria-label="Workspace navigation"><div class="brand dashboard-identity">      <h1><span id="title">Team Dashboard</span><span class="ver" id="ver" title="Version 3.20.1">3.20.1</span></h1><p class="brand-tag">One place for your people, priorities and team insights.</p>      <span class="sync" id="sync" role="status"><i></i><span id="syncText">Loading…</span></span></div><div class="nav-label">WORKSPACE</div>      <nav class="tabs" role="tablist" aria-label="Pages" aria-orientation="vertical">
         <button class="tab on" role="tab" aria-controls="pageSummary" data-view="summary" aria-selected="true">Overview</button>
         <button class="tab" role="tab" aria-controls="pageEmployees" data-view="employees" aria-selected="false">Employees</button>
       <button class="tab" role="tab" aria-controls="pageAttendance" data-view="attendance" aria-selected="false">Attendance</button>
@@ -1378,7 +1562,7 @@ body.filters-locked #cleanFilters, body.filters-locked #xchips, body.filters-loc
       </aside>
     </div>
 
-    <div id="pageReports" hidden><div id="reportSticky"><div class="report-controls"><label for="reportGroup">Explore</label><select class="input" id="reportGroup"><option value="team" selected>Team composition</option><option value="growth">Tenure & growth</option><option value="location">Location & travel</option><option value="attendance">Attendance</option></select><button class="btn mini rep-toggle" id="repTables" type="button" aria-pressed="false" title="Show every chart on this page as a table, or back">Show all as tables</button></div></div>      <section class="charts" id="charts" aria-label="Charts">
+    <div id="pageReports" hidden><div id="reportSticky"><div class="report-controls"><label for="reportGroup">Explore</label><select class="input" id="reportGroup"><option value="team" selected>Team composition</option><option value="growth">Tenure & growth</option><option value="location">Location & travel</option><option value="attendance">Attendance</option><option value="custom">📊 Custom dashboards</option></select><button class="btn mini rep-toggle" id="repTables" type="button" aria-pressed="false" title="Show every chart on this page as a table, or back">Show all as tables</button></div></div>      <section class="charts" id="charts" aria-label="Charts">
         <div class="card chart" id="cardStatus"></div>
         <div class="card chart" id="cardTenure"></div>
         <div class="card chart" id="cardTrend"></div>
@@ -1391,7 +1575,7 @@ body.filters-locked #cleanFilters, body.filters-locked #xchips, body.filters-loc
         <div class="card chart" id="cardDist"></div>
         <div class="card chart" id="cardArea"></div>
         <div class="card chart" id="cardAge"></div>
-      </section><div id="attReportsWrap" hidden><div class="section-heading"><div><h2>Attendance</h2><p>Leave, unplanned absences and who is out · from the attendance workbook · linked to your report selection</p></div></div><div id="slotReports"></div></div></div>
+      </section><div id="customDash" class="cd-page" hidden></div><div id="attReportsWrap" hidden><div class="section-heading"><div><h2>Attendance</h2><p>Leave, unplanned absences and who is out · from the attendance workbook · linked to your report selection</p></div></div><div id="slotReports"></div></div></div>
     <div id="pageAttendance" hidden><div id="slotAttendance"><div id="attHost"></div></div></div>
     <div id="pageActions" hidden>
       <div class="section-heading"><div><h2>Action center</h2><p>Everything that needs a decision or a fix, in one place · independent of search and report filters</p></div><span id="todayLabel"></span></div>
@@ -2733,6 +2917,13 @@ const CLOUD = (() => {
   const setSetting = (key, value) => rpc('td_admin_set_setting', { p_token: tok(), p_key: key, p_value: value });
   const setShared = (key, value) => rpc('td_set_shared_setting', { p_token: tok(), p_key: key, p_value: value });
   const saveLeaveRequest = (request, expected) => rpc('td_save_leave_request', { p_token: tok(), p_request: request, p_expected: expected });
+  /* v3.19: team chat and online status (supabase/chat.sql) */
+  const chat = {
+    sync: (state, idle, withId, after) => rpc('td_chat_sync', { p_token: tok(), p_state: state, p_idle: Math.max(0, Math.round(idle || 0)), p_with: withId ?? null, p_after: after || 0 }),
+    send: (withId, body) => rpc('td_chat_send', { p_token: tok(), p_with: withId, p_body: body }),
+    read: (withId, lastId) => rpc('td_chat_read', { p_token: tok(), p_with: withId, p_last_id: lastId || 0 }),
+    history: (withId, before) => rpc('td_chat_history', { p_token: tok(), p_with: withId, p_before: before }),
+  };
   const admin = {
     users: () => rpc('td_admin_list_users', { p_token: tok() }),
     save: (id, name, code, role, active, permissions, loginId) => rpc('td_admin_save_user', { p_token: tok(), p_id: id, p_name: name, p_passcode: code, p_role: role, p_active: active, p_permissions: permissions ?? null, p_login_id: loginId ?? null }),
@@ -2759,6 +2950,8 @@ const CLOUD = (() => {
     dropSession();
     const controller = new AbortController();
     const timeout = setTimeout(() => controller.abort(), 3000);
+    /* v3.19: show everyone this person signed out (grey with ✕) */
+    try { if (token) await rpc('td_chat_sync', { p_token: token, p_state: 'offline', p_idle: 0, p_with: null, p_after: 0 }, controller.signal); } catch { }
     try { if (token) await rpc('td_logout', { p_token: token }, controller.signal); } catch { }
     finally { clearTimeout(timeout); location.reload(); }
   }
@@ -2849,7 +3042,9 @@ const CLOUD = (() => {
   }
   /* v3.11: "Manage passcodes" is now Settings > People & access */
   function openAdmin() { if (session && session.role === 'superadmin' && window.openSettings) window.openSettings('people'); }
-  return { SUPABASE_CONFIG, changeMyPasscode, card, resume, mode, decorate, signOut, useLocalFiles, openAdmin, configured, isAdmin, refreshMe, user, getSettings, setSetting, setShared, saveLeaveRequest, admin, _rpc: rpc };
+  /* v3.19.1: custom dashboards are saved one at a time; the database checks who owns each one */
+  const saveDashboard = (dash, remove) => rpc('td_save_dashboard', { p_token: tok(), p_dash: dash, p_remove: !!remove });
+  return { SUPABASE_CONFIG, saveDashboard, chat, changeMyPasscode, card, resume, mode, decorate, signOut, useLocalFiles, openAdmin, configured, isAdmin, refreshMe, user, getSettings, setSetting, setShared, saveLeaveRequest, admin, _rpc: rpc };
 })();
 
 /* =====================================================================
@@ -2860,20 +3055,21 @@ const CLOUD = (() => {
 (() => {
 /* v3.13: rights are grouped by module. A module with a page has a "can open" box; its items sit underneath. */
 const PERM_GROUPS = [
-  { name: 'Overview', page: 'page.overview', items: [['ov.attendance', 'See the attendance card'], ['ov.openatt', 'See the “Open attendance →” button on the attendance card'], ['ov.coming', 'See birthdays and work anniversaries'], ['ov.holidays', 'See USA and India holidays'], ['ov.watch', 'See leave red flags and day patterns']], sub: { title: 'Request Center', items: [['requests.own', 'See Your requests'], ['requests.rejected', 'See Rejected request log (within notification audience)'], ['requests.approvals', 'See Approval requests'], ['att.approve', 'Approve or reject leave requests and edit approved leave']] } },
+  { name: 'Overview', page: 'page.overview', items: [['ov.attendance', 'See the attendance card'], ['ov.openatt', 'See the “Open attendance →” button on the attendance card'], ['ov.coming', 'See birthdays and work anniversaries'], ['ov.holidays', 'See USA and India holidays'], ['ov.watch', 'See leave red flags and day patterns']], sub: { title: 'Request Center', items: [['requests.own', 'See Waiting and History (their own and their group’s requests)'], ['requests.rejected', 'Also see rejected requests from their notification audience in History'], ['att.approve', 'Manager: approve or reject leave requests (shows the To approve tab) and edit approved leave']] } },
   { name: 'Employees', page: 'page.employees', items: [['emp.edit', 'Edit employee details'], ['emp.add', 'Add employees'], ['emp.delete', 'Delete employees'], ['emp.bulk', 'Fill in bulk and add columns'], ['emp.fields', 'Add new fields (new Excel columns)']] },
   { name: 'Attendance', page: 'page.attendance', items: [['att.who', 'See Who’s out'], ['att.grid', 'See the attendance grid and People'], ['att.log', 'Use Log leave (with the leave types ticked below)'], ['att.direct', 'Log leave straight into attendance (no manager approval)'], ['att.edit', 'Mark attendance in day cells'], ['att.rows', 'Edit any cell or row in the tracker (names, Emp IDs, clients, days) and delete rows'], ['att.holidays', 'Add holidays for everyone'], ['att.fields', 'Add fields to the attendance tracker'], ['att.addemp', 'Add employees to the attendance tracker (new rows, start a month)']],
     /* v3.14.2: which leave types appear in the Log leave “Type” list */
     sub: { title: 'Leave types in Log leave', items: [['log.LA', 'LA · Leave application (pending)'], ['log.AL', 'AL · Approved leave'], ['log.CL', 'CL · Casual leave'], ['log.SL', 'SL · Sick leave'], ['log.UL', 'UL · Unplanned leave'], ['log.AB', 'AB · Absent'], ['log.HD1', 'HD1 · Half day, 1st half'], ['log.HD2', 'HD2 · Half day, 2nd half'], ['log.R', 'R · Remote'], ['log.L', 'L · Late coming'], ['log.C', 'C · Cab late']] } },
   { name: 'Action center', page: 'page.actions', items: [['act.items', 'See Action items'], ['act.review', 'See Designation reviews'], ['act.health', 'See Attendance data health']] },
-  { name: 'Reports', page: 'page.reports', items: [['rep.team', 'Team composition'], ['rep.growth', 'Tenure & growth'], ['rep.location', 'Location & travel'], ['rep.attendance', 'Attendance reports'], ['rep.export', 'Copy report tables and charts']] },
+  { name: 'Reports', page: 'page.reports', items: [['rep.team', 'Team composition'], ['rep.growth', 'Tenure & growth'], ['rep.location', 'Location & travel'], ['rep.attendance', 'Attendance reports'], ['rep.custom', 'See custom dashboards (their own and shared ones)'], ['rep.export', 'Copy report tables and charts'], ['rep.build', 'Create and edit custom dashboards']] },
   { name: 'Save & sync', items: [['sync.view', 'Open the Save & sync settings'], ['sync.auto', 'Start or stop auto-sync'], ['sync.save', 'Save now and undo']] },
 
+  { name: 'Chat', items: [['chat.use', 'Use team chat and see who is online'], ['chat.all', 'Post in the Everyone room']] },
   { name: 'Notifications', items: [['notifications.view', 'Open notifications and receive request updates'], ['activity.view', 'See the activity log for all users']] },
   { name: 'Filters', items: [['filters.custom', 'Change the filters (search, status, client…)']] },
   { name: 'Settings', items: [['set.fields', 'Choose the mandatory fields'], ['set.workbook', 'Backups, sign-in history and replacing the workbook'], ['workbook.download', 'Download a copy of the workbook'], ['tools.distance', 'Use the distance tool']] },
 ];
-const PERM_VERSION = 10;
+const PERM_VERSION = 12;
 const LOG_CODES = ['AL', 'CL', 'SL', 'UL', 'AB', 'HD1', 'HD2', 'LA', 'R', 'L', 'C'];
 /* the leave types a passcode could log before 3.14.2 (approval codes with Approve leave, LA always, the rest with Mark and edit) */
 const oldLogKeys = p => LOG_CODES.filter(c => ['AL', 'CL', 'SL'].includes(c) ? p['att.approve'] : c === 'LA' ? true : p['att.edit']).map(c => 'log.' + c);
@@ -2883,17 +3079,18 @@ const PAGE_OF = { summary: 'page.overview', employees: 'page.employees', attenda
 const pick = keys => Object.fromEntries([['_v', PERM_VERSION], ...PERM_KEYS.map(k => [k, ['notifications.view', 'requests.own', 'requests.rejected'].includes(k) || (k === 'requests.approvals' && keys.includes('att.approve')) || keys.includes(k)])]);
 const ROLE_NAMES = { superadmin: 'Super admin', admin: 'Admin', user: 'User' };
 /* v3.14: what a page shows by default once someone may open it (red flags and new fields stay off until ticked) */
-const VIEW_KEYS = ['ov.attendance', 'ov.coming', 'ov.holidays', 'act.items', 'act.review', 'act.health', 'rep.team', 'rep.growth', 'rep.location', 'rep.attendance', 'rep.export'];
+const VIEW_KEYS = ['chat.use', 'ov.attendance', 'ov.coming', 'ov.holidays', 'act.items', 'act.review', 'act.health', 'rep.team', 'rep.growth', 'rep.location', 'rep.attendance', 'rep.custom', 'rep.export'];
 /* v3.17: rights that change data; everything else only lets someone see things. Used by the None / View / Edit switch per module. */
-const EDIT_KEYS = new Set(['att.approve', 'emp.edit', 'emp.add', 'emp.delete', 'emp.bulk', 'emp.fields', 'att.log', 'att.direct', 'att.edit', 'att.rows', 'att.holidays', 'att.fields', 'att.addemp', ...LOG_CODES.map(c => 'log.' + c), 'sync.auto', 'sync.save', 'filters.custom', 'set.fields', 'set.workbook']);
+const EDIT_KEYS = new Set(['att.approve', 'emp.edit', 'emp.add', 'emp.delete', 'emp.bulk', 'emp.fields', 'att.log', 'att.direct', 'att.edit', 'att.rows', 'att.holidays', 'att.fields', 'att.addemp', ...LOG_CODES.map(c => 'log.' + c), 'sync.auto', 'sync.save', 'filters.custom', 'set.fields', 'set.workbook', 'chat.all', 'rep.build']);
+const UPG = new WeakMap();
 window.PERM = {
   groups: PERM_GROUPS, keys: PERM_KEYS, roleNames: ROLE_NAMES, version: PERM_VERSION, isEditKey: k => EDIT_KEYS.has(k),
   presets: {
     'Full access': pick(PERM_KEYS),
     'Admin': pick(PERM_KEYS),
-    'Editor': pick([...PAGES, ...VIEW_KEYS, 'ov.openatt', ...oldLogKeys({ 'att.edit': true }), 'emp.edit', 'emp.add', 'emp.bulk', 'att.who', 'att.grid', 'att.log', 'att.edit', 'att.rows', 'att.addemp', 'filters.custom', 'activity.view', 'tools.distance', 'sync.view', 'sync.auto', 'sync.save']),
-    'Leave approver': pick([...PAGES, ...VIEW_KEYS, 'ov.openatt', ...LOG_CODES.map(c => 'log.' + c), 'att.direct', 'ov.watch', 'att.who', 'att.grid', 'att.log', 'att.edit', 'att.rows', 'att.approve', 'filters.custom', 'activity.view', 'sync.view', 'sync.auto', 'sync.save']),
-    'Leave logger': pick(['page.overview', 'page.attendance', 'ov.attendance', 'ov.coming', 'att.who', 'att.log', 'log.LA', 'sync.save']),
+    'Editor': pick([...PAGES, ...VIEW_KEYS, 'chat.all', 'ov.openatt', 'rep.build', ...oldLogKeys({ 'att.edit': true }), 'emp.edit', 'emp.add', 'emp.bulk', 'att.who', 'att.grid', 'att.log', 'att.edit', 'att.rows', 'att.addemp', 'filters.custom', 'activity.view', 'tools.distance', 'sync.view', 'sync.auto', 'sync.save']),
+    'Leave approver': pick([...PAGES, ...VIEW_KEYS, 'chat.all', 'ov.openatt', ...LOG_CODES.map(c => 'log.' + c), 'att.direct', 'ov.watch', 'att.who', 'att.grid', 'att.log', 'att.edit', 'att.rows', 'att.approve', 'filters.custom', 'activity.view', 'sync.view', 'sync.auto', 'sync.save']),
+    'Leave logger': pick(['chat.use', 'page.overview', 'page.attendance', 'ov.attendance', 'ov.coming', 'att.who', 'att.log', 'log.LA', 'sync.save']),
     'View only': pick([...PAGES, ...VIEW_KEYS, 'att.who', 'att.grid']),
   },
   online: () => CLOUD.mode() === 'cloud' && !!CLOUD.user(),
@@ -2909,6 +3106,9 @@ window.PERM = {
     /* v3.16: editing rows and adding employees in the tracker became their own rights; keep what Mark and edit used to allow */
     if (q._v < 9) { q['att.rows'] = !!q['att.edit']; q['att.addemp'] = !!q['att.edit']; }
     /* v3.17: the Open attendance button must be given on purpose; the holidays card is shown to anyone who sees the Overview */
+    /* v3.19: custom dashboards: anyone who can open Reports sees them; building them must be given on purpose */
+    if (q._v < 12) { q['rep.custom'] = !!q['page.reports']; q['rep.build'] = false; }
+    if (q._v < 11) { q['chat.use'] = true; q['chat.all'] = true; }
     if (q._v < 10) { q['ov.openatt'] = false; q['ov.holidays'] = !!q['page.overview']; }
     if (q._v < 8) { q['requests.own'] = true; q['requests.rejected'] = true; q['requests.approvals'] = !!q['att.approve']; }
     if (q._v < 2) { q['att.who'] = !!q['page.attendance']; q['att.grid'] = !!q['page.attendance']; q['att.log'] = !!q['att.edit']; }
@@ -2924,7 +3124,9 @@ window.PERM = {
     if (!this.online()) return true; const u = CLOUD.user(); if (u.role === 'superadmin') return true;
     const p = u.permissions || {};
     if (!p._v) return true;   // rights never set: full access, as before
-    return !!this.upgrade(p)[k];
+    /* v3.18: upgrade once per rights object instead of on every check (this runs thousands of times per screen) */
+    let q = UPG.get(p); if (!q) { q = this.upgrade(p); UPG.set(p, q); }
+    return !!q[k];
   },
   /* the employee this passcode is linked to (optional): the default person in Log leave */
   linkedEmp() { const u = this.online() ? CLOUD.user() : null; const p = (u && u.permissions) || {}; return p._emp ? { code: String(p._emp), name: p._empName || '' } : null; },
@@ -2933,6 +3135,16 @@ window.PERM = {
   canWrite() { return (this.online() && Array.isArray(CLOUD.user()?.permissions?._attendanceFields) && CLOUD.user().permissions._attendanceFields.length > 0) || ['emp.edit', 'emp.add', 'emp.delete', 'emp.bulk', 'emp.fields', 'att.log', 'att.edit', 'att.rows', 'att.addemp', 'att.approve', 'att.holidays', 'att.fields'].some(k => this.can(k)); },
   canView(view) { return view === 'settings' || this.can(PAGE_OF[view] || 'page.overview'); },
   firstView() { return Object.keys(PAGE_OF).find(v => this.canView(v)) || 'summary'; },
+  /* v3.20: user groups. People in the same group see each other's attendance requests and request notifications.
+     Kept in the team settings (key user_groups) as [{ id, name, members: [{ id, name }] }]; only the super admin changes them. */
+  userGroups() { const g = (window.TD_SETTINGS || {}).user_groups; return Array.isArray(g) ? g.filter(x => x && Array.isArray(x.members)) : []; },
+  groupsOf(userId) { const id = String(userId ?? ''); return id ? this.userGroups().filter(g => g.members.some(m => String(m && m.id != null ? m.id : m) === id)) : []; },
+  myUserGroups() { return this.online() ? this.groupsOf(CLOUD.user()?.id) : []; },
+  groupMates() {
+    const me = this.online() ? String(CLOUD.user()?.id ?? '') : '', out = new Set(); if (!me) return out;
+    for (const g of this.groupsOf(me)) for (const m of g.members) { const id = String(m && m.id != null ? m.id : m); if (id && id !== me) out.add(id); }
+    return out;
+  },
 };
 })();
 </script>
@@ -4403,9 +4615,58 @@ function seasonalityCard() {
     ${rowsHtml ? `<h3 style="margin:16px 0 6px;font-size:13px">Each person’s usual leave month</h3><div class="sub">People with 3+ leave days in the history, most leave first. “Share” is how much of their leave falls in that month.</div>
     <div class="rtab-wrap" style="max-height:260px;overflow:auto"><table class="rtab" style="width:100%"><thead><tr><th>Employee</th><th>Usually takes leave in</th><th class="n">Days that month</th><th class="n">Share</th></tr></thead><tbody>${rowsHtml}</tbody></table></div>` : ''}</div>`;
 }
+/* v3.19: which weekdays each person takes leave on (Mon–Fri), over a look-back period, with a team summary */
+const wdUi = () => S.ui.wd || (S.ui.wd = { look: 180, only: 'pattern', q: '' });
+function weekdayLeaveData() {
+  const u = wdUi(), d = D(), end = TODAY.getTime(), start = u.look ? end - (u.look - 1) * DAY_MS : null;
+  const team = [0, 0, 0, 0, 0, 0, 0], people = [];
+  for (const p of d.people.values()) {
+    if (S.ui.client !== 'all' && !p.rows.some(r => clientGroup(r.client) === S.ui.client)) continue;
+    const at = personDayReader(p), wd = [0, 0, 0, 0, 0, 0, 0], dates = [[], [], [], [], [], [], []];
+    const first = start != null ? start : Math.min(...p.rows.map(r => dateOf(r.month, 0).getTime()));
+    for (let t = first; t <= end; t += DAY_MS) {
+      const dt = new Date(t), w = dt.getUTCDay(); if (w === 0 || w === 6) continue;
+      const c = catOf(at(dt)); const v = FULL_LEAVE.has(c) ? 1 : c === 'half' ? 0.5 : 0; if (!v) continue;
+      wd[w] += v; dates[w].push(shortDate(dt) + (v < 1 ? ' (½)' : ''));
+    }
+    const n = wd.reduce((a, b) => a + b, 0); if (!n) continue;
+    for (let w = 1; w <= 5; w++) team[w] += wd[w];
+    let top = 1; for (let w = 2; w <= 5; w++) if (wd[w] > wd[top]) top = w;
+    const monFri = wd[1] + wd[5];
+    let kind = '', text = 'Spread across the week', strength = 0;
+    if (n >= 3 && wd[top] >= 2 && wd[top] / n >= 0.5) { kind = 'day'; strength = wd[top] / n; text = `Mostly ${['', 'Mondays', 'Tuesdays', 'Wednesdays', 'Thursdays', 'Fridays'][top]} · ${fmt(wd[top])} of ${fmt(n)}`; }
+    else if (n >= 4 && monFri / n >= 0.6) { kind = 'weekend'; strength = monFri / n; text = `Next to weekends (Mon + Fri) · ${fmt(monFri)} of ${fmt(n)}`; }
+    people.push({ k: p.key, name: p.name, client: p.latest ? p.latest.client : '', wd, dates, n, top, kind, text, strength });
+  }
+  people.sort((a, b) => (!!b.kind - !!a.kind) || b.strength - a.strength || b.n - a.n || a.name.localeCompare(b.name));
+  return { people, team, u };
+}
+function weekdayLeaveCard() {
+  const { people, team, u } = weekdayLeaveData();
+  const DAYN = ['', 'Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday'];
+  const tTot = team.reduce((a, b) => a + b, 0), q = (u.q || '').trim().toLowerCase();
+  const flagged = people.filter(p => p.kind), list = people.filter(p => (u.only === 'pattern' ? p.kind : p.n >= 3) && (!q || p.name.toLowerCase().includes(q)));
+  const lookSel = `<select data-bind="wd-look">${[[90, 'Last 90 days'], [180, 'Last 180 days'], [365, 'Last 12 months'], [0, 'All history']].map(([v, l]) => `<option value="${v}"${u.look === v ? ' selected' : ''}>${l}</option>`).join('')}</select>`;
+  const onlySel = `<select data-bind="wd-only"><option value="pattern"${u.only === 'pattern' ? ' selected' : ''}>People with a pattern</option><option value="all"${u.only === 'all' ? ' selected' : ''}>Everyone with 3+ leave days</option></select>`;
+  let teamTop = 1; for (let w = 2; w <= 5; w++) if (team[w] > team[teamTop]) teamTop = w;
+  const mf = tTot ? Math.round(((team[1] + team[5]) / tTot) * 100) : 0;
+  const insight = tTot ? `Across the team, <b>${DAYN[teamTop]}</b> is the most common leave day (${Math.round(team[teamTop] / tTot * 100)}% of weekday leave). Mondays + Fridays make up <b>${mf}%</b> (an even spread would be 40%).${mf >= 50 ? ' That leans towards long weekends.' : ''} <b>${flagged.length}</b> ${flagged.length === 1 ? 'person has' : 'people have'} a clear day pattern.` : 'No leave recorded in this period.';
+  const bars = [1, 2, 3, 4, 5].map(w => { const pc = tTot ? team[w] / tTot : 0, hot = w === teamTop && tTot; return `<div style="flex:1;min-width:0" data-tip="${esc(DAYN[w] + ': ' + fmt(team[w]) + ' leave days (' + Math.round(pc * 100) + '%)')}"><div style="height:8px;border-radius:4px;background:var(--line);overflow:hidden"><div style="height:100%;width:${Math.round(pc * 100)}%;background:${hot ? 'var(--orange)' : 'var(--blue)'}"></div></div><div class="sm" style="display:flex;justify-content:space-between;margin-top:3px"><span${hot ? ' style="font-weight:700"' : ''}>${WEEKDAYS[w]}</span><span class="muted">${Math.round(pc * 100)}%</span></div></div>`; }).join('');
+  const cell = (p, w) => { const v = p.wd[w]; if (!v) return `<td class="n muted" style="text-align:center">·</td>`; const a = Math.max(0.12, v / Math.max(...p.wd)); const isTop = w === p.top && p.kind === 'day' || (p.kind === 'weekend' && (w === 1 || w === 5));
+    return `<td class="n" style="text-align:center;background:color-mix(in srgb, var(--orange) ${Math.round(a * 45)}%, transparent);${isTop ? 'font-weight:800' : ''}" data-tip="${esc(p.name + ' · ' + DAYN[w] + 's: ' + fmt(v) + ' leave day' + (v === 1 ? '' : 's') + '<br>' + p.dates[w].slice(-12).join(', ') + (p.dates[w].length > 12 ? ' …' : ''))}">${fmt(v)}</td>`; };
+  const rowsHtml = list.slice(0, 200).map(p => `<tr><td><b>${esc(p.name)}</b>${p.client ? `<div class="sm muted">${esc(p.client)}</div>` : ''}</td>${[1, 2, 3, 4, 5].map(w => cell(p, w)).join('')}<td class="n" style="text-align:center">${fmt(p.n)}</td><td>${p.kind ? `<span class="tag ${p.kind === 'weekend' ? 'crit' : ''}" style="white-space:nowrap">${p.kind === 'weekend' ? '🗓️ ' : '📌 '}${esc(p.text)}</span>` : `<span class="sm muted">${esc(p.text)}</span>`}</td></tr>`).join('');
+  window.attendanceWeekdayExport = { title: 'Leave by weekday per employee', headers: ['Employee', 'Client', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Total', 'Pattern'], rows: list.map(p => [p.name, p.client, p.wd[1], p.wd[2], p.wd[3], p.wd[4], p.wd[5], p.n, p.text]) };
+  return `<div class="card" style="margin-bottom:14px"><div style="display:flex;gap:10px;align-items:baseline;flex-wrap:wrap"><h2 style="margin:0">Which weekdays people take leave</h2><span class="grow"></span>
+      <label class="sm muted">Period ${lookSel}</label><label class="sm muted">Show ${onlySel}</label><input type="search" data-bind="wdq" placeholder="Search a name" value="${esc(u.q || '')}" style="width:170px"></div>
+    <div class="sub" style="margin-top:2px">Weekday leave only (AL, CL, SL, UL, AB = 1 day · half day = ½). A “pattern” is half or more of someone’s leave on one weekday, or 60%+ on Mondays and Fridays. Hover a number for the dates.</div>
+    <p style="margin:10px 0;font-size:13px;line-height:1.5">💡 ${insight}</p>
+    <div style="display:flex;gap:10px;margin:0 0 14px">${bars}</div>
+    ${list.length ? `<div style="max-height:440px;overflow:auto;border:1px solid var(--line);border-radius:8px"><table class="rtab" style="width:100%"><thead><tr><th>Employee</th><th class="n" style="text-align:center">Mon</th><th class="n" style="text-align:center">Tue</th><th class="n" style="text-align:center">Wed</th><th class="n" style="text-align:center">Thu</th><th class="n" style="text-align:center">Fri</th><th class="n" style="text-align:center">Total</th><th>Pattern</th></tr></thead><tbody>${rowsHtml}</tbody></table></div>${list.length > 200 ? `<p class="sm muted">Showing the first 200 of ${list.length}. Search to narrow down.</p>` : ''}` : `<div class="empty">${u.only === 'pattern' ? 'Nobody has a clear weekday pattern in this period. Switch “Show” to everyone to see the full breakdown.' : 'No one matches.'}</div>`}
+  </div>`;
+}
 function reportsView() {
   const d = D(), rows = periodRows(), a = agg(rows), p = S.ui.period, isMonth = p.startsWith('m:');
-  const timelineHtml = attTimelineCard(rows);
+  const timelineHtml = attTimelineCard(rows), weekdayHtml = weekdayLeaveCard();
   const thr = S.ui.thr[isMonth ? 'month' : 'long'];
   let prev = null; if (isMonth) { const i = d.months.indexOf(+p.slice(2)); if (i > 0) { const pr = d.byMonth.get(d.months[i - 1]); prev = { a: agg(S.ui.client === 'all' ? pr : pr.filter(r => clientGroup(r.client) === S.ui.client)), label: monthLabel(d.months[i - 1]) }; } }
   const dl = (cur, old, label) => { if (!prev) return `<div class="delta">&nbsp;</div>`; const x = cur - old; const cls = x > 0 ? 'up' : x < 0 ? 'down' : ''; return `<div class="delta"><span class="${cls}">${x > 0 ? '▲' : x < 0 ? '▼' : '='} ${x > 0 ? '+' : ''}${fmt(x)}</span> vs ${prev.label.slice(0, 3)}</div>`; };
@@ -4435,6 +4696,7 @@ function reportsView() {
  {title:'Leave days by month',headers:['Month',...SERIES.map(s=>s.name),'Total'],rows:monthly.map(m=>{const v=SERIES.map(s=>m.rows.reduce((a,r)=>a+s.f(rowStats(r)),0));return [monthLabel(m.month),...v,v.reduce((a,b)=>a+b,0)];})},
  {title:'Most leave days · '+periodLabel(),headers:['Employee','Leave days','Unplanned','Late'],rows:top.map(x=>[x.label,x.v,x.u,x.late])},
  {title:'Leave days by client group',headers:['Client group','Leave days','People'],rows:cl.map(x=>[x.label,x.v,x.people.size])},
+ ...(window.attendanceWeekdayExport ? [window.attendanceWeekdayExport] : []),
  (()=>{const z=leaveSeasonality();return {title:'Leave by month of the year',headers:['Month','Leave days per person','Leave days','Person-months'],rows:z.cal.map(c=>[c.name,Math.round(c.avg*100)/100,c.days,c.rows])};})(),
  {title:'Needs attention · '+periodLabel(),headers:['Employee','Unplanned','Leave days','Late','Applications'],rows:flags.map(o=>[o.x.label,o.x.u,o.x.v,o.x.late,o.x.la])}
  ];
@@ -4449,6 +4711,7 @@ function reportsView() {
     </div>
     ${timelineHtml}
     ${seasonalityCard()}
+    ${weekdayHtml}
     <div class="grid g2" style="margin-bottom:14px">
       <div class="card"><h2>Leave days by month</h2><div class="sub">Click a month to focus the whole dashboard on it.</div>${T ? rtable(EX('Leave days by month')) : stackChart(monthly, { selectable: true, sel: isMonth ? +p.slice(2) : null })}</div>
       <div class="card"><h2>Most leave days · ${esc(periodLabel())}</h2><div class="sub">Top 10 people. Click a bar to filter all reports to that person.</div>${T ? rtable(EX('Most leave days')) : hbars(top, { link: true })}</div>
@@ -5585,45 +5848,75 @@ window.requestAuditEntries = () => reqList().flatMap(r => {
   if (r.status !== 'pending') events.push({...common,eventId:'request:'+r.id+':'+r.status+':'+r.decidedAt,time:r.decidedAt,user:r.decidedBy || r.by,userId:r.decidedById || r.byId,action:'request-'+r.status,details:{note:common.details.note+(r.reason ? ' · Reason: '+r.reason : '')}});
   return events;
 });
-const REQUEST_CARD_CSS = ":host {height:100%;font-size:13px;} .card {height:100%;max-height:none;display:flex;flex-direction:column;padding:0 !important;border:0 !important;border-radius:0;box-shadow:none !important;background:transparent !important;} .card > h2 {display:none;} .card > div[style*=max-height] {max-height:300px !important;} .request-heading h2 {font-size:12px !important;color:var(--ink-2);font-weight:600;} .card h2 {font-size:13px;} .card .sub {font-size:11px;line-height:1.4;margin-bottom:6px;} .card .empty {padding:10px 0;min-height:0;font-size:12px;} .card > div[style] {min-height:0;}";
-function renderRequestHistory() {
-  const me = myId();
-  const own = reqList().filter(r => me && String(r.byId) === me).sort((a,b) => (b.at || '').localeCompare(a.at || ''));
-  const rejected = reqList().filter(r => r.status === 'rejected' && (String(r.byId) === me || window.requestNotificationVisible?.(r))).sort((a,b) => (b.decidedAt || '').localeCompare(a.decidedAt || ''));
-  const row = r => `<div class="request-history-row"><div><b>${esc(r.name)}</b><div class="sm">${esc(r.code)} · ${esc(reqDatesText(r.dates || []))}</div><div class="sm muted">Requested by ${esc(r.by)} · ${esc(reqWhen(r.at))}</div>${r.note ? `<div class="sm">Note: ${esc(r.note)}</div>` : ''}${r.decidedBy ? `<div class="sm muted">${esc(r.status)} by ${esc(r.decidedBy)} · ${esc(reqWhen(r.decidedAt))}</div>` : ''}${r.reason ? `<div class="sm">Reason: ${esc(r.reason)}</div>` : ''}</div><span class="pill ${r.status === 'approved' ? 'ok' : ''}">${r.status === 'pending' ? 'Pending approval' : esc(r.status[0].toUpperCase() + r.status.slice(1))}</span>${r.status === 'pending' && String(r.byId) === me ? `<button class="btn sm" data-cancel="${esc(r.id)}">Cancel request</button>` : ''}</div>`;
-  const draw = (id, title, description, items, visible) => {
-    const host = document.getElementById(id); if (!host) return;
-    host.hidden = !visible; const root = host.shadowRoot || host.attachShadow({mode:'open'});
-    if (!visible) { root.innerHTML = ''; return; }
-    root.innerHTML = `<style>${ATT_CSS}${REQUEST_CARD_CSS}.request-history-row { display:flex;flex-wrap:wrap;align-items:center;gap:8px;padding:8px 0;border-bottom:1px solid var(--line); } .request-history-row>div { flex:1 1 240px;min-width:0;overflow-wrap:anywhere; }</style><div class="card"><h2>${esc(title)}</h2><div class="sub">${esc(description)}</div><div style="max-height:180px;overflow:auto">${items.length ? items.map(row).join('') : '<div class="empty">No requests to show.</div>'}</div></div>`;
-    root.querySelectorAll('[data-cancel]').forEach(b => { b.onclick = async () => { b.disabled = true; try { await cancelRequest(b.dataset.cancel); } finally { renderRequestHistory(); } }; });
-  };
-  draw('cardMyRequests', `Your requests · ${own.filter(r => r.status === 'pending').length} pending`, 'Your pending requests and decisions.', own, !!me && can('requests.own'));
-  draw('cardRejectedRequests', `Rejected request log · ${rejected.length}`, 'Decision history and rejection reasons.', rejected, !!me && can('requests.rejected') && (!!rejected.length || !!window.PERM?.can('notifications.view')));
+/* ---------- v3.20: one Request Center. Every request appears in exactly one place:
+   To approve (pending, you can decide it) · Waiting (pending, sent by you or your group) · History (decided).
+   People in the same user group see each other's requests. ---------- */
+const RC = { hist: 'all', scope: 'group' };
+const rcMates = () => { try { return window.PERM && PERM.groupMates ? PERM.groupMates() : new Set(); } catch { return new Set(); } };
+const rcMine = r => { const me = myId(); return !!me && String(r.byId) === me; };
+const rcGroup = r => rcMates().has(String(r.byId));
+function requestBuckets() {
+  const me = myId(), mates = rcMates();
+  const inScope = r => (me && String(r.byId) === me) || (RC.scope !== 'mine' && mates.has(String(r.byId)));
+  const approvals = canDecide() ? reqList().filter(r => r.status === 'pending' && inMyScope(r)).sort((a, b) => (a.at || '').localeCompare(b.at || '')) : [];
+  const deciding = new Set(approvals.map(r => r.id));
+  const waiting = can('requests.own') ? reqList().filter(r => r.status === 'pending' && !deciding.has(r.id) && inScope(r)).sort((a, b) => (b.at || '').localeCompare(a.at || '')) : [];
+  const seeRejected = r => r.status === 'rejected' && can('requests.rejected') && (RC.scope !== 'mine' || rcMine(r)) && !!window.requestNotificationVisible?.(r);
+  const history = (can('requests.own') || can('requests.rejected')) ? reqList().filter(r => r.status !== 'pending' && ((can('requests.own') && (inScope(r) || (me && String(r.decidedById) === me && RC.scope !== 'mine'))) || seeRejected(r)))
+    .sort((a, b) => (b.decidedAt || b.at || '').localeCompare(a.decidedAt || a.at || '')) : [];
+  return { approvals, waiting, history, hasGroup: mates.size > 0 };
 }
-
+const REQUEST_CARD_CSS = ":host {display:block;font-size:13px;} .rc {display:flex;flex-direction:column;gap:8px;} .rc-top {display:flex;flex-wrap:wrap;align-items:center;gap:6px;} .rc-top .grow {flex:1;} .rc-sub {margin:0;font-size:11.5px;line-height:1.4;color:var(--ink-2);} .rc-chips {display:flex;flex-wrap:wrap;gap:4px;} .rc-chip {border:1px solid var(--line);background:transparent;color:var(--ink-2);border-radius:999px;padding:2px 9px;font:inherit;font-size:11.5px;cursor:pointer;} .rc-chip[aria-pressed=true] {background:var(--ink);border-color:var(--ink);color:var(--surface, #fff);} .rc-list {max-height:300px;overflow:auto;} .rq {display:flex;flex-wrap:wrap;align-items:flex-start;gap:6px 10px;padding:9px 0;border-bottom:1px solid var(--line);} .rq:last-child {border-bottom:0;} .rq-main {flex:1 1 220px;min-width:0;overflow-wrap:anywhere;} .rq-main b {font-weight:650;} .rq-code {display:inline-block;margin-left:6px;padding:0 6px;border-radius:5px;background:var(--wash, rgba(127,127,127,.12));font-size:11px;font-weight:650;} .rq-l {display:block;font-size:12px;color:var(--ink-2);margin-top:1px;} .rq-l.q {font-style:italic;} .rq-side {display:flex;flex-wrap:wrap;align-items:center;gap:6px;} .rq-st {font-size:11px;font-weight:650;padding:2px 8px;border-radius:999px;background:var(--wash, rgba(127,127,127,.12));color:var(--ink-2);white-space:nowrap;} .rq-st.approved {background:rgba(34,160,90,.14);color:#1c8a4c;} .rq-st.rejected {background:rgba(227,73,72,.13);color:#c63b3a;} .rq-st.pending {background:rgba(217,164,0,.16);color:#9a7400;} .rq-you {font-size:10.5px;font-weight:650;color:var(--accent, #3b6cf6);margin-left:6px;padding:0 6px;border:1px solid currentColor;border-radius:5px;} .rc-empty {padding:14px 0;text-align:center;font-size:12px;color:var(--ink-2);} .rc-note {margin:0;font-size:12px;color:var(--ink-2);} select {font:inherit;font-size:12px;height:28px;}";
+function rqRow(r, actions) {
+  const who = rcMine(r) ? 'you' : r.by, st = r.status === 'pending' ? 'Pending' : r.status[0].toUpperCase() + r.status.slice(1);
+  const decided = r.status !== 'pending' && r.decidedBy ? (r.status === 'cancelled' ? 'Cancelled' : st) + ' by ' + (String(r.decidedById) === myId() ? 'you' : r.decidedBy) + ' · ' + reqWhen(r.decidedAt) : '';
+  const changed = r.status === 'approved' && r.asked && r.asked !== r.code ? ' (asked for ' + r.asked + ')' : '';
+  return `<div class="rq"><div class="rq-main"><b>${esc(r.name)}</b><span class="rq-code">${esc(r.code)}</span>${changed ? `<span class="sm muted">${esc(changed)}</span>` : ''}${rcGroup(r) ? '<span class="rq-you" title="Sent by someone in your group">Group</span>' : ''}
+    <span class="rq-l">${esc(reqDatesText(r.dates || []))}</span>
+    <span class="rq-l">Sent by ${esc(who)} · ${esc(reqWhen(r.at))}${decided ? ' · ' + esc(decided) : ''}</span>
+    ${r.note ? `<span class="rq-l q">“${esc(r.note)}”</span>` : ''}${r.reason ? `<span class="rq-l"><b>Reason:</b> ${esc(r.reason)}</span>` : ''}</div>
+    <div class="rq-side">${actions || `<span class="rq-st ${esc(r.status)}">${esc(st)}</span>`}</div></div>`;
+}
+function rcDraw(id, visible, html, bind) {
+  const host = document.getElementById(id); if (!host) return;
+  host.hidden = !visible; const root = host.shadowRoot || host.attachShadow({ mode: 'open' });
+  if (!visible) { root.innerHTML = ''; return; }
+  root.innerHTML = `<style>${ATT_CSS}${REQUEST_CARD_CSS}</style><div class="rc">${html}</div>`;
+  root.querySelectorAll('[data-rc-scope]').forEach(b => { b.onclick = () => { RC.scope = b.dataset.rcScope; renderApprovalRequests(); window.organizeOverview?.(); }; });
+  root.querySelectorAll('[data-rc-hist]').forEach(b => { b.onclick = () => { RC.hist = b.dataset.rcHist; renderRequestHistory(); }; });
+  if (bind) bind(root);
+}
+const rcScopeChips = hasGroup => hasGroup ? `<div class="rc-chips" role="group" aria-label="Whose requests"><button class="rc-chip" data-rc-scope="group" aria-pressed="${RC.scope !== 'mine'}">Me + my group</button><button class="rc-chip" data-rc-scope="mine" aria-pressed="${RC.scope === 'mine'}">Only mine</button></div>` : '';
+function renderRequestHistory() {
+  const { waiting, history, hasGroup } = requestBuckets();
+  rcDraw('cardMyRequests', !!myId() && can('requests.own'),
+    `<div class="rc-top"><p class="rc-sub grow">${hasGroup ? 'Sent by you or your group' : 'Sent by you'} · waiting for a manager. You can cancel your own.</p>${rcScopeChips(hasGroup)}</div>
+     <div class="rc-list">${waiting.length ? waiting.map(r => rqRow(r, `<span class="rq-st pending">Pending</span>${rcMine(r) ? `<button class="btn sm" data-cancel="${esc(r.id)}">Cancel</button>` : ''}`)).join('') : '<div class="rc-empty">Nothing waiting. New requests you send appear here.</div>'}</div>`,
+    root => root.querySelectorAll('[data-cancel]').forEach(b => { b.onclick = async () => { b.disabled = true; try { await cancelRequest(b.dataset.cancel); } finally { renderApprovalRequests(); } }; }));
+  const n = s => history.filter(r => r.status === s).length;
+  if (RC.hist !== 'all' && !n(RC.hist)) RC.hist = 'all';
+  const list = RC.hist === 'all' ? history : history.filter(r => r.status === RC.hist);
+  const chip = (k, label, c) => `<button class="rc-chip" data-rc-hist="${k}" aria-pressed="${RC.hist === k}">${label} · ${c}</button>`;
+  rcDraw('cardRejectedRequests', !!myId() && (can('requests.own') || can('requests.rejected')),
+    `<div class="rc-top"><div class="rc-chips grow">${chip('all', 'All', history.length)}${n('approved') ? chip('approved', 'Approved', n('approved')) : ''}${n('rejected') ? chip('rejected', 'Rejected', n('rejected')) : ''}${n('cancelled') ? chip('cancelled', 'Cancelled', n('cancelled')) : ''}</div>${rcScopeChips(hasGroup)}</div>
+     <div class="rc-list">${list.length ? list.slice(0, 60).map(r => rqRow(r)).join('') : '<div class="rc-empty">No decisions yet.</div>'}</div>`);
+}
 function renderApprovalRequests() {
   renderRequestHistory();
-  const host = document.getElementById('cardApprovalRequests'); if (!host) return;
-  host.hidden = !can('requests.approvals');
-  if (host.hidden) { host.replaceChildren(); return; }
-  const root = host.shadowRoot || host.attachShadow({ mode: 'open' });
-  const pending = reqList().filter(r => r.status === 'pending' && inMyScope(r)).sort((a,b) => (a.at || '').localeCompare(b.at || ''));
+  const { approvals: pending } = requestBuckets();
   const ready = S.status === 'ready' && !!S.ctx;
-  root.innerHTML = `<style>${ATT_CSS}${REQUEST_CARD_CSS}
-    .request-row { display:flex; flex-wrap:wrap; align-items:center; gap:8px; padding:8px 0; border-bottom:1px solid var(--line); }
-    .request-row:last-child { border-bottom:0; } .request-details { flex:1 1 260px; min-width:0; overflow-wrap:anywhere; }
-    .request-details span { display:block; } .request-actions { display:flex; flex-wrap:wrap; gap:6px; }
-    .request-heading { display:flex; flex-wrap:wrap; align-items:center; gap:6px; margin-bottom:6px; }
-    </style><div class="card"><div class="request-heading"><h2>Approval requests · ${pending.length} pending</h2><span class="grow"></span><button class="btn sm" data-refresh>Refresh</button></div>
-    <div class="sub">Approve logs before they reach the tracker.</div>
-    ${!canDecide() ? '<p class="sm">Ask a super admin to enable “Approve or reject leave” for your account to process these requests.</p>' : !ready ? '<p class="sm">Connect the attendance tracker in Settings → Save & sync to approve requests.</p>' : ''}
-    ${pending.length ? '<div style="max-height:180px;overflow:auto">' + pending.map(r => `<div class="request-row"><div class="request-details"><b>${esc(r.name)}</b><span>${esc(r.code)} · ${esc(reqDatesText(r.dates || []))}</span><span class="sm muted">Requested by ${esc(r.by)} · ${esc(reqWhen(r.at))}</span>${r.note ? '<span class="sm">Note: ' + esc(r.note) + '</span>' : ''}</div>
-    ${canDecide() ? `<div class="request-actions"><select aria-label="Approve leave type for ${esc(r.name)}" ${!ready ? 'disabled' : ''}>${LOG_TYPES.map(c => `<option value="${c}"${c === r.code ? ' selected' : ''}>${c}</option>`).join('')}</select><button class="btn sm primary" data-approve="${esc(r.id)}" ${!ready || S.saving ? 'disabled' : ''}>Approve</button><button class="btn sm" data-reject="${esc(r.id)}">Reject</button></div>` : ''}</div>`).join('') + '</div>' : '<div class="empty">No pending requests in your filters.</div>'}</div>`;
-  root.querySelector('[data-refresh]').onclick = async e => { e.target.disabled = true; try { await window.loadTeamSettings(true); notifyReq(); } finally { renderApprovalRequests(); } };
-  root.querySelectorAll('[data-approve]').forEach(b => { b.onclick = async () => { b.disabled = true; try { await approveRequest(b.dataset.approve, b.parentElement.querySelector('select').value); } finally { renderApprovalRequests(); } }; });
-  root.querySelectorAll('[data-reject]').forEach(b => { b.onclick = () => openRejectBox(b.dataset.reject); });
+  const warn = !ready ? '<p class="rc-note">Connect the attendance tracker (Settings › Save & sync) to approve.</p>' : '';
+  const acts = r => canDecide() ? `<select aria-label="Leave type to approve for ${esc(r.name)}" title="Approve as this leave type" ${!ready ? 'disabled' : ''}>${LOG_TYPES.map(c => `<option value="${c}"${c === r.code ? ' selected' : ''}>${c}</option>`).join('')}</select><button class="btn sm primary" data-approve="${esc(r.id)}" ${!ready || S.saving ? 'disabled' : ''}>Approve</button><button class="btn sm" data-reject="${esc(r.id)}">Reject</button>` : '<span class="rq-st pending">Pending</span>';
+  rcDraw('cardApprovalRequests', canDecide(),
+    `<div class="rc-top"><p class="rc-sub grow">Waiting for your decision. Approved leave goes straight into attendance.</p><button class="btn sm" data-refresh title="Check for new requests">↻ Refresh</button></div>${warn}
+     <div class="rc-list">${pending.length ? pending.map(r => rqRow(r, acts(r))).join('') : '<div class="rc-empty">All caught up. Nothing to approve.</div>'}</div>`,
+    root => {
+      root.querySelector('[data-refresh]').onclick = async e => { e.target.disabled = true; try { await window.loadTeamSettings(true); notifyReq(); } finally { renderApprovalRequests(); } };
+      root.querySelectorAll('[data-approve]').forEach(b => { b.onclick = async () => { b.disabled = true; try { await approveRequest(b.dataset.approve, b.parentElement.querySelector('select').value); } finally { renderApprovalRequests(); } }; });
+      root.querySelectorAll('[data-reject]').forEach(b => { b.onclick = () => openRejectBox(b.dataset.reject); });
+    });
 }
+const requestCounts = () => { const b = requestBuckets(); return { approvals: b.approvals.length, own: b.waiting.length, rejected: b.history.length }; };
 /* ---------- a tracker row built from a workforce person ---------- */
 /* Emp ID, name and client come from the workforce file. Before the Date of Joining, and after the Left Date, the days are NA (as the tracker already does). */
 function newRosterRow(ms, rr, opts = {}) {
@@ -5976,7 +6269,7 @@ function refocus(sel, caret) { render(); const i = $(sel); if (i) { i.focus(); c
 function onBind(e) {
   const fx = e.target.closest('[data-fix]'); if (fx) { fixInput(fx, e); return; }
   const el = e.target.closest('[data-bind]'); if (!el) return; const b = el.dataset.bind, v = el.value, isInput = e.type === 'input';
-  if (isInput && !['gq', 'pq', 'aq', 'hq', 'tlq'].includes(b) && el.type !== 'number') return; if (!isInput && ['gq', 'pq', 'aq', 'hq', 'tlq'].includes(b)) return;
+  if (isInput && !['gq', 'pq', 'aq', 'hq', 'tlq', 'wdq'].includes(b) && el.type !== 'number') return; if (!isInput && ['gq', 'pq', 'aq', 'hq', 'tlq', 'wdq'].includes(b)) return;
   const u = S.ui;
   switch (b) {
     case 'period': if(S.mode==='reports'){selectAttendanceReport('period',v);break;}u.period = v; render(); break; case 'oclient': if(S.mode==='reports'){if(v==='all'){reportScope.cohort=null;reportScope.label='';u.client='all';reportChanged();}else selectAttendanceReport('client',v);break;}u.client = v; render(); break;
@@ -5985,6 +6278,9 @@ function onBind(e) {
     case 'gyear': { const mIdx = Engine.serialToDate(u.grid.month).getUTCMonth(), ms = Engine.monthSerial(+v, mIdx); u.grid.month = ms; render(); break; }
     case 'gq': u.grid.q = v; refocus('[data-bind="gq"]'); break;
     case 'tlq': tlUi().q = v; refocus('[data-bind="tlq"]'); break;
+    case 'wd-look': wdUi().look = +v; render(); break;
+    case 'wd-only': wdUi().only = v; render(); break;
+    case 'wdq': wdUi().q = v; refocus('[data-bind="wdq"]'); break;
     case 'tl-range': { const t = tlUi(); t.range = v; if (v === 'custom' && !t.from) { const pr = tlRange(periodRows()); if (pr) { t.from = isoDate(pr[0]); t.to = isoDate(pr[1]); } } render(); break; }
     case 'tl-from': if (v) { tlUi().from = v; render(); } break; case 'tl-to': if (v) { tlUi().to = v; render(); } break;
     case 'tl-wk': tlUi().hideWk = el.checked; render(); break;
@@ -6342,7 +6638,9 @@ const healthCount = () => (S.status === 'ready' && S.ctx ? healthIssues().filter
 
 mount();
 return {
-  fieldNames: attFieldNames, hasTracker: Engine.hasTracker, refresh, init: () => { mount(); return connect(); }, askName, decorateTable, healthCount, chooseFileEarly, savedFile: async () => (await kv.get('file')) || ((await kv.get('handle')) || {}).name || '', show, leave, renderCard, renderWatch, drawerPanel, go, renderApprovalRequests, renderRequestHistory, requestsToDecide: () => requestsToDecide().length,
+  fieldNames: attFieldNames, hasTracker: Engine.hasTracker, refresh, init: () => { mount(); return connect(); }, askName, decorateTable, healthCount, chooseFileEarly, savedFile: async () => (await kv.get('file')) || ((await kv.get('handle')) || {}).name || '', show, leave, renderCard, renderWatch, drawerPanel, go, renderApprovalRequests, renderRequestHistory, requestCounts, requestsToDecide: () => requestsToDecide().length,
+  /* v3.19: every recorded code between two dates (UTC ms, null = open), for custom dashboards; follows the attendance scope */
+  entries: (from, to) => { if (S.status !== 'ready' || !S.ctx) return null; const d = D(), out = []; for (const m of d.months) { const dim = Engine.daysInMonth(m); for (const r of d.byMonth.get(m) || []) for (let i = 0; i < dim; i++) { const v = r.days[i]; if (v == null || v === '') continue; const dt = dateOf(m, i), t = dt.getTime(); if ((from != null && t < from) || (to != null && t > to)) continue; const cat = catOf(v); out.push({ name: r.name.trim(), empId: r.empId, client: r.client ? String(r.client).trim() : '', date: dt, code: String(v).trim().toUpperCase(), cat, catLabel: CATS[cat] || 'Other' }); } } return out; },
   todayStats: () => { if (S.status !== 'ready' || !S.ctx) return null; const rows = D().byMonth.get(TODAY_MS) || [], i = TODAY.getUTCDate() - 1, cats = rows.map(r => catOf(r.days[i])); return { full: cats.filter(c => c === 'approved' || c === 'sick' || c === 'unplanned').length, half: cats.filter(c => c === 'half').length, late: cats.filter(c => c === 'late').length, tracked: rows.length }; }, redraw: () => { if (active()) render(); }, state: () => S, dirty: () => S.changes.length,
   prepareSignOut, save: () => save(), undo: () => undo(), toggleAuto: () => { setAuto(!S.auto); if (S.auto) autoTick(); }, setAutoSync: on => { setAuto(on); if (S.auto) autoTick(); }, canWrite: attCanWrite,
   syncInfo: () => { const d = D(true), sc = scopeCounts(); return { fileName: S.fileName, changes: S.changes.length, undoLen: S.undo.length, saving: S.saving, auto: S.auto, autoErr: S.autoErr, autoAt: S.autoAt, diskChanged: S.diskChanged, rows: S.rows.length, people: d.people.size, monthFrom: d.months[0], monthTo: d.latestMonth, unmatched: sc.unmatched, hasRoster: hasRoster() }; },
@@ -6521,7 +6819,7 @@ async function poll() {
 }
 
 /* ============================== filtering ============================== */
-const APP = { title: "Team Dashboard", version: "3.18.0", released: "24 Sep 2026" };
+const APP = { title: "Team Dashboard", version: "3.20.1", released: "29 Sep 2026" };
 const BASE_DIMS = { status: "status_column", desig: "designation_column", client: "client_column", mode: "mode_column" };
 const STANDARD_STATUSES = ["Active", "Manager", "OJT", "Bench", "New", "Projected", "Left", "Moved"];
 const TILE_ORDER = ["Active", "Manager", "OJT", "Bench", "New", "Projected"];
@@ -7081,12 +7379,439 @@ $("#repTables").addEventListener("click", () => {
   for (const c of document.querySelectorAll("#charts > .card")) state.chartView[c.id] = window.REPORT_TABLES ? "table" : "chart";
   syncReportToggle(); ppHide(); renderCharts(); if (window.ATT && ATT.redraw) ATT.redraw();
 });
+/* ============================== v3.19: Custom dashboards (Reports → Custom dashboards) ============================== */
+/* People with the "Create and edit custom dashboards" right build their own charts from the workforce file or the
+   attendance tracker. Dashboards are stored with the team settings; each one is private to its owner unless shared. */
+const CD = { cur: null, view: {} };
+const CD_COLORS = ["var(--c-blue)", "var(--c-aqua)", "var(--c-violet)", "var(--c-orange)", "var(--c-green)", "var(--c-magenta)", "var(--c-yellow)", "var(--c-red)", "var(--c-gray)"];
+const CD_TYPES = [["bar", "Bar (horizontal)"], ["column", "Column (vertical)"], ["donut", "Donut"], ["line", "Line (trend)"], ["table", "Table"], ["kpi", "Single number"]];
+const CD_PERIODS = [["last30", "Last 30 days"], ["last90", "Last 90 days"], ["last180", "Last 180 days"], ["last365", "Last 12 months"], ["month", "This month"], ["year", "This year"], ["all", "All history"], ["next30", "Next 30 days"], ["next90", "Next 90 days"]];
+const CD_CODESETS = [["leave", "All leave (AL, CL, SL, UL, AB, half days)"], ["approved", "Approved leave (AL, CL)"], ["sick", "Sick leave (SL)"], ["unplanned", "Unplanned / absent (UL, AB)"], ["half", "Half days (HD1, HD2)"], ["applied", "Pending applications (LA)"], ["late", "Late / cab late (L, C)"], ["remote", "Remote (R)"], ["any", "Every recorded code"]];
+const cdMe = () => { try { return window.PERM && PERM.online() ? String(CLOUD.user().id) : "local"; } catch { return "local"; } };
+const cdMeName = () => { try { return window.PERM && PERM.online() ? CLOUD.user().name : "You"; } catch { return "You"; } };
+const cdCanBuild = () => !window.PERM || PERM.can("rep.build");
+/* v3.19.1: dashboards the database would not accept yet are kept in this browser until sharing is switched on */
+const CD_LOCAL = () => "td_custom_dash_local_" + cdMe();
+const cdLocal = () => { try { const l = JSON.parse(localStorage.getItem(CD_LOCAL()) || "[]"); return Array.isArray(l) ? l.map(d => ({ ...d, local: true })) : []; } catch { return []; } };
+const cdAll = () => { const l = (window.TD_SETTINGS || {}).custom_dashboards, srv = Array.isArray(l) ? l : [], loc = cdLocal().filter(d => !srv.some(x => x.id === d.id)); return [...srv, ...loc]; };
+const cdVisible = () => cdAll().filter(d => d && (d.shared || String(d.ownerId) === cdMe() || (window.PERM && PERM.isSuper())));
+const cdMine = d => d && (String(d.ownerId) === cdMe() || (window.PERM && PERM.isSuper()));
+const cdId = () => Date.now().toString(36) + Math.random().toString(36).slice(2, 7);
+async function cdSave(dash, remove) {
+  try { await window.loadTeamSettings(); } catch { }
+  const clean = d => { const { local, ...rest } = d; return rest; };
+  const srvList = (Array.isArray((window.TD_SETTINGS || {}).custom_dashboards) ? window.TD_SETTINGS.custom_dashboards : []).filter(d => d.id !== dash.id);
+  if (!remove) srvList.push(clean({ ...dash, updated: new Date().toISOString() }));
+  const dropLocal = () => { try { const l = JSON.parse(localStorage.getItem(CD_LOCAL()) || "[]").filter(d => d.id !== dash.id); localStorage.setItem(CD_LOCAL(), JSON.stringify(l)); } catch { } };
+  /* online: the database function td_save_dashboard (setup.sql 3.19) saves just this dashboard and checks its owner */
+  if (window.PERM && PERM.online() && CLOUD.saveDashboard && !cdSave.noFn) {
+    try { const list = await CLOUD.saveDashboard(clean(dash), remove); window.TD_SETTINGS = { ...window.TD_SETTINGS, custom_dashboards: Array.isArray(list) ? list : srvList }; dropLocal(); return; }
+    catch (e) {
+      if (/NOT_OWNER/.test(e.message || "")) throw new Error("Only the person who made this dashboard (or the super admin) can change it.");
+      if (/DASHBOARD_LIMIT/.test(e.message || "")) throw new Error("You already have 30 dashboards. Delete one first.");
+      if (/DASHBOARD_TOO_BIG/.test(e.message || "")) throw new Error("This dashboard is too big to save. Split it into two.");
+      if (!/not set up|function|schema cache/i.test(e.message || "")) throw e;
+      cdSave.noFn = true;   // older database: fall back below
+    }
+  }
+  try { await window.saveSharedSetting("custom_dashboards", srvList); dropLocal(); return; }
+  catch (e) {
+    const refused = e && (e.status === 403 || /ADMIN_ONLY|super admin can do that/i.test(e.message || ""));
+    if (!refused) throw e;
+    /* the database only lets a few lists be shared: the super admin can still save through the admin setting */
+    if (window.PERM && PERM.isSuper()) { await CLOUD.setSetting("custom_dashboards", srvList); window.TD_SETTINGS = { ...window.TD_SETTINGS, custom_dashboards: srvList }; dropLocal(); return; }
+    /* anyone else: keep it in this browser for now */
+    try { const l = JSON.parse(localStorage.getItem(CD_LOCAL()) || "[]").filter(d => d.id !== dash.id); if (!remove) l.push(clean({ ...dash, shared: false, updated: new Date().toISOString() })); localStorage.setItem(CD_LOCAL(), JSON.stringify(l)); }
+    catch { throw new Error("This browser blocked saving."); }
+    if (!cdSave.warned) { cdSave.warned = true; toast("Saved on this computer only. To keep dashboards online and share them, ask the super admin to allow “custom_dashboards” as a shared setting in Supabase.", true); }
+    if (dash.shared && !remove) toast("Sharing needs the online save, so this dashboard stays private for now.", true);
+  }
+}
+async function cdPersist(dash, msg) {
+  try { await cdSave(dash); if (msg) toast(msg); }
+  catch (e) { toast("Couldn’t save the dashboard: " + (e.message || e), true); }
+  renderCustomDash();
+}
+
+/* ---------- what can be charted ---------- */
+const cdMonthKey = d => d.getUTCFullYear() + "-" + String(d.getUTCMonth() + 1).padStart(2, "0");
+const cdMonthLabel = k => { const [y, m] = k.split("-"); return MON[+m - 1] + " " + y; };
+function cdEmpDims() {
+  if (!state.schema) return [];
+  const cols = state.cols.filter(c => !c.auto), out = [];
+  for (const c of cols) if (c.type !== "date") out.push({ id: "c:" + c.name, label: c.label, val: r => S(g(r, c.name)) || "(Blank)" });
+  for (const c of cols) if (c.type === "date") {
+    out.push({ id: "m:" + c.name, label: c.label + " · by month", time: true, val: r => { const v = g(r, c.name); return isNum(v) ? cdMonthKey(serialToDate(v)) : null; }, fmt: cdMonthLabel });
+    out.push({ id: "y:" + c.name, label: c.label + " · by year", time: true, val: r => { const v = g(r, c.name); return isNum(v) ? String(serialToDate(v).getUTCFullYear()) : null; } });
+  }
+  out.push({ id: "x:tenure", label: "Tenure band", val: r => tenureBucket(r) }, { id: "x:age", label: "Age band", val: r => ageBucket(r) }, { id: "x:distance", label: "Distance band", val: r => distBucket(r) }, { id: "x:area", label: "Area (cleaned)", val: r => { const a = gs(r, "current_area_column"); return a ? areaCanon(a) : "Not set"; } });
+  return out;
+}
+const CD_ATT_DIMS = [
+  { id: "a:month", label: "Month", time: true, val: e => cdMonthKey(e.date), fmt: cdMonthLabel },
+  { id: "a:week", label: "Week (starting Monday)", time: true, val: e => { const d = new Date(e.date.getTime() - ((e.date.getUTCDay() + 6) % 7) * 86400000); return d.toISOString().slice(0, 10); }, fmt: k => { const d = new Date(k + "T00:00:00Z"); return d.getUTCDate() + " " + MON[d.getUTCMonth()]; } },
+  { id: "a:date", label: "Date", time: true, val: e => e.date.toISOString().slice(0, 10), fmt: k => { const d = new Date(k + "T00:00:00Z"); return d.getUTCDate() + " " + MON[d.getUTCMonth()]; } },
+  { id: "a:weekday", label: "Weekday", time: true, val: e => String((e.date.getUTCDay() + 6) % 7), fmt: k => ["Mon", "Tue", "Wed", "Thu", "Fri", "Sat", "Sun"][+k] },
+  { id: "a:client", label: "Client", val: e => e.client || "(Blank)" },
+  { id: "a:emp", label: "Employee", val: e => e.name || "(Blank)" },
+  { id: "a:code", label: "Leave code", val: e => e.code },
+  { id: "a:cat", label: "Leave category", val: e => e.catLabel },
+];
+const cdDims = src => src === "att" ? CD_ATT_DIMS : cdEmpDims();
+const cdNumCols = () => state.schema ? state.cols.filter(c => !c.auto && c.type === "number") : [];
+function cdMeasures(src) {
+  if (src === "att") return [["days", "Leave days (half day = 0.5)"], ["entries", "Number of entries"], ["people", "Number of people"]];
+  return [["count", "Number of people"], ...cdNumCols().flatMap(c => [["sum:" + c.name, "Sum of " + c.label], ["avg:" + c.name, "Average of " + c.label]])];
+}
+function cdPeriod(p) {
+  const t = new Date(), T = Date.UTC(t.getFullYear(), t.getMonth(), t.getDate()), D = 86400000;
+  const r = { last30: [T - 29 * D, T], last90: [T - 89 * D, T], last180: [T - 179 * D, T], last365: [T - 364 * D, T], month: [Date.UTC(t.getFullYear(), t.getMonth(), 1), Date.UTC(t.getFullYear(), t.getMonth() + 1, 0)], year: [Date.UTC(t.getFullYear(), 0, 1), Date.UTC(t.getFullYear(), 11, 31)], all: [null, null], next30: [T, T + 29 * D], next90: [T, T + 89 * D] }[p] || [T - 89 * D, T];
+  return r;
+}
+const cdCodeOk = (set, cat) => set === "leave" ? ["approved", "sick", "unplanned", "half"].includes(cat) : set === "any" ? !["present", "off", "na", "moved", "unknown"].includes(cat) : cat === set;
+
+/* ---------- turn a chart definition into numbers ---------- */
+function cdCompute(sp) {
+  const dims = cdDims(sp.src), dim = dims.find(d => d.id === sp.group), split = sp.split ? dims.find(d => d.id === sp.split) : null;
+  let recs, note = "";
+  if (sp.src === "att") {
+    if (!window.ATT || !ATT.entries) return { err: "The attendance tracker isn’t available." };
+    const [from, to] = cdPeriod(sp.period), all = ATT.entries(from, to);
+    if (!all) return { err: "The attendance workbook isn’t connected yet." };
+    recs = all.filter(e => cdCodeOk(sp.codes || "leave", e.cat));
+    note = (CD_PERIODS.find(p => p[0] === sp.period) || ["", ""])[1] + " · " + ((CD_CODESETS.find(c => c[0] === (sp.codes || "leave")) || ["", ""])[1]).replace(/ \(.*\)$/, "");
+  } else {
+    if (!state.schema) return { err: "The workforce file isn’t loaded yet." };
+    recs = sp.who === "all" ? state.rows.slice() : sp.who === "current" ? state.rows.filter(isCurrent) : rowsFor(null);
+    note = sp.who === "all" ? "Everyone in the file" : sp.who === "current" ? "Current employees" : "Follows the report filters";
+  }
+  for (const f of sp.filters || []) {
+    const fd = dims.find(d => d.id === f.dim); if (!fd || !f.vals || !f.vals.length) continue;
+    const set = new Set(f.vals); recs = recs.filter(r => { const v = fd.val(r); return set.has(v == null ? "(Blank)" : v); });
+    note += " · " + fd.label + ": " + f.vals.slice(0, 3).map(v => fd.fmt && v !== "(Blank)" ? fd.fmt(v) : v).join(", ") + (f.vals.length > 3 ? " +" + (f.vals.length - 3) : "");
+  }
+  const m = sp.measure || (sp.src === "att" ? "days" : "count");
+  const numCol = m.includes(":") ? m.split(":").slice(1).join(":") : null;
+  const agg = list => {
+    if (sp.src === "att") return m === "entries" ? list.length : m === "people" ? new Set(list.map(e => (e.name || "").toLowerCase())).size : list.reduce((a, e) => a + (e.cat === "half" ? 0.5 : ["approved", "sick", "unplanned"].includes(e.cat) ? 1 : 0), 0);
+    if (m === "count") return list.length;
+    const vals = list.map(r => g(r, numCol)).filter(isNum);
+    if (m.startsWith("sum:")) return vals.reduce((a, b) => a + b, 0);
+    return vals.length ? vals.reduce((a, b) => a + b, 0) / vals.length : 0;
+  };
+  if (sp.type === "kpi" || !dim) return { kpi: agg(recs), n: recs.length, note };
+  const groups = new Map();
+  for (const r of recs) { const k = dim.val(r); if (k == null && dim.time) continue; const kk = k == null ? "(Blank)" : k; if (!groups.has(kk)) groups.set(kk, []); groups.get(kk).push(r); }
+  let keys = [...groups.keys()];
+  const total = agg(recs);
+  const value = k => agg(groups.get(k));
+  if (dim.time || sp.sort === "label") keys.sort((a, b) => dim.time && dim.id === "a:weekday" ? +a - +b : String(a).localeCompare(String(b), undefined, { numeric: true }));
+  else keys.sort((a, b) => value(b) - value(a) || String(a).localeCompare(String(b)));
+  if (dim.time && sp.fillGaps !== false && keys.length > 1 && (dim.id === "a:month" || dim.id.startsWith("m:"))) {
+    const out = []; let [y, mo] = keys[0].split("-").map(Number); const [ey, em] = keys[keys.length - 1].split("-").map(Number);
+    while (y < ey || (y === ey && mo <= em)) { out.push(y + "-" + String(mo).padStart(2, "0")); mo++; if (mo > 12) { mo = 1; y++; } if (out.length > 240) break; }
+    keys = out;
+  }
+  const lim = +sp.limit || 0; let other = null;
+  if (lim && keys.length > lim && !dim.time) { const rest = keys.slice(lim); keys = keys.slice(0, lim); if (sp.other !== false) other = rest.flatMap(k => groups.get(k)); }
+  const labels = keys.map(k => dim.fmt && k !== "(Blank)" ? dim.fmt(k) : k); if (other) labels.push("Other");
+  const listOf = i => i < keys.length ? (groups.get(keys[i]) || []) : other;
+  let series;
+  if (split && sp.type !== "donut") {
+    const sk = new Map(); for (const r of recs) { const v = split.val(r); const kk = v == null ? "(Blank)" : v; sk.set(kk, (sk.get(kk) || 0) + 1); }
+    let skeys = [...sk.keys()].sort((a, b) => split.time ? String(a).localeCompare(String(b), undefined, { numeric: true }) : sk.get(b) - sk.get(a));
+    let sOther = null; if (skeys.length > 8) { sOther = new Set(skeys.slice(7)); skeys = skeys.slice(0, 7); }
+    const mk = (name, test) => { const recs = labels.map((_, i) => listOf(i).filter(r => { const v = split.val(r); return test(v == null ? "(Blank)" : v); })); return { name, recs, values: recs.map(agg) }; };
+    series = skeys.map(s => mk(split.fmt && s !== "(Blank)" ? split.fmt(s) : s, v => v === s));
+    if (sOther) series.push(mk("Other", v => sOther.has(v)));
+  } else { const recs = labels.map((_, i) => listOf(i)); series = [{ name: (cdMeasures(sp.src).find(x => x[0] === m) || ["", "Value"])[1], recs, values: recs.map(agg) }]; }
+  return { labels, series, total, note, avg: m.startsWith("avg:"), src: sp.src, title: sp.title };
+}
+
+/* ---------- drawing ---------- */
+/* v3.19: the people behind a number (Emp ID + name), for the hover list and one-click copy */
+function cdPeople(src, recs) {
+  if (!recs || !recs.length) return [];
+  if (src !== "att") return peopleOf(recs);
+  const by = new Map();
+  for (const e of recs) { const k = (e.name || "").toLowerCase(); if (!by.has(k)) by.set(k, { id: e.empId == null ? "" : String(e.empId), name: e.name || "(no name)", n: 0 }); const o = by.get(k); o.n += e.cat === "half" ? 0.5 : 1; if (!o.id && e.empId != null) o.id = String(e.empId); }
+  for (const o of by.values()) if (!o.id) { const r = state.rows.find(x => (gs(x, "name_column") || "").toLowerCase() === o.name.toLowerCase()); if (r) o.id = gs(r, "key_column"); }
+  return [...by.values()].sort((a, b) => b.n - a.n || a.name.localeCompare(b.name)).map(o => ({ id: o.id || "—", name: o.name }));
+}
+function cdPeopleGroups(res, i, j) {
+  const pick = j == null ? res.series.map((s, k) => [s, k]) : [[res.series[j], j]];
+  return pick.map(([s, k]) => ({ color: CD_COLORS[k % CD_COLORS.length], label: (res.series.length > 1 ? s.name + " · " : "") + res.labels[i], value: s.values[i], people: cdPeople(res.src, s.recs && s.recs[i]), what: "people" })).filter(g => g.value);
+}
+function cdShowPeople(el, res, i, j) {
+  const groups = cdPeopleGroups(res, i, j); if (!groups.length) return;
+  const b = el.getBoundingClientRect();
+  ppShow(el, { left: b.left, top: b.top, bottom: b.bottom }, (res.title || "Chart") + " – " + res.labels[i], groups, res.src === "att" ? "People with at least one matching entry, most first." : "");
+}
+function cdNumCell(res, i, j, text, bold) {
+  const has = (j == null ? res.series.some(s => s.values[i]) : res.series[j].values[i]);
+  const td = h("td", { class: "n" + (has ? " copynum" : ""), tabindex: has ? 0 : null, role: has ? "button" : null, title: has ? "Hover to see who · click to copy Emp ID and name" : null }, bold ? h("b", {}, text) : text);
+  if (has) {
+    td.addEventListener("pointerenter", () => cdShowPeople(td, res, i, j)); td.addEventListener("focus", () => cdShowPeople(td, res, i, j));
+    td.addEventListener("pointerleave", () => ppHideSoon()); td.addEventListener("blur", () => ppHideSoon());
+    const copy = () => { const all = new Map(); for (const g of cdPeopleGroups(res, i, j)) for (const p of g.people) all.set(p.id + "|" + p.name, p); copyPeople([...all.values()], "people"); };
+    td.addEventListener("click", copy); td.addEventListener("keydown", e => { if (e.key === "Enter" || e.key === " ") { e.preventDefault(); copy(); } });
+  }
+  return td;
+}
+const cdFmt = v => (Math.round(v * 10) / 10).toLocaleString(undefined, { maximumFractionDigits: 1 });
+const cdAxis = v => { v = Math.max(v, 1); const p = Math.pow(10, Math.floor(Math.log10(v / 5))); for (const m of [1, 2, 2.5, 5, 10, 20]) { const st = m * p; if (Math.ceil(v / st) <= 5) { const n = Math.max(1, Math.ceil(v / st)); return { max: n * st, step: st, n }; } } return { max: v, step: v / 4, n: 4 }; };
+const cdTrunc = (s, n) => (s = String(s), s.length > n ? s.slice(0, n - 1) + "…" : s);
+function cdLegend(series) { return series.length > 1 ? h("div", { class: "cd-legend" }, series.map((s, i) => h("span", {}, h("i", { style: "background:" + CD_COLORS[i % CD_COLORS.length] }), s.name))) : null; }
+function cdBar(res, W) {
+  const n = res.labels.length, rowH = 26, labelW = Math.min(180, Math.round(W * 0.38)), valW = 56, area = Math.max(40, W - labelW - valW);
+  const tot = i => res.series.reduce((a, s) => a + s.values[i], 0), max = Math.max(...res.labels.map((_, i) => tot(i)), 1);
+  const H = n * rowH + 4, svg = sv("svg", { viewBox: "0 0 " + W + " " + H, class: "cd-svg", role: "img" });
+  res.labels.forEach((l, i) => {
+    const y = i * rowH + 4; let x = labelW;
+    svg.append(sv("text", { x: labelW - 8, y: y + 13, "text-anchor": "end", class: "cd-lab" }, cdTrunc(l, Math.floor(labelW / 6.6))));
+    res.series.forEach((s, j) => { const w = (s.values[i] / max) * area; if (w > 0) svg.append(sv("rect", { x, y: y + 2, width: Math.max(1, w), height: 15, rx: 3, fill: CD_COLORS[j % CD_COLORS.length], style: "cursor:pointer", onclick: ev => cdShowPeople(ev.currentTarget, res, i, j) }, sv("title", {}, l + (res.series.length > 1 ? " · " + s.name : "") + ": " + cdFmt(s.values[i]) + " · click to see who"))); x += w; });
+    svg.append(sv("text", { x: x + 6, y: y + 13, class: "cd-val" }, cdFmt(tot(i))));
+  });
+  return svg;
+}
+function cdColumn(res, W) {
+  const n = res.labels.length, H = 240, ml = 36, mb = 46, mt = 14, pw = W - ml - 8, ph = H - mt - mb;
+  const tot = i => res.series.reduce((a, s) => a + s.values[i], 0), ax = cdAxis(Math.max(...res.labels.map((_, i) => tot(i)), 1)), max = ax.max, step = pw / Math.max(n, 1), bw = Math.max(3, Math.min(46, step * 0.66));
+  const svg = sv("svg", { viewBox: "0 0 " + W + " " + H, class: "cd-svg", role: "img" });
+  for (let k = 0; k <= ax.n; k++) { const y = mt + ph - (ph * k) / ax.n; svg.append(sv("line", { x1: ml, x2: W - 8, y1: y, y2: y, class: "cd-grid" }), sv("text", { x: ml - 6, y: y + 4, "text-anchor": "end", class: "cd-ax" }, cdFmt(ax.step * k))); }
+  const every = Math.ceil(n / Math.max(1, Math.floor(pw / 46)));
+  res.labels.forEach((l, i) => {
+    const cx = ml + step * i + step / 2; let y = mt + ph;
+    res.series.forEach((s, j) => { const hgt = (s.values[i] / max) * ph; if (hgt > 0) { y -= hgt; svg.append(sv("rect", { x: cx - bw / 2, y, width: bw, height: Math.max(1, hgt), rx: 2, fill: CD_COLORS[j % CD_COLORS.length], style: "cursor:pointer", onclick: ev => cdShowPeople(ev.currentTarget, res, i, j) }, sv("title", {}, l + (res.series.length > 1 ? " · " + s.name : "") + ": " + cdFmt(s.values[i]) + " · click to see who"))); } });
+    if (n <= 24 && tot(i)) svg.append(sv("text", { x: cx, y: y - 4, "text-anchor": "middle", class: "cd-val" }, cdFmt(tot(i))));
+    if (i % every === 0) svg.append(sv("text", { x: cx, y: mt + ph + 14, "text-anchor": "middle", class: "cd-lab" }, cdTrunc(l, Math.max(4, Math.floor((step * every) / 6.4)))));
+  });
+  return svg;
+}
+function cdLine(res, W) {
+  const n = res.labels.length, H = 240, ml = 36, mr = 12, mb = 32, mt = 14, pw = W - ml - mr, ph = H - mt - mb;
+  const ax = cdAxis(Math.max(1, ...res.series.flatMap(s => s.values))), max = ax.max, X = i => ml + (n > 1 ? (pw * i) / (n - 1) : pw / 2), Y = v => mt + ph - (v / max) * ph;
+  const svg = sv("svg", { viewBox: "0 0 " + W + " " + H, class: "cd-svg", role: "img" });
+  for (let k = 0; k <= ax.n; k++) { const y = mt + ph - (ph * k) / ax.n; svg.append(sv("line", { x1: ml, x2: W - mr, y1: y, y2: y, class: "cd-grid" }), sv("text", { x: ml - 6, y: y + 4, "text-anchor": "end", class: "cd-ax" }, cdFmt(ax.step * k))); }
+  const every = Math.ceil(n / Math.max(1, Math.floor(pw / 56)));
+  res.labels.forEach((l, i) => { if (i % every === 0 || i === n - 1) svg.append(sv("text", { x: X(i), y: H - 10, "text-anchor": "middle", class: "cd-lab" }, cdTrunc(l, 10))); });
+  res.series.forEach((s, j) => {
+    const c = CD_COLORS[j % CD_COLORS.length];
+    svg.append(sv("polyline", { points: s.values.map((v, i) => X(i) + "," + Y(v)).join(" "), fill: "none", stroke: c, "stroke-width": 2.2, "stroke-linejoin": "round" }));
+    s.values.forEach((v, i) => svg.append(sv("circle", { cx: X(i), cy: Y(v), r: n > 40 ? 1.8 : 3.2, fill: c }, sv("title", {}, res.labels[i] + (res.series.length > 1 ? " · " + s.name : "") + ": " + cdFmt(v)))));
+  });
+  return svg;
+}
+function cdDonut(res) {
+  const vals = res.series[0].values, sum = vals.reduce((a, b) => a + b, 0) || 1, R = 70, r = 44, C = 90;
+  const svg = sv("svg", { viewBox: "0 0 180 180", class: "cd-donut", role: "img" });
+  let a0 = -Math.PI / 2;
+  vals.forEach((v, i) => {
+    if (!v) return; const a1 = a0 + (v / sum) * Math.PI * 2 - (vals.filter(Boolean).length > 1 ? 0.012 : 0.0001), big = a1 - a0 > Math.PI ? 1 : 0;
+    const p = (ang, rad) => (C + rad * Math.cos(ang)).toFixed(2) + " " + (C + rad * Math.sin(ang)).toFixed(2);
+    svg.append(sv("path", { d: "M " + p(a0, R) + " A " + R + " " + R + " 0 " + big + " 1 " + p(a1, R) + " L " + p(a1, r) + " A " + r + " " + r + " 0 " + big + " 0 " + p(a0, r) + " Z", fill: CD_COLORS[i % CD_COLORS.length] }, sv("title", {}, res.labels[i] + ": " + cdFmt(v) + " (" + Math.round((v / sum) * 100) + "%)")));
+    a0 += (v / sum) * Math.PI * 2;
+  });
+  svg.append(sv("text", { x: C, y: C + 2, "text-anchor": "middle", class: "cd-dnum" }, cdFmt(res.avg ? sum / vals.length : sum)), sv("text", { x: C, y: C + 18, "text-anchor": "middle", class: "cd-ax" }, "total"));
+  return h("div", { class: "cd-donut-wrap" }, svg, h("ul", { class: "cd-dleg" }, res.labels.map((l, i) => h("li", {}, h("i", { style: "background:" + CD_COLORS[i % CD_COLORS.length] }), h("span", { title: l }, l), h("b", {}, cdFmt(vals[i])), h("small", {}, Math.round((vals[i] / sum) * 100) + "%")))));
+}
+function cdTable(res) {
+  const multi = res.series.length > 1;
+  return h("div", { class: "cd-tablewrap" }, h("table", { class: "mtable" },
+    h("thead", {}, h("tr", {}, h("th", {}, ""), res.series.map(s => h("th", { class: "n" }, s.name)), multi ? h("th", { class: "n" }, "Total") : null)),
+    h("tbody", {}, res.labels.map((l, i) => h("tr", {}, h("td", {}, l), res.series.map((s, j) => cdNumCell(res, i, j, cdFmt(s.values[i]))), multi ? cdNumCell(res, i, null, cdFmt(res.series.reduce((a, s) => a + s.values[i], 0)), true) : null)))));
+}
+function cdToTsv(res, title) {
+  if (res.kpi != null) return title + "\t" + cdFmt(res.kpi);
+  const multi = res.series.length > 1;
+  return [["", ...res.series.map(s => s.name), ...(multi ? ["Total"] : [])].join("\t"), ...res.labels.map((l, i) => [l, ...res.series.map(s => cdFmt(s.values[i])), ...(multi ? [cdFmt(res.series.reduce((a, s) => a + s.values[i], 0))] : [])].join("\t"))].join("\n");
+}
+function cdDraw(sp, W, asTable) {
+  const res = cdCompute(sp);
+  if (res.err) return { el: h("div", { class: "empty" }, res.err), res };
+  if (res.kpi != null) return { el: h("div", { class: "cd-kpi" }, h("b", {}, cdFmt(res.kpi)), h("span", {}, (cdMeasures(sp.src).find(x => x[0] === (sp.measure || (sp.src === "att" ? "days" : "count"))) || ["", ""])[1])), res };
+  if (!res.labels.length) return { el: h("div", { class: "empty" }, "No data for these settings."), res };
+  const t = asTable ? "table" : sp.type === "table" ? ((cdDims(sp.src).find(d => d.id === sp.group) || {}).time ? "column" : "bar") : sp.type;
+  const body = t === "table" ? cdTable(res) : t === "donut" ? cdDonut({ ...res, series: [res.series.reduce((a, s) => ({ name: a.name, values: a.values.map((v, i) => v + s.values[i]) }))] }) : t === "line" ? cdLine(res, W) : t === "column" ? cdColumn(res, W) : cdBar(res, W);
+  return { el: h("div", {}, t === "donut" || t === "table" ? null : cdLegend(res.series), body), res };
+}
+function cdDescribe(sp) {
+  const dims = cdDims(sp.src), d = dims.find(x => x.id === sp.group), s = sp.split && dims.find(x => x.id === sp.split);
+  const m = (cdMeasures(sp.src).find(x => x[0] === (sp.measure || (sp.src === "att" ? "days" : "count"))) || ["", ""])[1];
+  return (sp.src === "att" ? "Attendance · " : "Employees · ") + m + (sp.type !== "kpi" && d ? " by " + d.label.toLowerCase() : "") + (s ? ", split by " + s.label.toLowerCase() : "");
+}
+
+/* ---------- the page ---------- */
+function renderCustomDash() {
+  const box = $("#customDash"); if (!box || box.hidden) return;
+  const list = cdVisible(), build = cdCanBuild();
+  if (!CD.cur || !list.some(d => d.id === CD.cur)) CD.cur = (list.find(d => String(d.ownerId) === cdMe()) || list[0] || {}).id || null;
+  const dash = list.find(d => d.id === CD.cur);
+  const mine = dash && cdMine(dash) && build;
+  const picker = list.length ? h("select", { class: "input", "aria-label": "Choose a dashboard", onchange: e => { CD.cur = e.target.value; renderCustomDash(); } },
+    list.map(d => h("option", { value: d.id, selected: d.id === CD.cur }, d.name + (String(d.ownerId) === cdMe() ? "" : " · by " + (d.owner || "someone")) + (d.shared ? " · shared" : "") + (d.local ? " · this computer only" : "")))) : null;
+  const head = h("div", { class: "card cd-head" },
+    h("div", { class: "cd-title" }, h("h2", {}, "Custom dashboards"), h("p", {}, "Build your own charts from the workforce file or the attendance tracker. Private to you unless you share them.")),
+    h("div", { class: "cd-tools" }, picker,
+      build ? h("button", { class: "btn", onclick: cdNewDashboard }, "+ New dashboard") : null,
+      mine ? h("button", { class: "btn primary", onclick: () => cdEditChart(dash, null) }, "+ Add chart") : null,
+      mine ? h("details", { class: "cd-more" }, h("summary", { class: "btn", "aria-label": "More dashboard options" }, "⋯"),
+        h("div", { class: "cd-menu" },
+          h("button", { onclick: () => { const n = prompt("Dashboard name", dash.name); if (n && n.trim()) cdPersist({ ...dash, name: n.trim() }, "Renamed."); } }, "Rename"),
+          h("button", { onclick: () => cdPersist({ ...dash, shared: !dash.shared }, dash.shared ? "Only you can see this dashboard now." : "Everyone who can open Reports can now see this dashboard (read-only).") }, dash.shared ? "Stop sharing" : "Share with the team (view only)"),
+          h("button", { onclick: () => { const copy = { ...JSON.parse(JSON.stringify(dash)), id: cdId(), name: dash.name + " (copy)", ownerId: cdMe(), owner: cdMeName(), shared: false }; CD.cur = copy.id; cdPersist(copy, "Duplicated."); } }, "Duplicate"),
+          h("button", { class: "danger", onclick: async () => { if (!confirm("Delete the dashboard “" + dash.name + "”? This can’t be undone.")) return; try { await cdSave(dash, true); CD.cur = null; toast("Dashboard deleted."); } catch (e) { toast(e.message, true); } renderCustomDash(); } }, "Delete dashboard"))) : null));
+  if (!dash) {
+    box.replaceChildren(head, h("div", { class: "card cd-empty" }, h("div", { class: "cd-empty-ic", "aria-hidden": "true" }, "📊"), h("h3", {}, build ? "No dashboards yet" : "No dashboards shared with you yet"),
+      h("p", {}, build ? "Start from a template or a blank dashboard, then add charts: pick the data, how to group it and the chart type." : "Ask someone who builds dashboards to share one with the team."),
+      build ? h("button", { class: "btn primary", onclick: cdNewDashboard }, "Create a dashboard") : null));
+    return;
+  }
+  const charts = dash.charts || [];
+  const grid = h("div", { class: "cd-grid" });
+  box.replaceChildren(head, charts.length ? grid : h("div", { class: "card cd-empty" }, h("div", { class: "cd-empty-ic", "aria-hidden": "true" }, "➕"), h("h3", {}, "This dashboard is empty"), mine ? h("button", { class: "btn primary", onclick: () => cdEditChart(dash, null) }, "Add your first chart") : h("p", {}, "Nothing here yet.")));
+  const move = (i, d) => { const c = charts.slice(); const [x] = c.splice(i, 1); c.splice(i + d, 0, x); cdPersist({ ...dash, charts: c }); };
+  charts.forEach((sp, i) => {
+    const card = h("div", { class: "card cd-card" + (sp.size === "full" ? " full" : "") });
+    grid.append(card);
+    const asTable = (CD.view[sp.id] || (sp.type === "table" ? "table" : "chart")) === "table";
+    const W = Math.max(280, (card.clientWidth || 520) - 36);
+    const { el, res } = cdDraw(sp, W, asTable);
+    const tools = h("div", { class: "cd-ctools" },
+      sp.type !== "kpi" ? h("div", { class: "cd-seg", role: "group", "aria-label": "Chart or table" },
+        h("button", { type: "button", "aria-pressed": String(!asTable), title: "Chart view", onclick: () => { CD.view[sp.id] = "chart"; renderCustomDash(); } }, "📊 Chart"),
+        h("button", { type: "button", "aria-pressed": String(asTable), title: "Table view: hover a number to see who, click to copy", onclick: () => { CD.view[sp.id] = "table"; renderCustomDash(); } }, "▦ Table")) : null,
+      h("button", { class: "btn mini", title: "Copy the numbers (paste into Excel or email)", onclick: async () => { await copyText(cdToTsv(res, sp.title)); toast("Copied the table."); } }, "Copy"),
+      mine ? h("button", { class: "btn mini", title: "Edit chart", onclick: () => cdEditChart(dash, i) }, "Edit") : null,
+      mine ? h("details", { class: "cd-more" }, h("summary", { class: "btn mini", "aria-label": "More chart options" }, "⋯"), h("div", { class: "cd-menu" },
+        i > 0 ? h("button", { onclick: () => move(i, -1) }, "Move earlier") : null,
+        i < charts.length - 1 ? h("button", { onclick: () => move(i, 1) }, "Move later") : null,
+        h("button", { onclick: () => { const c = charts.slice(); c[i] = { ...sp, size: sp.size === "full" ? "half" : "full" }; cdPersist({ ...dash, charts: c }); } }, sp.size === "full" ? "Make half width" : "Make full width"),
+        h("button", { onclick: () => { const c = charts.slice(); c.splice(i + 1, 0, { ...JSON.parse(JSON.stringify(sp)), id: cdId(), title: sp.title + " (copy)" }); cdPersist({ ...dash, charts: c }); } }, "Duplicate"),
+        h("button", { class: "danger", onclick: () => { if (!confirm("Remove the chart “" + sp.title + "”?")) return; cdPersist({ ...dash, charts: charts.filter((_, j) => j !== i) }, "Chart removed."); } }, "Remove chart"))) : null);
+    card.append(h("div", { class: "cd-chead" }, h("div", { class: "grow" }, h("h3", {}, sp.title || "Untitled chart"), h("div", { class: "sub" }, cdDescribe(sp) + (res.note ? " · " + res.note : ""))), tools), h("div", { class: "cd-body" }, el));
+  });
+}
+
+/* ---------- new dashboard (blank or template) ---------- */
+function cdTemplates() {
+  const sch = state.schema || {}, has = k => sch[k] && state.idx[sch[k]] != null;
+  return [
+    { id: "blank", name: "Blank dashboard", desc: "Start empty and add your own charts.", charts: [] },
+    { id: "people", name: "Team overview", desc: "Headcount by status, client and designation, joiners by month, tenure.", charts: [
+      has("status_column") && { title: "Headcount by status", src: "emp", type: "donut", group: "c:" + sch.status_column, measure: "count", who: "report", limit: 8 },
+      has("client_column") && { title: "Headcount by client", src: "emp", type: "bar", group: "c:" + sch.client_column, measure: "count", who: "report", limit: 10 },
+      has("doj_column") && { title: "Joiners by month", src: "emp", type: "column", group: "m:" + sch.doj_column, measure: "count", who: "all", size: "full" },
+      { title: "Tenure bands", src: "emp", type: "column", group: "x:tenure", measure: "count", who: "report" },
+      has("designation_column") && { title: "Designations", src: "emp", type: "bar", group: "c:" + sch.designation_column, measure: "count", who: "report", limit: 10 },
+    ].filter(Boolean) },
+    { id: "leave", name: "Leave overview", desc: "Leave days by month and type, top clients and people, weekdays.", charts: [
+      { title: "Leave days · last 12 months", src: "att", type: "column", group: "a:month", split: "a:cat", measure: "days", period: "last365", codes: "leave", size: "full" },
+      { title: "Leave by type", src: "att", type: "donut", group: "a:cat", measure: "days", period: "last90", codes: "leave" },
+      { title: "Leave by weekday", src: "att", type: "column", group: "a:weekday", measure: "days", period: "last180", codes: "leave" },
+      { title: "Top 10 · most leave days", src: "att", type: "bar", group: "a:emp", measure: "days", period: "last90", codes: "leave", limit: 10, other: false },
+      { title: "Leave days by client", src: "att", type: "bar", group: "a:client", measure: "days", period: "last90", codes: "leave", limit: 10 },
+    ] },
+  ];
+}
+function cdNewDashboard() {
+  if (!cdCanBuild()) return toast("Your passcode can’t create dashboards. Ask the admin for the right in Settings.", true);
+  const name = h("input", { class: "input", placeholder: "e.g. Monthly leave review", maxlength: "60" });
+  let pick = "blank";
+  const cards = cdTemplates().map(t => h("label", { class: "cd-tpl" }, h("input", { type: "radio", name: "cdtpl", value: t.id, checked: t.id === "blank", onchange: () => { pick = t.id; if (!name.value.trim() || cdTemplates().some(x => x.name === name.value)) name.value = t.id === "blank" ? "" : t.name; } }), h("span", {}, h("b", {}, t.name), h("small", {}, t.desc))));
+  const err = h("p", { class: "err" });
+  mountDrawer(h("aside", { class: "drawer", role: "dialog", "aria-modal": "true", "aria-label": "New dashboard" },
+    h("header", {}, h("h2", {}, "New dashboard"), h("button", { class: "btn ghost", onclick: closeDrawer, "aria-label": "Close" }, "✕")),
+    h("div", { class: "body" },
+      h("div", { class: "field" }, h("label", {}, "Name"), name),
+      h("div", { class: "field" }, h("label", {}, "Start from"), h("div", { class: "cd-tpls" }, cards)),
+      err,
+      h("div", { style: "display:flex;gap:8px;margin-top:12px" },
+        h("button", { class: "btn primary", onclick: async ev => {
+          const t = cdTemplates().find(x => x.id === pick), nm = name.value.trim() || (t.id === "blank" ? "My dashboard" : t.name);
+          const dash = { id: cdId(), name: nm, ownerId: cdMe(), owner: cdMeName(), shared: false, created: new Date().toISOString(), charts: t.charts.map(c => ({ size: "half", ...c, id: cdId() })) };
+          ev.currentTarget.disabled = true;
+          try { await cdSave(dash); CD.cur = dash.id; closeDrawer(); toast("Dashboard created."); renderCustomDash(); if (!dash.charts.length) cdEditChart(dash, null); }
+          catch (e) { err.textContent = "Couldn’t save: " + (e.message || e); ev.currentTarget.disabled = false; }
+        } }, "Create"),
+        h("button", { class: "btn", onclick: closeDrawer }, "Cancel")))));
+  setTimeout(() => name.focus(), 30);
+}
+
+/* ---------- chart editor with live preview ---------- */
+function cdEditChart(dash, index) {
+  const orig = index == null ? null : dash.charts[index];
+  const sp = orig ? JSON.parse(JSON.stringify(orig)) : { id: cdId(), title: "", src: "emp", type: "bar", group: "", measure: "count", who: "report", period: "last90", codes: "leave", limit: 10, sort: "value", size: "half", filters: [] };
+  sp.filters = sp.filters || [];
+  let autoTitle = !orig || !sp.title;
+  const form = h("div", { class: "cd-form" }), preview = h("div", { class: "cd-preview" }), err = h("p", { class: "err" });
+  const sel = (opts, val, fn, extra) => { const s = h("select", { class: "input", ...(extra || {}) }, opts.map(([v, l]) => h("option", { value: v, selected: String(v) === String(val ?? "") }, l))); s.addEventListener("change", () => fn(s.value)); return s; };
+  const fld = (label, ctl, hint) => h("div", { class: "field" }, h("label", {}, label), ctl, hint ? h("small", { class: "hint" }, hint) : null);
+  const suggest = () => { const d = cdDims(sp.src).find(x => x.id === sp.group), m = (cdMeasures(sp.src).find(x => x[0] === sp.measure) || ["", ""])[1]; return sp.type === "kpi" ? m : d ? m.replace(/ \(.*\)$/, "") + " by " + d.label.replace(/ · by /, " per ").toLowerCase() : "New chart"; };
+  const draw = () => {
+    const dims = cdDims(sp.src);
+    if (!dims.some(d => d.id === sp.group)) sp.group = (dims.find(d => /status|client/i.test(d.label)) || dims[0] || {}).id || "";
+    if (sp.split && !dims.some(d => d.id === sp.split)) sp.split = "";
+    if (!cdMeasures(sp.src).some(m => m[0] === sp.measure)) sp.measure = cdMeasures(sp.src)[0][0];
+    if (autoTitle) sp.title = suggest();
+    const title = h("input", { class: "input", value: sp.title, maxlength: "80", oninput: e => { sp.title = e.target.value; autoTitle = false; } });
+    const dimOpts = dims.map(d => [d.id, d.label]);
+    const filters = h("div", { class: "cd-filters" }, sp.filters.map((f, fi) => {
+      const fd = dims.find(d => d.id === f.dim);
+      let vals = [];
+      if (fd) { const src = sp.src === "att" ? (window.ATT && ATT.entries ? (ATT.entries(...cdPeriod(sp.period)) || []) : []) : state.rows; const cnt = new Map(); for (const r of src) { const v = fd.val(r); const k = v == null ? "(Blank)" : v; cnt.set(k, (cnt.get(k) || 0) + 1); } vals = [...cnt.keys()].sort((a, b) => String(a).localeCompare(String(b), undefined, { numeric: true })).slice(0, 400); }
+      const ms = h("select", { class: "input cd-multi", multiple: true, size: Math.min(6, Math.max(3, vals.length)), "aria-label": "Values to keep", onchange: e => { f.vals = [...e.target.selectedOptions].map(o => o.value); refresh(); } }, vals.map(v => h("option", { value: v, selected: (f.vals || []).includes(v) }, fd && fd.fmt && v !== "(Blank)" ? fd.fmt(v) : v)));
+      return h("div", { class: "cd-filter" }, h("div", { class: "cd-frow" }, sel(dimOpts, f.dim, v => { f.dim = v; f.vals = []; draw(); }), h("button", { class: "btn mini", type: "button", onclick: () => { sp.filters.splice(fi, 1); draw(); } }, "Remove")), ms, h("small", { class: "hint" }, "Ctrl / Cmd + click to pick several. Nothing picked = no filter."));
+    }), h("button", { class: "btn mini", type: "button", onclick: () => { sp.filters.push({ dim: dims[0] ? dims[0].id : "", vals: [] }); draw(); } }, "+ Add a filter"));
+    const isKpi = sp.type === "kpi", isTime = (dims.find(d => d.id === sp.group) || {}).time;
+    form.replaceChildren(...[
+      fld("Chart title", title),
+      h("div", { class: "cd-2" },
+        fld("Data", sel([["emp", "Employees (workforce file)"], ["att", "Attendance tracker"]], sp.src, v => { sp.src = v; sp.filters = []; sp.group = ""; sp.split = ""; sp.measure = ""; draw(); })),
+        fld("Chart type", sel(CD_TYPES, sp.type, v => { sp.type = v; draw(); }))),
+      h("div", { class: "cd-2" },
+        isKpi ? null : fld("Group by", sel(dimOpts, sp.group, v => { sp.group = v; draw(); })),
+        fld("Show", sel(cdMeasures(sp.src), sp.measure, v => { sp.measure = v; draw(); }))),
+      isKpi || sp.type === "donut" ? null : fld("Split each bar by (optional)", sel([["", "No split"], ...dimOpts.filter(d => d[0] !== sp.group)], sp.split || "", v => { sp.split = v; draw(); }), "Shows stacked bars, or one line per value."),
+      sp.src === "att" ? h("div", { class: "cd-2" },
+        fld("Period", sel(CD_PERIODS, sp.period, v => { sp.period = v; draw(); })),
+        fld("Which codes", sel(CD_CODESETS, sp.codes || "leave", v => { sp.codes = v; refresh(); }))) :
+        fld("Which people", sel([["report", "Follow the report filters at the top"], ["current", "Current employees"], ["all", "Everyone in the file"]], sp.who || "report", v => { sp.who = v; refresh(); })),
+      isKpi || isTime ? null : h("div", { class: "cd-2" },
+        fld("Show", sel([["0", "All values"], ["5", "Top 5"], ["10", "Top 10"], ["15", "Top 15"], ["20", "Top 20"]], String(sp.limit || 0), v => { sp.limit = +v; refresh(); })),
+        fld("Order", sel([["value", "Largest first"], ["label", "A → Z"]], sp.sort || "value", v => { sp.sort = v; refresh(); }))),
+      fld("Filters (optional)", filters),
+      fld("Width on the dashboard", sel([["half", "Half width"], ["full", "Full width"]], sp.size || "half", v => { sp.size = v; })),
+      sp.src === "att" ? h("p", { class: "hint" }, "Attendance charts also follow the client / status filters used by the attendance pages.") : null].filter(Boolean));
+    refresh();
+  };
+  const refresh = () => {
+    preview.replaceChildren(h("div", { class: "cd-ptitle" }, "Preview"), h("div", { class: "card cd-card" }, h("div", { class: "cd-chead" }, h("div", { class: "grow" }, h("h3", {}, sp.title || "Untitled chart"), h("div", { class: "sub" }, cdDescribe(sp)))), h("div", { class: "cd-body" }, cdDraw(sp, 420, false).el)));
+  };
+  const save = async ev => {
+    if (!sp.title.trim()) sp.title = suggest();
+    sp.filters = sp.filters.filter(f => f.dim && f.vals && f.vals.length);
+    const charts = (dash.charts || []).slice(); if (index == null) charts.push(sp); else charts[index] = sp;
+    ev.currentTarget.disabled = true;
+    try { await cdSave({ ...dash, charts }); closeDrawer(); toast(index == null ? "Chart added." : "Chart updated."); renderCustomDash(); }
+    catch (e) { err.textContent = "Couldn’t save: " + (e.message || e); ev.currentTarget.disabled = false; }
+  };
+  mountDrawer(h("aside", { class: "drawer cd-drawer", role: "dialog", "aria-modal": "true", "aria-label": index == null ? "Add a chart" : "Edit chart" },
+    h("header", {}, h("h2", {}, index == null ? "Add a chart" : "Edit chart"), h("button", { class: "btn ghost", onclick: closeDrawer, "aria-label": "Close" }, "✕")),
+    h("div", { class: "body" }, h("div", { class: "cd-edit" }, form, preview), err,
+      h("div", { class: "cd-actions" }, h("button", { class: "btn primary", onclick: save }, index == null ? "Add to dashboard" : "Save chart"), h("button", { class: "btn", onclick: closeDrawer }, "Cancel")))));
+  draw();
+}
+window.renderCustomDash = renderCustomDash;
+
 function renderCharts() {
   renderReportSelection(); syncReportToggle();
   if (window.REPORT_TABLES && !renderCharts._init) { renderCharts._init = true; for (const c of document.querySelectorAll("#charts > .card")) if (!state.chartView[c.id]) state.chartView[c.id] = "table"; }
   
-  const groups = { team: ["cardStatus","cardClient","cardSub","cardDesig","cardMode","cardGender","cardLang","cardAge"], growth: ["cardTenure","cardTrend"], location: ["cardArea","cardDist"], attendance: [] };
-  const chosen = $("#reportGroup").value; $("#charts").hidden = chosen === "attendance";
+  const groups = { team: ["cardStatus","cardClient","cardSub","cardDesig","cardMode","cardGender","cardLang","cardAge"], growth: ["cardTenure","cardTrend"], location: ["cardArea","cardDist"], attendance: [], custom: [] };
+  const chosen = $("#reportGroup").value; $("#charts").hidden = chosen === "attendance" || chosen === "custom";
+  const rt = $("#repTables"); if (rt) rt.hidden = chosen === "custom";
+  const cdBox = $("#customDash"); if (cdBox) { cdBox.hidden = chosen !== "custom"; if (chosen === "custom") { renderCustomDash(); return; } }
   const visible = id => chosen === "all" || groups[chosen].includes(id);
   document.querySelectorAll('#charts > .card').forEach(c => c.hidden = !visible(c.id));
   for (const spec of CAT_CARDS) if (visible(spec.id)) renderCat(spec);
@@ -7257,16 +7982,18 @@ function ovTabs(bar, tabs, active, onPick) {
 }
 function organizeRequests() {
   const wrap = $("#ovRequests"), bar = $("#rcTabs"); if (!wrap || !bar) return;
+  /* v3.20: To approve · Waiting · History. Each request is listed in exactly one tab. */
   const defs = [
-    { id: "approvals", host: $("#cardApprovalRequests"), label: "Approvals", sel: ".request-row" },
-    { id: "own", host: $("#cardMyRequests"), label: "My requests", sel: ".request-history-row" },
-    { id: "rejected", host: $("#cardRejectedRequests"), label: "Rejected", sel: ".request-history-row" },
+    { id: "approvals", host: $("#cardApprovalRequests"), label: "To approve" },
+    { id: "own", host: $("#cardMyRequests"), label: "Waiting" },
+    { id: "rejected", host: $("#cardRejectedRequests"), label: "History" },
   ].filter(d => d.host);
-  const vis = defs.filter(d => !d.host.hidden).map(d => ({ ...d, n: ovCount(d.host, d.sel) }));
+  let c = {}; try { c = (window.ATT && ATT.requestCounts) ? ATT.requestCounts() : {}; } catch { }
+  const vis = defs.filter(d => !d.host.hidden).map(d => ({ ...d, n: c[d.id] || 0 }));
   wrap.hidden = !vis.length; if (!vis.length) return;
-  if (!OV.rc || !vis.some(d => d.id === OV.rc)) OV.rc = (vis.find(d => d.id === "approvals" && d.n) || vis[0]).id;
+  if (!OV.rc || !vis.some(d => d.id === OV.rc)) OV.rc = (vis.find(d => d.id !== "rejected" && d.n) || vis.find(d => d.id === "rejected") || vis[0]).id;
   for (const d of defs) d.host.classList.toggle("ov-off", d.id !== OV.rc);
-  ovTabs(bar, vis.map(d => ({ ...d, hot: d.id === "approvals" && d.n > 0 })), OV.rc, id => { OV.rc = id; organizeRequests(); });
+  ovTabs(bar, vis.map(d => ({ ...d, n: d.id === "rejected" ? null : d.n, hot: d.id === "approvals" && d.n > 0 })), OV.rc, id => { OV.rc = id; organizeRequests(); });
 }
 function organizeUpcoming() {
   const wrap = $("#ovUpcoming"), bar = $("#ovUpTabs"), com = $("#cardComing"), hol = $("#cardHolidays"); if (!wrap || !bar) return;
@@ -7290,7 +8017,7 @@ function renderGlance() {
     const t = ATT.todayStats && ATT.todayStats();
     tiles.push(tile("🏖️", "t-leave", "On leave today", t ? String(t.full) : "–", t ? (t.half + " half day · " + t.late + " late") : "attendance not connected", jump("#cardAttendance")));
   }
-  if (can("requests.approvals") && window.ATT) {
+  if (can("att.approve") && window.ATT) {
     const n = ATT.requestsToDecide ? ATT.requestsToDecide() : 0;
     tiles.push(tile("📝", "t-req" + (n ? " hot" : ""), "Waiting for approval", String(n), n ? "open Request Center" : "all caught up", jump("#ovRequests", () => { OV.rc = "approvals"; organizeRequests(); })));
   }
@@ -7307,9 +8034,8 @@ function renderGlance() {
   box.replaceChildren(...tiles); box.hidden = !tiles.length;
   box.style.setProperty("--n", Math.max(1, tiles.length));
 }
-function organizeOverview() { for (const f of [organizeRequests, organizeUpcoming, renderGlance]) { try { f(); } catch (e) { console.warn(e); } } }
+function organizeOverview() { if (typeof state === "undefined" || state.view !== "summary" || document.getElementById("pageSummary")?.hidden) return; for (const f of [organizeRequests, organizeUpcoming, renderGlance]) { try { f(); } catch (e) { console.warn(e); } } }
 window.organizeOverview = organizeOverview;
-setInterval(() => { if (typeof state !== "undefined" && state.view === "summary" && !document.hidden) organizeOverview(); }, 4000);
 
 /* ---------- v3.17: USA federal and India gazetted holidays ---------- */
 const HOL_IN = {
@@ -7549,7 +8275,8 @@ for (const t of document.querySelectorAll(".atab")) t.addEventListener("click", 
 const FILL = {
   fields: [], mode: "missing", scope: "all", preset: null, ids: null, idsLabel: "", client: "", q: "", sort: "name", limit: 150,
   edits: new Map(),            // row id -> Map(column name -> { val: input text, base: cell value when the edit began })
-  fillCol: "", fillVal: "", blanksOnly: true, saving: false, sig: "", byId: new Map()
+  fillCol: "", fillVal: "", blanksOnly: true, saving: false, sig: "", byId: new Map(),
+  colf: {}                     // v3.18: column filters in the table header: key -> Set of values to show
 };
 const fillCols = () => state.cols.filter(c => !c.auto && c.name !== state.schema.key_column);
 const fillCol = n => (state.idx[n] == null ? null : state.cols[state.idx[n]]);
@@ -7580,7 +8307,18 @@ function fillPruneEdits() {
   }
   if (lost) toast(lost + " typed value" + (lost === 1 ? " was" : "s were") + " dropped because that cell changed in Excel in the meantime.", true);
 }
-function fillRows() {
+/* v3.18: the value a column shows for a row, as text (used by the header filters) */
+function fillKeyVal(r, key) {
+  let v;
+  if (key === "id") v = String(r.id ?? "");
+  else if (key === "name") v = gs(r, "name_column");
+  else if (key === "status") v = gs(r, "status_column");
+  else if (key === "client") v = gs(r, "client_column");
+  else { const c = fillCol(key.slice(2)); if (!c) return BLANK; const t = String(fillCell(r, c) ?? "").trim(); v = t && c.type === "date" && /^\d{4}-\d\d-\d\d$/.test(t) ? fmtDate(isoToSerial(t)) : t; }
+  v = String(v ?? "").trim(); return v || BLANK;
+}
+const fillColfOn = () => Object.keys(FILL.colf).length > 0;
+function fillRows(skipKey) {
   const P = FILL.preset ? fillPresets().find(p => p.id === FILL.preset) : null;
   const fields = FILL.fields.map(fillCol).filter(Boolean), q = FILL.q.trim().toLowerCase();
   let rows = state.rows.filter(r => r.id != null && String(r.id) !== "");
@@ -7592,6 +8330,7 @@ function fillRows() {
   if (FILL.client) rows = rows.filter(r => gs(r, "client_column") === FILL.client);
   if (q) rows = rows.filter(r => r._s.includes(q));
   if (FILL.mode === "missing" && fields.length) rows = rows.filter(r => FILL.edits.has(r.id) || fields.some(c => fillBlankCell(r, c)));
+  for (const [k, set] of Object.entries(FILL.colf)) { if (k === skipKey || (k.startsWith("f:") && !FILL.fields.includes(k.slice(2)))) continue; rows = rows.filter(r => set.has(fillKeyVal(r, k))); }
   const nm = r => gs(r, "name_column");
   const cmp = FILL.sort === "id" ? (a, b) => String(a.id).localeCompare(String(b.id), undefined, { numeric: true })
     : FILL.sort === "client" ? (a, b) => gs(a, "client_column").localeCompare(gs(b, "client_column")) || nm(a).localeCompare(nm(b))
@@ -7737,11 +8476,13 @@ function fillTable() {
   if (!fields.length) { box.replaceChildren(h("div", { class: "allclear" }, h("span", { "aria-hidden": "true" }, "☝"), "Choose a field above, or one of the quick starts, to begin.")); fillFooter(); return; }
   const all = fillRows(), rows = all.slice(0, FILL.limit);
   const P = FILL.preset ? fillPresets().find(p => p.id === FILL.preset) : null;
-  const head = h("div", { class: "fill-count" }, "Showing ", h("b", {}, fmtN(rows.length)), all.length > rows.length ? " of " + fmtN(all.length) : "", " " + (all.length === 1 ? "person" : "people") + (FILL.mode === "missing" ? " with a missing value" : ""));
+  const head = h("div", { class: "fill-count" }, "Showing ", h("b", {}, fmtN(rows.length)), all.length > rows.length ? " of " + fmtN(all.length) : "", " " + (all.length === 1 ? "person" : "people") + (FILL.mode === "missing" ? " with a missing value" : ""),
+    fillColfOn() ? h("span", {}, " · column filters on (" + Object.keys(FILL.colf).length + ") ", h("button", { class: "linkbtn", onclick: () => { FILL.colf = {}; FILL.sig = ""; fillTable(); } }, "Clear column filters")) : null);
   if (!all.length) { box.replaceChildren(head, h("div", { class: "allclear" }, h("span", { "aria-hidden": "true" }, "✓"), FILL.mode === "missing" ? "Nobody here is missing " + fields.map(c => c.label).join(" or ") + "." : "Nobody matches these filters.")); fillFooter(); return; }
   const th = t => h("th", {}, t);
+  const thF = (label, key) => h("th", {}, h("span", { class: "fth" }, h("span", {}, label), h("button", { type: "button", class: "fthf" + (FILL.colf[key] ? " on" : ""), "data-pop": "1", title: "Filter " + label, "aria-label": "Filter " + label, onclick: ev => { ev.stopPropagation(); openFillColFilter(ev.currentTarget, key, label); } }, FILL.colf[key] ? "▼" : "▾")));
   const table = h("table", { class: "filltbl" },
-    h("thead", {}, h("tr", {}, th("#"), th("Emp ID"), th("Name"), th("Status"), th("Client"), fields.map(c => th(c.label)), th(""))),
+    h("thead", {}, h("tr", {}, th("#"), thF("Emp ID", "id"), thF("Name", "name"), thF("Status", "status"), thF("Client", "client"), fields.map(c => thF(c.label, "f:" + c.name)), th(""))),
     h("tbody", {}, rows.map((r, i) => {
       const m = FILL.edits.get(r.id);
       const tr = h("tr", { "data-id": r.id, class: m ? "edited" : "" },
@@ -7753,7 +8494,7 @@ function fillTable() {
     })));
   const more = all.length > rows.length ? h("div", { class: "fill-more" }, h("button", { class: "btn", onclick: () => { FILL.limit += 150; fillTable(); } }, "Show " + Math.min(150, all.length - rows.length) + " more"), h("span", { class: "hint" }, " " + (all.length - rows.length) + " more not shown yet")) : null;
   const wrap = h("div", { class: "tablewrap filltbl-wrap" }, table);
-  box.replaceChildren(head, wrap, more);
+  box.replaceChildren(...[head, wrap, more].filter(Boolean));
   wrap.scrollTop = scrollTop;
   const rowOf = el => FILL.byId.get(el.closest("tr").dataset.id);
   const onEdit = e => { const el = e.target.closest(".fc"); if (!el) return; const r = rowOf(el), c = fillCol(el.dataset.col); fillSet(r.id, c, el.value); fillMark(el, r, c); el.closest("tr").classList.toggle("edited", FILL.edits.has(r.id)); fillFooter(); };
@@ -7765,6 +8506,40 @@ function fillTable() {
     if (nx) { e.preventDefault(); const t = nx.querySelector('.fc[data-col="' + CSS.escape(el.dataset.col) + '"]'); if (t) { t.focus(); if (t.select) t.select(); } }
   });
   fillFooter();
+}
+/* v3.18: Excel-style filter for a column of the Fill in bulk table */
+function openFillColFilter(anchor, key, label) {
+  const rows = fillRows(key), counts = new Map();
+  for (const r of rows) { const v = fillKeyVal(r, key); counts.set(v, (counts.get(v) || 0) + 1); }
+  for (const v of FILL.colf[key] || []) if (!counts.has(v)) counts.set(v, 0);
+  const allVals = [...counts.keys()].sort((a, b) => (a === BLANK ? 1 : b === BLANK ? -1 : a.localeCompare(b, undefined, { numeric: true })));
+  const pop = h("div", { class: "colf", role: "dialog", "aria-label": "Filter " + label });
+  const sortKey = { id: "id", name: "name", client: "client" }[key];
+  pop.append(h("div", { class: "colf-h" }, label));
+  if (sortKey) pop.append(h("div", { class: "colf-row" }, h("button", { class: "btn mini", onclick: () => { FILL.sort = sortKey; closePops(); fillTable(); } }, "↑ Sort A → Z")));
+  let sel = FILL.colf[key] ? new Set(FILL.colf[key]) : null;   // null = everything shown
+  const apply = () => { if (!sel || allVals.every(v => sel.has(v))) delete FILL.colf[key]; else FILL.colf[key] = new Set(sel); FILL.sig = ""; fillTable(); };
+  const search = h("input", { class: "input", type: "search", placeholder: "Search " + allVals.length + " values…", "aria-label": "Search values", style: "height:30px;margin:8px 0" });
+  const list = h("div", { class: "colf-list" });
+  const draw = () => {
+    const q = search.value.trim().toLowerCase(), shown = allVals.filter(v => !q || v.toLowerCase().includes(q));
+    list.replaceChildren(...shown.slice(0, 300).map(v => h("label", {}, h("input", { type: "checkbox", checked: !sel || sel.has(v), onchange: e => { sel = sel || new Set(allVals); if (e.target.checked) sel.add(v); else sel.delete(v); apply(); } }), h("span", { class: "colf-v" }, v), h("small", {}, String(counts.get(v))))));
+    if (shown.length > 300) list.append(h("div", { class: "hint", style: "padding:6px 8px" }, "Showing the first 300 of " + shown.length + " – type to narrow down."));
+    if (!shown.length) list.append(h("div", { class: "hint", style: "padding:6px 8px" }, "No values match."));
+  };
+  search.addEventListener("input", draw);
+  pop.append(search,
+    h("div", { class: "colf-row" },
+      h("button", { class: "linkbtn", onclick: () => { sel = null; apply(); draw(); } }, "Select all"),
+      h("button", { class: "linkbtn", onclick: () => { const q = search.value.trim().toLowerCase(); sel = new Set(q ? allVals.filter(v => !v.toLowerCase().includes(q) && (!sel || sel.has(v))) : []); apply(); draw(); } }, "Clear"),
+      h("button", { class: "linkbtn", onclick: () => { sel = new Set([BLANK]); apply(); draw(); } }, "Only blanks")),
+    list,
+    h("div", { class: "colf-row", style: "margin-top:8px" },
+      h("button", { class: "btn mini", onclick: () => { delete FILL.colf[key]; FILL.sig = ""; closePops(); fillTable(); } }, "Clear filter"),
+      h("button", { class: "btn mini primary", onclick: closePops }, "Done")));
+  draw();
+  openPopNode(anchor, pop);
+  setTimeout(() => search.focus(), 0);
 }
 function fillMark(el, row, c) {
   const m = FILL.edits.get(row.id), e = m && m.get(c.name), err = e ? fillCheck(row, c, e.val) : "";
@@ -9075,7 +9850,7 @@ window.applyAccess = () => {
   show('#cardAttendance', PERM.canView('attendance') && PERM.can('ov.attendance'));
   window.ATT?.renderApprovalRequests();
   show('#cardComing', PERM.can('ov.coming'));
-  show('#cardHolidays', PERM.can('ov.holidays')); window.organizeOverview?.(); if (typeof renderHolidays === 'function' && typeof state !== 'undefined' && state.view === 'summary') renderHolidays();
+  show('#cardHolidays', PERM.can('ov.holidays')); if (typeof renderHolidays === 'function' && typeof state !== 'undefined' && state.view === 'summary') { renderHolidays(); window.organizeOverview?.(); }
   show('#cardWatch', PERM.can('ov.watch'));
   show('#btnAddField', PERM.can('emp.fields'));
   show('#btnBell', PERM.can('notifications.view') || PERM.can('activity.view'));
@@ -9084,7 +9859,7 @@ window.applyAccess = () => {
   /* v3.14: each report group has its own right */
   const rg = el('reportGroup');
   if (rg) {
-    const need = { team: 'rep.team', growth: 'rep.growth', location: 'rep.location', attendance: 'rep.attendance' };
+    const need = { team: 'rep.team', growth: 'rep.growth', location: 'rep.location', attendance: 'rep.attendance', custom: 'rep.custom' };
     for (const o of rg.options) { const ok = PERM.can(need[o.value] || 'page.reports') && (o.value !== 'attendance' || PERM.canView('attendance')); o.hidden = o.disabled = !ok; }
     if (rg.selectedOptions[0] && rg.selectedOptions[0].disabled) { const f = [...rg.options].find(o => !o.disabled); if (f) { rg.value = f.value; if (typeof state !== 'undefined' && state.view === 'reports' && state.schema) { renderCharts(); attSync(); window.placeSavedFilters?.(); } } }
   }
@@ -9093,6 +9868,157 @@ window.applyAccess = () => {
   renderSyncButtons();
 };
 setInterval(async () => { if (PERM.online() && !el('app').hidden && !document.hidden) { await CLOUD.refreshMe(); applyAccess(); } }, 60000);
+
+/* ============================== v3.19: team chat and online status ==============================
+   Green = signed in with the dashboard open in the last 5 minutes · grey = signed in but the tab has not been
+   open for 5+ minutes (or the browser was closed) · grey with ✕ = signed out. Messages and presence go through
+   supabase/chat.sql; the window checks for news every 3 s while a chat is open and every 20 s otherwise. */
+const CHAT = { open: false, withId: null, people: [], unread: {}, me: null, skew: 0, msgs: new Map(), last: new Map(), busy: false, timer: null, broken: '', brokenAt: 0, blocked: false, notified: {}, extra: new Map(), extraAt: 0, q: '', activeSince: Date.now(), inactiveSince: null };
+const chatOnline = () => window.PERM && PERM.online() && !el('app').hidden && PERM.can('chat.use') && !CHAT.blocked;
+/* how long this tab has not been in front of the person */
+function chatIdle() { const on = document.visibilityState === 'visible' && document.hasFocus(); if (on) { CHAT.inactiveSince = null; return 0; } if (!CHAT.inactiveSince) CHAT.inactiveSince = Date.now(); return (Date.now() - CHAT.inactiveSince) / 1000; }
+function presenceOf(p) {
+  if (!p || p.state === 'offline' || p.never) return 'off';
+  const now = Date.now() + CHAT.skew, ping = now - Date.parse(p.last_ping), act = now - Date.parse(p.last_active);
+  if (ping > 12 * 3600e3) return 'off';
+  if (ping <= 120e3 && act < 5 * 60e3) return 'on';
+  return 'away';
+}
+const agoText = ms => { const m = Math.round(ms / 60000); return m < 1 ? 'just now' : m < 60 ? m + ' min' : m < 1440 ? Math.round(m / 60) + ' h' : Math.round(m / 1440) + ' d'; };
+function presenceText(p) {
+  const st = presenceOf(p), now = Date.now() + CHAT.skew;
+  if (st === 'on') return 'Online';
+  if (st === 'away') return 'Away · last active ' + agoText(now - Date.parse(p.last_active)) + ' ago';
+  if (p && p.never) return 'Not signed in yet';
+  return 'Signed out' + (p && p.last_ping ? ' · ' + agoText(now - Date.parse(p.last_ping)) + ' ago' : '');
+}
+const pdot = (p, big) => h('span', { class: 'pd pd-' + presenceOf(p) + (big ? ' big' : ''), title: presenceText(p), 'aria-label': presenceText(p) }, presenceOf(p) === 'off' ? '✕' : '');
+const chatName = id => id === 'all' ? 'Everyone' : ((CHAT.people.find(p => String(p.id) === String(id)) || CHAT.extra.get(String(id)) || {}).name || 'Someone');
+function chatPeople() {
+  const map = new Map(CHAT.people.map(p => [String(p.id), p]));
+  for (const [id, p] of CHAT.extra) if (!map.has(id)) map.set(id, p);
+  const rank = { on: 0, away: 1, off: 2 };
+  return [...map.values()].filter(p => String(p.id) !== String(CHAT.me)).sort((a, b) => (CHAT.unread[b.id] ? 1 : 0) - (CHAT.unread[a.id] ? 1 : 0) || rank[presenceOf(a)] - rank[presenceOf(b)] || String(a.name).localeCompare(String(b.name)));
+}
+function chatMount() {
+  if (el('chatFab')) return;
+  const fab = h('button', { id: 'chatFab', type: 'button', class: 'chat-fab', 'aria-label': 'Team chat', title: 'Team chat', onclick: () => chatToggle() }, h('span', { class: 'chat-fab-ic', 'aria-hidden': 'true' }, '💬'), h('span', { class: 'chat-fab-t' }, 'Chat'), h('span', { class: 'pd pd-on chat-me-dot', id: 'chatMeDot' }), h('b', { class: 'chat-badge', id: 'chatBadge', hidden: true }));
+  const panel = h('section', { id: 'chatPanel', class: 'chat-panel', hidden: true, role: 'dialog', 'aria-label': 'Team chat' });
+  document.body.append(fab, panel);
+  document.addEventListener('visibilitychange', () => { if (document.visibilityState === 'visible') chatSync(true); else chatSync(); });
+  addEventListener('focus', () => chatSync(true)); addEventListener('blur', () => { chatIdle(); });
+  addEventListener('keydown', e => { if (e.key === 'Escape' && CHAT.open) chatToggle(false); });
+}
+function chatToggle(on = !CHAT.open) {
+  CHAT.open = on; el('chatPanel').hidden = !on; el('chatFab').classList.toggle('on', on);
+  if (on) { chatDraw(); chatSync(true); setTimeout(() => (el('chatPanel').querySelector('.chat-in') || el('chatPanel').querySelector('.chat-search'))?.focus(), 30); }
+}
+function chatOpenWith(id) { CHAT.withId = id == null ? null : String(id); CHAT.q = ''; chatDraw(); chatSync(true); setTimeout(() => el('chatPanel').querySelector('.chat-in')?.focus(), 30); }
+function chatSchedule() {
+  clearTimeout(CHAT.timer);
+  const ms = document.visibilityState !== 'visible' ? 60000 : CHAT.open && CHAT.withId ? 3000 : CHAT.open ? 6000 : 20000;
+  CHAT.timer = setTimeout(() => chatSync(), ms);
+}
+async function chatSync(force) {
+  const fab = el('chatFab');
+  if (!chatOnline()) { if (fab) fab.hidden = true; if (el('chatPanel')) el('chatPanel').hidden = true; CHAT.open = false; clearTimeout(CHAT.timer); CHAT.timer = setTimeout(() => chatSync(), 5000); return; }
+  chatMount(); el('chatFab').hidden = false;
+  if (CHAT.busy) { chatSchedule(); return; }
+  if (CHAT.broken && Date.now() - CHAT.brokenAt < 300000 && !force) { chatSchedule(); return; }
+  CHAT.busy = true;
+  const withId = CHAT.open ? CHAT.withId : null;
+  try {
+    const r = await CLOUD.chat.sync('online', chatIdle(), withId, withId ? (CHAT.last.get(withId) || 0) : 0);
+    CHAT.broken = ''; CHAT.me = String(r.me); CHAT.skew = Date.parse(r.now) - Date.now(); CHAT.people = r.people || [];
+    const before = CHAT.unread; CHAT.unread = r.unread || {};
+    if (withId && r.messages && r.messages.length) {
+      const list = CHAT.msgs.get(withId) || []; const seen = new Set(list.map(m => m.id));
+      for (const m of r.messages) if (!seen.has(m.id)) list.push(m);
+      CHAT.msgs.set(withId, list); CHAT.last.set(withId, list[list.length - 1].id);
+    }
+    /* anything new in the conversation on screen counts as read */
+    if (withId && CHAT.unread[withId] && document.visibilityState === 'visible') { const lid = CHAT.last.get(withId) || 0; delete CHAT.unread[withId]; CLOUD.chat.read(withId, lid).catch(() => { }); }
+    for (const [k, n] of Object.entries(CHAT.unread)) if (n > (before[k] || 0) && n > (CHAT.notified[k] || 0) && !(CHAT.open && CHAT.withId === k)) { toast('💬 New message ' + (k === 'all' ? 'in Everyone' : 'from ' + chatName(k))); CHAT.notified[k] = n; }
+    for (const k of Object.keys(CHAT.notified)) if (!CHAT.unread[k]) delete CHAT.notified[k];
+    /* the super admin also sees people who have not signed in since chat was added */
+    if (PERM.isSuper() && Date.now() - CHAT.extraAt > 300000) { CHAT.extraAt = Date.now(); CLOUD.admin.users().then(us => { CHAT.extra = new Map((us || []).filter(u => u.active !== false).map(u => [String(u.id), { id: String(u.id), name: u.name, role: u.role, login_id: u.login_id, never: true }])); if (CHAT.open) chatDraw(); }).catch(() => { }); }
+  } catch (e) {
+    const m = String(e && e.message || e);
+    if (/NO_CHAT$/.test(m)) { CHAT.blocked = true; }
+    else if (/not set up|function|schema cache/i.test(m)) { CHAT.broken = 'setup'; CHAT.brokenAt = Date.now(); }
+    else if (!/SESSION_EXPIRED/.test(m)) { CHAT.broken = m; CHAT.brokenAt = Date.now(); }
+  } finally { CHAT.busy = false; }
+  chatBadge(); if (CHAT.open) chatDraw(); chatSchedule();
+}
+function chatBadge() {
+  const n = Object.values(CHAT.unread).reduce((a, b) => a + (+b || 0), 0), b = el('chatBadge'); if (!b) return;
+  b.textContent = n > 99 ? '99+' : String(n); b.hidden = !n;
+  const me = el('chatMeDot'); if (me) { const off = CHAT.broken; me.className = 'pd chat-me-dot ' + (off ? 'pd-off' : 'pd-on'); me.title = off ? 'Chat is not connected' : 'You are online'; }
+  document.title = document.title.replace(/^\(\d+\+?\) /, '') ; if (n) document.title = '(' + (n > 99 ? '99+' : n) + ') ' + document.title;
+}
+const chatTime = iso => { const d = new Date(iso); return d.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }); };
+const chatDay = iso => { const d = new Date(iso), t = new Date(); const same = (a, b) => a.toDateString() === b.toDateString(); if (same(d, t)) return 'Today'; const y = new Date(t); y.setDate(t.getDate() - 1); if (same(d, y)) return 'Yesterday'; return d.toLocaleDateString([], { weekday: 'short', day: 'numeric', month: 'short', year: d.getFullYear() !== t.getFullYear() ? 'numeric' : undefined }); };
+const chatFill = (el0, ...kids) => el0.replaceChildren(...kids.filter(k => k != null && k !== false));
+function chatDraw() {
+  const panel = el('chatPanel'); if (!panel || panel.hidden) return;
+  const keepScroll = panel.querySelector('.chat-msgs'), atBottom = !keepScroll || keepScroll.scrollHeight - keepScroll.scrollTop - keepScroll.clientHeight < 60, oldTop = keepScroll ? keepScroll.scrollTop : 0;
+  const draft = panel.querySelector('.chat-in')?.value || '', focusIn = document.activeElement && document.activeElement.classList.contains('chat-in'), focusSearch = document.activeElement && document.activeElement.classList.contains('chat-search');
+  const close = h('button', { type: 'button', class: 'chat-x', 'aria-label': 'Close chat', onclick: () => chatToggle(false) }, '✕');
+  if (CHAT.broken === 'setup') { chatFill(panel, h('header', { class: 'chat-head' }, h('b', {}, 'Team chat'), close), h('div', { class: 'chat-empty' }, h('p', {}, 'Chat needs a one-time database update.'), h('p', { class: 'sm' }, PERM.isSuper() ? 'Open Supabase → SQL Editor, paste supabase/chat.sql and press Run. Then reopen this window.' : 'Ask the super admin to run supabase/chat.sql in Supabase.'), h('button', { class: 'btn mini', type: 'button', onclick: () => { CHAT.broken = ''; chatSync(true); } }, 'Try again'))); return; }
+  if (!CHAT.withId) {
+    const q = CHAT.q.trim().toLowerCase(), ppl = chatPeople().filter(p => !q || (String(p.name) + ' ' + (p.login_id || '')).toLowerCase().includes(q));
+    const counts = { on: 0, away: 0, off: 0 }; chatPeople().forEach(p => counts[presenceOf(p)]++);
+    const row = (id, name, sub, dot, n) => h('button', { type: 'button', class: 'chat-row', onclick: () => chatOpenWith(id) }, dot, h('span', { class: 'chat-row-t' }, h('b', {}, name), h('small', {}, sub)), n ? h('span', { class: 'chat-unread' }, String(n)) : null);
+    const search = h('input', { class: 'input chat-search', type: 'search', placeholder: 'Search people', value: CHAT.q, 'aria-label': 'Search people' });
+    search.addEventListener('input', () => { CHAT.q = search.value; chatDraw(); });
+    chatFill(panel, 
+      h('header', { class: 'chat-head' }, h('div', {}, h('b', {}, 'Team chat'), h('small', {}, counts.on + ' online · ' + counts.away + ' away · ' + counts.off + ' signed out')), close),
+      h('div', { class: 'chat-legend' }, h('span', {}, pdot({ state: 'online', last_ping: new Date(Date.now() + CHAT.skew).toISOString(), last_active: new Date(Date.now() + CHAT.skew).toISOString() }), 'Online'), h('span', {}, h('span', { class: 'pd pd-away' }), 'Away 5+ min'), h('span', {}, h('span', { class: 'pd pd-off' }, '✕'), 'Signed out')),
+      h('div', { class: 'chat-searchbox' }, search),
+      h('div', { class: 'chat-list' },
+        !q ? row('all', '👥 Everyone', 'Message the whole team', h('span', { class: 'chat-av all', 'aria-hidden': 'true' }, '#'), CHAT.unread.all) : null,
+        ...ppl.map(p => row(String(p.id), p.name || 'Unknown', presenceText(p), h('span', { class: 'chat-av' }, (p.name || '?').trim().split(/\s+/).slice(0, 2).map(x => x[0]).join('').toUpperCase(), pdot(p)), CHAT.unread[p.id])),
+        !ppl.length ? h('div', { class: 'chat-empty sm' }, q ? 'No one matches.' : 'People appear here once they sign in.') : null),
+      CHAT.broken ? h('div', { class: 'chat-warn' }, 'Can’t reach chat right now. Retrying…') : null);
+    if (focusSearch) { search.focus(); search.setSelectionRange(search.value.length, search.value.length); }
+    return;
+  }
+  const id = CHAT.withId, isAll = id === 'all', p = CHAT.people.find(x => String(x.id) === id) || CHAT.extra.get(id), list = CHAT.msgs.get(id) || [];
+  const back = h('button', { type: 'button', class: 'chat-back', 'aria-label': 'Back to people', onclick: () => chatOpenWith(null) }, '←');
+  const msgs = h('div', { class: 'chat-msgs', role: 'log', 'aria-live': 'polite' });
+  if (list.length >= 200 || (list.length && list[0].id > 1 && list.more !== false)) msgs.append(h('button', { type: 'button', class: 'linkbtn chat-more', onclick: async () => { try { const older = await CLOUD.chat.history(id, list[0].id); if (!older.length) list.more = false; list.unshift(...older); chatDraw(); } catch (e) { toast(e.message, true); } } }, 'Load earlier messages'));
+  let day = '', prev = null;
+  for (const m of list) {
+    const d = chatDay(m.at); if (d !== day) { day = d; prev = null; msgs.append(h('div', { class: 'chat-day' }, h('span', {}, d))); }
+    const mine = String(m.from_id) === CHAT.me, cont = prev && prev.from_id === m.from_id && Date.parse(m.at) - Date.parse(prev.at) < 5 * 60e3;
+    msgs.append(h('div', { class: 'chat-msg' + (mine ? ' mine' : '') + (cont ? ' cont' : '') }, isAll && !mine && !cont ? h('small', { class: 'chat-from' }, m.from_name || chatName(m.from_id)) : null, h('div', { class: 'chat-bubble' }, m.body), h('time', { datetime: m.at }, chatTime(m.at))));
+    prev = m;
+  }
+  if (!list.length) msgs.append(h('div', { class: 'chat-empty sm' }, isAll ? 'Say hello to the team 👋' : 'No messages yet. Say hi 👋'));
+  const canPost = !isAll || PERM.can('chat.all');
+  const input = h('textarea', { class: 'chat-in', rows: 1, maxlength: 2000, placeholder: canPost ? 'Write a message… (Enter to send, Shift+Enter for a new line)' : 'You can read the Everyone room but not post in it', disabled: !canPost, 'aria-label': 'Message' });
+  input.value = draft;
+  const grow = () => { input.style.height = 'auto'; input.style.height = Math.min(120, input.scrollHeight) + 'px'; };
+  const send = async () => {
+    const body = input.value.trim(); if (!body) return;
+    input.value = ''; grow(); sendBtn.disabled = true;
+    try { const m = await CLOUD.chat.send(id, body); const l = CHAT.msgs.get(id) || []; if (!l.some(x => x.id === m.id)) l.push(m); CHAT.msgs.set(id, l); CHAT.last.set(id, Math.max(CHAT.last.get(id) || 0, m.id)); chatDraw(); el('chatPanel').querySelector('.chat-msgs')?.scrollTo(0, 1e9); }
+    catch (e) { input.value = body; grow(); toast(/NO_CHAT_ALL/.test(e.message) ? 'You can’t post in the Everyone room. Ask the admin for the right.' : 'Message not sent: ' + e.message, true); }
+    finally { sendBtn.disabled = false; el('chatPanel').querySelector('.chat-in')?.focus(); }
+  };
+  input.addEventListener('keydown', e => { if (e.key === 'Enter' && !e.shiftKey && !e.isComposing) { e.preventDefault(); send(); } });
+  input.addEventListener('input', grow);
+  const sendBtn = h('button', { type: 'button', class: 'btn primary chat-send', disabled: !canPost, onclick: send, 'aria-label': 'Send' }, 'Send');
+  chatFill(panel, 
+    h('header', { class: 'chat-head' }, back, h('div', { class: 'chat-who' }, isAll ? h('span', { class: 'chat-av all' }, '#') : h('span', { class: 'chat-av' }, (chatName(id) || '?').trim().split(/\s+/).slice(0, 2).map(x => x[0]).join('').toUpperCase(), pdot(p)), h('div', {}, h('b', {}, isAll ? 'Everyone' : chatName(id)), h('small', {}, isAll ? CHAT.people.filter(x => presenceOf(x) === 'on').length + ' online now' : presenceText(p)))), close),
+    msgs,
+    h('div', { class: 'chat-compose' }, input, sendBtn),
+    CHAT.broken ? h('div', { class: 'chat-warn' }, 'Can’t reach chat right now. Retrying…') : null);
+  requestAnimationFrame(() => { grow(); msgs.scrollTop = atBottom ? msgs.scrollHeight : oldTop; });
+  if (focusIn) { input.focus(); input.setSelectionRange(input.value.length, input.value.length); }
+}
+window.openChat = id => { chatMount(); chatToggle(true); if (id !== undefined) chatOpenWith(id); };
+setTimeout(() => chatSync(), 1500);
 
 /* ---------- v3.15: leave requests waiting for a manager: badge on Attendance, refreshed every 45 seconds ---------- */
 function updateReqBadge() {
@@ -9128,6 +10054,7 @@ window.requestNotificationVisible = r => {
   if (PERM.isSuper()) return true;
   const u = CLOUD.user(), me = String(u?.id ?? '');
   if (me && String(r.byId) === me) return true;
+  if (PERM.groupMates().has(String(r.byId))) return true;   // v3.20: same user group
   const audience = u?.permissions?._notificationAudience || {mode:'all'};
   return audience.mode === 'all' || (audience.mode === 'selected' && (audience.users || []).map(String).includes(String(r.byId)));
 };
@@ -9286,6 +10213,7 @@ window.drawSettingsPage = () => {
 const onSettings = () => typeof state !== 'undefined' && state.view === 'settings';
 
 /* ----- People & access (admin, online) ----- */
+/* v3.20: three simple tabs: People (list + one editor), Groups, Passcodes (reset requests and sign-in rules) */
 function rightsSummary(u) {
   const role = PERM.roleNames[u.role] || 'User';
   if (u.role === 'superadmin') return 'Super admin · every right';
@@ -9294,42 +10222,124 @@ function rightsSummary(u) {
   for (const [name, preset] of Object.entries(PERM.presets)) if (PERM.keys.every(k => !!p[k] === !!preset[k])) return role + ' · ' + name;
   return role + ' · custom (' + PERM.keys.filter(k => p[k]).length + ' rights)';
 }
+const pplInitials = n => (n || '?').trim().split(/\s+/).filter(Boolean).slice(0, 2).map(x => x[0]).join('').toUpperCase() || '?';
+const PPL = { tab: 'people', q: '', role: 'all' };
+const groupsFrom = settings => (Array.isArray(settings && settings.user_groups) ? settings.user_groups : []).filter(g => g && Array.isArray(g.members)).map(g => ({ id: String(g.id), name: String(g.name || 'Group'), members: g.members.map(m => ({ id: String(m && m.id != null ? m.id : m), name: (m && m.name) || '' })) }));
+const memberOf = (g, id) => g.members.some(m => m.id === String(id));
+async function saveGroups(next, note) {
+  await saveTeamSetting('user_groups', next, note ? { name: 'User groups', text: note } : null);
+  try { window.refreshNotifications?.(); window.ATT?.renderApprovalRequests(); window.organizeOverview?.(); } catch { }
+}
 async function drawPeople(pane, selectId) {
   fill(pane, h('p', { class: 'set-hint' }, 'Loading people…'));
   window.refreshResetBadge && window.refreshResetBadge();
   const [users, requests, settings] = await Promise.all([CLOUD.admin.users(), CLOUD.admin.resetRequests().catch(() => []), CLOUD.getSettings().catch(() => ({}))]);
+  const groups = groupsFrom(settings);
+  window.TD_SETTINGS = { ...(window.TD_SETTINGS || {}), user_groups: settings.user_groups || [] };
   const me = CLOUD.user();
-  const list = h('div', { class: 'ppl-list' }), editor = h('div', { class: 'ppl-editor' });
-  /* v3.18: "Forgot passcode?" requests from the sign-in screen */
   const pending = (requests || []).filter(r => r.status === 'pending');
-  const queue = pending.length ? h('div', { class: 'reset-queue' },
-    h('h4', {}, 'Passcode reset requests · ' + pending.length),
-    h('p', { class: 'set-hint' }, 'Open the person, press “New” next to their passcode, save, and send them the new passcode privately. Saving a new passcode closes the request by itself.'),
-    h('ul', { class: 'td-hist' }, ...pending.map(r => {
-      const who = users.find(x => x.id === r.user_id);
-      return h('li', {},
-        h('b', {}, r.login_id), ' · ', who ? who.name : h('span', { class: 'bad' }, 'no account has this login ID'),
-        ' · ' + when(r.at) + (r.ip ? ' · ' + r.ip : '') + (r.note ? ' · “' + r.note + '”' : ''), ' ',
-        who ? h('button', { class: 'btn mini primary', type: 'button', onclick: () => { select(who); setTimeout(() => editor.querySelector('.pc-wrap .btn:nth-of-type(2)')?.click(), 0); } }, 'Set new passcode') : null, ' ',
-        h('button', { class: 'btn mini', type: 'button', onclick: async () => { try { await CLOUD.admin.closeReset(r.id, 'dismissed'); window.refreshResetBadge && window.refreshResetBadge(); drawPeople(pane, selectId); } catch (e) { toast(e.message, true); } } }, 'Dismiss'));
-    }))) : null;
-  const selfOn = settings.self_passcode !== false;
-  const selfBox = checkLine('Let admins and users change their own passcode (they must type their current one)', selfOn);
-  selfBox.box.addEventListener('change', async () => {
-    try { await CLOUD.setSetting('self_passcode', selfBox.box.checked); toast(selfBox.box.checked ? 'People can now change their own passcode.' : 'Only you (super admin) can change passcodes now.'); }
-    catch (e) { selfBox.box.checked = !selfBox.box.checked; toast(e.message, true); }
-  });
+  const reload = id => drawPeople(pane, id);
+  const body = h('div', { class: 'ppl-body' });
+  const tabBtn = (id, label, n, hot) => h('button', { type: 'button', class: 'ppl-tab', role: 'tab', 'aria-selected': String(PPL.tab === id), onclick: () => { PPL.tab = id; drawPeople(pane, selectId); } }, label, n != null ? h('span', { class: 'ppl-tab-n' + (hot ? ' hot' : '') }, String(n)) : null);
+  const tabs = h('div', { class: 'ppl-tabs', role: 'tablist', 'aria-label': 'People & access' },
+    tabBtn('people', 'People', users.length), tabBtn('groups', 'Groups', groups.length), tabBtn('passcodes', 'Passcodes', pending.length || null, pending.length > 0));
+  fill(pane, tabs, body);
+
+  if (PPL.tab === 'groups') { drawGroups(body, users, groups, () => reload(selectId)); return; }
+
+  if (PPL.tab === 'passcodes') {
+    const selfOn = settings.self_passcode !== false;
+    const selfBox = checkLine('Let people change their own passcode (they must type their current one)', selfOn);
+    selfBox.box.addEventListener('change', async () => {
+      try { await CLOUD.setSetting('self_passcode', selfBox.box.checked); toast(selfBox.box.checked ? 'People can now change their own passcode.' : 'Only you (super admin) can change passcodes now.'); }
+      catch (e) { selfBox.box.checked = !selfBox.box.checked; toast(e.message, true); }
+    });
+    fill(body,
+      h('div', { class: 'set-card' }, h('h4', {}, 'Reset requests' + (pending.length ? ' · ' + pending.length : '')),
+        pending.length ? h('p', { class: 'set-hint' }, 'Press “Set new passcode”, save, and send them the new passcode privately. Saving closes the request.') : h('p', { class: 'set-hint', style: 'margin:0' }, 'No one is waiting for a new passcode.'),
+        pending.length ? h('ul', { class: 'ppl-resets' }, ...pending.map(r => {
+          const who = users.find(x => x.id === r.user_id);
+          return h('li', {},
+            h('span', { class: 'ppl-av' }, pplInitials(who ? who.name : r.login_id)),
+            h('span', { class: 'ppl-rs-main' }, h('b', {}, who ? who.name : r.login_id), h('small', {}, 'ID ' + r.login_id + ' · ' + when(r.at) + (r.note ? ' · “' + r.note + '”' : '') + (who ? '' : ' · no account has this login ID'))),
+            who ? h('button', { class: 'btn mini primary', type: 'button', onclick: () => { PPL.tab = 'people'; drawPeople(pane, who.id).then(() => setTimeout(() => pane.querySelector('.pc-wrap .btn:nth-of-type(2)')?.click(), 0)); } }, 'Set new passcode') : null,
+            h('button', { class: 'btn mini', type: 'button', onclick: async () => { try { await CLOUD.admin.closeReset(r.id, 'dismissed'); window.refreshResetBadge && window.refreshResetBadge(); reload(selectId); } catch (e) { toast(e.message, true); } } }, 'Dismiss'));
+        })) : null),
+      h('div', { class: 'set-card' }, h('h4', {}, 'Sign-in rules'), selfBox.el,
+        h('p', { class: 'set-hint', style: 'margin:8px 0 0' }, 'Everyone signs in with their login ID (usually their Emp ID) and their own passcode. Only a super admin can set someone else’s passcode.')));
+    return;
+  }
+
+  /* People: searchable list on the left, one editor on the right */
+  const list = h('div', { class: 'ppl-list', role: 'list' }), editor = h('div', { class: 'ppl-editor' });
+  const search = h('input', { class: 'input', type: 'search', placeholder: 'Find a person or ID…', 'aria-label': 'Find a person', value: PPL.q });
+  const roleF = h('select', { class: 'input', 'aria-label': 'Show' }, ...[['all', 'Everyone'], ['superadmin', 'Super admins'], ['admin', 'Admins'], ['user', 'Users'], ['off', 'Can’t sign in']].map(([v, t]) => h('option', { value: v, selected: PPL.role === v }, t)));
+  let selId = null;
   const select = u => {
-    list.querySelectorAll('.ppl-item').forEach(b => b.setAttribute('aria-current', b.dataset.id === String(u ? u.id : 'new') ? 'true' : 'false'));
-    drawEditor(editor, u, id => drawPeople(pane, id), users);
+    selId = u ? u.id : 'new';
+    list.querySelectorAll('.ppl-item').forEach(b => b.setAttribute('aria-current', b.dataset.id === String(selId) ? 'true' : 'false'));
+    drawEditor(editor, u, reload, users, null, groups);
   };
-  for (const u of users) list.append(h('button', { class: 'ppl-item' + (u.active ? '' : ' off'), type: 'button', 'data-id': String(u.id), onclick: () => select(u) },
-    h('b', {}, u.name + (u.id === me.id ? ' (you)' : '')), h('small', {}, 'ID ' + (u.login_id || '—') + ' · ' + rightsSummary(u) + (u.active ? '' : ' · can’t sign in'))));
-  fill(pane, 
-    h('p', { class: 'set-hint' }, 'Everyone signs in with their login ID (their Emp ID) and their own passcode. Choose what each person can open and change. Only super admins manage accounts and permissions, and only a super admin can set someone else’s passcode.'),
-    queue, selfBox.el,
-    h('div', { class: 'ppl' }, h('div', { class: 'ppl-side' }, h('button', { class: 'btn primary', type: 'button', onclick: () => select(null) }, 'Add person'), list), editor));
-  select(users.find(u => u.id === selectId) || users.find(u => u.id === me.id) || users[0] || null);
+  const drawList = () => {
+    const q = PPL.q.trim().toLowerCase();
+    const shown = users.filter(u => (PPL.role === 'all' || (PPL.role === 'off' ? !u.active : u.role === PPL.role)) && (!q || (u.name + ' ' + (u.login_id || '')).toLowerCase().includes(q)));
+    fill(list, ...shown.map(u => {
+      const gs2 = groups.filter(g => memberOf(g, u.id));
+      return h('button', { class: 'ppl-item' + (u.active ? '' : ' off'), type: 'button', role: 'listitem', 'data-id': String(u.id), 'aria-current': String(String(u.id) === String(selId)), onclick: () => select(u) },
+        h('span', { class: 'ppl-av r-' + u.role }, pplInitials(u.name)),
+        h('span', { class: 'ppl-it' }, h('b', {}, u.name + (u.id === me.id ? ' (you)' : '')),
+          h('small', {}, 'ID ' + (u.login_id || '—') + ' · ' + (u.active ? rightsSummary(u).replace(/^[^·]+· /, '').replace(/^custom \(.*$/, 'custom access').replace(/^every right$/, 'everything') : 'can’t sign in')),
+          gs2.length ? h('span', { class: 'ppl-gchips' }, ...gs2.map(g => h('em', {}, g.name))) : null),
+        h('span', { class: 'ppl-role r-' + u.role }, PERM.roleNames[u.role] || 'User'));
+    }), shown.length ? null : h('p', { class: 'set-hint', style: 'padding:10px 12px;margin:0' }, 'No one matches.'));
+  };
+  search.addEventListener('input', () => { PPL.q = search.value; drawList(); });
+  roleF.addEventListener('change', () => { PPL.role = roleF.value; drawList(); });
+  fill(body, h('div', { class: 'ppl' },
+    h('div', { class: 'ppl-side' }, h('button', { class: 'btn primary', type: 'button', onclick: () => select(null) }, '+ Add person'), h('div', { class: 'ppl-find' }, search, roleF), list),
+    editor));
+  const first = users.find(u => u.id === selectId) || users.find(u => u.id === me.id) || users[0] || null;
+  selId = first ? first.id : 'new'; drawList(); select(first);
+}
+/* ----- v3.20: user groups ----- */
+function drawGroups(box, users, groups, reload) {
+  let draft = groups.map(g => ({ ...g, members: g.members.map(m => ({ ...m })) }));
+  const nameOf = id => (users.find(u => String(u.id) === String(id)) || {}).name;
+  const err = h('p', { class: 'err', role: 'alert' });
+  const listBox = h('div', { class: 'grp-list' });
+  let dirty = false;
+  const saveBtn = h('button', { class: 'btn primary', type: 'button', disabled: true, onclick: async () => {
+    err.textContent = ''; saveBtn.disabled = true; saveBtn.textContent = 'Saving…';
+    try {
+      const clean = draft.map(g => ({ id: g.id, name: g.name.trim() || 'Group', members: g.members.filter(m => nameOf(m.id)).map(m => ({ id: m.id, name: nameOf(m.id) })) }));
+      await saveGroups(clean, 'User groups: ' + (clean.map(g => g.name + ' (' + g.members.length + ')').join(', ') || 'none'));
+      toast('Groups saved. Members see each other’s requests within a minute.'); await reload();
+    } catch (e) { err.textContent = e.message; saveBtn.disabled = false; saveBtn.textContent = 'Save groups'; }
+  } }, 'Save groups');
+  const touch = () => { dirty = true; saveBtn.disabled = false; draw(); };
+  const draw = () => {
+    fill(listBox, ...draft.map((g, gi) => {
+      const nm = h('input', { class: 'input grp-name', value: g.name, 'aria-label': 'Group name', maxlength: 60 });
+      nm.addEventListener('input', () => { g.name = nm.value; dirty = true; saveBtn.disabled = false; });
+      const addSel = h('select', { class: 'input', 'aria-label': 'Add a person to ' + g.name },
+        h('option', { value: '' }, '+ Add person…'), ...users.filter(u => !memberOf(g, u.id)).sort((a, b) => a.name.localeCompare(b.name)).map(u => h('option', { value: String(u.id) }, u.name + ' · ID ' + (u.login_id || '—'))));
+      addSel.addEventListener('change', () => { if (!addSel.value) return; g.members.push({ id: addSel.value, name: nameOf(addSel.value) || '' }); touch(); });
+      const del = confirmButton('Delete group', 'Click again to delete', async () => { draft.splice(gi, 1); touch(); }, 'btn mini');
+      return h('div', { class: 'grp' },
+        h('div', { class: 'grp-head' }, h('span', { class: 'grp-ic', 'aria-hidden': 'true' }, '👥'), nm, h('small', {}, g.members.length + (g.members.length === 1 ? ' person' : ' people')), del),
+        g.members.length ? h('div', { class: 'grp-members' }, ...g.members.map((m, mi) => h('span', { class: 'grp-chip' + (nameOf(m.id) ? '' : ' gone') },
+          h('span', { class: 'ppl-av sm' }, pplInitials(nameOf(m.id) || m.name)), nameOf(m.id) || (m.name || 'Deleted account') + ' (removed)',
+          h('button', { type: 'button', 'aria-label': 'Remove ' + (nameOf(m.id) || m.name), title: 'Remove from group', onclick: () => { g.members.splice(mi, 1); touch(); } }, '×')))) : h('p', { class: 'rmod-note', style: 'margin:6px 0' }, 'No one yet. Add at least two people.'),
+        g.members.length === 1 ? h('p', { class: 'rmod-note', style: 'margin:0' }, 'Add at least one more person so they can see each other’s requests.') : null,
+        h('div', { class: 'grp-add' }, addSel));
+    }), draft.length ? null : h('div', { class: 'grp-empty' }, h('b', {}, 'No groups yet'), h('p', {}, 'Create a group for a team that should see each other’s leave requests, for example a shift or a client team.')));
+  };
+  const addBtn = h('button', { class: 'btn', type: 'button', onclick: () => { draft.push({ id: Date.now().toString(36) + Math.random().toString(36).slice(2, 5), name: 'New group', members: [] }); touch(); setTimeout(() => { const i = listBox.querySelectorAll('.grp-name'); i[i.length - 1]?.select(); }, 0); } }, '+ New group');
+  draw();
+  fill(box,
+    h('div', { class: 'grp-intro' }, h('div', {}, h('b', {}, 'What a group does'),
+      h('ul', {}, h('li', {}, 'Members see each other’s attendance requests in Request Center (Waiting and History).'), h('li', {}, 'Members get each other’s request notifications (sent, approved, rejected, cancelled).'), h('li', {}, 'It doesn’t change what they can open or edit. That stays in each person’s access.')))),
+    h('div', { class: 'set-actions flat' }, addBtn, h('span', { class: 'spacer' }), saveBtn), err, listBox);
 }
 /* filters: what the super admin can fix for a person */
 const FILTER_NAMES = { status: 'Status', desig: 'Designation', client: 'Client', mode: 'Work mode' };
@@ -9345,7 +10355,7 @@ function filterText(f) {
   return parts.join(' · ') || 'no filters (everyone)';
 }
 window.filterText = filterText;
-function drawEditor(box, u, reload, users = [], template = null) {
+function drawEditor(box, u, reload, users = [], template = null, groups = []) {
   const me = CLOUD.user(), isNew = !u, self = u && u.id === me.id;
   const err = h('p', { class: 'err', role: 'alert' });
   const name = h('input', { class: 'input', value: u ? u.name : template ? template.name + ' (copy)' : '', 'aria-label': 'Name', autocomplete: 'off' });
@@ -9379,7 +10389,7 @@ function drawEditor(box, u, reload, users = [], template = null) {
   const audienceList = h('div', {class:'rmod-items',hidden:audienceMode.value !== 'selected'}, ...audienceChecks.map(c => c.el));
   audienceMode.onchange = () => { audienceList.hidden = audienceMode.value !== 'selected'; };
   const audienceBox = h('div', {class:'rmod-extra'}, h('label',{},'Request notifications from',audienceMode), audienceList,
-    h('p',{class:'rmod-note'},'Applies to request notifications and rejected-request history. Their own requests are always included. All users receive approved-request notifications by default. Activity log access is separate.'));
+    h('p',{class:'rmod-note'},'Applies to request notifications and rejected requests in History. Their own requests and their group’s requests (Groups tab) are always included. All users receive approved-request notifications by default. Activity log access is separate.'));
   const knownFields = [...new Set([...(window.ATT?.fieldNames() || []),...(accessSource?.permissions?._attendanceFields || [])])];
   const priorFields = accessSource?.permissions?._attendanceFields;
   const fieldChecks = knownFields.map(field => ({field,...checkLine(field,Array.isArray(priorFields)?priorFields.includes(field):!!(start['att.edit'] || start['att.fields']))}));
@@ -9453,8 +10463,8 @@ function drawEditor(box, u, reload, users = [], template = null) {
       h('div', { class: 'rmod-chips' }, ...subItems.map(c => c.el)),
       h('p', { class: 'rmod-note' }, g.name === 'Overview' ? 'Choose which Request Center cards this person can see and whether they can approve or reject requests.' : 'Only these types appear in the Type list of Log leave. A ticked type can be logged even without “Approve or reject leave” or “Mark and edit attendance”; changing a day that already holds approved leave still needs “Approve or reject leave”.')) : null;
     let head;
-    if (g.page) { const c = checkLine('', !!start[g.page], { 'data-k': g.page, 'aria-label': 'Can open ' + g.name }); boxes[g.page] = c.box; head = h('label', { class: 'rmod-head' }, c.box, h('b', {}, g.name), h('small', {}, 'can open this page')); }
-    else head = h('div', { class: 'rmod-head' }, h('b', {}, g.name));
+    if (g.page) { const c = checkLine('', !!start[g.page], { 'data-k': g.page, 'aria-label': 'Can open ' + g.name }); boxes[g.page] = c.box; head = h('label', { class: 'rmod-head' }, c.box, h('span', {}, 'Can open the ' + g.name + ' page')); }
+    else head = null;
     /* v3.17: items split into what they can see and what they can change, with a quick None / View / Edit switch */
     const allIt = [...g.items.map(i => i[0]).map((k, i) => [k, items[i]]), ...((g.sub && g.sub.items) || []).map((i, j) => [i[0], subItems[j]])];
     const viewIt = items.filter((c, i) => !PERM.isEditKey(g.items[i][0])), editIt = items.filter((c, i) => PERM.isEditKey(g.items[i][0]));
@@ -9475,24 +10485,34 @@ function drawEditor(box, u, reload, users = [], template = null) {
       for (const [k] of allIt) boxes[k].checked = lv === 'edit' || (lv === 'view' && !PERM.isEditKey(k));
       sync(); paintSeg();
     };
-    const segBtns = [['none', 'None'], ...(hasView ? [['view', 'View']] : []), ...(hasEdit ? [['edit', 'Edit']] : [])].map(([lv, t]) => h('button', { type: 'button', class: 'rseg-b', 'data-lv': lv, title: lv === 'none' ? 'Hide this module' : lv === 'view' ? 'Can see, but not change anything' : 'Can see and change everything here', onclick: () => setLevel(lv) }, t));
-    const segHint = h('small', { class: 'rseg-custom' }, 'custom');
-    const seg = h('div', { class: 'rseg', role: 'group', 'aria-label': g.name + ' access' }, ...segBtns, segHint);
-    const paintSeg = () => { const lv = levelOf(); segBtns.forEach(b => b.setAttribute('aria-pressed', String(b.dataset.lv === lv))); segHint.hidden = lv !== 'custom'; };
-    const card = h('div', { class: 'rmod' + (g.name === 'Filters' ? ' rmod-wide' : '') }, head, seg, itemsBox, subBox, g.name === 'Filters' ? fixedBox : g.name === 'Notifications' ? audienceBox : g.name === 'Attendance' ? fieldBox : null);
+    const segBtns = [['none', 'None'], ...(hasView ? [['view', 'View']] : []), ...(hasEdit ? [['edit', 'Edit']] : [])].map(([lv, t]) => h('button', { type: 'button', class: 'rseg-b', 'data-lv': lv, title: lv === 'none' ? 'Hide this module' : lv === 'view' ? 'Can see, but not change anything' : 'Can see and change everything here', onclick: e => { e.preventDefault(); e.stopPropagation(); setLevel(lv); } }, t));
+    const segHint = h('small', { class: 'rseg-custom' }, 'Custom');
+    const seg = h('div', { class: 'rseg', role: 'group', 'aria-label': g.name + ' access' }, ...segBtns);
+    /* v3.20: one line per module; the individual ticks open underneath with “Fine-tune” */
+    const allKeys = [...(g.page ? [g.page] : []), ...allIt.map(([k]) => k)];
+    const countEl = h('small', { class: 'rrow-count' });
+    const paintSeg = () => { const lv = levelOf(); segBtns.forEach(b => b.setAttribute('aria-pressed', String(b.dataset.lv === lv))); segHint.hidden = lv !== 'custom'; countEl.textContent = allKeys.filter(k => boxes[k].checked).length + ' of ' + allKeys.length + ' on'; };
+    const extra = g.name === 'Filters' ? fixedBox : g.name === 'Notifications' ? audienceBox : g.name === 'Attendance' ? fieldBox : null;
+    const card = h('details', { class: 'rrow' },
+      h('summary', {}, h('span', { class: 'rrow-name' }, h('b', {}, g.name), h('span', { class: 'rrow-meta' }, countEl, segHint)), seg, h('span', { class: 'rrow-more', 'aria-hidden': 'true' }, 'Fine-tune')),
+      h('div', { class: 'rrow-body' }, head, itemsBox, subBox, extra));
     const sync = () => { const off = g.page && !boxes[g.page].checked; card.classList.toggle('off', !!off); for (const c of items) c.box.disabled = isSuper() || !!off; for (const c of subItems) c.box.disabled = isSuper() || !!off; if (g.page) boxes[g.page].disabled = isSuper(); };
     if (g.page) boxes[g.page].addEventListener('change', sync);
     card.addEventListener('change', () => setTimeout(paintSeg));
     syncs.push(() => { sync(); paintSeg(); segBtns.forEach(b => { b.disabled = isSuper(); }); });
     return card;
   });
-  const presets = h('div', { class: 'rights-presets' }, h('span', {}, 'Start from:'), ...Object.entries(PERM.presets).map(([n, p]) => h('button', { class: 'btn mini', type: 'button', onclick: () => { for (const k of PERM.keys) boxes[k].checked = !!p[k]; syncs.forEach(f => f()); } }, n)));
-  const superNote = h('p', { class: 'set-hint' }, 'Super admins have every right, and only they can manage people, rights and fixed filters.');
-  const roleNote = h('p', { class: 'set-hint' }, 'Admins and users get exactly the rights ticked below; only a super admin can change them.');
-  const rights = h('div', { class: 'rights' }, h('h4', {}, 'What they can do'), superNote, roleNote, presets, h('div', { class: 'rmods' }, ...modules));
+  const presetBtns = Object.entries(PERM.presets).filter(([n]) => n !== 'Admin').map(([n, p]) => h('button', { class: 'rpre', type: 'button', 'data-n': n, onclick: () => { for (const k of PERM.keys) boxes[k].checked = !!p[k]; syncs.forEach(f => f()); paintPresets(); } }, n));
+  const paintPresets = () => { const m = Object.entries(PERM.presets).find(([n, p]) => n !== 'Admin' && PERM.keys.every(k => !!p[k] === !!boxes[k].checked)); presetBtns.forEach(b => b.setAttribute('aria-pressed', String(!!m && b.dataset.n === m[0]))); presetNow.textContent = m ? 'Matches “' + m[0] + '”' : 'Custom access'; };
+  const presetNow = h('small', { class: 'rpre-now' });
+  const presets = h('div', { class: 'rights-presets' }, h('span', {}, 'Quick start:'), ...presetBtns, presetNow);
+  const superNote = h('p', { class: 'set-hint sup-note' }, '⭐ Super admins can open and change everything, and manage people, groups and access. Nothing to tick.');
+  const roleNote = h('p', { class: 'set-hint' }, 'Pick a quick start, then set each area to None, View or Edit. Open “Fine-tune” on a line only if you need something in between.');
+  const rights = h('div', { class: 'rights' }, superNote, roleNote, presets, h('div', { class: 'rrows' }, ...modules));
+  rights.addEventListener('change', () => setTimeout(paintPresets)); rights.addEventListener('click', e => { if (e.target.closest('.rseg-b')) setTimeout(paintPresets); });
   const syncRole = () => { const sup = isSuper(); rights.classList.toggle('is-admin', sup); superNote.hidden = !sup; roleNote.hidden = sup; presets.hidden = sup; fixedBox.hidden = sup; audienceBox.hidden = sup; fieldBox.hidden = sup; syncs.forEach(f => f()); };
-  role.addEventListener('change', () => { if (isNew && role.value === 'admin') { for (const k of PERM.keys) boxes[k].checked = !!PERM.presets['Admin'][k]; } syncRole(); });
-  syncRole();
+  role.addEventListener('change', () => { if (isNew && role.value === 'admin') { for (const k of PERM.keys) boxes[k].checked = !!PERM.presets['Admin'][k]; } syncRole(); paintPresets(); });
+  syncRole(); paintPresets();
   const rightsNow = () => Object.fromEntries([['_v', PERM.version], ...PERM.keys.map(k => [k, boxes[k].checked])]);
   /* v3.16: copy rights between people, duplicate a person, or hand these rights to several people at once */
   const permsNow = () => isSuper() ? {} : { ...rightsNow(), _attendanceFields: fieldChecks.filter(c => c.box.checked).map(c => c.field), _notificationAudience: { mode: audienceMode.value, users: audienceChecks.filter(c => c.box.checked).map(c => c.id) }, ...(fixed ? { _filters: fixed } : {}) };
@@ -9510,7 +10530,7 @@ function drawEditor(box, u, reload, users = [], template = null) {
     syncRole(); err.textContent = 'Rights copied from ' + source.name + ' into this form. Review, then press ' + (isNew ? '“Add person”' : '“Save changes”') + ' to apply.';
   };
   const copyBtn = h('button', { class: 'btn', type: 'button', onclick: () => { const source = users.find(x => String(x.id) === sourceSelect.value); if (!source) { err.textContent = 'Choose whose rights to copy.'; return; } applySource(source); } }, 'Copy into this form');
-  const dupBtn = u ? h('button', { class: 'btn', type: 'button', title: 'A new account with the same role, rights, filters and field buttons. It gets its own new passcode.', onclick: () => drawEditor(box, null, reload, users, u) }, 'Duplicate ' + u.name) : null;
+  const dupBtn = u ? h('button', { class: 'btn', type: 'button', title: 'A new account with the same role, rights, filters and field buttons. It gets its own new passcode.', onclick: () => drawEditor(box, null, reload, users, u, groups) }, 'Duplicate ' + u.name) : null;
   /* give the rights in this form to other people (their names, passcodes and linked employees stay as they are) */
   const targets = others.filter(x => x.role !== 'superadmin').map(x => ({ x, ...checkLine(x.name + ' · ID ' + (x.login_id || '—') + ' · ' + (PERM.roleNames[x.role] || x.role), false) }));
   const targetRole = checkLine('Also give them this role', false);
@@ -9547,6 +10567,24 @@ function drawEditor(box, u, reload, users = [], template = null) {
     !isNew && others.length ? h('div', { class: 'rmod-items copy-targets' }, ...targets.map(t => t.el)) : null,
     !isNew && others.length ? h('div', { class: 'set-actions flat' }, targetRole.el, giveBtn) : null,
     !isNew && others.length ? giveMsg : null);
+  /* v3.20: which user groups this person is in */
+  const grpSrc = u || template;
+  const groupChecks = groups.map(g => ({ g, ...checkLine(g.name + ' · ' + g.members.length + (g.members.length === 1 ? ' person' : ' people'), !!grpSrc && memberOf(g, grpSrc.id)) }));
+  const groupBox = groups.length ? h('div', { class: 'grp-picks' }, ...groupChecks.map(c => c.el))
+    : h('p', { class: 'rmod-note', style: 'margin:0' }, 'No groups yet. Make one in the Groups tab above.');
+  const saveGroupsFor = async (id, nm) => {
+    if (!groups.length) return;
+    await loadTeamSettings(); const latest = groupsFrom(window.TD_SETTINGS);
+    let changed = false;
+    const next = latest.map(g => {
+      const want = groupChecks.find(c => c.g.id === g.id)?.box.checked, has = memberOf(g, id);
+      if (want && !has) { changed = true; return { ...g, members: [...g.members, { id: String(id), name: nm }] }; }
+      if (want === false && has) { changed = true; return { ...g, members: g.members.filter(m => m.id !== String(id)) }; }
+      if (has) return { ...g, members: g.members.map(m => m.id === String(id) && m.name !== nm ? (changed = true, { ...m, name: nm }) : m) };
+      return g;
+    });
+    if (changed) await saveGroups(next, 'Groups for ' + nm + ': ' + (next.filter(g => memberOf(g, id)).map(g => g.name).join(', ') || 'none'));
+  };
   const save = h('button', { class: 'btn primary', type: 'button', onclick: async () => {
     err.textContent = ''; save.disabled = true; save.textContent = 'Saving…';
     try {
@@ -9556,6 +10594,8 @@ function drawEditor(box, u, reload, users = [], template = null) {
       const link = linked ? { _emp: linked.code, _empName: linked.name } : {};
       const perms = isSuper() ? link : { ...rightsNow(), ...link, _attendanceFields: fieldChecks.filter(c=>c.box.checked).map(c=>c.field), _notificationAudience: { mode: audienceMode.value, users: audienceChecks.filter(c => c.box.checked).map(c => c.id) }, ...(fixed ? { _filters: fixed } : {}) };
       const r = await CLOUD.admin.save(u ? u.id : null, nm, pc, role.value, active.box.checked, perms, lid);
+      const savedId = (r && r.id) || (u && u.id);
+      if (savedId != null) { try { await saveGroupsFor(savedId, nm); } catch (ge) { toast('Saved, but the groups could not be updated: ' + ge.message, true); } }
       if (self) { CLOUD.admin.selfUpdated(nm); await CLOUD.refreshMe(); applyAccess(); }
       BE.appendActivity([{ time: BE.nowText(), user: BE.userName(), action: 'settings', key: '', name: nm, details: { note: (isNew ? 'Added ' : 'Updated access for ') + nm + ' · ' + rightsSummary({ role: role.value, permissions: perms }) + (fixed && !isSuper() ? ' · fixed filters: ' + filterText(fixed) : '') + (active.box.checked ? '' : ' · sign-in disabled') } }]);
       toast(isNew ? 'Added ' + nm + '. Give them their login ID (' + lid + ') and passcode.' : 'Saved. ' + (u.passcode !== pc ? 'The new passcode works now; the old one has stopped.' : 'Their rights apply within a minute.'));
@@ -9565,20 +10605,26 @@ function drawEditor(box, u, reload, users = [], template = null) {
   const del = !isNew && !self ? confirmButton('Delete', 'Click again to delete', async () => {
     try { await CLOUD.admin.remove(u.id); toast(u.name + ' deleted. Their passcode no longer works.'); await reload(null); } catch (e) { err.textContent = e.message; }
   }) : null;
+  const sec = (n, title, hint, ...kids) => h('section', { class: 'ped-sec' }, h('div', { class: 'ped-h' }, h('span', { class: 'ped-n' }, n), h('div', {}, h('b', {}, title), hint ? h('small', {}, hint) : null)), ...kids);
+  const shownName = isNew ? (template ? 'New person · copy of ' + template.name : 'New person') : u.name;
   fill(box,
-    h('h4', { class: 'ppl-name' }, isNew ? (template ? 'New person · copy of ' + template.name : 'New person') : u.name),
-    template ? h('p', { class: 'set-hint' }, 'Same role, rights, fixed filters and field buttons as ' + template.name + '. Enter the name and login ID (Emp ID), note the new passcode, then press “Add person”.') : null,
-    h('div', { class: 'ppl-row' },
-      h('label', {}, 'Name', name),
-      h('label', {}, 'Login ID (Emp ID)', loginId, loginList),
-      h('label', {}, 'Passcode', h('div', { class: 'pc-wrap' }, code, eye, fresh)),
-      h('label', {}, 'Role', role),
-      h('label', {}, 'Linked employee (optional)', emp, empList)),
-    active.el, copyControls,
-    u && u.last_login ? h('p', { class: 'set-hint' }, 'Last signed in ' + when(u.last_login) + '.') : null,
-    rights,
-    h('div', { class: 'set-actions' }, save, h('span', { class: 'spacer' }), del),
-    err);
+    h('div', { class: 'ped-top' }, h('span', { class: 'ppl-av lg r-' + curRole }, pplInitials(isNew ? '+' : u.name)),
+      h('div', { class: 'ped-id' }, h('h4', { class: 'ppl-name' }, shownName),
+        h('small', {}, isNew ? 'Fill in the account, choose access, then press “Add person”.' : ('ID ' + (u.login_id || '—') + ' · ' + rightsSummary(u) + (u.last_login ? ' · last signed in ' + when(u.last_login) : ' · never signed in'))))),
+    template ? h('p', { class: 'set-hint' }, 'Same role, access, filters and groups as ' + template.name + '. Enter the name and login ID (Emp ID), note the new passcode, then press “Add person”.') : null,
+    sec('1', 'Account', 'How they sign in',
+      h('div', { class: 'ppl-row' },
+        h('label', {}, 'Name', name),
+        h('label', {}, 'Login ID (Emp ID)', loginId, loginList),
+        h('label', {}, 'Passcode', h('div', { class: 'pc-wrap' }, code, eye, fresh)),
+        h('label', {}, 'Linked employee (optional)', emp, empList)),
+      active.el),
+    sec('2', 'Role & access', 'What they can open and change',
+      h('div', { class: 'ppl-row' }, h('label', {}, 'Role', role)), rights),
+    sec('3', 'Groups', 'People in the same group see each other’s requests and request notifications', groupBox),
+    h('details', { class: 'ped-more copy-access', open: !!template || null },
+      h('summary', {}, h('b', {}, 'More: copy, duplicate or share this access')), ...[...copyControls.childNodes].slice(1)),
+    h('div', { class: 'set-actions ped-save' }, save, err, h('span', { class: 'spacer' }), del));
   if (isNew) name.focus();
 }
 
