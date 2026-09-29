@@ -4,7 +4,7 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <link rel="icon" href="data:,">
-<title>Team Dashboard · 3.18.0</title>
+<title>Team Dashboard · 3.20.0</title>
 <style>
 :root {
   color-scheme: light;
@@ -1224,6 +1224,97 @@ div.rmod-head { cursor:default; }
 .ff-list .chk-line span { flex:1; min-width:0; overflow-wrap:anywhere; }
 .ff-list .chk-line small { color:var(--ink-3, var(--ink-2)); font-size:10.5px; }
 .rights.is-admin .rmods { opacity:.55; }
+/* ================= v3.20: People & access — tabs, clear sections, one line per module; user groups ================= */
+.ppl-tabs { display:flex; gap:4px; padding:3px; margin:0 0 16px; border-radius:10px; background:var(--surface-2); width:max-content; max-width:100%; overflow-x:auto; }
+.ppl-tab { display:inline-flex; align-items:center; gap:6px; padding:7px 14px; border:0; border-radius:8px; background:transparent; color:var(--ink-2); font:inherit; font-size:13px; font-weight:600; cursor:pointer; white-space:nowrap; }
+.ppl-tab[aria-selected="true"] { background:var(--surface); color:var(--ink); box-shadow:0 1px 3px rgba(15,23,42,.12); }
+.ppl-tab-n { min-width:18px; padding:0 6px; border-radius:999px; background:var(--border); font-size:11px; line-height:18px; text-align:center; }
+.ppl-tab-n.hot { background:#e34948; color:#fff; }
+.ppl { grid-template-columns:290px minmax(0,1fr) !important; }
+@media (max-width:900px) { .ppl { grid-template-columns:1fr !important; } }
+.ppl-find { display:flex; gap:6px; }
+.ppl-find .input { height:32px; min-width:0; }
+.ppl-find input { flex:1 1 auto; } .ppl-find select { flex:0 0 118px; }
+.ppl-item { flex-direction:row !important; align-items:center; gap:10px !important; }
+.ppl-it { display:flex; flex-direction:column; gap:1px; min-width:0; flex:1; }
+.ppl-it b, .ppl-it small { overflow:hidden; text-overflow:ellipsis; white-space:nowrap; }
+.ppl-av { flex:0 0 auto; display:inline-grid; place-items:center; width:30px; height:30px; border-radius:50%; background:color-mix(in srgb,var(--accent) 14%,var(--surface)); color:var(--accent); font-size:11.5px; font-weight:700; }
+.ppl-av.r-superadmin { background:color-mix(in srgb,#d9a400 20%,var(--surface)); color:#9a7400; }
+.ppl-av.r-admin { background:color-mix(in srgb,#7c5cff 16%,var(--surface)); color:#6a4be0; }
+.ppl-av.sm { width:20px; height:20px; font-size:9px; }
+.ppl-av.lg { width:44px; height:44px; font-size:15px; }
+.ppl-role { flex:0 0 auto; font-size:10.5px; font-weight:650; padding:2px 7px; border-radius:999px; background:var(--surface-2); color:var(--ink-2); }
+.ppl-role.r-superadmin { color:#9a7400; } .ppl-role.r-admin { color:#6a4be0; }
+.ppl-gchips { display:flex; flex-wrap:wrap; gap:3px; margin-top:2px; }
+.ppl-gchips em { font-style:normal; font-size:10.5px; padding:0 6px; border-radius:5px; background:var(--surface-2); color:var(--ink-2); }
+.ppl-editor { padding:0 !important; overflow:hidden; }
+.ped-top { display:flex; align-items:center; gap:12px; padding:16px 20px; border-bottom:1px solid var(--border); background:var(--surface-2); }
+.ped-top .ppl-name { margin:0 0 2px !important; }
+.ped-id small { font-size:12px; color:var(--ink-2); }
+.ppl-editor > .set-hint { margin:12px 20px 0; }
+.ped-sec { padding:16px 20px; border-bottom:1px solid var(--border); }
+.ped-h { display:flex; align-items:flex-start; gap:10px; margin:0 0 12px; }
+.ped-h b { display:block; font-size:13.5px; }
+.ped-h small { font-size:12px; color:var(--ink-2); }
+.ped-n { display:inline-grid; place-items:center; width:22px; height:22px; border-radius:50%; background:var(--accent); color:#fff; font-size:11.5px; font-weight:700; flex:0 0 auto; }
+.ped-sec .rights { margin:0; padding:0; border:0; }
+.ped-sec .ppl-row:has(> label:only-child) { grid-template-columns:minmax(0,260px); }
+.ped-more { margin:0 !important; padding:12px 20px; border-bottom:1px solid var(--border); }
+.ped-more > summary { font-size:13px; }
+.ped-save { position:sticky; bottom:0; z-index:2; margin:0 !important; padding:12px 20px; background:var(--surface); border-top:1px solid var(--border); align-items:center; }
+.ped-save .err { margin:0; }
+.rights-presets .rpre { border:1px solid var(--border); background:var(--surface); color:var(--ink); border-radius:999px; padding:4px 11px; font:inherit; font-size:12px; cursor:pointer; }
+.rights-presets .rpre[aria-pressed="true"] { background:var(--accent); border-color:var(--accent); color:#fff; font-weight:600; }
+.rpre-now { margin-left:4px; font-size:11.5px; color:var(--ink-3); }
+.sup-note { padding:10px 12px; border-radius:8px; background:var(--surface-2); max-width:none; }
+.rights.is-admin .rrows { display:none; }
+.rrows { border:1px solid var(--border); border-radius:10px; overflow:hidden; }
+.rrow { border-bottom:1px solid var(--border); background:var(--surface); }
+.rrow:last-child { border-bottom:0; }
+.rrow > summary { display:flex; align-items:center; gap:12px; padding:9px 12px; cursor:pointer; list-style:none; }
+.rrow > summary::-webkit-details-marker { display:none; }
+.rrow > summary:hover { background:var(--surface-2); }
+.rrow-name { flex:1; min-width:0; display:flex; flex-direction:column; }
+.rrow-name b { font-size:13px; }
+.rrow-meta { display:flex; gap:6px; align-items:center; }
+.rrow-count { font-size:11px; color:var(--ink-3); }
+.rrow .rseg { margin:0; }
+.rrow .rseg-custom { margin:0; padding:0 6px; border-radius:5px; background:color-mix(in srgb,#d9a400 16%,var(--surface)); color:#9a7400; font-weight:600; }
+.rrow-more { font-size:11.5px; color:var(--accent); white-space:nowrap; }
+.rrow-more::after { content:" ▾"; }
+.rrow[open] .rrow-more::after { content:" ▴"; }
+.rrow[open] > summary { background:var(--surface-2); }
+.rrow-body { padding:10px 14px 12px 14px; border-top:1px solid var(--border); }
+.rrow-body > .rmod-head { padding:0 0 6px; }
+.rrow-body > .rmod-head span { font-size:12.5px; font-weight:600; }
+.rrow-body .rmod-items { border-top:0; padding-top:0; display:grid; grid-template-columns:repeat(auto-fill,minmax(260px,1fr)); column-gap:18px; }
+.rrow-body .rmod-kind { grid-column:1 / -1; }
+.rrow-body .rmod-sub { margin:10px 0 0; }
+.rrow-body .rmod-chips { grid-template-columns:repeat(auto-fill,minmax(220px,1fr)); column-gap:14px; }
+.rrow.off .rmod-items, .rrow.off .rmod-sub { opacity:.45; }
+.grp-picks { display:grid; grid-template-columns:repeat(auto-fill,minmax(220px,1fr)); gap:2px 16px; }
+.grp-intro { margin:0 0 14px; padding:12px 14px; border-radius:10px; background:var(--surface-2); font-size:12.5px; color:var(--ink-2); }
+.grp-intro b { color:var(--ink); }
+.grp-intro ul { margin:6px 0 0; padding-left:18px; }
+.grp-list { display:grid; grid-template-columns:repeat(auto-fill,minmax(min(100%,320px),1fr)); gap:12px; margin-top:12px; }
+.grp { border:1px solid var(--border); border-radius:12px; padding:12px 14px; background:var(--surface); display:flex; flex-direction:column; gap:10px; }
+.grp-head { display:flex; align-items:center; gap:8px; }
+.grp-head small { font-size:11.5px; color:var(--ink-3); white-space:nowrap; }
+.grp-name { flex:1; min-width:0; height:32px; font-weight:650; }
+.grp-members { display:flex; flex-wrap:wrap; gap:6px; }
+.grp-chip { display:inline-flex; align-items:center; gap:6px; padding:3px 4px 3px 4px; border:1px solid var(--border); border-radius:999px; font-size:12px; background:var(--surface-2); }
+.grp-chip.gone { opacity:.6; text-decoration:line-through; }
+.grp-chip button { border:0; background:transparent; color:var(--ink-3); font-size:15px; line-height:1; cursor:pointer; padding:0 5px; border-radius:50%; }
+.grp-chip button:hover { color:#e34948; }
+.grp-add select { height:32px; max-width:100%; }
+.grp-empty { grid-column:1 / -1; padding:26px; text-align:center; border:1px dashed var(--border); border-radius:12px; color:var(--ink-2); font-size:12.5px; }
+.grp-empty b { color:var(--ink); font-size:13.5px; } .grp-empty p { margin:4px 0 0; }
+.ppl-resets { list-style:none; margin:0; padding:0; }
+.ppl-resets li { display:flex; align-items:center; gap:10px; padding:8px 0; border-bottom:1px solid var(--border); }
+.ppl-resets li:last-child { border-bottom:0; }
+.ppl-rs-main { flex:1; min-width:0; display:flex; flex-direction:column; }
+.ppl-rs-main small { font-size:11.5px; color:var(--ink-2); }
+@media (max-width:640px) { .rrow > summary { flex-wrap:wrap; } .rrow-more { display:none; } .ped-sec, .ped-top, .ped-save, .ped-more { padding-left:14px; padding-right:14px; } }
 body.filters-locked #cleanFilters, body.filters-locked #xchips, body.filters-locked .saved-filter-row, body.filters-locked #customFieldControls { display:none !important; }
 
 /* v3.17: USA and India holidays card */
@@ -1396,10 +1487,10 @@ body.filters-locked #cleanFilters, body.filters-locked #xchips, body.filters-loc
     <p class="gate-sub">One place for your people, priorities and team insights.</p>
     <div id="connectBody"><div class="empty">Loading…</div></div>
   </div>
-  <p class="gate-ver">3.18.0</p>
+  <p class="gate-ver">3.20.0</p>
 </section>
 
-<div id="app" hidden><aside class="sidebar" aria-label="Workspace navigation"><div class="brand dashboard-identity">      <h1><span id="title">Team Dashboard</span><span class="ver" id="ver" title="Version 3.18.0">3.18.0</span></h1><p class="brand-tag">One place for your people, priorities and team insights.</p>      <span class="sync" id="sync" role="status"><i></i><span id="syncText">Loading…</span></span></div><div class="nav-label">WORKSPACE</div>      <nav class="tabs" role="tablist" aria-label="Pages" aria-orientation="vertical">
+<div id="app" hidden><aside class="sidebar" aria-label="Workspace navigation"><div class="brand dashboard-identity">      <h1><span id="title">Team Dashboard</span><span class="ver" id="ver" title="Version 3.20.0">3.20.0</span></h1><p class="brand-tag">One place for your people, priorities and team insights.</p>      <span class="sync" id="sync" role="status"><i></i><span id="syncText">Loading…</span></span></div><div class="nav-label">WORKSPACE</div>      <nav class="tabs" role="tablist" aria-label="Pages" aria-orientation="vertical">
         <button class="tab on" role="tab" aria-controls="pageSummary" data-view="summary" aria-selected="true">Overview</button>
         <button class="tab" role="tab" aria-controls="pageEmployees" data-view="employees" aria-selected="false">Employees</button>
       <button class="tab" role="tab" aria-controls="pageAttendance" data-view="attendance" aria-selected="false">Attendance</button>
@@ -2964,7 +3055,7 @@ const CLOUD = (() => {
 (() => {
 /* v3.13: rights are grouped by module. A module with a page has a "can open" box; its items sit underneath. */
 const PERM_GROUPS = [
-  { name: 'Overview', page: 'page.overview', items: [['ov.attendance', 'See the attendance card'], ['ov.openatt', 'See the “Open attendance →” button on the attendance card'], ['ov.coming', 'See birthdays and work anniversaries'], ['ov.holidays', 'See USA and India holidays'], ['ov.watch', 'See leave red flags and day patterns']], sub: { title: 'Request Center', items: [['requests.own', 'See Your requests'], ['requests.rejected', 'See Rejected request log (within notification audience)'], ['requests.approvals', 'See Approval requests'], ['att.approve', 'Approve or reject leave requests and edit approved leave']] } },
+  { name: 'Overview', page: 'page.overview', items: [['ov.attendance', 'See the attendance card'], ['ov.openatt', 'See the “Open attendance →” button on the attendance card'], ['ov.coming', 'See birthdays and work anniversaries'], ['ov.holidays', 'See USA and India holidays'], ['ov.watch', 'See leave red flags and day patterns']], sub: { title: 'Request Center', items: [['requests.own', 'See Waiting and History (their own and their group’s requests)'], ['requests.rejected', 'Also see rejected requests from their notification audience in History'], ['requests.approvals', 'See the To approve tab'], ['att.approve', 'Approve or reject leave requests and edit approved leave']] } },
   { name: 'Employees', page: 'page.employees', items: [['emp.edit', 'Edit employee details'], ['emp.add', 'Add employees'], ['emp.delete', 'Delete employees'], ['emp.bulk', 'Fill in bulk and add columns'], ['emp.fields', 'Add new fields (new Excel columns)']] },
   { name: 'Attendance', page: 'page.attendance', items: [['att.who', 'See Who’s out'], ['att.grid', 'See the attendance grid and People'], ['att.log', 'Use Log leave (with the leave types ticked below)'], ['att.direct', 'Log leave straight into attendance (no manager approval)'], ['att.edit', 'Mark attendance in day cells'], ['att.rows', 'Edit any cell or row in the tracker (names, Emp IDs, clients, days) and delete rows'], ['att.holidays', 'Add holidays for everyone'], ['att.fields', 'Add fields to the attendance tracker'], ['att.addemp', 'Add employees to the attendance tracker (new rows, start a month)']],
     /* v3.14.2: which leave types appear in the Log leave “Type” list */
@@ -3044,6 +3135,16 @@ window.PERM = {
   canWrite() { return (this.online() && Array.isArray(CLOUD.user()?.permissions?._attendanceFields) && CLOUD.user().permissions._attendanceFields.length > 0) || ['emp.edit', 'emp.add', 'emp.delete', 'emp.bulk', 'emp.fields', 'att.log', 'att.edit', 'att.rows', 'att.addemp', 'att.approve', 'att.holidays', 'att.fields'].some(k => this.can(k)); },
   canView(view) { return view === 'settings' || this.can(PAGE_OF[view] || 'page.overview'); },
   firstView() { return Object.keys(PAGE_OF).find(v => this.canView(v)) || 'summary'; },
+  /* v3.20: user groups. People in the same group see each other's attendance requests and request notifications.
+     Kept in the team settings (key user_groups) as [{ id, name, members: [{ id, name }] }]; only the super admin changes them. */
+  userGroups() { const g = (window.TD_SETTINGS || {}).user_groups; return Array.isArray(g) ? g.filter(x => x && Array.isArray(x.members)) : []; },
+  groupsOf(userId) { const id = String(userId ?? ''); return id ? this.userGroups().filter(g => g.members.some(m => String(m && m.id != null ? m.id : m) === id)) : []; },
+  myUserGroups() { return this.online() ? this.groupsOf(CLOUD.user()?.id) : []; },
+  groupMates() {
+    const me = this.online() ? String(CLOUD.user()?.id ?? '') : '', out = new Set(); if (!me) return out;
+    for (const g of this.groupsOf(me)) for (const m of g.members) { const id = String(m && m.id != null ? m.id : m); if (id && id !== me) out.add(id); }
+    return out;
+  },
 };
 })();
 </script>
@@ -5747,45 +5848,75 @@ window.requestAuditEntries = () => reqList().flatMap(r => {
   if (r.status !== 'pending') events.push({...common,eventId:'request:'+r.id+':'+r.status+':'+r.decidedAt,time:r.decidedAt,user:r.decidedBy || r.by,userId:r.decidedById || r.byId,action:'request-'+r.status,details:{note:common.details.note+(r.reason ? ' · Reason: '+r.reason : '')}});
   return events;
 });
-const REQUEST_CARD_CSS = ":host {height:100%;font-size:13px;} .card {height:100%;max-height:none;display:flex;flex-direction:column;padding:0 !important;border:0 !important;border-radius:0;box-shadow:none !important;background:transparent !important;} .card > h2 {display:none;} .card > div[style*=max-height] {max-height:300px !important;} .request-heading h2 {font-size:12px !important;color:var(--ink-2);font-weight:600;} .card h2 {font-size:13px;} .card .sub {font-size:11px;line-height:1.4;margin-bottom:6px;} .card .empty {padding:10px 0;min-height:0;font-size:12px;} .card > div[style] {min-height:0;}";
-function renderRequestHistory() {
-  const me = myId();
-  const own = reqList().filter(r => me && String(r.byId) === me).sort((a,b) => (b.at || '').localeCompare(a.at || ''));
-  const rejected = reqList().filter(r => r.status === 'rejected' && (String(r.byId) === me || window.requestNotificationVisible?.(r))).sort((a,b) => (b.decidedAt || '').localeCompare(a.decidedAt || ''));
-  const row = r => `<div class="request-history-row"><div><b>${esc(r.name)}</b><div class="sm">${esc(r.code)} · ${esc(reqDatesText(r.dates || []))}</div><div class="sm muted">Requested by ${esc(r.by)} · ${esc(reqWhen(r.at))}</div>${r.note ? `<div class="sm">Note: ${esc(r.note)}</div>` : ''}${r.decidedBy ? `<div class="sm muted">${esc(r.status)} by ${esc(r.decidedBy)} · ${esc(reqWhen(r.decidedAt))}</div>` : ''}${r.reason ? `<div class="sm">Reason: ${esc(r.reason)}</div>` : ''}</div><span class="pill ${r.status === 'approved' ? 'ok' : ''}">${r.status === 'pending' ? 'Pending approval' : esc(r.status[0].toUpperCase() + r.status.slice(1))}</span>${r.status === 'pending' && String(r.byId) === me ? `<button class="btn sm" data-cancel="${esc(r.id)}">Cancel request</button>` : ''}</div>`;
-  const draw = (id, title, description, items, visible) => {
-    const host = document.getElementById(id); if (!host) return;
-    host.hidden = !visible; const root = host.shadowRoot || host.attachShadow({mode:'open'});
-    if (!visible) { root.innerHTML = ''; return; }
-    root.innerHTML = `<style>${ATT_CSS}${REQUEST_CARD_CSS}.request-history-row { display:flex;flex-wrap:wrap;align-items:center;gap:8px;padding:8px 0;border-bottom:1px solid var(--line); } .request-history-row>div { flex:1 1 240px;min-width:0;overflow-wrap:anywhere; }</style><div class="card"><h2>${esc(title)}</h2><div class="sub">${esc(description)}</div><div style="max-height:180px;overflow:auto">${items.length ? items.map(row).join('') : '<div class="empty">No requests to show.</div>'}</div></div>`;
-    root.querySelectorAll('[data-cancel]').forEach(b => { b.onclick = async () => { b.disabled = true; try { await cancelRequest(b.dataset.cancel); } finally { renderRequestHistory(); } }; });
-  };
-  draw('cardMyRequests', `Your requests · ${own.filter(r => r.status === 'pending').length} pending`, 'Your pending requests and decisions.', own, !!me && can('requests.own'));
-  draw('cardRejectedRequests', `Rejected request log · ${rejected.length}`, 'Decision history and rejection reasons.', rejected, !!me && can('requests.rejected') && (!!rejected.length || !!window.PERM?.can('notifications.view')));
+/* ---------- v3.20: one Request Center. Every request appears in exactly one place:
+   To approve (pending, you can decide it) · Waiting (pending, sent by you or your group) · History (decided).
+   People in the same user group see each other's requests. ---------- */
+const RC = { hist: 'all', scope: 'group' };
+const rcMates = () => { try { return window.PERM && PERM.groupMates ? PERM.groupMates() : new Set(); } catch { return new Set(); } };
+const rcMine = r => { const me = myId(); return !!me && String(r.byId) === me; };
+const rcGroup = r => rcMates().has(String(r.byId));
+function requestBuckets() {
+  const me = myId(), mates = rcMates();
+  const inScope = r => (me && String(r.byId) === me) || (RC.scope !== 'mine' && mates.has(String(r.byId)));
+  const approvals = can('requests.approvals') ? reqList().filter(r => r.status === 'pending' && inMyScope(r)).sort((a, b) => (a.at || '').localeCompare(b.at || '')) : [];
+  const deciding = new Set(approvals.map(r => r.id));
+  const waiting = can('requests.own') ? reqList().filter(r => r.status === 'pending' && !deciding.has(r.id) && inScope(r)).sort((a, b) => (b.at || '').localeCompare(a.at || '')) : [];
+  const seeRejected = r => r.status === 'rejected' && can('requests.rejected') && (RC.scope !== 'mine' || rcMine(r)) && !!window.requestNotificationVisible?.(r);
+  const history = (can('requests.own') || can('requests.rejected')) ? reqList().filter(r => r.status !== 'pending' && ((can('requests.own') && (inScope(r) || (me && String(r.decidedById) === me && RC.scope !== 'mine'))) || seeRejected(r)))
+    .sort((a, b) => (b.decidedAt || b.at || '').localeCompare(a.decidedAt || a.at || '')) : [];
+  return { approvals, waiting, history, hasGroup: mates.size > 0 };
 }
-
+const REQUEST_CARD_CSS = ":host {display:block;font-size:13px;} .rc {display:flex;flex-direction:column;gap:8px;} .rc-top {display:flex;flex-wrap:wrap;align-items:center;gap:6px;} .rc-top .grow {flex:1;} .rc-sub {margin:0;font-size:11.5px;line-height:1.4;color:var(--ink-2);} .rc-chips {display:flex;flex-wrap:wrap;gap:4px;} .rc-chip {border:1px solid var(--line);background:transparent;color:var(--ink-2);border-radius:999px;padding:2px 9px;font:inherit;font-size:11.5px;cursor:pointer;} .rc-chip[aria-pressed=true] {background:var(--ink);border-color:var(--ink);color:var(--surface, #fff);} .rc-list {max-height:300px;overflow:auto;} .rq {display:flex;flex-wrap:wrap;align-items:flex-start;gap:6px 10px;padding:9px 0;border-bottom:1px solid var(--line);} .rq:last-child {border-bottom:0;} .rq-main {flex:1 1 220px;min-width:0;overflow-wrap:anywhere;} .rq-main b {font-weight:650;} .rq-code {display:inline-block;margin-left:6px;padding:0 6px;border-radius:5px;background:var(--wash, rgba(127,127,127,.12));font-size:11px;font-weight:650;} .rq-l {display:block;font-size:12px;color:var(--ink-2);margin-top:1px;} .rq-l.q {font-style:italic;} .rq-side {display:flex;flex-wrap:wrap;align-items:center;gap:6px;} .rq-st {font-size:11px;font-weight:650;padding:2px 8px;border-radius:999px;background:var(--wash, rgba(127,127,127,.12));color:var(--ink-2);white-space:nowrap;} .rq-st.approved {background:rgba(34,160,90,.14);color:#1c8a4c;} .rq-st.rejected {background:rgba(227,73,72,.13);color:#c63b3a;} .rq-st.pending {background:rgba(217,164,0,.16);color:#9a7400;} .rq-you {font-size:10.5px;font-weight:650;color:var(--accent, #3b6cf6);margin-left:6px;padding:0 6px;border:1px solid currentColor;border-radius:5px;} .rc-empty {padding:14px 0;text-align:center;font-size:12px;color:var(--ink-2);} .rc-note {margin:0;font-size:12px;color:var(--ink-2);} select {font:inherit;font-size:12px;height:28px;}";
+function rqRow(r, actions) {
+  const who = rcMine(r) ? 'you' : r.by, st = r.status === 'pending' ? 'Pending' : r.status[0].toUpperCase() + r.status.slice(1);
+  const decided = r.status !== 'pending' && r.decidedBy ? (r.status === 'cancelled' ? 'Cancelled' : st) + ' by ' + (String(r.decidedById) === myId() ? 'you' : r.decidedBy) + ' · ' + reqWhen(r.decidedAt) : '';
+  const changed = r.status === 'approved' && r.asked && r.asked !== r.code ? ' (asked for ' + r.asked + ')' : '';
+  return `<div class="rq"><div class="rq-main"><b>${esc(r.name)}</b><span class="rq-code">${esc(r.code)}</span>${changed ? `<span class="sm muted">${esc(changed)}</span>` : ''}${rcGroup(r) ? '<span class="rq-you" title="Sent by someone in your group">Group</span>' : ''}
+    <span class="rq-l">${esc(reqDatesText(r.dates || []))}</span>
+    <span class="rq-l">Sent by ${esc(who)} · ${esc(reqWhen(r.at))}${decided ? ' · ' + esc(decided) : ''}</span>
+    ${r.note ? `<span class="rq-l q">“${esc(r.note)}”</span>` : ''}${r.reason ? `<span class="rq-l"><b>Reason:</b> ${esc(r.reason)}</span>` : ''}</div>
+    <div class="rq-side">${actions || `<span class="rq-st ${esc(r.status)}">${esc(st)}</span>`}</div></div>`;
+}
+function rcDraw(id, visible, html, bind) {
+  const host = document.getElementById(id); if (!host) return;
+  host.hidden = !visible; const root = host.shadowRoot || host.attachShadow({ mode: 'open' });
+  if (!visible) { root.innerHTML = ''; return; }
+  root.innerHTML = `<style>${ATT_CSS}${REQUEST_CARD_CSS}</style><div class="rc">${html}</div>`;
+  root.querySelectorAll('[data-rc-scope]').forEach(b => { b.onclick = () => { RC.scope = b.dataset.rcScope; renderApprovalRequests(); window.organizeOverview?.(); }; });
+  root.querySelectorAll('[data-rc-hist]').forEach(b => { b.onclick = () => { RC.hist = b.dataset.rcHist; renderRequestHistory(); }; });
+  if (bind) bind(root);
+}
+const rcScopeChips = hasGroup => hasGroup ? `<div class="rc-chips" role="group" aria-label="Whose requests"><button class="rc-chip" data-rc-scope="group" aria-pressed="${RC.scope !== 'mine'}">Me + my group</button><button class="rc-chip" data-rc-scope="mine" aria-pressed="${RC.scope === 'mine'}">Only mine</button></div>` : '';
+function renderRequestHistory() {
+  const { waiting, history, hasGroup } = requestBuckets();
+  rcDraw('cardMyRequests', !!myId() && can('requests.own'),
+    `<div class="rc-top"><p class="rc-sub grow">${hasGroup ? 'Sent by you or your group' : 'Sent by you'} · waiting for a manager. You can cancel your own.</p>${rcScopeChips(hasGroup)}</div>
+     <div class="rc-list">${waiting.length ? waiting.map(r => rqRow(r, `<span class="rq-st pending">Pending</span>${rcMine(r) ? `<button class="btn sm" data-cancel="${esc(r.id)}">Cancel</button>` : ''}`)).join('') : '<div class="rc-empty">Nothing waiting. New requests you send appear here.</div>'}</div>`,
+    root => root.querySelectorAll('[data-cancel]').forEach(b => { b.onclick = async () => { b.disabled = true; try { await cancelRequest(b.dataset.cancel); } finally { renderApprovalRequests(); } }; }));
+  const n = s => history.filter(r => r.status === s).length;
+  if (RC.hist !== 'all' && !n(RC.hist)) RC.hist = 'all';
+  const list = RC.hist === 'all' ? history : history.filter(r => r.status === RC.hist);
+  const chip = (k, label, c) => `<button class="rc-chip" data-rc-hist="${k}" aria-pressed="${RC.hist === k}">${label} · ${c}</button>`;
+  rcDraw('cardRejectedRequests', !!myId() && (can('requests.own') || can('requests.rejected')),
+    `<div class="rc-top"><div class="rc-chips grow">${chip('all', 'All', history.length)}${n('approved') ? chip('approved', 'Approved', n('approved')) : ''}${n('rejected') ? chip('rejected', 'Rejected', n('rejected')) : ''}${n('cancelled') ? chip('cancelled', 'Cancelled', n('cancelled')) : ''}</div>${rcScopeChips(hasGroup)}</div>
+     <div class="rc-list">${list.length ? list.slice(0, 60).map(r => rqRow(r)).join('') : '<div class="rc-empty">No decisions yet.</div>'}</div>`);
+}
 function renderApprovalRequests() {
   renderRequestHistory();
-  const host = document.getElementById('cardApprovalRequests'); if (!host) return;
-  host.hidden = !can('requests.approvals');
-  if (host.hidden) { host.replaceChildren(); return; }
-  const root = host.shadowRoot || host.attachShadow({ mode: 'open' });
-  const pending = reqList().filter(r => r.status === 'pending' && inMyScope(r)).sort((a,b) => (a.at || '').localeCompare(b.at || ''));
+  const { approvals: pending } = requestBuckets();
   const ready = S.status === 'ready' && !!S.ctx;
-  root.innerHTML = `<style>${ATT_CSS}${REQUEST_CARD_CSS}
-    .request-row { display:flex; flex-wrap:wrap; align-items:center; gap:8px; padding:8px 0; border-bottom:1px solid var(--line); }
-    .request-row:last-child { border-bottom:0; } .request-details { flex:1 1 260px; min-width:0; overflow-wrap:anywhere; }
-    .request-details span { display:block; } .request-actions { display:flex; flex-wrap:wrap; gap:6px; }
-    .request-heading { display:flex; flex-wrap:wrap; align-items:center; gap:6px; margin-bottom:6px; }
-    </style><div class="card"><div class="request-heading"><h2>Approval requests · ${pending.length} pending</h2><span class="grow"></span><button class="btn sm" data-refresh>Refresh</button></div>
-    <div class="sub">Approve logs before they reach the tracker.</div>
-    ${!canDecide() ? '<p class="sm">Ask a super admin to enable “Approve or reject leave” for your account to process these requests.</p>' : !ready ? '<p class="sm">Connect the attendance tracker in Settings → Save & sync to approve requests.</p>' : ''}
-    ${pending.length ? '<div style="max-height:180px;overflow:auto">' + pending.map(r => `<div class="request-row"><div class="request-details"><b>${esc(r.name)}</b><span>${esc(r.code)} · ${esc(reqDatesText(r.dates || []))}</span><span class="sm muted">Requested by ${esc(r.by)} · ${esc(reqWhen(r.at))}</span>${r.note ? '<span class="sm">Note: ' + esc(r.note) + '</span>' : ''}</div>
-    ${canDecide() ? `<div class="request-actions"><select aria-label="Approve leave type for ${esc(r.name)}" ${!ready ? 'disabled' : ''}>${LOG_TYPES.map(c => `<option value="${c}"${c === r.code ? ' selected' : ''}>${c}</option>`).join('')}</select><button class="btn sm primary" data-approve="${esc(r.id)}" ${!ready || S.saving ? 'disabled' : ''}>Approve</button><button class="btn sm" data-reject="${esc(r.id)}">Reject</button></div>` : ''}</div>`).join('') + '</div>' : '<div class="empty">No pending requests in your filters.</div>'}</div>`;
-  root.querySelector('[data-refresh]').onclick = async e => { e.target.disabled = true; try { await window.loadTeamSettings(true); notifyReq(); } finally { renderApprovalRequests(); } };
-  root.querySelectorAll('[data-approve]').forEach(b => { b.onclick = async () => { b.disabled = true; try { await approveRequest(b.dataset.approve, b.parentElement.querySelector('select').value); } finally { renderApprovalRequests(); } }; });
-  root.querySelectorAll('[data-reject]').forEach(b => { b.onclick = () => openRejectBox(b.dataset.reject); });
+  const warn = !canDecide() ? '<p class="rc-note">You can see these, but deciding needs “Approve or reject leave”. Ask the super admin.</p>' : !ready ? '<p class="rc-note">Connect the attendance tracker (Settings › Save & sync) to approve.</p>' : '';
+  const acts = r => canDecide() ? `<select aria-label="Leave type to approve for ${esc(r.name)}" title="Approve as this leave type" ${!ready ? 'disabled' : ''}>${LOG_TYPES.map(c => `<option value="${c}"${c === r.code ? ' selected' : ''}>${c}</option>`).join('')}</select><button class="btn sm primary" data-approve="${esc(r.id)}" ${!ready || S.saving ? 'disabled' : ''}>Approve</button><button class="btn sm" data-reject="${esc(r.id)}">Reject</button>` : '<span class="rq-st pending">Pending</span>';
+  rcDraw('cardApprovalRequests', can('requests.approvals'),
+    `<div class="rc-top"><p class="rc-sub grow">Waiting for your decision. Approved leave goes straight into attendance.</p><button class="btn sm" data-refresh title="Check for new requests">↻ Refresh</button></div>${warn}
+     <div class="rc-list">${pending.length ? pending.map(r => rqRow(r, acts(r))).join('') : '<div class="rc-empty">All caught up. Nothing to approve.</div>'}</div>`,
+    root => {
+      root.querySelector('[data-refresh]').onclick = async e => { e.target.disabled = true; try { await window.loadTeamSettings(true); notifyReq(); } finally { renderApprovalRequests(); } };
+      root.querySelectorAll('[data-approve]').forEach(b => { b.onclick = async () => { b.disabled = true; try { await approveRequest(b.dataset.approve, b.parentElement.querySelector('select').value); } finally { renderApprovalRequests(); } }; });
+      root.querySelectorAll('[data-reject]').forEach(b => { b.onclick = () => openRejectBox(b.dataset.reject); });
+    });
 }
+const requestCounts = () => { const b = requestBuckets(); return { approvals: b.approvals.length, own: b.waiting.length, rejected: b.history.length }; };
 /* ---------- a tracker row built from a workforce person ---------- */
 /* Emp ID, name and client come from the workforce file. Before the Date of Joining, and after the Left Date, the days are NA (as the tracker already does). */
 function newRosterRow(ms, rr, opts = {}) {
@@ -6507,7 +6638,7 @@ const healthCount = () => (S.status === 'ready' && S.ctx ? healthIssues().filter
 
 mount();
 return {
-  fieldNames: attFieldNames, hasTracker: Engine.hasTracker, refresh, init: () => { mount(); return connect(); }, askName, decorateTable, healthCount, chooseFileEarly, savedFile: async () => (await kv.get('file')) || ((await kv.get('handle')) || {}).name || '', show, leave, renderCard, renderWatch, drawerPanel, go, renderApprovalRequests, renderRequestHistory, requestsToDecide: () => requestsToDecide().length,
+  fieldNames: attFieldNames, hasTracker: Engine.hasTracker, refresh, init: () => { mount(); return connect(); }, askName, decorateTable, healthCount, chooseFileEarly, savedFile: async () => (await kv.get('file')) || ((await kv.get('handle')) || {}).name || '', show, leave, renderCard, renderWatch, drawerPanel, go, renderApprovalRequests, renderRequestHistory, requestCounts, requestsToDecide: () => requestsToDecide().length,
   /* v3.19: every recorded code between two dates (UTC ms, null = open), for custom dashboards; follows the attendance scope */
   entries: (from, to) => { if (S.status !== 'ready' || !S.ctx) return null; const d = D(), out = []; for (const m of d.months) { const dim = Engine.daysInMonth(m); for (const r of d.byMonth.get(m) || []) for (let i = 0; i < dim; i++) { const v = r.days[i]; if (v == null || v === '') continue; const dt = dateOf(m, i), t = dt.getTime(); if ((from != null && t < from) || (to != null && t > to)) continue; const cat = catOf(v); out.push({ name: r.name.trim(), empId: r.empId, client: r.client ? String(r.client).trim() : '', date: dt, code: String(v).trim().toUpperCase(), cat, catLabel: CATS[cat] || 'Other' }); } } return out; },
   todayStats: () => { if (S.status !== 'ready' || !S.ctx) return null; const rows = D().byMonth.get(TODAY_MS) || [], i = TODAY.getUTCDate() - 1, cats = rows.map(r => catOf(r.days[i])); return { full: cats.filter(c => c === 'approved' || c === 'sick' || c === 'unplanned').length, half: cats.filter(c => c === 'half').length, late: cats.filter(c => c === 'late').length, tracked: rows.length }; }, redraw: () => { if (active()) render(); }, state: () => S, dirty: () => S.changes.length,
@@ -6688,7 +6819,7 @@ async function poll() {
 }
 
 /* ============================== filtering ============================== */
-const APP = { title: "Team Dashboard", version: "3.18.0", released: "24 Sep 2026" };
+const APP = { title: "Team Dashboard", version: "3.20.0", released: "29 Sep 2026" };
 const BASE_DIMS = { status: "status_column", desig: "designation_column", client: "client_column", mode: "mode_column" };
 const STANDARD_STATUSES = ["Active", "Manager", "OJT", "Bench", "New", "Projected", "Left", "Moved"];
 const TILE_ORDER = ["Active", "Manager", "OJT", "Bench", "New", "Projected"];
@@ -7851,16 +7982,18 @@ function ovTabs(bar, tabs, active, onPick) {
 }
 function organizeRequests() {
   const wrap = $("#ovRequests"), bar = $("#rcTabs"); if (!wrap || !bar) return;
+  /* v3.20: To approve · Waiting · History. Each request is listed in exactly one tab. */
   const defs = [
-    { id: "approvals", host: $("#cardApprovalRequests"), label: "Approvals", sel: ".request-row" },
-    { id: "own", host: $("#cardMyRequests"), label: "My requests", sel: ".request-history-row" },
-    { id: "rejected", host: $("#cardRejectedRequests"), label: "Rejected", sel: ".request-history-row" },
+    { id: "approvals", host: $("#cardApprovalRequests"), label: "To approve" },
+    { id: "own", host: $("#cardMyRequests"), label: "Waiting" },
+    { id: "rejected", host: $("#cardRejectedRequests"), label: "History" },
   ].filter(d => d.host);
-  const vis = defs.filter(d => !d.host.hidden).map(d => ({ ...d, n: ovCount(d.host, d.sel) }));
+  let c = {}; try { c = (window.ATT && ATT.requestCounts) ? ATT.requestCounts() : {}; } catch { }
+  const vis = defs.filter(d => !d.host.hidden).map(d => ({ ...d, n: c[d.id] || 0 }));
   wrap.hidden = !vis.length; if (!vis.length) return;
-  if (!OV.rc || !vis.some(d => d.id === OV.rc)) OV.rc = (vis.find(d => d.id === "approvals" && d.n) || vis[0]).id;
+  if (!OV.rc || !vis.some(d => d.id === OV.rc)) OV.rc = (vis.find(d => d.id !== "rejected" && d.n) || vis.find(d => d.id === "rejected") || vis[0]).id;
   for (const d of defs) d.host.classList.toggle("ov-off", d.id !== OV.rc);
-  ovTabs(bar, vis.map(d => ({ ...d, hot: d.id === "approvals" && d.n > 0 })), OV.rc, id => { OV.rc = id; organizeRequests(); });
+  ovTabs(bar, vis.map(d => ({ ...d, n: d.id === "rejected" ? null : d.n, hot: d.id === "approvals" && d.n > 0 })), OV.rc, id => { OV.rc = id; organizeRequests(); });
 }
 function organizeUpcoming() {
   const wrap = $("#ovUpcoming"), bar = $("#ovUpTabs"), com = $("#cardComing"), hol = $("#cardHolidays"); if (!wrap || !bar) return;
@@ -9921,6 +10054,7 @@ window.requestNotificationVisible = r => {
   if (PERM.isSuper()) return true;
   const u = CLOUD.user(), me = String(u?.id ?? '');
   if (me && String(r.byId) === me) return true;
+  if (PERM.groupMates().has(String(r.byId))) return true;   // v3.20: same user group
   const audience = u?.permissions?._notificationAudience || {mode:'all'};
   return audience.mode === 'all' || (audience.mode === 'selected' && (audience.users || []).map(String).includes(String(r.byId)));
 };
@@ -10079,6 +10213,7 @@ window.drawSettingsPage = () => {
 const onSettings = () => typeof state !== 'undefined' && state.view === 'settings';
 
 /* ----- People & access (admin, online) ----- */
+/* v3.20: three simple tabs: People (list + one editor), Groups, Passcodes (reset requests and sign-in rules) */
 function rightsSummary(u) {
   const role = PERM.roleNames[u.role] || 'User';
   if (u.role === 'superadmin') return 'Super admin · every right';
@@ -10087,42 +10222,124 @@ function rightsSummary(u) {
   for (const [name, preset] of Object.entries(PERM.presets)) if (PERM.keys.every(k => !!p[k] === !!preset[k])) return role + ' · ' + name;
   return role + ' · custom (' + PERM.keys.filter(k => p[k]).length + ' rights)';
 }
+const pplInitials = n => (n || '?').trim().split(/\s+/).filter(Boolean).slice(0, 2).map(x => x[0]).join('').toUpperCase() || '?';
+const PPL = { tab: 'people', q: '', role: 'all' };
+const groupsFrom = settings => (Array.isArray(settings && settings.user_groups) ? settings.user_groups : []).filter(g => g && Array.isArray(g.members)).map(g => ({ id: String(g.id), name: String(g.name || 'Group'), members: g.members.map(m => ({ id: String(m && m.id != null ? m.id : m), name: (m && m.name) || '' })) }));
+const memberOf = (g, id) => g.members.some(m => m.id === String(id));
+async function saveGroups(next, note) {
+  await saveTeamSetting('user_groups', next, note ? { name: 'User groups', text: note } : null);
+  try { window.refreshNotifications?.(); window.ATT?.renderApprovalRequests(); window.organizeOverview?.(); } catch { }
+}
 async function drawPeople(pane, selectId) {
   fill(pane, h('p', { class: 'set-hint' }, 'Loading people…'));
   window.refreshResetBadge && window.refreshResetBadge();
   const [users, requests, settings] = await Promise.all([CLOUD.admin.users(), CLOUD.admin.resetRequests().catch(() => []), CLOUD.getSettings().catch(() => ({}))]);
+  const groups = groupsFrom(settings);
+  window.TD_SETTINGS = { ...(window.TD_SETTINGS || {}), user_groups: settings.user_groups || [] };
   const me = CLOUD.user();
-  const list = h('div', { class: 'ppl-list' }), editor = h('div', { class: 'ppl-editor' });
-  /* v3.18: "Forgot passcode?" requests from the sign-in screen */
   const pending = (requests || []).filter(r => r.status === 'pending');
-  const queue = pending.length ? h('div', { class: 'reset-queue' },
-    h('h4', {}, 'Passcode reset requests · ' + pending.length),
-    h('p', { class: 'set-hint' }, 'Open the person, press “New” next to their passcode, save, and send them the new passcode privately. Saving a new passcode closes the request by itself.'),
-    h('ul', { class: 'td-hist' }, ...pending.map(r => {
-      const who = users.find(x => x.id === r.user_id);
-      return h('li', {},
-        h('b', {}, r.login_id), ' · ', who ? who.name : h('span', { class: 'bad' }, 'no account has this login ID'),
-        ' · ' + when(r.at) + (r.ip ? ' · ' + r.ip : '') + (r.note ? ' · “' + r.note + '”' : ''), ' ',
-        who ? h('button', { class: 'btn mini primary', type: 'button', onclick: () => { select(who); setTimeout(() => editor.querySelector('.pc-wrap .btn:nth-of-type(2)')?.click(), 0); } }, 'Set new passcode') : null, ' ',
-        h('button', { class: 'btn mini', type: 'button', onclick: async () => { try { await CLOUD.admin.closeReset(r.id, 'dismissed'); window.refreshResetBadge && window.refreshResetBadge(); drawPeople(pane, selectId); } catch (e) { toast(e.message, true); } } }, 'Dismiss'));
-    }))) : null;
-  const selfOn = settings.self_passcode !== false;
-  const selfBox = checkLine('Let admins and users change their own passcode (they must type their current one)', selfOn);
-  selfBox.box.addEventListener('change', async () => {
-    try { await CLOUD.setSetting('self_passcode', selfBox.box.checked); toast(selfBox.box.checked ? 'People can now change their own passcode.' : 'Only you (super admin) can change passcodes now.'); }
-    catch (e) { selfBox.box.checked = !selfBox.box.checked; toast(e.message, true); }
-  });
+  const reload = id => drawPeople(pane, id);
+  const body = h('div', { class: 'ppl-body' });
+  const tabBtn = (id, label, n, hot) => h('button', { type: 'button', class: 'ppl-tab', role: 'tab', 'aria-selected': String(PPL.tab === id), onclick: () => { PPL.tab = id; drawPeople(pane, selectId); } }, label, n != null ? h('span', { class: 'ppl-tab-n' + (hot ? ' hot' : '') }, String(n)) : null);
+  const tabs = h('div', { class: 'ppl-tabs', role: 'tablist', 'aria-label': 'People & access' },
+    tabBtn('people', 'People', users.length), tabBtn('groups', 'Groups', groups.length), tabBtn('passcodes', 'Passcodes', pending.length || null, pending.length > 0));
+  fill(pane, tabs, body);
+
+  if (PPL.tab === 'groups') { drawGroups(body, users, groups, () => reload(selectId)); return; }
+
+  if (PPL.tab === 'passcodes') {
+    const selfOn = settings.self_passcode !== false;
+    const selfBox = checkLine('Let people change their own passcode (they must type their current one)', selfOn);
+    selfBox.box.addEventListener('change', async () => {
+      try { await CLOUD.setSetting('self_passcode', selfBox.box.checked); toast(selfBox.box.checked ? 'People can now change their own passcode.' : 'Only you (super admin) can change passcodes now.'); }
+      catch (e) { selfBox.box.checked = !selfBox.box.checked; toast(e.message, true); }
+    });
+    fill(body,
+      h('div', { class: 'set-card' }, h('h4', {}, 'Reset requests' + (pending.length ? ' · ' + pending.length : '')),
+        pending.length ? h('p', { class: 'set-hint' }, 'Press “Set new passcode”, save, and send them the new passcode privately. Saving closes the request.') : h('p', { class: 'set-hint', style: 'margin:0' }, 'No one is waiting for a new passcode.'),
+        pending.length ? h('ul', { class: 'ppl-resets' }, ...pending.map(r => {
+          const who = users.find(x => x.id === r.user_id);
+          return h('li', {},
+            h('span', { class: 'ppl-av' }, pplInitials(who ? who.name : r.login_id)),
+            h('span', { class: 'ppl-rs-main' }, h('b', {}, who ? who.name : r.login_id), h('small', {}, 'ID ' + r.login_id + ' · ' + when(r.at) + (r.note ? ' · “' + r.note + '”' : '') + (who ? '' : ' · no account has this login ID'))),
+            who ? h('button', { class: 'btn mini primary', type: 'button', onclick: () => { PPL.tab = 'people'; drawPeople(pane, who.id).then(() => setTimeout(() => pane.querySelector('.pc-wrap .btn:nth-of-type(2)')?.click(), 0)); } }, 'Set new passcode') : null,
+            h('button', { class: 'btn mini', type: 'button', onclick: async () => { try { await CLOUD.admin.closeReset(r.id, 'dismissed'); window.refreshResetBadge && window.refreshResetBadge(); reload(selectId); } catch (e) { toast(e.message, true); } } }, 'Dismiss'));
+        })) : null),
+      h('div', { class: 'set-card' }, h('h4', {}, 'Sign-in rules'), selfBox.el,
+        h('p', { class: 'set-hint', style: 'margin:8px 0 0' }, 'Everyone signs in with their login ID (usually their Emp ID) and their own passcode. Only a super admin can set someone else’s passcode.')));
+    return;
+  }
+
+  /* People: searchable list on the left, one editor on the right */
+  const list = h('div', { class: 'ppl-list', role: 'list' }), editor = h('div', { class: 'ppl-editor' });
+  const search = h('input', { class: 'input', type: 'search', placeholder: 'Find a person or ID…', 'aria-label': 'Find a person', value: PPL.q });
+  const roleF = h('select', { class: 'input', 'aria-label': 'Show' }, ...[['all', 'Everyone'], ['superadmin', 'Super admins'], ['admin', 'Admins'], ['user', 'Users'], ['off', 'Can’t sign in']].map(([v, t]) => h('option', { value: v, selected: PPL.role === v }, t)));
+  let selId = null;
   const select = u => {
-    list.querySelectorAll('.ppl-item').forEach(b => b.setAttribute('aria-current', b.dataset.id === String(u ? u.id : 'new') ? 'true' : 'false'));
-    drawEditor(editor, u, id => drawPeople(pane, id), users);
+    selId = u ? u.id : 'new';
+    list.querySelectorAll('.ppl-item').forEach(b => b.setAttribute('aria-current', b.dataset.id === String(selId) ? 'true' : 'false'));
+    drawEditor(editor, u, reload, users, null, groups);
   };
-  for (const u of users) list.append(h('button', { class: 'ppl-item' + (u.active ? '' : ' off'), type: 'button', 'data-id': String(u.id), onclick: () => select(u) },
-    h('b', {}, u.name + (u.id === me.id ? ' (you)' : '')), h('small', {}, 'ID ' + (u.login_id || '—') + ' · ' + rightsSummary(u) + (u.active ? '' : ' · can’t sign in'))));
-  fill(pane, 
-    h('p', { class: 'set-hint' }, 'Everyone signs in with their login ID (their Emp ID) and their own passcode. Choose what each person can open and change. Only super admins manage accounts and permissions, and only a super admin can set someone else’s passcode.'),
-    queue, selfBox.el,
-    h('div', { class: 'ppl' }, h('div', { class: 'ppl-side' }, h('button', { class: 'btn primary', type: 'button', onclick: () => select(null) }, 'Add person'), list), editor));
-  select(users.find(u => u.id === selectId) || users.find(u => u.id === me.id) || users[0] || null);
+  const drawList = () => {
+    const q = PPL.q.trim().toLowerCase();
+    const shown = users.filter(u => (PPL.role === 'all' || (PPL.role === 'off' ? !u.active : u.role === PPL.role)) && (!q || (u.name + ' ' + (u.login_id || '')).toLowerCase().includes(q)));
+    fill(list, ...shown.map(u => {
+      const gs2 = groups.filter(g => memberOf(g, u.id));
+      return h('button', { class: 'ppl-item' + (u.active ? '' : ' off'), type: 'button', role: 'listitem', 'data-id': String(u.id), 'aria-current': String(String(u.id) === String(selId)), onclick: () => select(u) },
+        h('span', { class: 'ppl-av r-' + u.role }, pplInitials(u.name)),
+        h('span', { class: 'ppl-it' }, h('b', {}, u.name + (u.id === me.id ? ' (you)' : '')),
+          h('small', {}, 'ID ' + (u.login_id || '—') + ' · ' + (u.active ? rightsSummary(u).replace(/^[^·]+· /, '').replace(/^custom \(.*$/, 'custom access').replace(/^every right$/, 'everything') : 'can’t sign in')),
+          gs2.length ? h('span', { class: 'ppl-gchips' }, ...gs2.map(g => h('em', {}, g.name))) : null),
+        h('span', { class: 'ppl-role r-' + u.role }, PERM.roleNames[u.role] || 'User'));
+    }), shown.length ? null : h('p', { class: 'set-hint', style: 'padding:10px 12px;margin:0' }, 'No one matches.'));
+  };
+  search.addEventListener('input', () => { PPL.q = search.value; drawList(); });
+  roleF.addEventListener('change', () => { PPL.role = roleF.value; drawList(); });
+  fill(body, h('div', { class: 'ppl' },
+    h('div', { class: 'ppl-side' }, h('button', { class: 'btn primary', type: 'button', onclick: () => select(null) }, '+ Add person'), h('div', { class: 'ppl-find' }, search, roleF), list),
+    editor));
+  const first = users.find(u => u.id === selectId) || users.find(u => u.id === me.id) || users[0] || null;
+  selId = first ? first.id : 'new'; drawList(); select(first);
+}
+/* ----- v3.20: user groups ----- */
+function drawGroups(box, users, groups, reload) {
+  let draft = groups.map(g => ({ ...g, members: g.members.map(m => ({ ...m })) }));
+  const nameOf = id => (users.find(u => String(u.id) === String(id)) || {}).name;
+  const err = h('p', { class: 'err', role: 'alert' });
+  const listBox = h('div', { class: 'grp-list' });
+  let dirty = false;
+  const saveBtn = h('button', { class: 'btn primary', type: 'button', disabled: true, onclick: async () => {
+    err.textContent = ''; saveBtn.disabled = true; saveBtn.textContent = 'Saving…';
+    try {
+      const clean = draft.map(g => ({ id: g.id, name: g.name.trim() || 'Group', members: g.members.filter(m => nameOf(m.id)).map(m => ({ id: m.id, name: nameOf(m.id) })) }));
+      await saveGroups(clean, 'User groups: ' + (clean.map(g => g.name + ' (' + g.members.length + ')').join(', ') || 'none'));
+      toast('Groups saved. Members see each other’s requests within a minute.'); await reload();
+    } catch (e) { err.textContent = e.message; saveBtn.disabled = false; saveBtn.textContent = 'Save groups'; }
+  } }, 'Save groups');
+  const touch = () => { dirty = true; saveBtn.disabled = false; draw(); };
+  const draw = () => {
+    fill(listBox, ...draft.map((g, gi) => {
+      const nm = h('input', { class: 'input grp-name', value: g.name, 'aria-label': 'Group name', maxlength: 60 });
+      nm.addEventListener('input', () => { g.name = nm.value; dirty = true; saveBtn.disabled = false; });
+      const addSel = h('select', { class: 'input', 'aria-label': 'Add a person to ' + g.name },
+        h('option', { value: '' }, '+ Add person…'), ...users.filter(u => !memberOf(g, u.id)).sort((a, b) => a.name.localeCompare(b.name)).map(u => h('option', { value: String(u.id) }, u.name + ' · ID ' + (u.login_id || '—'))));
+      addSel.addEventListener('change', () => { if (!addSel.value) return; g.members.push({ id: addSel.value, name: nameOf(addSel.value) || '' }); touch(); });
+      const del = confirmButton('Delete group', 'Click again to delete', async () => { draft.splice(gi, 1); touch(); }, 'btn mini');
+      return h('div', { class: 'grp' },
+        h('div', { class: 'grp-head' }, h('span', { class: 'grp-ic', 'aria-hidden': 'true' }, '👥'), nm, h('small', {}, g.members.length + (g.members.length === 1 ? ' person' : ' people')), del),
+        g.members.length ? h('div', { class: 'grp-members' }, ...g.members.map((m, mi) => h('span', { class: 'grp-chip' + (nameOf(m.id) ? '' : ' gone') },
+          h('span', { class: 'ppl-av sm' }, pplInitials(nameOf(m.id) || m.name)), nameOf(m.id) || (m.name || 'Deleted account') + ' (removed)',
+          h('button', { type: 'button', 'aria-label': 'Remove ' + (nameOf(m.id) || m.name), title: 'Remove from group', onclick: () => { g.members.splice(mi, 1); touch(); } }, '×')))) : h('p', { class: 'rmod-note', style: 'margin:6px 0' }, 'No one yet. Add at least two people.'),
+        g.members.length === 1 ? h('p', { class: 'rmod-note', style: 'margin:0' }, 'Add at least one more person so they can see each other’s requests.') : null,
+        h('div', { class: 'grp-add' }, addSel));
+    }), draft.length ? null : h('div', { class: 'grp-empty' }, h('b', {}, 'No groups yet'), h('p', {}, 'Create a group for a team that should see each other’s leave requests, for example a shift or a client team.')));
+  };
+  const addBtn = h('button', { class: 'btn', type: 'button', onclick: () => { draft.push({ id: Date.now().toString(36) + Math.random().toString(36).slice(2, 5), name: 'New group', members: [] }); touch(); setTimeout(() => { const i = listBox.querySelectorAll('.grp-name'); i[i.length - 1]?.select(); }, 0); } }, '+ New group');
+  draw();
+  fill(box,
+    h('div', { class: 'grp-intro' }, h('div', {}, h('b', {}, 'What a group does'),
+      h('ul', {}, h('li', {}, 'Members see each other’s attendance requests in Request Center (Waiting and History).'), h('li', {}, 'Members get each other’s request notifications (sent, approved, rejected, cancelled).'), h('li', {}, 'It doesn’t change what they can open or edit. That stays in each person’s access.')))),
+    h('div', { class: 'set-actions flat' }, addBtn, h('span', { class: 'spacer' }), saveBtn), err, listBox);
 }
 /* filters: what the super admin can fix for a person */
 const FILTER_NAMES = { status: 'Status', desig: 'Designation', client: 'Client', mode: 'Work mode' };
@@ -10138,7 +10355,7 @@ function filterText(f) {
   return parts.join(' · ') || 'no filters (everyone)';
 }
 window.filterText = filterText;
-function drawEditor(box, u, reload, users = [], template = null) {
+function drawEditor(box, u, reload, users = [], template = null, groups = []) {
   const me = CLOUD.user(), isNew = !u, self = u && u.id === me.id;
   const err = h('p', { class: 'err', role: 'alert' });
   const name = h('input', { class: 'input', value: u ? u.name : template ? template.name + ' (copy)' : '', 'aria-label': 'Name', autocomplete: 'off' });
@@ -10172,7 +10389,7 @@ function drawEditor(box, u, reload, users = [], template = null) {
   const audienceList = h('div', {class:'rmod-items',hidden:audienceMode.value !== 'selected'}, ...audienceChecks.map(c => c.el));
   audienceMode.onchange = () => { audienceList.hidden = audienceMode.value !== 'selected'; };
   const audienceBox = h('div', {class:'rmod-extra'}, h('label',{},'Request notifications from',audienceMode), audienceList,
-    h('p',{class:'rmod-note'},'Applies to request notifications and rejected-request history. Their own requests are always included. All users receive approved-request notifications by default. Activity log access is separate.'));
+    h('p',{class:'rmod-note'},'Applies to request notifications and rejected requests in History. Their own requests and their group’s requests (Groups tab) are always included. All users receive approved-request notifications by default. Activity log access is separate.'));
   const knownFields = [...new Set([...(window.ATT?.fieldNames() || []),...(accessSource?.permissions?._attendanceFields || [])])];
   const priorFields = accessSource?.permissions?._attendanceFields;
   const fieldChecks = knownFields.map(field => ({field,...checkLine(field,Array.isArray(priorFields)?priorFields.includes(field):!!(start['att.edit'] || start['att.fields']))}));
@@ -10246,8 +10463,8 @@ function drawEditor(box, u, reload, users = [], template = null) {
       h('div', { class: 'rmod-chips' }, ...subItems.map(c => c.el)),
       h('p', { class: 'rmod-note' }, g.name === 'Overview' ? 'Choose which Request Center cards this person can see and whether they can approve or reject requests.' : 'Only these types appear in the Type list of Log leave. A ticked type can be logged even without “Approve or reject leave” or “Mark and edit attendance”; changing a day that already holds approved leave still needs “Approve or reject leave”.')) : null;
     let head;
-    if (g.page) { const c = checkLine('', !!start[g.page], { 'data-k': g.page, 'aria-label': 'Can open ' + g.name }); boxes[g.page] = c.box; head = h('label', { class: 'rmod-head' }, c.box, h('b', {}, g.name), h('small', {}, 'can open this page')); }
-    else head = h('div', { class: 'rmod-head' }, h('b', {}, g.name));
+    if (g.page) { const c = checkLine('', !!start[g.page], { 'data-k': g.page, 'aria-label': 'Can open ' + g.name }); boxes[g.page] = c.box; head = h('label', { class: 'rmod-head' }, c.box, h('span', {}, 'Can open the ' + g.name + ' page')); }
+    else head = null;
     /* v3.17: items split into what they can see and what they can change, with a quick None / View / Edit switch */
     const allIt = [...g.items.map(i => i[0]).map((k, i) => [k, items[i]]), ...((g.sub && g.sub.items) || []).map((i, j) => [i[0], subItems[j]])];
     const viewIt = items.filter((c, i) => !PERM.isEditKey(g.items[i][0])), editIt = items.filter((c, i) => PERM.isEditKey(g.items[i][0]));
@@ -10268,24 +10485,34 @@ function drawEditor(box, u, reload, users = [], template = null) {
       for (const [k] of allIt) boxes[k].checked = lv === 'edit' || (lv === 'view' && !PERM.isEditKey(k));
       sync(); paintSeg();
     };
-    const segBtns = [['none', 'None'], ...(hasView ? [['view', 'View']] : []), ...(hasEdit ? [['edit', 'Edit']] : [])].map(([lv, t]) => h('button', { type: 'button', class: 'rseg-b', 'data-lv': lv, title: lv === 'none' ? 'Hide this module' : lv === 'view' ? 'Can see, but not change anything' : 'Can see and change everything here', onclick: () => setLevel(lv) }, t));
-    const segHint = h('small', { class: 'rseg-custom' }, 'custom');
-    const seg = h('div', { class: 'rseg', role: 'group', 'aria-label': g.name + ' access' }, ...segBtns, segHint);
-    const paintSeg = () => { const lv = levelOf(); segBtns.forEach(b => b.setAttribute('aria-pressed', String(b.dataset.lv === lv))); segHint.hidden = lv !== 'custom'; };
-    const card = h('div', { class: 'rmod' + (g.name === 'Filters' ? ' rmod-wide' : '') }, head, seg, itemsBox, subBox, g.name === 'Filters' ? fixedBox : g.name === 'Notifications' ? audienceBox : g.name === 'Attendance' ? fieldBox : null);
+    const segBtns = [['none', 'None'], ...(hasView ? [['view', 'View']] : []), ...(hasEdit ? [['edit', 'Edit']] : [])].map(([lv, t]) => h('button', { type: 'button', class: 'rseg-b', 'data-lv': lv, title: lv === 'none' ? 'Hide this module' : lv === 'view' ? 'Can see, but not change anything' : 'Can see and change everything here', onclick: e => { e.preventDefault(); e.stopPropagation(); setLevel(lv); } }, t));
+    const segHint = h('small', { class: 'rseg-custom' }, 'Custom');
+    const seg = h('div', { class: 'rseg', role: 'group', 'aria-label': g.name + ' access' }, ...segBtns);
+    /* v3.20: one line per module; the individual ticks open underneath with “Fine-tune” */
+    const allKeys = [...(g.page ? [g.page] : []), ...allIt.map(([k]) => k)];
+    const countEl = h('small', { class: 'rrow-count' });
+    const paintSeg = () => { const lv = levelOf(); segBtns.forEach(b => b.setAttribute('aria-pressed', String(b.dataset.lv === lv))); segHint.hidden = lv !== 'custom'; countEl.textContent = allKeys.filter(k => boxes[k].checked).length + ' of ' + allKeys.length + ' on'; };
+    const extra = g.name === 'Filters' ? fixedBox : g.name === 'Notifications' ? audienceBox : g.name === 'Attendance' ? fieldBox : null;
+    const card = h('details', { class: 'rrow' },
+      h('summary', {}, h('span', { class: 'rrow-name' }, h('b', {}, g.name), h('span', { class: 'rrow-meta' }, countEl, segHint)), seg, h('span', { class: 'rrow-more', 'aria-hidden': 'true' }, 'Fine-tune')),
+      h('div', { class: 'rrow-body' }, head, itemsBox, subBox, extra));
     const sync = () => { const off = g.page && !boxes[g.page].checked; card.classList.toggle('off', !!off); for (const c of items) c.box.disabled = isSuper() || !!off; for (const c of subItems) c.box.disabled = isSuper() || !!off; if (g.page) boxes[g.page].disabled = isSuper(); };
     if (g.page) boxes[g.page].addEventListener('change', sync);
     card.addEventListener('change', () => setTimeout(paintSeg));
     syncs.push(() => { sync(); paintSeg(); segBtns.forEach(b => { b.disabled = isSuper(); }); });
     return card;
   });
-  const presets = h('div', { class: 'rights-presets' }, h('span', {}, 'Start from:'), ...Object.entries(PERM.presets).map(([n, p]) => h('button', { class: 'btn mini', type: 'button', onclick: () => { for (const k of PERM.keys) boxes[k].checked = !!p[k]; syncs.forEach(f => f()); } }, n)));
-  const superNote = h('p', { class: 'set-hint' }, 'Super admins have every right, and only they can manage people, rights and fixed filters.');
-  const roleNote = h('p', { class: 'set-hint' }, 'Admins and users get exactly the rights ticked below; only a super admin can change them.');
-  const rights = h('div', { class: 'rights' }, h('h4', {}, 'What they can do'), superNote, roleNote, presets, h('div', { class: 'rmods' }, ...modules));
+  const presetBtns = Object.entries(PERM.presets).filter(([n]) => n !== 'Admin').map(([n, p]) => h('button', { class: 'rpre', type: 'button', 'data-n': n, onclick: () => { for (const k of PERM.keys) boxes[k].checked = !!p[k]; syncs.forEach(f => f()); paintPresets(); } }, n));
+  const paintPresets = () => { const m = Object.entries(PERM.presets).find(([n, p]) => n !== 'Admin' && PERM.keys.every(k => !!p[k] === !!boxes[k].checked)); presetBtns.forEach(b => b.setAttribute('aria-pressed', String(!!m && b.dataset.n === m[0]))); presetNow.textContent = m ? 'Matches “' + m[0] + '”' : 'Custom access'; };
+  const presetNow = h('small', { class: 'rpre-now' });
+  const presets = h('div', { class: 'rights-presets' }, h('span', {}, 'Quick start:'), ...presetBtns, presetNow);
+  const superNote = h('p', { class: 'set-hint sup-note' }, '⭐ Super admins can open and change everything, and manage people, groups and access. Nothing to tick.');
+  const roleNote = h('p', { class: 'set-hint' }, 'Pick a quick start, then set each area to None, View or Edit. Open “Fine-tune” on a line only if you need something in between.');
+  const rights = h('div', { class: 'rights' }, superNote, roleNote, presets, h('div', { class: 'rrows' }, ...modules));
+  rights.addEventListener('change', () => setTimeout(paintPresets)); rights.addEventListener('click', e => { if (e.target.closest('.rseg-b')) setTimeout(paintPresets); });
   const syncRole = () => { const sup = isSuper(); rights.classList.toggle('is-admin', sup); superNote.hidden = !sup; roleNote.hidden = sup; presets.hidden = sup; fixedBox.hidden = sup; audienceBox.hidden = sup; fieldBox.hidden = sup; syncs.forEach(f => f()); };
-  role.addEventListener('change', () => { if (isNew && role.value === 'admin') { for (const k of PERM.keys) boxes[k].checked = !!PERM.presets['Admin'][k]; } syncRole(); });
-  syncRole();
+  role.addEventListener('change', () => { if (isNew && role.value === 'admin') { for (const k of PERM.keys) boxes[k].checked = !!PERM.presets['Admin'][k]; } syncRole(); paintPresets(); });
+  syncRole(); paintPresets();
   const rightsNow = () => Object.fromEntries([['_v', PERM.version], ...PERM.keys.map(k => [k, boxes[k].checked])]);
   /* v3.16: copy rights between people, duplicate a person, or hand these rights to several people at once */
   const permsNow = () => isSuper() ? {} : { ...rightsNow(), _attendanceFields: fieldChecks.filter(c => c.box.checked).map(c => c.field), _notificationAudience: { mode: audienceMode.value, users: audienceChecks.filter(c => c.box.checked).map(c => c.id) }, ...(fixed ? { _filters: fixed } : {}) };
@@ -10303,7 +10530,7 @@ function drawEditor(box, u, reload, users = [], template = null) {
     syncRole(); err.textContent = 'Rights copied from ' + source.name + ' into this form. Review, then press ' + (isNew ? '“Add person”' : '“Save changes”') + ' to apply.';
   };
   const copyBtn = h('button', { class: 'btn', type: 'button', onclick: () => { const source = users.find(x => String(x.id) === sourceSelect.value); if (!source) { err.textContent = 'Choose whose rights to copy.'; return; } applySource(source); } }, 'Copy into this form');
-  const dupBtn = u ? h('button', { class: 'btn', type: 'button', title: 'A new account with the same role, rights, filters and field buttons. It gets its own new passcode.', onclick: () => drawEditor(box, null, reload, users, u) }, 'Duplicate ' + u.name) : null;
+  const dupBtn = u ? h('button', { class: 'btn', type: 'button', title: 'A new account with the same role, rights, filters and field buttons. It gets its own new passcode.', onclick: () => drawEditor(box, null, reload, users, u, groups) }, 'Duplicate ' + u.name) : null;
   /* give the rights in this form to other people (their names, passcodes and linked employees stay as they are) */
   const targets = others.filter(x => x.role !== 'superadmin').map(x => ({ x, ...checkLine(x.name + ' · ID ' + (x.login_id || '—') + ' · ' + (PERM.roleNames[x.role] || x.role), false) }));
   const targetRole = checkLine('Also give them this role', false);
@@ -10340,6 +10567,24 @@ function drawEditor(box, u, reload, users = [], template = null) {
     !isNew && others.length ? h('div', { class: 'rmod-items copy-targets' }, ...targets.map(t => t.el)) : null,
     !isNew && others.length ? h('div', { class: 'set-actions flat' }, targetRole.el, giveBtn) : null,
     !isNew && others.length ? giveMsg : null);
+  /* v3.20: which user groups this person is in */
+  const grpSrc = u || template;
+  const groupChecks = groups.map(g => ({ g, ...checkLine(g.name + ' · ' + g.members.length + (g.members.length === 1 ? ' person' : ' people'), !!grpSrc && memberOf(g, grpSrc.id)) }));
+  const groupBox = groups.length ? h('div', { class: 'grp-picks' }, ...groupChecks.map(c => c.el))
+    : h('p', { class: 'rmod-note', style: 'margin:0' }, 'No groups yet. Make one in the Groups tab above.');
+  const saveGroupsFor = async (id, nm) => {
+    if (!groups.length) return;
+    await loadTeamSettings(); const latest = groupsFrom(window.TD_SETTINGS);
+    let changed = false;
+    const next = latest.map(g => {
+      const want = groupChecks.find(c => c.g.id === g.id)?.box.checked, has = memberOf(g, id);
+      if (want && !has) { changed = true; return { ...g, members: [...g.members, { id: String(id), name: nm }] }; }
+      if (want === false && has) { changed = true; return { ...g, members: g.members.filter(m => m.id !== String(id)) }; }
+      if (has) return { ...g, members: g.members.map(m => m.id === String(id) && m.name !== nm ? (changed = true, { ...m, name: nm }) : m) };
+      return g;
+    });
+    if (changed) await saveGroups(next, 'Groups for ' + nm + ': ' + (next.filter(g => memberOf(g, id)).map(g => g.name).join(', ') || 'none'));
+  };
   const save = h('button', { class: 'btn primary', type: 'button', onclick: async () => {
     err.textContent = ''; save.disabled = true; save.textContent = 'Saving…';
     try {
@@ -10349,6 +10594,8 @@ function drawEditor(box, u, reload, users = [], template = null) {
       const link = linked ? { _emp: linked.code, _empName: linked.name } : {};
       const perms = isSuper() ? link : { ...rightsNow(), ...link, _attendanceFields: fieldChecks.filter(c=>c.box.checked).map(c=>c.field), _notificationAudience: { mode: audienceMode.value, users: audienceChecks.filter(c => c.box.checked).map(c => c.id) }, ...(fixed ? { _filters: fixed } : {}) };
       const r = await CLOUD.admin.save(u ? u.id : null, nm, pc, role.value, active.box.checked, perms, lid);
+      const savedId = (r && r.id) || (u && u.id);
+      if (savedId != null) { try { await saveGroupsFor(savedId, nm); } catch (ge) { toast('Saved, but the groups could not be updated: ' + ge.message, true); } }
       if (self) { CLOUD.admin.selfUpdated(nm); await CLOUD.refreshMe(); applyAccess(); }
       BE.appendActivity([{ time: BE.nowText(), user: BE.userName(), action: 'settings', key: '', name: nm, details: { note: (isNew ? 'Added ' : 'Updated access for ') + nm + ' · ' + rightsSummary({ role: role.value, permissions: perms }) + (fixed && !isSuper() ? ' · fixed filters: ' + filterText(fixed) : '') + (active.box.checked ? '' : ' · sign-in disabled') } }]);
       toast(isNew ? 'Added ' + nm + '. Give them their login ID (' + lid + ') and passcode.' : 'Saved. ' + (u.passcode !== pc ? 'The new passcode works now; the old one has stopped.' : 'Their rights apply within a minute.'));
@@ -10358,20 +10605,26 @@ function drawEditor(box, u, reload, users = [], template = null) {
   const del = !isNew && !self ? confirmButton('Delete', 'Click again to delete', async () => {
     try { await CLOUD.admin.remove(u.id); toast(u.name + ' deleted. Their passcode no longer works.'); await reload(null); } catch (e) { err.textContent = e.message; }
   }) : null;
+  const sec = (n, title, hint, ...kids) => h('section', { class: 'ped-sec' }, h('div', { class: 'ped-h' }, h('span', { class: 'ped-n' }, n), h('div', {}, h('b', {}, title), hint ? h('small', {}, hint) : null)), ...kids);
+  const shownName = isNew ? (template ? 'New person · copy of ' + template.name : 'New person') : u.name;
   fill(box,
-    h('h4', { class: 'ppl-name' }, isNew ? (template ? 'New person · copy of ' + template.name : 'New person') : u.name),
-    template ? h('p', { class: 'set-hint' }, 'Same role, rights, fixed filters and field buttons as ' + template.name + '. Enter the name and login ID (Emp ID), note the new passcode, then press “Add person”.') : null,
-    h('div', { class: 'ppl-row' },
-      h('label', {}, 'Name', name),
-      h('label', {}, 'Login ID (Emp ID)', loginId, loginList),
-      h('label', {}, 'Passcode', h('div', { class: 'pc-wrap' }, code, eye, fresh)),
-      h('label', {}, 'Role', role),
-      h('label', {}, 'Linked employee (optional)', emp, empList)),
-    active.el, copyControls,
-    u && u.last_login ? h('p', { class: 'set-hint' }, 'Last signed in ' + when(u.last_login) + '.') : null,
-    rights,
-    h('div', { class: 'set-actions' }, save, h('span', { class: 'spacer' }), del),
-    err);
+    h('div', { class: 'ped-top' }, h('span', { class: 'ppl-av lg r-' + curRole }, pplInitials(isNew ? '+' : u.name)),
+      h('div', { class: 'ped-id' }, h('h4', { class: 'ppl-name' }, shownName),
+        h('small', {}, isNew ? 'Fill in the account, choose access, then press “Add person”.' : ('ID ' + (u.login_id || '—') + ' · ' + rightsSummary(u) + (u.last_login ? ' · last signed in ' + when(u.last_login) : ' · never signed in'))))),
+    template ? h('p', { class: 'set-hint' }, 'Same role, access, filters and groups as ' + template.name + '. Enter the name and login ID (Emp ID), note the new passcode, then press “Add person”.') : null,
+    sec('1', 'Account', 'How they sign in',
+      h('div', { class: 'ppl-row' },
+        h('label', {}, 'Name', name),
+        h('label', {}, 'Login ID (Emp ID)', loginId, loginList),
+        h('label', {}, 'Passcode', h('div', { class: 'pc-wrap' }, code, eye, fresh)),
+        h('label', {}, 'Linked employee (optional)', emp, empList)),
+      active.el),
+    sec('2', 'Role & access', 'What they can open and change',
+      h('div', { class: 'ppl-row' }, h('label', {}, 'Role', role)), rights),
+    sec('3', 'Groups', 'People in the same group see each other’s requests and request notifications', groupBox),
+    h('details', { class: 'ped-more copy-access', open: !!template || null },
+      h('summary', {}, h('b', {}, 'More: copy, duplicate or share this access')), ...[...copyControls.childNodes].slice(1)),
+    h('div', { class: 'set-actions ped-save' }, save, err, h('span', { class: 'spacer' }), del));
   if (isNew) name.focus();
 }
 
