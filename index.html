@@ -4,7 +4,7 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <link rel="icon" href="data:,">
-<title>Team Dashboard · 3.39.2</title>
+<title>Team Dashboard · 3.39.3</title>
 <style>
 :root {
   color-scheme: light;
@@ -1065,7 +1065,13 @@ table.data td { padding:9px 10px; font-size:12px; }
 .watch-head .grow { flex:1 1 260px; }
 .watch-head select { height:30px; width:auto; min-width:0; }
 .watch-cols { display:grid; grid-template-columns:minmax(0,1fr) minmax(0,1fr); gap:16px; margin-top:12px; }
-.watch-late { margin-top:16px; }
+/* v3.39.3: back-to-back leave, leave on particular days and late comings side by side, equal cards */
+.watch-cols { grid-template-columns:repeat(3, minmax(0,1fr)) !important; align-items:stretch; }
+.watch-col { display:flex; flex-direction:column; min-width:0; }
+.watch-col > .sub { min-height:88px; margin-bottom:8px; }
+.watch-col > h3 { min-height:32px; display:flex; align-items:center; }
+.watch-col > .watch-list, .watch-col > .watch-empty { flex:1; height:420px; max-height:420px; overflow:auto; }
+@media (max-width:1100px) { .watch-cols { grid-template-columns:minmax(0,1fr) !important; } .watch-col > .sub { min-height:0; } .watch-col > .watch-list, .watch-col > .watch-empty { height:auto; } }
 @media(max-width:900px) { .watch-cols { grid-template-columns:minmax(0,1fr); } }
 .watch-col h3 { margin:0 0 2px; font-size:14px; }
 .watch-col .sub { font-size:12px; color:var(--ink-2); margin-bottom:8px; }
@@ -1803,10 +1809,10 @@ body.filters-locked #cleanFilters, body.filters-locked #xchips, body.filters-loc
     <p class="gate-sub">One place for your people, priorities and team insights.</p>
     <div id="connectBody"><div class="empty">Loading…</div></div>
   </div>
-  <p class="gate-ver">3.39.2</p>
+  <p class="gate-ver">3.39.3</p>
 </section>
 
-<div id="app" hidden><aside class="sidebar" aria-label="Workspace navigation"><div class="brand dashboard-identity">      <h1><span id="title">Team Dashboard</span><span class="ver" id="ver" title="Version 3.39.2">3.39.2</span></h1><p class="brand-tag">One place for your people, priorities and team insights.</p>      <span class="sync" id="sync" role="status"><i></i><span id="syncText">Loading…</span></span></div><div class="nav-label">WORKSPACE</div>      <nav class="tabs" role="tablist" aria-label="Pages" aria-orientation="vertical">
+<div id="app" hidden><aside class="sidebar" aria-label="Workspace navigation"><div class="brand dashboard-identity">      <h1><span id="title">Team Dashboard</span><span class="ver" id="ver" title="Version 3.39.3">3.39.3</span></h1><p class="brand-tag">One place for your people, priorities and team insights.</p>      <span class="sync" id="sync" role="status"><i></i><span id="syncText">Loading…</span></span></div><div class="nav-label">WORKSPACE</div>      <nav class="tabs" role="tablist" aria-label="Pages" aria-orientation="vertical">
         <button class="tab on" role="tab" aria-controls="pageSummary" data-view="summary" aria-selected="true" data-icon="🏠" data-short="Home">Overview</button>
         <button class="tab" role="tab" aria-controls="pageEmployees" data-view="employees" aria-selected="false" data-icon="👥" data-short="People">Employees</button>
       <button class="tab" role="tab" aria-controls="pageAttendance" data-view="attendance" aria-selected="false" data-icon="🗓️" data-short="Attend.">Attendance</button>
@@ -7878,8 +7884,8 @@ function renderWatch(el) {
     : `<div class="watch-empty">No one’s leave keeps falling on the same weekday in the past ${u.look} days.</div>`;
   el.innerHTML = head(`${reds ? `<b style="color:var(--danger)">${reds} red flag${reds === 1 ? '' : 's'}</b> · ` : ''}${streaks.length ? `${streaks.length} ${streaks.length === 1 ? 'person' : 'people'} with back-to-back leave` : 'No back-to-back leave'} · ${lates.length} repeated late coming${lates.length === 1 ? '' : 's'} · ${patterns.length} repeat-day pattern${patterns.length === 1 ? '' : 's'} · checking ${checked} ${checked === 1 ? 'person' : 'people'} in ${esc(hostSummary() || 'all statuses')} (the filters at the top; people who left are skipped)`)
     + hrBanner + `<div class="watch-cols"><section class="watch-col" aria-label="Back-to-back leave"><h3>Back-to-back leave · past ${u.days} days</h3><div class="sub">Only unplanned (UL, AB) and sick (SL) leave is flagged; planned leave (AL, CL) never is. <b>Red flag</b>: 3+ unplanned days in one stretch, 2+ separate stretches, 4+ unplanned days, or far more than the person’s own usual (last 6 months). Weekends and holidays in between don’t break a stretch.${plannedOnly ? ` <span class="muted">${plannedOnly} planned break${plannedOnly === 1 ? '' : 's'} not flagged.</span>` : ''}</div>${sList}</section>
-      <section class="watch-col" aria-label="Leave on particular days"><h3 style="display:flex;align-items:center;gap:8px;flex-wrap:wrap">Leave on particular days <label class="hint" style="display:flex;align-items:center;gap:6px;font-weight:400">over <select class="input mini" data-w="look" aria-label="Look-back for day patterns">${opt([60, 90, 180], u.look, v => v + ' days')}</select></label></h3><div class="sub">People with 3+ leave days where most fall on one weekday, or on Mondays and Fridays.</div>${pList}</section></div>
-      <section class="watch-col watch-late" aria-label="Late comings"><h3>Late comings · red flags</h3><div class="sub"><b>Red flag</b>: late (L) 3 working days in a row, 4+ times in one week (Sun–Sat) within the past ${u.days} days, or at least once every week for the last 4 weeks. Cab late (C) isn’t counted.</div>${lList}</section>`;
+      <section class="watch-col" aria-label="Leave on particular days"><h3 style="display:flex;align-items:center;gap:8px;flex-wrap:wrap">Leave on particular days <label class="hint" style="display:flex;align-items:center;gap:6px;font-weight:400">over <select class="input mini" data-w="look" aria-label="Look-back for day patterns">${opt([60, 90, 180], u.look, v => v + ' days')}</select></label></h3><div class="sub">People with 3+ leave days where most fall on one weekday, or on Mondays and Fridays.</div>${pList}</section>
+      <section class="watch-col watch-late" aria-label="Late comings"><h3>Late comings · red flags</h3><div class="sub"><b>Red flag</b>: late (L) 3 working days in a row, 4+ times in one week (Sun–Sat) within the past ${u.days} days, or at least once every week for the last 4 weeks. Cab late (C) isn’t counted.</div>${lList}</section></div>`;
   el.querySelectorAll('[data-w]').forEach(s => s.addEventListener('change', () => { u[s.dataset.w] = +s.value; try { localStorage.setItem(WATCH_KEY, JSON.stringify(u)); } catch { } renderWatch(el); }));
   el.querySelectorAll('[data-w-hr]').forEach(b => b.addEventListener('click', () => { const k = b.dataset.wHr; const list = k === 'all' ? untold : redList.filter(s => s.k === k && (b.closest('.watch-late') ? s.late_ : !s.late_)); if (list.length) openHrBox(list, u); }));
   el.querySelectorAll('[data-w-open]').forEach(b => b.addEventListener('click', () => { if (can('att.grid')) go('people', b.dataset.wOpen); else toast('Your passcode can’t open the People view.'); }));
@@ -8150,7 +8156,7 @@ async function poll() {
 }
 
 /* ============================== filtering ============================== */
-const APP = { title: "Team Dashboard", version: "3.39.2", released: "30 Sep 2026" };
+const APP = { title: "Team Dashboard", version: "3.39.3", released: "30 Sep 2026" };
 const BASE_DIMS = { status: "status_column", desig: "designation_column", client: "client_column", mode: "mode_column" };
 const STANDARD_STATUSES = ["Active", "Manager", "OJT", "Bench", "New", "Projected", "Left", "Moved"];
 const TILE_ORDER = ["Active", "Manager", "OJT", "Bench", "New", "Projected"];
