@@ -4,7 +4,7 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <link rel="icon" href="data:,">
-<title>Team Dashboard · 3.27.1</title>
+<title>Team Dashboard · 3.28.0</title>
 <style>
 :root {
   color-scheme: light;
@@ -1437,7 +1437,7 @@ body.filters-locked #cleanFilters, body.filters-locked #xchips, body.filters-loc
 #pageSummary.ov #cardWatch { grid-area:watch !important; grid-column:watch !important; grid-row:watch !important; min-width:0; }
 #pageSummary.ov .att-mini { max-height:260px; }
 #pageSummary.ov .att-mini li { grid-template-columns:minmax(0,1.5fr) minmax(0,1fr) auto; }
-#pageSummary.ov .att-mini-s { display:none; }
+#pageSummary.ov .att-mini-s, #pageSummary.ov .att-mini-c { display:none; }
 #pageSummary.ov #cardAttendance .card-head { flex-wrap:wrap; }
 #pageSummary.ov #cardAttendance .card-head > .grow { flex:1 1 100%; }
 #pageSummary.ov #cardAttendance .att-nav .input { width:auto; min-width:0; }
@@ -1689,7 +1689,7 @@ body.filters-locked #cleanFilters, body.filters-locked #xchips, body.filters-loc
 .dd-save { position:sticky; bottom:0; background:var(--surface); padding:10px 0; margin-top:0 !important; align-items:center; }
 @media (max-width:700px) { .dd-row { grid-template-columns:1fr; } .dd-save { bottom:calc(66px + env(safe-area-inset-bottom)); } }
 
-/* v3.27.1: the four glance tiles as one summary strip */
+/* v3.28.0: the four glance tiles as one summary strip */
 #pageSummary.ov > .ov-glance { gap:0 !important; border:1px solid var(--border); border-radius:14px; background:var(--surface); overflow:hidden; box-shadow:0 1px 2px rgba(15,23,42,.04); }
 #pageSummary.ov .ov-tile { --tone:var(--accent); position:relative; display:flex !important; flex-direction:column; align-items:flex-start !important; gap:4px !important; padding:14px 18px 13px !important; border:0 !important; border-radius:0 !important; border-left:1px solid var(--border) !important; background:transparent !important; box-shadow:none !important; transform:none !important; }
 #pageSummary.ov .ov-tile:first-child { border-left:0 !important; }
@@ -1718,6 +1718,20 @@ body.filters-locked #cleanFilters, body.filters-locked #xchips, body.filters-loc
   .ov-tile.t-hol .ov-val b { white-space:normal; font-size:15px; }
   #pageSummary.ov .ov-tile > em { white-space:normal; }
 }
+
+
+/* v3.28: backup column on the attendance card */
+.att-mini li { grid-template-columns:minmax(0,1.6fr) minmax(0,1fr) auto minmax(0,1fr) minmax(0,1.1fr) !important; }
+#pageSummary.ov .att-mini li { grid-template-columns:minmax(0,1.3fr) auto minmax(0,1.1fr) !important; }
+.att-bk { justify-self:end; max-width:100%; overflow:hidden; text-overflow:ellipsis; white-space:nowrap; border:1px solid var(--border); background:var(--surface); color:var(--ink-2); border-radius:999px; padding:2px 10px; font:inherit; font-size:11.5px; font-weight:600; cursor:pointer; }
+.att-bk.add { border-style:dashed; color:var(--accent); }
+.att-bk.set { background:color-mix(in srgb,#22a05a 12%,var(--surface)); border-color:color-mix(in srgb,#22a05a 35%,var(--border)); color:#1c7a45; }
+.att-bk.none { color:var(--ink-3); }
+.att-bk:disabled { cursor:default; }
+.att-bk-no { justify-self:end; font-size:11.5px; color:var(--ink-3); }
+.att-bk-sum { margin:0 0 6px; font-size:12px; color:#9a5a00; }
+.att-bk-sum.ok { color:#1c7a45; }
+@media (max-width:650px) { .att-mini li { grid-template-columns:minmax(0,1fr) auto auto !important; } }
 </style></head>
 
 
@@ -1731,10 +1745,10 @@ body.filters-locked #cleanFilters, body.filters-locked #xchips, body.filters-loc
     <p class="gate-sub">One place for your people, priorities and team insights.</p>
     <div id="connectBody"><div class="empty">Loading…</div></div>
   </div>
-  <p class="gate-ver">3.27.1</p>
+  <p class="gate-ver">3.28.0</p>
 </section>
 
-<div id="app" hidden><aside class="sidebar" aria-label="Workspace navigation"><div class="brand dashboard-identity">      <h1><span id="title">Team Dashboard</span><span class="ver" id="ver" title="Version 3.27.1">3.27.1</span></h1><p class="brand-tag">One place for your people, priorities and team insights.</p>      <span class="sync" id="sync" role="status"><i></i><span id="syncText">Loading…</span></span></div><div class="nav-label">WORKSPACE</div>      <nav class="tabs" role="tablist" aria-label="Pages" aria-orientation="vertical">
+<div id="app" hidden><aside class="sidebar" aria-label="Workspace navigation"><div class="brand dashboard-identity">      <h1><span id="title">Team Dashboard</span><span class="ver" id="ver" title="Version 3.28.0">3.28.0</span></h1><p class="brand-tag">One place for your people, priorities and team insights.</p>      <span class="sync" id="sync" role="status"><i></i><span id="syncText">Loading…</span></span></div><div class="nav-label">WORKSPACE</div>      <nav class="tabs" role="tablist" aria-label="Pages" aria-orientation="vertical">
         <button class="tab on" role="tab" aria-controls="pageSummary" data-view="summary" aria-selected="true" data-icon="🏠" data-short="Home">Overview</button>
         <button class="tab" role="tab" aria-controls="pageEmployees" data-view="employees" aria-selected="false" data-icon="👥" data-short="People">Employees</button>
       <button class="tab" role="tab" aria-controls="pageAttendance" data-view="attendance" aria-selected="false" data-icon="🗓️" data-short="Attend.">Attendance</button>
@@ -3412,7 +3426,7 @@ const CLOUD = (() => {
 const PERM_GROUPS = [
   { name: 'Overview', page: 'page.overview', items: [['ov.attendance', 'See the attendance card'], ['ov.openatt', 'See the “Open attendance →” button on the attendance card'], ['ov.coming', 'See birthdays and work anniversaries'], ['ov.holidays', 'See USA and India holidays'], ['ov.watch', 'See leave red flags and day patterns']], sub: { title: 'Request Center', items: [['requests.own', 'See Waiting and History (their own and their group’s requests)'], ['requests.rejected', 'Also see rejected requests from their notification audience in History'], ['att.approve', 'Manager: approve or reject leave requests (shows the To approve tab) and edit approved leave']] } },
   { name: 'Employees', page: 'page.employees', items: [['emp.edit', 'Edit employee details'], ['emp.add', 'Add employees'], ['emp.delete', 'Delete employees'], ['emp.bulk', 'Fill in bulk and add columns'], ['emp.fields', 'Add or delete fields (Excel columns)']] },
-  { name: 'Attendance', page: 'page.attendance', items: [['att.who', 'See Who’s out'], ['att.grid', 'See the attendance grid and People'], ['att.log', 'Use Record attendance (with the types ticked below)'], ['att.direct', 'Record attendance straight into the tracker (no manager approval)'], ['att.edit', 'Mark attendance in day cells'], ['att.rows', 'Edit any cell or row in the tracker (names, Emp IDs, clients, days) and delete rows'], ['att.holidays', 'Add holidays for everyone'], ['att.fields', 'Add or delete fields in the attendance tracker'], ['att.addemp', 'Add employees to the attendance tracker (new rows, start a month)']],
+  { name: 'Attendance', page: 'page.attendance', items: [['att.who', 'See leave applications (LA) waiting in the tracker'], ['att.grid', 'See the attendance grid and People'], ['att.log', 'Use Record attendance (with the types ticked below)'], ['att.direct', 'Record attendance straight into the tracker (no manager approval)'], ['att.edit', 'Mark attendance in day cells'], ['att.rows', 'Edit any cell or row in the tracker (names, Emp IDs, clients, days) and delete rows'], ['att.holidays', 'Add holidays for everyone'], ['att.fields', 'Add or delete fields in the attendance tracker'], ['att.addemp', 'Add employees to the attendance tracker (new rows, start a month)']],
     /* v3.14.2: which leave types appear in the Log leave “Type” list */
     sub: { title: 'Types in Record attendance', items: [['log.LA', 'LA · Leave application (pending)'], ['log.AL', 'AL · Approved leave'], ['log.CL', 'CL · Casual leave'], ['log.SL', 'SL · Sick leave'], ['log.UL', 'UL · Unplanned leave'], ['log.AB', 'AB · Absent'], ['log.HD1', 'HD1 · Half day, 1st half'], ['log.HD2', 'HD2 · Half day, 2nd half'], ['log.R', 'R · Remote'], ['log.L', 'L · Late coming'], ['log.C', 'C · Cab late']] } },
   { name: 'Action center', page: 'page.actions', items: [['act.items', 'See Action items'], ['act.review', 'See Designation reviews'], ['act.health', 'See Attendance data health']] },
@@ -4209,7 +4223,7 @@ const kv = { get: k => BE.kvGet('att:' + k).catch(() => null), set: (k, v) => BE
 /* The attendance UI lives in one shadow root that the host moves between pages. Mode says which page it is on:
    app = the Attendance page, health = Action center > Attendance data health, reports = Reports > Attendance. */
 const active = () => { try { return S.visible && !document.getElementById('app').hidden; } catch { return false; } };
-const APP_VIEWS = ['who', 'grid', 'people'];
+const APP_VIEWS = ['grid', 'people'];   /* v3.28: Who's out was retired; its Applications ahead list now lives on the Overview */
 /* v3.12: Who's out and the grid / People views each need their own right */
 const viewAllowed = v => v === 'who' ? can('att.who') : (v === 'grid' || v === 'people') ? can('att.grid') : true;
 const viewOf = () => { if (S.mode === 'health') return 'health'; if (S.mode === 'reports') return 'reports'; let v = APP_VIEWS.includes(S.ui.view) ? S.ui.view : 'grid'; if (!viewAllowed(v)) v = APP_VIEWS.find(viewAllowed) || v; return v; };
@@ -4696,7 +4710,7 @@ function scopeCounts() {
 function shellHtml() {
   if (S.mode === 'reports') return `<div id="view"></div>`;
   const tab = (id, icon, label, extra = '') => `<button class="tab" data-act="nav" data-v="${id}">${ic(icon)}<span>${label}</span>${extra}</button>`;
-  const left = S.mode === 'health' ? `<h2 style="margin:0;font-size:16px">Attendance data health</h2>` : `<nav class="subnav" aria-label="Attendance sections">${can('att.who') ? tab('who', 'clock', 'Who’s out') : ''}${can('att.grid') ? tab('grid', 'grid', 'Attendance') + tab('people', 'users', 'People') : ''}</nav>`;
+  const left = S.mode === 'health' ? `<h2 style="margin:0;font-size:16px">Attendance data health</h2>` : `<nav class="subnav" aria-label="Attendance sections">${can('att.grid') ? tab('grid', 'grid', 'Attendance') + tab('people', 'users', 'People') : ''}</nav>`;
   return `<div class="topbar">
       ${left}
       <span class="grow"></span>
@@ -5252,6 +5266,25 @@ function whoView() {
       </div></div>      ${appsOff ? `<aside class="card who-apps-min"><button class="who-apps-open" data-act="who-apps" title="Show Applications ahead" aria-label="Show Applications ahead (${pend.length})"><span>‹</span><b>${pend.length}</b><em>Applications ahead</em></button>` : `<aside class="card who-apps"><div class="who-apps-h"><h2>Applications ahead · ${pend.length}</h2><button class="btn sm" data-act="who-apps" title="Hide this panel and give the space to the table">Hide ›</button></div><div class="sub">${can('att.approve') ? 'Approve each date or a consecutive group. ✕ records RJ (rejected) in the tracker; it does not record attendance.' : 'Leave applied for and waiting for someone with the Approve leave right.'}</div>
         ${pend.length ? `<div class="list" style="max-height:calc(100vh - 230px);min-height:220px;overflow:auto">${applicationList(pend)}</div>` : '<div class="empty">No pending applications from today onward.</div>'}</div>
 `}</aside></div>`;
+}
+
+/* ---------- v3.28: Applications ahead on the Overview (LA dates in the tracker, today onward) ---------- */
+const APPS_CSS = `.apps { display:flex; flex-direction:column; min-height:0; height:100%; } .apps-h { display:flex; align-items:baseline; gap:8px; } .apps-h h2 { margin:0; font-size:15px; font-weight:700; } .apps-n { min-width:22px; padding:0 7px; border-radius:999px; background:var(--accent, #3b6cf6); color:#fff; font-size:12px; font-weight:700; text-align:center; } .apps-n.zero { background:var(--line-2, #ddd); color:var(--ink-2); } .apps .sub { margin:4px 0 8px; font-size:11.5px; color:var(--ink-2); line-height:1.4; } .apps .list { overflow:auto; max-height:360px; margin:0 -4px; padding:0 4px; } .li { display:flex; align-items:center; flex-wrap:wrap; gap:5px 8px; padding:8px 4px; border-bottom:1px solid var(--line); } .main-t { flex:1 1 180px; min-width:0; display:flex; flex-direction:column; } .main-t b { font-size:13px; } .la-group { padding:6px 0; border-bottom:1px solid var(--line); } .la-group > .li { border-bottom:0; padding-bottom:4px; } .la-bulk { display:flex; align-items:center; flex-wrap:wrap; gap:5px; padding:0 4px 6px; } .la-group details { padding:0 4px; } .la-group summary { cursor:pointer; font-size:12px; color:var(--ink-2); padding:3px 0; } .tag { font-size:11px; padding:2px 8px; border-radius:999px; background:rgba(217,164,0,.16); color:#9a7400; font-weight:600; } .empty { padding:18px 6px; text-align:center; color:var(--ink-2); font-size:12.5px; }`;
+function renderAppsCard(host) {
+  if (!host) return;
+  const ok = S.status === 'ready' && !!S.ctx && (can('att.who') || can('att.approve'));
+  host.hidden = !ok; if (!ok) { host.shadowRoot && (host.shadowRoot.innerHTML = ''); return; }
+  const root = host.shadowRoot || host.attachShadow({ mode: 'open' });
+  if (!root._wired) {
+    root._wired = true;
+    root.addEventListener('click', e => { const el = e.target.closest('[data-act]'); if (!el) return; const fn = ACTIONS[el.dataset.act]; if (fn && ['resolve-la', 'resolve-la-group', 'person'].includes(el.dataset.act)) { e.preventDefault(); if (el.dataset.act === 'person') go('people', el.dataset.k); else fn(el, e); } });
+    leaveTipDelegate(root);
+  }
+  const pend = pendingApplications(), people = new Set(pend.map(x => applicationPerson(x.r))).size;
+  root.innerHTML = `<style>${ATT_CSS}${APPS_CSS}${PAST_CSS}${LI_CSS}</style><div class="apps">
+    <div class="apps-h"><h2>Applications ahead</h2><span class="apps-n${pend.length ? '' : ' zero'}" title="${pend.length} day${pend.length === 1 ? '' : 's'}">${people}</span></div>
+    <div class="sub">${pend.length ? `${people} ${people === 1 ? 'person' : 'people'} · ${pend.length} day${pend.length === 1 ? '' : 's'} marked LA in the tracker, from today on. ` : ''}${can('att.approve') ? 'Approve a date or a whole stretch; Reject records RJ.' : 'Waiting for someone with the Approve leave right.'}</div>
+    ${pend.length ? `<div class="list">${applicationList(pend)}</div>` : '<div class="empty">No pending applications from today onward.</div>'}</div>`;
 }
 
 /* ---------- v3.16: one "Log <field>" button per field this passcode may fill (the super admin picks them) ---------- */
@@ -6460,7 +6493,7 @@ function rcDraw(id, visible, html, bind) {
   const host = document.getElementById(id); if (!host) return;
   host.hidden = !visible; const root = host.shadowRoot || host.attachShadow({ mode: 'open' });
   if (!visible) { root.innerHTML = ''; return; }
-  root.innerHTML = `<style>${ATT_CSS}${REQUEST_CARD_CSS}${PAST_CSS}${LI_CSS}</style><div class="rc">${html}</div>`;
+  root.innerHTML = `<style>${ATT_CSS}${REQUEST_CARD_CSS}${PAST_CSS}${LI_CSS}${APPS_CSS} .rc-la { margin-top:6px; } .rc-la-h { display:flex; flex-wrap:wrap; align-items:baseline; gap:6px; padding:8px 0 2px; border-top:1px solid var(--line); } .rc-la-h b { font-size:12.5px; }</style><div class="rc">${html}</div>`;
   root.querySelectorAll('[data-rc-scope]').forEach(b => { b.onclick = () => { RC.scope = b.dataset.rcScope; renderApprovalRequests(); window.organizeOverview?.(); }; });
   root.querySelectorAll('[data-rc-hist]').forEach(b => { b.onclick = () => { RC.hist = b.dataset.rcHist; renderRequestHistory(); }; });
   leaveTipDelegate(root);   /* v3.23: ⓘ hover card with past and upcoming leave */
@@ -6487,16 +6520,21 @@ function renderApprovalRequests() {
   const ready = S.status === 'ready' && !!S.ctx;
   const warn = !ready ? '<p class="rc-note">Connect the attendance tracker (Settings › Save & sync) to approve.</p>' : '';
   const acts = r => canDecide() ? `<select aria-label="Leave type to approve for ${esc(r.name)}" title="Approve as this leave type" ${!ready ? 'disabled' : ''}>${LOG_TYPES.map(c => `<option value="${c}"${c === r.code ? ' selected' : ''}>${c}</option>`).join('')}</select><button class="btn sm primary" data-approve="${esc(r.id)}" ${!ready || S.saving ? 'disabled' : ''}>Approve</button><button class="btn sm" data-reject="${esc(r.id)}">Reject</button>` : '<span class="rq-st pending">Pending</span>';
+  /* v3.28: Applications ahead (dates marked LA in the tracker) are part of To approve, below the requests */
+  const la = ready ? pendingApplications() : [], laPeople = new Set(la.map(x => applicationPerson(x.r))).size;
+  const laHtml = la.length ? `<div class="rc-la"><div class="rc-la-h"><b>Marked LA in the tracker</b><span class="sm muted">${laPeople} ${laPeople === 1 ? 'person' : 'people'} · ${la.length} day${la.length === 1 ? '' : 's'} from today on</span></div>${applicationList(la)}</div>` : '';
   rcDraw('cardApprovalRequests', canDecide(),
     `<div class="rc-top"><p class="rc-sub grow">Waiting for your decision. Approved leave goes straight into attendance.</p><button class="btn sm" data-refresh title="Check for new requests">↻ Refresh</button></div>${warn}
-     <div class="rc-list">${pending.length ? pending.map(r => rqRow(r, acts(r))).join('') : '<div class="rc-empty">All caught up. Nothing to approve.</div>'}</div>`,
+     <div class="rc-list">${pending.length ? pending.map(r => rqRow(r, acts(r))).join('') : la.length ? '' : '<div class="rc-empty">All caught up. Nothing to approve.</div>'}${laHtml}</div>`,
     root => {
+      if (!root._laWired) { root._laWired = true; root.addEventListener('click', e => { const el = e.target.closest('[data-act="resolve-la"],[data-act="resolve-la-group"]'); if (!el) return; e.preventDefault(); ACTIONS[el.dataset.act](el, e); }); }
       root.querySelector('[data-refresh]').onclick = async e => { e.target.disabled = true; try { await window.loadTeamSettings(true); notifyReq(); } finally { renderApprovalRequests(); } };
       root.querySelectorAll('[data-approve]').forEach(b => { b.onclick = async () => { b.disabled = true; try { await approveRequest(b.dataset.approve, b.parentElement.querySelector('select').value); } finally { renderApprovalRequests(); } }; });
       root.querySelectorAll('[data-reject]').forEach(b => { b.onclick = () => openRejectBox(b.dataset.reject); });
     });
 }
-const requestCounts = () => { const b = requestBuckets(); return { approvals: b.approvals.length, own: b.waiting.length, rejected: b.history.length }; };
+const laToDecide = () => { try { return canDecide() && S.status === 'ready' && S.ctx ? applicationGroups(pendingApplications()).length : 0; } catch { return 0; } };
+const requestCounts = () => { const b = requestBuckets(); return { approvals: b.approvals.length + laToDecide(), own: b.waiting.length, rejected: b.history.length }; };
 /* ---------- a tracker row built from a workforce person ---------- */
 /* Emp ID, name and client come from the workforce file. Before the Date of Joining, and after the Left Date, the days are NA (as the tracker already does). */
 function newRosterRow(ms, rr, opts = {}) {
@@ -6805,7 +6843,7 @@ const ACTIONS = {
   'pick-month'(el) { if(S.mode==='reports'){selectAttendanceReport('period','m:'+el.dataset.m);return;} S.ui.period = 'm:' + el.dataset.m; render(); },
   'who-picture'(el) { copyWhoPicture(el); },
   'who-back'() { S.ui.who.start = isoDate(new Date(TODAY.getTime() - 14 * 86400000)); render(); },
-  'review-la'() { S.ui.who.start = isoDate(TODAY); navTo('who'); },
+  'review-la'() { try { window.setView('summary'); setTimeout(() => { document.getElementById('ovRequests')?.scrollIntoView({ behavior: 'smooth', block: 'start' }); }, 60); } catch { } },
   'who-days'(el) { S.ui.who.days = +el.dataset.n; render(); },
   'grid-kind'(el) { const g = S.ui.grid, k = el.dataset.k; g.kinds = (g.kinds || []).includes(k) ? g.kinds.filter(x => x !== k) : [...(g.kinds || []), k]; if (!g.kinds.length && g.sort === 'kind') g.sort = 'file'; render(); },
   'tl-kind'(el) { const t = tlUi(), k = el.dataset.k; t.kinds = t.kinds.includes(k) ? t.kinds.filter(x => x !== k) : [...t.kinds, k]; render(); },
@@ -6901,7 +6939,7 @@ function mount() {
 @media (max-width:1000px) { .who-layout, .who-layout.apps-off { grid-template-columns:minmax(0,1fr); } .who-apps, .who-apps-min { position:static; min-height:0; } .who-apps-open { flex-direction:row; min-height:0; justify-content:center; } .who-apps-open em { writing-mode:horizontal-tb; transform:none; } }
 @media (max-width:700px) { .grid.g6[style*="repeat(4"] { grid-template-columns:repeat(2,minmax(0,1fr)) !important; } .card { padding:12px !important; } .tabs, .seg { flex-wrap:wrap; } table { font-size:12px; } .toolbar, .bar { flex-wrap:wrap; gap:6px; } }
 .tl-filters { display:flex; flex-wrap:wrap; align-items:center; gap:6px 8px; margin:10px 0 0; }
-/* v3.27.1: Who's out grid: even day columns, soft colored cells without boxes, calm weekends and a clear today */
+/* v3.28.0: Who's out grid: even day columns, soft colored cells without boxes, calm weekends and a clear today */
 table.who-tl { width:100%; table-layout:fixed; border-collapse:separate; border-spacing:0; }
 table.who-tl col.who-namecol { width:230px; }
 table.who-tl th, table.who-tl td { border-left:0 !important; border-right:0 !important; }
@@ -6922,7 +6960,7 @@ table.who-tl td.cell { width:auto; min-width:0; }
 table.who-tl td.cell .chip { width:100%; height:32px; border:0 !important; border-radius:7px; outline:0; box-shadow:none; font-size:12px; font-weight:700; letter-spacing:.02em; background:color-mix(in srgb,var(--c) 22%,var(--surface)); color:color-mix(in srgb,var(--c) 55%,var(--ink)); }
 table.who-tl td.cell.cc-applied .chip { background:repeating-linear-gradient(135deg,color-mix(in srgb,var(--c) 16%,var(--surface)) 0 6px,color-mix(in srgb,var(--c) 26%,var(--surface)) 6px 12px); }
 table.who-tl td.cell:hover .chip { filter:brightness(.96); }
-/* v3.27.1: the Who's out / Attendance / People bar stays at the top while scrolling */
+/* v3.28.0: the Who's out / Attendance / People bar stays at the top while scrolling */
 .topbar { top:var(--pinned-header-height, 0px) !important; z-index:20 !important; box-shadow:0 6px 10px -8px rgba(15,23,42,.18); }
 @media (max-width:700px) { .topbar { top:0 !important; } }
 .pp-bar { padding:12px 16px !important; }
@@ -7031,6 +7069,70 @@ function entriesOn(d, dt) {
 }
 const rangeEntries = (d, from, to) => { const out = []; for (let t = from.getTime(); t <= to.getTime(); t += 86400000) out.push(...entriesOn(d, new Date(t)).filter(e => kindOk(e.c))); return out; };
 
+/* ---------- v3.28: backups for people on leave. Kept in the shared team settings (key leave_backups):
+   { "<person key>|<yyyy-mm-dd>": { b: backup name, id: backup Emp ID, none: true when no backup is needed, by, at } } ---------- */
+const bkAll = () => { const m = (window.TD_SETTINGS || {}).leave_backups; return m && typeof m === 'object' && !Array.isArray(m) ? m : {}; };
+const bkGet = (key, iso) => bkAll()[key + '|' + iso] || null;
+const canBackup = () => canLog() || can('att.edit') || can('att.approve');
+const bkLabel = x => !x ? '' : x.none ? 'No backup needed' : x.b;
+function bkTeam(exceptKey, iso) {
+  const t = new Date(iso + 'T00:00:00Z'), ms = Engine.monthSerial(t.getUTCFullYear(), t.getUTCMonth()), i = t.getUTCDate() - 1;
+  const outToday = new Set((D(true).byMonth.get(ms) || []).filter(r => { const c = catOf(r.days[i]); return c && (LEAVE_CATS.has(c) || c === 'applied'); }).map(r => personKey(r.name)));
+  const list = []; const seen = new Set();
+  for (const r of rosterRows()) {
+    let cur = true; try { cur = isCurrent(r) && !goneKind(r); } catch { }
+    const name = gs(r, 'name_column').trim(); if (!cur || !name) continue; const k = personKey(name); if (k === exceptKey || seen.has(k)) continue; seen.add(k);
+    list.push({ name, id: String(gs(r, 'key_column') || ''), out: outToday.has(k), sub: [gs(r, 'designation_column'), gs(r, 'client_column')].filter(Boolean).join(' · ') });
+  }
+  return list.sort((a, b) => a.out - b.out || a.name.localeCompare(b.name));
+}
+/* the whole stretch of leave around one day (week offs and holidays in between keep it going) */
+function bkStretch(p, iso) {
+  if (!p) return [iso];
+  const at = d => { const ms = Engine.monthSerial(d.getUTCFullYear(), d.getUTCMonth()); const r = p.rows.find(x => x.month === ms); return r ? r.days[d.getUTCDate() - 1] : null; };
+  const isLeave = d => { const c = catOf(at(d)); return c && (LEAVE_CATS.has(c) || c === 'applied'); }, isOff = d => { const c = catOf(at(d)); return c === 'off' || (!c && (d.getUTCDay() % 6 === 0)); };
+  const out = [iso]; const t0 = new Date(iso + 'T00:00:00Z');
+  for (const dir of [-1, 1]) { let d = t0, gap = 0; for (let k = 0; k < 60; k++) { d = new Date(d.getTime() + dir * 86400000); if (isLeave(d)) { out.push(isoDate(d)); gap = 0; } else if (isOff(d) && gap < 4) gap++; else break; } }
+  return out.sort();
+}
+function openBackupBox(pKey, iso) {
+  if (!canBackup()) { toast('Your passcode can’t set backups.'); return; }
+  const d = D(true), p = d.people.get(pKey); const name = p ? p.name : pKey;
+  const cur = bkGet(pKey, iso), team = bkTeam(pKey, iso), days = bkStretch(p, iso);
+  const m = openModal({ title: 'Backup for ' + name,
+    body: `<p class="sm" style="margin:0 0 10px">${esc(longDate(new Date(iso + 'T00:00:00Z')))} · who covers ${esc(name)}’s work?</p>
+      <div class="form"><label class="full" style="flex-direction:row;align-items:center;gap:8px;font-weight:500"><input type="radio" name="bk-k" value="yes" ${!cur || !cur.none ? 'checked' : ''}> A backup is covering</label>
+      <label class="full" id="bk-wrap">Backup (anyone in the current team)<input type="text" id="bk-name" list="bk-list" value="${esc(cur && !cur.none ? cur.b : '')}" placeholder="Type or pick a name" autocomplete="off">
+        <datalist id="bk-list">${team.map(t => `<option value="${esc(t.name)}" label="${esc([t.id && 'ID ' + t.id, t.sub, t.out ? 'also off that day' : ''].filter(Boolean).join(' · '))}"></option>`).join('')}</datalist></label>
+      <label class="full" style="flex-direction:row;align-items:center;gap:8px;font-weight:500"><input type="radio" name="bk-k" value="none" ${cur && cur.none ? 'checked' : ''}> No backup needed</label>
+      ${days.length > 1 ? `<label class="full" style="flex-direction:row;align-items:center;gap:8px;font-weight:500"><input type="checkbox" id="bk-all" checked> Same for the whole leave: ${esc(longDate(new Date(days[0] + 'T00:00:00Z')))} – ${esc(longDate(new Date(days[days.length - 1] + 'T00:00:00Z')))} (${days.length} days)</label>` : ''}</div>
+      <div class="err" id="bk-err"></div>`,
+    footer: `${cur ? '<button class="btn" id="bk-clear">Clear</button>' : ''}<span class="grow"></span><button class="btn" data-close>Cancel</button><button class="btn primary" id="bk-go">Save</button>` });
+  const kind = () => (m.querySelector('input[name="bk-k"]:checked') || {}).value;
+  const syncKind = () => { $('#bk-wrap', m).style.opacity = kind() === 'none' ? .45 : 1; $('#bk-name', m).disabled = kind() === 'none'; };
+  m.querySelectorAll('input[name="bk-k"]').forEach(r => r.addEventListener('change', syncKind)); syncKind();
+  const write = async val => {
+    const which = ($('#bk-all', m) && $('#bk-all', m).checked) ? days : [iso];
+    await window.loadTeamSettings(true);
+    const all = { ...bkAll() }, cut = isoDate(new Date(TODAY.getTime() - 120 * 86400000));
+    for (const k of Object.keys(all)) if ((k.split('|')[1] || '') < cut) delete all[k];   // old entries are dropped after 4 months
+    for (const x of which) { if (val) all[pKey + '|' + x] = val; else delete all[pKey + '|' + x]; }
+    await window.saveSharedSetting('leave_backups', all);
+    BE.appendActivity([{ time: BE.nowText(), user: BE.userName(), action: 'settings', att: S.fileName, key: '', name, details: { note: (val ? (val.none ? 'No backup needed' : 'Backup: ' + val.b) : 'Backup cleared') + ' · ' + which.join(', ') } }]);
+    closeModal(); if (renderCard.el) renderCard(renderCard.el); notify();
+    toast(val ? (val.none ? 'Marked: no backup needed.' : val.b + ' is covering for ' + name + (which.length > 1 ? ' (' + which.length + ' days).' : '.')) : 'Backup cleared.');
+  };
+  $('#bk-go', m).onclick = async () => {
+    try {
+      if (kind() === 'none') return await write({ none: true, by: BE.userName(), at: new Date().toISOString() });
+      const v = $('#bk-name', m).value.trim(); const hit = team.find(t => t.name.toLowerCase() === v.toLowerCase());
+      if (!v) { $('#bk-err', m).textContent = 'Pick who is covering, or choose “No backup needed”.'; return; }
+      if (!hit) { $('#bk-err', m).textContent = 'Pick someone from the current team list.'; return; }
+      await write({ b: hit.name, id: hit.id, by: BE.userName(), at: new Date().toISOString() });
+    } catch (e) { $('#bk-err', m).textContent = 'Could not save: ' + e.message; }
+  };
+  $('#bk-clear', m)?.addEventListener('click', async () => { try { await write(null); } catch (e) { $('#bk-err', m).textContent = e.message; } });
+}
 function renderCard(el, opts = {}) {
   if (!el) return; if (!opts.hist) renderCard.el = el;
   const C = S.ui.card, goBtns = can('ov.openatt') && can('page.attendance') ? `<button class="btn mini" data-att-go="grid">Open attendance →</button>` : '';
@@ -7080,7 +7182,7 @@ function renderCard(el, opts = {}) {
     const col2 = pl.length ? '<p class="att-table-meta">' + pl.length + ' people · ' + fmt(pastDays) + (C.kind === 'applied' ? ' application days' : ' leave days') + '</p>' + tableHtml(pastCopy) : '<div class="att-table-empty">No matching absences in this period.</div>';
     const nx = rangeEntries(d, addDays(rd, 1), addDays(rd, C.next));
     const nPeople = new Set(nx.map(e => personKey(e.r.name))).size;
-    const upcomingCopy = tableData(['Date', 'Employee', 'Client', 'Code', 'Status'], nx.map(e => [isoDate(e.dt), nm(e.r), cl(e.r), e.v, e.c === 'applied' ? 'Awaiting approval' : labelOf(e.v)]), 'Next ' + C.next + ' days after ' + longDate(rd));
+    const upcomingCopy = tableData(['Date', 'Employee', 'Client', 'Code', 'Status', 'Backup'], nx.map(e => [isoDate(e.dt), nm(e.r), cl(e.r), e.v, e.c === 'applied' ? 'Awaiting approval' : labelOf(e.v), bkLabel(bkGet(personKey(e.r.name), isoDate(e.dt))) || '—']), 'Next ' + C.next + ' days after ' + longDate(rd));
     const col3 = nx.length ? '<p class="att-table-meta">' + nx.length + ' entries · ' + nPeople + ' people</p>' + tableHtml(upcomingCopy) : '<div class="att-table-empty">No upcoming leave in this period.</div>';
     const sel = (b, opts, v, fmtOpt) => `<select class="input mini" data-att-${b} style="width:auto;min-width:0;height:26px" aria-label="${b === 'past' ? 'Days back' : 'Days ahead'}">${opts.map(o => `<option value="${o}"${o === v ? ' selected' : ''}>${fmtOpt(o)}</option>`).join('')}</select>`;
     const kindSel = `<label class="hint" style="display:inline-flex;align-items:center;gap:6px">Show <select class="input mini" data-att-kind style="width:auto;min-width:0;height:26px">${Object.entries(KIND_LABELS).map(([k, l]) => `<option value="${k}"${k === C.kind ? ' selected' : ''}>${l}</option>`).join('')}</select></label>`;
@@ -7103,8 +7205,10 @@ function renderCard(el, opts = {}) {
       const listCopy = tableData(['Employee', 'Client', 'Code', 'Status'], list.map(x => [nm(x.r), cl(x.r), String(x.v).trim().toUpperCase(), x.c === 'applied' ? 'Awaiting approval' : labelOf(x.v)]), (C.tab === 'late' ? 'Late comings' : C.tab === 'half' ? 'Half days' : 'Out') + ' on ' + longDate(rd));
       renderCard._copy = { ...renderCard._copy, today: listCopy };
       const emptyTxt = !rows.length ? 'No attendance rows for this month.' : C.tab === 'late' ? 'No late comings ' + dayWord + '.' : C.tab === 'half' ? 'No half days ' + dayWord + '.' : 'Nobody is on leave ' + dayWord + '.';
-      const miniList = list.length ? `<ul class="att-mini">${list.map(x => `<li><span class="att-mini-n">${esc(nm(x.r))}${can('att.info') ? `<button type="button" class="rq-i" data-lainfo="${esc(x.r.name.trim())}" aria-label="Past and upcoming leave of ${esc(nm(x.r))}">i</button>` : ''}</span><span class="att-mini-c">${esc(cl(x.r))}</span><span class="ph-chip c-${esc(x.c)}">${esc(String(x.v).trim().toUpperCase())}</span><span class="att-mini-s">${esc(x.c === 'applied' ? 'Awaiting approval' : labelOf(x.v))}</span></li>`).join('')}</ul>` : `<div class="att-mini-empty">${emptyTxt}</div>`;
-      html = head2 + `<div class="att-tabs">${tabBtn('leave', nFull, ' on leave', nLa ? ` <em>+${nLa} awaiting</em>` : '')}${tabBtn('half', T.half.length, ' half day')}${tabBtn('late', T.late.length, ' late')}<span class="grow"></span>${copyBtn('today', listCopy)}${pseudoCol ? toggle('names', [['real', 'Real'], ['pseudo', 'Pseudo']]) : ''}<button type="button" class="btn mini" data-att-hist>History &amp; upcoming ↗</button></div>` + miniList;
+      const miniList = list.length ? `<ul class="att-mini">${list.map(x => `<li><span class="att-mini-n">${esc(nm(x.r))}${can('att.info') ? `<button type="button" class="rq-i" data-lainfo="${esc(x.r.name.trim())}" aria-label="Past and upcoming leave of ${esc(nm(x.r))}">i</button>` : ''}</span><span class="att-mini-c">${esc(cl(x.r))}</span><span class="ph-chip c-${esc(x.c)}">${esc(String(x.v).trim().toUpperCase())}</span><span class="att-mini-s">${esc(x.c === 'applied' ? 'Awaiting approval' : labelOf(x.v))}</span>${C.tab === 'late' ? '<span></span>' : (() => { const k = personKey(x.r.name), b = bkGet(k, rdIso); return b ? `<button type="button" class="att-bk ${b.none ? 'none' : 'set'}" data-bk="${esc(k)}" ${canBackup() ? '' : 'disabled'} title="${esc(b.none ? 'No backup needed' : 'Backup: ' + b.b + (b.by ? ' · set by ' + b.by : ''))}">${b.none ? 'No backup' : '↪ ' + esc(b.b)}</button>` : canBackup() ? `<button type="button" class="att-bk add" data-bk="${esc(k)}">+ Backup</button>` : '<span class="att-bk-no">No backup</span>'; })()}</li>`).join('')}</ul>` : `<div class="att-mini-empty">${emptyTxt}</div>`;
+      const needBk = C.tab === 'late' ? [] : list, covered = needBk.filter(x => bkGet(personKey(x.r.name), rdIso)).length;
+      const bkLine = needBk.length ? `<div class="att-bk-sum ${covered === needBk.length ? 'ok' : ''}">Backups: <b>${covered} of ${needBk.length}</b> covered${covered < needBk.length ? ' · ' + (needBk.length - covered) + ' without a backup' : ''}</div>` : '';
+      html = head2 + `<div class="att-tabs">${tabBtn('leave', nFull, ' on leave', nLa ? ` <em>+${nLa} awaiting</em>` : '')}${tabBtn('half', T.half.length, ' half day')}${tabBtn('late', T.late.length, ' late')}<span class="grow"></span>${copyBtn('today', listCopy)}${pseudoCol ? toggle('names', [['real', 'Real'], ['pseudo', 'Pseudo']]) : ''}<button type="button" class="btn mini" data-att-hist>History &amp; upcoming ↗</button></div>` + bkLine + miniList;
     }
   }
   if (S.status === 'ready' && S.ctx && hasRoster()) { const n = rosterGaps().missing.length, u = rosterGaps().notInRoster.length; const bits = []; if (n) bits.push(`${n} ${n === 1 ? 'person' : 'people'} in the workforce file ${n === 1 ? 'isn’t' : 'aren’t'} in the attendance tracker yet`); if (u) bits.push(`${u} tracker ${u === 1 ? 'name doesn’t' : 'names don’t'} match the workforce file`); if (bits.length) html += `<div class="hint" style="margin-top:12px">${bits.join(' · ')}. <button class="linkbtn" data-att-go="health">Fix in Action center</button></div>`; }
@@ -7112,6 +7216,7 @@ function renderCard(el, opts = {}) {
   const again = () => { renderCard(el, opts); if (opts.hist && renderCard.el && renderCard.el.isConnected) renderCard(renderCard.el); };
   el.querySelectorAll('[data-att-tab]').forEach(b => b.addEventListener('click', () => { S.ui.card.tab = b.dataset.attTab; renderCard(el); }));
   el.querySelector('[data-att-hist]')?.addEventListener('click', openAttHistory);
+  el.querySelectorAll('[data-bk]').forEach(b => b.addEventListener('click', () => openBackupBox(b.dataset.bk, isoDate(refDay()))));
   el.querySelectorAll('[data-att-names]').forEach(b => b.addEventListener('click', () => { S.ui.card.names = b.dataset.attNames; saveCardUi(); again(); }));
   if (!opts.hist) leaveTipDelegate(el);
   el.querySelectorAll('[data-att-go]').forEach(b => b.addEventListener('click', () => { const v = b.dataset.attGo; if (v === 'who' && refDay().getTime() !== TODAY.getTime()) S.ui.who.start = isoDate(refDay()); go(v); if (b.dataset.attNew) setTimeout(() => ACTIONS['new-month'](), 60); }));
@@ -7360,7 +7465,7 @@ const healthCount = () => (S.status === 'ready' && S.ctx ? healthIssues().filter
 
 mount();
 return {
-  fieldNames: attFieldNames, hasTracker: Engine.hasTracker, refresh, init: () => { mount(); return connect(); }, askName, decorateTable, healthCount, chooseFileEarly, savedFile: async () => (await kv.get('file')) || ((await kv.get('handle')) || {}).name || '', show, leave, renderCard, renderWatch, drawerPanel, go, renderApprovalRequests, renderRequestHistory, requestCounts, renameField: (a, b) => renameAttField(a, b), attReady: () => S.status === 'ready' && !!S.ctx, recordAttendance: () => openLogLeave(), canRecord: () => canLog(), requestsToDecide: () => requestsToDecide().length,
+  fieldNames: attFieldNames, hasTracker: Engine.hasTracker, refresh, init: () => { mount(); return connect(); }, askName, decorateTable, healthCount, chooseFileEarly, savedFile: async () => (await kv.get('file')) || ((await kv.get('handle')) || {}).name || '', show, leave, renderCard, renderWatch, drawerPanel, go, renderApprovalRequests, renderRequestHistory, requestCounts, renderAppsCard, openBackupBox, renameField: (a, b) => renameAttField(a, b), attReady: () => S.status === 'ready' && !!S.ctx, recordAttendance: () => openLogLeave(), canRecord: () => canLog(), requestsToDecide: () => requestsToDecide().length + laToDecide(),
   /* v3.19: every recorded code between two dates (UTC ms, null = open), for custom dashboards; follows the attendance scope */
   entries: (from, to) => { if (S.status !== 'ready' || !S.ctx) return null; const d = D(), out = []; for (const m of d.months) { const dim = Engine.daysInMonth(m); for (const r of d.byMonth.get(m) || []) for (let i = 0; i < dim; i++) { const v = r.days[i]; if (v == null || v === '') continue; const dt = dateOf(m, i), t = dt.getTime(); if ((from != null && t < from) || (to != null && t > to)) continue; const cat = catOf(v); out.push({ name: r.name.trim(), empId: r.empId, client: r.client ? String(r.client).trim() : '', date: dt, code: String(v).trim().toUpperCase(), cat, catLabel: CATS[cat] || 'Other' }); } } return out; },
   todayStats: () => { if (S.status !== 'ready' || !S.ctx) return null; const rows = D().byMonth.get(TODAY_MS) || [], i = TODAY.getUTCDate() - 1, cats = rows.map(r => catOf(r.days[i])); return { full: cats.filter(c => c === 'approved' || c === 'sick' || c === 'unplanned').length, half: cats.filter(c => c === 'half').length, late: cats.filter(c => c === 'late').length, tracked: rows.length }; }, redraw: () => { if (active()) render(); }, state: () => S, dirty: () => S.changes.length,
@@ -7541,7 +7646,7 @@ async function poll() {
 }
 
 /* ============================== filtering ============================== */
-const APP = { title: "Team Dashboard", version: "3.27.1", released: "29 Sep 2026" };
+const APP = { title: "Team Dashboard", version: "3.28.0", released: "29 Sep 2026" };
 const BASE_DIMS = { status: "status_column", desig: "designation_column", client: "client_column", mode: "mode_column" };
 const STANDARD_STATUSES = ["Active", "Manager", "OJT", "Bench", "New", "Projected", "Left", "Moved"];
 const TILE_ORDER = ["Active", "Manager", "OJT", "Bench", "New", "Projected"];
@@ -8767,7 +8872,7 @@ function organizeUpcoming() {
 function renderGlance() {
   const box = $("#ovGlance"); if (!box) return;
   const can = k => !window.PERM || PERM.can(k), tiles = [];
-  /* v3.27.1: one summary strip with drawn icons (emoji and flags don't show on every computer) */
+  /* v3.28.0: one summary strip with drawn icons (emoji and flags don't show on every computer) */
   const ICONS = { leave: '<path d="M3 21h18"/><path d="M12 3a9 9 0 0 1 9 9H3a9 9 0 0 1 9-9z"/><path d="M12 12v9"/>', req: '<rect x="5" y="3" width="14" height="18" rx="2"/><path d="M9 8h6M9 12h6M9 16h3"/>', cel: '<path d="M20 12v9H4v-9"/><rect x="2" y="7" width="20" height="5" rx="1"/><path d="M12 22V7"/><path d="M12 7c-2-4-6-4-6-1.5S10 7 12 7zM12 7c2-4 6-4 6-1.5S14 7 12 7z"/>', hol: '<rect x="3" y="5" width="18" height="16" rx="2"/><path d="M3 10h18M8 3v4M16 3v4"/><circle cx="12" cy="15" r="2"/>' };
   const svg = k => { const sp = h("span", { class: "ov-ic", "aria-hidden": "true" }); sp.innerHTML = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">' + ICONS[k] + '</svg>'; return sp; };
   const tile = (icon, tone, label, value, sub, go, badge) => h("button", { type: "button", class: "ov-tile " + tone, onclick: go },
