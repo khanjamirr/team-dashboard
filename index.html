@@ -4,7 +4,7 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <link rel="icon" href="data:,">
-<title>Team Dashboard · 3.40.0</title>
+<title>Team Dashboard · 3.40.2</title>
 <style>
 :root {
   color-scheme: light;
@@ -1810,10 +1810,10 @@ body.filters-locked #cleanFilters, body.filters-locked #xchips, body.filters-loc
     <p class="gate-sub">One place for your people, priorities and team insights.</p>
     <div id="connectBody"><div class="empty">Loading…</div></div>
   </div>
-  <p class="gate-ver">3.40.0</p>
+  <p class="gate-ver">3.40.2</p>
 </section>
 
-<div id="app" hidden><aside class="sidebar" aria-label="Workspace navigation"><div class="brand dashboard-identity">      <h1><span id="title">Team Dashboard</span><span class="ver" id="ver" title="Version 3.40.0">3.40.0</span></h1><p class="brand-tag">One place for your people, priorities and team insights.</p>      <span class="sync" id="sync" role="status"><i></i><span id="syncText">Loading…</span></span></div><div class="nav-label">WORKSPACE</div>      <nav class="tabs" role="tablist" aria-label="Pages" aria-orientation="vertical">
+<div id="app" hidden><aside class="sidebar" aria-label="Workspace navigation"><div class="brand dashboard-identity">      <h1><span id="title">Team Dashboard</span><span class="ver" id="ver" title="Version 3.40.2">3.40.2</span></h1><p class="brand-tag">One place for your people, priorities and team insights.</p>      <span class="sync" id="sync" role="status"><i></i><span id="syncText">Loading…</span></span></div><div class="nav-label">WORKSPACE</div>      <nav class="tabs" role="tablist" aria-label="Pages" aria-orientation="vertical">
         <button class="tab on" role="tab" aria-controls="pageSummary" data-view="summary" aria-selected="true" data-icon="🏠" data-short="Home">Overview</button>
         <button class="tab" role="tab" aria-controls="pageEmployees" data-view="employees" aria-selected="false" data-icon="👥" data-short="People">Employees</button>
       <button class="tab" role="tab" aria-controls="pageAttendance" data-view="attendance" aria-selected="false" data-icon="🗓️" data-short="Attend.">Attendance</button>
@@ -7290,7 +7290,7 @@ function openBackupBox(pKey, iso, onDone, opts = {}) {
       <div class="bkx-row">Cover for <span class="bkx-seg" role="group" aria-label="Cover for"><button type="button" data-bkh="full" aria-pressed="${!(cur && cur.half)}">Full day</button><button type="button" data-bkh="half" aria-pressed="${!!(cur && cur.half)}">Half day</button></span></div>
       ${nmMode === 'off' ? '' : `<label>Backup person <em>${nmMode === 'optional' ? 'optional · anyone in the current team' : 'anyone in the current team'}</em><input type="text" id="bk-name" list="bk-list" value="${esc(cur && cur.b ? cur.b : '')}" placeholder="${nmMode === 'optional' ? 'Type or pick a name, or leave blank' : 'Type or pick a name'}" autocomplete="off"><datalist id="bk-list">${team.map(t => `<option value="${esc(t.name)}" label="${esc([t.id && 'ID ' + t.id, t.sub, t.out ? 'also off that day' : ''].filter(Boolean).join(' · '))}"></option>`).join('')}</datalist></label>`}
     </div>
-    <label class="bkx-rm" id="bkx-rm" ${curK && curK !== 'live' ? '' : 'hidden'}>Remarks <em>optional · goes into the client copy</em><textarea id="bk-rm" rows="2" maxlength="200" placeholder="e.g. Client informed · handover done">${esc(bkRemark(pKey, iso))}</textarea></label>
+    <label class="bkx-rm" id="bkx-rm" ${curK && curK !== 'live' ? '' : 'hidden'}>Remarks <em>optional · copied as written</em><textarea id="bk-rm" rows="2" maxlength="200" placeholder="Optional note">${esc(bkRemark(pKey, iso))}</textarea></label>
     <div class="err" id="bk-err"></div>`,
     footer: `<span class="grow"></span><button class="btn" data-close>Cancel</button><button class="btn primary" id="bk-go" ${curK ? '' : 'disabled'}>${esc(opts.confirm || 'Save')}</button>` });
   let pick = curK, half = !!(cur && cur.half);
@@ -7677,7 +7677,7 @@ function renderCard(el, opts = {}) {
       const listCopy = C.tab === 'late' || !canBackup() ? tableData(['Employee', 'Client', 'Code', 'Status'], list.map(x => [nm(x.r), cl(x.r), String(x.v).trim().toUpperCase(), x.c === 'applied' ? 'Awaiting approval' : labelOf(x.v)]), (C.tab === 'late' ? 'Late comings' : C.tab === 'half' ? 'Half days' : 'Out') + ' on ' + longDate(rd)) : (() => {
         /* v3.36.0: client copy: date + title on top, then pseudo name · backup · remarks (blank to fill in) */
         const pOf = n => { if (!pseudoCol || !n) return n; try { const w = rosterRows().find(r => personKey(gs(r, 'name_column')) === personKey(n)); const v = w ? String(g(w, pseudoCol) ?? '').trim() : ''; return v || n; } catch { return n; } };
-        const recs = list.filter(x => x.c !== 'applied' && !bkLive(bkGet(personKey(x.r.name), rdIso))).map(x => { const k = personKey(x.r.name), b = bkGet(k, rdIso); return [pOf(x.r.name.trim()), (bkYes(b) ? 'Backup Provided' : 'Backup Not Provided') + (b && b.b ? ' – ' + pOf(b.b) : '') + (b && b.half ? ' (half day)' : ''), bkRemark(k, rdIso)]; });
+        const recs = list.filter(x => { if (x.c === 'applied') return false; const b = bkGet(personKey(x.r.name), rdIso); return !!b && !bkLive(b); }).map(x => {   /* v3.40.2: only days marked Backup Provided / Not Provided */ const k = personKey(x.r.name), b = bkGet(k, rdIso); return [pOf(x.r.name.trim()), (bkYes(b) ? 'Backup Provided' : 'Backup Not Provided') + (b && b.half ? ' (half day)' : ''), bkRemark(k, rdIso)]; });
         return { headers: [pseudoCol ? 'Name' : 'Employee', 'Backup', 'Remarks'], records: recs, caption: (isToday ? "Today's attendance record" : 'Attendance record') + ' · ' + longDate(rd), top: [longDate(rd), isToday ? "Today's attendance record" : 'Attendance record'] };
       })();
       renderCard._copy = { ...renderCard._copy, today: listCopy };
@@ -8160,7 +8160,7 @@ async function poll() {
 }
 
 /* ============================== filtering ============================== */
-const APP = { title: "Team Dashboard", version: "3.40.0", released: "30 Sep 2026" };
+const APP = { title: "Team Dashboard", version: "3.40.2", released: "30 Sep 2026" };
 const BASE_DIMS = { status: "status_column", desig: "designation_column", client: "client_column", mode: "mode_column" };
 const STANDARD_STATUSES = ["Active", "Manager", "OJT", "Bench", "New", "Projected", "Left", "Moved"];
 const TILE_ORDER = ["Active", "Manager", "OJT", "Bench", "New", "Projected"];
