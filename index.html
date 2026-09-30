@@ -4,7 +4,7 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <link rel="icon" href="data:,">
-<title>Team Dashboard · 3.26.3</title>
+<title>Team Dashboard · 3.27.0</title>
 <style>
 :root {
   color-scheme: light;
@@ -1644,6 +1644,50 @@ body.filters-locked #cleanFilters, body.filters-locked #xchips, body.filters-loc
   .rrow .rrow-more { display:none; }
 }
 
+
+/* v3.27: Reports show three charts side by side */
+#pageReports .charts { grid-template-columns:repeat(3,minmax(0,1fr)) !important; gap:14px !important; }
+#pageReports .charts > * { min-width:0; }
+#pageReports .charts .card-head { flex-wrap:wrap; gap:6px; }
+#pageReports .charts .card-head > .grow, #pageReports .charts .card-head > div:first-child { flex:1 1 100%; }
+@media (max-width:1300px) { #pageReports .charts { grid-template-columns:repeat(2,minmax(0,1fr)) !important; } }
+@media (max-width:760px) { #pageReports .charts { grid-template-columns:minmax(0,1fr) !important; } }
+
+/* v3.27: employee form in clear categories */
+.emp-nav { position:sticky; top:-1px; z-index:3; display:flex; gap:6px; overflow-x:auto; padding:8px 0 10px; margin:0 0 6px; background:var(--surface); border-bottom:1px solid var(--border); scrollbar-width:thin; }
+.emp-jump { flex:0 0 auto; border:1px solid var(--border); background:var(--surface); color:var(--ink-2); border-radius:999px; padding:4px 11px; font:inherit; font-size:12px; cursor:pointer; white-space:nowrap; }
+.emp-jump:hover { background:var(--surface-2); color:var(--ink); }
+.emp-sec { margin:0 0 12px; border:1px solid var(--border); border-radius:12px; background:var(--surface); scroll-margin-top:56px; }
+.emp-sec > summary { display:flex; align-items:center; gap:8px; padding:10px 14px; cursor:pointer; list-style:none; font-size:13.5px; }
+.emp-sec > summary::-webkit-details-marker { display:none; }
+.emp-sec > summary::after { content:"▾"; margin-left:6px; color:var(--ink-3); }
+.emp-sec:not([open]) > summary::after { content:"▸"; }
+.emp-sec[open] > summary { border-bottom:1px solid var(--border); }
+.emp-ic { font-size:15px; width:20px; text-align:center; }
+.emp-cnt { margin-left:auto; font-size:11px; padding:1px 7px; border-radius:999px; background:var(--surface-2); color:var(--ink-2); }
+.emp-cnt.full { background:color-mix(in srgb,#22a05a 14%,var(--surface)); color:#1c8a4c; }
+.emp-sec > .fgrid { padding:12px 14px 14px; }
+.emp-sec > .att-panel, .emp-sec > .connection-card { margin:12px 14px 14px !important; }
+
+/* v3.27: Fields & drop-downs */
+.dd-list { display:flex; flex-direction:column; border:1px solid var(--border); border-radius:12px; overflow:hidden; margin-top:10px; }
+.dd-row { display:grid; grid-template-columns:minmax(0,1fr) minmax(0,1.1fr); gap:14px; padding:12px 14px; border-bottom:1px solid var(--border); align-items:start; }
+.dd-row:last-child { border-bottom:0; }
+.dd-row[hidden] { display:none; }
+.dd-l { display:flex; flex-direction:column; gap:4px; min-width:0; }
+.dd-l small { font-size:11.5px; color:var(--ink-2); }
+.dd-name { font-weight:600; height:34px; }
+.dd-name:disabled { background:transparent; border-color:transparent; padding-left:0; color:var(--ink); opacity:1; }
+.dd-r { display:flex; flex-direction:column; gap:6px; min-width:0; }
+.dd-mode { height:34px; }
+.dd-box { display:flex; flex-direction:column; gap:5px; }
+.dd-box[hidden] { display:none; }
+.dd-choices { width:100%; resize:vertical; font:inherit; font-size:12.5px; }
+.dd-tools { font-size:12px; color:var(--ink-2); }
+.dd-rename { font-size:12px; }
+.dd-rename[hidden] { display:none; }
+.dd-save { position:sticky; bottom:0; background:var(--surface); padding:10px 0; margin-top:0 !important; align-items:center; }
+@media (max-width:700px) { .dd-row { grid-template-columns:1fr; } .dd-save { bottom:calc(66px + env(safe-area-inset-bottom)); } }
 </style></head>
 
 
@@ -1657,10 +1701,10 @@ body.filters-locked #cleanFilters, body.filters-locked #xchips, body.filters-loc
     <p class="gate-sub">One place for your people, priorities and team insights.</p>
     <div id="connectBody"><div class="empty">Loading…</div></div>
   </div>
-  <p class="gate-ver">3.26.3</p>
+  <p class="gate-ver">3.27.0</p>
 </section>
 
-<div id="app" hidden><aside class="sidebar" aria-label="Workspace navigation"><div class="brand dashboard-identity">      <h1><span id="title">Team Dashboard</span><span class="ver" id="ver" title="Version 3.26.3">3.26.3</span></h1><p class="brand-tag">One place for your people, priorities and team insights.</p>      <span class="sync" id="sync" role="status"><i></i><span id="syncText">Loading…</span></span></div><div class="nav-label">WORKSPACE</div>      <nav class="tabs" role="tablist" aria-label="Pages" aria-orientation="vertical">
+<div id="app" hidden><aside class="sidebar" aria-label="Workspace navigation"><div class="brand dashboard-identity">      <h1><span id="title">Team Dashboard</span><span class="ver" id="ver" title="Version 3.27.0">3.27.0</span></h1><p class="brand-tag">One place for your people, priorities and team insights.</p>      <span class="sync" id="sync" role="status"><i></i><span id="syncText">Loading…</span></span></div><div class="nav-label">WORKSPACE</div>      <nav class="tabs" role="tablist" aria-label="Pages" aria-orientation="vertical">
         <button class="tab on" role="tab" aria-controls="pageSummary" data-view="summary" aria-selected="true" data-icon="🏠" data-short="Home">Overview</button>
         <button class="tab" role="tab" aria-controls="pageEmployees" data-view="employees" aria-selected="false" data-icon="👥" data-short="People">Employees</button>
       <button class="tab" role="tab" aria-controls="pageAttendance" data-view="attendance" aria-selected="false" data-icon="🗓️" data-short="Attend.">Attendance</button>
@@ -1914,9 +1958,13 @@ const CFG = {
     "DOJ": "Date of Joining", "DOB": "Date of Birth", "Handover": "Handover Date", "Live Seat": "Live Seat Date", "Remarks2": "Remarks (2)",
   },
   groups: {
-    "Identity": ["Emp Code", "Employee Name", "Pseudo Names", "Gender", "DOB", "Phone", "WhatsApp"],
-    "Employment": ["Status", "Designation", "Client", "Sub Client/Type", "DOJ", "Handover", "Live Seat", "Left Date", "Notice Period", "Remarks", "Remarks2"],
-    "Location & logistics": ["Current Area", "Distance to Office", "Cab", "From City", "From State", "Status2", "Asset?", "Dual Monitor", "Column1"],
+    /* v3.27: clearer categories for the employee form */
+    "Personal": ["Emp Code", "Employee Name", "Pseudo Names", "Gender", "DOB", "Column1"],
+    "Contact & address": ["Phone", "WhatsApp", "Current Area", "From City", "From State"],
+    "Job": ["Status", "Designation", "Client", "Sub Client/Type", "Status2"],
+    "Key dates": ["DOJ", "Handover", "Live Seat", "Notice Period", "Left Date"],
+    "Commute & equipment": ["Distance to Office", "Cab", "Asset?", "Dual Monitor"],
+    "Notes": ["Remarks", "Remarks2"],
   },
   inactive: ["Left", "Moved"],
   subClient: "Sub Client/Type",
@@ -2196,8 +2244,14 @@ function buildSchema(book) {
   });
   const groupOf = {}, posOf = {};
   for (const [g, cols] of Object.entries(CFG.groups)) cols.forEach((c, i) => { groupOf[c] = g; posOf[c] = i; });
+  /* v3.27: also by what each field is, so the form is organised whatever the Excel headings are called */
+  const byRole = { Personal: ["key", "name", "gender", "dob", "language"], "Contact & address": ["phone", "whatsapp", "area"], Job: ["status", "designation", "client", "subclient", "mode"], "Key dates": ["doj", "left"], "Commute & equipment": ["distance"] };
+  for (const [g, rs] of Object.entries(byRole)) rs.forEach((r, i) => { const c = roles[r]; if (c && !(c in groupOf)) { groupOf[c] = g; posOf[c] = i; } });
+  H.forEach(h => { if (h in groupOf) return; if (/remark|note|comment/i.test(h)) groupOf[h] = "Notes"; else if (/pseudo|gender|birth|father|mother|blood|marital/i.test(h)) groupOf[h] = "Personal"; else if (/phone|mobile|whats|email|address|area|city|state|pincode|pin code/i.test(h)) groupOf[h] = "Contact & address"; else if (/date|joining|handover|live seat|notice|exit|leaving/i.test(h)) groupOf[h] = "Key dates"; else if (/cab|asset|monitor|laptop|distance|transport/i.test(h)) groupOf[h] = "Commute & equipment"; });
+  /* v3.27: display names the super admin chose (Settings › Fields & drop-downs) */
+  const FL = (((typeof window !== "undefined" && window.TD_SETTINGS) || {}).field_labels) || {};
   const columns = H.map(h => ({
-    name: h, label: CFG.labels[h] || h,
+    name: h, label: (typeof FL[h] === "string" && FL[h].trim()) || CFG.labels[h] || h,
     type: dateCols.has(h) ? "date" : numCols.has(h) ? "number" : "text",
     auto: autoCols.has(h), select: selCols.has(h), group: groupOf[h] || (CF.has(h) ? "Additional details" : "Other"), pos: posOf[h] ?? 999,
   }));
@@ -2445,7 +2499,7 @@ const ACT_SHEET = "Activity Log", ACT_DAYS = Infinity, ACT_MAX = Infinity;
 const ACT_HEAD = ["Date & time", "User", "Area", "Action", "Emp Code", "Name", "Details", "Data (used by the dashboard)"];
 const LOGQ = [];
 let logTimer = null;
-const ACT_VERBS = { add: "Added", edit: "Edited", delete: "Deleted", bulk: "Bulk update", "add-column": "Added a column", "delete-column": "Deleted a column",
+const ACT_VERBS = { add: "Added", edit: "Edited", delete: "Deleted", bulk: "Bulk update", "add-column": "Added a column", "delete-column": "Deleted a column", "rename-column": "Renamed a column",
   "external-edit": "Edited in Excel", "external-add": "Added in Excel", "external-delete": "Removed in Excel", "external-columns": "Columns changed in Excel", "external-summary": "Changed in Excel",
   "att-edit": "Attendance updated", "att-add": "Added to tracker", "att-delete": "Removed from tracker", "external-att-edit": "Attendance updated in Excel",
   "external-att-add": "Added to tracker in Excel", "external-att-delete": "Removed from tracker in Excel", "att-link": "Linked tracker name", "att-unlink": "Unlinked tracker name",
@@ -2813,6 +2867,25 @@ async function addColumn(rawName) {
   return res;
 }
 
+/* v3.27: rename a field (the column heading) in the workforce sheet. Values stay where they are. */
+async function renameColumn(oldName, newName) {
+  const from = String(oldName || "").trim(), to = cleanStr(String(newName || "").replace(/\s+/g, " ").trim());
+  if (!from || !to) throw new ApiErr(400, "Enter the new name.");
+  if (/^[=+@-]/.test(to)) throw new ApiErr(400, "A field name can’t start with =, +, - or @.");
+  return mutate(async (book, schema) => {
+    const H = book.headers, i = H.indexOf(from);
+    if (i < 0) throw new ApiErr(404, "That field is no longer in the sheet. Refresh the page.");
+    if (from === to) return { noWrite: true, res: { ok: true, name: to } };
+    if (H.some((h, k) => k !== i && h.toLowerCase() === to.toLowerCase())) throw new ApiErr(409, "There is already a field called “" + to + "”.");
+    if ((await sheetTables(book)).length) throw new ApiErr(400, "This sheet is an Excel Table, so rename the heading in Excel itself.");
+    const hrEl = book.rowEls.get(book.hr), c = getOrCreateCell(book, hrEl, i + 1);
+    writeCell(book, c, to);
+    const n = book.rows.length;
+    return { res: { ok: true, name: to }, log: [{ action: "rename-column", key: "", name: to, details: { note: "Renamed the column '" + from + "' to '" + to + "'" } }],
+      verify: chk => chk.headers[i] === to && !chk.headers.includes(from) && chk.rows.length === n };
+  });
+}
+
 /* v3.21: delete a field (a whole column) from the workforce sheet. Cells to the right move one column left, and every
    reference that points at them (formulas, column widths, filters, merged cells, validations, links) moves with them. */
 function shiftColTok(tok, C) {
@@ -2928,7 +3001,7 @@ const routes = {
   async call(method, path, body) {
     try {
       const need = method === "POST" && path === "/api/rows" ? "emp.add" : method === "PUT" ? "emp.edit" : method === "DELETE" ? "emp.delete"
-        : method === "POST" && path === "/api/columns/delete" ? "emp.fields"
+        : method === "POST" && (path === "/api/columns/delete" || path === "/api/columns/rename") ? "emp.fields"
         : method === "POST" && (path === "/api/bulk" || path === "/api/columns") ? "emp.bulk" : null;
       if (need === "emp.bulk" && path === "/api/columns" && window.PERM && PERM.can("emp.fields")) { /* v3.14: the Add new fields right is enough to add a column */ }
       else if (need && window.PERM && !PERM.can(need)) throw new ApiErr(403, "Your passcode doesn't allow this change. Ask the admin for the right in Settings.");
@@ -2942,6 +3015,7 @@ const routes = {
       if (path === "/api/rows" && method === "POST") { if (!body || typeof body.values !== "object") throw new ApiErr(400, "Missing values."); return await addRow(body.values); }
       if (path === "/api/columns" && method === "POST") return await addColumn(body && body.name);
       if (path === "/api/columns/delete" && method === "POST") return await deleteColumn(body && body.name);
+      if (path === "/api/columns/rename" && method === "POST") { if (window.PERM && !PERM.isSuper()) throw new ApiErr(403, "Only the super admin can rename fields."); return await renameColumn(body && body.from, body && body.to); }
       if (path === "/api/bulk" && method === "POST") return await bulkUpdate(body && body.updates, body && body.note);
       const m = /^\/api\/rows\/([^?]+)(?:\?(.*))?$/.exec(path);
       if (m) {
@@ -3632,14 +3706,17 @@ const Engine = (() => {
   }
 
   /* ---- Writing ---- */
-  async function build(ctx, rows, fieldNames = [], removedFields = []) {
+  async function build(ctx, rows, fieldNames = [], removedFields = [], renamedFields = []) {
     const zip = await ZipShim.loadAsync(ctx.bytes);      // start clean from the last saved bytes
     /* v3.14: extra fields after AM. Existing ones keep their column; new ones are added after the last one.
        v3.21: deleted fields are dropped and the fields after them move left, so no empty columns are left behind. */
     const gone = new Set((removedFields || []).map(n => String(n).toLowerCase()));
     const dropping = (ctx.extraCols || []).some(c => gone.has(c.name.toLowerCase()));
-    const extra = dropping ? ctx.extraCols.filter(c => !gone.has(c.name.toLowerCase())).map((c, i) => ({ cn: COL_REG + 1 + i, name: c.name, from: c.cn }))
-      : (ctx.extraCols || []).map(c => ({ ...c, from: c.cn }));
+    /* v3.27: renamed fields keep their column; the heading changes */
+    const ren = new Map((renamedFields || []).map(x => [String(x.from).toLowerCase(), String(x.to)]));
+    const renaming = (ctx.extraCols || []).some(c => ren.has(c.name.toLowerCase()) && !gone.has(c.name.toLowerCase()));
+    const extra = (dropping ? ctx.extraCols.filter(c => !gone.has(c.name.toLowerCase())).map((c, i) => ({ cn: COL_REG + 1 + i, name: c.name, from: c.cn }))
+      : (ctx.extraCols || []).map(c => ({ ...c, from: c.cn }))).map(c => ren.has(c.name.toLowerCase()) ? { ...c, oldName: c.name, name: ren.get(c.name.toLowerCase()) } : c);
     let nextCol = Math.max(COL_REG, ...extra.map(c => c.cn)) + 1; const addedCols = [];
     for (const nm of fieldNames) if (nm && !extra.some(c => c.name.toLowerCase() === String(nm).toLowerCase())) { const c = { cn: nextCol++, name: String(nm) }; extra.push(c); addedCols.push(c); }
     const lastColNum = Math.max(COL_REG, ...extra.map(c => c.cn)), lastCol = colName(lastColNum);
@@ -3698,7 +3775,7 @@ const Engine = (() => {
       .replace(/(<selection pane="bottomRight"[^>]*?)sqref="[^"]*"/, '$1sqref="C3"');
     /* new field headings go into row 2, styled like the AM heading */
     let row2 = ctx.rawRow2;
-    if (dropping && row2) {
+    if ((dropping || renaming) && row2) {
       /* rewrite the headings after AM: take out the old ones and put the kept fields back in their new columns */
       const oldHead = new Map();
       row2 = row2.replace(/<c r="([A-Z]+)2"[^>]*?(?:\/>|>[\s\S]*?<\/c>)/g, (m, col) => { const cn = colNum(col); if (cn <= COL_REG) return m; oldHead.set(cn, (m.match(/\ss="(\d+)"/) || [])[1]); return ''; });
@@ -3740,10 +3817,10 @@ const Engine = (() => {
       /* v3.14: a table needs one tableColumn per column; add the new fields */
       let tcM = tx.match(/<tableColumns\b[^>]*>([\s\S]*?)<\/tableColumns>/);
       /* v3.21: after deleting fields, keep A–AM and list the remaining fields again */
-      if (tcM && dropping) {
+      if (tcM && (dropping || renaming)) {
         const all = tcM[1].match(/<tableColumn\b[^>]*?(?:\/>|>[\s\S]*?<\/tableColumn>)/g) || [];
         const base = all.slice(0, COL_REG); let id = Math.max(0, ...all.map(x => +(x.match(/\sid="(\d+)"/) || [, 0])[1]));
-        const kept = extra.filter(c => !addedCols.includes(c)).map(c => all[c.from - 1] || `<tableColumn id="${++id}" name="${encode(c.name).replace(/"/g, '&quot;')}"/>`);
+        const kept = extra.filter(c => !addedCols.includes(c)).map(c => { const old = all[c.from - 1]; if (!old) return `<tableColumn id="${++id}" name="${encode(c.name).replace(/"/g, '&quot;')}"/>`; return c.oldName ? old.replace(/(\sname=")[^"]*(")/, (m, a, b) => a + encode(c.name).replace(/"/g, '&quot;') + b) : old; });
         const list = [...base, ...kept], open = (tx.match(/<tableColumns\b[^>]*>/) || ['<tableColumns>'])[0].replace(/\scount="\d+"/, ` count="${list.length}"`);
         tx = tx.replace(/<tableColumns\b[^>]*>[\s\S]*?<\/tableColumns>/, () => open + list.join('') + '</tableColumns>');
         tcM = tx.match(/<tableColumns\b[^>]*>([\s\S]*?)<\/tableColumns>/);
@@ -4007,7 +4084,8 @@ function snapshot() { return S.rows.map(r => ({ ...r, days: r.days.slice(), extr
 /* v3.14: fields added to the tracker (columns after AM). New ones wait in S.newFields until the next save writes them. */
 /* v3.21: deleted fields wait in S.removedFields and disappear from Excel with the next save */
 const attRemoved = n => (S.removedFields || []).some(x => x.toLowerCase() === String(n).toLowerCase());
-const attFieldNames = () => { const out = [...((S.ctx && S.ctx.extraCols) || []).map(c => c.name)].filter(n => !attRemoved(n)); for (const n of (S.newFields || [])) if (!out.some(x => x.toLowerCase() === n.toLowerCase())) out.push(n); return out; };
+const attRenamedTo = n => { const x = (S.renamedFields || []).find(r => r.from.toLowerCase() === String(n).toLowerCase()); return x ? x.to : n; };
+const attFieldNames = () => { const out = [...((S.ctx && S.ctx.extraCols) || []).map(c => c.name)].filter(n => !attRemoved(n)).map(attRenamedTo); for (const n of (S.newFields || [])) if (!out.some(x => x.toLowerCase() === n.toLowerCase())) out.push(n); return out; };
 /* v3.11: rights. Approving or rejecting leave (AL, CL, SL, RJ) needs "Approve leave"; other codes need "Edit attendance". */
 const can = k => !window.PERM || PERM.can(k);
 const APPROVAL_CODES = new Set(['AL', 'CL', 'SL', 'RJ']);
@@ -4038,7 +4116,7 @@ function mutate(desc, fn, opts = {}) {
   if (opts.addEmp && !can('att.addemp')) { toast('Your passcode can’t add employees to the attendance tracker. Ask the admin for the right in Settings.'); return false; }
   if (opts.rows && !can('att.rows')) { toast('Your passcode can’t edit or delete rows in the attendance tracker. Ask the admin for the right in Settings.'); return false; }
   if (!(opts.addEmp || opts.rows || can('att.edit') || (opts.cells && can('att.approve')) || (opts.holiday && can('att.holidays')) || (opts.log && can('att.log')) || (opts.fields && can('att.fields')) || (opts.fieldName && canFillField(opts.fieldName)))) { toast('Your passcode can view attendance but not change this. Ask the admin for the right in Settings.'); return false; }
-  S.undo.push({ rows: snapshot(), log: S.changes.length, nf: (S.newFields || []).length, nfList: (S.newFields || []).slice(), rfList: (S.removedFields || []).slice() });
+  S.undo.push({ rows: snapshot(), log: S.changes.length, nf: (S.newFields || []).length, nfList: (S.newFields || []).slice(), rfList: (S.removedFields || []).slice(), rnList: (S.renamedFields || []).map(x => ({ ...x })) });
   if (S.undo.length > 60) S.undo.shift();
   const before = S.rows.length;
   let res;
@@ -4061,7 +4139,7 @@ function mutate(desc, fn, opts = {}) {
 function undo() {
   if (S.saving) return;
   const u = S.undo.pop(); if (!u) return;
-  S.rows = u.rows.map(r => ({ ...r, _s: null, _dp: null })); S.changes.length = u.log; if (u.nfList) S.newFields = u.nfList.slice(); else if (S.newFields && u.nf != null) S.newFields.length = Math.min(S.newFields.length, u.nf); if (u.rfList) S.removedFields = u.rfList.slice(); S.ver++; S.lastChange = Date.now(); render(); toast('Undone');
+  S.rows = u.rows.map(r => ({ ...r, _s: null, _dp: null })); S.changes.length = u.log; if (u.nfList) S.newFields = u.nfList.slice(); else if (S.newFields && u.nf != null) S.newFields.length = Math.min(S.newFields.length, u.nf); if (u.rfList) S.removedFields = u.rfList.slice(); if (u.rnList) S.renamedFields = u.rnList.map(x => ({ ...x })); S.ver++; S.lastChange = Date.now(); render(); toast('Undone');
   if (S.changes.length) schedulePendingSave(); else clearPending();
 }
 function newRow(month, name, opts = {}) {
@@ -4129,7 +4207,7 @@ function flushPendingNow() { clearTimeout(pendingTimer); return persistPending()
 async function persistPending() {
     if (!S.ctx || !S.changes.length) { await clearPending(); return; }
     const rows = S.rows.map(r => ({ uid: r.uid, r0: r.r0, month: r.month, empId: r.empId, name: r.name, client: r.client, days: r.days.slice(), reg: r.reg, styles: { ...r.styles }, variant: r.variant, extra: { ...(r.extra || {}) } }));
-    await queuePending({ fileName: S.fileName, mtime: S.mtime, savedAt: Date.now(), n: S.changes.length, rows, fields: (S.newFields || []).slice(), removed: (S.removedFields || []).slice() });
+    await queuePending({ fileName: S.fileName, mtime: S.mtime, savedAt: Date.now(), n: S.changes.length, rows, fields: (S.newFields || []).slice(), removed: (S.removedFields || []).slice(), renamed: (S.renamedFields || []).slice() });
 }
 async function clearPending() { clearTimeout(pendingTimer); await queuePending(null); }
 async function prepareSignOut() {
@@ -4143,7 +4221,7 @@ async function restorePendingIfAny() {
   if (pending.fileName !== S.fileName || pending.mtime !== S.mtime) { await clearPending(); return; }   // the file moved on since then: too risky to merge
   const diskRows = snapshot();
   S.rows = pending.rows.map(r => ({ ...r, extra: r.extra || {}, _s: null, _dp: null }));
-  S.newFields = Array.isArray(pending.fields) ? pending.fields.slice() : []; S.removedFields = Array.isArray(pending.removed) ? pending.removed.slice() : [];
+  S.newFields = Array.isArray(pending.fields) ? pending.fields.slice() : []; S.removedFields = Array.isArray(pending.removed) ? pending.removed.slice() : []; S.renamedFields = Array.isArray(pending.renamed) ? pending.renamed.slice() : [];
   S.uid = Math.max(S.uid, ...S.rows.map(r => (r.uid || 0) + 1));
   S.undo = [{ rows: diskRows, log: 0 }];
   S.changes = [{ t: new Date(), desc: `Restored ${pending.n || 1} unsaved change${(pending.n || 1) === 1 ? '' : 's'} from before the page reloaded` }];
@@ -4154,7 +4232,7 @@ async function restorePendingIfAny() {
 
 async function adopt(ctx, { recover = false } = {}) {
   ctx.rows.forEach(r => { r.uid = S.uid++; if (!r.extra) r.extra = {}; });
-  S.newFields = []; S.removedFields = [];
+  S.newFields = []; S.removedFields = []; S.renamedFields = [];
   S.ctx = ctx; S.rows = ctx.rows; S.changes = []; S.undo = []; S.ver++; S.diskChanged = false; S.base = snapshot();
   const d = D(true);
   const has = ms => d.byMonth.has(ms);
@@ -4308,10 +4386,11 @@ async function save(opts = {}) {
       if (!auto || Date.now() - S.lastBackup > 600000) { try { await BE.backup(S.ctx.bytes, S.fileName); S.lastBackup = Date.now(); } catch (e) { if (!auto) downloadBytes(S.ctx.bytes, `${base}_backup_${stamp()}.xlsx`); else console.error(e); } }
       const n = S.changes.length, diff = diffRows(S.base, S.rows, r => 'u' + r.uid);
       /* in a shared workbook, build on top of the latest file so the workforce sheet's newest edits are kept */
-      const out = await Engine.build(BE.single() ? await Engine.load(new Uint8Array(await f.arrayBuffer())) : S.ctx, S.rows, attFieldNames(), S.removedFields || []);
+      const out = await Engine.build(BE.single() ? await Engine.load(new Uint8Array(await f.arrayBuffer())) : S.ctx, S.rows, attFieldNames(), S.removedFields || [], S.renamedFields || []);
       if (!force && !S.handle.cloud && (await S.handle.getFile()).lastModified !== f.lastModified) { if (attempt < 2) continue; throw new Error('The workbook changed during saving. Try again in a moment.'); }
       const entries = entriesFromDiff(diff, { user: BE.userName(), time: BE.nowText(), external: false });
       /* v3.14: new tracker fields and their values are logged too */
+      for (const x of (S.renamedFields || [])) entries.push({ time: BE.nowText(), user: BE.userName(), action: 'settings', att: S.fileName, key: '', name: 'Attendance tracker', details: { note: 'Renamed the field “' + x.from + '” to “' + x.to + '”' } });
       for (const nm of (S.removedFields || [])) entries.push({ time: BE.nowText(), user: BE.userName(), action: 'settings', att: S.fileName, key: '', name: 'Attendance tracker', details: { note: 'Deleted the field “' + nm + '” (its column and values)' } });
       for (const nm of (S.newFields || [])) entries.push({ time: BE.nowText(), user: BE.userName(), action: 'settings', att: S.fileName, key: '', name: 'Attendance tracker', details: { note: 'Added the field “' + nm + '” (a new column after AM)' } });
       { const baseBy = new Map(S.base.map(r => [r.uid,r]));
@@ -4329,7 +4408,7 @@ async function save(opts = {}) {
       S.autoErr = ''; S.autoRetry = 0; S.conflictAsked = false; if (auto) S.autoAt = new Date(); else toast(`Saved ${n} change${n === 1 ? '' : 's'} to ${S.fileName}`);
       if (force && !S.auto) setAuto(true);
       await clearPending();
-      S.newFields = []; S.removedFields = [];
+      S.newFields = []; S.removedFields = []; S.renamedFields = [];
       await adopt(ctx); notify(); if (S.act) S.act.items = null;
       S.saving = false; render(); return true;
     }
@@ -5122,13 +5201,14 @@ function whoView() {
   });
   const list = [...people.values()].sort((a, b) => a.first - b.first || a.name.localeCompare(b.name));
   const peak = perDay.reduce((m, x, j) => x.out > perDay[m].out ? j : m, 0);
-  const pend = pendingApplications(), stale = staleApplications();
+  const pend = pendingApplications();
   const dayOut = (dt) => { const ms = Engine.monthSerial(dt.getUTCFullYear(), dt.getUTCMonth()); return (d.byMonth.get(ms) || []).filter(r => isLeaveCode(r.days[dt.getUTCDate() - 1])).length; };
   const tomorrow = new Date(TODAY.getTime() + 86400000);
   const chk = (k, l) => `<label><input type="checkbox" data-bind="who-show" data-k="${k}" ${w.show[k] ? 'checked' : ''}> ${l}</label>`;
   const head = dates.map((dt, j) => { const wk = dt.getUTCDay() === 0 || dt.getUTCDay() === 6, isT = isoDate(dt) === isoDate(TODAY); return `<th class="d ${wk ? 'wk' : ''} ${isT ? 'tdy' : ''}" style="min-width:44px" data-tip="${longDate(dt)}<br>${perDay[j].out} out · ${perDay[j].la} applied">${dt.getUTCDate()}<small>${WEEKDAYS[dt.getUTCDay()]}</small><small style="color:${perDay[j].out ? 'var(--ink)' : 'var(--ink-3)'};font-weight:650">${perDay[j].out || '·'}</small></th>`; }).join('');
   const body = list.map(o => `<tr><td class="c-name" data-act="person" data-k="${esc(o.k)}"><b>${esc(o.name)}</b><span>${esc(o.cells.find(Boolean).r.client || '—')}</span></td>${o.cells.map((c, j) => { const wk = dates[j].getUTCDay() % 6 === 0, isT = isoDate(dates[j]) === isoDate(TODAY); return c ? `<td class="cell ${wk ? 'wk' : ''} ${isT ? 'tdy' : ''}" data-act="cell" data-r="${c.r.uid}" data-d="${c.i}" data-tip="${esc(cellTip(c.r, c.i))}">${chip(c.v)}</td>` : `<td class="${wk ? 'wk' : ''} ${isT ? 'tdy' : ''}"></td>`; }).join('')}</tr>`).join('');
-  return `<div class="grid g6" style="grid-template-columns:repeat(4,1fr);margin-bottom:14px">
+  const appsOff = (() => { try { return localStorage.getItem('td_who_apps_off') === '1'; } catch { return false; } })();
+  return `<div class="who-layout${appsOff ? ' apps-off' : ''}"><div class="who-main"><div class="grid g6" style="grid-template-columns:repeat(4,1fr);margin-bottom:14px">
       <div class="card tile"><div class="lbl">OUT TODAY</div><div class="val">${dayOut(TODAY)}</div><div class="delta">${longDate(TODAY)}</div></div>
       <div class="card tile"><div class="lbl">OUT TOMORROW</div><div class="val">${dayOut(tomorrow)}</div><div class="delta">${longDate(tomorrow)}</div></div>
       <div class="card tile"><div class="lbl">BUSIEST DAY IN WINDOW</div><div class="val">${perDay[peak].out}</div><div class="delta">${longDate(dates[peak])}</div></div>
@@ -5137,12 +5217,11 @@ function whoView() {
       <div class="seg" role="group" aria-label="Window length">${[7, 14, 21, 30].map(n => `<button data-act="who-days" data-n="${n}" aria-pressed="${w.days === n}">${n} days</button>`).join('')}</div>
       <button class="btn" data-act="who-today">Today</button><button class="btn" data-act="who-picture">Copy as picture</button><span class="sm muted">Show:</span>${chk('leave', 'Leaves')}${chk('applied', 'Applied (LA)')}${chk('late', 'Late')}${chk('remote', 'Remote')}
       <span class="grow"></span>${canLog() ? `<button class="btn primary" data-act="log-leave">${ic('plus')} Record attendance</button>` : ''}</div>${fieldBar()}
-    <div class="grid who3" style="display:grid;grid-template-columns:minmax(0,1.5fr) minmax(0,1fr) minmax(0,1fr);gap:14px;align-items:start">
+    <div class="who-grid">
       <div class="card" style="padding:0;overflow:hidden;min-width:0">${list.length ? `<div class="gridwrap" style="border:0;box-shadow:none;max-height:calc(100vh - 330px)"><table class="att" data-picture-timeline><thead><tr><th class="c-name">Team member</th>${head}</tr></thead><tbody>${body}</tbody></table></div>` : `<div class="empty">Nothing recorded in this window (${longDate(dates[0])} to ${longDate(dates[dates.length - 1])}). The sheet may not have entries this far ahead yet.<br><button class="btn sm" style="margin-top:10px" data-act="who-back">Show the last 14 days instead</button></div>`}</div>
-      <div class="card" style="min-width:0"><h2>Applications ahead · ${pend.length}</h2><div class="sub">${can('att.approve') ? 'Approve each date or a consecutive group. ✕ records RJ (rejected) in the tracker; it does not record attendance.' : 'Leave applied for and waiting for someone with the Approve leave right.'}</div>
-        ${pend.length ? `<div class="list" style="max-height:calc(100vh - 380px);min-height:220px;overflow:auto">${applicationList(pend)}</div>` : '<div class="empty">No pending applications from today onward.</div>'}</div>
-        <div class="card" style="min-width:0"><h2>Applications never closed · ${stale.length}</h2><div class="sub">These dates have passed but the cell still says LA, so they are not counted as leave. ${can('att.approve') ? 'Pick what actually happened.' : 'Someone with the Approve leave right needs to close them.'}</div>
-        ${stale.length ? `<div class="list" style="max-height:calc(100vh - 380px);min-height:220px;overflow:auto">${applicationList(stale)}</div>` : '<div class="empty">Nothing outstanding. Every past application has been closed.</div>'}</div></div>`;
+      </div></div>      ${appsOff ? `<aside class="card who-apps-min"><button class="who-apps-open" data-act="who-apps" title="Show Applications ahead" aria-label="Show Applications ahead (${pend.length})"><span>‹</span><b>${pend.length}</b><em>Applications ahead</em></button>` : `<aside class="card who-apps"><div class="who-apps-h"><h2>Applications ahead · ${pend.length}</h2><button class="btn sm" data-act="who-apps" title="Hide this panel and give the space to the table">Hide ›</button></div><div class="sub">${can('att.approve') ? 'Approve each date or a consecutive group. ✕ records RJ (rejected) in the tracker; it does not record attendance.' : 'Leave applied for and waiting for someone with the Approve leave right.'}</div>
+        ${pend.length ? `<div class="list" style="max-height:calc(100vh - 230px);min-height:220px;overflow:auto">${applicationList(pend)}</div>` : '<div class="empty">No pending applications from today onward.</div>'}</div>
+`}</aside></div>`;
 }
 
 /* ---------- v3.16: one "Log <field>" button per field this passcode may fill (the super admin picks them) ---------- */
@@ -5420,7 +5499,7 @@ function checksView() {
 
 /* ---------- ACTIVITY (past 30 days) ---------- */
 const ACT_VERBS = { 'att-link': 'linked', 'att-unlink': 'unlinked', 'att-edit': 'updated attendance for', 'att-add': 'added to the tracker:', 'att-delete': 'removed from the tracker:', attendance: 'saved attendance changes to',
-  add: 'added', edit: 'edited', delete: 'deleted', bulk: 'updated', 'add-column': 'added a column', 'delete-column': 'deleted a column', login: 'signed in', download: 'downloaded a copy of the Excel file',
+  add: 'added', edit: 'edited', delete: 'deleted', bulk: 'updated', 'add-column': 'added a column', 'delete-column': 'deleted a column', 'rename-column': 'renamed a column', login: 'signed in', download: 'downloaded a copy of the Excel file',
   'external-edit': 'changed', 'external-add': 'added', 'external-delete': 'removed', 'external-columns': 'changed the columns', 'external-summary': 'changed' };
 const isExt = it => /^external-/.test(it.action || '');
 const isAtt = it => !!it.att || it.action === 'attendance' || /att-/.test(it.action || '');
@@ -5959,6 +6038,21 @@ function confirmDelete(uid) {
   confirmBox('Delete this row?', `${rowLabel(r)} will be removed from the tracker${s.total ? ` (it holds ${fmt(s.total)} leave days)` : ''}. It is only written to Excel when you Save, and you can Undo until then.`, 'Delete row').then(ok => { if (ok) deleteRows([uid]); });
 }
 
+/* v3.27: rename an attendance tracker field (super admin). Values move with it; Excel changes with the next save. */
+function renameAttField(from, to) {
+  if (!(window.PERM && PERM.isSuper())) { toast('Only the super admin can rename fields.'); return false; }
+  const nm = String(to || '').replace(/\s+/g, ' ').trim(); if (!nm) { toast('Enter the new name.'); return false; }
+  if (/^[=+@-]/.test(nm)) { toast('A field name can’t start with =, +, - or @.'); return false; }
+  if (nm.toLowerCase() !== String(from).toLowerCase() && [...((S.ctx && S.ctx.headerNames) || []), ...attFieldNames()].some(x => x.toLowerCase() === nm.toLowerCase())) { toast(`The tracker already has a column called “${nm}”.`); return false; }
+  if (nm === from) return true;
+  return mutate(`Renamed the field “${from}” to “${nm}”`, () => {
+    const lc = String(from).toLowerCase();
+    if ((S.newFields || []).some(x => x.toLowerCase() === lc)) S.newFields = S.newFields.map(x => x.toLowerCase() === lc ? nm : x);
+    else { S.renamedFields = S.renamedFields || []; const ex = S.renamedFields.find(r => r.to.toLowerCase() === lc); if (ex) ex.to = nm; else S.renamedFields.push({ from, to: nm }); }
+    for (const r of S.rows) if (r.extra && Object.keys(r.extra).some(k => k.toLowerCase() === lc)) { const e2 = {}; for (const [k, v] of Object.entries(r.extra)) e2[k.toLowerCase() === lc ? nm : k] = v; r.extra = e2; }
+  }, { fields: true }) !== false;
+}
+
 /* ---------- v3.22: past leave of one person, for Record attendance and for managers deciding a request ---------- */
 let PAST_DAYS = 60;
 const PAST_OPTS = [[60, '60 days'], [90, '90 days'], [180, '180 days'], [365, '1 year']];
@@ -6305,6 +6399,8 @@ window.requestAuditEntries = () => reqList().flatMap(r => {
    To approve (pending, you can decide it) · Waiting (pending, sent by you or your group) · History (decided).
    People in the same user group see each other's requests. ---------- */
 const RC = { hist: 'all', scope: 'group' };
+/* v3.27: Waiting is for users; admins and super admins log attendance directly, so they don't get that tab */
+const isAdminRole = () => { try { const u = window.PERM && PERM.online() ? CLOUD.user() : null; return !!u && (u.role === 'admin' || u.role === 'superadmin'); } catch { return false; } };
 const rcMates = () => { try { return window.PERM && PERM.groupMates ? PERM.groupMates() : new Set(); } catch { return new Set(); } };
 const rcMine = r => { const me = myId(); return !!me && String(r.byId) === me; };
 const rcGroup = r => rcMates().has(String(r.byId));
@@ -6343,7 +6439,7 @@ function rcDraw(id, visible, html, bind) {
 const rcScopeChips = hasGroup => hasGroup ? `<div class="rc-chips" role="group" aria-label="Whose requests"><button class="rc-chip" data-rc-scope="group" aria-pressed="${RC.scope !== 'mine'}">Me + my group</button><button class="rc-chip" data-rc-scope="mine" aria-pressed="${RC.scope === 'mine'}">Only mine</button></div>` : '';
 function renderRequestHistory() {
   const { waiting, history, hasGroup } = requestBuckets();
-  rcDraw('cardMyRequests', !!myId() && can('requests.own'),
+  rcDraw('cardMyRequests', !!myId() && can('requests.own') && !isAdminRole(),
     `<div class="rc-top"><p class="rc-sub grow">${hasGroup ? 'Sent by you or your group' : 'Sent by you'} · waiting for a manager. You can cancel your own.</p>${rcScopeChips(hasGroup)}</div>
      <div class="rc-list">${waiting.length ? waiting.map(r => rqRow(r, `<span class="rq-st pending">Pending</span>${rcMine(r) ? `<button class="btn sm" data-cancel="${esc(r.id)}">Cancel</button>` : ''}`)).join('') : '<div class="rc-empty">Nothing waiting. New requests you send appear here.</div>'}</div>`,
     root => root.querySelectorAll('[data-cancel]').forEach(b => { b.onclick = async () => { b.disabled = true; try { await cancelRequest(b.dataset.cancel); } finally { renderApprovalRequests(); } }; }));
@@ -6697,6 +6793,7 @@ const ACTIONS = {
   'req-approve'(el) { const s = el.closest('.li') && el.closest('.li').querySelector('select[data-req-code]'); el.disabled = true; approveRequest(el.dataset.id, s ? s.value : null); },
   'req-reject'(el) { openRejectBox(el.dataset.id); },
   'req-cancel'(el) { cancelRequest(el.dataset.id); },
+  'who-apps'() { try { localStorage.setItem('td_who_apps_off', localStorage.getItem('td_who_apps_off') === '1' ? '0' : '1'); } catch { } render(); },
   'pp-range'(el) { const pu = S.ui.people, v = el.dataset.v; pu.preset = v; if (v === 'all') { pu.from = pu.to = null; } else { const d0 = D(), pp = d0.people.get(pu.sel); if (!pp) return; const last = Math.min(pp.latest.month, TODAY_MS), n = +v, dt = Engine.serialToDate(last); pu.to = last; pu.from = Engine.monthSerial(dt.getUTCFullYear(), dt.getUTCMonth() - (n - 1)); } render(); },
   'log-leave'(el) { openLogLeave(el.dataset.k || (S.ui.view === 'people' ? S.ui.people.sel : null)); },
   'new-month'() { if (!can('att.addemp')) return toast('Your passcode can’t add employees to the attendance tracker. Ask the admin for the right in Settings.'); openNewMonth(); }, 'add-row'() { if (!can('att.addemp')) return toast('Your passcode can’t add employees to the attendance tracker. Ask the admin for the right in Settings.'); openRowEditor(null); },
@@ -6761,6 +6858,17 @@ function mount() {
   const host = document.getElementById('attHost'); if (!host || ROOT) return;
   ROOT = host.attachShadow({ mode: 'open' });
   ROOT.innerHTML = `<style>${ATT_CSS}
+.who-layout { display:grid; grid-template-columns:minmax(0,4fr) minmax(260px,1fr); gap:14px; align-items:start; }
+.who-main { min-width:0; }
+.who-apps { min-width:0; position:sticky; top:12px; margin:0; align-self:stretch; min-height:calc(100vh - 260px); }
+.who-apps-h { display:flex; align-items:flex-start; gap:8px; } .who-apps-h h2 { flex:1; }
+.who-layout.apps-off { grid-template-columns:minmax(0,1fr) 44px; }
+.who-apps-min { margin:0; padding:0 !important; position:sticky; top:12px; align-self:stretch; min-height:220px; overflow:hidden; }
+.who-apps-open { display:flex; flex-direction:column; align-items:center; gap:8px; width:100%; height:100%; min-height:220px; padding:12px 0; border:0; background:transparent; color:var(--ink-2); font:inherit; cursor:pointer; }
+.who-apps-open:hover { background:var(--surface-2); color:var(--ink); }
+.who-apps-open b { min-width:22px; padding:1px 6px; border-radius:999px; background:var(--accent, #3b6cf6); color:#fff; font-size:12px; text-align:center; }
+.who-apps-open em { font-style:normal; font-size:12px; font-weight:600; writing-mode:vertical-rl; transform:rotate(180deg); }
+@media (max-width:1000px) { .who-layout, .who-layout.apps-off { grid-template-columns:minmax(0,1fr); } .who-apps, .who-apps-min { position:static; min-height:0; } .who-apps-open { flex-direction:row; min-height:0; justify-content:center; } .who-apps-open em { writing-mode:horizontal-tb; transform:none; } }
 @media (max-width:700px) { .grid.g6[style*="repeat(4"] { grid-template-columns:repeat(2,minmax(0,1fr)) !important; } .card { padding:12px !important; } .tabs, .seg { flex-wrap:wrap; } table { font-size:12px; } .toolbar, .bar { flex-wrap:wrap; gap:6px; } }
 .tl-filters { display:flex; flex-wrap:wrap; align-items:center; gap:6px 8px; margin:10px 0 0; }
 .pp-bar { padding:12px 16px !important; }
@@ -7198,7 +7306,7 @@ const healthCount = () => (S.status === 'ready' && S.ctx ? healthIssues().filter
 
 mount();
 return {
-  fieldNames: attFieldNames, hasTracker: Engine.hasTracker, refresh, init: () => { mount(); return connect(); }, askName, decorateTable, healthCount, chooseFileEarly, savedFile: async () => (await kv.get('file')) || ((await kv.get('handle')) || {}).name || '', show, leave, renderCard, renderWatch, drawerPanel, go, renderApprovalRequests, renderRequestHistory, requestCounts, recordAttendance: () => openLogLeave(), canRecord: () => canLog(), requestsToDecide: () => requestsToDecide().length,
+  fieldNames: attFieldNames, hasTracker: Engine.hasTracker, refresh, init: () => { mount(); return connect(); }, askName, decorateTable, healthCount, chooseFileEarly, savedFile: async () => (await kv.get('file')) || ((await kv.get('handle')) || {}).name || '', show, leave, renderCard, renderWatch, drawerPanel, go, renderApprovalRequests, renderRequestHistory, requestCounts, renameField: (a, b) => renameAttField(a, b), attReady: () => S.status === 'ready' && !!S.ctx, recordAttendance: () => openLogLeave(), canRecord: () => canLog(), requestsToDecide: () => requestsToDecide().length,
   /* v3.19: every recorded code between two dates (UTC ms, null = open), for custom dashboards; follows the attendance scope */
   entries: (from, to) => { if (S.status !== 'ready' || !S.ctx) return null; const d = D(), out = []; for (const m of d.months) { const dim = Engine.daysInMonth(m); for (const r of d.byMonth.get(m) || []) for (let i = 0; i < dim; i++) { const v = r.days[i]; if (v == null || v === '') continue; const dt = dateOf(m, i), t = dt.getTime(); if ((from != null && t < from) || (to != null && t > to)) continue; const cat = catOf(v); out.push({ name: r.name.trim(), empId: r.empId, client: r.client ? String(r.client).trim() : '', date: dt, code: String(v).trim().toUpperCase(), cat, catLabel: CATS[cat] || 'Other' }); } } return out; },
   todayStats: () => { if (S.status !== 'ready' || !S.ctx) return null; const rows = D().byMonth.get(TODAY_MS) || [], i = TODAY.getUTCDate() - 1, cats = rows.map(r => catOf(r.days[i])); return { full: cats.filter(c => c === 'approved' || c === 'sick' || c === 'unplanned').length, half: cats.filter(c => c === 'half').length, late: cats.filter(c => c === 'late').length, tracked: rows.length }; }, redraw: () => { if (active()) render(); }, state: () => S, dirty: () => S.changes.length,
@@ -7379,7 +7487,7 @@ async function poll() {
 }
 
 /* ============================== filtering ============================== */
-const APP = { title: "Team Dashboard", version: "3.26.3", released: "29 Sep 2026" };
+const APP = { title: "Team Dashboard", version: "3.27.0", released: "29 Sep 2026" };
 const BASE_DIMS = { status: "status_column", desig: "designation_column", client: "client_column", mode: "mode_column" };
 const STANDARD_STATUSES = ["Active", "Manager", "OJT", "Bench", "New", "Projected", "Left", "Moved"];
 const TILE_ORDER = ["Active", "Manager", "OJT", "Bench", "New", "Projected"];
@@ -8972,8 +9080,10 @@ const fillCell = (row, c) => { const m = FILL.edits.get(row.id), e = m && m.get(
 
 /* ---------- the page ---------- */
 function fillControl(c, value) {
-  const sch = state.schema, sug = suggestions(c.name); let el;
-  if (c.type === "date") el = h("input", { class: "input fc", type: "date", value });
+  const sch = state.schema, sug = suggestions(c.name), fch = fieldChoice(c.name); let el;
+  if (c.type !== "date" && fch.mode === "list" && c.name !== sch.name_column) { const list = (fch.choices || []).filter(Boolean).slice(); if (value && !list.includes(value)) list.unshift(value); el = h("select", { class: "input fc" }, h("option", { value: "" }, "—"), list.map(v => h("option", { value: v }, v))); el.value = value; }
+  else if (c.type !== "date" && fch.mode === "free") el = h("input", { class: "input fc", value, autocomplete: "off", inputmode: c.type === "number" ? "decimal" : null });
+  else if (c.type === "date") el = h("input", { class: "input fc", type: "date", value });
   else if (c.select) {
     const list = sug.slice();
     if (c.name === sch.status_column) for (const st of STANDARD_STATUSES) if (!list.some(x => x.toLowerCase() === st.toLowerCase())) list.push(st);
@@ -9686,14 +9796,31 @@ function suggestions(colName_) {
   return [...m.entries()].sort((a, b) => b[1] - a[1] || a[0].localeCompare(b[0])).map(e => e[0]);
 }
 
+/* v3.27: per-field drop-down setting (Settings › Fields & drop-downs): 'auto' (from values already used), 'list' (fixed choices), 'free' (no drop-down) */
+function fieldChoice(name) { const m = (window.TD_SETTINGS || {}).field_choices || {}; const f = m[name]; return f && typeof f === "object" && ["auto", "list", "free"].includes(f.mode) ? f : { mode: "auto" }; }
+window.fieldChoice = fieldChoice;
+function choiceSelect(cls, choices, cur, allowOther, label) {
+  const list = choices.slice(); if (cur && !list.includes(cur)) list.unshift(cur);
+  const sel = h("select", { class: cls }, h("option", { value: "" }, "—"), list.map(v => h("option", { value: v }, v)), allowOther ? h("option", { value: "__other" }, "Other…") : null);
+  sel.value = cur || "";
+  const other = allowOther ? h("input", { class: "input", placeholder: "Type a new value", style: "margin-top:6px", hidden: true, "aria-label": label + " (new value)" }) : null;
+  if (other) sel.addEventListener("change", () => { other.hidden = sel.value !== "__other"; if (!other.hidden) other.focus(); });
+  return { sel, other, get: () => (sel.value === "__other" ? (other ? other.value.trim() : "") : sel.value) };
+}
 function buildField(c, value, isNew) {
   const name = c.name, id = "f_" + state.idx[name];
   const sch = state.schema;
   const readonlyKey = !isNew && name === sch.key_column;
   const wide = /remark/i.test(name);
   let control, get, extra = null;
-  const sug = suggestions(name);
-  if (c.type === "date") {
+  const sug = suggestions(name), fch = fieldChoice(name);
+  if (c.type !== "date" && !c.auto && name !== sch.key_column && name !== sch.name_column && fch.mode === "list") {
+    const x = choiceSelect("input", (fch.choices || []).filter(Boolean), S(value), fch.other !== false, c.label);
+    control = x.sel; control.id = id; extra = x.other; get = x.get;
+  } else if (c.type !== "date" && fch.mode === "free" && !/remark/i.test(name)) {
+    control = h("input", { class: "input", id, value: S(value), inputmode: c.type === "number" ? "decimal" : null, readonly: readonlyKey ? true : null, autocomplete: "off" });
+    get = () => control.value.trim();
+  } else if (c.type === "date") {
     control = h("input", { class: "input", id, type: "date", value: serialToISO(value) });
     get = () => (control.value ? isoToSerial(control.value) : null);
   } else if (c.select) {
@@ -9742,21 +9869,14 @@ function openDrawer(row) {
 
   function build() {
     fields.length = 0; body.replaceChildren(errBox);
-    if (!isNew && window.ATT) { try { body.append(ATT.drawerPanel(row)); } catch (e) { console.error(e); } }
-    if (!isNew) {
-      const cfg=GD.config || {}, addressColumn=cfg.addressColumn || state.cols.find(c=>/^(current|present|residential)[ _]*address$/i.test(c.name))?.name;
-      const address=addressColumn ? String(g(row,addressColumn) || '').trim() : '';
-      if(address) {
-        const destination=address+(cfg.city ? ', '+cfg.city : '');
-        const url='https://www.google.com/maps/dir/?'+new URLSearchParams({api:'1',origin:cfg.office || GOOGLE_OFFICE,destination,travelmode:'driving'});
-        body.append(h('div',{class:'connection-card'},h('div',{class:'lbl'},'Office → current address'),h('p',{},address),h('a',{class:'btn',href:url,target:'_blank',rel:'noopener noreferrer'},'Open route in Google Maps'),h('p',{class:'hint'},'Optional: view the exact route in Google Maps. The automatic distance tool provides a rough estimate without a Google account.')));
-      }
-    }
-    const cols = state.cols.filter(c => !c.auto);
+    /* v3.27: details first, in clear categories with a jump bar; attendance and the route come after */
+    const ICON = { "Personal": "👤", "Contact & address": "📞", "Job": "💼", "Key dates": "📅", "Commute & equipment": "🚗", "Notes": "📝", "Additional details": "➕", "Other": "…" };
+    const cols = state.cols.filter(c => !c.auto), secs = [];
+    const nav = h("nav", { class: "emp-nav", "aria-label": "Jump to a section" });
     for (const grp of sch.groups) {
       const list = cols.filter(c => c.group === grp).sort((a, b) => a.pos - b.pos);
       if (!list.length) continue;
-      const grid = h("div", { class: "fgrid" });
+      const grid = h("div", { class: "fgrid" }), mine = [];
       for (const c of list) {
         let val = base ? base.v[state.idx[c.name]] : null;
         if (isNew && val == null) {
@@ -9764,9 +9884,29 @@ function openDrawer(row) {
           if (c.name === sch.doj_column) val = todaySerial();
         }
         const f = buildField(c, val, isNew);
-        fields.push(f); grid.append(f.wrap);
+        fields.push(f); mine.push(f); grid.append(f.wrap);
       }
-      body.append(h("fieldset", {}, h("legend", {}, grp), grid));
+      const cnt = h("small", { class: "emp-cnt" });
+      const paint = () => { const n = mine.filter(f => { const v = f.get(); return v != null && v !== ""; }).length; cnt.textContent = n + " of " + mine.length; cnt.classList.toggle("full", n === mine.length); };
+      grid.addEventListener("input", paint); grid.addEventListener("change", paint); paint();
+      const id = "emp-sec-" + secs.length;
+      const sec = h("details", { class: "emp-sec", id, open: grp !== "Other" || isNew ? true : null },
+        h("summary", {}, h("span", { class: "emp-ic", "aria-hidden": "true" }, ICON[grp] || "•"), h("b", {}, grp), cnt), grid);
+      secs.push(sec);
+      nav.append(h("button", { type: "button", class: "emp-jump", onclick: () => { sec.open = true; sec.scrollIntoView({ behavior: "smooth", block: "start" }); } }, grp));
+    }
+    body.append(nav, ...secs);
+    if (!isNew) {
+      const extra = h("details", { class: "emp-sec", open: true }, h("summary", {}, h("span", { class: "emp-ic", "aria-hidden": "true" }, "🗓️"), h("b", {}, "Attendance & route")));
+      if (window.ATT) { try { extra.append(ATT.drawerPanel(row)); } catch (e) { console.error(e); } }
+      const cfg=GD.config || {}, addressColumn=cfg.addressColumn || state.cols.find(c=>/^(current|present|residential)[ _]*address$/i.test(c.name))?.name;
+      const address=addressColumn ? String(g(row,addressColumn) || '').trim() : '';
+      if(address) {
+        const destination=address+(cfg.city ? ', '+cfg.city : '');
+        const url='https://www.google.com/maps/dir/?'+new URLSearchParams({api:'1',origin:cfg.office || GOOGLE_OFFICE,destination,travelmode:'driving'});
+        extra.append(h('div',{class:'connection-card'},h('div',{class:'lbl'},'Office → current address'),h('p',{},address),h('a',{class:'btn',href:url,target:'_blank',rel:'noopener noreferrer'},'Open route in Google Maps'),h('p',{class:'hint'},'Optional: view the exact route in Google Maps. The automatic distance tool provides a rough estimate without a Google account.')));
+      }
+      if (extra.children.length > 1) { body.append(extra); nav.append(h("button", { type: "button", class: "emp-jump", onclick: () => { extra.open = true; extra.scrollIntoView({ behavior: "smooth", block: "start" }); } }, "Attendance")); }
     }
   }
   build();
@@ -10782,6 +10922,7 @@ const checkLine = (text, checked, attrs = {}) => { const c = h('input', { type: 
 const MODULES = [
   { id: 'people', name: 'People & access', show: () => PERM.online() && PERM.isSuper(), draw: drawPeople },
   { id: 'fields', name: 'Mandatory fields', show: () => PERM.isSuper() || PERM.can('set.fields'), draw: drawFields },
+  { id: 'choices', name: 'Fields & drop-downs', show: () => PERM.isSuper() || PERM.can('set.fields'), draw: drawChoices },
   { id: 'sync', name: 'Save & sync', show: () => PERM.can('sync.view'), draw: drawSync },
   { id: 'signins', name: 'Sign-in log', show: () => PERM.online() && PERM.can('set.workbook'), draw: drawSignins },
   { id: 'workbook', name: 'Workbook & backups', show: () => PERM.can('set.workbook') || PERM.can('workbook.download'), draw: drawWorkbook },
@@ -11239,6 +11380,110 @@ window.applyFixedFilters = () => {
   } else if (locked) { state.filters = { q: '', sel: {}, inited: true }; const q = el('fq'); if (q) q.value = ''; }
   document.body.classList.toggle('filters-locked', locked);
 };
+
+
+/* ----- v3.27: Fields & drop-downs. Per field: its name (super admin) and whether it is a drop-down, with preloaded choices ----- */
+const CORE_ROLES = ['key_column', 'name_column', 'status_column', 'designation_column', 'client_column', 'mode_column', 'dob_column', 'doj_column', 'left_column', 'phone_column', 'subclient_column', 'language_column', 'current_area_column', 'distance_column', 'gender_column', 'whatsapp_column'];
+async function drawChoices(pane) {
+  if (!state.schema) { fill(pane, h('p', { class: 'set-hint' }, 'Open the workbook first.')); return; }
+  const sup = PERM.isSuper();
+  const tab = drawChoices.tab || 'emp';
+  const tabs = h('div', { class: 'ppl-tabs', role: 'tablist' },
+    ...[['emp', 'Employee fields'], ['att', 'Attendance fields']].map(([k, l]) => h('button', { type: 'button', class: 'ppl-tab', role: 'tab', 'aria-selected': String(tab === k), onclick: () => { drawChoices.tab = k; drawChoices(pane); } }, l)));
+  if (tab === 'att') { drawAttFieldNames(pane, tabs, sup); return; }
+  const core = new Set(CORE_ROLES.map(k => state.schema[k]).filter(Boolean));
+  const saved = JSON.parse(JSON.stringify((window.TD_SETTINGS || {}).field_choices || {}));
+  const labels = { ...((window.TD_SETTINGS || {}).field_labels || {}) };
+  const draft = {}, nameDraft = {};
+  const cols = state.cols.filter(c => !c.auto);
+  const q = h('input', { class: 'input', type: 'search', placeholder: 'Find a field…', 'aria-label': 'Find a field', style: 'max-width:260px' });
+  const list = h('div', { class: 'dd-list' }), err = h('p', { class: 'err', role: 'alert' });
+  const dirty = h('span', { class: 'sm muted' });
+  const markDirty = () => { const n = Object.keys(draft).length + Object.keys(nameDraft).length; dirty.textContent = n ? n + ' unsaved change' + (n === 1 ? '' : 's') : ''; save.disabled = !n; };
+  const row = c => {
+    const cur = draft[c.name] || saved[c.name] || { mode: 'auto' };
+    const isDate = c.type === 'date', isCore = core.has(c.name), isKey = c.name === state.schema.key_column || c.name === state.schema.name_column;
+    const used = suggestions(c.name);
+    const mode = h('select', { class: 'input dd-mode', 'aria-label': 'Drop-down for ' + c.label, disabled: isDate || isKey || null },
+      h('option', { value: 'auto' }, 'Automatic: values already used'), h('option', { value: 'list' }, 'Yes: fixed choices'), h('option', { value: 'free' }, 'No: free text'));
+    mode.value = isDate ? 'auto' : cur.mode;
+    const ta = h('textarea', { class: 'input dd-choices', rows: 4, placeholder: 'One choice per line', 'aria-label': 'Choices for ' + c.label }, (cur.choices || []).join('\n'));
+    ta.value = (cur.choices || []).join('\n');
+    const other = checkLine('Allow typing a value that isn’t in the list', cur.other !== false);
+    const load = h('button', { class: 'linkbtn', type: 'button', onclick: () => { const have = ta.value.split('\n').map(x => x.trim()).filter(Boolean); ta.value = [...new Set([...have, ...used])].join('\n'); upd(); } }, 'Preload the ' + used.length + ' value' + (used.length === 1 ? '' : 's') + ' already in the sheet');
+    const clear = h('button', { class: 'linkbtn', type: 'button', onclick: () => { ta.value = ''; upd(); } }, 'Clear');
+    const sortB = h('button', { class: 'linkbtn', type: 'button', onclick: () => { ta.value = ta.value.split('\n').map(x => x.trim()).filter(Boolean).sort((a, b) => a.localeCompare(b)).join('\n'); upd(); } }, 'Sort A–Z');
+    const box = h('div', { class: 'dd-box', hidden: mode.value !== 'list' }, ta, h('div', { class: 'dd-tools' }, load, ' · ', sortB, ' · ', clear), other.el);
+    const upd = () => {
+      box.hidden = mode.value !== 'list';
+      const v = { mode: mode.value, ...(mode.value === 'list' ? { choices: [...new Set(ta.value.split('\n').map(x => x.trim()).filter(Boolean))], other: other.box.checked } : {}) };
+      if (JSON.stringify(v) === JSON.stringify(saved[c.name] || { mode: 'auto' })) delete draft[c.name]; else draft[c.name] = v;
+      markDirty();
+    };
+    mode.addEventListener('change', upd); ta.addEventListener('input', upd); other.box.addEventListener('change', upd);
+    /* name */
+    const nm = h('input', { class: 'input dd-name', value: labels[c.name] || c.label, 'aria-label': 'Name of ' + c.name, disabled: !sup || null, maxlength: 60 });
+    const excel = checkLine(isCore ? 'Display name only (the dashboard finds this field by its Excel heading)' : 'Also rename the column in Excel', !isCore, { disabled: isCore || null });
+    const nameBox = h('div', { class: 'dd-rename', hidden: true }, excel.el);
+    nm.addEventListener('input', () => { const v = nm.value.replace(/\s+/g, ' ').trim(); const changed = v && v !== (labels[c.name] || c.label); nameBox.hidden = !changed; if (changed) nameDraft[c.name] = { to: v, excel: () => excel.box.checked && !isCore }; else delete nameDraft[c.name]; markDirty(); });
+    const typeTxt = isDate ? 'Date · picked from a calendar' : c.type === 'number' ? 'Number' : 'Text';
+    return h('div', { class: 'dd-row', 'data-name': (c.label + ' ' + c.name).toLowerCase() },
+      h('div', { class: 'dd-l' }, nm, h('small', {}, (c.name !== (labels[c.name] || c.label) ? 'Excel column: ' + c.name + ' · ' : '') + typeTxt + ' · ' + used.length + ' different value' + (used.length === 1 ? '' : 's') + (isKey ? ' · identifies each employee' : '')), nameBox),
+      h('div', { class: 'dd-r' }, isDate ? h('span', { class: 'sm muted' }, 'Dates always use a calendar') : isKey ? h('span', { class: 'sm muted' }, 'Always typed in') : mode, box));
+  };
+  const rows = cols.map(row);
+  const draw = () => { const t = q.value.trim().toLowerCase(); rows.forEach(r => { r.hidden = !!t && !r.dataset.name.includes(t); }); };
+  q.addEventListener('input', draw);
+  fill(list, ...rows);
+  const save = h('button', { class: 'btn primary', type: 'button', disabled: true, onclick: async () => {
+    err.textContent = ''; save.disabled = true; save.textContent = 'Saving…';
+    try {
+      await loadTeamSettings(true);
+      const fc = { ...((window.TD_SETTINGS || {}).field_choices || {}) }, fl = { ...((window.TD_SETTINGS || {}).field_labels || {}) };
+      for (const [k, v] of Object.entries(draft)) { if (v.mode === 'auto') delete fc[k]; else fc[k] = v; }
+      const renames = [];
+      for (const [k, v] of Object.entries(nameDraft)) { if (v.excel()) renames.push([k, v.to]); else fl[k] = v.to; }
+      for (const [from, to] of renames) {
+        await api('POST', '/api/columns/rename', { from, to });
+        for (const obj of [fc, fl]) if (from in obj) { obj[to] = obj[from]; delete obj[from]; }
+        delete fl[to];
+        const cf = (window.TD_SETTINGS || {}).custom_fields; if (Array.isArray(cf) && cf.some(f => f && f.name === from)) await saveSharedSetting('custom_fields', cf.map(f => f && f.name === from ? { ...f, name: to } : f));
+        const rq = (window.TD_SETTINGS || {}).required_fields; if (Array.isArray(rq) && rq.includes(from)) await saveTeamSetting('required_fields', rq.map(x => x === from ? to : x));
+        if (state.visible && state.visible.includes(from)) { state.visible = state.visible.map(x => x === from ? to : x); lsSet('td_cols', JSON.stringify(state.visible)); }
+      }
+      if (Object.keys(draft).length || renames.length) await saveTeamSetting('field_choices', fc);
+      if (Object.keys(nameDraft).length) await saveTeamSetting('field_labels', fl);
+      BE.appendActivity([{ time: BE.nowText(), user: BE.userName(), action: 'settings', key: '', name: 'Fields & drop-downs', details: { note: [Object.keys(draft).length ? 'Drop-down settings changed for ' + Object.keys(draft).join(', ') : '', Object.keys(nameDraft).length ? 'Renamed ' + Object.entries(nameDraft).map(([k, v]) => k + ' → ' + v.to).join(', ') : ''].filter(Boolean).join(' · ') } }]);
+      await loadData(true); renderAll();
+      toast('Saved. Forms and Fill in bulk use the new settings now.');
+      drawChoices(pane);
+    } catch (e) { err.textContent = e.message; save.disabled = false; save.textContent = 'Save changes'; }
+  } }, 'Save changes');
+  fill(pane, tabs,
+    h('p', { class: 'set-hint' }, 'For each field choose whether it is a drop-down. “Automatic” lists the values already used in the sheet. “Yes: fixed choices” shows only the choices you enter here (you can preload them from the sheet). “No: free text” is a plain box. ' + (sup ? 'You can also rename a field: type a new name.' : 'Only the super admin can rename fields.')),
+    h('div', { class: 'activity-controls' }, q, h('span', { class: 'spacer' }), dirty),
+    list, h('div', { class: 'set-actions dd-save' }, save, err));
+}
+async function drawAttFieldNames(pane, tabs, sup) {
+  const names = window.ATT && ATT.attReady && ATT.attReady() ? ATT.fieldNames() : null;
+  const err = h('p', { class: 'err', role: 'alert' });
+  const rows = (names || []).map(n => {
+    const inp = h('input', { class: 'input dd-name', value: n, disabled: !sup || null, maxlength: 60, 'aria-label': 'Name of ' + n });
+    const b = h('button', { class: 'btn mini', type: 'button', disabled: true, onclick: async () => {
+      const to = inp.value.replace(/\s+/g, ' ').trim(); err.textContent = '';
+      if (!ATT.renameField(n, to)) return;
+      /* people who could log the old field keep that right under the new name */
+      if (PERM.online()) { try { const us = await CLOUD.admin.users(); for (const u of us) { const f = u.permissions && u.permissions._attendanceFields; if (Array.isArray(f) && f.includes(n)) await CLOUD.admin.save(u.id, u.name, u.passcode, u.role, u.active, { ...u.permissions, _attendanceFields: f.map(x => x === n ? to : x) }, u.login_id); } } catch (e) { err.textContent = 'Renamed, but the Log buttons could not be moved for everyone: ' + e.message; } }
+      toast('Renamed “' + n + '” to “' + to + '”. It is written to Excel with the next save.'); drawAttFieldNames(pane, tabs, sup);
+    } }, 'Rename');
+    inp.addEventListener('input', () => { const v = inp.value.trim(); b.disabled = !v || v === n; });
+    return h('div', { class: 'dd-row' }, h('div', { class: 'dd-l' }, inp, h('small', {}, 'Column after AM in the “Attendance Tracker” sheet')), h('div', { class: 'dd-r' }, sup ? b : h('span', { class: 'sm muted' }, 'Only the super admin can rename')));
+  });
+  fill(pane, tabs,
+    h('p', { class: 'set-hint' }, 'Extra fields in the attendance tracker (added with Attendance › Fields). Renaming keeps every value and the people who can log it; Excel changes with the next attendance save.'),
+    names == null ? h('p', { class: 'set-hint' }, 'Open the Attendance page once so the tracker is loaded, then come back.') : names.length ? h('div', { class: 'dd-list' }, ...rows) : h('p', { class: 'set-hint' }, 'No extra attendance fields yet. Add them on the Attendance page with the “Fields” button.'),
+    err);
+}
 
 /* ----- Mandatory fields ----- */
 async function drawFields(pane) {
