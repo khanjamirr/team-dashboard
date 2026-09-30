@@ -4,7 +4,7 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <link rel="icon" href="data:,">
-<title>Team Dashboard · 3.27.0</title>
+<title>Team Dashboard · 3.27.1</title>
 <style>
 :root {
   color-scheme: light;
@@ -1541,7 +1541,7 @@ body.filters-locked #cleanFilters, body.filters-locked #xchips, body.filters-loc
 
 /* ================= v3.25: phone layout (screens up to 700px wide) ================= */
 @media (max-width:700px) {
-  html, body { overflow-x:hidden; }
+  html, body { overflow-x:clip; }
   #app { padding:0 12px calc(78px + env(safe-area-inset-bottom)) !important; }
   /* compact top bar: name + version on the left, sign-in on the right */
   .sidebar { position:static !important; width:auto !important; margin:0 -12px !important; padding:10px 14px !important; display:flex !important; flex-direction:row !important; align-items:center; gap:8px; flex-wrap:wrap; }
@@ -1688,6 +1688,36 @@ body.filters-locked #cleanFilters, body.filters-locked #xchips, body.filters-loc
 .dd-rename[hidden] { display:none; }
 .dd-save { position:sticky; bottom:0; background:var(--surface); padding:10px 0; margin-top:0 !important; align-items:center; }
 @media (max-width:700px) { .dd-row { grid-template-columns:1fr; } .dd-save { bottom:calc(66px + env(safe-area-inset-bottom)); } }
+
+/* v3.27.1: the four glance tiles as one summary strip */
+#pageSummary.ov > .ov-glance { gap:0 !important; border:1px solid var(--border); border-radius:14px; background:var(--surface); overflow:hidden; box-shadow:0 1px 2px rgba(15,23,42,.04); }
+#pageSummary.ov .ov-tile { --tone:var(--accent); position:relative; display:flex !important; flex-direction:column; align-items:flex-start !important; gap:4px !important; padding:14px 18px 13px !important; border:0 !important; border-radius:0 !important; border-left:1px solid var(--border) !important; background:transparent !important; box-shadow:none !important; transform:none !important; }
+#pageSummary.ov .ov-tile:first-child { border-left:0 !important; }
+#pageSummary.ov .ov-tile::before { content:""; position:absolute; left:0; right:0; top:0; height:3px; background:var(--tone); opacity:.85; }
+#pageSummary.ov .ov-tile:hover { background:color-mix(in srgb,var(--tone) 6%,var(--surface)) !important; }
+#pageSummary.ov .ov-tile.t-leave { --tone:#0f9f8f; } #pageSummary.ov .ov-tile.t-req { --tone:#3b6cf6; } #pageSummary.ov .ov-tile.t-req.hot { --tone:#e8772e; } #pageSummary.ov .ov-tile.t-cel { --tone:#7c5cff; } #pageSummary.ov .ov-tile.t-hol { --tone:#d99a00; }
+.ov-top { display:flex; align-items:center; gap:8px; min-width:0; }
+.ov-top small { font-size:11px; font-weight:650; letter-spacing:.04em; text-transform:uppercase; color:var(--ink-2); white-space:nowrap; overflow:hidden; text-overflow:ellipsis; }
+#pageSummary.ov .ov-ic { display:inline-grid !important; place-items:center; width:26px !important; height:26px !important; border-radius:8px !important; background:color-mix(in srgb,var(--tone) 14%,var(--surface)) !important; color:var(--tone); font-size:0 !important; }
+.ov-ic svg { width:15px; height:15px; }
+.ov-val { display:flex; align-items:center; gap:8px; min-width:0; max-width:100%; }
+.ov-val b { font-size:26px; font-weight:750; line-height:1.15; letter-spacing:-.02em; font-variant-numeric:tabular-nums; white-space:nowrap; overflow:hidden; text-overflow:ellipsis; min-width:0; }
+.ov-tile.t-hol .ov-val b { font-size:18px; letter-spacing:0; line-height:1.4; }
+.ov-badge { flex:none; font-style:normal; font-size:10.5px; font-weight:700; padding:1px 7px; border-radius:999px; background:color-mix(in srgb,var(--tone) 16%,var(--surface)); color:color-mix(in srgb,var(--tone) 70%,var(--ink)); }
+#pageSummary.ov .ov-tile > em { font-style:normal; font-size:12px; color:var(--ink-2); white-space:nowrap; overflow:hidden; text-overflow:ellipsis; max-width:100%; }
+@media (max-width:700px) {
+  #pageSummary.ov > .ov-glance { grid-template-columns:repeat(2,minmax(0,1fr)) !important; }
+  #pageSummary.ov .ov-tile { padding:11px 12px !important; }
+  #pageSummary.ov .ov-tile:nth-child(odd) { border-left:0 !important; }
+  #pageSummary.ov .ov-tile:nth-child(n+3) { border-top:1px solid var(--border) !important; }
+  #pageSummary.ov .ov-ic { display:inline-grid !important; }
+  .ov-val b { font-size:22px; }
+  .ov-top { align-items:flex-start; }
+  .ov-top small { white-space:normal; line-height:1.25; font-size:10px; }
+  .ov-tile.t-hol .ov-val { flex-wrap:wrap; gap:2px 6px; }
+  .ov-tile.t-hol .ov-val b { white-space:normal; font-size:15px; }
+  #pageSummary.ov .ov-tile > em { white-space:normal; }
+}
 </style></head>
 
 
@@ -1701,10 +1731,10 @@ body.filters-locked #cleanFilters, body.filters-locked #xchips, body.filters-loc
     <p class="gate-sub">One place for your people, priorities and team insights.</p>
     <div id="connectBody"><div class="empty">Loading…</div></div>
   </div>
-  <p class="gate-ver">3.27.0</p>
+  <p class="gate-ver">3.27.1</p>
 </section>
 
-<div id="app" hidden><aside class="sidebar" aria-label="Workspace navigation"><div class="brand dashboard-identity">      <h1><span id="title">Team Dashboard</span><span class="ver" id="ver" title="Version 3.27.0">3.27.0</span></h1><p class="brand-tag">One place for your people, priorities and team insights.</p>      <span class="sync" id="sync" role="status"><i></i><span id="syncText">Loading…</span></span></div><div class="nav-label">WORKSPACE</div>      <nav class="tabs" role="tablist" aria-label="Pages" aria-orientation="vertical">
+<div id="app" hidden><aside class="sidebar" aria-label="Workspace navigation"><div class="brand dashboard-identity">      <h1><span id="title">Team Dashboard</span><span class="ver" id="ver" title="Version 3.27.1">3.27.1</span></h1><p class="brand-tag">One place for your people, priorities and team insights.</p>      <span class="sync" id="sync" role="status"><i></i><span id="syncText">Loading…</span></span></div><div class="nav-label">WORKSPACE</div>      <nav class="tabs" role="tablist" aria-label="Pages" aria-orientation="vertical">
         <button class="tab on" role="tab" aria-controls="pageSummary" data-view="summary" aria-selected="true" data-icon="🏠" data-short="Home">Overview</button>
         <button class="tab" role="tab" aria-controls="pageEmployees" data-view="employees" aria-selected="false" data-icon="👥" data-short="People">Employees</button>
       <button class="tab" role="tab" aria-controls="pageAttendance" data-view="attendance" aria-selected="false" data-icon="🗓️" data-short="Attend.">Attendance</button>
@@ -5205,8 +5235,8 @@ function whoView() {
   const dayOut = (dt) => { const ms = Engine.monthSerial(dt.getUTCFullYear(), dt.getUTCMonth()); return (d.byMonth.get(ms) || []).filter(r => isLeaveCode(r.days[dt.getUTCDate() - 1])).length; };
   const tomorrow = new Date(TODAY.getTime() + 86400000);
   const chk = (k, l) => `<label><input type="checkbox" data-bind="who-show" data-k="${k}" ${w.show[k] ? 'checked' : ''}> ${l}</label>`;
-  const head = dates.map((dt, j) => { const wk = dt.getUTCDay() === 0 || dt.getUTCDay() === 6, isT = isoDate(dt) === isoDate(TODAY); return `<th class="d ${wk ? 'wk' : ''} ${isT ? 'tdy' : ''}" style="min-width:44px" data-tip="${longDate(dt)}<br>${perDay[j].out} out · ${perDay[j].la} applied">${dt.getUTCDate()}<small>${WEEKDAYS[dt.getUTCDay()]}</small><small style="color:${perDay[j].out ? 'var(--ink)' : 'var(--ink-3)'};font-weight:650">${perDay[j].out || '·'}</small></th>`; }).join('');
-  const body = list.map(o => `<tr><td class="c-name" data-act="person" data-k="${esc(o.k)}"><b>${esc(o.name)}</b><span>${esc(o.cells.find(Boolean).r.client || '—')}</span></td>${o.cells.map((c, j) => { const wk = dates[j].getUTCDay() % 6 === 0, isT = isoDate(dates[j]) === isoDate(TODAY); return c ? `<td class="cell ${wk ? 'wk' : ''} ${isT ? 'tdy' : ''}" data-act="cell" data-r="${c.r.uid}" data-d="${c.i}" data-tip="${esc(cellTip(c.r, c.i))}">${chip(c.v)}</td>` : `<td class="${wk ? 'wk' : ''} ${isT ? 'tdy' : ''}"></td>`; }).join('')}</tr>`).join('');
+  const head = dates.map((dt, j) => { const wk = dt.getUTCDay() === 0 || dt.getUTCDay() === 6, isT = isoDate(dt) === isoDate(TODAY); return `<th class="d ${wk ? 'wk' : ''} ${isT ? 'tdy' : ''}" data-tip="${longDate(dt)}<br>${perDay[j].out} out · ${perDay[j].la} applied">${dt.getUTCDate()}<small>${WEEKDAYS[dt.getUTCDay()]}</small><small style="color:${perDay[j].out ? 'var(--ink)' : 'var(--ink-3)'};font-weight:650">${perDay[j].out || '·'}</small></th>`; }).join('');
+  const body = list.map(o => `<tr><td class="c-name" data-act="person" data-k="${esc(o.k)}"><b>${esc(o.name)}</b><span>${esc(o.cells.find(Boolean).r.client || '—')}</span></td>${o.cells.map((c, j) => { const wk = dates[j].getUTCDay() % 6 === 0, isT = isoDate(dates[j]) === isoDate(TODAY); return c ? `<td class="cell cc-${catOf(c.v) || 'x'} ${wk ? 'wk' : ''} ${isT ? 'tdy' : ''}" data-act="cell" data-r="${c.r.uid}" data-d="${c.i}" data-tip="${esc(cellTip(c.r, c.i))}">${chip(c.v)}</td>` : `<td class="${wk ? 'wk' : ''} ${isT ? 'tdy' : ''}"></td>`; }).join('')}</tr>`).join('');
   const appsOff = (() => { try { return localStorage.getItem('td_who_apps_off') === '1'; } catch { return false; } })();
   return `<div class="who-layout${appsOff ? ' apps-off' : ''}"><div class="who-main"><div class="grid g6" style="grid-template-columns:repeat(4,1fr);margin-bottom:14px">
       <div class="card tile"><div class="lbl">OUT TODAY</div><div class="val">${dayOut(TODAY)}</div><div class="delta">${longDate(TODAY)}</div></div>
@@ -5218,7 +5248,7 @@ function whoView() {
       <button class="btn" data-act="who-today">Today</button><button class="btn" data-act="who-picture">Copy as picture</button><span class="sm muted">Show:</span>${chk('leave', 'Leaves')}${chk('applied', 'Applied (LA)')}${chk('late', 'Late')}${chk('remote', 'Remote')}
       <span class="grow"></span>${canLog() ? `<button class="btn primary" data-act="log-leave">${ic('plus')} Record attendance</button>` : ''}</div>${fieldBar()}
     <div class="who-grid">
-      <div class="card" style="padding:0;overflow:hidden;min-width:0">${list.length ? `<div class="gridwrap" style="border:0;box-shadow:none;max-height:calc(100vh - 330px)"><table class="att" data-picture-timeline><thead><tr><th class="c-name">Team member</th>${head}</tr></thead><tbody>${body}</tbody></table></div>` : `<div class="empty">Nothing recorded in this window (${longDate(dates[0])} to ${longDate(dates[dates.length - 1])}). The sheet may not have entries this far ahead yet.<br><button class="btn sm" style="margin-top:10px" data-act="who-back">Show the last 14 days instead</button></div>`}</div>
+      <div class="card" style="padding:0;overflow:hidden;min-width:0">${list.length ? `<div class="gridwrap" style="border:0;box-shadow:none;max-height:calc(100vh - 330px)"><table class="att who-tl" data-picture-timeline><colgroup><col class="who-namecol">${dates.map(() => '<col>').join('')}</colgroup><thead><tr><th class="c-name">Team member</th>${head}</tr></thead><tbody>${body}</tbody></table></div>` : `<div class="empty">Nothing recorded in this window (${longDate(dates[0])} to ${longDate(dates[dates.length - 1])}). The sheet may not have entries this far ahead yet.<br><button class="btn sm" style="margin-top:10px" data-act="who-back">Show the last 14 days instead</button></div>`}</div>
       </div></div>      ${appsOff ? `<aside class="card who-apps-min"><button class="who-apps-open" data-act="who-apps" title="Show Applications ahead" aria-label="Show Applications ahead (${pend.length})"><span>‹</span><b>${pend.length}</b><em>Applications ahead</em></button>` : `<aside class="card who-apps"><div class="who-apps-h"><h2>Applications ahead · ${pend.length}</h2><button class="btn sm" data-act="who-apps" title="Hide this panel and give the space to the table">Hide ›</button></div><div class="sub">${can('att.approve') ? 'Approve each date or a consecutive group. ✕ records RJ (rejected) in the tracker; it does not record attendance.' : 'Leave applied for and waiting for someone with the Approve leave right.'}</div>
         ${pend.length ? `<div class="list" style="max-height:calc(100vh - 230px);min-height:220px;overflow:auto">${applicationList(pend)}</div>` : '<div class="empty">No pending applications from today onward.</div>'}</div>
 `}</aside></div>`;
@@ -6871,6 +6901,30 @@ function mount() {
 @media (max-width:1000px) { .who-layout, .who-layout.apps-off { grid-template-columns:minmax(0,1fr); } .who-apps, .who-apps-min { position:static; min-height:0; } .who-apps-open { flex-direction:row; min-height:0; justify-content:center; } .who-apps-open em { writing-mode:horizontal-tb; transform:none; } }
 @media (max-width:700px) { .grid.g6[style*="repeat(4"] { grid-template-columns:repeat(2,minmax(0,1fr)) !important; } .card { padding:12px !important; } .tabs, .seg { flex-wrap:wrap; } table { font-size:12px; } .toolbar, .bar { flex-wrap:wrap; gap:6px; } }
 .tl-filters { display:flex; flex-wrap:wrap; align-items:center; gap:6px 8px; margin:10px 0 0; }
+/* v3.27.1: Who's out grid: even day columns, soft colored cells without boxes, calm weekends and a clear today */
+table.who-tl { width:100%; table-layout:fixed; border-collapse:separate; border-spacing:0; }
+table.who-tl col.who-namecol { width:230px; }
+table.who-tl th, table.who-tl td { border-left:0 !important; border-right:0 !important; }
+table.who-tl thead th.d { padding:8px 2px 6px; text-align:center; font-weight:650; font-size:13px; line-height:1.15; border-bottom:1px solid var(--line); background:var(--surface); }
+table.who-tl thead th.d small { display:block; font-size:10.5px; font-weight:500; color:var(--ink-3); margin-top:1px; }
+table.who-tl thead th.d small + small { margin-top:3px; font-size:11px; }
+table.who-tl thead th.c-name { text-align:left; padding-left:14px; font-size:12px; color:var(--ink-2); font-weight:600; background:var(--surface); border-bottom:1px solid var(--line); }
+table.who-tl td { height:40px; padding:3px; border-bottom:1px solid var(--line); background:var(--surface); }
+table.who-tl td.c-name { padding:6px 14px; }
+table.who-tl td.c-name b { display:block; font-weight:600; font-size:13px; white-space:nowrap; overflow:hidden; text-overflow:ellipsis; }
+table.who-tl td.c-name span { display:block; font-size:11px; color:var(--ink-3); white-space:nowrap; overflow:hidden; text-overflow:ellipsis; }
+table.who-tl tbody tr:hover td { background:color-mix(in srgb,var(--accent) 4%,var(--surface)); }
+table.who-tl th.wk, table.who-tl td.wk { background:color-mix(in srgb,var(--ink) 3.5%,var(--surface)) !important; }
+table.who-tl th.tdy { color:var(--accent); box-shadow:inset 0 -2px 0 var(--accent); }
+table.who-tl td.tdy { background:color-mix(in srgb,var(--today, var(--accent)) 6%,var(--surface)); box-shadow:none !important; }
+table.who-tl th.tdy { color:var(--today, var(--accent)) !important; box-shadow:inset 0 -3px 0 var(--today, var(--accent)) !important; }
+table.who-tl td.cell { width:auto; min-width:0; }
+table.who-tl td.cell .chip { width:100%; height:32px; border:0 !important; border-radius:7px; outline:0; box-shadow:none; font-size:12px; font-weight:700; letter-spacing:.02em; background:color-mix(in srgb,var(--c) 22%,var(--surface)); color:color-mix(in srgb,var(--c) 55%,var(--ink)); }
+table.who-tl td.cell.cc-applied .chip { background:repeating-linear-gradient(135deg,color-mix(in srgb,var(--c) 16%,var(--surface)) 0 6px,color-mix(in srgb,var(--c) 26%,var(--surface)) 6px 12px); }
+table.who-tl td.cell:hover .chip { filter:brightness(.96); }
+/* v3.27.1: the Who's out / Attendance / People bar stays at the top while scrolling */
+.topbar { top:var(--pinned-header-height, 0px) !important; z-index:20 !important; box-shadow:0 6px 10px -8px rgba(15,23,42,.18); }
+@media (max-width:700px) { .topbar { top:0 !important; } }
 .pp-bar { padding:12px 16px !important; }
 .pp-row { display:flex; flex-wrap:wrap; align-items:center; gap:6px 8px; }
 .pp-title { font-size:13px; margin-right:4px; }
@@ -7487,7 +7541,7 @@ async function poll() {
 }
 
 /* ============================== filtering ============================== */
-const APP = { title: "Team Dashboard", version: "3.27.0", released: "29 Sep 2026" };
+const APP = { title: "Team Dashboard", version: "3.27.1", released: "29 Sep 2026" };
 const BASE_DIMS = { status: "status_column", desig: "designation_column", client: "client_column", mode: "mode_column" };
 const STANDARD_STATUSES = ["Active", "Manager", "OJT", "Bench", "New", "Projected", "Left", "Moved"];
 const TILE_ORDER = ["Active", "Manager", "OJT", "Bench", "New", "Projected"];
@@ -8713,25 +8767,31 @@ function organizeUpcoming() {
 function renderGlance() {
   const box = $("#ovGlance"); if (!box) return;
   const can = k => !window.PERM || PERM.can(k), tiles = [];
-  const tile = (icon, tone, label, value, sub, go) => h("button", { type: "button", class: "ov-tile " + tone, onclick: go }, h("span", { class: "ov-ic", "aria-hidden": "true" }, icon), h("span", { class: "ov-tx" }, h("small", {}, label), h("b", {}, value), h("em", {}, sub)));
+  /* v3.27.1: one summary strip with drawn icons (emoji and flags don't show on every computer) */
+  const ICONS = { leave: '<path d="M3 21h18"/><path d="M12 3a9 9 0 0 1 9 9H3a9 9 0 0 1 9-9z"/><path d="M12 12v9"/>', req: '<rect x="5" y="3" width="14" height="18" rx="2"/><path d="M9 8h6M9 12h6M9 16h3"/>', cel: '<path d="M20 12v9H4v-9"/><rect x="2" y="7" width="20" height="5" rx="1"/><path d="M12 22V7"/><path d="M12 7c-2-4-6-4-6-1.5S10 7 12 7zM12 7c2-4 6-4 6-1.5S14 7 12 7z"/>', hol: '<rect x="3" y="5" width="18" height="16" rx="2"/><path d="M3 10h18M8 3v4M16 3v4"/><circle cx="12" cy="15" r="2"/>' };
+  const svg = k => { const sp = h("span", { class: "ov-ic", "aria-hidden": "true" }); sp.innerHTML = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">' + ICONS[k] + '</svg>'; return sp; };
+  const tile = (icon, tone, label, value, sub, go, badge) => h("button", { type: "button", class: "ov-tile " + tone, onclick: go },
+    h("span", { class: "ov-top" }, svg(icon), h("small", {}, label)),
+    h("span", { class: "ov-val" }, h("b", {}, value), badge ? h("i", { class: "ov-badge" }, badge) : null),
+    h("em", {}, sub));
   const jump = (sel, fn) => () => { if (fn) fn(); const e = $(sel); if (e) e.scrollIntoView({ behavior: "smooth", block: "start" }); };
   if (can("ov.attendance") && window.ATT && (!window.PERM || PERM.canView("attendance"))) {
     const t = ATT.todayStats && ATT.todayStats();
-    tiles.push(tile("🏖️", "t-leave", "On leave today", t ? String(t.full) : "–", t ? (t.half + " half day · " + t.late + " late") : "attendance not connected", jump("#cardAttendance")));
+    tiles.push(tile("leave", "t-leave", "On leave today", t ? String(t.full) : "–", t ? (t.half + " half day · " + t.late + " late") : "attendance not connected", jump("#cardAttendance")));
   }
   if (can("att.approve") && window.ATT) {
     const n = ATT.requestsToDecide ? ATT.requestsToDecide() : 0;
-    tiles.push(tile("📝", "t-req" + (n ? " hot" : ""), "Waiting for approval", String(n), n ? "open Request Center" : "all caught up", jump("#ovRequests", () => { OV.rc = "approvals"; organizeRequests(); })));
+    tiles.push(tile("req", "t-req" + (n ? " hot" : ""), "Waiting for approval", String(n), n ? "open Request Center" : "all caught up", jump("#ovRequests", () => { OV.rc = "approvals"; organizeRequests(); })));
   }
   if (can("ov.coming") && state.schema) {
     let b = 0, a = 0; try { b = upcoming("dob_column", "bday", 7).length; a = upcoming("doj_column", "anniv", 7).length; } catch { }
-    tiles.push(tile("🎉", "t-cel", "Celebrations this week", String(b + a), b + " birthday" + (b === 1 ? "" : "s") + " · " + a + " anniversar" + (a === 1 ? "y" : "ies"), jump("#ovUpcoming", () => { OV.up = b || !a ? "bday" : "anniv"; organizeUpcoming(); })));
+    tiles.push(tile("cel", "t-cel", "Celebrations this week", String(b + a), b + " birthday" + (b === 1 ? "" : "s") + " · " + a + " anniversar" + (a === 1 ? "y" : "ies"), jump("#ovUpcoming", () => { OV.up = b || !a ? "bday" : "anniv"; organizeUpcoming(); })));
   }
   if (can("ov.holidays")) {
     const t = new Date(), today = Date.UTC(t.getFullYear(), t.getMonth(), t.getDate()), ys = [t.getFullYear(), t.getFullYear() + 1];
-    const all = [...ys.flatMap(usHolidays).map(x => ({ ...x, f: "🇺🇸" })), ...ys.flatMap(inHolidays).map(x => ({ ...x, f: "🇮🇳" }))].filter(x => x.obs.getTime() >= today).sort((a, b) => a.obs - b.obs);
+    const all = [...ys.flatMap(usHolidays).map(x => ({ ...x, f: "USA" })), ...ys.flatMap(inHolidays).map(x => ({ ...x, f: "India" }))].filter(x => x.obs.getTime() >= today).sort((a, b) => a.obs - b.obs);
     const nx = all[0];
-    if (nx) { const n = Math.round((nx.obs.getTime() - today) / 86400000); tiles.push(tile("🗓️", "t-hol", "Next holiday", nx.f + " " + nx.name, (n === 0 ? "today" : n === 1 ? "tomorrow" : "in " + n + " days") + " · " + DOW[nx.obs.getUTCDay()] + " " + nx.obs.getUTCDate() + " " + MON[nx.obs.getUTCMonth()], jump("#ovUpcoming", () => { OV.up = "hol"; organizeUpcoming(); }))); }
+    if (nx) { const n = Math.round((nx.obs.getTime() - today) / 86400000); tiles.push(tile("hol", "t-hol", "Next holiday", nx.name, (n === 0 ? "today" : n === 1 ? "tomorrow" : "in " + n + " days") + " · " + DOW[nx.obs.getUTCDay()] + " " + nx.obs.getUTCDate() + " " + MON[nx.obs.getUTCMonth()], jump("#ovUpcoming", () => { OV.up = "hol"; organizeUpcoming(); }), nx.f)); }
   }
   box.replaceChildren(...tiles); box.hidden = !tiles.length;
   box.style.setProperty("--n", Math.max(1, tiles.length));
