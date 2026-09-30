@@ -4,7 +4,7 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <link rel="icon" href="data:,">
-<title>Team Dashboard · 3.37.0</title>
+<title>Team Dashboard · 3.38.0</title>
 <style>
 :root {
   color-scheme: light;
@@ -1065,6 +1065,7 @@ table.data td { padding:9px 10px; font-size:12px; }
 .watch-head .grow { flex:1 1 260px; }
 .watch-head select { height:30px; width:auto; min-width:0; }
 .watch-cols { display:grid; grid-template-columns:minmax(0,1fr) minmax(0,1fr); gap:16px; margin-top:12px; }
+.watch-late { margin-top:16px; }
 @media(max-width:900px) { .watch-cols { grid-template-columns:minmax(0,1fr); } }
 .watch-col h3 { margin:0 0 2px; font-size:14px; }
 .watch-col .sub { font-size:12px; color:var(--ink-2); margin-bottom:8px; }
@@ -1802,10 +1803,10 @@ body.filters-locked #cleanFilters, body.filters-locked #xchips, body.filters-loc
     <p class="gate-sub">One place for your people, priorities and team insights.</p>
     <div id="connectBody"><div class="empty">Loading…</div></div>
   </div>
-  <p class="gate-ver">3.37.0</p>
+  <p class="gate-ver">3.38.0</p>
 </section>
 
-<div id="app" hidden><aside class="sidebar" aria-label="Workspace navigation"><div class="brand dashboard-identity">      <h1><span id="title">Team Dashboard</span><span class="ver" id="ver" title="Version 3.37.0">3.37.0</span></h1><p class="brand-tag">One place for your people, priorities and team insights.</p>      <span class="sync" id="sync" role="status"><i></i><span id="syncText">Loading…</span></span></div><div class="nav-label">WORKSPACE</div>      <nav class="tabs" role="tablist" aria-label="Pages" aria-orientation="vertical">
+<div id="app" hidden><aside class="sidebar" aria-label="Workspace navigation"><div class="brand dashboard-identity">      <h1><span id="title">Team Dashboard</span><span class="ver" id="ver" title="Version 3.38.0">3.38.0</span></h1><p class="brand-tag">One place for your people, priorities and team insights.</p>      <span class="sync" id="sync" role="status"><i></i><span id="syncText">Loading…</span></span></div><div class="nav-label">WORKSPACE</div>      <nav class="tabs" role="tablist" aria-label="Pages" aria-orientation="vertical">
         <button class="tab on" role="tab" aria-controls="pageSummary" data-view="summary" aria-selected="true" data-icon="🏠" data-short="Home">Overview</button>
         <button class="tab" role="tab" aria-controls="pageEmployees" data-view="employees" aria-selected="false" data-icon="👥" data-short="People">Employees</button>
       <button class="tab" role="tab" aria-controls="pageAttendance" data-view="attendance" aria-selected="false" data-icon="🗓️" data-short="Attend.">Attendance</button>
@@ -7753,18 +7754,50 @@ function leaveWatchData() {
       if (kind) patterns.push({ k: p.key, name: p.name, client: p.latest ? p.latest.client : '', kind, text, share: (kind === 'day' ? wd[top] : monFri) / n, n, day: kind === 'day' ? WD[top] : 'Mon / Fri', recent: dates.slice(-4).map(shortDate) });
     }
   }
+  const lates = lateWatch(d, u);
   streaks.sort((a, b) => (a.sev === b.sev ? 0 : a.sev === 'red' ? -1 : 1) || b.longest - a.longest || b.hits.length - a.hits.length || a.name.localeCompare(b.name));
   patterns.sort((a, b) => b.share - a.share || b.n - a.n || a.name.localeCompare(b.name));
-  return { streaks, patterns, u, checked, plannedOnly };
+  return { streaks, patterns, lates, u, checked, plannedOnly };
+}
+/* v3.38.0: late comings (L; cab late "C" is not the person's doing and is left out). Red flag when someone is late
+   3 working days in a row (week offs / holidays in between don't break it), 4+ times in one Sunday–Saturday week,
+   or at least once in every one of the last 4 weeks. */
+function lateWatch(d, u) {
+  const out = [], wkStart = dt => new Date(dt.getTime() - dt.getUTCDay() * DAY_MS);
+  const curWk = wkStart(TODAY), from = new Date(Math.min(TODAY.getTime() - (u.days - 1) * DAY_MS, curWk.getTime() - 4 * 7 * DAY_MS));
+  for (const p of d.people.values()) {
+    { const hit = hasRoster() ? rosterOfPerson(p) : null; if (hit && goneKind(hit.row)) continue; }
+    const at = personDayReader(p), why = [], dates = [], perWeek = new Map(); let run = [], best = [], winLate = 0;
+    const winFrom = TODAY.getTime() - (u.days - 1) * DAY_MS;
+    for (let t = from.getTime(); t <= TODAY.getTime(); t += DAY_MS) {
+      const dt = new Date(t), v = at(dt), code = v == null ? '' : up(v).trim(), c = catOf(v), wk = dt.getUTCDay() === 0 || dt.getUTCDay() === 6;
+      const late = code === 'L';
+      if (late) { const k = isoDate(wkStart(dt)); perWeek.set(k, (perWeek.get(k) || 0) + 1); if (t >= winFrom) { winLate++; dates.push(dt); } }
+      if (t < winFrom) { if (!late && !(c === 'off' || (!c && wk))) run = []; else if (late) run.push(dt); continue; }
+      if (late) { run.push(dt); if (run.length > best.length) best = run.slice(); }
+      else if (c === 'off' || (!c && wk)) { /* week off / holiday: keeps the run going */ }
+      else run = [];
+    }
+    if (best.length >= 3) why.push('late ' + best.length + ' working days in a row (' + shortDate(best[0]) + ' – ' + shortDate(best[best.length - 1]) + ')');
+    const busy = [...perWeek.entries()].filter(([k, n]) => n >= 4 && new Date(k + 'T00:00:00Z').getTime() + 6 * DAY_MS >= winFrom);
+    if (busy.length) why.push(busy.map(([k, n]) => n + ' late days in the week of ' + shortDate(new Date(k + 'T00:00:00Z'))).join(', '));
+    const wks = [0, 1, 2, 3, 4].map(i => perWeek.get(isoDate(new Date(curWk.getTime() - i * 7 * DAY_MS))) || 0);
+    const every = wks.slice(0, 4).every(n => n > 0) || wks.slice(1, 5).every(n => n > 0);
+    if (every) why.push('late every week for the last 4 weeks (' + (wks.slice(0, 4).every(n => n > 0) ? wks.slice(0, 4) : wks.slice(1, 5)).reverse().join(', ') + ' times)');
+    if (why.length) out.push({ k: p.key, name: p.name, client: p.latest ? p.latest.client : '', why, late: winLate, recent: dates.slice(-5).map(shortDate), sev: 'red', late_: true, hrk: p.key + '|late|' + (dates.length ? isoDate(dates[dates.length - 1]) : isoDate(TODAY)) });
+  }
+  return out.sort((a, b) => b.why.length - a.why.length || b.late - a.late || a.name.localeCompare(b.name));
 }
 /* v3.24: tell HR about red flags. The HR address is shared with the team; what was sent is remembered in this browser. */
 const HR_TOLD_KEY = 'td_hr_told_v1';
 const hrTold = () => { try { return JSON.parse(localStorage.getItem(HR_TOLD_KEY) || '{}') || {}; } catch { return {}; } };
-const hrKey = s => s.k + '|' + isoDate(s.hits[s.hits.length - 1].end);
+const hrKey = s => s.hrk || (s.k + '|' + isoDate(s.hits[s.hits.length - 1].end));
 function hrText(list, u) {
   const run = r => (r.start.getTime() === r.end.getTime() ? shortDate(r.start) : shortDate(r.start) + ' – ' + shortDate(r.end)) + ' (' + r.n + ' days: ' + Object.entries(r.codes).map(([c, k]) => c + (k > 1 ? ' ×' + k : '')).join(', ') + ')';
-  return 'Hi,\n\nThe team dashboard flagged back-to-back leave in the past ' + u.days + ' days for ' + (list.length === 1 ? 'this person' : 'these ' + list.length + ' people') + ':\n\n'
-    + list.map(s => '• ' + s.name + (s.client ? ' (' + s.client + ')' : '') + ': ' + (s.why ? s.why.join('; ') + '. ' : '') + s.hits.length + ' streak' + (s.hits.length === 1 ? '' : 's') + ', longest ' + s.longest + ' days, ' + fmt(s.total) + ' leave days in total' + (s.aroundWk ? ', spans a weekend' : '') + '\n   ' + s.hits.slice(-3).map(run).join('\n   ')).join('\n\n')
+  const lt = list.filter(s => s.late_), lv = list.filter(s => !s.late_);
+  return 'Hi,\n\nThe team dashboard flagged ' + [lv.length ? 'back-to-back leave' : '', lt.length ? 'repeated late coming' : ''].filter(Boolean).join(' and ') + ' in the past ' + u.days + ' days for ' + (list.length === 1 ? 'this person' : 'these ' + list.length + ' people') + ':\n\n'
+    + lt.map(s => '• ' + s.name + (s.client ? ' (' + s.client + ')' : '') + ': ' + s.why.join('; ') + '.\n   Latest late days: ' + s.recent.join(', ')).join('\n') + (lt.length && lv.length ? '\n' : '')
+    + lv.map(s => '• ' + s.name + (s.client ? ' (' + s.client + ')' : '') + ': ' + (s.why ? s.why.join('; ') + '. ' : '') + s.hits.length + ' streak' + (s.hits.length === 1 ? '' : 's') + ', longest ' + s.longest + ' days, ' + fmt(s.total) + ' leave days in total' + (s.aroundWk ? ', spans a weekend' : '') + '\n   ' + s.hits.slice(-3).map(run).join('\n   ')).join('\n\n')
     + '\n\nCould you please review and advise?\n\nThanks,\n' + (BE.userName() || '');
 }
 function openHrBox(list, u) {
@@ -7795,20 +7828,23 @@ function renderWatch(el) {
     <label class="hint" style="display:flex;align-items:center;gap:6px">Past <select class="input mini" data-w="days" aria-label="Window for back-to-back leave">${opt([15, 30, 45, 60], u.days, v => v + ' days')}</select></label>
     <label class="hint" style="display:flex;align-items:center;gap:6px">Streak <select class="input mini" data-w="min" aria-label="Shortest streak to flag">${opt([2, 3, 5], u.min, v => v + '+ days')}</select></label></div>`;
   if (S.status !== 'ready' || !S.ctx) { el.innerHTML = head('Back-to-back leave and repeat-day patterns') + '<div class="watch-empty">The attendance workbook isn’t connected yet.</div>'; return; }
-  const { streaks, patterns, checked, plannedOnly } = leaveWatchData();
-  const reds = streaks.filter(s => s.sev === 'red').length, told = hrTold();
-  const redList = streaks.filter(s => s.sev === 'red'), untold = redList.filter(s => !told[hrKey(s)]);
+  const { streaks, patterns, lates, checked, plannedOnly } = leaveWatchData();
+  const reds = streaks.filter(s => s.sev === 'red').length + lates.length, told = hrTold();
+  const redList = [...streaks.filter(s => s.sev === 'red'), ...lates], untold = redList.filter(s => !told[hrKey(s)]);
   const hrBanner = redList.length ? `<div class="watch-hr${untold.length ? '' : ' done'}"><span>${untold.length ? `⚑ <b>${untold.length} red flag${untold.length === 1 ? '' : 's'}</b> not shared with HR yet. Consider letting HR know so they can follow up.` : `✓ HR has been told about every current red flag (from this browser).`}</span>${untold.length ? `<button class="btn mini primary" data-w-hr="all">Update HR…</button>` : ''}</div>` : '';
   const runText = r => r.n + ' days · ' + (r.start.getTime() === r.end.getTime() ? shortDate(r.start) : shortDate(r.start) + ' – ' + shortDate(r.end)) + ' (' + Object.entries(r.codes).map(([c, k]) => c + (k > 1 ? ' ×' + k : '')).join(', ') + ')';
   const sList = streaks.length ? `<ul class="watch-list">${streaks.map(s => `<li><span class="flag ${s.sev}">${s.sev === 'red' ? '⚑ Red flag' : 'Watch'}</span><div class="who"><b>${esc(s.name)}</b><small class="why ${s.sev}">Why: ${esc(s.why.join('; '))}</small><small>${s.hits.length} streak${s.hits.length === 1 ? '' : 's'} · longest ${s.longest} days · ${fmt(s.total)} leave days in the past ${u.days} days${s.aroundWk ? ' · spans a weekend' : ''}</small><small>${s.hits.slice(-3).map(runText).map(esc).join('<br>')}</small>${s.sev === 'red' && told[hrKey(s)] ? `<small class="hr-told">✓ HR told ${esc(shortDate(new Date(told[hrKey(s)] + 'T00:00:00Z')))}</small>` : ''}</div><div class="watch-acts">${s.sev === 'red' ? `<button class="btn mini" data-w-hr="${esc(s.k)}" title="Draft an email to HR about ${esc(s.name)}">Tell HR</button>` : ''}<button class="btn mini" data-w-open="${esc(s.k)}">Open</button></div></li>`).join('')}</ul>`
     : `<div class="watch-empty">Nobody took ${u.min} or more working days of leave in a row in the past ${u.days} days.</div>`;
+  const lList = lates.length ? `<ul class="watch-list">${lates.map(x => `<li><span class="flag red">⚑ Red flag</span><div class="who"><b>${esc(x.name)}</b><small class="why red">Why: ${esc(x.why.join('; '))}</small><small>${x.late} late day${x.late === 1 ? '' : 's'} in the past ${u.days} days${x.recent.length ? ' · latest: ' + esc(x.recent.join(', ')) : ''}</small></div>${told[hrKey(x)] ? '<span class="sm muted">HR told</span>' : `<button class="btn mini" data-w-hr="${esc(x.k)}">Tell HR</button>`}<button class="btn mini" data-w-open="${esc(x.k)}">Open</button></li>`).join('')}</ul>`
+    : `<div class="watch-empty">No repeated late coming in the past ${u.days} days.</div>`;
   const pList = patterns.length ? `<ul class="watch-list">${patterns.map(p => `<li><span class="flag ${p.kind === 'day' ? 'blue' : 'amber'}">${esc(p.day)}</span><div class="who"><b>${esc(p.name)}</b><small>${esc(p.text)}</small><small>Latest: ${esc(p.recent.join(', '))}</small></div><button class="btn mini" data-w-open="${esc(p.k)}">Open</button></li>`).join('')}</ul>`
     : `<div class="watch-empty">No one’s leave keeps falling on the same weekday in the past ${u.look} days.</div>`;
-  el.innerHTML = head(`${streaks.length ? `<b style="color:var(--danger)">${reds} red flag${reds === 1 ? '' : 's'}</b> · ${streaks.length} ${streaks.length === 1 ? 'person' : 'people'} with back-to-back leave` : 'No back-to-back leave'} · ${patterns.length} repeat-day pattern${patterns.length === 1 ? '' : 's'} · checking ${checked} ${checked === 1 ? 'person' : 'people'} in ${esc(hostSummary() || 'all statuses')} (the filters at the top; people who left are skipped)`)
+  el.innerHTML = head(`${reds ? `<b style="color:var(--danger)">${reds} red flag${reds === 1 ? '' : 's'}</b> · ` : ''}${streaks.length ? `${streaks.length} ${streaks.length === 1 ? 'person' : 'people'} with back-to-back leave` : 'No back-to-back leave'} · ${lates.length} repeated late coming${lates.length === 1 ? '' : 's'} · ${patterns.length} repeat-day pattern${patterns.length === 1 ? '' : 's'} · checking ${checked} ${checked === 1 ? 'person' : 'people'} in ${esc(hostSummary() || 'all statuses')} (the filters at the top; people who left are skipped)`)
     + hrBanner + `<div class="watch-cols"><section class="watch-col" aria-label="Back-to-back leave"><h3>Back-to-back leave · past ${u.days} days</h3><div class="sub">Only unplanned (UL, AB) and sick (SL) leave is flagged; planned leave (AL, CL) never is. <b>Red flag</b>: 3+ unplanned days in one stretch, 2+ separate stretches, 4+ unplanned days, or far more than the person’s own usual (last 6 months). Weekends and holidays in between don’t break a stretch.${plannedOnly ? ` <span class="muted">${plannedOnly} planned break${plannedOnly === 1 ? '' : 's'} not flagged.</span>` : ''}</div>${sList}</section>
-      <section class="watch-col" aria-label="Leave on particular days"><h3 style="display:flex;align-items:center;gap:8px;flex-wrap:wrap">Leave on particular days <label class="hint" style="display:flex;align-items:center;gap:6px;font-weight:400">over <select class="input mini" data-w="look" aria-label="Look-back for day patterns">${opt([60, 90, 180], u.look, v => v + ' days')}</select></label></h3><div class="sub">People with 3+ leave days where most fall on one weekday, or on Mondays and Fridays.</div>${pList}</section></div>`;
+      <section class="watch-col" aria-label="Leave on particular days"><h3 style="display:flex;align-items:center;gap:8px;flex-wrap:wrap">Leave on particular days <label class="hint" style="display:flex;align-items:center;gap:6px;font-weight:400">over <select class="input mini" data-w="look" aria-label="Look-back for day patterns">${opt([60, 90, 180], u.look, v => v + ' days')}</select></label></h3><div class="sub">People with 3+ leave days where most fall on one weekday, or on Mondays and Fridays.</div>${pList}</section></div>
+      <section class="watch-col watch-late" aria-label="Late comings"><h3>Late comings · red flags</h3><div class="sub"><b>Red flag</b>: late (L) 3 working days in a row, 4+ times in one week (Sun–Sat) within the past ${u.days} days, or at least once every week for the last 4 weeks. Cab late (C) isn’t counted.</div>${lList}</section>`;
   el.querySelectorAll('[data-w]').forEach(s => s.addEventListener('change', () => { u[s.dataset.w] = +s.value; try { localStorage.setItem(WATCH_KEY, JSON.stringify(u)); } catch { } renderWatch(el); }));
-  el.querySelectorAll('[data-w-hr]').forEach(b => b.addEventListener('click', () => { const k = b.dataset.wHr; const list = k === 'all' ? untold : redList.filter(s => s.k === k); if (list.length) openHrBox(list, u); }));
+  el.querySelectorAll('[data-w-hr]').forEach(b => b.addEventListener('click', () => { const k = b.dataset.wHr; const list = k === 'all' ? untold : redList.filter(s => s.k === k && (b.closest('.watch-late') ? s.late_ : !s.late_)); if (list.length) openHrBox(list, u); }));
   el.querySelectorAll('[data-w-open]').forEach(b => b.addEventListener('click', () => { if (can('att.grid')) go('people', b.dataset.wOpen); else toast('Your passcode can’t open the People view.'); }));
 }
 
@@ -8077,7 +8113,7 @@ async function poll() {
 }
 
 /* ============================== filtering ============================== */
-const APP = { title: "Team Dashboard", version: "3.37.0", released: "30 Sep 2026" };
+const APP = { title: "Team Dashboard", version: "3.38.0", released: "30 Sep 2026" };
 const BASE_DIMS = { status: "status_column", desig: "designation_column", client: "client_column", mode: "mode_column" };
 const STANDARD_STATUSES = ["Active", "Manager", "OJT", "Bench", "New", "Projected", "Left", "Moved"];
 const TILE_ORDER = ["Active", "Manager", "OJT", "Bench", "New", "Projected"];
