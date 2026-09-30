@@ -4,7 +4,7 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <link rel="icon" href="data:,">
-<title>Team Dashboard · 3.34.0</title>
+<title>Team Dashboard · 3.34.1</title>
 <style>
 :root {
   color-scheme: light;
@@ -1790,10 +1790,10 @@ body.filters-locked #cleanFilters, body.filters-locked #xchips, body.filters-loc
     <p class="gate-sub">One place for your people, priorities and team insights.</p>
     <div id="connectBody"><div class="empty">Loading…</div></div>
   </div>
-  <p class="gate-ver">3.34.0</p>
+  <p class="gate-ver">3.34.1</p>
 </section>
 
-<div id="app" hidden><aside class="sidebar" aria-label="Workspace navigation"><div class="brand dashboard-identity">      <h1><span id="title">Team Dashboard</span><span class="ver" id="ver" title="Version 3.34.0">3.34.0</span></h1><p class="brand-tag">One place for your people, priorities and team insights.</p>      <span class="sync" id="sync" role="status"><i></i><span id="syncText">Loading…</span></span></div><div class="nav-label">WORKSPACE</div>      <nav class="tabs" role="tablist" aria-label="Pages" aria-orientation="vertical">
+<div id="app" hidden><aside class="sidebar" aria-label="Workspace navigation"><div class="brand dashboard-identity">      <h1><span id="title">Team Dashboard</span><span class="ver" id="ver" title="Version 3.34.1">3.34.1</span></h1><p class="brand-tag">One place for your people, priorities and team insights.</p>      <span class="sync" id="sync" role="status"><i></i><span id="syncText">Loading…</span></span></div><div class="nav-label">WORKSPACE</div>      <nav class="tabs" role="tablist" aria-label="Pages" aria-orientation="vertical">
         <button class="tab on" role="tab" aria-controls="pageSummary" data-view="summary" aria-selected="true" data-icon="🏠" data-short="Home">Overview</button>
         <button class="tab" role="tab" aria-controls="pageEmployees" data-view="employees" aria-selected="false" data-icon="👥" data-short="People">Employees</button>
       <button class="tab" role="tab" aria-controls="pageAttendance" data-view="attendance" aria-selected="false" data-icon="🗓️" data-short="Attend.">Attendance</button>
@@ -4940,7 +4940,7 @@ function attTimelineData(periodRowsList) {
     const dt = new Date(t), w = dt.getUTCDay(), wk = w === 0 || w === 6; if (u.hideWk && wk) continue;
     const ms = Engine.monthSerial(dt.getUTCFullYear(), dt.getUTCMonth()), i = dt.getUTCDate() - 1, mr = byMonth.get(ms) || [];
     let key, label, start = dt;
-    if (u.by === 'week') { const back = (w + 6) % 7; start = new Date(t - back * 86400000); key = isoDate(start); label = start.getUTCDate() + ' ' + MONTHS[start.getUTCMonth()]; }
+    if (u.by === 'week') { const back = w;   /* v3.34.1: weeks run Sunday → Saturday */ start = new Date(t - back * 86400000); key = isoDate(start); label = start.getUTCDate() + ' ' + MONTHS[start.getUTCMonth()]; }
     else if (u.by === 'month') { key = 'm' + ms; start = dateOf(ms, 0); label = MONTHS[dt.getUTCMonth()] + ' ' + String(dt.getUTCFullYear()).slice(2); }
     else { key = isoDate(dt); label = String(i + 1); }
     let b = index.get(key);
@@ -7333,7 +7333,7 @@ const BKR = { month: null, client: 'all', names: 'real', yn: 'all', span: 'cycle
 /* v3.30.2: look at the whole cycle, one week (Mon–Sun, cut to the cycle) or one day */
 function bkWeeks(cycle) {
   const { start, end } = cycParts(cycle), out = []; let a = new Date(start);
-  while (a <= end) { const dow = (a.getUTCDay() + 6) % 7; let b = new Date(a.getTime() + (6 - dow) * 86400000); if (b > end) b = new Date(end); out.push({ from: isoDate(a), to: isoDate(b) }); a = new Date(b.getTime() + 86400000); }
+  while (a <= end) { const dow = a.getUTCDay();   /* Sunday → Saturday */ let b = new Date(a.getTime() + (6 - dow) * 86400000); if (b > end) b = new Date(end); out.push({ from: isoDate(a), to: isoDate(b) }); a = new Date(b.getTime() + 86400000); }
   return out;
 }
 function bkRange(cycle) {
@@ -7960,7 +7960,7 @@ async function poll() {
 }
 
 /* ============================== filtering ============================== */
-const APP = { title: "Team Dashboard", version: "3.34.0", released: "30 Sep 2026" };
+const APP = { title: "Team Dashboard", version: "3.34.1", released: "30 Sep 2026" };
 const BASE_DIMS = { status: "status_column", desig: "designation_column", client: "client_column", mode: "mode_column" };
 const STANDARD_STATUSES = ["Active", "Manager", "OJT", "Bench", "New", "Projected", "Left", "Moved"];
 const TILE_ORDER = ["Active", "Manager", "OJT", "Bench", "New", "Projected"];
@@ -8621,9 +8621,9 @@ function cdEmpDims() {
 }
 const CD_ATT_DIMS = [
   { id: "a:month", label: "Month", time: true, val: e => cdMonthKey(e.date), fmt: cdMonthLabel },
-  { id: "a:week", label: "Week (starting Monday)", time: true, val: e => { const d = new Date(e.date.getTime() - ((e.date.getUTCDay() + 6) % 7) * 86400000); return d.toISOString().slice(0, 10); }, fmt: k => { const d = new Date(k + "T00:00:00Z"); return d.getUTCDate() + " " + MON[d.getUTCMonth()]; } },
+  { id: "a:week", label: "Week (Sunday to Saturday)", time: true, val: e => { const d = new Date(e.date.getTime() - e.date.getUTCDay() * 86400000); return d.toISOString().slice(0, 10); }, fmt: k => { const d = new Date(k + "T00:00:00Z"); return d.getUTCDate() + " " + MON[d.getUTCMonth()]; } },
   { id: "a:date", label: "Date", time: true, val: e => e.date.toISOString().slice(0, 10), fmt: k => { const d = new Date(k + "T00:00:00Z"); return d.getUTCDate() + " " + MON[d.getUTCMonth()]; } },
-  { id: "a:weekday", label: "Weekday", time: true, val: e => String((e.date.getUTCDay() + 6) % 7), fmt: k => ["Mon", "Tue", "Wed", "Thu", "Fri", "Sat", "Sun"][+k] },
+  { id: "a:weekday", label: "Weekday", time: true, val: e => String(e.date.getUTCDay()), fmt: k => ["Sun", "Mon", "Tue", "Wed", "Thu", "Fri", "Sat"][+k] },
   { id: "a:client", label: "Client", val: e => e.client || "(Blank)" },
   { id: "a:emp", label: "Employee", val: e => e.name || "(Blank)" },
   { id: "a:code", label: "Leave code", val: e => e.code },
@@ -9205,7 +9205,8 @@ function renderGlance() {
     tiles.push(tile("req", "t-req" + (n ? " hot" : ""), "Waiting for approval", String(n), n ? [rc.approvals ? rc.approvals + " request" + (rc.approvals === 1 ? "" : "s") : "", rc.la ? rc.la + " leave application" + (rc.la === 1 ? "" : "s") : ""].filter(Boolean).join(" · ") : "all caught up", jump("#ovRequests", () => { OV.rc = rc.approvals || !rc.la ? "approvals" : "la"; organizeRequests(); })));
   }
   if (can("ov.coming") && state.schema) {
-    let b = 0, a = 0; try { b = upcoming("dob_column", "bday", 7).length; a = upcoming("doj_column", "anniv", 7).length; } catch { }
+    let b = 0, a = 0; const toSat = 6 - new Date().getDay();   /* v3.34.1: "this week" = today to Saturday (weeks run Sunday → Saturday) */
+    try { b = upcoming("dob_column", "bday", toSat).length; a = upcoming("doj_column", "anniv", toSat).length; } catch { }
     tiles.push(tile("cel", "t-cel", "Celebrations this week", String(b + a), b + " birthday" + (b === 1 ? "" : "s") + " · " + a + " anniversar" + (a === 1 ? "y" : "ies"), jump("#ovUpcoming", () => { OV.up = b || !a ? "bday" : "anniv"; organizeUpcoming(); })));
   }
   if (can("ov.holidays")) {
