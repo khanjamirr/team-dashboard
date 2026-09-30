@@ -4,7 +4,7 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <link rel="icon" href="data:,">
-<title>Team Dashboard · 3.31.0</title>
+<title>Team Dashboard · 3.32.0</title>
 <style>
 :root {
   color-scheme: light;
@@ -612,6 +612,24 @@ header.top .spacer { display:block; }
 #colpop { width:min(360px,calc(100vw - 24px)); padding:12px; }
 .column-list { max-height:min(320px,45vh); overflow-y:auto; border-block:1px solid var(--border); padding:6px 0; }
 .column-list label { min-height:32px; }
+/* v3.32.0: fields to show + copy a cell */
+#colpop { width:min(340px, calc(100vw - 24px)); }
+.colbar { display:flex; gap:6px; align-items:center; margin:8px 0; } .colbar input { flex:1; min-width:0; }
+.colrow { display:flex; align-items:center; gap:6px; padding:0 4px 0 8px; border-radius:8px; }
+.colrow:hover { background:var(--surface-2); }
+.colrow label { flex:1; display:flex; align-items:center; gap:8px; cursor:pointer; min-width:0; }
+.colrow:not(.on) label { color:var(--muted); }
+.colmv { display:inline-flex; opacity:.35; } .colrow:hover .colmv { opacity:1; }
+.colmv .btn { padding:1px 6px; min-height:0; }
+#tbl td.cc-cell { position:relative; padding-right:26px; }
+.cellcopy { position:absolute; right:3px; top:50%; transform:translateY(-50%); width:22px; height:22px; border:1px solid var(--border); border-radius:6px; background:var(--surface); color:var(--ink-2); cursor:pointer; opacity:0; display:grid; place-items:center; padding:0; transition:opacity .1s; }
+#tbl tr:hover .cellcopy, .cellcopy:focus-visible { opacity:.9; }
+.cellcopy:hover { opacity:1 !important; color:var(--accent); border-color:var(--accent); }
+.cc-i { width:10px; height:11px; border:1.6px solid currentColor; border-radius:2px; position:relative; margin:2px 0 0 2px; }
+.cc-i::before { content:""; position:absolute; left:-5px; top:-5px; width:10px; height:11px; border:1.6px solid currentColor; border-radius:2px; border-right-color:transparent; border-bottom-color:transparent; }
+.cellcopy.done { opacity:1; color:#1c7a45; border-color:#1c7a45; }
+.cellcopy.done .cc-i { border:0; width:auto; height:auto; margin:0; } .cellcopy.done .cc-i::before { content:"✓"; position:static; border:0; width:auto; height:auto; font-size:12px; font-weight:700; }
+@media (hover:none) { .cellcopy { opacity:.55; } }
 .column-actions { display:flex; flex-wrap:wrap; gap:8px; padding-top:6px; }
 @media(max-width:950px) { .sticky-top header.top h1 { flex-basis:100%; font-size:21px; } header.top .spacer { display:none; } }
 @media(max-width:650px) { .sticky-top header.top { padding:12px 0 10px; margin-bottom:8px; } .sticky-top header.top h1 { display:block; font-size:20px; } }
@@ -1772,10 +1790,10 @@ body.filters-locked #cleanFilters, body.filters-locked #xchips, body.filters-loc
     <p class="gate-sub">One place for your people, priorities and team insights.</p>
     <div id="connectBody"><div class="empty">Loading…</div></div>
   </div>
-  <p class="gate-ver">3.31.0</p>
+  <p class="gate-ver">3.32.0</p>
 </section>
 
-<div id="app" hidden><aside class="sidebar" aria-label="Workspace navigation"><div class="brand dashboard-identity">      <h1><span id="title">Team Dashboard</span><span class="ver" id="ver" title="Version 3.31.0">3.31.0</span></h1><p class="brand-tag">One place for your people, priorities and team insights.</p>      <span class="sync" id="sync" role="status"><i></i><span id="syncText">Loading…</span></span></div><div class="nav-label">WORKSPACE</div>      <nav class="tabs" role="tablist" aria-label="Pages" aria-orientation="vertical">
+<div id="app" hidden><aside class="sidebar" aria-label="Workspace navigation"><div class="brand dashboard-identity">      <h1><span id="title">Team Dashboard</span><span class="ver" id="ver" title="Version 3.32.0">3.32.0</span></h1><p class="brand-tag">One place for your people, priorities and team insights.</p>      <span class="sync" id="sync" role="status"><i></i><span id="syncText">Loading…</span></span></div><div class="nav-label">WORKSPACE</div>      <nav class="tabs" role="tablist" aria-label="Pages" aria-orientation="vertical">
         <button class="tab on" role="tab" aria-controls="pageSummary" data-view="summary" aria-selected="true" data-icon="🏠" data-short="Home">Overview</button>
         <button class="tab" role="tab" aria-controls="pageEmployees" data-view="employees" aria-selected="false" data-icon="👥" data-short="People">Employees</button>
       <button class="tab" role="tab" aria-controls="pageAttendance" data-view="attendance" aria-selected="false" data-icon="🗓️" data-short="Attend.">Attendance</button>
@@ -1883,7 +1901,7 @@ body.filters-locked #cleanFilters, body.filters-locked #xchips, body.filters-loc
           <span class="count" id="count"></span>
           <span class="spacer"></span>
           <button class="btn" id="btnFill" title="Fill or correct one field for many people in one table, then save once">Fill in bulk</button>
-          <button class="btn" id="btnCols" aria-haspopup="true" data-pop="1">Columns</button>
+          <button class="btn" id="btnCols" aria-haspopup="true" data-pop="1" title="Choose which fields show in the table, and their order">Fields to show</button>
           <button class="btn" id="btnAddField" type="button" hidden title="Add a new field (a new Excel column) or delete one">⚙ Fields</button>
           <button class="btn primary" id="btnAdd">+ Add employee</button>
         </div>
@@ -7850,7 +7868,7 @@ async function poll() {
 }
 
 /* ============================== filtering ============================== */
-const APP = { title: "Team Dashboard", version: "3.31.0", released: "30 Sep 2026" };
+const APP = { title: "Team Dashboard", version: "3.32.0", released: "30 Sep 2026" };
 const BASE_DIMS = { status: "status_column", desig: "designation_column", client: "client_column", mode: "mode_column" };
 const STANDARD_STATUSES = ["Active", "Manager", "OJT", "Bench", "New", "Projected", "Left", "Moved"];
 const TILE_ORDER = ["Active", "Manager", "OJT", "Bench", "New", "Projected"];
@@ -9824,6 +9842,18 @@ function sortedRows(rows) {
     return String(x).localeCompare(String(y), undefined, { numeric: true }) * dir;
   });
 }
+/* v3.32.0: every cell gets a small copy button on hover (copies just that value; the row does not open) */
+function withCellCopy(td, tc) {
+  const txt = (td.textContent || "").trim(); if (!txt) return td;
+  td.classList.add("cc-cell");
+  td.append(h("button", { type: "button", class: "cellcopy", title: "Copy " + tc.label + ": " + txt, "aria-label": "Copy " + tc.label, onclick: async ev => {
+    ev.stopPropagation(); ev.preventDefault(); const b = ev.currentTarget;
+    try { await navigator.clipboard.writeText(txt); }
+    catch { const ta = document.createElement("textarea"); ta.value = txt; ta.style.position = "fixed"; ta.style.opacity = "0"; document.body.append(ta); ta.select(); try { document.execCommand("copy"); } catch { } ta.remove(); }
+    b.classList.add("done"); setTimeout(() => b.classList.remove("done"), 900); toast("Copied " + tc.label + ": " + (txt.length > 40 ? txt.slice(0, 40) + "…" : txt));
+  } }, h("span", { class: "cc-i", "aria-hidden": "true" })));
+  return td;
+}
 function cellNode(row, tc) {
   if (tc.key === "__tenure") return h("td", { class: "num" }, tenureText(row));
   const v = g(row, tc.key);
@@ -9880,7 +9910,7 @@ function renderTable() {
         h("button", { class: "thf" + (fa ? " on" : ""), "data-pop": "1", "aria-label": "Filter " + tc.label, title: "Filter " + tc.label, onclick: ev => openColFilter(ev.currentTarget, tc.key) }, "▾")));
   })));
   tbody.replaceChildren(...slice.map(row => h("tr", { tabindex: 0, class: row.id === state.flashId ? "flash" : "", "aria-label": "Edit " + gs(row, "name_column"),
-      onclick: () => openDrawer(row), onkeydown: ev => { if (ev.key === "Enter") openDrawer(row); } }, cols.map(tc => cellNode(row, tc)))));
+      onclick: () => openDrawer(row), onkeydown: ev => { if (ev.key === "Enter") openDrawer(row); } }, cols.map(tc => withCellCopy(cellNode(row, tc), tc)))));
   if (window.ATT) { try { ATT.decorateTable(thead, tbody, slice); } catch (e) { console.error(e); } }
   if (!slice.length) tbody.append(h("tr", {}, h("td", { colspan: Math.max(1, cols.length), style: "text-align:center;color:var(--ink-2);padding:28px;cursor:default" }, "No employees match the current filters.")));
   state.flashId = null;
@@ -9907,27 +9937,40 @@ function defaultVisibleColumns() {
   return cols.length ? cols : ALLCOLS().slice(0, 1).map(c => c.key);
 }
 function openColumns(ev) {
-  let draft = new Set(state.visible);
-  const pop = h("div", {id:"colpop",role:"dialog","aria-label":"Choose columns"});
-  const list = h("div", {class:"column-list"});
-  const note = h("p", {class:"tip",role:"status",style:"margin:8px 0"}, "Choose columns, then save. Saved on this browser.");
-  const save = h("button", {class:"btn primary mini",onclick:()=>{
-    const selected=ALLCOLS().map(c=>c.key).filter(k=>draft.has(k));
-    if(!selected.length){note.textContent="Keep at least one column selected.";return;}
-    try { localStorage.setItem("td_cols",JSON.stringify(selected)); }
-    catch(e){note.textContent="Could not save preferences. Allow browser storage and try again.";return;}
-    state.visible=selected;renderTable();closePops();toast("Column preferences saved on this browser");
-  }},"Save columns");
-  for(const tc of ALLCOLS())list.append(h("label",{},h("input",{type:"checkbox",checked:draft.has(tc.key),onchange:e=>{
-    if(e.target.checked)draft.add(tc.key);else draft.delete(tc.key);
-    save.disabled=!draft.size;note.textContent=draft.size ? draft.size+" columns selected · select Save columns to apply" : "Select at least one column.";
-  }}),tc.label));
-  const reset=h("button",{class:"btn mini",onclick:()=>{
-    try{localStorage.removeItem("td_cols");}catch(e){note.textContent="Could not reset preferences. Allow browser storage and try again.";return;}
-    state.visible=defaultVisibleColumns();renderTable();closePops();toast("Default columns restored");
-  }},"Reset to default");
-  pop.append(h("div",{class:"colf-h"},"Employee table columns"),list,note,h("div",{class:"column-actions"},save,reset));
-  openPopNode(ev.currentTarget,pop);
+  /* v3.32.0: choose which fields show in the table, search them, show all / none, and set the order */
+  const all = ALLCOLS(), byKey = new Map(all.map(c => [c.key, c]));
+  let order = [...state.visible.filter(k => byKey.has(k)), ...all.map(c => c.key).filter(k => !state.visible.includes(k))];
+  let draft = new Set(state.visible), q = "";
+  const pop = h("div", { id: "colpop", role: "dialog", "aria-label": "Fields to show" });
+  const list = h("div", { class: "column-list" });
+  const note = h("p", { class: "tip", role: "status", style: "margin:8px 0" }, "");
+  const count = () => { note.textContent = draft.size ? draft.size + " of " + all.length + " fields shown · Save to apply" : "Select at least one field."; save.disabled = !draft.size; };
+  const move = (k, d) => { const i = order.indexOf(k), j = i + d; if (j < 0 || j >= order.length) return; [order[i], order[j]] = [order[j], order[i]]; draw(); };
+  const draw = () => {
+    const ql = q.trim().toLowerCase();
+    list.replaceChildren(...order.filter(k => !ql || byKey.get(k).label.toLowerCase().includes(ql)).map(k => {
+      const tc = byKey.get(k);
+      return h("div", { class: "colrow" + (draft.has(k) ? " on" : "") },
+        h("label", {}, h("input", { type: "checkbox", checked: draft.has(k), onchange: e => { e.target.checked ? draft.add(k) : draft.delete(k); e.target.closest(".colrow").classList.toggle("on", e.target.checked); count(); } }), tc.label),
+        h("span", { class: "colmv" }, h("button", { type: "button", class: "btn mini ghost", title: "Move up", "aria-label": "Move " + tc.label + " up", onclick: () => move(k, -1) }, "↑"), h("button", { type: "button", class: "btn mini ghost", title: "Move down", "aria-label": "Move " + tc.label + " down", onclick: () => move(k, 1) }, "↓")));
+    }));
+  };
+  const save = h("button", { class: "btn primary mini", onclick: () => {
+    const selected = order.filter(k => draft.has(k));
+    if (!selected.length) { note.textContent = "Keep at least one field selected."; return; }
+    try { localStorage.setItem("td_cols", JSON.stringify(selected)); } catch (e) { note.textContent = "Could not save preferences. Allow browser storage and try again."; return; }
+    state.visible = selected; renderTable(); closePops(); toast("Fields saved on this browser");
+  } }, "Save");
+  const reset = h("button", { class: "btn mini", onclick: () => {
+    try { localStorage.removeItem("td_cols"); } catch (e) { }
+    state.visible = defaultVisibleColumns(); renderTable(); closePops(); toast("Default fields restored");
+  } }, "Reset to default");
+  const search = h("input", { class: "input mini", type: "search", placeholder: "Search fields", "aria-label": "Search fields", oninput: e => { q = e.target.value; draw(); } });
+  const allBtn = h("button", { type: "button", class: "btn mini", onclick: () => { order.forEach(k => draft.add(k)); draw(); count(); } }, "Show all");
+  const noneBtn = h("button", { type: "button", class: "btn mini", onclick: () => { const first = order.find(k => k === colName("name_column")) || order[0]; draft = new Set([first]); draw(); count(); } }, "Only name");
+  pop.append(h("div", { class: "colf-h" }, "Fields to show in the table"), h("div", { class: "colbar" }, search, allBtn, noneBtn), list, note, h("div", { class: "column-actions" }, save, reset));
+  draw(); count();
+  openPopNode(ev.currentTarget, pop); setTimeout(() => search.focus(), 0);
 }
 
 /* Excel-style column filter: sort + value list (text) or range (dates, numbers, tenure) */
