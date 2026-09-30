@@ -4,7 +4,7 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <link rel="icon" href="data:,">
-<title>Team Dashboard · 3.39.3</title>
+<title>Team Dashboard · 3.40.0</title>
 <style>
 :root {
   color-scheme: light;
@@ -1752,6 +1752,7 @@ body.filters-locked #cleanFilters, body.filters-locked #xchips, body.filters-loc
 .att-bk.add { border-style:dashed; color:var(--accent); }
 .att-bk.set { background:color-mix(in srgb,#22a05a 12%,var(--surface)); border-color:color-mix(in srgb,#22a05a 35%,var(--border)); color:#1c7a45; }
 .att-bk.none { color:var(--ink-3); }
+.att-bk.live { background:color-mix(in srgb,#3b6cf6 10%,var(--surface)); border-color:color-mix(in srgb,#3b6cf6 35%,var(--border)); color:#3558c8; }
 .att-bk:disabled { cursor:default; }
 .att-bk-no { justify-self:end; font-size:11.5px; color:var(--ink-3); }
 .att-bk-sum { margin:0 0 6px; font-size:12px; color:#9a5a00; }
@@ -1809,10 +1810,10 @@ body.filters-locked #cleanFilters, body.filters-locked #xchips, body.filters-loc
     <p class="gate-sub">One place for your people, priorities and team insights.</p>
     <div id="connectBody"><div class="empty">Loading…</div></div>
   </div>
-  <p class="gate-ver">3.39.3</p>
+  <p class="gate-ver">3.40.0</p>
 </section>
 
-<div id="app" hidden><aside class="sidebar" aria-label="Workspace navigation"><div class="brand dashboard-identity">      <h1><span id="title">Team Dashboard</span><span class="ver" id="ver" title="Version 3.39.3">3.39.3</span></h1><p class="brand-tag">One place for your people, priorities and team insights.</p>      <span class="sync" id="sync" role="status"><i></i><span id="syncText">Loading…</span></span></div><div class="nav-label">WORKSPACE</div>      <nav class="tabs" role="tablist" aria-label="Pages" aria-orientation="vertical">
+<div id="app" hidden><aside class="sidebar" aria-label="Workspace navigation"><div class="brand dashboard-identity">      <h1><span id="title">Team Dashboard</span><span class="ver" id="ver" title="Version 3.40.0">3.40.0</span></h1><p class="brand-tag">One place for your people, priorities and team insights.</p>      <span class="sync" id="sync" role="status"><i></i><span id="syncText">Loading…</span></span></div><div class="nav-label">WORKSPACE</div>      <nav class="tabs" role="tablist" aria-label="Pages" aria-orientation="vertical">
         <button class="tab on" role="tab" aria-controls="pageSummary" data-view="summary" aria-selected="true" data-icon="🏠" data-short="Home">Overview</button>
         <button class="tab" role="tab" aria-controls="pageEmployees" data-view="employees" aria-selected="false" data-icon="👥" data-short="People">Employees</button>
       <button class="tab" role="tab" aria-controls="pageAttendance" data-view="attendance" aria-selected="false" data-icon="🗓️" data-short="Attend.">Attendance</button>
@@ -5463,7 +5464,7 @@ function gridView() {
     ${leaveFilterBar(gridBaseRows())}
     <div class="sm muted" style="margin-bottom:8px"><b class="num">${rows.length}</b> employees${hl ? ` with ${esc(kindNames)} · <b class="num">${fmt(kindDays)}</b> days of that type (other codes faded)` : ''} · <b class="num">${fmt(tot)}</b> leave days · <b>Click any day</b> to set its code, or a day number at the top to mark a holiday for everyone. A blank day counts as present (P), and blank Saturdays / Sundays are week offs.</div>
     <div class="gridwrap">${gridTable(rows, { month: g.month, hl })}</div>
-    <div style="display:flex;gap:6px 16px;flex-wrap:wrap;margin-top:12px">${legend}${g.bk === false || !canBackup() ? '' : `<span class="bk-legend"><b class="sm">Backup provided:</b><span><span class="bk-mark y"></span>Yes</span><span><span class="bk-mark n"></span>No</span><span></span>`}</div>`;
+    <div style="display:flex;gap:6px 16px;flex-wrap:wrap;margin-top:12px">${legend}${g.bk === false || !canBackup() ? '' : `<span class="bk-legend"><b class="sm">Backup provided:</b><span><span class="bk-mark y"></span>Yes</span><span><span class="bk-mark n"></span>No</span><span><span class="bk-mark l"></span>Seat shown live</span><span></span>`}</div>`;
 }
 
 /* ---------- PEOPLE ---------- */
@@ -7200,9 +7201,10 @@ const bkRead = v0 => { let v = String(v0).trim(); const half = BK_HALF.test(v); 
   /* v3.35.0: two answers only: Backup Provided / Backup Not Provided, each with an optional person and full / half day.
      "No/Chen Li" = not provided officially, but Chen Li covered. Old "Kept live" / "Unofficial backup" read as Not Provided. */
   const mn = /^(no|not provided|backup not provided)(\s*\/\s*(.+))?$/i.exec(v);
-  const o = bkIsLive(v) ? { no: true, b: '' } : mn ? { no: true, b: (mn[3] || '').trim() } : /^(yes|backup provided)$/i.test(v) ? { b: '', yes: true } : { b: v };
+  /* v3.40.0: "Seat shown live" (old "Kept live" too): the person is on leave, but the client sees the seat as present */
+  const o = /^(seat\s*(shown\s*)?live|kept live|live)$/i.test(v) ? { live: true, b: '' } : bkIsLive(v) ? { no: true, b: '' } : mn ? { no: true, b: (mn[3] || '').trim() } : /^(yes|backup provided)$/i.test(v) ? { b: '', yes: true } : { b: v };
   if (half) o.half = true; return o; };
-const bkText = val => !val ? '' : (val.no ? 'No' + (val.b ? '/' + val.b : '') : (val.b || 'Yes')) + (val.half ? ' (half)' : '');
+const bkText = val => !val ? '' : val.live ? 'Seat shown live' : (val.no ? 'No' + (val.b ? '/' + val.b : '') : (val.b || 'Yes')) + (val.half ? ' (half)' : '');
 const bkRemark = (key, iso) => { const r = bkRow(key, iso); if (!r) return ''; const k = Object.keys(r.extra || {}).find(q => q.toLowerCase() === BKM_FIELD.toLowerCase()); return k ? (bkParse(r.extra[k]).get(+iso.slice(8, 10)) || '') : ''; };
 const bkGet = (key, iso) => {
   const r = bkRow(key, iso);
@@ -7211,17 +7213,18 @@ const bkGet = (key, iso) => {
 };
 /* v3.33.0: backups are for admins and super admins only (users don't see or change them). Local mode (no sign-in) = the owner. */
 const canBackup = () => { try { return !(window.PERM && PERM.online()) || isAdminRole(); } catch { return false; } };
-const bkLabel = x => !x ? '' : (x.no ? 'Backup Not Provided' : 'Backup Provided') + (x.b ? ' · ' + x.b : '') + (x.half ? ' (half day)' : '');
+const bkLabel = x => !x ? '' : x.live ? 'Seat Shown Live' : (x.no ? 'Backup Not Provided' : 'Backup Provided') + (x.b ? ' · ' + x.b : '') + (x.half ? ' (half day)' : '');
 /* v3.30.1: backup settings: is the backup person's name optional (default), required, or not asked at all */
 const bkNameMode = () => { const m = ((window.TD_SETTINGS || {}).backup_opts || {}).name; return ['optional', 'required', 'off'].includes(m) ? m : 'optional'; };
 /* v3.30.0: "Backup provided" as a plain Yes / No (kept live counts as No: nobody was put on the work) */
-const bkYes = x => !!(x && !x.no);
+const bkYes = x => !!(x && !x.no && !x.live);
+const bkLive = x => !!(x && x.live);
 /* v3.33.0: "existing member" is a backup too, just not shown officially */
 const bkAnyYes = x => !!(x && !x.no);
-const bkYN = x => bkAnyYes(x) ? 'Yes' : 'No';
-const bkYNLong = x => (bkYes(x) ? 'Backup Provided' : 'Backup Not Provided') + (x && x.half ? ' · half day' : '');
-const bkYNCls = x => bkYes(x) ? 'y' : 'n';
-const bkTipLine = x => '<b>' + (bkYes(x) ? 'Backup Provided' : 'Backup Not Provided') + '</b>' + (x && x.b ? ' · ' + esc(x.b) : '') + (x && x.half ? ' · half day' : '');
+const bkYN = x => bkLive(x) ? 'Live' : bkAnyYes(x) ? 'Yes' : 'No';
+const bkYNLong = x => bkLive(x) ? 'Seat Shown Live' : (bkYes(x) ? 'Backup Provided' : 'Backup Not Provided') + (x && x.half ? ' · half day' : '');
+const bkYNCls = x => bkYes(x) ? 'y' : bkLive(x) ? 'l' : 'n';
+const bkTipLine = x => bkLive(x) ? '<b>Seat Shown Live</b> · shown present to the client' : '<b>' + (bkYes(x) ? 'Backup Provided' : 'Backup Not Provided') + '</b>' + (x && x.b ? ' · ' + esc(x.b) : '') + (x && x.half ? ' · half day' : '');
 function bkTeam(exceptKey, iso) {
   const t = new Date(iso + 'T00:00:00Z'), ms = Engine.monthSerial(t.getUTCFullYear(), t.getUTCMonth()), i = t.getUTCDate() - 1;
   const outToday = new Set((D(true).byMonth.get(ms) || []).filter(r => { const c = catOf(r.days[i]); return c && (LEAVE_CATS.has(c) || c === 'applied'); }).map(r => personKey(r.name)));
@@ -7246,9 +7249,9 @@ function openBackupBox(pKey, iso, onDone, opts = {}) {
   if (!canBackup()) { toast('Your passcode can’t set backups.'); return; }
   const d = D(true), p = d.people.get(pKey); const name = p ? p.name : pKey;
   const cur = bkGet(pKey, iso), team = bkTeam(pKey, iso), days = bkStretch(p, iso), nmMode = bkNameMode();
-  const curK = !cur ? '' : cur.no ? 'no' : 'yes', dt = new Date(iso + 'T00:00:00Z');
+  const curK = !cur ? '' : cur.live ? 'live' : cur.no ? 'no' : 'yes', dt = new Date(iso + 'T00:00:00Z');
   /* v3.33.0: a cleaner box: pick one of three cards; the "Yes" card opens the person and full / half day */
-  const OPT = [['yes', 'Backup Provided', 'A backup covers the work', '#22a05a', '<path d="M5 12l5 5L20 7"/>'], ['no', 'Backup Not Provided', 'No official backup', '#e34948', '<path d="M6 6l12 12M18 6L6 18"/>']];
+  const OPT = [['yes', 'Backup Provided', 'A backup covers the work', '#22a05a', '<path d="M5 12l5 5L20 7"/>'], ['no', 'Backup Not Provided', 'No official backup', '#e34948', '<path d="M6 6l12 12M18 6L6 18"/>'], ['live', 'Seat Shown Live', 'On leave here, shown present to the client', '#3b6cf6', '<circle cx="12" cy="12" r="3"/><path d="M5.6 5.6a9 9 0 0 0 0 12.8M18.4 5.6a9 9 0 0 1 0 12.8M8.5 8.5a5 5 0 0 0 0 7M15.5 8.5a5 5 0 0 1 0 7"/>']];
   const m = openModal({ title: 'Backup for ' + name,
     body: `<style>
       .bkx-when{display:flex;align-items:center;gap:10px;margin:0 0 14px;padding:10px 12px;border-radius:12px;background:var(--surface-2,#f4f6f9)}
@@ -7256,7 +7259,7 @@ function openBackupBox(pKey, iso, onDone, opts = {}) {
       .bkx-cal i{display:block;font-style:normal;font-size:9.5px;font-weight:700;letter-spacing:.05em;text-transform:uppercase;background:#e34948;color:#fff;padding:2px 0}
       .bkx-cal b{display:block;font-size:17px;padding:3px 0 4px}
       .bkx-when div{font-size:13px;line-height:1.35} .bkx-when div span{display:block;font-size:12px;color:var(--muted,var(--ink-3,#667))}
-      .bkx-opts{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:8px}
+      .bkx-opts{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:8px}
       .bkx-o{all:unset;box-sizing:border-box;cursor:pointer;display:flex;flex-direction:column;gap:6px;padding:12px;border-radius:12px;border:1.5px solid var(--border,var(--line,#e3e6ec));background:var(--surface,#fff);transition:border-color .12s,box-shadow .12s,background .12s;position:relative}
       .bkx-o:hover{border-color:var(--oc)} .bkx-o:focus-visible{outline:2px solid var(--oc);outline-offset:2px}
       .bkx-o svg{width:22px;height:22px;padding:5px;border-radius:50%;color:var(--oc);background:color-mix(in srgb,var(--oc) 12%,transparent);box-sizing:content-box}
@@ -7283,19 +7286,19 @@ function openBackupBox(pKey, iso, onDone, opts = {}) {
     <div class="bkx-when">${cur && !opts.collect ? '<span class="bkx-clr" id="bkx-clr"><button type="button" class="btn mini" id="bk-clear-ask" title="Remove the saved backup for this day">Clear</button></span>' : ''}<span class="bkx-cal"><i>${MONTHS[dt.getUTCMonth()]}</i><b>${dt.getUTCDate()}</b></span><div style="padding-right:90px"><b>${esc(name)}</b> is on leave<span>${esc(opts.days && opts.days.length > 1 ? longDate(new Date(opts.days[0] + 'T00:00:00Z')) + ' – ' + longDate(new Date(opts.days[opts.days.length - 1] + 'T00:00:00Z')) + ' · ' + opts.days.length + ' days' : longDate(dt))} · who covers the work?</span></div></div>
     ${opts.collect ? `<p class="sm" style="margin:-4px 0 12px;padding:8px 10px;border-radius:10px;background:color-mix(in srgb,#d97706 10%,transparent);color:var(--ink-2,#445)"><b>Backup is required to approve.</b> Choose one option; the leave is approved when you save.</p>` : ''}
     <div class="bkx-opts" role="radiogroup" aria-label="Backup">${OPT.map(([k, t, sub, c, ico]) => `<button type="button" class="bkx-o" role="radio" data-bkx="${k}" aria-checked="${curK === k}" style="--oc:${c}"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">${ico}</svg><b>${t}</b><small>${sub}</small></button>`).join('')}</div>
-    <div class="bkx-yes${curK === 'no' ? ' no' : ''}" id="bkx-yes" ${curK ? '' : 'hidden'}>
+    <div class="bkx-yes${curK === 'no' ? ' no' : ''}" id="bkx-yes" ${curK && curK !== 'live' ? '' : 'hidden'}>
       <div class="bkx-row">Cover for <span class="bkx-seg" role="group" aria-label="Cover for"><button type="button" data-bkh="full" aria-pressed="${!(cur && cur.half)}">Full day</button><button type="button" data-bkh="half" aria-pressed="${!!(cur && cur.half)}">Half day</button></span></div>
       ${nmMode === 'off' ? '' : `<label>Backup person <em>${nmMode === 'optional' ? 'optional · anyone in the current team' : 'anyone in the current team'}</em><input type="text" id="bk-name" list="bk-list" value="${esc(cur && cur.b ? cur.b : '')}" placeholder="${nmMode === 'optional' ? 'Type or pick a name, or leave blank' : 'Type or pick a name'}" autocomplete="off"><datalist id="bk-list">${team.map(t => `<option value="${esc(t.name)}" label="${esc([t.id && 'ID ' + t.id, t.sub, t.out ? 'also off that day' : ''].filter(Boolean).join(' · '))}"></option>`).join('')}</datalist></label>`}
     </div>
-    <label class="bkx-rm" id="bkx-rm" ${curK ? '' : 'hidden'}>Remarks <em>optional · goes into the client copy</em><textarea id="bk-rm" rows="2" maxlength="200" placeholder="e.g. Client informed · handover done">${esc(bkRemark(pKey, iso))}</textarea></label>
+    <label class="bkx-rm" id="bkx-rm" ${curK && curK !== 'live' ? '' : 'hidden'}>Remarks <em>optional · goes into the client copy</em><textarea id="bk-rm" rows="2" maxlength="200" placeholder="e.g. Client informed · handover done">${esc(bkRemark(pKey, iso))}</textarea></label>
     <div class="err" id="bk-err"></div>`,
     footer: `<span class="grow"></span><button class="btn" data-close>Cancel</button><button class="btn primary" id="bk-go" ${curK ? '' : 'disabled'}>${esc(opts.confirm || 'Save')}</button>` });
   let pick = curK, half = !!(cur && cur.half);
   const kind = () => pick, isHalf = () => half;
   m.querySelectorAll('[data-bkx]').forEach(b => b.addEventListener('click', () => {
     pick = b.dataset.bkx; m.querySelectorAll('[data-bkx]').forEach(x => x.setAttribute('aria-checked', String(x === b)));
-    $('#bkx-yes', m).hidden = !pick; $('#bkx-rm', m).hidden = !pick; $('#bkx-yes', m).classList.toggle('no', pick === 'no'); $('#bk-go', m).disabled = false; $('#bk-err', m).textContent = '';
-    setTimeout(() => $('#bk-name', m)?.focus(), 0);
+    $('#bkx-yes', m).hidden = !pick || pick === 'live'; $('#bkx-rm', m).hidden = !pick || pick === 'live'; $('#bkx-yes', m).classList.toggle('no', pick === 'no'); $('#bk-go', m).disabled = false; $('#bk-err', m).textContent = '';
+    if (pick !== 'live') setTimeout(() => $('#bk-name', m)?.focus(), 0);
   }));
   m.querySelectorAll('[data-bkh]').forEach(b => b.addEventListener('click', () => { half = b.dataset.bkh === 'half'; m.querySelectorAll('[data-bkh]').forEach(x => x.setAttribute('aria-pressed', String(x === b))); }));
   const write = async val => {
@@ -7314,6 +7317,7 @@ function openBackupBox(pKey, iso, onDone, opts = {}) {
   $('#bk-go', m).onclick = async () => {
     const write = v => write0(v ? { ...v, remark: rmv() } : v);
     try {
+      if (kind() === 'live') return await write({ live: true, by: BE.userName(), at: new Date().toISOString() });
       if (kind() === 'no') { const vn = !$('#bk-name', m) ? '' : $('#bk-name', m).value.trim(), hn = vn ? team.find(t => t.name.toLowerCase() === vn.toLowerCase()) : null;
         if (vn && !hn) { $('#bk-err', m).textContent = 'Pick someone from the current team list, or leave the name blank.'; return; }
         return await write({ no: true, b: hn ? hn.name : '', half: isHalf(), by: BE.userName(), at: new Date().toISOString() }); }
@@ -7424,17 +7428,17 @@ function backupReportData(cycle, client, yn = 'all', range = null, sub = BKR.sub
       const cl = bkClientOf(r); if (!bkPass(r, client, sub)) continue;
       const c = catOf(r.days[i]); if (!c || !LEAVE_CATS.has(c)) continue;
       const key = personKey(r.name), b = bkGet(key, iso);
-      items.push({ iso, name: r.name.trim(), pseudo: bkPseudo(r), key, client: cl, code: String(r.days[i]).trim().toUpperCase(), days: c === 'half' ? 0.5 : 1, st: bkYes(b) ? 'backup' : 'none', backup: b && b.b ? b.b : '', half: !!(b && b.half), set: !!b });
+      items.push({ iso, name: r.name.trim(), pseudo: bkPseudo(r), key, client: cl, code: String(r.days[i]).trim().toUpperCase(), days: c === 'half' ? 0.5 : 1, st: bkYes(b) ? 'backup' : bkLive(b) ? 'live' : 'none', backup: b && b.b && !b.live ? b.b : '', half: !!(b && b.half), set: !!b });
     }
   }
   items.sort((a, b) => a.iso.localeCompare(b.iso) || a.name.localeCompare(b.name));
-  for (const x of items) x.yn = x.st !== 'none' ? 'Yes' : 'No', x.ynL = (x.st === 'backup' ? 'Backup Provided' : 'Backup Not Provided') + (x.half ? ' · half day' : '');
+  for (const x of items) x.yn = x.st !== 'none' ? 'Yes' : 'No', x.ynL = x.st === 'live' ? 'Seat Shown Live' : (x.st === 'backup' ? 'Backup Provided' : 'Backup Not Provided') + (x.half ? ' · half day' : '');
   if (yn !== 'all') { const keep = items.filter(x => x.yn.toLowerCase() === yn); items.length = 0; items.push(...keep); }
   const sum = list => { const o = { people: new Set(list.map(x => x.key)).size, days: 0, backup: 0, live: 0, none: 0, pBackup: new Set(), pLive: new Set(), pNone: new Set() }; for (const x of list) { o.days += x.days; if (x.st === 'backup' && x.half) { o.backup += x.days / 2; o.none += x.days / 2; } else o[x.st] += x.days; ({ backup: o.pBackup, live: o.pLive, none: o.pNone })[x.st].add(x.key); } o.pBackup = o.pBackup.size; o.pLive = o.pLive.size; o.pNone = o.pNone.size; o.cov = o.days ? Math.round((o.backup + o.live) / o.days * 100) : 100; return o; };
   const clients = [...new Set(items.map(x => x.client))].sort();
   return { items, total: sum(items), byClient: clients.map(c => ({ client: c, ...sum(items.filter(x => x.client === c)) })) };
 }
-const BK_ST = { backup: 'Backup Provided', live: 'Backup Not Provided', none: 'Backup Not Provided' };
+const BK_ST = { backup: 'Backup Provided', live: 'Seat Shown Live', none: 'Backup Not Provided' };
 const bkFmtD = iso => { const t = new Date(iso + 'T00:00:00Z'); return WEEKDAYS[t.getUTCDay()] + ' ' + t.getUTCDate() + ' ' + MONTHS[t.getUTCMonth()]; };
 /* one copy for the whole report: plain text with tabs (pastes as columns in Excel / Sheets) plus an HTML table (pastes as a table in Outlook / Teams) */
 async function bkCopy(cycle, client, names = BKR.names, yn = 'all', range = null) {
@@ -7442,11 +7446,11 @@ async function bkCopy(cycle, client, names = BKR.names, yn = 'all', range = null
   const R = backupReportData(cycle, client, yn, range), T = R.total, cv = client !== 'all', nmOf = x => names === 'pseudo' ? x.pseudo : x.name;
   const title = 'Backup report · ' + monthLabel(cycle) + ' (' + cycRange(cycle) + ')' + (range && BKR.span !== 'cycle' ? ' · ' + (BKR.span === 'week' ? 'Week ' : '') + bkRangeLabel(range) : '') + ' · ' + (cv ? client : 'All clients') + (yn !== 'all' ? ' · Backup provided: ' + (yn === 'yes' ? 'Yes' : 'No') : '') + (names === 'pseudo' ? ' · pseudo names' : '');
   const line2 = T.people + ' on leave · ' + fmt(T.days) + ' leave days · ' + T.cov + '% covered';
-  const sumRows = [['Backup Provided', fmt(T.backup), T.pBackup], ['Backup Not Provided', fmt(T.none), T.pNone]];
+  const sumRows = [['Backup Provided', fmt(T.backup), T.pBackup], ['Seat Shown Live', fmt(T.live), T.pLive], ['Backup Not Provided', fmt(T.none), T.pNone]];
   const hd = ['Date', 'Employee', ...(cv ? [] : ['Client']), 'Leave', 'Backup', 'Cover'];
   const rows = R.items.map(x => [x.iso, nmOf(x), ...(cv ? [] : [x.client]), x.code + (x.days === .5 ? ' (half)' : ''), x.ynL, x.backup || '']);
-  const cRows = !cv ? R.byClient.map(c => [c.client, c.people, fmt(c.days), fmt(c.backup), fmt(c.none), c.cov + '%']) : [];
-  const cHd = ['Client', 'People on leave', 'Leave days', 'Backup Provided', 'Backup Not Provided', 'Covered'];
+  const cRows = !cv ? R.byClient.map(c => [c.client, c.people, fmt(c.days), fmt(c.backup), fmt(c.live), fmt(c.none), c.cov + '%']) : [];
+  const cHd = ['Client', 'People on leave', 'Leave days', 'Backup Provided', 'Seat Shown Live', 'Backup Not Provided', 'Covered'];
   const txt = [title, line2, '', ['Status', 'Days', 'People'].join('\t'), ...sumRows.map(r => r.join('\t')),
     ...(cRows.length ? ['', cHd.join('\t'), ...cRows.map(r => r.join('\t'))] : []), '', hd.join('\t'), ...rows.map(r => r.join('\t'))].join('\n');
   const tb = (h, rs) => `<table border="1" cellpadding="4" cellspacing="0" style="border-collapse:collapse;font:12px Segoe UI,Arial,sans-serif"><thead><tr>${h.map(x => `<th style="background:#f1f3f7;text-align:left">${esc(String(x))}</th>`).join('')}</tr></thead><tbody>${rs.map(r => '<tr>' + r.map(x => `<td>${esc(String(x))}</td>`).join('') + '</tr>').join('')}</tbody></table>`;
@@ -7500,10 +7504,10 @@ function mountBackupReport(body) {
       <p class="sm muted bkr-cyc">Each cycle runs from the 26th to the 25th and is named after the month it ends in.</p>
       <div class="bkr-sheet" id="bkrSheet">
       <div class="bkr-title"><h3>Leave cover report · ${esc(monthLabel(BKR.month))}</h3><p>${BKR.span === 'cycle' ? esc(cycRange(BKR.month)) : '<b>' + (BKR.span === 'week' ? 'Week ' + (Math.min(BKR.week, WK.length - 1) + 1) + ': ' : '') + esc(bkRangeLabel(RG)) + '</b> (cycle ' + esc(cycRange(BKR.month)) + ')'} · ${clientView ? esc(BKR.client) + ' · ' : 'All clients · '}${BKR.yn !== 'all' ? 'Backup provided: ' + (BKR.yn === 'yes' ? 'Yes' : 'No') + ' · ' : ''}${pl(T.people)} on leave · ${dl(T.days)} of leave · <b>${T.cov}%</b> covered</p></div>
-      <div class="bkr-tiles two">${tile('b', dl(T.backup), 'Backup Provided', pl(T.pBackup))}${tile('n', dl(T.none), 'Backup Not Provided', pl(T.pNone))}</div>
-      <div class="bkr-bar2" title="${T.cov}% covered"><i class="b" style="width:${T.days ? T.backup / T.days * 100 : 0}%"></i><i class="n" style="width:${T.days ? T.none / T.days * 100 : 0}%"></i></div>
+      <div class="bkr-tiles">${tile('b', dl(T.backup), 'Backup Provided', pl(T.pBackup))}${tile('l', dl(T.live), 'Seat Shown Live', pl(T.pLive) + ' · shown present to the client')}${tile('n', dl(T.none), 'Backup Not Provided', pl(T.pNone))}</div>
+      <div class="bkr-bar2" title="${T.cov}% covered"><i class="b" style="width:${T.days ? T.backup / T.days * 100 : 0}%"></i><i class="l" style="width:${T.days ? T.live / T.days * 100 : 0}%"></i><i class="n" style="width:${T.days ? T.none / T.days * 100 : 0}%"></i></div>
       ${R.items.length ? bkCharts(R, clientView) : ''}
-      ${!clientView && R.byClient.length ? `<h4>By client</h4><table class="bkr-tbl"><thead><tr><th>Client</th><th>People on leave</th><th>Leave days</th><th>Backup Provided</th><th>Backup Not Provided</th><th>Covered</th></tr></thead><tbody>${R.byClient.map(c => `<tr><td><button class="linkbtn" data-bkr-client="${esc(c.client)}">${esc(c.client)}</button></td><td>${c.people}</td><td>${fmt(c.days)}</td><td>${fmt(c.backup)}</td><td class="${c.none ? 'bad' : ''}">${fmt(c.none)}</td><td><b>${c.cov}%</b></td></tr>`).join('')}</tbody></table>` : ''}
+      ${!clientView && R.byClient.length ? `<h4>By client</h4><table class="bkr-tbl"><thead><tr><th>Client</th><th>People on leave</th><th>Leave days</th><th>Backup Provided</th><th>Seat Shown Live</th><th>Backup Not Provided</th><th>Covered</th></tr></thead><tbody>${R.byClient.map(c => `<tr><td><button class="linkbtn" data-bkr-client="${esc(c.client)}">${esc(c.client)}</button></td><td>${c.people}</td><td>${fmt(c.days)}</td><td>${fmt(c.backup)}</td><td>${fmt(c.live)}</td><td class="${c.none ? 'bad' : ''}">${fmt(c.none)}</td><td><b>${c.cov}%</b></td></tr>`).join('')}</tbody></table>` : ''}
       <h4>Day by day</h4>${R.items.length ? `<table class="bkr-tbl"><thead><tr><th>Date</th><th>Employee</th>${clientView ? '' : '<th>Client</th>'}<th>Leave</th><th>Backup</th><th>Cover</th></tr></thead><tbody>${R.items.map(x => `<tr><td>${bkFmtD(x.iso)}</td><td>${esc(nmOf(x))}</td>${clientView ? '' : `<td>${esc(x.client)}</td>`}<td>${esc(x.code)}${x.days === .5 ? ' (½)' : ''}</td><td><span class="bkr-st ${x.st}">${x.ynL}</span></td><td>${x.backup ? esc(x.backup) : ''}${edit ? `<button type="button" class="btn mini bkr-ed" data-bkr-ed="${esc(x.key)}" data-iso="${x.iso}" title="Change the backup for this day">${x.set ? 'Edit' : '+ Add'}</button>` : ''}</td></tr>`).join('')}</tbody></table>` : '<p class="sm muted">No leave in this ' + (BKR.span === 'cycle' ? 'cycle' : BKR.span) + (clientView ? ' for this client' : '') + (BKR.yn !== 'all' ? ' with backup provided: ' + BKR.yn : '') + '.</p>'}
       </div>`;
     body.querySelectorAll('[data-bkr]').forEach(el => el.addEventListener('change', () => { BKR[el.dataset.bkr] = el.dataset.bkr === 'month' ? +el.value : el.value; draw(); }));
@@ -7543,11 +7547,11 @@ function bkGridData(cycle, client, sub, range, merge) {
       if (v == null) k = !trackedOn(r, i) ? 'SR' : (w === 0 || w === 6) ? 'L' : 'P';
       else if (c === 'off') k = code === 'H' ? 'H' : 'L';
       else if (c === 'moved' || c === 'na') k = 'SR';
-      else if (c === 'half' || LEAVE_CATS.has(c) || c === 'applied') { const b = bkGet(key, iso); k = bkYes(b) ? 'BR' : c === 'half' ? 'HD' : 'L'; if (k === 'BR' && b.half && c !== 'half') k = 'BRH'; }
+      else if (c === 'half' || LEAVE_CATS.has(c) || c === 'applied') { const b = bkGet(key, iso); k = bkLive(b) ? 'LIVE' : bkYes(b) ? 'BR' : c === 'half' ? 'HD' : 'L'; if (k === 'BR' && b.half && c !== 'half') k = 'BRH'; }
       else if (c === 'present' || c === 'remote' || c === 'late') k = 'P';
       else k = 'X';
       const b = k === 'BR' || k === 'BRH' ? bkGet(key, iso) : null;
-      const def = k === 'BRH' ? ['BR½', 'br', .5, 'Backup for half the day'] : k === 'X' ? [code, 'x', 0, 'Code ' + code] : BKG[k];
+      const def = k === 'LIVE' ? ['P', 'p', 1, 'Seat shown live (on leave, shown present to the client)'] : k === 'BRH' ? ['BR½', 'br', .5, 'Backup for half the day'] : k === 'X' ? [code, 'x', 0, 'Code ' + code] : BKG[k];
       P.cells[j] = { key, iso, leave: c === 'half' || LEAVE_CATS.has(c) || c === 'applied', t: def[0], cls: def[1], bill: def[2], title: bkFmtD(iso) + ' · ' + (code || (k === 'P' ? 'blank = present' : k === 'L' ? 'week end' : '')) + ' · ' + def[3] + (b && b.b ? ' · ' + b.b : '') };
       P.total += def[2];
     }
@@ -7591,10 +7595,10 @@ async function bkGridCopy(G, title, names) {
   catch { toast('The browser blocked copying.'); }
 }
 function bkCharts(R, clientView) {
-  const byDate = new Map(); for (const x of R.items) { const o = byDate.get(x.iso) || { p: 0, n: 0 }; const pv = x.st === 'backup' ? (x.half ? x.days / 2 : x.days) : 0; o.p += pv; o.n += x.days - pv; byDate.set(x.iso, o); }
+  const byDate = new Map(); for (const x of R.items) { const o = byDate.get(x.iso) || { p: 0, n: 0 }; const pv = x.st === 'backup' ? (x.half ? x.days / 2 : x.days) : x.st === 'live' ? x.days : 0; o.p += pv; o.n += x.days - pv; byDate.set(x.iso, o); }
   const dates = [...byDate.keys()].sort(), mx = Math.max(1, ...[...byDate.values()].map(o => o.p + o.n));
   const cols = dates.map(d => { const o = byDate.get(d), t = new Date(d + 'T00:00:00Z'); return `<div class="bkc-col" title="${esc(bkFmtD(d))}: ${fmt(o.p)} provided · ${fmt(o.n)} not provided"><div class="bkc-stack" style="height:${(o.p + o.n) / mx * 100}%"><i class="n" style="flex:${o.n}"></i><i class="p" style="flex:${o.p}"></i></div><span>${t.getUTCDate()}<small>${MONTHS[t.getUTCMonth()]}</small></span></div>`; }).join('');
-  const cl = clientView ? '' : `<div class="bkc-panel"><h5>By client</h5>${R.byClient.map(c => `<div class="bkc-row"><span title="${esc(c.client)}">${esc(c.client)}</span><div class="bkc-bar"><i class="p" style="width:${c.days ? c.backup / c.days * 100 : 0}%"></i><i class="n" style="width:${c.days ? c.none / c.days * 100 : 0}%"></i></div><b>${c.cov}%</b></div>`).join('')}</div>`;
+  const cl = clientView ? '' : `<div class="bkc-panel"><h5>By client</h5>${R.byClient.map(c => `<div class="bkc-row"><span title="${esc(c.client)}">${esc(c.client)}</span><div class="bkc-bar"><i class="p" style="width:${c.days ? (c.backup + c.live) / c.days * 100 : 0}%"></i><i class="n" style="width:${c.days ? c.none / c.days * 100 : 0}%"></i></div><b>${c.cov}%</b></div>`).join('')}</div>`;
   return `<div class="bkc ${clientView ? 'one' : ''}">${cl}<div class="bkc-panel"><h5>Day by day <em><i class="p"></i>Provided <i class="n"></i>Not provided</em></h5><div class="bkc-cols">${cols}</div></div></div>`;
 }
 const BKG_CSS = `.bkg-title{text-align:center;font-weight:700;font-size:15px;margin:4px 0 10px}.bkg-legend{display:flex;flex-wrap:wrap;justify-content:flex-end;gap:6px 14px;font-size:12.5px;margin:0 0 10px}.bkg-legend>span{display:inline-flex;align-items:center;gap:5px}.bkg-wrap{overflow:auto;border:1px solid #e3e6ec;border-radius:10px}.bkg{border-collapse:collapse;font-size:12.5px;min-width:100%}.bkg th,.bkg td{padding:4px 3px;text-align:center;border-bottom:1px solid #eef0f4}.bkg thead th{font-size:11.5px;vertical-align:bottom;background:#f7f8fa;position:sticky;top:0}.bkg thead th .wd{display:block;writing-mode:vertical-rl;transform:rotate(180deg);margin:0 auto 4px;font-weight:700}.bkg thead th b{display:block}.bkg .nm{text-align:left;white-space:nowrap;padding:4px 10px;position:sticky;left:0;background:#fff}.bkg thead .nm{background:#f7f8fa;z-index:2}.bkg-c{display:inline-flex;align-items:center;justify-content:center;min-width:24px;height:22px;padding:0 3px;font-size:11px;font-weight:700;border:1px solid transparent;border-radius:2px;box-sizing:border-box}.bkg-c.p{background:#c6f7c6;border-color:#4caf50;color:#1d3d1d}.bkg-c.hd{background:#ffff66;border-color:#c9b600;color:#333}.bkg-c.h{background:#1ee3ef;border-color:#0aa;color:#023}.bkg-c.br{background:#8bc34a;border-color:#5b8f22;color:#fff}.bkg-c.sr{background:#111;border-color:#111;color:#fff}.bkg-c.l{background:#ff8a8a;border-color:#e06666}.bkg-c.x{background:#eee;border-color:#bbb;color:#333}.bkg-c.ed{cursor:pointer}.bkg-m{font-size:10.5px;color:#667;border:1px solid #d9dde5;border-radius:8px;padding:0 5px;margin-left:4px;cursor:help}.bkg-c.ed:hover{outline:2px solid #334;outline-offset:1px}`;
@@ -7673,12 +7677,12 @@ function renderCard(el, opts = {}) {
       const listCopy = C.tab === 'late' || !canBackup() ? tableData(['Employee', 'Client', 'Code', 'Status'], list.map(x => [nm(x.r), cl(x.r), String(x.v).trim().toUpperCase(), x.c === 'applied' ? 'Awaiting approval' : labelOf(x.v)]), (C.tab === 'late' ? 'Late comings' : C.tab === 'half' ? 'Half days' : 'Out') + ' on ' + longDate(rd)) : (() => {
         /* v3.36.0: client copy: date + title on top, then pseudo name · backup · remarks (blank to fill in) */
         const pOf = n => { if (!pseudoCol || !n) return n; try { const w = rosterRows().find(r => personKey(gs(r, 'name_column')) === personKey(n)); const v = w ? String(g(w, pseudoCol) ?? '').trim() : ''; return v || n; } catch { return n; } };
-        const recs = list.filter(x => x.c !== 'applied').map(x => { const k = personKey(x.r.name), b = bkGet(k, rdIso); return [pOf(x.r.name.trim()), (bkYes(b) ? 'Backup Provided' : 'Backup Not Provided') + (b && b.b ? ' – ' + pOf(b.b) : '') + (b && b.half ? ' (half day)' : ''), bkRemark(k, rdIso)]; });
+        const recs = list.filter(x => x.c !== 'applied' && !bkLive(bkGet(personKey(x.r.name), rdIso))).map(x => { const k = personKey(x.r.name), b = bkGet(k, rdIso); return [pOf(x.r.name.trim()), (bkYes(b) ? 'Backup Provided' : 'Backup Not Provided') + (b && b.b ? ' – ' + pOf(b.b) : '') + (b && b.half ? ' (half day)' : ''), bkRemark(k, rdIso)]; });
         return { headers: [pseudoCol ? 'Name' : 'Employee', 'Backup', 'Remarks'], records: recs, caption: (isToday ? "Today's attendance record" : 'Attendance record') + ' · ' + longDate(rd), top: [longDate(rd), isToday ? "Today's attendance record" : 'Attendance record'] };
       })();
       renderCard._copy = { ...renderCard._copy, today: listCopy };
       const emptyTxt = !rows.length ? 'No attendance rows for this month.' : C.tab === 'late' ? 'No late comings ' + dayWord + '.' : C.tab === 'half' ? 'No half days ' + dayWord + '.' : 'Nobody is on leave ' + dayWord + '.';
-      const miniList = list.length ? `<ul class="att-mini">${list.map(x => `<li><span class="att-mini-n">${esc(nm(x.r))}${can('att.info') ? `<button type="button" class="rq-i" data-lainfo="${esc(x.r.name.trim())}" aria-label="Past and upcoming leave of ${esc(nm(x.r))}">i</button>` : ''}</span><span class="att-mini-c">${esc(cl(x.r))}</span><span class="ph-chip c-${esc(x.c)}">${esc(String(x.v).trim().toUpperCase())}</span><span class="att-mini-s">${esc(x.c === 'applied' ? 'Awaiting approval' : labelOf(x.v))}</span>${C.tab === 'late' || !canBackup() ? '<span></span>' : (() => { const k = personKey(x.r.name), b = bkGet(k, rdIso); return `<span class="att-bkc"><em class="bk-yn ${bkYNCls(b)}" title="Backup provided: ${bkYN(b)}">${bkYN(b)}</em>` + (b ? `<button type="button" class="att-bk ${b.none || b.no ? 'none' : 'set'}" data-bk="${esc(k)}" ${canBackup() ? '' : 'disabled'} title="${esc(bkLabel(b))}">${(b.no ? '✕ ' : '↪ ') + (b.b ? esc(b.b) : b.no ? 'Not provided' : 'Provided') + (b.half ? ' · ½' : '')}</button>` : canBackup() ? `<button type="button" class="att-bk add" data-bk="${esc(k)}">+ Backup</button>` : '<span class="att-bk-no">No backup</span>') + '</span>'; })()}</li>`).join('')}</ul>` : `<div class="att-mini-empty">${emptyTxt}</div>`;
+      const miniList = list.length ? `<ul class="att-mini">${list.map(x => `<li><span class="att-mini-n">${esc(nm(x.r))}${can('att.info') ? `<button type="button" class="rq-i" data-lainfo="${esc(x.r.name.trim())}" aria-label="Past and upcoming leave of ${esc(nm(x.r))}">i</button>` : ''}</span><span class="att-mini-c">${esc(cl(x.r))}</span><span class="ph-chip c-${esc(x.c)}">${esc(String(x.v).trim().toUpperCase())}</span><span class="att-mini-s">${esc(x.c === 'applied' ? 'Awaiting approval' : labelOf(x.v))}</span>${C.tab === 'late' || !canBackup() ? '<span></span>' : (() => { const k = personKey(x.r.name), b = bkGet(k, rdIso); return `<span class="att-bkc"><em class="bk-yn ${bkYNCls(b)}" title="Backup provided: ${bkYN(b)}">${bkYN(b)}</em>` + (b ? `<button type="button" class="att-bk ${b.live ? 'live' : b.none || b.no ? 'none' : 'set'}" data-bk="${esc(k)}" ${canBackup() ? '' : 'disabled'} title="${esc(bkLabel(b))}">${b.live ? '◉ Shown live' : (b.no ? '✕ ' : '↪ ') + (b.b ? esc(b.b) : b.no ? 'Not provided' : 'Provided') + (b.half ? ' · ½' : '')}</button>` : canBackup() ? `<button type="button" class="att-bk add" data-bk="${esc(k)}">+ Backup</button>` : '<span class="att-bk-no">No backup</span>') + '</span>'; })()}</li>`).join('')}</ul>` : `<div class="att-mini-empty">${emptyTxt}</div>`;
       const needBk = C.tab === 'late' ? [] : list, covered = needBk.filter(x => { const b = bkGet(personKey(x.r.name), rdIso); return b && !b.no; }).length;
       const bkLine = needBk.length && canBackup() ? `<div class="att-bk-sum ${covered === needBk.length ? 'ok' : ''}">Backups: <b>${covered} of ${needBk.length}</b> covered${covered < needBk.length ? ' · ' + (needBk.length - covered) + ' without a backup' : ''}</div>` : '';
       html = head2 + `<div class="att-tabs">${tabBtn('leave', nFull, ' on leave', (nHalf ? ` <em>incl. ${nHalf} half day</em>` : '') + (nLa ? ` <em>+${nLa} awaiting</em>` : ''))}${tabBtn('late', T.late.length, ' late')}<span class="grow"></span>${copyBtn('today', listCopy)}${pseudoCol ? `<button type="button" class="btn mini names1" data-att-names="${C.names === 'pseudo' ? 'real' : 'pseudo'}" aria-pressed="${C.names === 'pseudo'}" title="Switch between real and pseudo names">${C.names === 'pseudo' ? 'Pseudo names ⇄' : 'Real names ⇄'}</button>` : ''}</div>` + bkLine + miniList;
@@ -8156,7 +8160,7 @@ async function poll() {
 }
 
 /* ============================== filtering ============================== */
-const APP = { title: "Team Dashboard", version: "3.39.3", released: "30 Sep 2026" };
+const APP = { title: "Team Dashboard", version: "3.40.0", released: "30 Sep 2026" };
 const BASE_DIMS = { status: "status_column", desig: "designation_column", client: "client_column", mode: "mode_column" };
 const STANDARD_STATUSES = ["Active", "Manager", "OJT", "Bench", "New", "Projected", "Left", "Moved"];
 const TILE_ORDER = ["Active", "Manager", "OJT", "Bench", "New", "Projected"];
