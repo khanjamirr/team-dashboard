@@ -4,7 +4,7 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <link rel="icon" href="data:,">
-<title>Team Dashboard · 3.25.1</title>
+<title>Team Dashboard · 3.26.0</title>
 <style>
 :root {
   color-scheme: light;
@@ -1428,7 +1428,7 @@ body.filters-locked #cleanFilters, body.filters-locked #xchips, body.filters-loc
   #pageSummary.ov > .ov-glance { grid-template-columns:repeat(auto-fit,minmax(min(100%,300px),1fr)); }
 }
 @media (max-width:650px) { .ov-tile { padding:12px; } .ov-ic { width:34px; height:34px; font-size:17px; } .ov-tx b { font-size:18px; } }
-/* v3.25.1: Attendance, Request Center and Coming up side by side in one row; Leave watch full width below */
+/* v3.26.0: Attendance, Request Center and Coming up side by side in one row; Leave watch full width below */
 #pageSummary.ov { grid-template-columns:minmax(0,1.45fr) minmax(0,1fr) minmax(0,1fr) !important; grid-template-areas:"glance glance glance" "att req up" "watch watch watch" !important; }
 #pageSummary.ov > .ov-main, #pageSummary.ov > .ov-side { display:contents !important; }
 #pageSummary.ov #cardAttendance { grid-area:att !important; grid-column:att !important; grid-row:att !important; align-self:stretch; min-width:0; }
@@ -1621,6 +1621,26 @@ body.filters-locked #cleanFilters, body.filters-locked #xchips, body.filters-loc
   .btn, .btn.mini, select.input, input.input { min-height:34px; }
   .rq-i { width:20px !important; height:20px !important; }
 }
+
+/* v3.26: Hide / View / Edit tick boxes in aligned columns */
+.rgrid-head, .rrow > summary { display:grid !important; grid-template-columns:minmax(0,1fr) 62px 62px 62px 84px; align-items:center; gap:0 !important; }
+.rgrid-head { padding:7px 12px; border-bottom:1px solid var(--border); background:var(--surface-2); font-size:11px; font-weight:700; letter-spacing:.04em; text-transform:uppercase; color:var(--ink-2); }
+.rgrid-head span:nth-child(n+2):nth-child(-n+4) { text-align:center; }
+.rchks { display:contents; }
+.rchk { display:flex; flex-direction:column; align-items:center; gap:2px; cursor:pointer; padding:2px 0; }
+.rchk input { width:18px; height:18px; margin:0; accent-color:var(--accent); cursor:pointer; }
+.rchk-hide input, .rchk-none input { accent-color:#8a93a3; }
+.rchk-t { display:none; font-size:10.5px; color:var(--ink-2); }
+.rchk-na { text-align:center; color:var(--ink-3); font-size:13px; }
+.rrow .rrow-more { justify-self:end; }
+.rights.is-admin .rgrid-head { display:none !important; }
+@media (max-width:700px) {
+  .rgrid-head { display:none !important; }
+  .rrow > summary { grid-template-columns:repeat(3,minmax(0,1fr)) !important; row-gap:8px !important; }
+  .rrow > summary .rrow-name { grid-column:1 / -1; }
+  .rchk-t { display:block; }
+  .rrow .rrow-more { display:none; }
+}
 </style></head>
 
 
@@ -1634,10 +1654,10 @@ body.filters-locked #cleanFilters, body.filters-locked #xchips, body.filters-loc
     <p class="gate-sub">One place for your people, priorities and team insights.</p>
     <div id="connectBody"><div class="empty">Loading…</div></div>
   </div>
-  <p class="gate-ver">3.25.1</p>
+  <p class="gate-ver">3.26.0</p>
 </section>
 
-<div id="app" hidden><aside class="sidebar" aria-label="Workspace navigation"><div class="brand dashboard-identity">      <h1><span id="title">Team Dashboard</span><span class="ver" id="ver" title="Version 3.25.1">3.25.1</span></h1><p class="brand-tag">One place for your people, priorities and team insights.</p>      <span class="sync" id="sync" role="status"><i></i><span id="syncText">Loading…</span></span></div><div class="nav-label">WORKSPACE</div>      <nav class="tabs" role="tablist" aria-label="Pages" aria-orientation="vertical">
+<div id="app" hidden><aside class="sidebar" aria-label="Workspace navigation"><div class="brand dashboard-identity">      <h1><span id="title">Team Dashboard</span><span class="ver" id="ver" title="Version 3.26.0">3.26.0</span></h1><p class="brand-tag">One place for your people, priorities and team insights.</p>      <span class="sync" id="sync" role="status"><i></i><span id="syncText">Loading…</span></span></div><div class="nav-label">WORKSPACE</div>      <nav class="tabs" role="tablist" aria-label="Pages" aria-orientation="vertical">
         <button class="tab on" role="tab" aria-controls="pageSummary" data-view="summary" aria-selected="true" data-icon="🏠" data-short="Home">Overview</button>
         <button class="tab" role="tab" aria-controls="pageEmployees" data-view="employees" aria-selected="false" data-icon="👥" data-short="People">Employees</button>
       <button class="tab" role="tab" aria-controls="pageAttendance" data-view="attendance" aria-selected="false" data-icon="🗓️" data-short="Attend.">Attendance</button>
@@ -5241,23 +5261,44 @@ function peopleView() {
   const p = d.people.get(pu.sel);
   const side = `<div class="card people-list"><input type="search" placeholder="Search ${list.length} people" value="${esc(pu.q)}" data-bind="pq" style="width:100%;margin-bottom:6px">${filtered.map(x => `<button class="p" data-act="person" data-k="${esc(x.key)}" ${x.key === pu.sel ? 'aria-current="true"' : ''}><span>${esc(x.name)}</span><small>${esc(peopleSub(x))}</small></button>`).join('') || '<div class="empty">No match</div>'}</div>`;
   if (!p) return `<div class="people-layout">${side}<div class="empty">No people found.</div></div>`;
-  const all = agg(p.rows), yr = monthYear(d.latestMonth), yrRows = p.rows.filter(r => monthYear(r.month) === yr), ya = agg(yrRows);
-  const series = p.rows.map(r => ({ month: r.month, rows: [r] }));
+  const all = agg(p.rows);
+  /* v3.26: period for this person: quick picks, a year, From/To months, or the timeline slider */
+  const months = d.months.filter(m => m >= p.rows[0].month && m <= p.latest.month);
+  const clampM = (m, dflt) => m == null ? dflt : months.includes(m) ? m : months.reduce((b, x) => Math.abs(x - m) < Math.abs(b - m) ? x : b, dflt);
+  let pFrom = clampM(pu.from, months[0]), pTo = clampM(pu.to, months[months.length - 1]); if (pFrom > pTo) [pFrom, pTo] = [pTo, pFrom];
+  const fRows = p.rows.filter(r => r.month >= pFrom && r.month <= pTo), fa = agg(fRows);
+  const isAll = pFrom === months[0] && pTo === months[months.length - 1];
+  const nM = months.filter(m => m >= pFrom && m <= pTo).length;
+  const pLabel = isAll ? 'all time' : pFrom === pTo ? monthLabel(pFrom) : monthLabel(pFrom) + ' – ' + monthLabel(pTo);
+  const years = [...new Set(months.map(monthYear))];
+  const iFrom = months.indexOf(pFrom), iTo = months.indexOf(pTo), maxI = Math.max(0, months.length - 1);
+  const presetOn = k => pu.preset === k && !isAll ? ' on' : k === 'all' && isAll ? ' on' : '';
+  const periodBar = `<div class="card pp-bar" style="margin-bottom:14px">
+      <div class="pp-row"><b class="pp-title">Period</b>
+        ${[['all', 'All time'], ['12', 'Last 12 months'], ['6', 'Last 6 months'], ['3', 'Last 3 months']].map(([k, l]) => `<button class="chip-btn${presetOn(k)}" data-act="pp-range" data-v="${k}">${l}</button>`).join('')}
+        <label class="pp-lbl">Year <select data-bind="pp-year"><option value="">—</option>${years.map(y => `<option value="${y}"${!isAll && pFrom === clampM(Engine.monthSerial(y, 0), months[0]) && pTo === clampM(Engine.monthSerial(y, 11), months[maxI]) ? ' selected' : ''}>${y}</option>`).join('')}</select></label>
+        <label class="pp-lbl">From <select data-bind="pp-from">${months.map(m => `<option value="${m}"${m === pFrom ? ' selected' : ''}>${monthLabel(m)}</option>`).join('')}</select></label>
+        <label class="pp-lbl">To <select data-bind="pp-to">${months.map(m => `<option value="${m}"${m === pTo ? ' selected' : ''}>${monthLabel(m)}</option>`).join('')}</select></label></div>
+      ${months.length > 1 ? `<div class="pp-slider" style="--a:${iFrom / maxI * 100}%;--b:${iTo / maxI * 100}%"><div class="pp-track"></div><input type="range" min="0" max="${maxI}" value="${iFrom}" data-bind="pp-s0" aria-label="Period start"><input type="range" min="0" max="${maxI}" value="${iTo}" data-bind="pp-s1" aria-label="Period end"></div>
+      <div class="pp-ticks">${years.map(y => { const i = months.findIndex(m => monthYear(m) === y); return `<span style="left:${i / maxI * 100}%">${i === 0 ? monthShort(months[0]) + ' ' : ''}${y}</span>`; }).join('')}<span class="pp-end">${monthLabel(months[maxI])}</span></div>` : ''}
+      <div class="sm muted" style="margin-top:6px">Showing <b>${esc(pLabel)}</b> · ${nM} month${nM === 1 ? '' : 's'} · the tiles, chart and month-by-month table follow this period.</div></div>`;
+  const series = fRows.map(r => ({ month: r.month, rows: [r] }));
   const ids = [...p.ids]; const last = p.latest; const cur = p.rows.find(r => r.month === TODAY_MS) || last;
   const missingMonths = d.months.filter(m => m >= p.rows[0].month && !p.rows.some(r => r.month === m));
   return `<div class="people-layout">${side}<div>
       <div class="card" style="margin-bottom:14px"><div style="display:flex;gap:12px;align-items:center;flex-wrap:wrap"><div style="flex:1;min-width:220px"><h2 style="font-size:20px;margin:0">${esc(p.name)}</h2>
         <div class="sm muted">${ids.length ? 'ID ' + ids.map(esc).join(', ') : 'No employee ID recorded'} · ${esc(last.client || 'No client')} · ${p.rows.length} months tracked (${monthLabel(p.rows[0].month)} – ${monthLabel(last.month)})</div>${rosterLine(p)}</div>
         <button class="btn" data-act="log-leave" data-k="${esc(p.key)}">${ic('plus')} Record attendance</button></div></div>
-      <div class="grid g6" style="grid-template-columns:repeat(6,1fr);margin-bottom:14px">
+      ${periodBar}
+      <div class="grid g6 pp-tiles" style="grid-template-columns:repeat(6,1fr);margin-bottom:14px">
         <div class="card tile"><div class="lbl">PRESENT · ${monthShort(cur.month).toUpperCase()}</div><div class="val">${rowStats(cur).present}</div><div class="delta">blank = present</div></div>
-        <div class="card tile"><div class="lbl">LEAVE DAYS ${yr}</div><div class="val">${fmt(ya.total)}</div></div>
-        <div class="card tile"><div class="lbl">LEAVE DAYS ALL TIME</div><div class="val">${fmt(all.total)}</div></div>
-        <div class="card tile"><div class="lbl">UNPLANNED / ABSENT</div><div class="val">${fmt(all.unpl)}</div></div>
-        <div class="card tile"><div class="lbl">LATE / CAB LATE</div><div class="val">${all.late}</div></div>
+        <div class="card tile"><div class="lbl">LEAVE DAYS</div><div class="val">${fmt(fa.total)}</div><div class="delta">${esc(pLabel)}</div></div>
+        <div class="card tile"><div class="lbl">UNPLANNED / ABSENT</div><div class="val">${fmt(fa.unpl)}</div><div class="delta">${esc(pLabel)}</div></div>
+        <div class="card tile"><div class="lbl">LATE / CAB LATE</div><div class="val">${fa.late}</div><div class="delta">${esc(pLabel)}</div></div>
+        <div class="card tile"><div class="lbl">LEAVE DAYS ALL TIME</div><div class="val">${fmt(all.total)}</div><div class="delta">since ${monthLabel(p.rows[0].month)}</div></div>
         <div class="card tile"><div class="lbl">PENDING APPLICATIONS</div><div class="val">${pendingApplications().filter(x => personKey(x.r.name) === p.key).length}</div></div></div>
-      <div class="card" style="margin-bottom:14px"><h2>Leave days by month</h2><div class="sub">${missingMonths.length ? `No row for ${missingMonths.length} month${missingMonths.length > 1 ? 's' : ''} in between (${missingMonths.slice(0, 4).map(monthLabel).join(', ')}${missingMonths.length > 4 ? '…' : ''}).` : 'Every month since joining has a row.'}</div>${stackChart(series, { height: 200 })}</div>
-      <div class="card" style="padding:0;overflow:hidden"><div style="padding:14px 16px 6px"><h2>Month by month</h2><div class="sub" style="margin-bottom:0">Click a day to change it.</div></div><div class="gridwrap" style="border:0;border-radius:0;box-shadow:none;max-height:none">${gridTable([...p.rows].reverse(), { mode: 'multi' })}</div></div></div></div>`;
+      <div class="card" style="margin-bottom:14px"><h2>Leave days by month</h2><div class="sub">${esc(pLabel[0].toUpperCase() + pLabel.slice(1))} · ${missingMonths.length ? `No row for ${missingMonths.length} month${missingMonths.length > 1 ? 's' : ''} in between (${missingMonths.slice(0, 4).map(monthLabel).join(', ')}${missingMonths.length > 4 ? '…' : ''}).` : 'Every month since joining has a row.'}</div>${stackChart(series, { height: 200 })}</div>
+      <div class="card" style="padding:0;overflow:hidden"><div style="padding:14px 16px 6px"><h2>Month by month</h2><div class="sub" style="margin-bottom:0">Click a day to change it.</div></div><div class="gridwrap" style="border:0;border-radius:0;box-shadow:none;max-height:none">${fRows.length ? gridTable([...fRows].reverse(), { mode: 'multi' }) : '<div class="empty">No rows in this period.</div>'}</div></div></div></div>`;
 }
 
 /* ---------- LEFT / MOVED: what still has to be marked in the tracker ---------- */
@@ -6650,6 +6691,7 @@ const ACTIONS = {
   'req-approve'(el) { const s = el.closest('.li') && el.closest('.li').querySelector('select[data-req-code]'); el.disabled = true; approveRequest(el.dataset.id, s ? s.value : null); },
   'req-reject'(el) { openRejectBox(el.dataset.id); },
   'req-cancel'(el) { cancelRequest(el.dataset.id); },
+  'pp-range'(el) { const pu = S.ui.people, v = el.dataset.v; pu.preset = v; if (v === 'all') { pu.from = pu.to = null; } else { const d0 = D(), pp = d0.people.get(pu.sel); if (!pp) return; const last = Math.min(pp.latest.month, TODAY_MS), n = +v, dt = Engine.serialToDate(last); pu.to = last; pu.from = Engine.monthSerial(dt.getUTCFullYear(), dt.getUTCMonth() - (n - 1)); } render(); },
   'log-leave'(el) { openLogLeave(el.dataset.k || (S.ui.view === 'people' ? S.ui.people.sel : null)); },
   'new-month'() { if (!can('att.addemp')) return toast('Your passcode can’t add employees to the attendance tracker. Ask the admin for the right in Settings.'); openNewMonth(); }, 'add-row'() { if (!can('att.addemp')) return toast('Your passcode can’t add employees to the attendance tracker. Ask the admin for the right in Settings.'); openRowEditor(null); },
   'edit-row'(el) { if (!can('att.rows')) return toast('Your passcode can’t edit rows in the attendance tracker. Ask the admin for the right in Settings.'); openRowEditor(+el.dataset.r); }, 'del-row'(el) { if (!can('att.rows')) return toast('Your passcode can’t delete rows in the attendance tracker. Ask the admin for the right in Settings.'); confirmDelete(+el.dataset.r); },
@@ -6694,6 +6736,10 @@ function onBind(e) {
     case 'gclient': u.grid.client = v; render(); break; case 'gstatus': u.grid.status = v; render(); break; case 'gfilter': u.grid.filter = v; render(); break; case 'gsort': u.grid.sort = v; render(); break;
     case 'who-start': if (v) { u.who.start = v; render(); } break; case 'who-show': u.who.show[el.dataset.k] = el.checked; render(); break;
     case 'pq': u.people.q = v; refocus('[data-bind="pq"]'); break;
+    case 'pp-from': u.people.from = +v; u.people.preset = null; render(); break;
+    case 'pp-to': u.people.to = +v; u.people.preset = null; render(); break;
+    case 'pp-year': if (v) { u.people.from = Engine.monthSerial(+v, 0); u.people.to = Engine.monthSerial(+v, 11); u.people.preset = 'y'; } else { u.people.from = u.people.to = null; u.people.preset = 'all'; } render(); break;
+    case 'pp-s0': case 'pp-s1': { const d0 = D(), pp = d0.people.get(u.people.sel); if (!pp) break; const ms = d0.months.filter(m => m >= pp.rows[0].month && m <= pp.latest.month); const other = el.parentElement.querySelector(b === 'pp-s0' ? '[data-bind="pp-s1"]' : '[data-bind="pp-s0"]'); let a = +v, c = +other.value; if (b === 'pp-s1') [a, c] = [c, a]; if (a > c) [a, c] = [c, a]; u.people.from = ms[a]; u.people.to = ms[c]; u.people.preset = null; render(); break; }
     case 'scope': u.scope = v; render(); break;
     case 'awb': u.act.wb = v; u.act.user = 'all'; u.act.shown = 100; render(); break; case 'auser': u.act.user = v; u.act.shown = 100; render(); break;
     case 'avia': u.act.via = v; u.act.shown = 100; render(); break; case 'atype': u.act.type = v; u.act.shown = 100; render(); break;
@@ -6711,6 +6757,24 @@ function mount() {
   ROOT.innerHTML = `<style>${ATT_CSS}
 @media (max-width:700px) { .grid.g6[style*="repeat(4"] { grid-template-columns:repeat(2,minmax(0,1fr)) !important; } .card { padding:12px !important; } .tabs, .seg { flex-wrap:wrap; } table { font-size:12px; } .toolbar, .bar { flex-wrap:wrap; gap:6px; } }
 .tl-filters { display:flex; flex-wrap:wrap; align-items:center; gap:6px 8px; margin:10px 0 0; }
+.pp-bar { padding:12px 16px !important; }
+.pp-row { display:flex; flex-wrap:wrap; align-items:center; gap:6px 8px; }
+.pp-title { font-size:13px; margin-right:4px; }
+.chip-btn { border:1px solid var(--line-2); background:var(--surface); color:var(--ink-2); border-radius:999px; padding:4px 11px; font:inherit; font-size:12.5px; cursor:pointer; }
+.chip-btn.on { background:var(--ink); border-color:var(--ink); color:var(--surface); }
+.pp-lbl { display:inline-flex; align-items:center; gap:5px; font-size:12.5px; color:var(--ink-2); }
+.pp-lbl select { height:30px; font-size:12.5px; }
+.pp-slider { position:relative; height:28px; margin:12px 6px 0; }
+.pp-track { position:absolute; left:0; right:0; top:12px; height:4px; border-radius:4px; background:linear-gradient(90deg, var(--line-2) var(--a), var(--accent, #3b6cf6) var(--a), var(--accent, #3b6cf6) var(--b), var(--line-2) var(--b)); }
+.pp-slider input[type=range] { position:absolute; left:-8px; right:-8px; width:calc(100% + 16px); top:4px; margin:0; background:transparent; pointer-events:none; -webkit-appearance:none; appearance:none; height:20px; }
+.pp-slider input[type=range]::-webkit-slider-runnable-track { background:transparent; height:20px; }
+.pp-slider input[type=range]::-moz-range-track { background:transparent; }
+.pp-slider input[type=range]::-webkit-slider-thumb { -webkit-appearance:none; pointer-events:auto; width:18px; height:18px; margin-top:1px; border-radius:50%; background:var(--surface); border:2px solid var(--accent, #3b6cf6); box-shadow:0 1px 4px rgba(0,0,0,.25); cursor:grab; }
+.pp-slider input[type=range]::-moz-range-thumb { pointer-events:auto; width:16px; height:16px; border-radius:50%; background:var(--surface); border:2px solid var(--accent, #3b6cf6); cursor:grab; }
+.pp-ticks { position:relative; height:16px; margin:2px 6px 0; font-size:11px; color:var(--ink-3, #888); }
+.pp-ticks span { position:absolute; transform:translateX(0); white-space:nowrap; }
+.pp-ticks .pp-end { right:0; }
+@media (max-width:700px) { .pp-tiles { grid-template-columns:repeat(2,minmax(0,1fr)) !important; } }
 .tl-filters label { display:inline-flex; align-items:center; gap:6px; }
 .tl-filters + .tl-scroll, .tl-filters + .empty { margin-top:12px; }
 .tl-dot { display:inline-block; width:10px; height:10px; border-radius:3px; margin-left:4px; }
@@ -7309,7 +7373,7 @@ async function poll() {
 }
 
 /* ============================== filtering ============================== */
-const APP = { title: "Team Dashboard", version: "3.25.1", released: "29 Sep 2026" };
+const APP = { title: "Team Dashboard", version: "3.26.0", released: "29 Sep 2026" };
 const BASE_DIMS = { status: "status_column", desig: "designation_column", client: "client_column", mode: "mode_column" };
 const STANDARD_STATUSES = ["Active", "Manager", "OJT", "Bench", "New", "Projected", "Left", "Moved"];
 const TILE_ORDER = ["Active", "Manager", "OJT", "Bench", "New", "Projected"];
@@ -11009,13 +11073,21 @@ function drawEditor(box, u, reload, users = [], template = null, groups = []) {
       for (const [k] of allIt) boxes[k].checked = lv === 'edit' || (lv === 'view' && !PERM.isEditKey(k));
       sync(); paintSeg();
     };
-    const segBtns = [['none', 'None'], ...(hasView ? [['view', 'View']] : []), ...(hasEdit ? [['edit', 'Edit']] : [])].map(([lv, t]) => h('button', { type: 'button', class: 'rseg-b', 'data-lv': lv, title: lv === 'none' ? 'Hide this module' : lv === 'view' ? 'Can see, but not change anything' : 'Can see and change everything here', onclick: e => { e.preventDefault(); e.stopPropagation(); setLevel(lv); } }, t));
+    /* v3.26: one tick box per level (Hide / View / Edit) in fixed columns; ticking one clears the others */
+    const LV = [['none', 'Hide', 'Hide this area'], ['view', 'View', 'Can see, but not change anything'], ['edit', 'Edit', 'Can see and change everything here']];
+    const segBtns = [];
+    const segCells = LV.map(([lv, t, tip]) => {
+      if ((lv === 'view' && !hasView) || (lv === 'edit' && !hasEdit)) return h('span', { class: 'rchk-na', title: lv === 'edit' ? 'Nothing to change in this area' : 'Nothing to see in this area' }, '—');
+      const box = h('input', { type: 'checkbox', 'data-lv': lv, 'aria-label': t + ' · ' + g.name });
+      segBtns.push(box);
+      return h('label', { class: 'rchk rchk-' + lv, title: tip, onclick: e => { e.preventDefault(); e.stopPropagation(); if (!box.disabled) setTimeout(() => { setLevel(lv); paintPresets(); }, 0); } }, box, h('span', { class: 'rchk-t' }, t));
+    });
     const segHint = h('small', { class: 'rseg-custom' }, 'Custom');
-    const seg = h('div', { class: 'rseg', role: 'group', 'aria-label': g.name + ' access' }, ...segBtns);
+    const seg = h('div', { class: 'rchks', role: 'group', 'aria-label': g.name + ' access' }, ...segCells);
     /* v3.20: one line per module; the individual ticks open underneath with “Fine-tune” */
     const allKeys = [...(g.page ? [g.page] : []), ...allIt.map(([k]) => k)];
     const countEl = h('small', { class: 'rrow-count' });
-    const paintSeg = () => { const lv = levelOf(); segBtns.forEach(b => b.setAttribute('aria-pressed', String(b.dataset.lv === lv))); segHint.hidden = lv !== 'custom'; countEl.textContent = allKeys.filter(k => boxes[k].checked).length + ' of ' + allKeys.length + ' on'; };
+    const paintSeg = () => { const lv = levelOf(); segBtns.forEach(b => { b.checked = b.dataset.lv === lv; }); segHint.hidden = lv !== 'custom'; countEl.textContent = allKeys.filter(k => boxes[k].checked).length + ' of ' + allKeys.length + ' on'; };
     const extra = g.name === 'Filters' ? fixedBox : g.name === 'Notifications' ? audienceBox : g.name === 'Attendance' ? fieldBox : null;
     const card = h('details', { class: 'rrow' },
       h('summary', {}, h('span', { class: 'rrow-name' }, h('b', {}, g.name), h('span', { class: 'rrow-meta' }, countEl, segHint)), seg, h('span', { class: 'rrow-more', 'aria-hidden': 'true' }, 'Fine-tune')),
@@ -11031,9 +11103,9 @@ function drawEditor(box, u, reload, users = [], template = null, groups = []) {
   const presetNow = h('small', { class: 'rpre-now' });
   const presets = h('div', { class: 'rights-presets' }, h('span', {}, 'Quick start:'), ...presetBtns, presetNow);
   const superNote = h('p', { class: 'set-hint sup-note' }, '⭐ Super admins can open and change everything, and manage people, groups and access. Nothing to tick.');
-  const roleNote = h('p', { class: 'set-hint' }, 'Pick a quick start, then set each area to None, View or Edit. Open “Fine-tune” on a line only if you need something in between.');
-  const rights = h('div', { class: 'rights' }, superNote, roleNote, presets, h('div', { class: 'rrows' }, ...modules));
-  rights.addEventListener('change', () => setTimeout(paintPresets)); rights.addEventListener('click', e => { if (e.target.closest('.rseg-b')) setTimeout(paintPresets); });
+  const roleNote = h('p', { class: 'set-hint' }, 'Pick a quick start, then tick Hide, View or Edit for each area. Open “Fine-tune” on a line only if you need something in between; the line then shows “Custom”.');
+  const rights = h('div', { class: 'rights' }, superNote, roleNote, presets, h('div', { class: 'rrows' }, h('div', { class: 'rgrid-head', 'aria-hidden': 'true' }, h('span', {}, 'Area'), h('span', {}, 'Hide'), h('span', {}, 'View'), h('span', {}, 'Edit'), h('span', {}, '')), ...modules));
+  rights.addEventListener('change', () => setTimeout(paintPresets)); rights.addEventListener('click', e => { if (e.target.closest('.rseg-b, .rchk')) setTimeout(paintPresets); });
   const syncRole = () => { const sup = isSuper(); rights.classList.toggle('is-admin', sup); superNote.hidden = !sup; roleNote.hidden = sup; presets.hidden = sup; fixedBox.hidden = sup; audienceBox.hidden = sup; fieldBox.hidden = sup; syncs.forEach(f => f()); };
   role.addEventListener('change', () => { if (isNew && role.value === 'admin') { for (const k of PERM.keys) boxes[k].checked = !!PERM.presets['Admin'][k]; } syncRole(); paintPresets(); });
   syncRole(); paintPresets();
