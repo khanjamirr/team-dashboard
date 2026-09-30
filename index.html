@@ -4,7 +4,7 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <link rel="icon" href="data:,">
-<title>Team Dashboard · 3.30.0</title>
+<title>Team Dashboard · 3.30.1</title>
 <style>
 :root {
   color-scheme: light;
@@ -1757,10 +1757,10 @@ body.filters-locked #cleanFilters, body.filters-locked #xchips, body.filters-loc
     <p class="gate-sub">One place for your people, priorities and team insights.</p>
     <div id="connectBody"><div class="empty">Loading…</div></div>
   </div>
-  <p class="gate-ver">3.30.0</p>
+  <p class="gate-ver">3.30.1</p>
 </section>
 
-<div id="app" hidden><aside class="sidebar" aria-label="Workspace navigation"><div class="brand dashboard-identity">      <h1><span id="title">Team Dashboard</span><span class="ver" id="ver" title="Version 3.30.0">3.30.0</span></h1><p class="brand-tag">One place for your people, priorities and team insights.</p>      <span class="sync" id="sync" role="status"><i></i><span id="syncText">Loading…</span></span></div><div class="nav-label">WORKSPACE</div>      <nav class="tabs" role="tablist" aria-label="Pages" aria-orientation="vertical">
+<div id="app" hidden><aside class="sidebar" aria-label="Workspace navigation"><div class="brand dashboard-identity">      <h1><span id="title">Team Dashboard</span><span class="ver" id="ver" title="Version 3.30.1">3.30.1</span></h1><p class="brand-tag">One place for your people, priorities and team insights.</p>      <span class="sync" id="sync" role="status"><i></i><span id="syncText">Loading…</span></span></div><div class="nav-label">WORKSPACE</div>      <nav class="tabs" role="tablist" aria-label="Pages" aria-orientation="vertical">
         <button class="tab on" role="tab" aria-controls="pageSummary" data-view="summary" aria-selected="true" data-icon="🏠" data-short="Home">Overview</button>
         <button class="tab" role="tab" aria-controls="pageEmployees" data-view="employees" aria-selected="false" data-icon="👥" data-short="People">Employees</button>
       <button class="tab" role="tab" aria-controls="pageAttendance" data-view="attendance" aria-selected="false" data-icon="🗓️" data-short="Attend.">Attendance</button>
@@ -7125,15 +7125,17 @@ const bkRow = (key, iso) => { const p = D(true).people.get(key); if (!p) return 
 const bkExtraKey = r => Object.keys(r.extra || {}).find(k => k.toLowerCase() === BK_FIELD.toLowerCase());
 const bkGet = (key, iso) => {
   const r = bkRow(key, iso);
-  if (r) { const k = bkExtraKey(r); if (k) { const v = bkParse(r.extra[k]).get(+iso.slice(8, 10)); if (v) return bkIsLive(v) ? { none: true } : { b: v }; } }
+  if (r) { const k = bkExtraKey(r); if (k) { const v = bkParse(r.extra[k]).get(+iso.slice(8, 10)); if (v) return bkIsLive(v) ? { none: true } : /^(yes|backup provided)$/i.test(v.trim()) ? { b: '', yes: true } : { b: v }; } }
   return bkAll()[key + '|' + iso] || null;   // backups saved before 3.28.2 (shared settings)
 };
 const canBackup = () => canLog() || can('att.edit') || can('att.approve');
-const bkLabel = x => !x ? '' : x.none ? 'Kept live' : x.b;
+const bkLabel = x => !x ? '' : x.none ? 'Kept live' : (x.b || 'Backup provided');
+/* v3.30.1: backup settings: is the backup person's name optional (default), required, or not asked at all */
+const bkNameMode = () => { const m = ((window.TD_SETTINGS || {}).backup_opts || {}).name; return ['optional', 'required', 'off'].includes(m) ? m : 'optional'; };
 /* v3.30.0: "Backup provided" as a plain Yes / No (kept live counts as No: nobody was put on the work) */
 const bkYN = x => x && !x.none ? 'Yes' : 'No';
 const bkYNCls = x => x && !x.none ? 'y' : x && x.none ? 'l' : 'n';
-const bkTipLine = x => 'Backup provided: <b>' + bkYN(x) + '</b>' + (x ? (x.none ? ' · kept live' : ' · ' + esc(x.b)) : '');
+const bkTipLine = x => 'Backup provided: <b>' + bkYN(x) + '</b>' + (x ? (x.none ? ' · kept live' : x.b ? ' · ' + esc(x.b) : '') : '');
 function bkTeam(exceptKey, iso) {
   const t = new Date(iso + 'T00:00:00Z'), ms = Engine.monthSerial(t.getUTCFullYear(), t.getUTCMonth()), i = t.getUTCDate() - 1;
   const outToday = new Set((D(true).byMonth.get(ms) || []).filter(r => { const c = catOf(r.days[i]); return c && (LEAVE_CATS.has(c) || c === 'applied'); }).map(r => personKey(r.name)));
@@ -7157,11 +7159,11 @@ function bkStretch(p, iso) {
 function openBackupBox(pKey, iso, onDone) {
   if (!canBackup()) { toast('Your passcode can’t set backups.'); return; }
   const d = D(true), p = d.people.get(pKey); const name = p ? p.name : pKey;
-  const cur = bkGet(pKey, iso), team = bkTeam(pKey, iso), days = bkStretch(p, iso);
+  const cur = bkGet(pKey, iso), team = bkTeam(pKey, iso), days = bkStretch(p, iso), nmMode = bkNameMode();
   const m = openModal({ title: 'Backup for ' + name,
     body: `<p class="sm" style="margin:0 0 10px">${esc(longDate(new Date(iso + 'T00:00:00Z')))} · who covers ${esc(name)}’s work?</p>
-      <div class="form"><label class="full" style="flex-direction:row;align-items:center;gap:8px;font-weight:500"><input type="radio" name="bk-k" value="yes" ${!cur || !cur.none ? 'checked' : ''}> A backup is covering</label>
-      <label class="full" id="bk-wrap">Backup (anyone in the current team)<input type="text" id="bk-name" list="bk-list" value="${esc(cur && !cur.none ? cur.b : '')}" placeholder="Type or pick a name" autocomplete="off">
+      <div class="form"><label class="full" style="flex-direction:row;align-items:center;gap:8px;font-weight:500"><input type="radio" name="bk-k" value="yes" ${!cur || !cur.none ? 'checked' : ''}> Backup provided: Yes</label>
+      <label class="full" id="bk-wrap" ${nmMode === 'off' ? 'style="display:none"' : ''}>Backup person${nmMode === 'optional' ? ' <span class="muted" style="font-weight:400">(optional · anyone in the current team)</span>' : ' (anyone in the current team)'}<input type="text" id="bk-name" list="bk-list" value="${esc(cur && !cur.none ? cur.b : '')}" placeholder="${nmMode === 'optional' ? 'Leave blank to just mark Yes' : 'Type or pick a name'}" autocomplete="off">
         <datalist id="bk-list">${team.map(t => `<option value="${esc(t.name)}" label="${esc([t.id && 'ID ' + t.id, t.sub, t.out ? 'also off that day' : ''].filter(Boolean).join(' · '))}"></option>`).join('')}</datalist></label>
       <label class="full" style="flex-direction:row;align-items:center;gap:8px;font-weight:500"><input type="radio" name="bk-k" value="none" ${cur && cur.none ? 'checked' : ''}> Kept live (no backup needed)</label>
       ${days.length > 1 ? `<label class="full" style="flex-direction:row;align-items:center;gap:8px;font-weight:500"><input type="checkbox" id="bk-all" checked> Same for the whole leave: ${esc(longDate(new Date(days[0] + 'T00:00:00Z')))} – ${esc(longDate(new Date(days[days.length - 1] + 'T00:00:00Z')))} (${days.length} days)</label>` : ''}</div>
@@ -7172,9 +7174,9 @@ function openBackupBox(pKey, iso, onDone) {
   m.querySelectorAll('input[name="bk-k"]').forEach(r => r.addEventListener('change', syncKind)); syncKind();
   const write = async val => {
     const which = ($('#bk-all', m) && $('#bk-all', m).checked) ? days : [iso];
-    const txt = val ? (val.none ? 'Kept live' : val.b) : '';
+    const txt = val ? (val.none ? 'Kept live' : (val.b || 'Yes')) : '';
     const missing = which.filter(x => !bkRow(pKey, x));
-    const ok = mutate((val ? (val.none ? 'Kept live (no backup) for ' : 'Backup ' + val.b + ' for ') : 'Backup cleared for ') + name + ' · ' + which.length + ' day' + (which.length === 1 ? '' : 's'), () => {
+    const ok = mutate((val ? (val.none ? 'Kept live (no backup) for ' : val.b ? 'Backup ' + val.b + ' for ' : 'Backup provided for ') : 'Backup cleared for ') + name + ' · ' + which.length + ' day' + (which.length === 1 ? '' : 's'), () => {
       if (!attFieldNames().some(n => n.toLowerCase() === BK_FIELD.toLowerCase()) && !(S.newFields || []).some(n => n.toLowerCase() === BK_FIELD.toLowerCase())) (S.newFields || (S.newFields = [])).push(BK_FIELD);
       for (const x of which) {
         const r = bkRow(pKey, x); if (!r) continue;
@@ -7185,13 +7187,14 @@ function openBackupBox(pKey, iso, onDone) {
     }, { backup: true });
     if (ok === false) return;
     closeModal(); if (renderCard.el) renderCard(renderCard.el); notify(); try { onDone && onDone(); } catch { }
-    toast((val ? (val.none ? 'Marked as kept live.' : val.b + ' is covering for ' + name + (which.length > 1 ? ' (' + which.length + ' days).' : '.')) : 'Backup cleared.') + (S.auto ? '' : ' Saved to Excel with the next sync.') + (missing.length ? ' ' + missing.length + ' day(s) had no tracker row and were skipped.' : ''));
+    toast((val ? (val.none ? 'Marked as kept live.' : !val.b ? 'Marked as backup provided for ' + name + (which.length > 1 ? ' (' + which.length + ' days).' : '.') : val.b + ' is covering for ' + name + (which.length > 1 ? ' (' + which.length + ' days).' : '.')) : 'Backup cleared.') + (S.auto ? '' : ' Saved to Excel with the next sync.') + (missing.length ? ' ' + missing.length + ' day(s) had no tracker row and were skipped.' : ''));
   };
   $('#bk-go', m).onclick = async () => {
     try {
       if (kind() === 'none') return await write({ none: true, by: BE.userName(), at: new Date().toISOString() });
-      const v = $('#bk-name', m).value.trim(); const hit = team.find(t => t.name.toLowerCase() === v.toLowerCase());
-      if (!v) { $('#bk-err', m).textContent = 'Pick who is covering, or choose “Kept live”.'; return; }
+      const v = nmMode === 'off' ? '' : $('#bk-name', m).value.trim(); const hit = team.find(t => t.name.toLowerCase() === v.toLowerCase());
+      if (!v && nmMode === 'required') { $('#bk-err', m).textContent = 'Pick who is covering, or choose “Kept live”.'; return; }
+      if (!v) return await write({ b: '', yes: true, by: BE.userName(), at: new Date().toISOString() });
       if (!hit) { $('#bk-err', m).textContent = 'Pick someone from the current team list.'; return; }
       await write({ b: hit.name, id: hit.id, by: BE.userName(), at: new Date().toISOString() });
     } catch (e) { $('#bk-err', m).textContent = 'Could not save: ' + e.message; }
@@ -7280,7 +7283,7 @@ function openBackupReport() {
       <div class="bkr-tiles">${tile('b', dl(T.backup), 'Backup provided', pl(T.pBackup))}${tile('l', dl(T.live), 'Kept live', pl(T.pLive) + ' · no backup needed')}${tile('n', dl(T.none), 'No backup', pl(T.pNone))}</div>
       <div class="bkr-bar2" title="${T.cov}% covered"><i class="b" style="width:${T.days ? T.backup / T.days * 100 : 0}%"></i><i class="l" style="width:${T.days ? T.live / T.days * 100 : 0}%"></i><i class="n" style="width:${T.days ? T.none / T.days * 100 : 0}%"></i></div>
       ${!clientView && R.byClient.length ? `<h4>By client</h4><table class="bkr-tbl"><thead><tr><th>Client</th><th>People on leave</th><th>Leave days</th><th>Backup provided</th><th>Kept live</th><th>No backup</th><th>Covered</th></tr></thead><tbody>${R.byClient.map(c => `<tr><td><button class="linkbtn" data-bkr-client="${esc(c.client)}">${esc(c.client)}</button></td><td>${c.people}</td><td>${fmt(c.days)}</td><td>${fmt(c.backup)}</td><td>${fmt(c.live)}</td><td class="${c.none ? 'bad' : ''}">${fmt(c.none)}</td><td><b>${c.cov}%</b></td></tr>`).join('')}</tbody></table>` : ''}
-      <h4>Day by day</h4>${R.items.length ? `<table class="bkr-tbl"><thead><tr><th>Date</th><th>Employee</th>${clientView ? '' : '<th>Client</th>'}<th>Leave</th><th>Backup provided</th><th>Cover</th></tr></thead><tbody>${R.items.map(x => `<tr><td>${bkFmtD(x.iso)}</td><td>${esc(nmOf(x))}</td>${clientView ? '' : `<td>${esc(x.client)}</td>`}<td>${esc(x.code)}${x.days === .5 ? ' (½)' : ''}</td><td><em class="bk-yn ${x.st === 'backup' ? 'y' : x.st === 'live' ? 'l' : 'n'}">${x.yn}</em></td><td><span class="bkr-st ${x.st}">${x.st === 'backup' ? '↪ ' + esc(x.backup) : BK_ST[x.st]}</span>${edit ? `<button type="button" class="btn mini bkr-ed" data-bkr-ed="${esc(x.key)}" data-iso="${x.iso}" title="Change the backup for this day">${x.st === 'none' ? '+ Add' : 'Edit'}</button>` : ''}</td></tr>`).join('')}</tbody></table>` : '<p class="sm muted">No leave in this cycle' + (clientView ? ' for this client' : '') + (BKR.yn !== 'all' ? ' with backup provided: ' + BKR.yn : '') + '.</p>'}
+      <h4>Day by day</h4>${R.items.length ? `<table class="bkr-tbl"><thead><tr><th>Date</th><th>Employee</th>${clientView ? '' : '<th>Client</th>'}<th>Leave</th><th>Backup provided</th><th>Cover</th></tr></thead><tbody>${R.items.map(x => `<tr><td>${bkFmtD(x.iso)}</td><td>${esc(nmOf(x))}</td>${clientView ? '' : `<td>${esc(x.client)}</td>`}<td>${esc(x.code)}${x.days === .5 ? ' (½)' : ''}</td><td><em class="bk-yn ${x.st === 'backup' ? 'y' : x.st === 'live' ? 'l' : 'n'}">${x.yn}</em></td><td><span class="bkr-st ${x.st}">${x.st === 'backup' && x.backup ? '↪ ' + esc(x.backup) : BK_ST[x.st]}</span>${edit ? `<button type="button" class="btn mini bkr-ed" data-bkr-ed="${esc(x.key)}" data-iso="${x.iso}" title="Change the backup for this day">${x.st === 'none' ? '+ Add' : 'Edit'}</button>` : ''}</td></tr>`).join('')}</tbody></table>` : '<p class="sm muted">No leave in this cycle' + (clientView ? ' for this client' : '') + (BKR.yn !== 'all' ? ' with backup provided: ' + BKR.yn : '') + '.</p>'}
       </div>`;
     body.querySelectorAll('[data-bkr]').forEach(el => el.addEventListener('change', () => { BKR[el.dataset.bkr] = el.dataset.bkr === 'month' ? +el.value : el.value; draw(); }));
     body.querySelectorAll('[data-bkr-client]').forEach(el => el.addEventListener('click', () => { BKR.client = el.dataset.bkrClient; draw(); }));
@@ -7364,7 +7367,7 @@ function renderCard(el, opts = {}) {
       const listCopy = C.tab === 'late' ? tableData(['Employee', 'Client', 'Code', 'Status'], list.map(x => [nm(x.r), cl(x.r), String(x.v).trim().toUpperCase(), x.c === 'applied' ? 'Awaiting approval' : labelOf(x.v)]), (C.tab === 'late' ? 'Late comings' : C.tab === 'half' ? 'Half days' : 'Out') + ' on ' + longDate(rd)) : tableData(['Employee', 'Client', 'Code', 'Status', 'Backup provided', 'Backup'], list.map(x => { const b = bkGet(personKey(x.r.name), rdIso); return [nm(x.r), cl(x.r), String(x.v).trim().toUpperCase(), x.c === 'applied' ? 'Awaiting approval' : labelOf(x.v), bkYN(b), bkLabel(b) || '—']; }), (C.tab === 'late' ? 'Late comings' : C.tab === 'half' ? 'Half days' : 'Out') + ' on ' + longDate(rd));
       renderCard._copy = { ...renderCard._copy, today: listCopy };
       const emptyTxt = !rows.length ? 'No attendance rows for this month.' : C.tab === 'late' ? 'No late comings ' + dayWord + '.' : C.tab === 'half' ? 'No half days ' + dayWord + '.' : 'Nobody is on leave ' + dayWord + '.';
-      const miniList = list.length ? `<ul class="att-mini">${list.map(x => `<li><span class="att-mini-n">${esc(nm(x.r))}${can('att.info') ? `<button type="button" class="rq-i" data-lainfo="${esc(x.r.name.trim())}" aria-label="Past and upcoming leave of ${esc(nm(x.r))}">i</button>` : ''}</span><span class="att-mini-c">${esc(cl(x.r))}</span><span class="ph-chip c-${esc(x.c)}">${esc(String(x.v).trim().toUpperCase())}</span><span class="att-mini-s">${esc(x.c === 'applied' ? 'Awaiting approval' : labelOf(x.v))}</span>${C.tab === 'late' ? '<span></span>' : (() => { const k = personKey(x.r.name), b = bkGet(k, rdIso); return `<span class="att-bkc"><em class="bk-yn ${bkYNCls(b)}" title="Backup provided: ${bkYN(b)}">${bkYN(b)}</em>` + (b ? `<button type="button" class="att-bk ${b.none ? 'none' : 'set'}" data-bk="${esc(k)}" ${canBackup() ? '' : 'disabled'} title="${esc(b.none ? 'Kept live (no backup needed)' : 'Backup: ' + b.b)}">${b.none ? 'Kept live' : '↪ ' + esc(b.b)}</button>` : canBackup() ? `<button type="button" class="att-bk add" data-bk="${esc(k)}">+ Backup</button>` : '<span class="att-bk-no">No backup</span>') + '</span>'; })()}</li>`).join('')}</ul>` : `<div class="att-mini-empty">${emptyTxt}</div>`;
+      const miniList = list.length ? `<ul class="att-mini">${list.map(x => `<li><span class="att-mini-n">${esc(nm(x.r))}${can('att.info') ? `<button type="button" class="rq-i" data-lainfo="${esc(x.r.name.trim())}" aria-label="Past and upcoming leave of ${esc(nm(x.r))}">i</button>` : ''}</span><span class="att-mini-c">${esc(cl(x.r))}</span><span class="ph-chip c-${esc(x.c)}">${esc(String(x.v).trim().toUpperCase())}</span><span class="att-mini-s">${esc(x.c === 'applied' ? 'Awaiting approval' : labelOf(x.v))}</span>${C.tab === 'late' ? '<span></span>' : (() => { const k = personKey(x.r.name), b = bkGet(k, rdIso); return `<span class="att-bkc"><em class="bk-yn ${bkYNCls(b)}" title="Backup provided: ${bkYN(b)}">${bkYN(b)}</em>` + (b ? `<button type="button" class="att-bk ${b.none ? 'none' : 'set'}" data-bk="${esc(k)}" ${canBackup() ? '' : 'disabled'} title="${esc(b.none ? 'Kept live (no backup needed)' : b.b ? 'Backup: ' + b.b : 'Backup provided (no name)')}">${b.none ? 'Kept live' : b.b ? '↪ ' + esc(b.b) : 'Provided'}</button>` : canBackup() ? `<button type="button" class="att-bk add" data-bk="${esc(k)}">+ Backup</button>` : '<span class="att-bk-no">No backup</span>') + '</span>'; })()}</li>`).join('')}</ul>` : `<div class="att-mini-empty">${emptyTxt}</div>`;
       const needBk = C.tab === 'late' ? [] : list, covered = needBk.filter(x => bkGet(personKey(x.r.name), rdIso)).length;
       const bkLine = needBk.length ? `<div class="att-bk-sum ${covered === needBk.length ? 'ok' : ''}">Backups: <b>${covered} of ${needBk.length}</b> covered${covered < needBk.length ? ' · ' + (needBk.length - covered) + ' without a backup' : ''}<button type="button" class="linkbtn" data-bk-copy title="Copy this cycle's backups (${esc(cycLabel(cycOf(rd)))}) for Excel or email">Copy ${esc(monthLabel(cycOf(rd)))} backups</button></div>` : '';
       html = head2 + `<div class="att-tabs">${tabBtn('leave', nFull, ' on leave', nLa ? ` <em>+${nLa} awaiting</em>` : '')}${tabBtn('half', T.half.length, ' half day')}${tabBtn('late', T.late.length, ' late')}<span class="grow"></span>${copyBtn('today', listCopy)}${pseudoCol ? toggle('names', [['real', 'Real'], ['pseudo', 'Pseudo']]) : ''}<button type="button" class="btn mini" data-att-hist>History &amp; upcoming ↗</button><button type="button" class="btn mini" data-bk-report>Backup report ↗</button></div>` + bkLine + miniList;
@@ -7807,7 +7810,7 @@ async function poll() {
 }
 
 /* ============================== filtering ============================== */
-const APP = { title: "Team Dashboard", version: "3.30.0", released: "30 Sep 2026" };
+const APP = { title: "Team Dashboard", version: "3.30.1", released: "30 Sep 2026" };
 const BASE_DIMS = { status: "status_column", desig: "designation_column", client: "client_column", mode: "mode_column" };
 const STANDARD_STATUSES = ["Active", "Manager", "OJT", "Bench", "New", "Projected", "Left", "Moved"];
 const TILE_ORDER = ["Active", "Manager", "OJT", "Bench", "New", "Projected"];
@@ -11258,6 +11261,7 @@ const MODULES = [
   { id: 'sync', name: 'Save & sync', show: () => PERM.can('sync.view'), draw: drawSync },
   { id: 'signins', name: 'Sign-in log', show: () => PERM.online() && PERM.can('set.workbook'), draw: drawSignins },
   { id: 'workbook', name: 'Workbook & backups', show: () => PERM.can('set.workbook') || PERM.can('workbook.download'), draw: drawWorkbook },
+  { id: 'backups', name: 'Leave backups', show: () => PERM.isSuper() || PERM.can('set.fields'), draw: drawBackupSettings },
   { id: 'tools', name: 'Tools', show: () => PERM.can('tools.distance'), draw: drawTools },
   { id: 'prefs', name: 'Preferences', show: () => true, draw: drawPrefs },
 ];
@@ -11977,6 +11981,18 @@ function drawTools(pane) {
     h('div', { class: 'set-card' }, h('h4', {}, 'Distance from the office'),
       h('p', { class: 'set-hint' }, 'Estimates how far each person’s current area is from the office, without a Google account. ' + ((window.GD && (GD.error || GD.status)) || '')),
       h('button', { class: 'btn', type: 'button', onclick: () => openDistanceTool() }, 'Calculate approximate distances')));
+}
+
+/* ----- v3.30.1: Leave backups ----- */
+function drawBackupSettings(pane) {
+  const cur = (((window.TD_SETTINGS || {}).backup_opts || {}).name) || 'optional', opts = { ...((window.TD_SETTINGS || {}).backup_opts || {}) };
+  const OPTS = [['optional', 'Optional', 'Mark “Backup provided: Yes” with or without naming who covers.'], ['required', 'Required', 'Every “Yes” must name someone from the current team.'], ['off', 'Don’t ask', 'Only Yes / No / Kept live. No name field in the backup box.']];
+  const save = async v => { try { await saveTeamSetting('backup_opts', { ...opts, name: v }, { name: 'Leave backups', text: 'Backup person name: ' + OPTS.find(o => o[0] === v)[1] }); toast('Saved. Backup person name: ' + OPTS.find(o => o[0] === v)[1] + '.'); drawBackupSettings(pane); } catch (e) { toast('Could not save: ' + e.message); } };
+  fill(pane,
+    h('div', { class: 'set-card' }, h('h4', {}, 'Backup person’s name'),
+      h('p', { class: 'set-hint' }, 'When someone marks that a backup was provided for a leave day, should they also tag who the backup is? Reports always show Backup provided: Yes / No either way.'),
+      h('div', { class: 'seg-set', role: 'group', 'aria-label': 'Backup person name' }, ...OPTS.map(([v, l]) => h('button', { type: 'button', 'aria-pressed': cur === v ? 'true' : 'false', onclick: () => save(v) }, l))),
+      h('p', { class: 'set-hint', style: 'margin-top:8px' }, OPTS.find(o => o[0] === cur)[2])));
 }
 
 /* ----- Preferences ----- */
