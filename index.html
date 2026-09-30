@@ -4,7 +4,7 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <link rel="icon" href="data:,">
-<title>Team Dashboard · 3.40.2</title>
+<title>Team Dashboard · 3.40.4</title>
 <style>
 :root {
   color-scheme: light;
@@ -1810,10 +1810,10 @@ body.filters-locked #cleanFilters, body.filters-locked #xchips, body.filters-loc
     <p class="gate-sub">One place for your people, priorities and team insights.</p>
     <div id="connectBody"><div class="empty">Loading…</div></div>
   </div>
-  <p class="gate-ver">3.40.2</p>
+  <p class="gate-ver">3.40.4</p>
 </section>
 
-<div id="app" hidden><aside class="sidebar" aria-label="Workspace navigation"><div class="brand dashboard-identity">      <h1><span id="title">Team Dashboard</span><span class="ver" id="ver" title="Version 3.40.2">3.40.2</span></h1><p class="brand-tag">One place for your people, priorities and team insights.</p>      <span class="sync" id="sync" role="status"><i></i><span id="syncText">Loading…</span></span></div><div class="nav-label">WORKSPACE</div>      <nav class="tabs" role="tablist" aria-label="Pages" aria-orientation="vertical">
+<div id="app" hidden><aside class="sidebar" aria-label="Workspace navigation"><div class="brand dashboard-identity">      <h1><span id="title">Team Dashboard</span><span class="ver" id="ver" title="Version 3.40.4">3.40.4</span></h1><p class="brand-tag">One place for your people, priorities and team insights.</p>      <span class="sync" id="sync" role="status"><i></i><span id="syncText">Loading…</span></span></div><div class="nav-label">WORKSPACE</div>      <nav class="tabs" role="tablist" aria-label="Pages" aria-orientation="vertical">
         <button class="tab on" role="tab" aria-controls="pageSummary" data-view="summary" aria-selected="true" data-icon="🏠" data-short="Home">Overview</button>
         <button class="tab" role="tab" aria-controls="pageEmployees" data-view="employees" aria-selected="false" data-icon="👥" data-short="People">Employees</button>
       <button class="tab" role="tab" aria-controls="pageAttendance" data-view="attendance" aria-selected="false" data-icon="🗓️" data-short="Attend.">Attendance</button>
@@ -7202,9 +7202,10 @@ const bkRead = v0 => { let v = String(v0).trim(); const half = BK_HALF.test(v); 
      "No/Chen Li" = not provided officially, but Chen Li covered. Old "Kept live" / "Unofficial backup" read as Not Provided. */
   const mn = /^(no|not provided|backup not provided)(\s*\/\s*(.+))?$/i.exec(v);
   /* v3.40.0: "Seat shown live" (old "Kept live" too): the person is on leave, but the client sees the seat as present */
-  const o = /^(seat\s*(shown\s*)?live|kept live|live)$/i.test(v) ? { live: true, b: '' } : bkIsLive(v) ? { no: true, b: '' } : mn ? { no: true, b: (mn[3] || '').trim() } : /^(yes|backup provided)$/i.test(v) ? { b: '', yes: true } : { b: v };
+  const ml = /^(seat\s*(shown\s*)?live|kept live|live)(\s*\/\s*(.+))?$/i.exec(v);
+  const o = ml ? { live: true, b: (ml[4] || '').trim() } : bkIsLive(v) ? { no: true, b: '' } : mn ? { no: true, b: (mn[3] || '').trim() } : /^(yes|backup provided)$/i.test(v) ? { b: '', yes: true } : { b: v };
   if (half) o.half = true; return o; };
-const bkText = val => !val ? '' : val.live ? 'Seat shown live' : (val.no ? 'No' + (val.b ? '/' + val.b : '') : (val.b || 'Yes')) + (val.half ? ' (half)' : '');
+const bkText = val => !val ? '' : (val.live ? 'Seat shown live' + (val.b ? '/' + val.b : '') : val.no ? 'No' + (val.b ? '/' + val.b : '') : (val.b || 'Yes')) + (val.half ? ' (half)' : '');
 const bkRemark = (key, iso) => { const r = bkRow(key, iso); if (!r) return ''; const k = Object.keys(r.extra || {}).find(q => q.toLowerCase() === BKM_FIELD.toLowerCase()); return k ? (bkParse(r.extra[k]).get(+iso.slice(8, 10)) || '') : ''; };
 const bkGet = (key, iso) => {
   const r = bkRow(key, iso);
@@ -7213,7 +7214,7 @@ const bkGet = (key, iso) => {
 };
 /* v3.33.0: backups are for admins and super admins only (users don't see or change them). Local mode (no sign-in) = the owner. */
 const canBackup = () => { try { return !(window.PERM && PERM.online()) || isAdminRole(); } catch { return false; } };
-const bkLabel = x => !x ? '' : x.live ? 'Seat Shown Live' : (x.no ? 'Backup Not Provided' : 'Backup Provided') + (x.b ? ' · ' + x.b : '') + (x.half ? ' (half day)' : '');
+const bkLabel = x => !x ? '' : (x.live ? 'Seat Shown Live' : x.no ? 'Backup Not Provided' : 'Backup Provided') + (x.b ? ' · ' + x.b : '') + (x.half ? ' (half day)' : '');
 /* v3.30.1: backup settings: is the backup person's name optional (default), required, or not asked at all */
 const bkNameMode = () => { const m = ((window.TD_SETTINGS || {}).backup_opts || {}).name; return ['optional', 'required', 'off'].includes(m) ? m : 'optional'; };
 /* v3.30.0: "Backup provided" as a plain Yes / No (kept live counts as No: nobody was put on the work) */
@@ -7224,7 +7225,7 @@ const bkAnyYes = x => !!(x && !x.no);
 const bkYN = x => bkLive(x) ? 'Live' : bkAnyYes(x) ? 'Yes' : 'No';
 const bkYNLong = x => bkLive(x) ? 'Seat Shown Live' : (bkYes(x) ? 'Backup Provided' : 'Backup Not Provided') + (x && x.half ? ' · half day' : '');
 const bkYNCls = x => bkYes(x) ? 'y' : bkLive(x) ? 'l' : 'n';
-const bkTipLine = x => bkLive(x) ? '<b>Seat Shown Live</b> · shown present to the client' : '<b>' + (bkYes(x) ? 'Backup Provided' : 'Backup Not Provided') + '</b>' + (x && x.b ? ' · ' + esc(x.b) : '') + (x && x.half ? ' · half day' : '');
+const bkTipLine = x => bkLive(x) ? '<b>Seat Shown Live</b>' + (x.b ? ' · ' + esc(x.b) : '') + (x.half ? ' · half day' : '') + ' · shown present to the client' : '<b>' + (bkYes(x) ? 'Backup Provided' : 'Backup Not Provided') + '</b>' + (x && x.b ? ' · ' + esc(x.b) : '') + (x && x.half ? ' · half day' : '');
 function bkTeam(exceptKey, iso) {
   const t = new Date(iso + 'T00:00:00Z'), ms = Engine.monthSerial(t.getUTCFullYear(), t.getUTCMonth()), i = t.getUTCDate() - 1;
   const outToday = new Set((D(true).byMonth.get(ms) || []).filter(r => { const c = catOf(r.days[i]); return c && (LEAVE_CATS.has(c) || c === 'applied'); }).map(r => personKey(r.name)));
@@ -7280,15 +7281,17 @@ function openBackupBox(pKey, iso, onDone, opts = {}) {
       .bkx-rm{display:flex;flex-direction:column;gap:5px;margin-top:10px;font-size:12px;font-weight:600;color:var(--ink-2,#445)} .bkx-rm em{font-style:normal;font-weight:400;color:var(--muted,var(--ink-3,#667))} .bkx-rm textarea{font:inherit;font-size:13.5px;font-weight:400;padding:8px 10px;border-radius:9px;border:1px solid var(--border,var(--line,#d0d5dd));resize:vertical;background:var(--surface,#fff);color:var(--ink,#1a1a1a)}
       .bkx-yes.no{border-color:color-mix(in srgb,#e34948 40%,transparent);background:color-mix(in srgb,#e34948 4%,transparent)}
       .bkx-yes.no .bkx-seg button[aria-pressed="true"]{color:#c63b3a}
+      .bkx-yes.live{border-color:color-mix(in srgb,#3b6cf6 40%,transparent);background:color-mix(in srgb,#3b6cf6 4%,transparent)}
+      .bkx-yes.live .bkx-seg button[aria-pressed="true"]{color:#3558c8}
       .bkx-row{display:flex;align-items:center;gap:12px;font-size:12px;font-weight:600;color:var(--ink-2,#445)}
       @media (max-width:560px){.bkx-opts{grid-template-columns:1fr}.bkx-o{flex-direction:row;align-items:center}.bkx-o small{display:none}}
     </style>
     <div class="bkx-when">${cur && !opts.collect ? '<span class="bkx-clr" id="bkx-clr"><button type="button" class="btn mini" id="bk-clear-ask" title="Remove the saved backup for this day">Clear</button></span>' : ''}<span class="bkx-cal"><i>${MONTHS[dt.getUTCMonth()]}</i><b>${dt.getUTCDate()}</b></span><div style="padding-right:90px"><b>${esc(name)}</b> is on leave<span>${esc(opts.days && opts.days.length > 1 ? longDate(new Date(opts.days[0] + 'T00:00:00Z')) + ' – ' + longDate(new Date(opts.days[opts.days.length - 1] + 'T00:00:00Z')) + ' · ' + opts.days.length + ' days' : longDate(dt))} · who covers the work?</span></div></div>
     ${opts.collect ? `<p class="sm" style="margin:-4px 0 12px;padding:8px 10px;border-radius:10px;background:color-mix(in srgb,#d97706 10%,transparent);color:var(--ink-2,#445)"><b>Backup is required to approve.</b> Choose one option; the leave is approved when you save.</p>` : ''}
     <div class="bkx-opts" role="radiogroup" aria-label="Backup">${OPT.map(([k, t, sub, c, ico]) => `<button type="button" class="bkx-o" role="radio" data-bkx="${k}" aria-checked="${curK === k}" style="--oc:${c}"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">${ico}</svg><b>${t}</b><small>${sub}</small></button>`).join('')}</div>
-    <div class="bkx-yes${curK === 'no' ? ' no' : ''}" id="bkx-yes" ${curK && curK !== 'live' ? '' : 'hidden'}>
+    <div class="bkx-yes${curK === 'no' ? ' no' : curK === 'live' ? ' live' : ''}" id="bkx-yes" ${curK ? '' : 'hidden'}>
       <div class="bkx-row">Cover for <span class="bkx-seg" role="group" aria-label="Cover for"><button type="button" data-bkh="full" aria-pressed="${!(cur && cur.half)}">Full day</button><button type="button" data-bkh="half" aria-pressed="${!!(cur && cur.half)}">Half day</button></span></div>
-      ${nmMode === 'off' ? '' : `<label>Backup person <em>${nmMode === 'optional' ? 'optional · anyone in the current team' : 'anyone in the current team'}</em><input type="text" id="bk-name" list="bk-list" value="${esc(cur && cur.b ? cur.b : '')}" placeholder="${nmMode === 'optional' ? 'Type or pick a name, or leave blank' : 'Type or pick a name'}" autocomplete="off"><datalist id="bk-list">${team.map(t => `<option value="${esc(t.name)}" label="${esc([t.id && 'ID ' + t.id, t.sub, t.out ? 'also off that day' : ''].filter(Boolean).join(' · '))}"></option>`).join('')}</datalist></label>`}
+      ${nmMode === 'off' ? '' : `<label id="bkx-pwrap" ${curK === 'no' ? 'style="display:none"' : ''}><span id="bkx-plbl">${curK === 'live' ? 'Taken care of by' : 'Backup person'}</span> <em id="bkx-pem">${nmMode === 'optional' || curK !== 'yes' ? 'optional · anyone in the current team' : 'anyone in the current team'}</em><input type="text" id="bk-name" list="bk-list" value="${esc(cur && cur.b ? cur.b : '')}" placeholder="${nmMode === 'optional' ? 'Type or pick a name, or leave blank' : 'Type or pick a name'}" autocomplete="off"><datalist id="bk-list">${team.map(t => `<option value="${esc(t.name)}" label="${esc([t.id && 'ID ' + t.id, t.sub, t.out ? 'also off that day' : ''].filter(Boolean).join(' · '))}"></option>`).join('')}</datalist></label>`}
     </div>
     <label class="bkx-rm" id="bkx-rm" ${curK && curK !== 'live' ? '' : 'hidden'}>Remarks <em>optional · copied as written</em><textarea id="bk-rm" rows="2" maxlength="200" placeholder="Optional note">${esc(bkRemark(pKey, iso))}</textarea></label>
     <div class="err" id="bk-err"></div>`,
@@ -7297,8 +7300,8 @@ function openBackupBox(pKey, iso, onDone, opts = {}) {
   const kind = () => pick, isHalf = () => half;
   m.querySelectorAll('[data-bkx]').forEach(b => b.addEventListener('click', () => {
     pick = b.dataset.bkx; m.querySelectorAll('[data-bkx]').forEach(x => x.setAttribute('aria-checked', String(x === b)));
-    $('#bkx-yes', m).hidden = !pick || pick === 'live'; $('#bkx-rm', m).hidden = !pick || pick === 'live'; $('#bkx-yes', m).classList.toggle('no', pick === 'no'); $('#bk-go', m).disabled = false; $('#bk-err', m).textContent = '';
-    if (pick !== 'live') setTimeout(() => $('#bk-name', m)?.focus(), 0);
+    $('#bkx-yes', m).hidden = !pick; $('#bkx-yes', m).classList.toggle('live', pick === 'live'); $('#bkx-yes', m).classList.toggle('no', pick === 'no'); if ($('#bkx-pwrap', m)) $('#bkx-pwrap', m).style.display = pick === 'no' ? 'none' : ''; if ($('#bkx-plbl', m)) { $('#bkx-plbl', m).textContent = pick === 'live' ? 'Taken care of by' : 'Backup person'; $('#bkx-pem', m).textContent = (nmMode === 'optional' || pick !== 'yes' ? 'optional · ' : '') + 'anyone in the current team'; } $('#bkx-rm', m).hidden = !pick || pick === 'live'; $('#bkx-yes', m).classList.toggle('no', pick === 'no'); $('#bk-go', m).disabled = false; $('#bk-err', m).textContent = '';
+    setTimeout(() => $('#bk-name', m)?.focus(), 0);
   }));
   m.querySelectorAll('[data-bkh]').forEach(b => b.addEventListener('click', () => { half = b.dataset.bkh === 'half'; m.querySelectorAll('[data-bkh]').forEach(x => x.setAttribute('aria-pressed', String(x === b))); }));
   const write = async val => {
@@ -7317,8 +7320,10 @@ function openBackupBox(pKey, iso, onDone, opts = {}) {
   $('#bk-go', m).onclick = async () => {
     const write = v => write0(v ? { ...v, remark: rmv() } : v);
     try {
-      if (kind() === 'live') return await write({ live: true, by: BE.userName(), at: new Date().toISOString() });
-      if (kind() === 'no') { const vn = !$('#bk-name', m) ? '' : $('#bk-name', m).value.trim(), hn = vn ? team.find(t => t.name.toLowerCase() === vn.toLowerCase()) : null;
+      if (kind() === 'live') { const vl = !$('#bk-name', m) ? '' : $('#bk-name', m).value.trim(), hl = vl ? team.find(t => t.name.toLowerCase() === vl.toLowerCase()) : null;
+        if (vl && !hl) { $('#bk-err', m).textContent = 'Pick someone from the current team list, or leave the name blank.'; return; }
+        return await write({ live: true, b: hl ? hl.name : '', half: isHalf(), by: BE.userName(), at: new Date().toISOString() }); }
+      if (kind() === 'no') { const vn = '',   /* v3.40.4: no name for Backup Not Provided */ hn = vn ? team.find(t => t.name.toLowerCase() === vn.toLowerCase()) : null;
         if (vn && !hn) { $('#bk-err', m).textContent = 'Pick someone from the current team list, or leave the name blank.'; return; }
         return await write({ no: true, b: hn ? hn.name : '', half: isHalf(), by: BE.userName(), at: new Date().toISOString() }); }
       if (kind() === 'none') return await write({ none: true, by: BE.userName(), at: new Date().toISOString() });
@@ -7428,7 +7433,7 @@ function backupReportData(cycle, client, yn = 'all', range = null, sub = BKR.sub
       const cl = bkClientOf(r); if (!bkPass(r, client, sub)) continue;
       const c = catOf(r.days[i]); if (!c || !LEAVE_CATS.has(c)) continue;
       const key = personKey(r.name), b = bkGet(key, iso);
-      items.push({ iso, name: r.name.trim(), pseudo: bkPseudo(r), key, client: cl, code: String(r.days[i]).trim().toUpperCase(), days: c === 'half' ? 0.5 : 1, st: bkYes(b) ? 'backup' : bkLive(b) ? 'live' : 'none', backup: b && b.b && !b.live ? b.b : '', half: !!(b && b.half), set: !!b });
+      items.push({ iso, name: r.name.trim(), pseudo: bkPseudo(r), key, client: cl, code: String(r.days[i]).trim().toUpperCase(), days: c === 'half' ? 0.5 : 1, st: bkYes(b) ? 'backup' : bkLive(b) ? 'live' : 'none', backup: b && b.b ? b.b : '', half: !!(b && b.half), set: !!b });
     }
   }
   items.sort((a, b) => a.iso.localeCompare(b.iso) || a.name.localeCompare(b.name));
@@ -7682,7 +7687,7 @@ function renderCard(el, opts = {}) {
       })();
       renderCard._copy = { ...renderCard._copy, today: listCopy };
       const emptyTxt = !rows.length ? 'No attendance rows for this month.' : C.tab === 'late' ? 'No late comings ' + dayWord + '.' : C.tab === 'half' ? 'No half days ' + dayWord + '.' : 'Nobody is on leave ' + dayWord + '.';
-      const miniList = list.length ? `<ul class="att-mini">${list.map(x => `<li><span class="att-mini-n">${esc(nm(x.r))}${can('att.info') ? `<button type="button" class="rq-i" data-lainfo="${esc(x.r.name.trim())}" aria-label="Past and upcoming leave of ${esc(nm(x.r))}">i</button>` : ''}</span><span class="att-mini-c">${esc(cl(x.r))}</span><span class="ph-chip c-${esc(x.c)}">${esc(String(x.v).trim().toUpperCase())}</span><span class="att-mini-s">${esc(x.c === 'applied' ? 'Awaiting approval' : labelOf(x.v))}</span>${C.tab === 'late' || !canBackup() ? '<span></span>' : (() => { const k = personKey(x.r.name), b = bkGet(k, rdIso); return `<span class="att-bkc"><em class="bk-yn ${bkYNCls(b)}" title="Backup provided: ${bkYN(b)}">${bkYN(b)}</em>` + (b ? `<button type="button" class="att-bk ${b.live ? 'live' : b.none || b.no ? 'none' : 'set'}" data-bk="${esc(k)}" ${canBackup() ? '' : 'disabled'} title="${esc(bkLabel(b))}">${b.live ? '◉ Shown live' : (b.no ? '✕ ' : '↪ ') + (b.b ? esc(b.b) : b.no ? 'Not provided' : 'Provided') + (b.half ? ' · ½' : '')}</button>` : canBackup() ? `<button type="button" class="att-bk add" data-bk="${esc(k)}">+ Backup</button>` : '<span class="att-bk-no">No backup</span>') + '</span>'; })()}</li>`).join('')}</ul>` : `<div class="att-mini-empty">${emptyTxt}</div>`;
+      const miniList = list.length ? `<ul class="att-mini">${list.map(x => `<li><span class="att-mini-n">${esc(nm(x.r))}${can('att.info') ? `<button type="button" class="rq-i" data-lainfo="${esc(x.r.name.trim())}" aria-label="Past and upcoming leave of ${esc(nm(x.r))}">i</button>` : ''}</span><span class="att-mini-c">${esc(cl(x.r))}</span><span class="ph-chip c-${esc(x.c)}">${esc(String(x.v).trim().toUpperCase())}</span><span class="att-mini-s">${esc(x.c === 'applied' ? 'Awaiting approval' : labelOf(x.v))}</span>${C.tab === 'late' || !canBackup() ? '<span></span>' : (() => { const k = personKey(x.r.name), b = bkGet(k, rdIso); return `<span class="att-bkc"><em class="bk-yn ${bkYNCls(b)}" title="Backup provided: ${bkYN(b)}">${bkYN(b)}</em>` + (b ? `<button type="button" class="att-bk ${b.live ? 'live' : b.none || b.no ? 'none' : 'set'}" data-bk="${esc(k)}" ${canBackup() ? '' : 'disabled'} title="${esc(bkLabel(b))}">${b.live ? '◉ ' + (b.b ? esc(b.b) : 'Shown live') + (b.half ? ' · ½' : '') : (b.no ? '✕ ' : '↪ ') + (b.b ? esc(b.b) : b.no ? 'Not provided' : 'Provided') + (b.half ? ' · ½' : '')}</button>` : canBackup() ? `<button type="button" class="att-bk add" data-bk="${esc(k)}">+ Backup</button>` : '<span class="att-bk-no">No backup</span>') + '</span>'; })()}</li>`).join('')}</ul>` : `<div class="att-mini-empty">${emptyTxt}</div>`;
       const needBk = C.tab === 'late' ? [] : list, covered = needBk.filter(x => { const b = bkGet(personKey(x.r.name), rdIso); return b && !b.no; }).length;
       const bkLine = needBk.length && canBackup() ? `<div class="att-bk-sum ${covered === needBk.length ? 'ok' : ''}">Backups: <b>${covered} of ${needBk.length}</b> covered${covered < needBk.length ? ' · ' + (needBk.length - covered) + ' without a backup' : ''}</div>` : '';
       html = head2 + `<div class="att-tabs">${tabBtn('leave', nFull, ' on leave', (nHalf ? ` <em>incl. ${nHalf} half day</em>` : '') + (nLa ? ` <em>+${nLa} awaiting</em>` : ''))}${tabBtn('late', T.late.length, ' late')}<span class="grow"></span>${copyBtn('today', listCopy)}${pseudoCol ? `<button type="button" class="btn mini names1" data-att-names="${C.names === 'pseudo' ? 'real' : 'pseudo'}" aria-pressed="${C.names === 'pseudo'}" title="Switch between real and pseudo names">${C.names === 'pseudo' ? 'Pseudo names ⇄' : 'Real names ⇄'}</button>` : ''}</div>` + bkLine + miniList;
@@ -8160,7 +8165,7 @@ async function poll() {
 }
 
 /* ============================== filtering ============================== */
-const APP = { title: "Team Dashboard", version: "3.40.2", released: "30 Sep 2026" };
+const APP = { title: "Team Dashboard", version: "3.40.4", released: "30 Sep 2026" };
 const BASE_DIMS = { status: "status_column", desig: "designation_column", client: "client_column", mode: "mode_column" };
 const STANDARD_STATUSES = ["Active", "Manager", "OJT", "Bench", "New", "Projected", "Left", "Moved"];
 const TILE_ORDER = ["Active", "Manager", "OJT", "Bench", "New", "Projected"];
