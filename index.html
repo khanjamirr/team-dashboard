@@ -4,7 +4,7 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <link rel="icon" href="data:,">
-<title>Team Dashboard · 3.26.1</title>
+<title>Team Dashboard · 3.26.2</title>
 <style>
 :root {
   color-scheme: light;
@@ -1428,7 +1428,7 @@ body.filters-locked #cleanFilters, body.filters-locked #xchips, body.filters-loc
   #pageSummary.ov > .ov-glance { grid-template-columns:repeat(auto-fit,minmax(min(100%,300px),1fr)); }
 }
 @media (max-width:650px) { .ov-tile { padding:12px; } .ov-ic { width:34px; height:34px; font-size:17px; } .ov-tx b { font-size:18px; } }
-/* v3.26.1: Attendance, Request Center and Coming up side by side in one row; Leave watch full width below */
+/* v3.26.2: Attendance, Request Center and Coming up side by side in one row; Leave watch full width below */
 #pageSummary.ov { grid-template-columns:minmax(0,1.45fr) minmax(0,1fr) minmax(0,1fr) !important; grid-template-areas:"glance glance glance" "att req up" "watch watch watch" !important; }
 #pageSummary.ov > .ov-main, #pageSummary.ov > .ov-side { display:contents !important; }
 #pageSummary.ov #cardAttendance { grid-area:att !important; grid-column:att !important; grid-row:att !important; align-self:stretch; min-width:0; }
@@ -1642,20 +1642,6 @@ body.filters-locked #cleanFilters, body.filters-locked #xchips, body.filters-loc
   .rrow .rrow-more { display:none; }
 }
 
-/* v3.26.1: ⓘ hover card in People & access */
-.r-i { vertical-align:2px; }
-.r-tip { position:fixed; z-index:200; width:320px; max-width:calc(100vw - 16px); max-height:70vh; overflow:auto; padding:12px 14px; border:1px solid var(--border); border-radius:12px; background:var(--surface); color:var(--ink); box-shadow:0 14px 36px rgba(15,23,42,.24); font-size:12.5px; }
-.r-tip-h { font-weight:700; font-size:14px; }
-.r-tip-d { margin:2px 0 8px; color:var(--ink-2); }
-.r-tip-sec { padding:6px 0; border-top:1px solid var(--border); }
-.r-tip-sec b { display:inline-block; padding:1px 8px; border-radius:999px; font-size:11px; letter-spacing:.03em; text-transform:uppercase; }
-.r-tip-sec .lv-none { background:rgba(127,127,127,.15); color:var(--ink-2); }
-.r-tip-sec .lv-view { background:rgba(59,108,246,.13); color:#3558c8; }
-.r-tip-sec .lv-edit { background:rgba(34,160,90,.15); color:#1c8a4c; }
-.r-tip-sec ul { margin:5px 0 0; padding-left:18px; }
-.r-tip-sec li { margin:1px 0; }
-.r-tip-sec p { margin:4px 0 0; color:var(--ink-2); }
-.r-tip-f { margin:6px 0 0; padding-top:6px; border-top:1px solid var(--border); font-size:11.5px; color:var(--ink-3); }
 </style></head>
 
 
@@ -1669,10 +1655,10 @@ body.filters-locked #cleanFilters, body.filters-locked #xchips, body.filters-loc
     <p class="gate-sub">One place for your people, priorities and team insights.</p>
     <div id="connectBody"><div class="empty">Loading…</div></div>
   </div>
-  <p class="gate-ver">3.26.1</p>
+  <p class="gate-ver">3.26.2</p>
 </section>
 
-<div id="app" hidden><aside class="sidebar" aria-label="Workspace navigation"><div class="brand dashboard-identity">      <h1><span id="title">Team Dashboard</span><span class="ver" id="ver" title="Version 3.26.1">3.26.1</span></h1><p class="brand-tag">One place for your people, priorities and team insights.</p>      <span class="sync" id="sync" role="status"><i></i><span id="syncText">Loading…</span></span></div><div class="nav-label">WORKSPACE</div>      <nav class="tabs" role="tablist" aria-label="Pages" aria-orientation="vertical">
+<div id="app" hidden><aside class="sidebar" aria-label="Workspace navigation"><div class="brand dashboard-identity">      <h1><span id="title">Team Dashboard</span><span class="ver" id="ver" title="Version 3.26.2">3.26.2</span></h1><p class="brand-tag">One place for your people, priorities and team insights.</p>      <span class="sync" id="sync" role="status"><i></i><span id="syncText">Loading…</span></span></div><div class="nav-label">WORKSPACE</div>      <nav class="tabs" role="tablist" aria-label="Pages" aria-orientation="vertical">
         <button class="tab on" role="tab" aria-controls="pageSummary" data-view="summary" aria-selected="true" data-icon="🏠" data-short="Home">Overview</button>
         <button class="tab" role="tab" aria-controls="pageEmployees" data-view="employees" aria-selected="false" data-icon="👥" data-short="People">Employees</button>
       <button class="tab" role="tab" aria-controls="pageAttendance" data-view="attendance" aria-selected="false" data-icon="🗓️" data-short="Attend.">Attendance</button>
@@ -3320,13 +3306,14 @@ const CLOUD = (() => {
 const PERM_GROUPS = [
   { name: 'Overview', page: 'page.overview', items: [['ov.attendance', 'See the attendance card'], ['ov.openatt', 'See the “Open attendance →” button on the attendance card'], ['ov.coming', 'See birthdays and work anniversaries'], ['ov.holidays', 'See USA and India holidays'], ['ov.watch', 'See leave red flags and day patterns']], sub: { title: 'Request Center', items: [['requests.own', 'See Waiting and History (their own and their group’s requests)'], ['requests.rejected', 'Also see rejected requests from their notification audience in History'], ['att.approve', 'Manager: approve or reject leave requests (shows the To approve tab) and edit approved leave']] } },
   { name: 'Employees', page: 'page.employees', items: [['emp.edit', 'Edit employee details'], ['emp.add', 'Add employees'], ['emp.delete', 'Delete employees'], ['emp.bulk', 'Fill in bulk and add columns'], ['emp.fields', 'Add or delete fields (Excel columns)']] },
-  { name: 'Attendance', page: 'page.attendance', items: [['att.who', 'See Who’s out'], ['att.grid', 'See the attendance grid and People'], ['att.info', 'See the ⓘ leave card (past and upcoming leave and late comings) for everyone'], ['att.log', 'Use Record attendance (with the types ticked below)'], ['att.direct', 'Record attendance straight into the tracker (no manager approval)'], ['att.edit', 'Mark attendance in day cells'], ['att.rows', 'Edit any cell or row in the tracker (names, Emp IDs, clients, days) and delete rows'], ['att.holidays', 'Add holidays for everyone'], ['att.fields', 'Add or delete fields in the attendance tracker'], ['att.addemp', 'Add employees to the attendance tracker (new rows, start a month)']],
+  { name: 'Attendance', page: 'page.attendance', items: [['att.who', 'See Who’s out'], ['att.grid', 'See the attendance grid and People'], ['att.log', 'Use Record attendance (with the types ticked below)'], ['att.direct', 'Record attendance straight into the tracker (no manager approval)'], ['att.edit', 'Mark attendance in day cells'], ['att.rows', 'Edit any cell or row in the tracker (names, Emp IDs, clients, days) and delete rows'], ['att.holidays', 'Add holidays for everyone'], ['att.fields', 'Add or delete fields in the attendance tracker'], ['att.addemp', 'Add employees to the attendance tracker (new rows, start a month)']],
     /* v3.14.2: which leave types appear in the Log leave “Type” list */
     sub: { title: 'Types in Record attendance', items: [['log.LA', 'LA · Leave application (pending)'], ['log.AL', 'AL · Approved leave'], ['log.CL', 'CL · Casual leave'], ['log.SL', 'SL · Sick leave'], ['log.UL', 'UL · Unplanned leave'], ['log.AB', 'AB · Absent'], ['log.HD1', 'HD1 · Half day, 1st half'], ['log.HD2', 'HD2 · Half day, 2nd half'], ['log.R', 'R · Remote'], ['log.L', 'L · Late coming'], ['log.C', 'C · Cab late']] } },
   { name: 'Action center', page: 'page.actions', items: [['act.items', 'See Action items'], ['act.review', 'See Designation reviews'], ['act.health', 'See Attendance data health']] },
   { name: 'Reports', page: 'page.reports', items: [['rep.team', 'Team composition'], ['rep.growth', 'Tenure & growth'], ['rep.location', 'Location & travel'], ['rep.attendance', 'Attendance reports'], ['rep.custom', 'See custom dashboards (their own and shared ones)'], ['rep.export', 'Copy report tables and charts'], ['rep.build', 'Create and edit custom dashboards']] },
   { name: 'Save & sync', items: [['sync.view', 'Open the Save & sync settings'], ['sync.auto', 'Start or stop auto-sync'], ['sync.save', 'Save now and undo']] },
 
+  { name: 'ⓘ Leave card', items: [['att.info', 'See the ⓘ button next to names (Request Center, Applications ahead, attendance card) with anyone’s past and upcoming leave and late comings']] },
   { name: 'Chat', items: [['chat.use', 'Use team chat and see who is online'], ['chat.all', 'Post in the Everyone room']] },
   { name: 'Notifications', items: [['notifications.view', 'Open notifications and receive request updates'], ['activity.view', 'See the activity log for all users']] },
   { name: 'Filters', items: [['filters.custom', 'Change the filters (search, status, client…)']] },
@@ -3342,7 +3329,7 @@ const PAGE_OF = { summary: 'page.overview', employees: 'page.employees', attenda
 const pick = keys => Object.fromEntries([['_v', PERM_VERSION], ...PERM_KEYS.map(k => [k, ['notifications.view', 'requests.own', 'requests.rejected'].includes(k) || (k === 'requests.approvals' && keys.includes('att.approve')) || keys.includes(k)])]);
 const ROLE_NAMES = { superadmin: 'Super admin', admin: 'Admin', user: 'User' };
 /* v3.14: what a page shows by default once someone may open it (red flags and new fields stay off until ticked) */
-const VIEW_KEYS = ['att.info', 'chat.use', 'ov.attendance', 'ov.coming', 'ov.holidays', 'act.items', 'act.review', 'act.health', 'rep.team', 'rep.growth', 'rep.location', 'rep.attendance', 'rep.custom', 'rep.export'];
+const VIEW_KEYS = ['chat.use', 'ov.attendance', 'ov.coming', 'ov.holidays', 'act.items', 'act.review', 'act.health', 'rep.team', 'rep.growth', 'rep.location', 'rep.attendance', 'rep.custom', 'rep.export'];
 /* v3.17: rights that change data; everything else only lets someone see things. Used by the None / View / Edit switch per module. */
 const EDIT_KEYS = new Set(['att.approve', 'emp.edit', 'emp.add', 'emp.delete', 'emp.bulk', 'emp.fields', 'att.log', 'att.direct', 'att.edit', 'att.rows', 'att.holidays', 'att.fields', 'att.addemp', ...LOG_CODES.map(c => 'log.' + c), 'sync.auto', 'sync.save', 'filters.custom', 'set.fields', 'set.workbook', 'chat.all', 'rep.build']);
 const UPG = new WeakMap();
@@ -3352,7 +3339,7 @@ window.PERM = {
     'Full access': pick(PERM_KEYS),
     'Admin': pick(PERM_KEYS),
     'Editor': pick([...PAGES, ...VIEW_KEYS, 'chat.all', 'ov.openatt', 'rep.build', ...oldLogKeys({ 'att.edit': true }), 'emp.edit', 'emp.add', 'emp.bulk', 'att.who', 'att.grid', 'att.log', 'att.edit', 'att.rows', 'att.addemp', 'filters.custom', 'activity.view', 'tools.distance', 'sync.view', 'sync.auto', 'sync.save']),
-    'Leave approver': pick([...PAGES, ...VIEW_KEYS, 'chat.all', 'ov.openatt', ...LOG_CODES.map(c => 'log.' + c), 'att.direct', 'ov.watch', 'att.who', 'att.grid', 'att.log', 'att.edit', 'att.rows', 'att.approve', 'filters.custom', 'activity.view', 'sync.view', 'sync.auto', 'sync.save']),
+    'Leave approver': pick([...PAGES, ...VIEW_KEYS, 'att.info', 'chat.all', 'ov.openatt', ...LOG_CODES.map(c => 'log.' + c), 'att.direct', 'ov.watch', 'att.who', 'att.grid', 'att.log', 'att.edit', 'att.rows', 'att.approve', 'filters.custom', 'activity.view', 'sync.view', 'sync.auto', 'sync.save']),
     'Leave logger': pick(['chat.use', 'page.overview', 'page.attendance', 'ov.attendance', 'ov.coming', 'att.who', 'att.log', 'log.LA', 'sync.save']),
     'View only': pick([...PAGES, ...VIEW_KEYS, 'att.who', 'att.grid']),
   },
@@ -3370,8 +3357,8 @@ window.PERM = {
     if (q._v < 9) { q['att.rows'] = !!q['att.edit']; q['att.addemp'] = !!q['att.edit']; }
     /* v3.17: the Open attendance button must be given on purpose; the holidays card is shown to anyone who sees the Overview */
     /* v3.19: custom dashboards: anyone who can open Reports sees them; building them must be given on purpose */
-    /* v3.26.1: the ⓘ leave card got its own right; keep what people could see before (grid or approvers) */
-    if (q._v < 13) q['att.info'] = !!(q['att.grid'] || q['att.approve']);
+    /* v3.26.2: the ⓘ leave card got its own right; keep what people could see before (grid or approvers) */
+    if (q._v < 13) q['att.info'] = !!q['att.approve'];
     if (q._v < 12) { q['rep.custom'] = !!q['page.reports']; q['rep.build'] = false; }
     if (q._v < 11) { q['chat.use'] = true; q['chat.all'] = true; }
     if (q._v < 10) { q['ov.openatt'] = false; q['ov.holidays'] = !!q['page.overview']; }
@@ -7390,7 +7377,7 @@ async function poll() {
 }
 
 /* ============================== filtering ============================== */
-const APP = { title: "Team Dashboard", version: "3.26.1", released: "29 Sep 2026" };
+const APP = { title: "Team Dashboard", version: "3.26.2", released: "29 Sep 2026" };
 const BASE_DIMS = { status: "status_column", desig: "designation_column", client: "client_column", mode: "mode_column" };
 const STANDARD_STATUSES = ["Active", "Manager", "OJT", "Bench", "New", "Projected", "Left", "Moved"];
 const TILE_ORDER = ["Active", "Manager", "OJT", "Bench", "New", "Projected"];
@@ -10960,41 +10947,6 @@ function filterText(f) {
   return parts.join(' · ') || 'no filters (everyone)';
 }
 window.filterText = filterText;
-/* v3.26.1: ⓘ next to each area: what the area is and what Hide / View / Edit let the person do */
-const AREA_INFO = {
-  'Overview': 'The home page: today’s attendance, Request Center, birthdays and holidays, and Leave watch.',
-  'Employees': 'The employee list and each person’s record from the workforce sheet.',
-  'Attendance': 'The attendance tracker: who’s out, the grid, each person’s history and recording attendance.',
-  'Action center': 'Missing details, designation reviews and attendance data checks.',
-  'Reports': 'Charts about the team and attendance, and custom dashboards.',
-  'Save & sync': 'Saving attendance changes to the workbook and auto-sync.',
-  'Chat': 'Team chat and who is online.',
-  'Notifications': 'The bell: request updates and the activity log.',
-  'Filters': 'The search and filters at the top of every page.',
-  'Settings': 'Mandatory fields, backups, downloading the workbook and tools.',
-};
-let rTip = null, rTipT = null;
-function rightsTipHide(now) { clearTimeout(rTipT); const go = () => { rTip?.remove(); rTip = null; }; if (now) go(); else rTipT = setTimeout(go, 150); }
-function rightsTip(btn, g, toggle) {
-  clearTimeout(rTipT);
-  if (rTip && rTip._for === btn) { if (toggle) rightsTipHide(true); return; }
-  rightsTipHide(true);
-  const all = [...g.items, ...((g.sub && g.sub.items) || [])];
-  const view = all.filter(([k]) => !PERM.isEditKey(k)).map(x => x[1]), edit = all.filter(([k]) => PERM.isEditKey(k)).map(x => x[1]);
-  const sec = (t, cls, list, empty) => h('div', { class: 'r-tip-sec' }, h('b', { class: cls }, t), list.length ? h('ul', {}, ...list.map(x => h('li', {}, x))) : h('p', {}, empty));
-  rTip = h('div', { class: 'r-tip', role: 'tooltip' },
-    h('div', { class: 'r-tip-h' }, g.name), h('p', { class: 'r-tip-d' }, AREA_INFO[g.name] || ''),
-    sec('Hide', 'lv-none', [], g.page ? 'The page is not in their menu and they can’t open it.' : 'None of this is available to them.'),
-    sec('View', 'lv-view', [...(g.page ? ['Open the ' + g.name + ' page'] : []), ...view], 'Nothing to see on its own here.'),
-    sec('Edit', 'lv-edit', edit, 'Nothing to change here: View already gives everything.'),
-    h('p', { class: 'r-tip-f' }, 'Edit includes everything in View. Use Fine-tune for anything in between.'));
-  rTip._for = btn; document.body.append(rTip);
-  const a = btn.getBoundingClientRect(), w = rTip.offsetWidth, hh = rTip.offsetHeight;
-  let top = a.bottom + 6; if (top + hh > innerHeight - 8) top = Math.max(8, a.top - hh - 6);
-  rTip.style.left = Math.min(Math.max(8, a.left - 12), innerWidth - w - 8) + 'px'; rTip.style.top = top + 'px';
-  rTip.addEventListener('mouseenter', () => clearTimeout(rTipT)); rTip.addEventListener('mouseleave', () => rightsTipHide());
-}
-addEventListener('scroll', () => rightsTipHide(true), { passive: true, capture: true });
 function drawEditor(box, u, reload, users = [], template = null, groups = []) {
   const me = CLOUD.user(), isNew = !u, self = u && u.id === me.id;
   const err = h('p', { class: 'err', role: 'alert' });
@@ -11142,7 +11094,7 @@ function drawEditor(box, u, reload, users = [], template = null, groups = []) {
     const paintSeg = () => { const lv = levelOf(); segBtns.forEach(b => { b.checked = b.dataset.lv === lv; }); segHint.hidden = lv !== 'custom'; countEl.textContent = allKeys.filter(k => boxes[k].checked).length + ' of ' + allKeys.length + ' on'; };
     const extra = g.name === 'Filters' ? fixedBox : g.name === 'Notifications' ? audienceBox : g.name === 'Attendance' ? fieldBox : null;
     const card = h('details', { class: 'rrow' },
-      h('summary', {}, h('span', { class: 'rrow-name' }, h('b', {}, g.name, h('button', { type: 'button', class: 'rq-i r-i', 'aria-label': 'What ' + g.name + ' access means', onclick: e => { e.preventDefault(); e.stopPropagation(); rightsTip(e.currentTarget, g, true); }, onmouseenter: e => rightsTip(e.currentTarget, g), onmouseleave: () => rightsTipHide(), onfocus: e => rightsTip(e.currentTarget, g), onblur: () => rightsTipHide() }, 'i')), h('span', { class: 'rrow-meta' }, countEl, segHint)), seg, h('span', { class: 'rrow-more', 'aria-hidden': 'true' }, 'Fine-tune')),
+      h('summary', {}, h('span', { class: 'rrow-name' }, h('b', {}, g.name), h('span', { class: 'rrow-meta' }, countEl, segHint)), seg, h('span', { class: 'rrow-more', 'aria-hidden': 'true' }, 'Fine-tune')),
       h('div', { class: 'rrow-body' }, head, itemsBox, subBox, extra));
     const sync = () => { const off = g.page && !boxes[g.page].checked; card.classList.toggle('off', !!off); for (const c of items) c.box.disabled = isSuper() || !!off; for (const c of subItems) c.box.disabled = isSuper() || !!off; if (g.page) boxes[g.page].disabled = isSuper(); };
     if (g.page) boxes[g.page].addEventListener('change', sync);
