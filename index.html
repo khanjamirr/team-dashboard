@@ -4,7 +4,7 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <link rel="icon" href="data:,">
-<title>Team Dashboard · 3.30.1</title>
+<title>Team Dashboard · 3.31.0</title>
 <style>
 :root {
   color-scheme: light;
@@ -1733,6 +1733,20 @@ body.filters-locked #cleanFilters, body.filters-locked #xchips, body.filters-loc
 .att-bk-sum.ok { color:#1c7a45; }
 @media (max-width:650px) { .att-mini li { grid-template-columns:minmax(0,1fr) auto auto !important; } }
 
+/* v3.31.0: celebrations pop-up */
+.cel-veil { position:fixed; inset:0; z-index:200; background:rgba(12,16,28,.45); display:grid; place-items:center; padding:16px; animation:celIn .18s ease-out; }
+@keyframes celIn { from { opacity:0; } }
+.cel-box { width:min(460px,100%); max-height:calc(100vh - 32px); overflow:auto; background:var(--surface); color:var(--ink); border-radius:16px; box-shadow:0 24px 60px rgba(0,0,0,.3); padding:18px 20px 16px; border-top:4px solid #d97706; }
+.cel-top { display:flex; align-items:center; gap:12px; color:#d97706; }
+.cel-top h3 { margin:0; font-size:18px; color:var(--ink); } .cel-top p { margin:2px 0 0; font-size:12.5px; color:var(--muted); }
+.cel-top > div { flex:1; }
+.cel-x { border:0; background:transparent; color:var(--muted); font-size:16px; cursor:pointer; padding:4px 6px; border-radius:6px; } .cel-x:hover { background:var(--surface-2); }
+.cel-box h4 { margin:14px 0 6px; font-size:11px; letter-spacing:.05em; text-transform:uppercase; color:var(--ink-2); }
+.cel-list { list-style:none; margin:0; padding:0; border:1px solid var(--border); border-radius:12px; overflow:hidden; }
+.cel-row { display:flex; align-items:center; gap:10px; padding:9px 12px; } .cel-row + .cel-row { border-top:1px solid var(--border); }
+.cel-main { flex:1; min-width:0; display:flex; flex-direction:column; } .cel-main b { font-size:14px; overflow:hidden; text-overflow:ellipsis; white-space:nowrap; } .cel-main small { color:var(--muted); font-size:12px; }
+.cel-tag { font-size:11px; font-weight:700; padding:2px 8px; border-radius:999px; } .cel-tag.bday { background:#fdecf3; color:#b4235f; } .cel-tag.anniv { background:#fdf3e1; color:#a15c07; }
+.cel-foot { display:flex; justify-content:flex-end; gap:8px; margin-top:16px; flex-wrap:wrap; }
 /* v3.28.2: backup report */
 .att-bkc { justify-self:end; display:inline-flex; align-items:center; gap:6px; min-width:0; max-width:100%; }
 .att-bkc .att-bk { min-width:0; }
@@ -1740,6 +1754,7 @@ body.filters-locked #cleanFilters, body.filters-locked #xchips, body.filters-loc
 .bk-yn.y { background:#e3f4ea; color:#1c7a45; } .bk-yn.n { background:#fde8e8; color:#c63b3a; } .bk-yn.l { background:#e6edfe; color:#3558c8; }
 .bkr-tbl td .bkr-ed { margin-left:6px; padding:1px 8px; font-size:11.5px; }
 .bkr-bar .att-toggle { display:inline-flex; }
+.bkr-day { display:inline-flex; align-items:center; gap:4px; } .bkr-day input { height:30px; }
 .att-bk-sum [data-bk-copy]{margin-left:10px;font-size:12px}.bkr-cyc{margin:-4px 0 10px}
 .bkr-bar { display:flex; flex-wrap:wrap; align-items:center; gap:8px 12px; margin:0 0 14px; }
 .bkr-bar label { display:inline-flex; align-items:center; gap:6px; font-size:12.5px; color:var(--ink-2); }
@@ -1757,10 +1772,10 @@ body.filters-locked #cleanFilters, body.filters-locked #xchips, body.filters-loc
     <p class="gate-sub">One place for your people, priorities and team insights.</p>
     <div id="connectBody"><div class="empty">Loading…</div></div>
   </div>
-  <p class="gate-ver">3.30.1</p>
+  <p class="gate-ver">3.31.0</p>
 </section>
 
-<div id="app" hidden><aside class="sidebar" aria-label="Workspace navigation"><div class="brand dashboard-identity">      <h1><span id="title">Team Dashboard</span><span class="ver" id="ver" title="Version 3.30.1">3.30.1</span></h1><p class="brand-tag">One place for your people, priorities and team insights.</p>      <span class="sync" id="sync" role="status"><i></i><span id="syncText">Loading…</span></span></div><div class="nav-label">WORKSPACE</div>      <nav class="tabs" role="tablist" aria-label="Pages" aria-orientation="vertical">
+<div id="app" hidden><aside class="sidebar" aria-label="Workspace navigation"><div class="brand dashboard-identity">      <h1><span id="title">Team Dashboard</span><span class="ver" id="ver" title="Version 3.31.0">3.31.0</span></h1><p class="brand-tag">One place for your people, priorities and team insights.</p>      <span class="sync" id="sync" role="status"><i></i><span id="syncText">Loading…</span></span></div><div class="nav-label">WORKSPACE</div>      <nav class="tabs" role="tablist" aria-label="Pages" aria-orientation="vertical">
         <button class="tab on" role="tab" aria-controls="pageSummary" data-view="summary" aria-selected="true" data-icon="🏠" data-short="Home">Overview</button>
         <button class="tab" role="tab" aria-controls="pageEmployees" data-view="employees" aria-selected="false" data-icon="👥" data-short="People">Employees</button>
       <button class="tab" role="tab" aria-controls="pageAttendance" data-view="attendance" aria-selected="false" data-icon="🗓️" data-short="Attend.">Attendance</button>
@@ -1817,7 +1832,7 @@ body.filters-locked #cleanFilters, body.filters-locked #xchips, body.filters-loc
         <div class="card c-coming" id="cardComing" aria-label="Upcoming birthdays and work anniversaries">
           <div class="card-head">
             <div class="grow"><h2 id="comingTitle">Coming up in the next 14 days</h2><div class="sub">Birthdays and work anniversaries of current team members</div></div>
-            <label class="hint" style="display:flex;align-items:center;gap:6px">Show <select class="input mini" id="comingDays" style="width:auto;min-width:0;height:28px"><option value="7">7 days</option><option value="14" selected>14 days</option><option value="30">30 days</option><option value="60">60 days</option><option value="90">90 days</option><option value="180">180 days</option></select></label>
+            <label class="hint" style="display:flex;align-items:center;gap:6px">Show <select class="input mini" id="comingDays" style="width:auto;min-width:0;height:28px"><option value="7">7 days</option><option value="14" selected>14 days</option><option value="30">30 days</option><option value="60">60 days</option><option value="90">90 days</option><option value="180">180 days</option></select><button type="button" class="btn mini" id="comingCopy" title="Copy names and dates straight from the employee records, ready for Excel, Outlook or Teams">Copy dates</button></label>
           </div>
           <div class="coming" id="coming"></div>
         </div>
@@ -5403,7 +5418,7 @@ function gridView() {
     ${leaveFilterBar(gridBaseRows())}
     <div class="sm muted" style="margin-bottom:8px"><b class="num">${rows.length}</b> employees${hl ? ` with ${esc(kindNames)} · <b class="num">${fmt(kindDays)}</b> days of that type (other codes faded)` : ''} · <b class="num">${fmt(tot)}</b> leave days · <b>Click any day</b> to set its code, or a day number at the top to mark a holiday for everyone. A blank day counts as present (P), and blank Saturdays / Sundays are week offs.</div>
     <div class="gridwrap">${gridTable(rows, { month: g.month, hl })}</div>
-    <div style="display:flex;gap:6px 16px;flex-wrap:wrap;margin-top:12px">${legend}${g.bk === false ? '' : `<span class="bk-legend"><b class="sm">Backup provided:</b><span><span class="bk-mark y"></span>Yes</span><span><span class="bk-mark n"></span>No</span><span><span class="bk-mark l"></span>No · kept live</span></span>`}</div>`;
+    <div style="display:flex;gap:6px 16px;flex-wrap:wrap;margin-top:12px">${legend}${g.bk === false ? '' : `<span class="bk-legend"><b class="sm">Backup provided:</b><span><span class="bk-mark y"></span>Yes</span><span><span class="bk-mark n"></span>No</span><span><span class="bk-mark l"></span>No · covered by existing member</span></span>`}</div>`;
 }
 
 /* ---------- PEOPLE ---------- */
@@ -7120,22 +7135,24 @@ const bkAll = () => { const m = (window.TD_SETTINGS || {}).leave_backups; return
    month, e.g. "3,4,5: Chen Li; 30: Kept live". Anyone who can record attendance can save it (the shared settings were super-admin only). */
 const bkParse = txt => { const m = new Map(); for (const part of String(txt || '').split(';')) { const i = part.indexOf(':'); if (i < 0) continue; const v = part.slice(i + 1).trim(); if (!v) continue; for (const d of part.slice(0, i).split(',')) { const n = parseInt(d, 10); if (n >= 1 && n <= 31) m.set(n, v); } } return m; };
 const bkSerialize = m => { const by = new Map(); for (const [d, v] of [...m.entries()].sort((a, b) => a[0] - b[0])) { if (!by.has(v)) by.set(v, []); by.get(v).push(d); } return [...by.entries()].map(([v, ds]) => ds.join(',') + ': ' + v).join('; '); };
-const bkIsLive = v => /^kept live$|^no backup( needed)?$/i.test(String(v || '').trim());
+const bkIsLive = v => /^kept live$|^no backup( needed)?$|^covered by (an )?existing member$/i.test(String(v || '').trim());
 const bkRow = (key, iso) => { const p = D(true).people.get(key); if (!p) return null; const t = new Date(iso + 'T00:00:00Z'), ms = Engine.monthSerial(t.getUTCFullYear(), t.getUTCMonth()); const rs = p.rows.filter(r => r.month === ms); return rs[rs.length - 1] || null; };
 const bkExtraKey = r => Object.keys(r.extra || {}).find(k => k.toLowerCase() === BK_FIELD.toLowerCase());
 const bkGet = (key, iso) => {
   const r = bkRow(key, iso);
-  if (r) { const k = bkExtraKey(r); if (k) { const v = bkParse(r.extra[k]).get(+iso.slice(8, 10)); if (v) return bkIsLive(v) ? { none: true } : /^(yes|backup provided)$/i.test(v.trim()) ? { b: '', yes: true } : { b: v }; } }
+  if (r) { const k = bkExtraKey(r); if (k) { const v = bkParse(r.extra[k]).get(+iso.slice(8, 10)); if (v) return bkIsLive(v) ? { none: true } : /^(no|not provided|backup not provided)$/i.test(v.trim()) ? { no: true } : /^(yes|backup provided)$/i.test(v.trim()) ? { b: '', yes: true } : { b: v }; } }
   return bkAll()[key + '|' + iso] || null;   // backups saved before 3.28.2 (shared settings)
 };
 const canBackup = () => canLog() || can('att.edit') || can('att.approve');
-const bkLabel = x => !x ? '' : x.none ? 'Kept live' : (x.b || 'Backup provided');
+const bkLabel = x => !x ? '' : x.no ? 'Not provided' : x.none ? 'Covered by existing member' : (x.b || 'Backup provided');
 /* v3.30.1: backup settings: is the backup person's name optional (default), required, or not asked at all */
 const bkNameMode = () => { const m = ((window.TD_SETTINGS || {}).backup_opts || {}).name; return ['optional', 'required', 'off'].includes(m) ? m : 'optional'; };
 /* v3.30.0: "Backup provided" as a plain Yes / No (kept live counts as No: nobody was put on the work) */
-const bkYN = x => x && !x.none ? 'Yes' : 'No';
-const bkYNCls = x => x && !x.none ? 'y' : x && x.none ? 'l' : 'n';
-const bkTipLine = x => 'Backup provided: <b>' + bkYN(x) + '</b>' + (x ? (x.none ? ' · kept live' : x.b ? ' · ' + esc(x.b) : '') : '');
+const bkYes = x => !!(x && !x.none && !x.no);
+const bkYN = x => bkYes(x) ? 'Yes' : 'No';
+const bkYNLong = x => bkYes(x) ? 'Yes, provided' : x && x.none ? 'No backup (covered by existing member)' : 'No backup';
+const bkYNCls = x => bkYes(x) ? 'y' : x && x.none ? 'l' : 'n';
+const bkTipLine = x => 'Backup provided: <b>' + bkYN(x) + '</b>' + (x ? (x.none ? ' · covered by existing member' : x.no ? ' · marked not provided' : x.b ? ' · ' + esc(x.b) : '') : '');
 function bkTeam(exceptKey, iso) {
   const t = new Date(iso + 'T00:00:00Z'), ms = Engine.monthSerial(t.getUTCFullYear(), t.getUTCMonth()), i = t.getUTCDate() - 1;
   const outToday = new Set((D(true).byMonth.get(ms) || []).filter(r => { const c = catOf(r.days[i]); return c && (LEAVE_CATS.has(c) || c === 'applied'); }).map(r => personKey(r.name)));
@@ -7162,21 +7179,22 @@ function openBackupBox(pKey, iso, onDone) {
   const cur = bkGet(pKey, iso), team = bkTeam(pKey, iso), days = bkStretch(p, iso), nmMode = bkNameMode();
   const m = openModal({ title: 'Backup for ' + name,
     body: `<p class="sm" style="margin:0 0 10px">${esc(longDate(new Date(iso + 'T00:00:00Z')))} · who covers ${esc(name)}’s work?</p>
-      <div class="form"><label class="full" style="flex-direction:row;align-items:center;gap:8px;font-weight:500"><input type="radio" name="bk-k" value="yes" ${!cur || !cur.none ? 'checked' : ''}> Backup provided: Yes</label>
-      <label class="full" id="bk-wrap" ${nmMode === 'off' ? 'style="display:none"' : ''}>Backup person${nmMode === 'optional' ? ' <span class="muted" style="font-weight:400">(optional · anyone in the current team)</span>' : ' (anyone in the current team)'}<input type="text" id="bk-name" list="bk-list" value="${esc(cur && !cur.none ? cur.b : '')}" placeholder="${nmMode === 'optional' ? 'Leave blank to just mark Yes' : 'Type or pick a name'}" autocomplete="off">
+      <div class="form"><label class="full" style="flex-direction:row;align-items:center;gap:8px;font-weight:500"><input type="radio" name="bk-k" value="yes" ${!cur || (!cur.none && !cur.no) ? 'checked' : ''}> Backup provided: Yes</label>
+      <label class="full" id="bk-wrap" ${nmMode === 'off' ? 'style="display:none"' : ''}>Backup person${nmMode === 'optional' ? ' <span class="muted" style="font-weight:400">(optional · anyone in the current team)</span>' : ' (anyone in the current team)'}<input type="text" id="bk-name" list="bk-list" value="${esc(cur && cur.b ? cur.b : '')}" placeholder="${nmMode === 'optional' ? 'Leave blank to just mark Yes' : 'Type or pick a name'}" autocomplete="off">
         <datalist id="bk-list">${team.map(t => `<option value="${esc(t.name)}" label="${esc([t.id && 'ID ' + t.id, t.sub, t.out ? 'also off that day' : ''].filter(Boolean).join(' · '))}"></option>`).join('')}</datalist></label>
-      <label class="full" style="flex-direction:row;align-items:center;gap:8px;font-weight:500"><input type="radio" name="bk-k" value="none" ${cur && cur.none ? 'checked' : ''}> Kept live (no backup needed)</label>
+      <label class="full" style="flex-direction:row;align-items:center;gap:8px;font-weight:500"><input type="radio" name="bk-k" value="no" ${cur && cur.no ? 'checked' : ''}> Backup not provided: No</label>
+      <label class="full" style="flex-direction:row;align-items:center;gap:8px;font-weight:500"><input type="radio" name="bk-k" value="none" ${cur && cur.none ? 'checked' : ''}> Covered by existing member</label>
       ${days.length > 1 ? `<label class="full" style="flex-direction:row;align-items:center;gap:8px;font-weight:500"><input type="checkbox" id="bk-all" checked> Same for the whole leave: ${esc(longDate(new Date(days[0] + 'T00:00:00Z')))} – ${esc(longDate(new Date(days[days.length - 1] + 'T00:00:00Z')))} (${days.length} days)</label>` : ''}</div>
       <div class="err" id="bk-err"></div>`,
     footer: `${cur ? '<button class="btn" id="bk-clear">Clear</button>' : ''}<span class="grow"></span><button class="btn" data-close>Cancel</button><button class="btn primary" id="bk-go">Save</button>` });
   const kind = () => (m.querySelector('input[name="bk-k"]:checked') || {}).value;
-  const syncKind = () => { $('#bk-wrap', m).style.opacity = kind() === 'none' ? .45 : 1; $('#bk-name', m).disabled = kind() === 'none'; };
+  const syncKind = () => { $('#bk-wrap', m).style.opacity = kind() !== 'yes' ? .45 : 1; $('#bk-name', m).disabled = kind() !== 'yes'; };
   m.querySelectorAll('input[name="bk-k"]').forEach(r => r.addEventListener('change', syncKind)); syncKind();
   const write = async val => {
     const which = ($('#bk-all', m) && $('#bk-all', m).checked) ? days : [iso];
-    const txt = val ? (val.none ? 'Kept live' : (val.b || 'Yes')) : '';
+    const txt = val ? (val.none ? 'Covered by existing member' : val.no ? 'No' : (val.b || 'Yes')) : '';
     const missing = which.filter(x => !bkRow(pKey, x));
-    const ok = mutate((val ? (val.none ? 'Kept live (no backup) for ' : val.b ? 'Backup ' + val.b + ' for ' : 'Backup provided for ') : 'Backup cleared for ') + name + ' · ' + which.length + ' day' + (which.length === 1 ? '' : 's'), () => {
+    const ok = mutate((val ? (val.none ? 'Covered by existing member for ' : val.no ? 'Backup not provided for ' : val.b ? 'Backup ' + val.b + ' for ' : 'Backup provided for ') : 'Backup cleared for ') + name + ' · ' + which.length + ' day' + (which.length === 1 ? '' : 's'), () => {
       if (!attFieldNames().some(n => n.toLowerCase() === BK_FIELD.toLowerCase()) && !(S.newFields || []).some(n => n.toLowerCase() === BK_FIELD.toLowerCase())) (S.newFields || (S.newFields = [])).push(BK_FIELD);
       for (const x of which) {
         const r = bkRow(pKey, x); if (!r) continue;
@@ -7187,13 +7205,14 @@ function openBackupBox(pKey, iso, onDone) {
     }, { backup: true });
     if (ok === false) return;
     closeModal(); if (renderCard.el) renderCard(renderCard.el); notify(); try { onDone && onDone(); } catch { }
-    toast((val ? (val.none ? 'Marked as kept live.' : !val.b ? 'Marked as backup provided for ' + name + (which.length > 1 ? ' (' + which.length + ' days).' : '.') : val.b + ' is covering for ' + name + (which.length > 1 ? ' (' + which.length + ' days).' : '.')) : 'Backup cleared.') + (S.auto ? '' : ' Saved to Excel with the next sync.') + (missing.length ? ' ' + missing.length + ' day(s) had no tracker row and were skipped.' : ''));
+    toast((val ? (val.none ? 'Marked as covered by an existing member.' : val.no ? 'Marked as backup not provided for ' + name + (which.length > 1 ? ' (' + which.length + ' days).' : '.') : !val.b ? 'Marked as backup provided for ' + name + (which.length > 1 ? ' (' + which.length + ' days).' : '.') : val.b + ' is covering for ' + name + (which.length > 1 ? ' (' + which.length + ' days).' : '.')) : 'Backup cleared.') + (S.auto ? '' : ' Saved to Excel with the next sync.') + (missing.length ? ' ' + missing.length + ' day(s) had no tracker row and were skipped.' : ''));
   };
   $('#bk-go', m).onclick = async () => {
     try {
+      if (kind() === 'no') return await write({ no: true, by: BE.userName(), at: new Date().toISOString() });
       if (kind() === 'none') return await write({ none: true, by: BE.userName(), at: new Date().toISOString() });
       const v = nmMode === 'off' ? '' : $('#bk-name', m).value.trim(); const hit = team.find(t => t.name.toLowerCase() === v.toLowerCase());
-      if (!v && nmMode === 'required') { $('#bk-err', m).textContent = 'Pick who is covering, or choose “Kept live”.'; return; }
+      if (!v && nmMode === 'required') { $('#bk-err', m).textContent = 'Pick who is covering, or choose “Covered by existing member”.'; return; }
       if (!v) return await write({ b: '', yes: true, by: BE.userName(), at: new Date().toISOString() });
       if (!hit) { $('#bk-err', m).textContent = 'Pick someone from the current team list.'; return; }
       await write({ b: hit.name, id: hit.id, by: BE.userName(), at: new Date().toISOString() });
@@ -7202,7 +7221,21 @@ function openBackupBox(pKey, iso, onDone) {
   $('#bk-clear', m)?.addEventListener('click', async () => { try { await write(null); } catch (e) { $('#bk-err', m).textContent = e.message; } });
 }
 /* ---------- v3.29.0: backup report by pay cycle: "Oct 2026" = 26 Sep – 25 Oct 2026 (the month the cycle ends in) ---------- */
-const BKR = { month: null, client: 'all', names: 'real', yn: 'all' };
+const BKR = { month: null, client: 'all', names: 'real', yn: 'all', span: 'cycle', week: 0, day: '' };
+/* v3.30.2: look at the whole cycle, one week (Mon–Sun, cut to the cycle) or one day */
+function bkWeeks(cycle) {
+  const { start, end } = cycParts(cycle), out = []; let a = new Date(start);
+  while (a <= end) { const dow = (a.getUTCDay() + 6) % 7; let b = new Date(a.getTime() + (6 - dow) * 86400000); if (b > end) b = new Date(end); out.push({ from: isoDate(a), to: isoDate(b) }); a = new Date(b.getTime() + 86400000); }
+  return out;
+}
+function bkRange(cycle) {
+  const { start, end } = cycParts(cycle), s0 = isoDate(start), e0 = isoDate(end);
+  if (BKR.span === 'week') { const w = bkWeeks(cycle); const x = w[Math.min(BKR.week, w.length - 1)] || w[0]; return { from: x.from, to: x.to }; }
+  if (BKR.span === 'day') { const d = BKR.day && BKR.day >= s0 && BKR.day <= e0 ? BKR.day : (isoDate(TODAY) >= s0 && isoDate(TODAY) <= e0 ? isoDate(TODAY) : s0); BKR.day = d; return { from: d, to: d }; }
+  return { from: s0, to: e0 };
+}
+const bkShortD = iso => { const t = new Date(iso + 'T00:00:00Z'); return t.getUTCDate() + ' ' + MONTHS[t.getUTCMonth()]; };
+const bkRangeLabel = r => r.from === r.to ? bkFmtD(r.from) + ' ' + new Date(r.from + 'T00:00:00Z').getUTCFullYear() : bkShortD(r.from) + ' – ' + bkShortD(r.to);
 const bkPseudoCol = () => typeof colByName === 'function' ? colByName(/pseudo/i) : null;
 const bkPseudo = r => { const pc = bkPseudoCol(), w = pc ? rowRoster(r) : null, v = w ? String(g(w, pc) ?? '').trim() : ''; return v || r.name.trim(); };
 const CYC_END = 25;
@@ -7217,37 +7250,38 @@ function bkCycles() {
   return [...set].sort((a, b) => b - a);
 }
 const bkClientOf = r => String(r.client || (rowRoster(r) ? gs(rowRoster(r), 'client_column') : '') || 'No client').trim();
-function backupReportData(cycle, client, yn = 'all') {
+function backupReportData(cycle, client, yn = 'all', range = null) {
   const d = D(true), items = [], { start, end } = cycParts(cycle);
   /* the cycle spans two tracker months: 26th → end of the first, 1st → 25th of the second */
   for (let dt = new Date(start); dt <= end; dt = new Date(Date.UTC(dt.getUTCFullYear(), dt.getUTCMonth(), dt.getUTCDate() + 1))) {
     const ms = Engine.monthSerial(dt.getUTCFullYear(), dt.getUTCMonth()), i = dt.getUTCDate() - 1, iso = isoDate(dt);
+    if (range && (iso < range.from || iso > range.to)) continue;
     for (const r of d.byMonth.get(ms) || []) {
       const cl = bkClientOf(r); if (client !== 'all' && cl !== client) continue;
       const c = catOf(r.days[i]); if (!c || !LEAVE_CATS.has(c)) continue;
       const key = personKey(r.name), b = bkGet(key, iso);
-      items.push({ iso, name: r.name.trim(), pseudo: bkPseudo(r), key, client: cl, code: String(r.days[i]).trim().toUpperCase(), days: c === 'half' ? 0.5 : 1, st: !b ? 'none' : b.none ? 'live' : 'backup', backup: b && !b.none ? b.b : '' });
+      items.push({ iso, name: r.name.trim(), pseudo: bkPseudo(r), key, client: cl, code: String(r.days[i]).trim().toUpperCase(), days: c === 'half' ? 0.5 : 1, st: !b || b.no ? 'none' : b.none ? 'live' : 'backup', backup: bkYes(b) ? b.b : '', set: !!b });
     }
   }
   items.sort((a, b) => a.iso.localeCompare(b.iso) || a.name.localeCompare(b.name));
-  for (const x of items) x.yn = x.st === 'backup' ? 'Yes' : 'No';
+  for (const x of items) x.yn = x.st === 'backup' ? 'Yes' : 'No', x.ynL = x.st === 'backup' ? 'Yes, provided' : x.st === 'live' ? 'No backup (covered by existing member)' : 'No backup';
   if (yn !== 'all') { const keep = items.filter(x => x.yn.toLowerCase() === yn); items.length = 0; items.push(...keep); }
   const sum = list => { const o = { people: new Set(list.map(x => x.key)).size, days: 0, backup: 0, live: 0, none: 0, pBackup: new Set(), pLive: new Set(), pNone: new Set() }; for (const x of list) { o.days += x.days; o[x.st] += x.days; ({ backup: o.pBackup, live: o.pLive, none: o.pNone })[x.st].add(x.key); } o.pBackup = o.pBackup.size; o.pLive = o.pLive.size; o.pNone = o.pNone.size; o.cov = o.days ? Math.round((o.backup + o.live) / o.days * 100) : 100; return o; };
   const clients = [...new Set(items.map(x => x.client))].sort();
   return { items, total: sum(items), byClient: clients.map(c => ({ client: c, ...sum(items.filter(x => x.client === c)) })) };
 }
-const BK_ST = { backup: 'Backup provided', live: 'Kept live', none: 'No backup' };
+const BK_ST = { backup: 'Backup provided', live: 'Covered by existing member', none: 'No backup' };
 const bkFmtD = iso => { const t = new Date(iso + 'T00:00:00Z'); return WEEKDAYS[t.getUTCDay()] + ' ' + t.getUTCDate() + ' ' + MONTHS[t.getUTCMonth()]; };
 /* one copy for the whole report: plain text with tabs (pastes as columns in Excel / Sheets) plus an HTML table (pastes as a table in Outlook / Teams) */
-async function bkCopy(cycle, client, names = BKR.names, yn = 'all') {
-  const R = backupReportData(cycle, client, yn), T = R.total, cv = client !== 'all', nmOf = x => names === 'pseudo' ? x.pseudo : x.name;
-  const title = 'Backup report · ' + monthLabel(cycle) + ' (' + cycRange(cycle) + ') · ' + (cv ? client : 'All clients') + (yn !== 'all' ? ' · Backup provided: ' + (yn === 'yes' ? 'Yes' : 'No') : '') + (names === 'pseudo' ? ' · pseudo names' : '');
+async function bkCopy(cycle, client, names = BKR.names, yn = 'all', range = null) {
+  const R = backupReportData(cycle, client, yn, range), T = R.total, cv = client !== 'all', nmOf = x => names === 'pseudo' ? x.pseudo : x.name;
+  const title = 'Backup report · ' + monthLabel(cycle) + ' (' + cycRange(cycle) + ')' + (range && BKR.span !== 'cycle' ? ' · ' + (BKR.span === 'week' ? 'Week ' : '') + bkRangeLabel(range) : '') + ' · ' + (cv ? client : 'All clients') + (yn !== 'all' ? ' · Backup provided: ' + (yn === 'yes' ? 'Yes' : 'No') : '') + (names === 'pseudo' ? ' · pseudo names' : '');
   const line2 = T.people + ' on leave · ' + fmt(T.days) + ' leave days · ' + T.cov + '% covered';
-  const sumRows = [['Backup provided', fmt(T.backup), T.pBackup], ['Kept live', fmt(T.live), T.pLive], ['No backup', fmt(T.none), T.pNone]];
-  const hd = ['Date', 'Employee', ...(cv ? [] : ['Client']), 'Leave', 'Backup provided', 'Cover', 'Backup person'];
-  const rows = R.items.map(x => [x.iso, nmOf(x), ...(cv ? [] : [x.client]), x.code + (x.days === .5 ? ' (half)' : ''), x.yn, BK_ST[x.st], x.backup || '']);
+  const sumRows = [['Backup provided', fmt(T.backup), T.pBackup], ['Covered by existing member', fmt(T.live), T.pLive], ['No backup', fmt(T.none), T.pNone]];
+  const hd = ['Date', 'Employee', ...(cv ? [] : ['Client']), 'Leave', 'Backup provided', 'Cover'];
+  const rows = R.items.map(x => [x.iso, nmOf(x), ...(cv ? [] : [x.client]), x.code + (x.days === .5 ? ' (half)' : ''), x.ynL, x.backup || '']);
   const cRows = !cv ? R.byClient.map(c => [c.client, c.people, fmt(c.days), fmt(c.backup), fmt(c.live), fmt(c.none), c.cov + '%']) : [];
-  const cHd = ['Client', 'People on leave', 'Leave days', 'Backup provided', 'Kept live', 'No backup', 'Covered'];
+  const cHd = ['Client', 'People on leave', 'Leave days', 'Backup provided', 'Covered by existing member', 'No backup', 'Covered'];
   const txt = [title, line2, '', ['Status', 'Days', 'People'].join('\t'), ...sumRows.map(r => r.join('\t')),
     ...(cRows.length ? ['', cHd.join('\t'), ...cRows.map(r => r.join('\t'))] : []), '', hd.join('\t'), ...rows.map(r => r.join('\t'))].join('\n');
   const tb = (h, rs) => `<table border="1" cellpadding="4" cellspacing="0" style="border-collapse:collapse;font:12px Segoe UI,Arial,sans-serif"><thead><tr>${h.map(x => `<th style="background:#f1f3f7;text-align:left">${esc(String(x))}</th>`).join('')}</tr></thead><tbody>${rs.map(r => '<tr>' + r.map(x => `<td>${esc(String(x))}</td>`).join('') + '</tr>').join('')}</tbody></table>`;
@@ -7269,27 +7303,33 @@ function openBackupReport() {
   const hd = document.createElement('header'); const h2 = document.createElement('h2'); h2.textContent = 'Backup report'; hd.append(h2, close);
   const aside = document.createElement('aside'); aside.className = 'drawer att-hist-drawer'; aside.setAttribute('role', 'dialog'); aside.setAttribute('aria-label', 'Backup report'); aside.append(hd, body);
   const draw = () => {
-    const R = backupReportData(BKR.month, BKR.client, BKR.yn), T = R.total, clientView = BKR.client !== 'all', pc = bkPseudoCol(), nmOf = x => BKR.names === 'pseudo' ? x.pseudo : x.name, edit = canBackup();
+    const RG = bkRange(BKR.month), WK = bkWeeks(BKR.month), R = backupReportData(BKR.month, BKR.client, BKR.yn, RG), T = R.total, clientView = BKR.client !== 'all', pc = bkPseudoCol(), nmOf = x => BKR.names === 'pseudo' ? x.pseudo : x.name, edit = canBackup();
     const tg = (key, opts) => `<div class="att-toggle" role="group">${opts.map(([v, l]) => `<button type="button" data-bkr-t="${key}" data-v="${v}" aria-pressed="${BKR[key] === v}">${l}</button>`).join('')}</div>`;
     const tile = (cls, n, l, sub) => `<div class="bkr-t ${cls}"><b>${n}</b><span>${l}</span><em>${sub}</em></div>`;
     const pl = n => n + ' ' + (n === 1 ? 'person' : 'people'), dl = n => fmt(n) + ' day' + (n === 1 ? '' : 's');
     body.innerHTML = `<div class="bkr-bar"><label>Cycle <select data-bkr="month">${cycles.map(m => `<option value="${m}"${m === BKR.month ? ' selected' : ''}>${esc(cycLabel(m))}</option>`).join('')}</select></label>
         <label>Client <select data-bkr="client"><option value="all">All clients</option>${allClients.map(c => `<option${c === BKR.client ? ' selected' : ''}>${esc(c)}</option>`).join('')}</select></label>
+        <label>Show ${tg('span', [['cycle', 'Whole cycle'], ['week', 'Week'], ['day', 'Day']])}</label>
+        ${BKR.span === 'week' ? `<select data-bkr-week aria-label="Week">${WK.map((w, k) => `<option value="${k}"${k === Math.min(BKR.week, WK.length - 1) ? ' selected' : ''}>Week ${k + 1} · ${bkShortD(w.from)}${w.to !== w.from ? ' – ' + bkShortD(w.to) : ''}</option>`).join('')}</select>` : ''}
+        ${BKR.span === 'day' ? `<span class="bkr-day"><button type="button" class="btn mini" data-bkr-step="-1" aria-label="Previous day">‹</button><input type="date" data-bkr-day value="${RG.from}" min="${isoDate(cycParts(BKR.month).start)}" max="${isoDate(cycParts(BKR.month).end)}" aria-label="Day"><button type="button" class="btn mini" data-bkr-step="1" aria-label="Next day">›</button></span>` : ''}
         <label>Backup provided ${tg('yn', [['all', 'All'], ['yes', 'Yes'], ['no', 'No']])}</label>${pc ? `<label>Names ${tg('names', [['real', 'Real'], ['pseudo', 'Pseudo']])}</label>` : ''}
         <span class="grow"></span><button class="btn primary" data-bkr-copy title="Copies the summary and every leave day with its backup, ready to paste into Excel, Outlook or Teams">${typeof ic === 'function' ? ic('copy') + ' ' : ''}Copy to clipboard</button><button class="btn" data-bkr-print>Print</button></div>
       <p class="sm muted bkr-cyc">Each cycle runs from the 26th to the 25th and is named after the month it ends in.</p>
       <div class="bkr-sheet" id="bkrSheet">
-      <div class="bkr-title"><h3>Leave cover report · ${esc(monthLabel(BKR.month))}</h3><p>${esc(cycRange(BKR.month))} · ${clientView ? esc(BKR.client) + ' · ' : 'All clients · '}${BKR.yn !== 'all' ? 'Backup provided: ' + (BKR.yn === 'yes' ? 'Yes' : 'No') + ' · ' : ''}${pl(T.people)} on leave · ${dl(T.days)} of leave · <b>${T.cov}%</b> covered</p></div>
-      <div class="bkr-tiles">${tile('b', dl(T.backup), 'Backup provided', pl(T.pBackup))}${tile('l', dl(T.live), 'Kept live', pl(T.pLive) + ' · no backup needed')}${tile('n', dl(T.none), 'No backup', pl(T.pNone))}</div>
+      <div class="bkr-title"><h3>Leave cover report · ${esc(monthLabel(BKR.month))}</h3><p>${BKR.span === 'cycle' ? esc(cycRange(BKR.month)) : '<b>' + (BKR.span === 'week' ? 'Week ' + (Math.min(BKR.week, WK.length - 1) + 1) + ': ' : '') + esc(bkRangeLabel(RG)) + '</b> (cycle ' + esc(cycRange(BKR.month)) + ')'} · ${clientView ? esc(BKR.client) + ' · ' : 'All clients · '}${BKR.yn !== 'all' ? 'Backup provided: ' + (BKR.yn === 'yes' ? 'Yes' : 'No') + ' · ' : ''}${pl(T.people)} on leave · ${dl(T.days)} of leave · <b>${T.cov}%</b> covered</p></div>
+      <div class="bkr-tiles">${tile('b', dl(T.backup), 'Backup provided', pl(T.pBackup))}${tile('l', dl(T.live), 'Covered by existing member', pl(T.pLive))}${tile('n', dl(T.none), 'No backup', pl(T.pNone))}</div>
       <div class="bkr-bar2" title="${T.cov}% covered"><i class="b" style="width:${T.days ? T.backup / T.days * 100 : 0}%"></i><i class="l" style="width:${T.days ? T.live / T.days * 100 : 0}%"></i><i class="n" style="width:${T.days ? T.none / T.days * 100 : 0}%"></i></div>
-      ${!clientView && R.byClient.length ? `<h4>By client</h4><table class="bkr-tbl"><thead><tr><th>Client</th><th>People on leave</th><th>Leave days</th><th>Backup provided</th><th>Kept live</th><th>No backup</th><th>Covered</th></tr></thead><tbody>${R.byClient.map(c => `<tr><td><button class="linkbtn" data-bkr-client="${esc(c.client)}">${esc(c.client)}</button></td><td>${c.people}</td><td>${fmt(c.days)}</td><td>${fmt(c.backup)}</td><td>${fmt(c.live)}</td><td class="${c.none ? 'bad' : ''}">${fmt(c.none)}</td><td><b>${c.cov}%</b></td></tr>`).join('')}</tbody></table>` : ''}
-      <h4>Day by day</h4>${R.items.length ? `<table class="bkr-tbl"><thead><tr><th>Date</th><th>Employee</th>${clientView ? '' : '<th>Client</th>'}<th>Leave</th><th>Backup provided</th><th>Cover</th></tr></thead><tbody>${R.items.map(x => `<tr><td>${bkFmtD(x.iso)}</td><td>${esc(nmOf(x))}</td>${clientView ? '' : `<td>${esc(x.client)}</td>`}<td>${esc(x.code)}${x.days === .5 ? ' (½)' : ''}</td><td><em class="bk-yn ${x.st === 'backup' ? 'y' : x.st === 'live' ? 'l' : 'n'}">${x.yn}</em></td><td><span class="bkr-st ${x.st}">${x.st === 'backup' && x.backup ? '↪ ' + esc(x.backup) : BK_ST[x.st]}</span>${edit ? `<button type="button" class="btn mini bkr-ed" data-bkr-ed="${esc(x.key)}" data-iso="${x.iso}" title="Change the backup for this day">${x.st === 'none' ? '+ Add' : 'Edit'}</button>` : ''}</td></tr>`).join('')}</tbody></table>` : '<p class="sm muted">No leave in this cycle' + (clientView ? ' for this client' : '') + (BKR.yn !== 'all' ? ' with backup provided: ' + BKR.yn : '') + '.</p>'}
+      ${!clientView && R.byClient.length ? `<h4>By client</h4><table class="bkr-tbl"><thead><tr><th>Client</th><th>People on leave</th><th>Leave days</th><th>Backup provided</th><th>Existing member</th><th>No backup</th><th>Covered</th></tr></thead><tbody>${R.byClient.map(c => `<tr><td><button class="linkbtn" data-bkr-client="${esc(c.client)}">${esc(c.client)}</button></td><td>${c.people}</td><td>${fmt(c.days)}</td><td>${fmt(c.backup)}</td><td>${fmt(c.live)}</td><td class="${c.none ? 'bad' : ''}">${fmt(c.none)}</td><td><b>${c.cov}%</b></td></tr>`).join('')}</tbody></table>` : ''}
+      <h4>Day by day</h4>${R.items.length ? `<table class="bkr-tbl"><thead><tr><th>Date</th><th>Employee</th>${clientView ? '' : '<th>Client</th>'}<th>Leave</th><th>Backup provided</th><th>Cover</th></tr></thead><tbody>${R.items.map(x => `<tr><td>${bkFmtD(x.iso)}</td><td>${esc(nmOf(x))}</td>${clientView ? '' : `<td>${esc(x.client)}</td>`}<td>${esc(x.code)}${x.days === .5 ? ' (½)' : ''}</td><td><span class="bkr-st ${x.st}">${x.ynL}</span></td><td>${x.backup ? esc(x.backup) : ''}${edit ? `<button type="button" class="btn mini bkr-ed" data-bkr-ed="${esc(x.key)}" data-iso="${x.iso}" title="Change the backup for this day">${x.set ? 'Edit' : '+ Add'}</button>` : ''}</td></tr>`).join('')}</tbody></table>` : '<p class="sm muted">No leave in this ' + (BKR.span === 'cycle' ? 'cycle' : BKR.span) + (clientView ? ' for this client' : '') + (BKR.yn !== 'all' ? ' with backup provided: ' + BKR.yn : '') + '.</p>'}
       </div>`;
     body.querySelectorAll('[data-bkr]').forEach(el => el.addEventListener('change', () => { BKR[el.dataset.bkr] = el.dataset.bkr === 'month' ? +el.value : el.value; draw(); }));
     body.querySelectorAll('[data-bkr-client]').forEach(el => el.addEventListener('click', () => { BKR.client = el.dataset.bkrClient; draw(); }));
-    body.querySelectorAll('[data-bkr-t]').forEach(b => b.addEventListener('click', () => { BKR[b.dataset.bkrT] = b.dataset.v; draw(); }));
+    body.querySelectorAll('[data-bkr-t]').forEach(b => b.addEventListener('click', () => { BKR[b.dataset.bkrT] = b.dataset.v; if (b.dataset.bkrT === 'span' && b.dataset.v === 'week') { const t = isoDate(TODAY), k = WK.findIndex(w => t >= w.from && t <= w.to); BKR.week = k < 0 ? 0 : k; } draw(); }));
+    body.querySelector('[data-bkr-week]')?.addEventListener('change', e => { BKR.week = +e.target.value; draw(); });
+    body.querySelector('[data-bkr-day]')?.addEventListener('change', e => { if (e.target.value) { BKR.day = e.target.value; draw(); } });
+    body.querySelectorAll('[data-bkr-step]').forEach(b => b.addEventListener('click', () => { const t = new Date(RG.from + 'T00:00:00Z'); BKR.day = isoDate(new Date(t.getTime() + (+b.dataset.bkrStep) * 86400000)); draw(); }));
     body.querySelectorAll('[data-bkr-ed]').forEach(b => b.addEventListener('click', () => openBackupBox(b.dataset.bkrEd, b.dataset.iso, draw)));
-    body.querySelector('[data-bkr-copy]').onclick = () => bkCopy(BKR.month, BKR.client, BKR.names, BKR.yn);
+    body.querySelector('[data-bkr-copy]').onclick = () => bkCopy(BKR.month, BKR.client, BKR.names, BKR.yn, RG);
     body.querySelector('[data-bkr-print]').onclick = () => { const w = window.open('', '_blank'); if (!w) { toast('Allow pop-ups to print.'); return; } w.document.write(`<!doctype html><meta charset="utf-8"><title>Leave cover report</title><style>body{font:13px system-ui,Segoe UI,sans-serif;color:#1f2937;margin:24px}${BKR_CSS}.bkr-ed{display:none}</style>` + document.querySelector('#bkrSheet').outerHTML); w.document.close(); w.focus(); w.print(); };
   };
   mountDrawer(aside); draw();
@@ -7364,11 +7404,11 @@ function renderCard(el, opts = {}) {
       if (!T[C.tab]) C.tab = T.leave.length ? 'leave' : T.late.length ? 'late' : T.half.length ? 'half' : 'leave';
       const tabBtn = (k, n, l, extra) => `<button type="button" class="att-tab${n ? ' has' : ''}" data-att-tab="${k}" aria-pressed="${C.tab === k}"><b>${n}</b>${l}${extra || ''}</button>`;
       const list = T[C.tab].slice().sort((a, b) => nm(a.r).localeCompare(nm(b.r)));
-      const listCopy = C.tab === 'late' ? tableData(['Employee', 'Client', 'Code', 'Status'], list.map(x => [nm(x.r), cl(x.r), String(x.v).trim().toUpperCase(), x.c === 'applied' ? 'Awaiting approval' : labelOf(x.v)]), (C.tab === 'late' ? 'Late comings' : C.tab === 'half' ? 'Half days' : 'Out') + ' on ' + longDate(rd)) : tableData(['Employee', 'Client', 'Code', 'Status', 'Backup provided', 'Backup'], list.map(x => { const b = bkGet(personKey(x.r.name), rdIso); return [nm(x.r), cl(x.r), String(x.v).trim().toUpperCase(), x.c === 'applied' ? 'Awaiting approval' : labelOf(x.v), bkYN(b), bkLabel(b) || '—']; }), (C.tab === 'late' ? 'Late comings' : C.tab === 'half' ? 'Half days' : 'Out') + ' on ' + longDate(rd));
+      const listCopy = C.tab === 'late' ? tableData(['Employee', 'Client', 'Code', 'Status'], list.map(x => [nm(x.r), cl(x.r), String(x.v).trim().toUpperCase(), x.c === 'applied' ? 'Awaiting approval' : labelOf(x.v)]), (C.tab === 'late' ? 'Late comings' : C.tab === 'half' ? 'Half days' : 'Out') + ' on ' + longDate(rd)) : tableData(['Employee', 'Client', 'Code', 'Status', 'Backup provided', 'Cover'], list.map(x => { const b = bkGet(personKey(x.r.name), rdIso); return [nm(x.r), cl(x.r), String(x.v).trim().toUpperCase(), x.c === 'applied' ? 'Awaiting approval' : labelOf(x.v), bkYNLong(b), bkYes(b) ? b.b : '']; }), (C.tab === 'late' ? 'Late comings' : C.tab === 'half' ? 'Half days' : 'Out') + ' on ' + longDate(rd));
       renderCard._copy = { ...renderCard._copy, today: listCopy };
       const emptyTxt = !rows.length ? 'No attendance rows for this month.' : C.tab === 'late' ? 'No late comings ' + dayWord + '.' : C.tab === 'half' ? 'No half days ' + dayWord + '.' : 'Nobody is on leave ' + dayWord + '.';
-      const miniList = list.length ? `<ul class="att-mini">${list.map(x => `<li><span class="att-mini-n">${esc(nm(x.r))}${can('att.info') ? `<button type="button" class="rq-i" data-lainfo="${esc(x.r.name.trim())}" aria-label="Past and upcoming leave of ${esc(nm(x.r))}">i</button>` : ''}</span><span class="att-mini-c">${esc(cl(x.r))}</span><span class="ph-chip c-${esc(x.c)}">${esc(String(x.v).trim().toUpperCase())}</span><span class="att-mini-s">${esc(x.c === 'applied' ? 'Awaiting approval' : labelOf(x.v))}</span>${C.tab === 'late' ? '<span></span>' : (() => { const k = personKey(x.r.name), b = bkGet(k, rdIso); return `<span class="att-bkc"><em class="bk-yn ${bkYNCls(b)}" title="Backup provided: ${bkYN(b)}">${bkYN(b)}</em>` + (b ? `<button type="button" class="att-bk ${b.none ? 'none' : 'set'}" data-bk="${esc(k)}" ${canBackup() ? '' : 'disabled'} title="${esc(b.none ? 'Kept live (no backup needed)' : b.b ? 'Backup: ' + b.b : 'Backup provided (no name)')}">${b.none ? 'Kept live' : b.b ? '↪ ' + esc(b.b) : 'Provided'}</button>` : canBackup() ? `<button type="button" class="att-bk add" data-bk="${esc(k)}">+ Backup</button>` : '<span class="att-bk-no">No backup</span>') + '</span>'; })()}</li>`).join('')}</ul>` : `<div class="att-mini-empty">${emptyTxt}</div>`;
-      const needBk = C.tab === 'late' ? [] : list, covered = needBk.filter(x => bkGet(personKey(x.r.name), rdIso)).length;
+      const miniList = list.length ? `<ul class="att-mini">${list.map(x => `<li><span class="att-mini-n">${esc(nm(x.r))}${can('att.info') ? `<button type="button" class="rq-i" data-lainfo="${esc(x.r.name.trim())}" aria-label="Past and upcoming leave of ${esc(nm(x.r))}">i</button>` : ''}</span><span class="att-mini-c">${esc(cl(x.r))}</span><span class="ph-chip c-${esc(x.c)}">${esc(String(x.v).trim().toUpperCase())}</span><span class="att-mini-s">${esc(x.c === 'applied' ? 'Awaiting approval' : labelOf(x.v))}</span>${C.tab === 'late' ? '<span></span>' : (() => { const k = personKey(x.r.name), b = bkGet(k, rdIso); return `<span class="att-bkc"><em class="bk-yn ${bkYNCls(b)}" title="Backup provided: ${bkYN(b)}">${bkYN(b)}</em>` + (b ? `<button type="button" class="att-bk ${b.none || b.no ? 'none' : 'set'}" data-bk="${esc(k)}" ${canBackup() ? '' : 'disabled'} title="${esc(b.no ? 'Backup not provided' : b.none ? 'Covered by existing member' : b.b ? 'Backup: ' + b.b : 'Backup provided (no name)')}">${b.no ? 'Not provided' : b.none ? 'Existing member' : b.b ? '↪ ' + esc(b.b) : 'Provided'}</button>` : canBackup() ? `<button type="button" class="att-bk add" data-bk="${esc(k)}">+ Backup</button>` : '<span class="att-bk-no">No backup</span>') + '</span>'; })()}</li>`).join('')}</ul>` : `<div class="att-mini-empty">${emptyTxt}</div>`;
+      const needBk = C.tab === 'late' ? [] : list, covered = needBk.filter(x => { const b = bkGet(personKey(x.r.name), rdIso); return b && !b.no; }).length;
       const bkLine = needBk.length ? `<div class="att-bk-sum ${covered === needBk.length ? 'ok' : ''}">Backups: <b>${covered} of ${needBk.length}</b> covered${covered < needBk.length ? ' · ' + (needBk.length - covered) + ' without a backup' : ''}<button type="button" class="linkbtn" data-bk-copy title="Copy this cycle's backups (${esc(cycLabel(cycOf(rd)))}) for Excel or email">Copy ${esc(monthLabel(cycOf(rd)))} backups</button></div>` : '';
       html = head2 + `<div class="att-tabs">${tabBtn('leave', nFull, ' on leave', nLa ? ` <em>+${nLa} awaiting</em>` : '')}${tabBtn('half', T.half.length, ' half day')}${tabBtn('late', T.late.length, ' late')}<span class="grow"></span>${copyBtn('today', listCopy)}${pseudoCol ? toggle('names', [['real', 'Real'], ['pseudo', 'Pseudo']]) : ''}<button type="button" class="btn mini" data-att-hist>History &amp; upcoming ↗</button><button type="button" class="btn mini" data-bk-report>Backup report ↗</button></div>` + bkLine + miniList;
     }
@@ -7810,7 +7850,7 @@ async function poll() {
 }
 
 /* ============================== filtering ============================== */
-const APP = { title: "Team Dashboard", version: "3.30.1", released: "30 Sep 2026" };
+const APP = { title: "Team Dashboard", version: "3.31.0", released: "30 Sep 2026" };
 const BASE_DIMS = { status: "status_column", desig: "designation_column", client: "client_column", mode: "mode_column" };
 const STANDARD_STATUSES = ["Active", "Manager", "OJT", "Bench", "New", "Projected", "Left", "Moved"];
 const TILE_ORDER = ["Active", "Manager", "OJT", "Bench", "New", "Projected"];
@@ -8990,7 +9030,7 @@ function upcoming(colKey, kind, days) {
     if (diff > days) continue;
     const years = new Date(cand).getUTCFullYear() - d0.getUTCFullYear();
     if (kind === "anniv" && years < 1) continue;
-    out.push({ name: gs(r, "name_column"), date: new Date(cand), diff, years });
+    out.push({ name: gs(r, "name_column"), date: new Date(cand), diff, years, r, src: s });
   }
   return out.sort((a, b) => a.diff - b.diff || a.name.localeCompare(b.name));
 }
@@ -9130,6 +9170,59 @@ function renderComing() {
   $("#coming").replaceChildren(
     mk("bday", "🎂 Birthdays", upcoming("dob_column", "bday", days), () => "🎉 Birthday"),
     mk("anniv", "🏆 Work anniversaries", upcoming("doj_column", "anniv", days), x => "🎊 " + x.years + (x.years === 1 ? " year" : " years")));
+}
+
+/* ---------- v3.31.0: today's birthdays and work anniversaries pop up at sign-in / page refresh.
+   "Close for today" hides it until tomorrow (in this browser, for this user); "Show again next time" just closes it. ---------- */
+/* v3.31.0: copy birthdays / anniversaries with the dates taken straight from the employee (workforce) records */
+async function copyCelebrations(days, only) {
+  const t = new Date(), S0 = v => String(v ?? ""), keyCol = colName("key_column"), clCol = colName("client_column"), dsCol = colName("designation_column");
+  const long = d => String(d.getUTCDate()).padStart(2, "0") + " " + MON[d.getUTCMonth()] + " " + d.getUTCFullYear();
+  const rows = [];
+  for (const [col, kind, label] of [["dob_column", "bday", "Birthday"], ["doj_column", "anniv", "Work anniversary"]]) {
+    if (only && only !== kind) continue;
+    for (const x of upcoming(col, kind, days)) rows.push([x.name, keyCol ? S0(g(x.r, keyCol)) : "", clCol ? S0(g(x.r, clCol)) : "", dsCol ? S0(g(x.r, dsCol)) : "", label, long(x.date), long(serialToDate(x.src)), kind === "anniv" ? String(x.years) : "", x.diff === 0 ? "Today" : x.diff === 1 ? "Tomorrow" : "In " + x.diff + " days"]);
+  }
+  rows.sort((a, b) => new Date(a[5]) - new Date(b[5]) || a[0].localeCompare(b[0]));
+  if (!rows.length) { toast("Nothing to copy in this period."); return; }
+  const hd = ["Employee", "Emp ID", "Client", "Designation", "Occasion", "Date", "Date in records (birth / joining)", "Years", "When"];
+  const title = (days === 0 ? "Celebrations today · " + long(new Date(Date.UTC(t.getFullYear(), t.getMonth(), t.getDate()))) : "Birthdays and work anniversaries · next " + days + " days");
+  const txt = [title, "", hd.join("\t"), ...rows.map(r => r.join("\t"))].join("\n");
+  const e = v => String(v ?? "").replace(/[&<>"]/g, c => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;" }[c]));
+  const html = `<div style="font:13px Segoe UI,Arial,sans-serif"><p><b>${e(title)}</b></p><table border="1" cellpadding="4" cellspacing="0" style="border-collapse:collapse;font:12px Segoe UI,Arial,sans-serif"><thead><tr>${hd.map(x => `<th style="background:#f1f3f7;text-align:left">${e(x)}</th>`).join("")}</tr></thead><tbody>${rows.map(r => "<tr>" + r.map(x => `<td>${e(x)}</td>`).join("") + "</tr>").join("")}</tbody></table></div>`;
+  try {
+    if (window.ClipboardItem && navigator.clipboard?.write) await navigator.clipboard.write([new ClipboardItem({ "text/plain": new Blob([txt], { type: "text/plain" }), "text/html": new Blob([html], { type: "text/html" }) })]);
+    else await navigator.clipboard.writeText(txt);
+    toast(rows.length + " date" + (rows.length === 1 ? "" : "s") + " copied from the employee records.");
+  } catch { toast("The browser blocked copying."); }
+}
+document.addEventListener("click", ev => { if (ev.target.closest && ev.target.closest("#comingCopy")) copyCelebrations(state.comingDays, OV.up === "bday" || OV.up === "anniv" ? OV.up : null); });
+let celebrateShown = false;
+function celebratePopup() {
+  if (celebrateShown || !state.rows || !state.rows.length) return;
+  const app = document.getElementById("app"); if (!app || app.hidden) return;
+  if (window.PERM && PERM.can && !PERM.can("ov.coming")) return;
+  const t = new Date(), today = t.getFullYear() + "-" + String(t.getMonth() + 1).padStart(2, "0") + "-" + String(t.getDate()).padStart(2, "0");
+  const who = (window.BE && BE.userName && BE.userName()) || "me", KEY = "td_celebrate_closed|" + who;
+  let closed = null; try { closed = localStorage.getItem(KEY); } catch { }
+  if (closed === today) { celebrateShown = true; return; }
+  let b = [], a = []; try { b = upcoming("dob_column", "bday", 0); a = upcoming("doj_column", "anniv", 0); } catch { return; }
+  celebrateShown = true;
+  if (!b.length && !a.length) return;
+  const esc = v => String(v ?? '').replace(/[&<>"']/g, c => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c]));
+  const initials = n => (n || "?").trim().split(/\s+/).filter(Boolean).slice(0, 2).map(x => x[0]).join("").toUpperCase() || "?";
+  const row = (x, kind) => `<li class="cel-row"><span class="coming-avatar ${kind}">${esc(initials(x.name))}</span><span class="cel-main"><b>${esc(x.name)}</b><small>${kind === "bday" ? "Happy birthday!" : x.years + (x.years === 1 ? " year" : " years") + " with the team"}</small></span><span class="cel-tag ${kind}">${kind === "bday" ? "Birthday" : "Anniversary"}</span></li>`;
+  const veil = document.createElement("div"); veil.className = "cel-veil"; veil.setAttribute("role", "dialog"); veil.setAttribute("aria-modal", "true"); veil.setAttribute("aria-label", "Today's celebrations");
+  veil.innerHTML = `<div class="cel-box"><div class="cel-top"><svg viewBox="0 0 24 24" width="30" height="30" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M4 21h16"/><path d="M5 21v-7a2 2 0 0 1 2-2h10a2 2 0 0 1 2 2v7"/><path d="M5 16c1.5 1 3 1 4.5 0s3-1 4.5 0 3 1 4.5 0"/><path d="M12 12V8"/><path d="M12 5.5c.8-.8.8-1.7 0-2.5-.8.8-.8 1.7 0 2.5z"/></svg>
+      <div><h3>Celebrations today</h3><p>${esc(t.toLocaleDateString(undefined, { weekday: "long", day: "numeric", month: "long" }))}</p></div><button type="button" class="cel-x" data-cel="later" aria-label="Close">✕</button></div>
+    ${b.length ? `<h4>Birthdays (${b.length})</h4><ul class="cel-list">${b.map(x => row(x, "bday")).join("")}</ul>` : ""}
+    ${a.length ? `<h4>Work anniversaries (${a.length})</h4><ul class="cel-list">${a.map(x => row(x, "anniv")).join("")}</ul>` : ""}
+    <div class="cel-foot"><button type="button" class="btn" data-cel="copy" title="Copy names and dates from the employee records">Copy dates</button><span style="flex:1"></span><button type="button" class="btn" data-cel="later" title="Close now and show this again the next time the page opens today">Show again next time</button><button type="button" class="btn primary" data-cel="today" title="Don't show this again today">Close for today</button></div></div>`;
+  const done = mode => { if (mode === "today") { try { localStorage.setItem(KEY, today); } catch { } } veil.remove(); document.removeEventListener("keydown", onKey); };
+  const onKey = e => { if (e.key === "Escape") done("later"); };
+  veil.addEventListener("click", e => { const btn = e.target.closest("[data-cel]"); if (btn && btn.dataset.cel === "copy") copyCelebrations(0); else if (btn) done(btn.dataset.cel); else if (e.target === veil) done("later"); });
+  document.addEventListener("keydown", onKey);
+  document.body.append(veil); veil.querySelector('[data-cel="today"]').focus();
 }
 
 /* ============================== action items (missing details) ============================== */
@@ -9957,6 +10050,7 @@ function renderAll() {
   renderFilters(); renderCustomFieldFilters(); renderChips(); window.syncFilterSaveActions?.();
   $("#scopeLine").textContent = fmtN(rowsFor(null).length) + " of " + fmtN(state.rows.length) + " employees · " + (filterSummary() || "All statuses · no filters");
   $("#todayLabel").textContent = new Date().toLocaleDateString(undefined,{weekday:"short",month:"short",day:"numeric"});
+  setTimeout(celebratePopup, 400);
   if (state.view === "summary") { window.ATT?.renderApprovalRequests(); renderComing(); renderHolidays(); setTimeout(organizeOverview, 0); renderStrip(); if (window.ATT) { ATT.renderCard($("#cardAttendance")); if (window.PERM && PERM.can("ov.watch")) ATT.renderWatch($("#cardWatch")); } } else if (state.view === "reports") renderCharts(); else if (state.view === "actions") { renderActions(); renderReview(); } else if (state.view === "attendance" || state.view === "settings") { /* these pages draw themselves */ } else renderTable();
   syncActionTabs(); attSync();
 }
@@ -11986,7 +12080,7 @@ function drawTools(pane) {
 /* ----- v3.30.1: Leave backups ----- */
 function drawBackupSettings(pane) {
   const cur = (((window.TD_SETTINGS || {}).backup_opts || {}).name) || 'optional', opts = { ...((window.TD_SETTINGS || {}).backup_opts || {}) };
-  const OPTS = [['optional', 'Optional', 'Mark “Backup provided: Yes” with or without naming who covers.'], ['required', 'Required', 'Every “Yes” must name someone from the current team.'], ['off', 'Don’t ask', 'Only Yes / No / Kept live. No name field in the backup box.']];
+  const OPTS = [['optional', 'Optional', 'Mark “Backup provided: Yes” with or without naming who covers.'], ['required', 'Required', 'Every “Yes” must name someone from the current team.'], ['off', 'Don’t ask', 'Only Yes / No / Covered by existing member. No name field in the backup box.']];
   const save = async v => { try { await saveTeamSetting('backup_opts', { ...opts, name: v }, { name: 'Leave backups', text: 'Backup person name: ' + OPTS.find(o => o[0] === v)[1] }); toast('Saved. Backup person name: ' + OPTS.find(o => o[0] === v)[1] + '.'); drawBackupSettings(pane); } catch (e) { toast('Could not save: ' + e.message); } };
   fill(pane,
     h('div', { class: 'set-card' }, h('h4', {}, 'Backup person’s name'),
