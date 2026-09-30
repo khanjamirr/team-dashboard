@@ -4,7 +4,7 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <link rel="icon" href="data:,">
-<title>Team Dashboard · 3.26.0</title>
+<title>Team Dashboard · 3.26.1</title>
 <style>
 :root {
   color-scheme: light;
@@ -1428,7 +1428,7 @@ body.filters-locked #cleanFilters, body.filters-locked #xchips, body.filters-loc
   #pageSummary.ov > .ov-glance { grid-template-columns:repeat(auto-fit,minmax(min(100%,300px),1fr)); }
 }
 @media (max-width:650px) { .ov-tile { padding:12px; } .ov-ic { width:34px; height:34px; font-size:17px; } .ov-tx b { font-size:18px; } }
-/* v3.26.0: Attendance, Request Center and Coming up side by side in one row; Leave watch full width below */
+/* v3.26.1: Attendance, Request Center and Coming up side by side in one row; Leave watch full width below */
 #pageSummary.ov { grid-template-columns:minmax(0,1.45fr) minmax(0,1fr) minmax(0,1fr) !important; grid-template-areas:"glance glance glance" "att req up" "watch watch watch" !important; }
 #pageSummary.ov > .ov-main, #pageSummary.ov > .ov-side { display:contents !important; }
 #pageSummary.ov #cardAttendance { grid-area:att !important; grid-column:att !important; grid-row:att !important; align-self:stretch; min-width:0; }
@@ -1641,6 +1641,21 @@ body.filters-locked #cleanFilters, body.filters-locked #xchips, body.filters-loc
   .rchk-t { display:block; }
   .rrow .rrow-more { display:none; }
 }
+
+/* v3.26.1: ⓘ hover card in People & access */
+.r-i { vertical-align:2px; }
+.r-tip { position:fixed; z-index:200; width:320px; max-width:calc(100vw - 16px); max-height:70vh; overflow:auto; padding:12px 14px; border:1px solid var(--border); border-radius:12px; background:var(--surface); color:var(--ink); box-shadow:0 14px 36px rgba(15,23,42,.24); font-size:12.5px; }
+.r-tip-h { font-weight:700; font-size:14px; }
+.r-tip-d { margin:2px 0 8px; color:var(--ink-2); }
+.r-tip-sec { padding:6px 0; border-top:1px solid var(--border); }
+.r-tip-sec b { display:inline-block; padding:1px 8px; border-radius:999px; font-size:11px; letter-spacing:.03em; text-transform:uppercase; }
+.r-tip-sec .lv-none { background:rgba(127,127,127,.15); color:var(--ink-2); }
+.r-tip-sec .lv-view { background:rgba(59,108,246,.13); color:#3558c8; }
+.r-tip-sec .lv-edit { background:rgba(34,160,90,.15); color:#1c8a4c; }
+.r-tip-sec ul { margin:5px 0 0; padding-left:18px; }
+.r-tip-sec li { margin:1px 0; }
+.r-tip-sec p { margin:4px 0 0; color:var(--ink-2); }
+.r-tip-f { margin:6px 0 0; padding-top:6px; border-top:1px solid var(--border); font-size:11.5px; color:var(--ink-3); }
 </style></head>
 
 
@@ -1654,10 +1669,10 @@ body.filters-locked #cleanFilters, body.filters-locked #xchips, body.filters-loc
     <p class="gate-sub">One place for your people, priorities and team insights.</p>
     <div id="connectBody"><div class="empty">Loading…</div></div>
   </div>
-  <p class="gate-ver">3.26.0</p>
+  <p class="gate-ver">3.26.1</p>
 </section>
 
-<div id="app" hidden><aside class="sidebar" aria-label="Workspace navigation"><div class="brand dashboard-identity">      <h1><span id="title">Team Dashboard</span><span class="ver" id="ver" title="Version 3.26.0">3.26.0</span></h1><p class="brand-tag">One place for your people, priorities and team insights.</p>      <span class="sync" id="sync" role="status"><i></i><span id="syncText">Loading…</span></span></div><div class="nav-label">WORKSPACE</div>      <nav class="tabs" role="tablist" aria-label="Pages" aria-orientation="vertical">
+<div id="app" hidden><aside class="sidebar" aria-label="Workspace navigation"><div class="brand dashboard-identity">      <h1><span id="title">Team Dashboard</span><span class="ver" id="ver" title="Version 3.26.1">3.26.1</span></h1><p class="brand-tag">One place for your people, priorities and team insights.</p>      <span class="sync" id="sync" role="status"><i></i><span id="syncText">Loading…</span></span></div><div class="nav-label">WORKSPACE</div>      <nav class="tabs" role="tablist" aria-label="Pages" aria-orientation="vertical">
         <button class="tab on" role="tab" aria-controls="pageSummary" data-view="summary" aria-selected="true" data-icon="🏠" data-short="Home">Overview</button>
         <button class="tab" role="tab" aria-controls="pageEmployees" data-view="employees" aria-selected="false" data-icon="👥" data-short="People">Employees</button>
       <button class="tab" role="tab" aria-controls="pageAttendance" data-view="attendance" aria-selected="false" data-icon="🗓️" data-short="Attend.">Attendance</button>
@@ -3305,7 +3320,7 @@ const CLOUD = (() => {
 const PERM_GROUPS = [
   { name: 'Overview', page: 'page.overview', items: [['ov.attendance', 'See the attendance card'], ['ov.openatt', 'See the “Open attendance →” button on the attendance card'], ['ov.coming', 'See birthdays and work anniversaries'], ['ov.holidays', 'See USA and India holidays'], ['ov.watch', 'See leave red flags and day patterns']], sub: { title: 'Request Center', items: [['requests.own', 'See Waiting and History (their own and their group’s requests)'], ['requests.rejected', 'Also see rejected requests from their notification audience in History'], ['att.approve', 'Manager: approve or reject leave requests (shows the To approve tab) and edit approved leave']] } },
   { name: 'Employees', page: 'page.employees', items: [['emp.edit', 'Edit employee details'], ['emp.add', 'Add employees'], ['emp.delete', 'Delete employees'], ['emp.bulk', 'Fill in bulk and add columns'], ['emp.fields', 'Add or delete fields (Excel columns)']] },
-  { name: 'Attendance', page: 'page.attendance', items: [['att.who', 'See Who’s out'], ['att.grid', 'See the attendance grid and People'], ['att.log', 'Use Record attendance (with the types ticked below)'], ['att.direct', 'Record attendance straight into the tracker (no manager approval)'], ['att.edit', 'Mark attendance in day cells'], ['att.rows', 'Edit any cell or row in the tracker (names, Emp IDs, clients, days) and delete rows'], ['att.holidays', 'Add holidays for everyone'], ['att.fields', 'Add or delete fields in the attendance tracker'], ['att.addemp', 'Add employees to the attendance tracker (new rows, start a month)']],
+  { name: 'Attendance', page: 'page.attendance', items: [['att.who', 'See Who’s out'], ['att.grid', 'See the attendance grid and People'], ['att.info', 'See the ⓘ leave card (past and upcoming leave and late comings) for everyone'], ['att.log', 'Use Record attendance (with the types ticked below)'], ['att.direct', 'Record attendance straight into the tracker (no manager approval)'], ['att.edit', 'Mark attendance in day cells'], ['att.rows', 'Edit any cell or row in the tracker (names, Emp IDs, clients, days) and delete rows'], ['att.holidays', 'Add holidays for everyone'], ['att.fields', 'Add or delete fields in the attendance tracker'], ['att.addemp', 'Add employees to the attendance tracker (new rows, start a month)']],
     /* v3.14.2: which leave types appear in the Log leave “Type” list */
     sub: { title: 'Types in Record attendance', items: [['log.LA', 'LA · Leave application (pending)'], ['log.AL', 'AL · Approved leave'], ['log.CL', 'CL · Casual leave'], ['log.SL', 'SL · Sick leave'], ['log.UL', 'UL · Unplanned leave'], ['log.AB', 'AB · Absent'], ['log.HD1', 'HD1 · Half day, 1st half'], ['log.HD2', 'HD2 · Half day, 2nd half'], ['log.R', 'R · Remote'], ['log.L', 'L · Late coming'], ['log.C', 'C · Cab late']] } },
   { name: 'Action center', page: 'page.actions', items: [['act.items', 'See Action items'], ['act.review', 'See Designation reviews'], ['act.health', 'See Attendance data health']] },
@@ -3317,7 +3332,7 @@ const PERM_GROUPS = [
   { name: 'Filters', items: [['filters.custom', 'Change the filters (search, status, client…)']] },
   { name: 'Settings', items: [['set.fields', 'Choose the mandatory fields'], ['set.workbook', 'Backups, sign-in history and replacing the workbook'], ['workbook.download', 'Download a copy of the workbook'], ['tools.distance', 'Use the distance tool']] },
 ];
-const PERM_VERSION = 12;
+const PERM_VERSION = 13;
 const LOG_CODES = ['AL', 'CL', 'SL', 'UL', 'AB', 'HD1', 'HD2', 'LA', 'R', 'L', 'C'];
 /* the leave types a passcode could log before 3.14.2 (approval codes with Approve leave, LA always, the rest with Mark and edit) */
 const oldLogKeys = p => LOG_CODES.filter(c => ['AL', 'CL', 'SL'].includes(c) ? p['att.approve'] : c === 'LA' ? true : p['att.edit']).map(c => 'log.' + c);
@@ -3327,7 +3342,7 @@ const PAGE_OF = { summary: 'page.overview', employees: 'page.employees', attenda
 const pick = keys => Object.fromEntries([['_v', PERM_VERSION], ...PERM_KEYS.map(k => [k, ['notifications.view', 'requests.own', 'requests.rejected'].includes(k) || (k === 'requests.approvals' && keys.includes('att.approve')) || keys.includes(k)])]);
 const ROLE_NAMES = { superadmin: 'Super admin', admin: 'Admin', user: 'User' };
 /* v3.14: what a page shows by default once someone may open it (red flags and new fields stay off until ticked) */
-const VIEW_KEYS = ['chat.use', 'ov.attendance', 'ov.coming', 'ov.holidays', 'act.items', 'act.review', 'act.health', 'rep.team', 'rep.growth', 'rep.location', 'rep.attendance', 'rep.custom', 'rep.export'];
+const VIEW_KEYS = ['att.info', 'chat.use', 'ov.attendance', 'ov.coming', 'ov.holidays', 'act.items', 'act.review', 'act.health', 'rep.team', 'rep.growth', 'rep.location', 'rep.attendance', 'rep.custom', 'rep.export'];
 /* v3.17: rights that change data; everything else only lets someone see things. Used by the None / View / Edit switch per module. */
 const EDIT_KEYS = new Set(['att.approve', 'emp.edit', 'emp.add', 'emp.delete', 'emp.bulk', 'emp.fields', 'att.log', 'att.direct', 'att.edit', 'att.rows', 'att.holidays', 'att.fields', 'att.addemp', ...LOG_CODES.map(c => 'log.' + c), 'sync.auto', 'sync.save', 'filters.custom', 'set.fields', 'set.workbook', 'chat.all', 'rep.build']);
 const UPG = new WeakMap();
@@ -3355,6 +3370,8 @@ window.PERM = {
     if (q._v < 9) { q['att.rows'] = !!q['att.edit']; q['att.addemp'] = !!q['att.edit']; }
     /* v3.17: the Open attendance button must be given on purpose; the holidays card is shown to anyone who sees the Overview */
     /* v3.19: custom dashboards: anyone who can open Reports sees them; building them must be given on purpose */
+    /* v3.26.1: the ⓘ leave card got its own right; keep what people could see before (grid or approvers) */
+    if (q._v < 13) q['att.info'] = !!(q['att.grid'] || q['att.approve']);
     if (q._v < 12) { q['rep.custom'] = !!q['page.reports']; q['rep.build'] = false; }
     if (q._v < 11) { q['chat.use'] = true; q['chat.all'] = true; }
     if (q._v < 10) { q['ov.openatt'] = false; q['ov.holidays'] = !!q['page.overview']; }
@@ -5011,7 +5028,7 @@ function staleApplications(all = false) {
   for (const r of (all ? S.rows : D().rows)) for (let i = 0; i < Engine.daysInMonth(r.month); i++) { if (up(r.days[i]) !== 'LA') continue; const dt = dateOf(r.month, i); if (dt < TODAY) out.push({ r, i, dt }); }
   return out.sort((a, b) => b.dt - a.dt || a.r.name.localeCompare(b.r.name));
 }
-const laInfo = (x, on) => on ? `<button type="button" class="rq-i" data-lainfo="${esc(x.r.name.trim())}" aria-label="Past and upcoming leave of ${esc(x.r.name.trim())}">i</button>` : '';
+const laInfo = (x, on) => on && can('att.info') ? `<button type="button" class="rq-i" data-lainfo="${esc(x.r.name.trim())}" aria-label="Past and upcoming leave of ${esc(x.r.name.trim())}">i</button>` : '';
 const laRow = (x, older, info) => !can('att.approve') ? `<div class="li"><div class="main-t"><b>${esc(x.r.name.trim())}${laInfo(x, info)}</b><span class="sm muted">${longDate(x.dt)}</span></div><span class="tag">Awaiting approval</span></div>` : `<div class="li"><div class="main-t"><b>${esc(x.r.name.trim())}${laInfo(x, info)}</b><span class="sm muted">${longDate(x.dt)}</span></div>${['AL', 'CL', 'SL'].map(c => `<button class="btn sm" data-act="resolve-la" data-r="${x.r.uid}" data-d="${x.i}" data-c="${c}" title="Approve as ${CODES[c].label}">${c}</button>`).join('')}<button class="btn sm" data-act="resolve-la" data-r="${x.r.uid}" data-d="${x.i}" data-c="UL" title="Mark as unplanned leave">UL</button><button class="btn sm danger" data-act="resolve-la" data-r="${x.r.uid}" data-d="${x.i}" data-c="" title="Reject request · record RJ in tracker">✕</button></div>`;
 /* One request group per employee and uninterrupted run of application dates.
    Only recorded off days, or blank weekend cells, may bridge a gap. */
@@ -5958,7 +5975,7 @@ let PAST_DAYS = 60;
 const PAST_OPTS = [[60, '60 days'], [90, '90 days'], [180, '180 days'], [365, '1 year']];
 /* people who can't see the attendance grid only see their own (linked) leave */
 function canSeeLeaveOf(p) {
-  if (!p) return false; if (can('att.grid') || can('att.approve') || (window.PERM && PERM.isSuper())) return true;
+  if (!p) return false; if (can('att.info') || (window.PERM && PERM.isSuper())) return true;
   const ln = window.PERM && PERM.linkedEmp && PERM.linkedEmp(); if (!ln) return false;
   const idn = identityOf(p); return idKey(idn.empId ?? '') === idKey(ln.code);
 }
@@ -6318,7 +6335,7 @@ function rqRow(r, actions) {
   const who = rcMine(r) ? 'you' : r.by, st = r.status === 'pending' ? 'Pending' : r.status[0].toUpperCase() + r.status.slice(1);
   const decided = r.status !== 'pending' && r.decidedBy ? (r.status === 'cancelled' ? 'Cancelled' : st) + ' by ' + (String(r.decidedById) === myId() ? 'you' : r.decidedBy) + ' · ' + reqWhen(r.decidedAt) : '';
   const changed = r.status === 'approved' && r.asked && r.asked !== r.code ? ' (asked for ' + r.asked + ')' : '';
-  return `<div class="rq"><div class="rq-main"><b>${esc(r.name)}</b><button type="button" class="rq-i" data-info="${esc(r.id)}" aria-label="Past and upcoming leave of ${esc(r.name)}">i</button><span class="rq-code">${esc(r.code)}</span>${changed ? `<span class="sm muted">${esc(changed)}</span>` : ''}${rcGroup(r) ? '<span class="rq-you" title="Sent by someone in your group">Group</span>' : ''}
+  return `<div class="rq"><div class="rq-main"><b>${esc(r.name)}</b>${!can('att.info') ? '' : `<button type="button" class="rq-i" data-info="${esc(r.id)}" aria-label="Past and upcoming leave of ${esc(r.name)}">i</button>`}<span class="rq-code">${esc(r.code)}</span>${changed ? `<span class="sm muted">${esc(changed)}</span>` : ''}${rcGroup(r) ? '<span class="rq-you" title="Sent by someone in your group">Group</span>' : ''}
     <span class="rq-l">${esc(reqDatesText(r.dates || []))}</span>
     <span class="rq-l">Sent by ${esc(who)} · ${esc(reqWhen(r.at))}${decided ? ' · ' + esc(decided) : ''}</span>
     ${r.note ? `<span class="rq-l q">“${esc(r.note)}”</span>` : ''}${r.reason ? `<span class="rq-l"><b>Reason:</b> ${esc(r.reason)}</span>` : ''}</div>
@@ -6935,7 +6952,7 @@ function renderCard(el, opts = {}) {
       const listCopy = tableData(['Employee', 'Client', 'Code', 'Status'], list.map(x => [nm(x.r), cl(x.r), String(x.v).trim().toUpperCase(), x.c === 'applied' ? 'Awaiting approval' : labelOf(x.v)]), (C.tab === 'late' ? 'Late comings' : C.tab === 'half' ? 'Half days' : 'Out') + ' on ' + longDate(rd));
       renderCard._copy = { ...renderCard._copy, today: listCopy };
       const emptyTxt = !rows.length ? 'No attendance rows for this month.' : C.tab === 'late' ? 'No late comings ' + dayWord + '.' : C.tab === 'half' ? 'No half days ' + dayWord + '.' : 'Nobody is on leave ' + dayWord + '.';
-      const miniList = list.length ? `<ul class="att-mini">${list.map(x => `<li><span class="att-mini-n">${esc(nm(x.r))}<button type="button" class="rq-i" data-lainfo="${esc(x.r.name.trim())}" aria-label="Past and upcoming leave of ${esc(nm(x.r))}">i</button></span><span class="att-mini-c">${esc(cl(x.r))}</span><span class="ph-chip c-${esc(x.c)}">${esc(String(x.v).trim().toUpperCase())}</span><span class="att-mini-s">${esc(x.c === 'applied' ? 'Awaiting approval' : labelOf(x.v))}</span></li>`).join('')}</ul>` : `<div class="att-mini-empty">${emptyTxt}</div>`;
+      const miniList = list.length ? `<ul class="att-mini">${list.map(x => `<li><span class="att-mini-n">${esc(nm(x.r))}${can('att.info') ? `<button type="button" class="rq-i" data-lainfo="${esc(x.r.name.trim())}" aria-label="Past and upcoming leave of ${esc(nm(x.r))}">i</button>` : ''}</span><span class="att-mini-c">${esc(cl(x.r))}</span><span class="ph-chip c-${esc(x.c)}">${esc(String(x.v).trim().toUpperCase())}</span><span class="att-mini-s">${esc(x.c === 'applied' ? 'Awaiting approval' : labelOf(x.v))}</span></li>`).join('')}</ul>` : `<div class="att-mini-empty">${emptyTxt}</div>`;
       html = head2 + `<div class="att-tabs">${tabBtn('leave', nFull, ' on leave', nLa ? ` <em>+${nLa} awaiting</em>` : '')}${tabBtn('half', T.half.length, ' half day')}${tabBtn('late', T.late.length, ' late')}<span class="grow"></span>${copyBtn('today', listCopy)}${pseudoCol ? toggle('names', [['real', 'Real'], ['pseudo', 'Pseudo']]) : ''}<button type="button" class="btn mini" data-att-hist>History &amp; upcoming ↗</button></div>` + miniList;
     }
   }
@@ -7373,7 +7390,7 @@ async function poll() {
 }
 
 /* ============================== filtering ============================== */
-const APP = { title: "Team Dashboard", version: "3.26.0", released: "29 Sep 2026" };
+const APP = { title: "Team Dashboard", version: "3.26.1", released: "29 Sep 2026" };
 const BASE_DIMS = { status: "status_column", desig: "designation_column", client: "client_column", mode: "mode_column" };
 const STANDARD_STATUSES = ["Active", "Manager", "OJT", "Bench", "New", "Projected", "Left", "Moved"];
 const TILE_ORDER = ["Active", "Manager", "OJT", "Bench", "New", "Projected"];
@@ -10943,6 +10960,41 @@ function filterText(f) {
   return parts.join(' · ') || 'no filters (everyone)';
 }
 window.filterText = filterText;
+/* v3.26.1: ⓘ next to each area: what the area is and what Hide / View / Edit let the person do */
+const AREA_INFO = {
+  'Overview': 'The home page: today’s attendance, Request Center, birthdays and holidays, and Leave watch.',
+  'Employees': 'The employee list and each person’s record from the workforce sheet.',
+  'Attendance': 'The attendance tracker: who’s out, the grid, each person’s history and recording attendance.',
+  'Action center': 'Missing details, designation reviews and attendance data checks.',
+  'Reports': 'Charts about the team and attendance, and custom dashboards.',
+  'Save & sync': 'Saving attendance changes to the workbook and auto-sync.',
+  'Chat': 'Team chat and who is online.',
+  'Notifications': 'The bell: request updates and the activity log.',
+  'Filters': 'The search and filters at the top of every page.',
+  'Settings': 'Mandatory fields, backups, downloading the workbook and tools.',
+};
+let rTip = null, rTipT = null;
+function rightsTipHide(now) { clearTimeout(rTipT); const go = () => { rTip?.remove(); rTip = null; }; if (now) go(); else rTipT = setTimeout(go, 150); }
+function rightsTip(btn, g, toggle) {
+  clearTimeout(rTipT);
+  if (rTip && rTip._for === btn) { if (toggle) rightsTipHide(true); return; }
+  rightsTipHide(true);
+  const all = [...g.items, ...((g.sub && g.sub.items) || [])];
+  const view = all.filter(([k]) => !PERM.isEditKey(k)).map(x => x[1]), edit = all.filter(([k]) => PERM.isEditKey(k)).map(x => x[1]);
+  const sec = (t, cls, list, empty) => h('div', { class: 'r-tip-sec' }, h('b', { class: cls }, t), list.length ? h('ul', {}, ...list.map(x => h('li', {}, x))) : h('p', {}, empty));
+  rTip = h('div', { class: 'r-tip', role: 'tooltip' },
+    h('div', { class: 'r-tip-h' }, g.name), h('p', { class: 'r-tip-d' }, AREA_INFO[g.name] || ''),
+    sec('Hide', 'lv-none', [], g.page ? 'The page is not in their menu and they can’t open it.' : 'None of this is available to them.'),
+    sec('View', 'lv-view', [...(g.page ? ['Open the ' + g.name + ' page'] : []), ...view], 'Nothing to see on its own here.'),
+    sec('Edit', 'lv-edit', edit, 'Nothing to change here: View already gives everything.'),
+    h('p', { class: 'r-tip-f' }, 'Edit includes everything in View. Use Fine-tune for anything in between.'));
+  rTip._for = btn; document.body.append(rTip);
+  const a = btn.getBoundingClientRect(), w = rTip.offsetWidth, hh = rTip.offsetHeight;
+  let top = a.bottom + 6; if (top + hh > innerHeight - 8) top = Math.max(8, a.top - hh - 6);
+  rTip.style.left = Math.min(Math.max(8, a.left - 12), innerWidth - w - 8) + 'px'; rTip.style.top = top + 'px';
+  rTip.addEventListener('mouseenter', () => clearTimeout(rTipT)); rTip.addEventListener('mouseleave', () => rightsTipHide());
+}
+addEventListener('scroll', () => rightsTipHide(true), { passive: true, capture: true });
 function drawEditor(box, u, reload, users = [], template = null, groups = []) {
   const me = CLOUD.user(), isNew = !u, self = u && u.id === me.id;
   const err = h('p', { class: 'err', role: 'alert' });
@@ -11090,7 +11142,7 @@ function drawEditor(box, u, reload, users = [], template = null, groups = []) {
     const paintSeg = () => { const lv = levelOf(); segBtns.forEach(b => { b.checked = b.dataset.lv === lv; }); segHint.hidden = lv !== 'custom'; countEl.textContent = allKeys.filter(k => boxes[k].checked).length + ' of ' + allKeys.length + ' on'; };
     const extra = g.name === 'Filters' ? fixedBox : g.name === 'Notifications' ? audienceBox : g.name === 'Attendance' ? fieldBox : null;
     const card = h('details', { class: 'rrow' },
-      h('summary', {}, h('span', { class: 'rrow-name' }, h('b', {}, g.name), h('span', { class: 'rrow-meta' }, countEl, segHint)), seg, h('span', { class: 'rrow-more', 'aria-hidden': 'true' }, 'Fine-tune')),
+      h('summary', {}, h('span', { class: 'rrow-name' }, h('b', {}, g.name, h('button', { type: 'button', class: 'rq-i r-i', 'aria-label': 'What ' + g.name + ' access means', onclick: e => { e.preventDefault(); e.stopPropagation(); rightsTip(e.currentTarget, g, true); }, onmouseenter: e => rightsTip(e.currentTarget, g), onmouseleave: () => rightsTipHide(), onfocus: e => rightsTip(e.currentTarget, g), onblur: () => rightsTipHide() }, 'i')), h('span', { class: 'rrow-meta' }, countEl, segHint)), seg, h('span', { class: 'rrow-more', 'aria-hidden': 'true' }, 'Fine-tune')),
       h('div', { class: 'rrow-body' }, head, itemsBox, subBox, extra));
     const sync = () => { const off = g.page && !boxes[g.page].checked; card.classList.toggle('off', !!off); for (const c of items) c.box.disabled = isSuper() || !!off; for (const c of subItems) c.box.disabled = isSuper() || !!off; if (g.page) boxes[g.page].disabled = isSuper(); };
     if (g.page) boxes[g.page].addEventListener('change', sync);
