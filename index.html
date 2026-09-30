@@ -4,7 +4,7 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <link rel="icon" href="data:,">
-<title>Team Dashboard · 3.28.1</title>
+<title>Team Dashboard · 3.29.0</title>
 <style>
 :root {
   color-scheme: light;
@@ -1689,7 +1689,7 @@ body.filters-locked #cleanFilters, body.filters-locked #xchips, body.filters-loc
 .dd-save { position:sticky; bottom:0; background:var(--surface); padding:10px 0; margin-top:0 !important; align-items:center; }
 @media (max-width:700px) { .dd-row { grid-template-columns:1fr; } .dd-save { bottom:calc(66px + env(safe-area-inset-bottom)); } }
 
-/* v3.28.1: the four glance tiles as one summary strip */
+/* v3.28.2: the four glance tiles as one summary strip */
 #pageSummary.ov > .ov-glance { gap:0 !important; border:1px solid var(--border); border-radius:14px; background:var(--surface); overflow:hidden; box-shadow:0 1px 2px rgba(15,23,42,.04); }
 #pageSummary.ov .ov-tile { --tone:var(--accent); position:relative; display:flex !important; flex-direction:column; align-items:flex-start !important; gap:4px !important; padding:14px 18px 13px !important; border:0 !important; border-radius:0 !important; border-left:1px solid var(--border) !important; background:transparent !important; box-shadow:none !important; transform:none !important; }
 #pageSummary.ov .ov-tile:first-child { border-left:0 !important; }
@@ -1732,6 +1732,12 @@ body.filters-locked #cleanFilters, body.filters-locked #xchips, body.filters-loc
 .att-bk-sum { margin:0 0 6px; font-size:12px; color:#9a5a00; }
 .att-bk-sum.ok { color:#1c7a45; }
 @media (max-width:650px) { .att-mini li { grid-template-columns:minmax(0,1fr) auto auto !important; } }
+
+/* v3.28.2: backup report */
+.att-bk-sum [data-bk-copy]{margin-left:10px;font-size:12px}.bkr-cyc{margin:-4px 0 10px}
+.bkr-bar { display:flex; flex-wrap:wrap; align-items:center; gap:8px 12px; margin:0 0 14px; }
+.bkr-bar label { display:inline-flex; align-items:center; gap:6px; font-size:12.5px; color:var(--ink-2); }
+.bkr-bar select { height:32px; }
 </style></head>
 
 
@@ -1745,10 +1751,10 @@ body.filters-locked #cleanFilters, body.filters-locked #xchips, body.filters-loc
     <p class="gate-sub">One place for your people, priorities and team insights.</p>
     <div id="connectBody"><div class="empty">Loading…</div></div>
   </div>
-  <p class="gate-ver">3.28.1</p>
+  <p class="gate-ver">3.29.0</p>
 </section>
 
-<div id="app" hidden><aside class="sidebar" aria-label="Workspace navigation"><div class="brand dashboard-identity">      <h1><span id="title">Team Dashboard</span><span class="ver" id="ver" title="Version 3.28.1">3.28.1</span></h1><p class="brand-tag">One place for your people, priorities and team insights.</p>      <span class="sync" id="sync" role="status"><i></i><span id="syncText">Loading…</span></span></div><div class="nav-label">WORKSPACE</div>      <nav class="tabs" role="tablist" aria-label="Pages" aria-orientation="vertical">
+<div id="app" hidden><aside class="sidebar" aria-label="Workspace navigation"><div class="brand dashboard-identity">      <h1><span id="title">Team Dashboard</span><span class="ver" id="ver" title="Version 3.29.0">3.29.0</span></h1><p class="brand-tag">One place for your people, priorities and team insights.</p>      <span class="sync" id="sync" role="status"><i></i><span id="syncText">Loading…</span></span></div><div class="nav-label">WORKSPACE</div>      <nav class="tabs" role="tablist" aria-label="Pages" aria-orientation="vertical">
         <button class="tab on" role="tab" aria-controls="pageSummary" data-view="summary" aria-selected="true" data-icon="🏠" data-short="Home">Overview</button>
         <button class="tab" role="tab" aria-controls="pageEmployees" data-view="employees" aria-selected="false" data-icon="👥" data-short="People">Employees</button>
       <button class="tab" role="tab" aria-controls="pageAttendance" data-view="attendance" aria-selected="false" data-icon="🗓️" data-short="Attend.">Attendance</button>
@@ -4134,6 +4140,9 @@ const attFieldNames = () => { const out = [...((S.ctx && S.ctx.extraCols) || [])
 const can = k => !window.PERM || PERM.can(k);
 const APPROVAL_CODES = new Set(['AL', 'CL', 'SL', 'RJ']);
 const fieldGrants = () => window.PERM && PERM.online() ? CLOUD.user()?.permissions?._attendanceFields : null;
+/* v3.28.2: the Backup column is managed by the backup tracker, so it is not offered as a normal field */
+const BK_FIELD = 'Backup';
+const attUserFields = () => attFieldNames().filter(n => n.toLowerCase() !== BK_FIELD.toLowerCase());
 const canFillField = name => attFieldNames().includes(name) && (!window.PERM || PERM.isSuper() || (Array.isArray(fieldGrants()) ? fieldGrants().includes(name) : can('att.edit') || can('att.fields')));
 const attCanWrite = () => can('att.fields') || attFieldNames().some(canFillField) || can('att.log') || can('att.edit') || can('att.approve') || can('att.holidays');
 const LOG_TYPES = ['AL', 'CL', 'SL', 'UL', 'AB', 'HD1', 'HD2', 'LA', 'R', 'L', 'C'];
@@ -4159,7 +4168,7 @@ function mutate(desc, fn, opts = {}) {
   /* v3.16: row edits and new employees need their own rights; everything else keeps the old checks */
   if (opts.addEmp && !can('att.addemp')) { toast('Your passcode can’t add employees to the attendance tracker. Ask the admin for the right in Settings.'); return false; }
   if (opts.rows && !can('att.rows')) { toast('Your passcode can’t edit or delete rows in the attendance tracker. Ask the admin for the right in Settings.'); return false; }
-  if (!(opts.addEmp || opts.rows || can('att.edit') || (opts.cells && can('att.approve')) || (opts.holiday && can('att.holidays')) || (opts.log && can('att.log')) || (opts.fields && can('att.fields')) || (opts.fieldName && canFillField(opts.fieldName)))) { toast('Your passcode can view attendance but not change this. Ask the admin for the right in Settings.'); return false; }
+  if (!(opts.addEmp || opts.rows || can('att.edit') || (opts.cells && can('att.approve')) || (opts.holiday && can('att.holidays')) || (opts.log && can('att.log')) || (opts.fields && can('att.fields')) || (opts.fieldName && canFillField(opts.fieldName)) || (opts.backup && canBackup()))) { toast('Your passcode can view attendance but not change this. Ask the admin for the right in Settings.'); return false; }
   S.undo.push({ rows: snapshot(), log: S.changes.length, nf: (S.newFields || []).length, nfList: (S.newFields || []).slice(), rfList: (S.removedFields || []).slice(), rnList: (S.renamedFields || []).map(x => ({ ...x })) });
   if (S.undo.length > 60) S.undo.shift();
   const before = S.rows.length;
@@ -5289,7 +5298,7 @@ function renderAppsCard(host) {
 
 /* ---------- v3.16: one "Log <field>" button per field this passcode may fill (the super admin picks them) ---------- */
 function fieldBar() {
-  const names = attFieldNames().filter(canFillField);
+  const names = attUserFields().filter(canFillField);
   if (!names.length) return '';
   return `<div class="fldbar" aria-label="Log attendance fields"><b>Log a field</b>${names.map(n => `<button class="btn sm" data-act="log-field" data-field="${esc(n)}">${ic('plus')} Log ${esc(n)}</button>`).join('')}<span class="sm muted">Values are saved per employee and month, and also show as columns next to Emp ID in the Attendance grid.</span></div>`;
 }
@@ -5300,7 +5309,7 @@ function cellTip(r, i) {
   return `<b>${esc(r.name.trim())}</b><br>${longDate(dt)}<br>${v == null ? (!trackedOn(r, i) ? 'Blank · not tracked (' + (departure(r).kind === 'left' ? 'left the team' : 'moved') + ')' : impliedCode(r.month, i) === 'WO' ? 'Blank · week off (Sat / Sun)' : 'Blank · counts as present (P)') : esc(String(v).trim()) + ' · ' + esc(labelOf(v))}${note}`;
 }
 function gridTable(rows, { mode = 'month', month = null, hl = null } = {}) {
-  const extraFields = attFieldNames();
+  const extraFields = attUserFields();
   const dim = mode === 'month' ? Engine.daysInMonth(month) : 31; let head = '';
   for (let i = 0; i < dim; i++) {
     if (mode === 'month') { const w = dow(month, i), isT = month === TODAY_MS && i === TODAY_IDX; head += `<th class="d hd ${w % 6 === 0 ? 'wk' : ''} ${isT ? 'tdy' : ''}" data-act="day-head" data-ms="${month}" data-d="${i}" data-tip="${esc(longDate(dateOf(month, i)))}<br>Click to mark this day as a holiday (H) for everyone">${i + 1}<small>${WEEKDAYS[w][0]}</small></th>`; }
@@ -5913,7 +5922,7 @@ function openRowEditor(uid, preset = {}) {
       <div class="full sm" id="f-src"></div>
       <label>Client<input type="text" id="f-client" list="clientlist" value="${esc(base.client)}" autocomplete="off"></label>
       <label>Regularizations<input type="number" id="f-reg" min="0" step="1" value="${base.reg ?? ''}"></label>
-      ${attFieldNames().length ? `<div class="full"><b style="font-size:12px;color:var(--ink-2)">Extra fields</b><div class="xf-grid" style="margin-top:6px">${attFieldNames().map((n, k) => `<label>${esc(n)}<input type="text" data-xf="${k}" value="${esc((base.extra || {})[n] ?? '')}" autocomplete="off" ${canFillField(n) ? '' : 'disabled'}></label>`).join('')}</div></div>` : ''}
+      ${attUserFields().length ? `<div class="full"><b style="font-size:12px;color:var(--ink-2)">Extra fields</b><div class="xf-grid" style="margin-top:6px">${attUserFields().map((n, k) => `<label>${esc(n)}<input type="text" data-xf="${k}" value="${esc((base.extra || {})[n] ?? '')}" autocomplete="off" ${canFillField(n) ? '' : 'disabled'}></label>`).join('')}</div></div>` : ''}
       <div class="full"><div style="display:flex;align-items:center;gap:8px;margin:2px 0 6px"><b style="font-size:12px;color:var(--ink-2)">Daily codes</b><span class="grow"></span><button class="btn sm" id="f-wo" type="button">Fill weekends with WO</button><button class="btn sm" id="f-clr" type="button">Clear all days</button></div><div class="dayedit" id="f-days"></div>
       <div class="sm muted" style="margin-top:6px">Leave empty for a normal working day. Codes: ${['AL', 'CL', 'SL', 'UL', 'AB', 'HD1', 'HD2', 'LA', 'L', 'C', 'R', 'WO', 'H', 'M', 'P', 'X', 'NA'].join(', ')}.</div></div></div>
       <datalist id="namelist">${names.map(n => `<option value="${esc(n.name)}">${esc(n.hint)}</option>`).join('')}</datalist><datalist id="clientlist">${clients.map(n => `<option value="${esc(n)}">`).join('')}</datalist><datalist id="idlist">${hasRoster() ? rosterRows().filter(r => gs(r, 'key_column').trim()).map(r => `<option value="${esc(gs(r, 'key_column').trim())}" label="${esc(gs(r, 'name_column').trim())}"></option>`).join('') : ''}</datalist><datalist id="codelist">${PICK.map(c => `<option value="${c}">`).join('')}</datalist>
@@ -5953,7 +5962,7 @@ function openRowEditor(uid, preset = {}) {
     if (bad.length) return err('Not in your legend: ' + bad.slice(0, 4).join(', ') + '. Use a listed code or leave it empty.');
     const stray = days.map((v, i) => (i >= dim && v != null && v !== '' && !(row && row.days[i] === v)) ? i + 1 : 0).filter(Boolean); if (stray.length) return err(`${monthLabel(ms)} has only ${dim} days, but day ${stray[0]} has an entry.`);
     const f = { name, empId: parseId($('#f-id', m).value), client: $('#f-client', m).value.trim(), reg: $('#f-reg', m).value === '' ? null : Number($('#f-reg', m).value), month: ms, days: days.slice() };
-    const fn = attFieldNames(); if (fn.length) { const ex = { ...((row && row.extra) || {}) }; $('[data-xf]', m).forEach(inp => { if (inp.disabled) return; const nm = fn[+inp.dataset.xf], v = inp.value.trim(); if (v === '') delete ex[nm]; else ex[nm] = /^-?\d+(\.\d+)?$/.test(v) ? Number(v) : v; }); f.extra = ex; }
+    const fn = attUserFields(); if (fn.length) { const ex = { ...((row && row.extra) || {}) }; $('[data-xf]', m).forEach(inp => { if (inp.disabled) return; const nm = fn[+inp.dataset.xf], v = inp.value.trim(); if (v === '') delete ex[nm]; else ex[nm] = /^-?\d+(\.\d+)?$/.test(v) ? Number(v) : v; }); f.extra = ex; }
     closeModal();
     if (row) mutate(`Edited ${rowLabel(row)}`, () => { Object.assign(row, f); }, { rows: true });
     else mutate(`Added ${name} · ${monthLabel(ms)}`, () => { const nr = newRow(ms, name, { weekends: false }); Object.assign(nr, f); insertRow(nr); }, { addEmp: true });
@@ -6044,7 +6053,7 @@ async function drawFieldAccess(box, names) {
 let FM_TAB = 'fields';
 function openFieldsManager(sel, tab) {
   if (tab) FM_TAB = tab;
-  const names = attFieldNames(), fillNames = names.filter(canFillField), canAdd = can('att.fields'), canFill = fillNames.length > 0;
+  const names = attUserFields(), fillNames = names.filter(canFillField), canAdd = can('att.fields'), canFill = fillNames.length > 0;
   const superAccess = names.length > 0 && window.PERM && PERM.online() && PERM.isSuper();
   const d = D(), month = S.ui.grid.month || d.latestMonth, fieldSel = sel && fillNames.includes(sel) ? sel : fillNames[0];
   const monthRows = (d.byMonth.get(month) || []).slice().sort((a, b) => a.name.localeCompare(b.name));
@@ -6054,7 +6063,7 @@ function openFieldsManager(sel, tab) {
   const add = canAdd ? `<div style="display:flex;gap:8px;align-items:flex-end;flex-wrap:wrap;margin:6px 0 14px"><label style="flex:1;min-width:220px">New field name<input type="text" id="xf-new" maxlength="60" placeholder="e.g. Shift, Laptop returned, Manager" autocomplete="off"></label><button class="btn primary" id="xf-add" type="button">${ic('plus')} Add field</button></div><div class="sm muted" style="margin:-6px 0 14px">It becomes a new column after AM in the “Attendance Tracker” sheet, for every month.</div>` : '<div class="sm muted" style="margin-bottom:12px">Only people with the “Add fields to the attendance tracker” right can add fields.</div>';
   const fill = names.length && canFill ? `<div style="display:flex;gap:10px;align-items:center;flex-wrap:wrap;margin:6px 0 8px"><b style="font-size:13px">Fill in</b><select id="xf-pick">${fillNames.map(n => `<option${n === fieldSel ? ' selected' : ''}>${esc(n)}</option>`).join('')}</select><span class="sm muted">for ${monthLabel(month)} · ${monthRows.length} people (follows the filters at the top)</span></div>
     <div class="fld-fill">${fieldValuesList(fieldSel, 'xf-vals')}<table><thead><tr><th>Employee</th><th>Emp ID</th><th>Client</th><th>${esc(fieldSel)}</th></tr></thead><tbody>${monthRows.map(r => `<tr><td>${esc(r.name.trim())}</td><td class="sm muted">${esc(String(r.empId ?? '—'))}</td><td class="sm muted">${esc(r.client || '')}</td><td><input type="text" list="xf-vals" data-xfr="${r.uid}" value="${esc((r.extra || {})[fieldSel] ?? '')}" aria-label="${esc(fieldSel)} for ${esc(r.name.trim())}"></td></tr>`).join('')}</tbody></table></div>` : '';
-  /* v3.28.1: one thing at a time: Fields · Who can log · Fill in values */
+  /* v3.28.2: one thing at a time: Fields · Who can log · Fill in values */
   const tabs = [['fields', 'Fields (' + names.length + ')'], ...(superAccess ? [['who', 'Who can log']] : []), ...(fill ? [['fill', 'Fill in values']] : [])];
   if (!tabs.some(t => t[0] === FM_TAB)) FM_TAB = 'fields';
   const m = openModal({ title: 'Attendance tracker fields', wide: true,
@@ -6537,7 +6546,7 @@ function renderApprovalRequests() {
   const warn = !ready ? '<p class="rc-note">Connect the attendance tracker (Settings › Save & sync) to approve.</p>' : '';
   const acts = r => canDecide() ? `<select aria-label="Leave type to approve for ${esc(r.name)}" title="Approve as this leave type" ${!ready ? 'disabled' : ''}>${LOG_TYPES.map(c => `<option value="${c}"${c === r.code ? ' selected' : ''}>${c}</option>`).join('')}</select><button class="btn sm primary" data-approve="${esc(r.id)}" ${!ready || S.saving ? 'disabled' : ''}>Approve</button><button class="btn sm" data-reject="${esc(r.id)}">Reject</button>` : '<span class="rq-st pending">Pending</span>';
   /* v3.28: Applications ahead (dates marked LA in the tracker) are part of To approve, below the requests */
-  /* v3.28.1: leave applications (LA in the tracker) have their own tab */
+  /* v3.28.2: leave applications (LA in the tracker) have their own tab */
   const la = ready ? pendingApplications() : [], laPeople = new Set(la.map(x => applicationPerson(x.r))).size;
   rcDraw('cardLeaveApps', ready && (canDecide() || can('att.who')),
     `<div class="rc-top"><p class="rc-sub grow">${la.length ? `${laPeople} ${laPeople === 1 ? 'person has' : 'people have'} leave marked LA in the tracker · ${la.length} day${la.length === 1 ? '' : 's'} from today on. ` : ''}${canDecide() ? 'Approve a date or a whole stretch; Reject records RJ.' : 'Waiting for someone with the Approve leave right.'}</p></div>
@@ -6959,7 +6968,7 @@ function mount() {
 @media (max-width:1000px) { .who-layout, .who-layout.apps-off { grid-template-columns:minmax(0,1fr); } .who-apps, .who-apps-min { position:static; min-height:0; } .who-apps-open { flex-direction:row; min-height:0; justify-content:center; } .who-apps-open em { writing-mode:horizontal-tb; transform:none; } }
 @media (max-width:700px) { .grid.g6[style*="repeat(4"] { grid-template-columns:repeat(2,minmax(0,1fr)) !important; } .card { padding:12px !important; } .tabs, .seg { flex-wrap:wrap; } table { font-size:12px; } .toolbar, .bar { flex-wrap:wrap; gap:6px; } }
 .tl-filters { display:flex; flex-wrap:wrap; align-items:center; gap:6px 8px; margin:10px 0 0; }
-/* v3.28.1: Who's out grid: even day columns, soft colored cells without boxes, calm weekends and a clear today */
+/* v3.28.2: Who's out grid: even day columns, soft colored cells without boxes, calm weekends and a clear today */
 table.who-tl { width:100%; table-layout:fixed; border-collapse:separate; border-spacing:0; }
 table.who-tl col.who-namecol { width:230px; }
 table.who-tl th, table.who-tl td { border-left:0 !important; border-right:0 !important; }
@@ -6980,7 +6989,7 @@ table.who-tl td.cell { width:auto; min-width:0; }
 table.who-tl td.cell .chip { width:100%; height:32px; border:0 !important; border-radius:7px; outline:0; box-shadow:none; font-size:12px; font-weight:700; letter-spacing:.02em; background:color-mix(in srgb,var(--c) 22%,var(--surface)); color:color-mix(in srgb,var(--c) 55%,var(--ink)); }
 table.who-tl td.cell.cc-applied .chip { background:repeating-linear-gradient(135deg,color-mix(in srgb,var(--c) 16%,var(--surface)) 0 6px,color-mix(in srgb,var(--c) 26%,var(--surface)) 6px 12px); }
 table.who-tl td.cell:hover .chip { filter:brightness(.96); }
-/* v3.28.1: the Who's out / Attendance / People bar stays at the top while scrolling */
+/* v3.28.2: the Who's out / Attendance / People bar stays at the top while scrolling */
 .topbar { top:var(--pinned-header-height, 0px) !important; z-index:20 !important; box-shadow:0 6px 10px -8px rgba(15,23,42,.18); }
 @media (max-width:700px) { .topbar { top:0 !important; } }
 .pp-bar { padding:12px 16px !important; }
@@ -7039,7 +7048,7 @@ table.att td { padding-top:5px; padding-bottom:5px; }
 .la-group details .li { flex-wrap:wrap; gap:5px; }
 </style><div id="app"></div>`;
   wireTips(); wireEvents(); leaveTipDelegate(ROOT);
-  if (!document.getElementById('liGlobalCss')) { const st = document.createElement('style'); st.id = 'liGlobalCss'; st.textContent = PAST_CSS + LI_CSS; document.head.append(st); }
+  if (!document.getElementById('liGlobalCss')) { const st = document.createElement('style'); st.id = 'liGlobalCss'; st.textContent = PAST_CSS + LI_CSS + BKR_CSS; document.head.append(st); }
   kv.get('user').then(n => { if (n) BE.setUser(n); updateWho(); });
   document.getElementById('btnWho')?.addEventListener('click', askName); updateWho();
   window.addEventListener('focus', () => { if (S.status === 'ready') checkDisk(); });
@@ -7092,9 +7101,20 @@ const rangeEntries = (d, from, to) => { const out = []; for (let t = from.getTim
 /* ---------- v3.28: backups for people on leave. Kept in the shared team settings (key leave_backups):
    { "<person key>|<yyyy-mm-dd>": { b: backup name, id: backup Emp ID, none: true when no backup is needed, by, at } } ---------- */
 const bkAll = () => { const m = (window.TD_SETTINGS || {}).leave_backups; return m && typeof m === 'object' && !Array.isArray(m) ? m : {}; };
-const bkGet = (key, iso) => bkAll()[key + '|' + iso] || null;
+/* v3.28.2: backups are kept in the attendance workbook: a "Backup" column in the Attendance Tracker, one cell per person and
+   month, e.g. "3,4,5: Chen Li; 30: Kept live". Anyone who can record attendance can save it (the shared settings were super-admin only). */
+const bkParse = txt => { const m = new Map(); for (const part of String(txt || '').split(';')) { const i = part.indexOf(':'); if (i < 0) continue; const v = part.slice(i + 1).trim(); if (!v) continue; for (const d of part.slice(0, i).split(',')) { const n = parseInt(d, 10); if (n >= 1 && n <= 31) m.set(n, v); } } return m; };
+const bkSerialize = m => { const by = new Map(); for (const [d, v] of [...m.entries()].sort((a, b) => a[0] - b[0])) { if (!by.has(v)) by.set(v, []); by.get(v).push(d); } return [...by.entries()].map(([v, ds]) => ds.join(',') + ': ' + v).join('; '); };
+const bkIsLive = v => /^kept live$|^no backup( needed)?$/i.test(String(v || '').trim());
+const bkRow = (key, iso) => { const p = D(true).people.get(key); if (!p) return null; const t = new Date(iso + 'T00:00:00Z'), ms = Engine.monthSerial(t.getUTCFullYear(), t.getUTCMonth()); const rs = p.rows.filter(r => r.month === ms); return rs[rs.length - 1] || null; };
+const bkExtraKey = r => Object.keys(r.extra || {}).find(k => k.toLowerCase() === BK_FIELD.toLowerCase());
+const bkGet = (key, iso) => {
+  const r = bkRow(key, iso);
+  if (r) { const k = bkExtraKey(r); if (k) { const v = bkParse(r.extra[k]).get(+iso.slice(8, 10)); if (v) return bkIsLive(v) ? { none: true } : { b: v }; } }
+  return bkAll()[key + '|' + iso] || null;   // backups saved before 3.28.2 (shared settings)
+};
 const canBackup = () => canLog() || can('att.edit') || can('att.approve');
-const bkLabel = x => !x ? '' : x.none ? 'No backup needed' : x.b;
+const bkLabel = x => !x ? '' : x.none ? 'Kept live' : x.b;
 function bkTeam(exceptKey, iso) {
   const t = new Date(iso + 'T00:00:00Z'), ms = Engine.monthSerial(t.getUTCFullYear(), t.getUTCMonth()), i = t.getUTCDate() - 1;
   const outToday = new Set((D(true).byMonth.get(ms) || []).filter(r => { const c = catOf(r.days[i]); return c && (LEAVE_CATS.has(c) || c === 'applied'); }).map(r => personKey(r.name)));
@@ -7124,7 +7144,7 @@ function openBackupBox(pKey, iso) {
       <div class="form"><label class="full" style="flex-direction:row;align-items:center;gap:8px;font-weight:500"><input type="radio" name="bk-k" value="yes" ${!cur || !cur.none ? 'checked' : ''}> A backup is covering</label>
       <label class="full" id="bk-wrap">Backup (anyone in the current team)<input type="text" id="bk-name" list="bk-list" value="${esc(cur && !cur.none ? cur.b : '')}" placeholder="Type or pick a name" autocomplete="off">
         <datalist id="bk-list">${team.map(t => `<option value="${esc(t.name)}" label="${esc([t.id && 'ID ' + t.id, t.sub, t.out ? 'also off that day' : ''].filter(Boolean).join(' · '))}"></option>`).join('')}</datalist></label>
-      <label class="full" style="flex-direction:row;align-items:center;gap:8px;font-weight:500"><input type="radio" name="bk-k" value="none" ${cur && cur.none ? 'checked' : ''}> No backup needed</label>
+      <label class="full" style="flex-direction:row;align-items:center;gap:8px;font-weight:500"><input type="radio" name="bk-k" value="none" ${cur && cur.none ? 'checked' : ''}> Kept live (no backup needed)</label>
       ${days.length > 1 ? `<label class="full" style="flex-direction:row;align-items:center;gap:8px;font-weight:500"><input type="checkbox" id="bk-all" checked> Same for the whole leave: ${esc(longDate(new Date(days[0] + 'T00:00:00Z')))} – ${esc(longDate(new Date(days[days.length - 1] + 'T00:00:00Z')))} (${days.length} days)</label>` : ''}</div>
       <div class="err" id="bk-err"></div>`,
     footer: `${cur ? '<button class="btn" id="bk-clear">Clear</button>' : ''}<span class="grow"></span><button class="btn" data-close>Cancel</button><button class="btn primary" id="bk-go">Save</button>` });
@@ -7133,26 +7153,118 @@ function openBackupBox(pKey, iso) {
   m.querySelectorAll('input[name="bk-k"]').forEach(r => r.addEventListener('change', syncKind)); syncKind();
   const write = async val => {
     const which = ($('#bk-all', m) && $('#bk-all', m).checked) ? days : [iso];
-    await window.loadTeamSettings(true);
-    const all = { ...bkAll() }, cut = isoDate(new Date(TODAY.getTime() - 120 * 86400000));
-    for (const k of Object.keys(all)) if ((k.split('|')[1] || '') < cut) delete all[k];   // old entries are dropped after 4 months
-    for (const x of which) { if (val) all[pKey + '|' + x] = val; else delete all[pKey + '|' + x]; }
-    await window.saveSharedSetting('leave_backups', all);
-    BE.appendActivity([{ time: BE.nowText(), user: BE.userName(), action: 'settings', att: S.fileName, key: '', name, details: { note: (val ? (val.none ? 'No backup needed' : 'Backup: ' + val.b) : 'Backup cleared') + ' · ' + which.join(', ') } }]);
+    const txt = val ? (val.none ? 'Kept live' : val.b) : '';
+    const missing = which.filter(x => !bkRow(pKey, x));
+    const ok = mutate((val ? (val.none ? 'Kept live (no backup) for ' : 'Backup ' + val.b + ' for ') : 'Backup cleared for ') + name + ' · ' + which.length + ' day' + (which.length === 1 ? '' : 's'), () => {
+      if (!attFieldNames().some(n => n.toLowerCase() === BK_FIELD.toLowerCase()) && !(S.newFields || []).some(n => n.toLowerCase() === BK_FIELD.toLowerCase())) (S.newFields || (S.newFields = [])).push(BK_FIELD);
+      for (const x of which) {
+        const r = bkRow(pKey, x); if (!r) continue;
+        const k = bkExtraKey(r) || BK_FIELD, mp = bkParse((r.extra || {})[k]), dd = +x.slice(8, 10);
+        if (txt) mp.set(dd, txt); else mp.delete(dd);
+        const ex = { ...(r.extra || {}) }; delete ex[k]; const ser = bkSerialize(mp); if (ser) ex[BK_FIELD] = ser; r.extra = ex;
+      }
+    }, { backup: true });
+    if (ok === false) return;
     closeModal(); if (renderCard.el) renderCard(renderCard.el); notify();
-    toast(val ? (val.none ? 'Marked: no backup needed.' : val.b + ' is covering for ' + name + (which.length > 1 ? ' (' + which.length + ' days).' : '.')) : 'Backup cleared.');
+    toast((val ? (val.none ? 'Marked as kept live.' : val.b + ' is covering for ' + name + (which.length > 1 ? ' (' + which.length + ' days).' : '.')) : 'Backup cleared.') + (S.auto ? '' : ' Saved to Excel with the next sync.') + (missing.length ? ' ' + missing.length + ' day(s) had no tracker row and were skipped.' : ''));
   };
   $('#bk-go', m).onclick = async () => {
     try {
       if (kind() === 'none') return await write({ none: true, by: BE.userName(), at: new Date().toISOString() });
       const v = $('#bk-name', m).value.trim(); const hit = team.find(t => t.name.toLowerCase() === v.toLowerCase());
-      if (!v) { $('#bk-err', m).textContent = 'Pick who is covering, or choose “No backup needed”.'; return; }
+      if (!v) { $('#bk-err', m).textContent = 'Pick who is covering, or choose “Kept live”.'; return; }
       if (!hit) { $('#bk-err', m).textContent = 'Pick someone from the current team list.'; return; }
       await write({ b: hit.name, id: hit.id, by: BE.userName(), at: new Date().toISOString() });
     } catch (e) { $('#bk-err', m).textContent = 'Could not save: ' + e.message; }
   };
   $('#bk-clear', m)?.addEventListener('click', async () => { try { await write(null); } catch (e) { $('#bk-err', m).textContent = e.message; } });
 }
+/* ---------- v3.29.0: backup report by pay cycle: "Oct 2026" = 26 Sep – 25 Oct 2026 (the month the cycle ends in) ---------- */
+const BKR = { month: null, client: 'all' };
+const CYC_END = 25;
+const cycParts = ms => { const d = Engine.serialToDate(ms), y = d.getUTCFullYear(), m0 = d.getUTCMonth(); return { start: new Date(Date.UTC(y, m0 - 1, CYC_END + 1)), end: new Date(Date.UTC(y, m0, CYC_END)) }; };
+const cycOf = dt => { const up = dt.getUTCDate() > CYC_END; return Engine.monthSerial(dt.getUTCFullYear(), dt.getUTCMonth() + (up ? 1 : 0)); };
+const cycRange = ms => { const { start, end } = cycParts(ms); return start.getUTCDate() + ' ' + MONTHS[start.getUTCMonth()] + ' – ' + end.getUTCDate() + ' ' + MONTHS[end.getUTCMonth()] + ' ' + end.getUTCFullYear(); };
+const cycLabel = ms => monthLabel(ms) + ' (' + cycRange(ms) + ')';
+function bkCycles() {
+  const set = new Set();
+  for (const m of D(true).months) { const d = Engine.serialToDate(m); set.add(m); set.add(Engine.monthSerial(d.getUTCFullYear(), d.getUTCMonth() + 1)); }
+  set.add(cycOf(TODAY));
+  return [...set].sort((a, b) => b - a);
+}
+const bkClientOf = r => String(r.client || (rowRoster(r) ? gs(rowRoster(r), 'client_column') : '') || 'No client').trim();
+function backupReportData(cycle, client) {
+  const d = D(true), items = [], { start, end } = cycParts(cycle);
+  /* the cycle spans two tracker months: 26th → end of the first, 1st → 25th of the second */
+  for (let dt = new Date(start); dt <= end; dt = new Date(Date.UTC(dt.getUTCFullYear(), dt.getUTCMonth(), dt.getUTCDate() + 1))) {
+    const ms = Engine.monthSerial(dt.getUTCFullYear(), dt.getUTCMonth()), i = dt.getUTCDate() - 1, iso = isoDate(dt);
+    for (const r of d.byMonth.get(ms) || []) {
+      const cl = bkClientOf(r); if (client !== 'all' && cl !== client) continue;
+      const c = catOf(r.days[i]); if (!c || !LEAVE_CATS.has(c)) continue;
+      const key = personKey(r.name), b = bkGet(key, iso);
+      items.push({ iso, name: r.name.trim(), key, client: cl, code: String(r.days[i]).trim().toUpperCase(), days: c === 'half' ? 0.5 : 1, st: !b ? 'none' : b.none ? 'live' : 'backup', backup: b && !b.none ? b.b : '' });
+    }
+  }
+  items.sort((a, b) => a.iso.localeCompare(b.iso) || a.name.localeCompare(b.name));
+  const sum = list => { const o = { people: new Set(list.map(x => x.key)).size, days: 0, backup: 0, live: 0, none: 0, pBackup: new Set(), pLive: new Set(), pNone: new Set() }; for (const x of list) { o.days += x.days; o[x.st] += x.days; ({ backup: o.pBackup, live: o.pLive, none: o.pNone })[x.st].add(x.key); } o.pBackup = o.pBackup.size; o.pLive = o.pLive.size; o.pNone = o.pNone.size; o.cov = o.days ? Math.round((o.backup + o.live) / o.days * 100) : 100; return o; };
+  const clients = [...new Set(items.map(x => x.client))].sort();
+  return { items, total: sum(items), byClient: clients.map(c => ({ client: c, ...sum(items.filter(x => x.client === c)) })) };
+}
+const BK_ST = { backup: 'Backup provided', live: 'Kept live', none: 'No backup' };
+const bkFmtD = iso => { const t = new Date(iso + 'T00:00:00Z'); return WEEKDAYS[t.getUTCDay()] + ' ' + t.getUTCDate() + ' ' + MONTHS[t.getUTCMonth()]; };
+/* one copy for the whole report: plain text with tabs (pastes as columns in Excel / Sheets) plus an HTML table (pastes as a table in Outlook / Teams) */
+async function bkCopy(cycle, client) {
+  const R = backupReportData(cycle, client), T = R.total, cv = client !== 'all';
+  const title = 'Backup report · ' + monthLabel(cycle) + ' (' + cycRange(cycle) + ') · ' + (cv ? client : 'All clients');
+  const line2 = T.people + ' on leave · ' + fmt(T.days) + ' leave days · ' + T.cov + '% covered';
+  const sumRows = [['Backup provided', fmt(T.backup), T.pBackup], ['Kept live', fmt(T.live), T.pLive], ['No backup', fmt(T.none), T.pNone]];
+  const hd = ['Date', 'Employee', ...(cv ? [] : ['Client']), 'Leave', 'Cover', 'Backup person'];
+  const rows = R.items.map(x => [x.iso, x.name, ...(cv ? [] : [x.client]), x.code + (x.days === .5 ? ' (half)' : ''), BK_ST[x.st], x.backup || '']);
+  const cRows = !cv ? R.byClient.map(c => [c.client, c.people, fmt(c.days), fmt(c.backup), fmt(c.live), fmt(c.none), c.cov + '%']) : [];
+  const cHd = ['Client', 'People on leave', 'Leave days', 'Backup provided', 'Kept live', 'No backup', 'Covered'];
+  const txt = [title, line2, '', ['Status', 'Days', 'People'].join('\t'), ...sumRows.map(r => r.join('\t')),
+    ...(cRows.length ? ['', cHd.join('\t'), ...cRows.map(r => r.join('\t'))] : []), '', hd.join('\t'), ...rows.map(r => r.join('\t'))].join('\n');
+  const tb = (h, rs) => `<table border="1" cellpadding="4" cellspacing="0" style="border-collapse:collapse;font:12px Segoe UI,Arial,sans-serif"><thead><tr>${h.map(x => `<th style="background:#f1f3f7;text-align:left">${esc(String(x))}</th>`).join('')}</tr></thead><tbody>${rs.map(r => '<tr>' + r.map(x => `<td>${esc(String(x))}</td>`).join('') + '</tr>').join('')}</tbody></table>`;
+  const html = `<div style="font:13px Segoe UI,Arial,sans-serif"><p><b>${esc(title)}</b><br>${esc(line2)}</p>${tb(['Status', 'Days', 'People'], sumRows)}${cRows.length ? '<p><b>By client</b></p>' + tb(cHd, cRows) : ''}<p><b>Day by day</b></p>${rows.length ? tb(hd, rows) : '<p>No leave in this cycle.</p>'}</div>`;
+  try {
+    if (window.ClipboardItem && navigator.clipboard?.write) await navigator.clipboard.write([new ClipboardItem({ 'text/plain': new Blob([txt], { type: 'text/plain' }), 'text/html': new Blob([html], { type: 'text/html' }) })]);
+    else await navigator.clipboard.writeText(txt);
+    toast('Backups for ' + monthLabel(cycle) + ' copied: paste into Excel, Outlook or Teams.');
+  } catch {
+    try { const ta = document.createElement('textarea'); ta.value = txt; ta.style.position = 'fixed'; ta.style.opacity = '0'; document.body.append(ta); ta.select(); const ok = document.execCommand('copy'); ta.remove(); toast(ok ? 'Backups copied.' : 'The browser blocked copying.'); } catch { toast('The browser blocked copying.'); }
+  }
+}
+function openBackupReport() {
+  const cycles = bkCycles();
+  if (!BKR.month || !cycles.includes(BKR.month)) BKR.month = cycOf(TODAY);
+  const allClients = [...new Set(D(true).rows.map(bkClientOf))].sort();
+  const body = document.createElement('div'); body.className = 'body bkr';
+  const close = document.createElement('button'); close.className = 'btn ghost'; close.textContent = '✕'; close.setAttribute('aria-label', 'Close'); close.onclick = () => closeDrawer();
+  const hd = document.createElement('header'); const h2 = document.createElement('h2'); h2.textContent = 'Backup report'; hd.append(h2, close);
+  const aside = document.createElement('aside'); aside.className = 'drawer att-hist-drawer'; aside.setAttribute('role', 'dialog'); aside.setAttribute('aria-label', 'Backup report'); aside.append(hd, body);
+  const draw = () => {
+    const R = backupReportData(BKR.month, BKR.client), T = R.total, clientView = BKR.client !== 'all';
+    const tile = (cls, n, l, sub) => `<div class="bkr-t ${cls}"><b>${n}</b><span>${l}</span><em>${sub}</em></div>`;
+    const pl = n => n + ' ' + (n === 1 ? 'person' : 'people'), dl = n => fmt(n) + ' day' + (n === 1 ? '' : 's');
+    body.innerHTML = `<div class="bkr-bar"><label>Cycle <select data-bkr="month">${cycles.map(m => `<option value="${m}"${m === BKR.month ? ' selected' : ''}>${esc(cycLabel(m))}</option>`).join('')}</select></label>
+        <label>Client <select data-bkr="client"><option value="all">All clients</option>${allClients.map(c => `<option${c === BKR.client ? ' selected' : ''}>${esc(c)}</option>`).join('')}</select></label>
+        <span class="grow"></span><button class="btn primary" data-bkr-copy title="Copies the summary and every leave day with its backup, ready to paste into Excel, Outlook or Teams">${typeof ic === 'function' ? ic('copy') + ' ' : ''}Copy to clipboard</button><button class="btn" data-bkr-print>Print</button></div>
+      <p class="sm muted bkr-cyc">Each cycle runs from the 26th to the 25th and is named after the month it ends in.</p>
+      <div class="bkr-sheet" id="bkrSheet">
+      <div class="bkr-title"><h3>Leave cover report · ${esc(monthLabel(BKR.month))}</h3><p>${esc(cycRange(BKR.month))} · ${clientView ? esc(BKR.client) + ' · ' : 'All clients · '}${pl(T.people)} on leave · ${dl(T.days)} of leave · <b>${T.cov}%</b> covered</p></div>
+      <div class="bkr-tiles">${tile('b', dl(T.backup), 'Backup provided', pl(T.pBackup))}${tile('l', dl(T.live), 'Kept live', pl(T.pLive) + ' · no backup needed')}${tile('n', dl(T.none), 'No backup', pl(T.pNone))}</div>
+      <div class="bkr-bar2" title="${T.cov}% covered"><i class="b" style="width:${T.days ? T.backup / T.days * 100 : 0}%"></i><i class="l" style="width:${T.days ? T.live / T.days * 100 : 0}%"></i><i class="n" style="width:${T.days ? T.none / T.days * 100 : 0}%"></i></div>
+      ${!clientView && R.byClient.length ? `<h4>By client</h4><table class="bkr-tbl"><thead><tr><th>Client</th><th>People on leave</th><th>Leave days</th><th>Backup provided</th><th>Kept live</th><th>No backup</th><th>Covered</th></tr></thead><tbody>${R.byClient.map(c => `<tr><td><button class="linkbtn" data-bkr-client="${esc(c.client)}">${esc(c.client)}</button></td><td>${c.people}</td><td>${fmt(c.days)}</td><td>${fmt(c.backup)}</td><td>${fmt(c.live)}</td><td class="${c.none ? 'bad' : ''}">${fmt(c.none)}</td><td><b>${c.cov}%</b></td></tr>`).join('')}</tbody></table>` : ''}
+      <h4>Day by day</h4>${R.items.length ? `<table class="bkr-tbl"><thead><tr><th>Date</th><th>Employee</th>${clientView ? '' : '<th>Client</th>'}<th>Leave</th><th>Cover</th></tr></thead><tbody>${R.items.map(x => `<tr><td>${bkFmtD(x.iso)}</td><td>${esc(x.name)}</td>${clientView ? '' : `<td>${esc(x.client)}</td>`}<td>${esc(x.code)}${x.days === .5 ? ' (½)' : ''}</td><td><span class="bkr-st ${x.st}">${x.st === 'backup' ? '↪ ' + esc(x.backup) : BK_ST[x.st]}</span></td></tr>`).join('')}</tbody></table>` : '<p class="sm muted">No leave in this cycle' + (clientView ? ' for this client' : '') + '.</p>'}
+      </div>`;
+    body.querySelectorAll('[data-bkr]').forEach(el => el.addEventListener('change', () => { BKR[el.dataset.bkr] = el.dataset.bkr === 'month' ? +el.value : el.value; draw(); }));
+    body.querySelectorAll('[data-bkr-client]').forEach(el => el.addEventListener('click', () => { BKR.client = el.dataset.bkrClient; draw(); }));
+    body.querySelector('[data-bkr-copy]').onclick = () => bkCopy(BKR.month, BKR.client);
+    body.querySelector('[data-bkr-print]').onclick = () => { const w = window.open('', '_blank'); if (!w) { toast('Allow pop-ups to print.'); return; } w.document.write(`<!doctype html><meta charset="utf-8"><title>Leave cover report</title><style>body{font:13px system-ui,Segoe UI,sans-serif;color:#1f2937;margin:24px}${BKR_CSS}</style>` + document.querySelector('#bkrSheet').outerHTML); w.document.close(); w.focus(); w.print(); };
+  };
+  mountDrawer(aside); draw();
+}
+const BKR_CSS = `.bkr-title h3{margin:0 0 2px;font-size:17px}.bkr-title p{margin:0 0 12px;color:#556;font-size:12.5px}.bkr-tiles{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:10px;margin-bottom:10px}.bkr-t{border:1px solid #e3e6ec;border-radius:12px;padding:10px 14px;display:flex;flex-direction:column;border-top:3px solid var(--tc)}.bkr-t b{font-size:22px}.bkr-t span{font-weight:650;font-size:12.5px}.bkr-t em{font-style:normal;font-size:12px;color:#667}.bkr-t.b{--tc:#22a05a}.bkr-t.l{--tc:#3b6cf6}.bkr-t.n{--tc:#e34948}.bkr-bar2{display:flex;height:10px;border-radius:6px;overflow:hidden;background:#eef0f4;margin:0 0 16px}.bkr-bar2 .b{background:#22a05a}.bkr-bar2 .l{background:#3b6cf6}.bkr-bar2 .n{background:#e34948}h4{margin:16px 0 6px;font-size:13px}.bkr-tbl{width:100%;border-collapse:collapse;font-size:12.5px}.bkr-tbl th{text-align:left;font-size:11px;text-transform:uppercase;letter-spacing:.04em;color:#667;border-bottom:1px solid #e3e6ec;padding:6px 8px}.bkr-tbl td{padding:6px 8px;border-bottom:1px solid #eef0f4}.bkr-tbl td.bad{color:#c63b3a;font-weight:650}.bkr-st{display:inline-block;padding:1px 8px;border-radius:999px;font-size:11.5px;font-weight:600}.bkr-st.backup{background:#e3f4ea;color:#1c7a45}.bkr-st.live{background:#e6edfe;color:#3558c8}.bkr-st.none{background:#fde8e8;color:#c63b3a}`;
 function renderCard(el, opts = {}) {
   if (!el) return; if (!opts.hist) renderCard.el = el;
   const C = S.ui.card, goBtns = can('ov.openatt') && can('page.attendance') ? `<button class="btn mini" data-att-go="grid">Open attendance →</button>` : '';
@@ -7225,10 +7337,10 @@ function renderCard(el, opts = {}) {
       const listCopy = tableData(['Employee', 'Client', 'Code', 'Status'], list.map(x => [nm(x.r), cl(x.r), String(x.v).trim().toUpperCase(), x.c === 'applied' ? 'Awaiting approval' : labelOf(x.v)]), (C.tab === 'late' ? 'Late comings' : C.tab === 'half' ? 'Half days' : 'Out') + ' on ' + longDate(rd));
       renderCard._copy = { ...renderCard._copy, today: listCopy };
       const emptyTxt = !rows.length ? 'No attendance rows for this month.' : C.tab === 'late' ? 'No late comings ' + dayWord + '.' : C.tab === 'half' ? 'No half days ' + dayWord + '.' : 'Nobody is on leave ' + dayWord + '.';
-      const miniList = list.length ? `<ul class="att-mini">${list.map(x => `<li><span class="att-mini-n">${esc(nm(x.r))}${can('att.info') ? `<button type="button" class="rq-i" data-lainfo="${esc(x.r.name.trim())}" aria-label="Past and upcoming leave of ${esc(nm(x.r))}">i</button>` : ''}</span><span class="att-mini-c">${esc(cl(x.r))}</span><span class="ph-chip c-${esc(x.c)}">${esc(String(x.v).trim().toUpperCase())}</span><span class="att-mini-s">${esc(x.c === 'applied' ? 'Awaiting approval' : labelOf(x.v))}</span>${C.tab === 'late' ? '<span></span>' : (() => { const k = personKey(x.r.name), b = bkGet(k, rdIso); return b ? `<button type="button" class="att-bk ${b.none ? 'none' : 'set'}" data-bk="${esc(k)}" ${canBackup() ? '' : 'disabled'} title="${esc(b.none ? 'No backup needed' : 'Backup: ' + b.b + (b.by ? ' · set by ' + b.by : ''))}">${b.none ? 'No backup' : '↪ ' + esc(b.b)}</button>` : canBackup() ? `<button type="button" class="att-bk add" data-bk="${esc(k)}">+ Backup</button>` : '<span class="att-bk-no">No backup</span>'; })()}</li>`).join('')}</ul>` : `<div class="att-mini-empty">${emptyTxt}</div>`;
+      const miniList = list.length ? `<ul class="att-mini">${list.map(x => `<li><span class="att-mini-n">${esc(nm(x.r))}${can('att.info') ? `<button type="button" class="rq-i" data-lainfo="${esc(x.r.name.trim())}" aria-label="Past and upcoming leave of ${esc(nm(x.r))}">i</button>` : ''}</span><span class="att-mini-c">${esc(cl(x.r))}</span><span class="ph-chip c-${esc(x.c)}">${esc(String(x.v).trim().toUpperCase())}</span><span class="att-mini-s">${esc(x.c === 'applied' ? 'Awaiting approval' : labelOf(x.v))}</span>${C.tab === 'late' ? '<span></span>' : (() => { const k = personKey(x.r.name), b = bkGet(k, rdIso); return b ? `<button type="button" class="att-bk ${b.none ? 'none' : 'set'}" data-bk="${esc(k)}" ${canBackup() ? '' : 'disabled'} title="${esc(b.none ? 'Kept live (no backup needed)' : 'Backup: ' + b.b)}">${b.none ? 'Kept live' : '↪ ' + esc(b.b)}</button>` : canBackup() ? `<button type="button" class="att-bk add" data-bk="${esc(k)}">+ Backup</button>` : '<span class="att-bk-no">No backup</span>'; })()}</li>`).join('')}</ul>` : `<div class="att-mini-empty">${emptyTxt}</div>`;
       const needBk = C.tab === 'late' ? [] : list, covered = needBk.filter(x => bkGet(personKey(x.r.name), rdIso)).length;
-      const bkLine = needBk.length ? `<div class="att-bk-sum ${covered === needBk.length ? 'ok' : ''}">Backups: <b>${covered} of ${needBk.length}</b> covered${covered < needBk.length ? ' · ' + (needBk.length - covered) + ' without a backup' : ''}</div>` : '';
-      html = head2 + `<div class="att-tabs">${tabBtn('leave', nFull, ' on leave', nLa ? ` <em>+${nLa} awaiting</em>` : '')}${tabBtn('half', T.half.length, ' half day')}${tabBtn('late', T.late.length, ' late')}<span class="grow"></span>${copyBtn('today', listCopy)}${pseudoCol ? toggle('names', [['real', 'Real'], ['pseudo', 'Pseudo']]) : ''}<button type="button" class="btn mini" data-att-hist>History &amp; upcoming ↗</button></div>` + bkLine + miniList;
+      const bkLine = needBk.length ? `<div class="att-bk-sum ${covered === needBk.length ? 'ok' : ''}">Backups: <b>${covered} of ${needBk.length}</b> covered${covered < needBk.length ? ' · ' + (needBk.length - covered) + ' without a backup' : ''}<button type="button" class="linkbtn" data-bk-copy title="Copy this cycle's backups (${esc(cycLabel(cycOf(rd)))}) for Excel or email">Copy ${esc(monthLabel(cycOf(rd)))} backups</button></div>` : '';
+      html = head2 + `<div class="att-tabs">${tabBtn('leave', nFull, ' on leave', nLa ? ` <em>+${nLa} awaiting</em>` : '')}${tabBtn('half', T.half.length, ' half day')}${tabBtn('late', T.late.length, ' late')}<span class="grow"></span>${copyBtn('today', listCopy)}${pseudoCol ? toggle('names', [['real', 'Real'], ['pseudo', 'Pseudo']]) : ''}<button type="button" class="btn mini" data-att-hist>History &amp; upcoming ↗</button><button type="button" class="btn mini" data-bk-report>Backup report ↗</button></div>` + bkLine + miniList;
     }
   }
   if (S.status === 'ready' && S.ctx && hasRoster()) { const n = rosterGaps().missing.length, u = rosterGaps().notInRoster.length; const bits = []; if (n) bits.push(`${n} ${n === 1 ? 'person' : 'people'} in the workforce file ${n === 1 ? 'isn’t' : 'aren’t'} in the attendance tracker yet`); if (u) bits.push(`${u} tracker ${u === 1 ? 'name doesn’t' : 'names don’t'} match the workforce file`); if (bits.length) html += `<div class="hint" style="margin-top:12px">${bits.join(' · ')}. <button class="linkbtn" data-att-go="health">Fix in Action center</button></div>`; }
@@ -7236,6 +7348,8 @@ function renderCard(el, opts = {}) {
   const again = () => { renderCard(el, opts); if (opts.hist && renderCard.el && renderCard.el.isConnected) renderCard(renderCard.el); };
   el.querySelectorAll('[data-att-tab]').forEach(b => b.addEventListener('click', () => { S.ui.card.tab = b.dataset.attTab; renderCard(el); }));
   el.querySelector('[data-att-hist]')?.addEventListener('click', openAttHistory);
+  el.querySelector('[data-bk-report]')?.addEventListener('click', openBackupReport);
+  el.querySelector('[data-bk-copy]')?.addEventListener('click', () => bkCopy(cycOf(refDay()), 'all'));
   el.querySelectorAll('[data-bk]').forEach(b => b.addEventListener('click', () => openBackupBox(b.dataset.bk, isoDate(refDay()))));
   el.querySelectorAll('[data-att-names]').forEach(b => b.addEventListener('click', () => { S.ui.card.names = b.dataset.attNames; saveCardUi(); again(); }));
   if (!opts.hist) leaveTipDelegate(el);
@@ -7485,7 +7599,7 @@ const healthCount = () => (S.status === 'ready' && S.ctx ? healthIssues().filter
 
 mount();
 return {
-  fieldNames: attFieldNames, hasTracker: Engine.hasTracker, refresh, init: () => { mount(); return connect(); }, askName, decorateTable, healthCount, chooseFileEarly, savedFile: async () => (await kv.get('file')) || ((await kv.get('handle')) || {}).name || '', show, leave, renderCard, renderWatch, drawerPanel, go, renderApprovalRequests, renderRequestHistory, requestCounts, renderAppsCard, openBackupBox, renameField: (a, b) => renameAttField(a, b), attReady: () => S.status === 'ready' && !!S.ctx, recordAttendance: () => openLogLeave(), canRecord: () => canLog(), requestsToDecide: () => requestsToDecide().length + laToDecide(),
+  fieldNames: attUserFields, hasTracker: Engine.hasTracker, refresh, init: () => { mount(); return connect(); }, askName, decorateTable, healthCount, chooseFileEarly, savedFile: async () => (await kv.get('file')) || ((await kv.get('handle')) || {}).name || '', show, leave, renderCard, renderWatch, drawerPanel, go, renderApprovalRequests, renderRequestHistory, requestCounts, renderAppsCard, openBackupBox, renameField: (a, b) => renameAttField(a, b), attReady: () => S.status === 'ready' && !!S.ctx, recordAttendance: () => openLogLeave(), canRecord: () => canLog(), requestsToDecide: () => requestsToDecide().length + laToDecide(),
   /* v3.19: every recorded code between two dates (UTC ms, null = open), for custom dashboards; follows the attendance scope */
   entries: (from, to) => { if (S.status !== 'ready' || !S.ctx) return null; const d = D(), out = []; for (const m of d.months) { const dim = Engine.daysInMonth(m); for (const r of d.byMonth.get(m) || []) for (let i = 0; i < dim; i++) { const v = r.days[i]; if (v == null || v === '') continue; const dt = dateOf(m, i), t = dt.getTime(); if ((from != null && t < from) || (to != null && t > to)) continue; const cat = catOf(v); out.push({ name: r.name.trim(), empId: r.empId, client: r.client ? String(r.client).trim() : '', date: dt, code: String(v).trim().toUpperCase(), cat, catLabel: CATS[cat] || 'Other' }); } } return out; },
   todayStats: () => { if (S.status !== 'ready' || !S.ctx) return null; const rows = D().byMonth.get(TODAY_MS) || [], i = TODAY.getUTCDate() - 1, cats = rows.map(r => catOf(r.days[i])); return { full: cats.filter(c => c === 'approved' || c === 'sick' || c === 'unplanned').length, half: cats.filter(c => c === 'half').length, late: cats.filter(c => c === 'late').length, tracked: rows.length }; }, redraw: () => { if (active()) render(); }, state: () => S, dirty: () => S.changes.length,
@@ -7666,7 +7780,7 @@ async function poll() {
 }
 
 /* ============================== filtering ============================== */
-const APP = { title: "Team Dashboard", version: "3.28.1", released: "29 Sep 2026" };
+const APP = { title: "Team Dashboard", version: "3.29.0", released: "30 Sep 2026" };
 const BASE_DIMS = { status: "status_column", desig: "designation_column", client: "client_column", mode: "mode_column" };
 const STANDARD_STATUSES = ["Active", "Manager", "OJT", "Bench", "New", "Projected", "Left", "Moved"];
 const TILE_ORDER = ["Active", "Manager", "OJT", "Bench", "New", "Projected"];
@@ -8893,7 +9007,7 @@ function organizeUpcoming() {
 function renderGlance() {
   const box = $("#ovGlance"); if (!box) return;
   const can = k => !window.PERM || PERM.can(k), tiles = [];
-  /* v3.28.1: one summary strip with drawn icons (emoji and flags don't show on every computer) */
+  /* v3.28.2: one summary strip with drawn icons (emoji and flags don't show on every computer) */
   const ICONS = { leave: '<path d="M3 21h18"/><path d="M12 3a9 9 0 0 1 9 9H3a9 9 0 0 1 9-9z"/><path d="M12 12v9"/>', req: '<rect x="5" y="3" width="14" height="18" rx="2"/><path d="M9 8h6M9 12h6M9 16h3"/>', cel: '<path d="M20 12v9H4v-9"/><rect x="2" y="7" width="20" height="5" rx="1"/><path d="M12 22V7"/><path d="M12 7c-2-4-6-4-6-1.5S10 7 12 7zM12 7c2-4 6-4 6-1.5S14 7 12 7z"/>', hol: '<rect x="3" y="5" width="18" height="16" rx="2"/><path d="M3 10h18M8 3v4M16 3v4"/><circle cx="12" cy="15" r="2"/>' };
   const svg = k => { const sp = h("span", { class: "ov-ic", "aria-hidden": "true" }); sp.innerHTML = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">' + ICONS[k] + '</svg>'; return sp; };
   const tile = (icon, tone, label, value, sub, go, badge) => h("button", { type: "button", class: "ov-tile " + tone, onclick: go },
@@ -10944,7 +11058,7 @@ setTimeout(() => chatSync(), 1500);
 /* ---------- v3.15: leave requests waiting for a manager: badge on Attendance, refreshed every 45 seconds ---------- */
 function updateReqBadge() {
   window.ATT?.renderApprovalRequests(); window.organizeOverview?.();
-  /* v3.28.1: the number sits on Overview, where Request Center is: requests + leave applications (LA) waiting for you */
+  /* v3.28.2: the number sits on Overview, where Request Center is: requests + leave applications (LA) waiting for you */
   document.querySelectorAll('.tab[data-view="attendance"] .tabn.req').forEach(x => x.remove());
   const t = document.querySelector('.tab[data-view="summary"]'); if (!t) return;
   let b = t.querySelector('.tabn.req'); const n = window.ATT && ATT.requestsToDecide ? ATT.requestsToDecide() : 0;
