@@ -4,7 +4,7 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <link rel="icon" href="data:,">
-<title>Team Dashboard · 3.39.1</title>
+<title>Team Dashboard · 3.39.2</title>
 <style>
 :root {
   color-scheme: light;
@@ -1803,10 +1803,10 @@ body.filters-locked #cleanFilters, body.filters-locked #xchips, body.filters-loc
     <p class="gate-sub">One place for your people, priorities and team insights.</p>
     <div id="connectBody"><div class="empty">Loading…</div></div>
   </div>
-  <p class="gate-ver">3.39.1</p>
+  <p class="gate-ver">3.39.2</p>
 </section>
 
-<div id="app" hidden><aside class="sidebar" aria-label="Workspace navigation"><div class="brand dashboard-identity">      <h1><span id="title">Team Dashboard</span><span class="ver" id="ver" title="Version 3.39.1">3.39.1</span></h1><p class="brand-tag">One place for your people, priorities and team insights.</p>      <span class="sync" id="sync" role="status"><i></i><span id="syncText">Loading…</span></span></div><div class="nav-label">WORKSPACE</div>      <nav class="tabs" role="tablist" aria-label="Pages" aria-orientation="vertical">
+<div id="app" hidden><aside class="sidebar" aria-label="Workspace navigation"><div class="brand dashboard-identity">      <h1><span id="title">Team Dashboard</span><span class="ver" id="ver" title="Version 3.39.2">3.39.2</span></h1><p class="brand-tag">One place for your people, priorities and team insights.</p>      <span class="sync" id="sync" role="status"><i></i><span id="syncText">Loading…</span></span></div><div class="nav-label">WORKSPACE</div>      <nav class="tabs" role="tablist" aria-label="Pages" aria-orientation="vertical">
         <button class="tab on" role="tab" aria-controls="pageSummary" data-view="summary" aria-selected="true" data-icon="🏠" data-short="Home">Overview</button>
         <button class="tab" role="tab" aria-controls="pageEmployees" data-view="employees" aria-selected="false" data-icon="👥" data-short="People">Employees</button>
       <button class="tab" role="tab" aria-controls="pageAttendance" data-view="attendance" aria-selected="false" data-icon="🗓️" data-short="Attend.">Attendance</button>
@@ -7529,7 +7529,7 @@ function bkGridData(cycle, client, sub, range, merge) {
   days.forEach((dt, j) => {
     const ms = Engine.monthSerial(dt.getUTCFullYear(), dt.getUTCMonth()), i = dt.getUTCDate() - 1, iso = isoDate(dt), w = dt.getUTCDay();
     for (const r of d.byMonth.get(ms) || []) {
-      if (!(merge ? bkPassBase(r, client, sub) : bkPass(r, client, sub))) continue;
+      if (!bkPassBase(r, client, sub)) continue;
       const key = personKey(r.name);
       if (!people.has(key)) people.set(key, { key, name: r.name.trim(), pseudo: bkPseudo(r), client: bkClientOf(r), sub: bkSubOf(r), cells: new Array(days.length).fill(null), total: 0, pass: false });
       const P = people.get(key); if (bkPass(r, client, sub)) P.pass = true; const v = r.days[i], c = v == null ? null : catOf(v), code = v == null ? '' : String(v).trim().toUpperCase();
@@ -7558,7 +7558,15 @@ function bkGridData(cycle, client, sub, range, merge) {
       const act = g.find(P => P.pass) || g[0];
       return { ...act, name: g.map(P => P.name).join(' / '), cells, total: cells.reduce((a, c) => a + (c ? c.bill : 0), 0), members: g.map(P => P.name) };
     });
-  } else list = list.filter(P => P.pass);
+  } else {
+    /* v3.39.2: real names: a leaver's "seat removed" days are only shown when nobody else has taken their pseudo name */
+    const byPseudo = new Map(); for (const P of list) { const k = (P.pseudo || '').trim().toLowerCase(); if (k) byPseudo.set(k, (byPseudo.get(k) || 0) + 1); }
+    list = list.filter(P => P.pass).map(P => {
+      const k = (P.pseudo || '').trim().toLowerCase();
+      if (!k || k === P.name.trim().toLowerCase() || (byPseudo.get(k) || 0) < 2 || !P.cells.some(c => c && c.cls === 'sr')) return P;
+      return { ...P, cells: P.cells.map(c => c && c.cls === 'sr' ? null : c), replaced: true };
+    });
+  }
   return { days, people: list.sort((a, b) => (merge ? (a.pseudo || a.name).localeCompare(b.pseudo || b.name) : a.name.localeCompare(b.name))) };
 }
 function bkGridHTML(G, title, names, forCopy) {
@@ -8142,7 +8150,7 @@ async function poll() {
 }
 
 /* ============================== filtering ============================== */
-const APP = { title: "Team Dashboard", version: "3.39.1", released: "30 Sep 2026" };
+const APP = { title: "Team Dashboard", version: "3.39.2", released: "30 Sep 2026" };
 const BASE_DIMS = { status: "status_column", desig: "designation_column", client: "client_column", mode: "mode_column" };
 const STANDARD_STATUSES = ["Active", "Manager", "OJT", "Bench", "New", "Projected", "Left", "Moved"];
 const TILE_ORDER = ["Active", "Manager", "OJT", "Bench", "New", "Projected"];
