@@ -4,7 +4,7 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <link rel="icon" href="data:,">
-<title>Team Dashboard · 3.26.2</title>
+<title>Team Dashboard · 3.26.3</title>
 <style>
 :root {
   color-scheme: light;
@@ -1428,8 +1428,8 @@ body.filters-locked #cleanFilters, body.filters-locked #xchips, body.filters-loc
   #pageSummary.ov > .ov-glance { grid-template-columns:repeat(auto-fit,minmax(min(100%,300px),1fr)); }
 }
 @media (max-width:650px) { .ov-tile { padding:12px; } .ov-ic { width:34px; height:34px; font-size:17px; } .ov-tx b { font-size:18px; } }
-/* v3.26.2: Attendance, Request Center and Coming up side by side in one row; Leave watch full width below */
-#pageSummary.ov { grid-template-columns:minmax(0,1.45fr) minmax(0,1fr) minmax(0,1fr) !important; grid-template-areas:"glance glance glance" "att req up" "watch watch watch" !important; }
+/* v3.26.3: Attendance, Request Center and Coming up side by side in one row; Leave watch full width below */
+#pageSummary.ov { grid-template-columns:repeat(3,minmax(0,1fr)) !important; grid-template-areas:"glance glance glance" "att req up" "watch watch watch" !important; }
 #pageSummary.ov > .ov-main, #pageSummary.ov > .ov-side { display:contents !important; }
 #pageSummary.ov #cardAttendance { grid-area:att !important; grid-column:att !important; grid-row:att !important; align-self:stretch; min-width:0; }
 #pageSummary.ov #ovRequests { grid-area:req !important; grid-column:req !important; grid-row:req !important; align-self:stretch; min-width:0; }
@@ -1439,6 +1439,8 @@ body.filters-locked #cleanFilters, body.filters-locked #xchips, body.filters-loc
 #pageSummary.ov .att-mini li { grid-template-columns:minmax(0,1.5fr) minmax(0,1fr) auto; }
 #pageSummary.ov .att-mini-s { display:none; }
 #pageSummary.ov #cardAttendance .card-head { flex-wrap:wrap; }
+#pageSummary.ov #cardAttendance .card-head > .grow { flex:1 1 100%; }
+#pageSummary.ov #cardAttendance .att-nav .input { width:auto; min-width:0; }
 @media (max-width:1280px) {
   #pageSummary.ov { grid-template-columns:minmax(0,1fr) minmax(0,1fr) !important; grid-template-areas:"glance glance" "att att" "req up" "watch watch" !important; }
   #pageSummary.ov .att-mini li { grid-template-columns:minmax(0,1.6fr) minmax(0,1fr) auto minmax(0,1fr); }
@@ -1655,10 +1657,10 @@ body.filters-locked #cleanFilters, body.filters-locked #xchips, body.filters-loc
     <p class="gate-sub">One place for your people, priorities and team insights.</p>
     <div id="connectBody"><div class="empty">Loading…</div></div>
   </div>
-  <p class="gate-ver">3.26.2</p>
+  <p class="gate-ver">3.26.3</p>
 </section>
 
-<div id="app" hidden><aside class="sidebar" aria-label="Workspace navigation"><div class="brand dashboard-identity">      <h1><span id="title">Team Dashboard</span><span class="ver" id="ver" title="Version 3.26.2">3.26.2</span></h1><p class="brand-tag">One place for your people, priorities and team insights.</p>      <span class="sync" id="sync" role="status"><i></i><span id="syncText">Loading…</span></span></div><div class="nav-label">WORKSPACE</div>      <nav class="tabs" role="tablist" aria-label="Pages" aria-orientation="vertical">
+<div id="app" hidden><aside class="sidebar" aria-label="Workspace navigation"><div class="brand dashboard-identity">      <h1><span id="title">Team Dashboard</span><span class="ver" id="ver" title="Version 3.26.3">3.26.3</span></h1><p class="brand-tag">One place for your people, priorities and team insights.</p>      <span class="sync" id="sync" role="status"><i></i><span id="syncText">Loading…</span></span></div><div class="nav-label">WORKSPACE</div>      <nav class="tabs" role="tablist" aria-label="Pages" aria-orientation="vertical">
         <button class="tab on" role="tab" aria-controls="pageSummary" data-view="summary" aria-selected="true" data-icon="🏠" data-short="Home">Overview</button>
         <button class="tab" role="tab" aria-controls="pageEmployees" data-view="employees" aria-selected="false" data-icon="👥" data-short="People">Employees</button>
       <button class="tab" role="tab" aria-controls="pageAttendance" data-view="attendance" aria-selected="false" data-icon="🗓️" data-short="Attend.">Attendance</button>
@@ -3357,7 +3359,7 @@ window.PERM = {
     if (q._v < 9) { q['att.rows'] = !!q['att.edit']; q['att.addemp'] = !!q['att.edit']; }
     /* v3.17: the Open attendance button must be given on purpose; the holidays card is shown to anyone who sees the Overview */
     /* v3.19: custom dashboards: anyone who can open Reports sees them; building them must be given on purpose */
-    /* v3.26.2: the ⓘ leave card got its own right; keep what people could see before (grid or approvers) */
+    /* v3.26.3: the ⓘ leave card got its own right; keep what people could see before (grid or approvers) */
     if (q._v < 13) q['att.info'] = !!q['att.approve'];
     if (q._v < 12) { q['rep.custom'] = !!q['page.reports']; q['rep.build'] = false; }
     if (q._v < 11) { q['chat.use'] = true; q['chat.all'] = true; }
@@ -7377,7 +7379,7 @@ async function poll() {
 }
 
 /* ============================== filtering ============================== */
-const APP = { title: "Team Dashboard", version: "3.26.2", released: "29 Sep 2026" };
+const APP = { title: "Team Dashboard", version: "3.26.3", released: "29 Sep 2026" };
 const BASE_DIMS = { status: "status_column", desig: "designation_column", client: "client_column", mode: "mode_column" };
 const STANDARD_STATUSES = ["Active", "Manager", "OJT", "Bench", "New", "Projected", "Left", "Moved"];
 const TILE_ORDER = ["Active", "Manager", "OJT", "Bench", "New", "Projected"];
