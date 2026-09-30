@@ -4,7 +4,7 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <link rel="icon" href="data:,">
-<title>Team Dashboard · 3.28.0</title>
+<title>Team Dashboard · 3.28.1</title>
 <style>
 :root {
   color-scheme: light;
@@ -1689,7 +1689,7 @@ body.filters-locked #cleanFilters, body.filters-locked #xchips, body.filters-loc
 .dd-save { position:sticky; bottom:0; background:var(--surface); padding:10px 0; margin-top:0 !important; align-items:center; }
 @media (max-width:700px) { .dd-row { grid-template-columns:1fr; } .dd-save { bottom:calc(66px + env(safe-area-inset-bottom)); } }
 
-/* v3.28.0: the four glance tiles as one summary strip */
+/* v3.28.1: the four glance tiles as one summary strip */
 #pageSummary.ov > .ov-glance { gap:0 !important; border:1px solid var(--border); border-radius:14px; background:var(--surface); overflow:hidden; box-shadow:0 1px 2px rgba(15,23,42,.04); }
 #pageSummary.ov .ov-tile { --tone:var(--accent); position:relative; display:flex !important; flex-direction:column; align-items:flex-start !important; gap:4px !important; padding:14px 18px 13px !important; border:0 !important; border-radius:0 !important; border-left:1px solid var(--border) !important; background:transparent !important; box-shadow:none !important; transform:none !important; }
 #pageSummary.ov .ov-tile:first-child { border-left:0 !important; }
@@ -1745,10 +1745,10 @@ body.filters-locked #cleanFilters, body.filters-locked #xchips, body.filters-loc
     <p class="gate-sub">One place for your people, priorities and team insights.</p>
     <div id="connectBody"><div class="empty">Loading…</div></div>
   </div>
-  <p class="gate-ver">3.28.0</p>
+  <p class="gate-ver">3.28.1</p>
 </section>
 
-<div id="app" hidden><aside class="sidebar" aria-label="Workspace navigation"><div class="brand dashboard-identity">      <h1><span id="title">Team Dashboard</span><span class="ver" id="ver" title="Version 3.28.0">3.28.0</span></h1><p class="brand-tag">One place for your people, priorities and team insights.</p>      <span class="sync" id="sync" role="status"><i></i><span id="syncText">Loading…</span></span></div><div class="nav-label">WORKSPACE</div>      <nav class="tabs" role="tablist" aria-label="Pages" aria-orientation="vertical">
+<div id="app" hidden><aside class="sidebar" aria-label="Workspace navigation"><div class="brand dashboard-identity">      <h1><span id="title">Team Dashboard</span><span class="ver" id="ver" title="Version 3.28.1">3.28.1</span></h1><p class="brand-tag">One place for your people, priorities and team insights.</p>      <span class="sync" id="sync" role="status"><i></i><span id="syncText">Loading…</span></span></div><div class="nav-label">WORKSPACE</div>      <nav class="tabs" role="tablist" aria-label="Pages" aria-orientation="vertical">
         <button class="tab on" role="tab" aria-controls="pageSummary" data-view="summary" aria-selected="true" data-icon="🏠" data-short="Home">Overview</button>
         <button class="tab" role="tab" aria-controls="pageEmployees" data-view="employees" aria-selected="false" data-icon="👥" data-short="People">Employees</button>
       <button class="tab" role="tab" aria-controls="pageAttendance" data-view="attendance" aria-selected="false" data-icon="🗓️" data-short="Attend.">Attendance</button>
@@ -1799,7 +1799,7 @@ body.filters-locked #cleanFilters, body.filters-locked #xchips, body.filters-loc
         <div class="card c-watch" id="cardWatch" aria-label="Leave watch" hidden></div>
       </div>
       <aside class="ov-side">
-        <section class="request-cards card" id="ovRequests" aria-labelledby="requestCenterTitle"><div class="ov-up-head"><div class="rc-headrow"><h2 id="requestCenterTitle">Request Center</h2><button class="btn primary rc-record" id="rcRecord" type="button" hidden title="Record leave, remote, late or half day. Without the manager right it goes to a manager for approval.">+ Record attendance</button></div><div class="ov-tabs" id="rcTabs" role="tablist" aria-label="Request Center"></div></div><section id="cardMyRequests" style="grid-column:1 / -1;min-width:0" aria-label="Your requests" hidden></section><section id="cardRejectedRequests" style="grid-column:1 / -1;min-width:0" aria-label="Rejected request log" hidden></section><section id="cardApprovalRequests" style="grid-column:1 / -1;min-width:0" aria-label="Approval requests" hidden></section></section>
+        <section class="request-cards card" id="ovRequests" aria-labelledby="requestCenterTitle"><div class="ov-up-head"><div class="rc-headrow"><h2 id="requestCenterTitle">Request Center</h2><button class="btn primary rc-record" id="rcRecord" type="button" hidden title="Record leave, remote, late or half day. Without the manager right it goes to a manager for approval.">+ Record attendance</button></div><div class="ov-tabs" id="rcTabs" role="tablist" aria-label="Request Center"></div></div><section id="cardMyRequests" style="grid-column:1 / -1;min-width:0" aria-label="Your requests" hidden></section><section id="cardRejectedRequests" style="grid-column:1 / -1;min-width:0" aria-label="Rejected request log" hidden></section><section id="cardLeaveApps" style="grid-column:1 / -1;min-width:0" aria-label="Leave applications" hidden></section><section id="cardApprovalRequests" style="grid-column:1 / -1;min-width:0" aria-label="Approval requests" hidden></section></section>
         <section class="card ov-up" id="ovUpcoming" aria-labelledby="ovUpTitle">
           <div class="ov-up-head"><h2 id="ovUpTitle">Coming up</h2><div class="ov-tabs" id="ovUpTabs" role="tablist" aria-label="Coming up"></div></div>
         <div class="card c-coming" id="cardComing" aria-label="Upcoming birthdays and work anniversaries">
@@ -6041,20 +6041,36 @@ async function drawFieldAccess(box, names) {
     btn.disabled = false;
   };
 }
-function openFieldsManager(sel) {
+let FM_TAB = 'fields';
+function openFieldsManager(sel, tab) {
+  if (tab) FM_TAB = tab;
   const names = attFieldNames(), fillNames = names.filter(canFillField), canAdd = can('att.fields'), canFill = fillNames.length > 0;
   const superAccess = names.length > 0 && window.PERM && PERM.online() && PERM.isSuper();
   const d = D(), month = S.ui.grid.month || d.latestMonth, fieldSel = sel && fillNames.includes(sel) ? sel : fillNames[0];
   const monthRows = (d.byMonth.get(month) || []).slice().sort((a, b) => a.name.localeCompare(b.name));
   const pendingNote = n => (S.newFields || []).some(x => x.toLowerCase() === n.toLowerCase()) ? ' <span class="tag">added · saves with the next sync</span>' : '';
-  const list = names.length ? `<ul class="fld-list">${names.map(n => { const filled = S.rows.filter(r => r.extra && r.extra[n] != null && r.extra[n] !== '').length; return `<li><b>${esc(n)}</b>${pendingNote(n)}<span class="grow"></span><span class="sm muted">${filled} of ${S.rows.length} rows filled</span>${canAdd ? `<button class="btn sm" type="button" data-xf-del="${esc(n)}" title="Delete this field and its values from the tracker">Delete</button>` : ''}</li>`; }).join('')}</ul>` : '<div class="empty" style="padding:14px">No extra fields yet.</div>';
+  const list = names.length ? `<ul class="fld-list">${names.map(n => { const filled = S.rows.filter(r => r.extra && r.extra[n] != null && r.extra[n] !== '').length; return `<li><b>${esc(n)}</b>${pendingNote(n)}<span class="grow"></span><span class="sm muted">${filled} of ${S.rows.length} rows filled</span>${canFillField(n) ? `<button class="btn sm" type="button" data-xf-fill="${esc(n)}">Fill in</button>` : ''}${canAdd ? `<button class="btn sm" type="button" data-xf-del="${esc(n)}" title="Delete this field and its values from the tracker">Delete</button>` : ''}</li>`; }).join('')}</ul>` : '<div class="empty" style="padding:14px">No extra fields yet.</div>';
   const gonePending = (S.removedFields || []).length ? `<div class="sm muted" style="margin:6px 0 10px">Deleted, removed from Excel with the next save: ${(S.removedFields || []).map(esc).join(', ')}</div>` : '';
   const add = canAdd ? `<div style="display:flex;gap:8px;align-items:flex-end;flex-wrap:wrap;margin:6px 0 14px"><label style="flex:1;min-width:220px">New field name<input type="text" id="xf-new" maxlength="60" placeholder="e.g. Shift, Laptop returned, Manager" autocomplete="off"></label><button class="btn primary" id="xf-add" type="button">${ic('plus')} Add field</button></div><div class="sm muted" style="margin:-6px 0 14px">It becomes a new column after AM in the “Attendance Tracker” sheet, for every month.</div>` : '<div class="sm muted" style="margin-bottom:12px">Only people with the “Add fields to the attendance tracker” right can add fields.</div>';
   const fill = names.length && canFill ? `<div style="display:flex;gap:10px;align-items:center;flex-wrap:wrap;margin:6px 0 8px"><b style="font-size:13px">Fill in</b><select id="xf-pick">${fillNames.map(n => `<option${n === fieldSel ? ' selected' : ''}>${esc(n)}</option>`).join('')}</select><span class="sm muted">for ${monthLabel(month)} · ${monthRows.length} people (follows the filters at the top)</span></div>
     <div class="fld-fill">${fieldValuesList(fieldSel, 'xf-vals')}<table><thead><tr><th>Employee</th><th>Emp ID</th><th>Client</th><th>${esc(fieldSel)}</th></tr></thead><tbody>${monthRows.map(r => `<tr><td>${esc(r.name.trim())}</td><td class="sm muted">${esc(String(r.empId ?? '—'))}</td><td class="sm muted">${esc(r.client || '')}</td><td><input type="text" list="xf-vals" data-xfr="${r.uid}" value="${esc((r.extra || {})[fieldSel] ?? '')}" aria-label="${esc(fieldSel)} for ${esc(r.name.trim())}"></td></tr>`).join('')}</tbody></table></div>` : '';
+  /* v3.28.1: one thing at a time: Fields · Who can log · Fill in values */
+  const tabs = [['fields', 'Fields (' + names.length + ')'], ...(superAccess ? [['who', 'Who can log']] : []), ...(fill ? [['fill', 'Fill in values']] : [])];
+  if (!tabs.some(t => t[0] === FM_TAB)) FM_TAB = 'fields';
   const m = openModal({ title: 'Attendance tracker fields', wide: true,
-    body: `${add}${list}${gonePending}${superAccess ? '<div id="xf-acc"><p class="sm muted">Loading who can log each field…</p></div>' : ''}${fill}<div class="err" id="xf-err" role="alert"></div>`,
-    footer: `<span class="grow"></span><button class="btn" data-close>Close</button>${fill ? '<button class="btn primary" id="xf-save" type="button">Save values</button>' : ''}` });
+    body: `<style>.fm-tabs{display:flex;gap:4px;padding:3px;border-radius:10px;background:var(--surface-2);width:max-content;max-width:100%;margin:0 0 14px}.fm-tabs button{border:0;background:transparent;border-radius:8px;padding:6px 14px;font:inherit;font-size:13px;font-weight:600;color:var(--ink-2);cursor:pointer}.fm-tabs button[aria-selected=true]{background:var(--surface);color:var(--ink);box-shadow:0 1px 3px rgba(15,23,42,.12)}.fm-hint{margin:-6px 0 12px;font-size:12px;color:var(--ink-2)}</style>
+      ${tabs.length > 1 ? `<div class="fm-tabs" role="tablist">${tabs.map(([k, l]) => `<button type="button" role="tab" data-fm="${k}" aria-selected="${k === FM_TAB}">${l}</button>`).join('')}</div>` : ''}
+      <div data-fmp="fields"${FM_TAB === 'fields' ? '' : ' hidden'}>${list}${gonePending}${add}</div>
+      ${superAccess ? `<div data-fmp="who"${FM_TAB === 'who' ? '' : ' hidden'}><p class="fm-hint">Tick who gets a “Log &lt;field&gt;” button. Super admins can always log every field.</p><div id="xf-acc"><p class="sm muted">Loading…</p></div></div>` : ''}
+      ${fill ? `<div data-fmp="fill"${FM_TAB === 'fill' ? '' : ' hidden'}>${fill}</div>` : ''}<div class="err" id="xf-err" role="alert"></div>`,
+    footer: `<span class="grow"></span><button class="btn" data-close>Close</button>${fill ? `<button class="btn primary" id="xf-save" type="button"${FM_TAB === 'fill' ? '' : ' hidden'}>Save values</button>` : ''}` });
+  m.querySelectorAll('[data-fm]').forEach(b => b.addEventListener('click', () => {
+    FM_TAB = b.dataset.fm;
+    m.querySelectorAll('[data-fm]').forEach(x => x.setAttribute('aria-selected', String(x === b)));
+    m.querySelectorAll('[data-fmp]').forEach(x => { x.hidden = x.dataset.fmp !== FM_TAB; });
+    const sv = $('#xf-save', m); if (sv) sv.hidden = FM_TAB !== 'fill';
+  }));
+  m.querySelectorAll('[data-xf-fill]').forEach(b => b.addEventListener('click', () => openFieldsManager(b.dataset.xfFill, 'fill')));
   const err = t => { $('#xf-err', m).textContent = t; };
   if (superAccess) drawFieldAccess($('#xf-acc', m), names).catch(e => { const b = $('#xf-acc', m); if (b) b.innerHTML = `<p class="err">Could not load people: ${esc(e.message)}</p>`; });
   $('#xf-add', m)?.addEventListener('click', () => {
@@ -6521,20 +6537,24 @@ function renderApprovalRequests() {
   const warn = !ready ? '<p class="rc-note">Connect the attendance tracker (Settings › Save & sync) to approve.</p>' : '';
   const acts = r => canDecide() ? `<select aria-label="Leave type to approve for ${esc(r.name)}" title="Approve as this leave type" ${!ready ? 'disabled' : ''}>${LOG_TYPES.map(c => `<option value="${c}"${c === r.code ? ' selected' : ''}>${c}</option>`).join('')}</select><button class="btn sm primary" data-approve="${esc(r.id)}" ${!ready || S.saving ? 'disabled' : ''}>Approve</button><button class="btn sm" data-reject="${esc(r.id)}">Reject</button>` : '<span class="rq-st pending">Pending</span>';
   /* v3.28: Applications ahead (dates marked LA in the tracker) are part of To approve, below the requests */
+  /* v3.28.1: leave applications (LA in the tracker) have their own tab */
   const la = ready ? pendingApplications() : [], laPeople = new Set(la.map(x => applicationPerson(x.r))).size;
-  const laHtml = la.length ? `<div class="rc-la"><div class="rc-la-h"><b>Marked LA in the tracker</b><span class="sm muted">${laPeople} ${laPeople === 1 ? 'person' : 'people'} · ${la.length} day${la.length === 1 ? '' : 's'} from today on</span></div>${applicationList(la)}</div>` : '';
+  rcDraw('cardLeaveApps', ready && (canDecide() || can('att.who')),
+    `<div class="rc-top"><p class="rc-sub grow">${la.length ? `${laPeople} ${laPeople === 1 ? 'person has' : 'people have'} leave marked LA in the tracker · ${la.length} day${la.length === 1 ? '' : 's'} from today on. ` : ''}${canDecide() ? 'Approve a date or a whole stretch; Reject records RJ.' : 'Waiting for someone with the Approve leave right.'}</p></div>
+     <div class="rc-list">${la.length ? applicationList(la) : '<div class="rc-empty">No leave applications waiting.</div>'}</div>`,
+    root => { if (!root._laWired) { root._laWired = true; root.addEventListener('click', e => { const el = e.target.closest('[data-act="resolve-la"],[data-act="resolve-la-group"]'); if (!el) return; e.preventDefault(); ACTIONS[el.dataset.act](el, e); }); } });
   rcDraw('cardApprovalRequests', canDecide(),
     `<div class="rc-top"><p class="rc-sub grow">Waiting for your decision. Approved leave goes straight into attendance.</p><button class="btn sm" data-refresh title="Check for new requests">↻ Refresh</button></div>${warn}
-     <div class="rc-list">${pending.length ? pending.map(r => rqRow(r, acts(r))).join('') : la.length ? '' : '<div class="rc-empty">All caught up. Nothing to approve.</div>'}${laHtml}</div>`,
+     <div class="rc-list">${pending.length ? pending.map(r => rqRow(r, acts(r))).join('') : '<div class="rc-empty">All caught up. Nothing to approve.</div>'}</div>`,
     root => {
-      if (!root._laWired) { root._laWired = true; root.addEventListener('click', e => { const el = e.target.closest('[data-act="resolve-la"],[data-act="resolve-la-group"]'); if (!el) return; e.preventDefault(); ACTIONS[el.dataset.act](el, e); }); }
       root.querySelector('[data-refresh]').onclick = async e => { e.target.disabled = true; try { await window.loadTeamSettings(true); notifyReq(); } finally { renderApprovalRequests(); } };
       root.querySelectorAll('[data-approve]').forEach(b => { b.onclick = async () => { b.disabled = true; try { await approveRequest(b.dataset.approve, b.parentElement.querySelector('select').value); } finally { renderApprovalRequests(); } }; });
       root.querySelectorAll('[data-reject]').forEach(b => { b.onclick = () => openRejectBox(b.dataset.reject); });
     });
 }
 const laToDecide = () => { try { return canDecide() && S.status === 'ready' && S.ctx ? applicationGroups(pendingApplications()).length : 0; } catch { return 0; } };
-const requestCounts = () => { const b = requestBuckets(); return { approvals: b.approvals.length + laToDecide(), own: b.waiting.length, rejected: b.history.length }; };
+const laCount = () => { try { return S.status === 'ready' && S.ctx && (canDecide() || can('att.who')) ? applicationGroups(pendingApplications()).length : 0; } catch { return 0; } };
+const requestCounts = () => { const b = requestBuckets(); return { approvals: b.approvals.length, la: laCount(), own: b.waiting.length, rejected: b.history.length }; };
 /* ---------- a tracker row built from a workforce person ---------- */
 /* Emp ID, name and client come from the workforce file. Before the Date of Joining, and after the Left Date, the days are NA (as the tracker already does). */
 function newRosterRow(ms, rr, opts = {}) {
@@ -6939,7 +6959,7 @@ function mount() {
 @media (max-width:1000px) { .who-layout, .who-layout.apps-off { grid-template-columns:minmax(0,1fr); } .who-apps, .who-apps-min { position:static; min-height:0; } .who-apps-open { flex-direction:row; min-height:0; justify-content:center; } .who-apps-open em { writing-mode:horizontal-tb; transform:none; } }
 @media (max-width:700px) { .grid.g6[style*="repeat(4"] { grid-template-columns:repeat(2,minmax(0,1fr)) !important; } .card { padding:12px !important; } .tabs, .seg { flex-wrap:wrap; } table { font-size:12px; } .toolbar, .bar { flex-wrap:wrap; gap:6px; } }
 .tl-filters { display:flex; flex-wrap:wrap; align-items:center; gap:6px 8px; margin:10px 0 0; }
-/* v3.28.0: Who's out grid: even day columns, soft colored cells without boxes, calm weekends and a clear today */
+/* v3.28.1: Who's out grid: even day columns, soft colored cells without boxes, calm weekends and a clear today */
 table.who-tl { width:100%; table-layout:fixed; border-collapse:separate; border-spacing:0; }
 table.who-tl col.who-namecol { width:230px; }
 table.who-tl th, table.who-tl td { border-left:0 !important; border-right:0 !important; }
@@ -6960,7 +6980,7 @@ table.who-tl td.cell { width:auto; min-width:0; }
 table.who-tl td.cell .chip { width:100%; height:32px; border:0 !important; border-radius:7px; outline:0; box-shadow:none; font-size:12px; font-weight:700; letter-spacing:.02em; background:color-mix(in srgb,var(--c) 22%,var(--surface)); color:color-mix(in srgb,var(--c) 55%,var(--ink)); }
 table.who-tl td.cell.cc-applied .chip { background:repeating-linear-gradient(135deg,color-mix(in srgb,var(--c) 16%,var(--surface)) 0 6px,color-mix(in srgb,var(--c) 26%,var(--surface)) 6px 12px); }
 table.who-tl td.cell:hover .chip { filter:brightness(.96); }
-/* v3.28.0: the Who's out / Attendance / People bar stays at the top while scrolling */
+/* v3.28.1: the Who's out / Attendance / People bar stays at the top while scrolling */
 .topbar { top:var(--pinned-header-height, 0px) !important; z-index:20 !important; box-shadow:0 6px 10px -8px rgba(15,23,42,.18); }
 @media (max-width:700px) { .topbar { top:0 !important; } }
 .pp-bar { padding:12px 16px !important; }
@@ -7646,7 +7666,7 @@ async function poll() {
 }
 
 /* ============================== filtering ============================== */
-const APP = { title: "Team Dashboard", version: "3.28.0", released: "29 Sep 2026" };
+const APP = { title: "Team Dashboard", version: "3.28.1", released: "29 Sep 2026" };
 const BASE_DIMS = { status: "status_column", desig: "designation_column", client: "client_column", mode: "mode_column" };
 const STANDARD_STATUSES = ["Active", "Manager", "OJT", "Bench", "New", "Projected", "Left", "Moved"];
 const TILE_ORDER = ["Active", "Manager", "OJT", "Bench", "New", "Projected"];
@@ -8843,6 +8863,7 @@ function organizeRequests() {
   /* v3.20: To approve · Waiting · History. Each request is listed in exactly one tab. */
   const defs = [
     { id: "approvals", host: $("#cardApprovalRequests"), label: "To approve" },
+    { id: "la", host: $("#cardLeaveApps"), label: "Applications" },
     { id: "own", host: $("#cardMyRequests"), label: "Waiting" },
     { id: "rejected", host: $("#cardRejectedRequests"), label: "History" },
   ].filter(d => d.host);
@@ -8852,7 +8873,7 @@ function organizeRequests() {
   wrap.hidden = !vis.length; if (!vis.length) return;
   if (!OV.rc || !vis.some(d => d.id === OV.rc)) OV.rc = (vis.find(d => d.id !== "rejected" && d.n) || vis.find(d => d.id === "rejected") || vis[0]).id;
   for (const d of defs) d.host.classList.toggle("ov-off", d.id !== OV.rc);
-  ovTabs(bar, vis.map(d => ({ ...d, n: d.id === "rejected" ? null : d.n, hot: d.id === "approvals" && d.n > 0 })), OV.rc, id => { OV.rc = id; organizeRequests(); });
+  ovTabs(bar, vis.map(d => ({ ...d, n: d.id === "rejected" ? null : d.n, hot: (d.id === "approvals" || (d.id === "la" && window.PERM && PERM.can("att.approve"))) && d.n > 0 })), OV.rc, id => { OV.rc = id; organizeRequests(); });
 }
 /* v3.21: Record attendance straight from the Request Center */
 document.addEventListener("click", e => { if (e.target.closest && e.target.closest("#rcRecord")) { if (window.ATT && ATT.recordAttendance) ATT.recordAttendance(); } });
@@ -8872,7 +8893,7 @@ function organizeUpcoming() {
 function renderGlance() {
   const box = $("#ovGlance"); if (!box) return;
   const can = k => !window.PERM || PERM.can(k), tiles = [];
-  /* v3.28.0: one summary strip with drawn icons (emoji and flags don't show on every computer) */
+  /* v3.28.1: one summary strip with drawn icons (emoji and flags don't show on every computer) */
   const ICONS = { leave: '<path d="M3 21h18"/><path d="M12 3a9 9 0 0 1 9 9H3a9 9 0 0 1 9-9z"/><path d="M12 12v9"/>', req: '<rect x="5" y="3" width="14" height="18" rx="2"/><path d="M9 8h6M9 12h6M9 16h3"/>', cel: '<path d="M20 12v9H4v-9"/><rect x="2" y="7" width="20" height="5" rx="1"/><path d="M12 22V7"/><path d="M12 7c-2-4-6-4-6-1.5S10 7 12 7zM12 7c2-4 6-4 6-1.5S14 7 12 7z"/>', hol: '<rect x="3" y="5" width="18" height="16" rx="2"/><path d="M3 10h18M8 3v4M16 3v4"/><circle cx="12" cy="15" r="2"/>' };
   const svg = k => { const sp = h("span", { class: "ov-ic", "aria-hidden": "true" }); sp.innerHTML = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">' + ICONS[k] + '</svg>'; return sp; };
   const tile = (icon, tone, label, value, sub, go, badge) => h("button", { type: "button", class: "ov-tile " + tone, onclick: go },
@@ -8886,7 +8907,8 @@ function renderGlance() {
   }
   if (can("att.approve") && window.ATT) {
     const n = ATT.requestsToDecide ? ATT.requestsToDecide() : 0;
-    tiles.push(tile("req", "t-req" + (n ? " hot" : ""), "Waiting for approval", String(n), n ? "open Request Center" : "all caught up", jump("#ovRequests", () => { OV.rc = "approvals"; organizeRequests(); })));
+    const rc = ATT.requestCounts ? ATT.requestCounts() : { approvals: n, la: 0 };
+    tiles.push(tile("req", "t-req" + (n ? " hot" : ""), "Waiting for approval", String(n), n ? [rc.approvals ? rc.approvals + " request" + (rc.approvals === 1 ? "" : "s") : "", rc.la ? rc.la + " leave application" + (rc.la === 1 ? "" : "s") : ""].filter(Boolean).join(" · ") : "all caught up", jump("#ovRequests", () => { OV.rc = rc.approvals || !rc.la ? "approvals" : "la"; organizeRequests(); })));
   }
   if (can("ov.coming") && state.schema) {
     let b = 0, a = 0; try { b = upcoming("dob_column", "bday", 7).length; a = upcoming("doj_column", "anniv", 7).length; } catch { }
@@ -10922,9 +10944,13 @@ setTimeout(() => chatSync(), 1500);
 /* ---------- v3.15: leave requests waiting for a manager: badge on Attendance, refreshed every 45 seconds ---------- */
 function updateReqBadge() {
   window.ATT?.renderApprovalRequests(); window.organizeOverview?.();
-  const t = document.querySelector('.tab[data-view="attendance"]'); if (!t) return;
+  /* v3.28.1: the number sits on Overview, where Request Center is: requests + leave applications (LA) waiting for you */
+  document.querySelectorAll('.tab[data-view="attendance"] .tabn.req').forEach(x => x.remove());
+  const t = document.querySelector('.tab[data-view="summary"]'); if (!t) return;
   let b = t.querySelector('.tabn.req'); const n = window.ATT && ATT.requestsToDecide ? ATT.requestsToDecide() : 0;
-  if (!b) { b = h('span', { class: 'tabn req', title: 'Leave requests waiting for your approval' }); t.append(b); }
+  const nr = window.ATT && ATT.requestCounts ? ATT.requestCounts() : null;
+  if (!b) { b = h('span', { class: 'tabn req' }); t.append(b); }
+  b.title = nr ? (nr.approvals + ' request' + (nr.approvals === 1 ? '' : 's') + ' and ' + nr.la + ' leave application' + (nr.la === 1 ? '' : 's') + ' waiting for you in Request Center') : 'Waiting for your approval';
   b.textContent = String(n); b.hidden = !n;
 }
 let reqPolling = false;
