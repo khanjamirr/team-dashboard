@@ -4,7 +4,7 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <link rel="icon" href="data:,">
-<title>Team Dashboard · 3.41.0</title>
+<title>Team Dashboard · 3.41.3</title>
 <style>
 :root {
   color-scheme: light;
@@ -1810,10 +1810,10 @@ body.filters-locked #cleanFilters, body.filters-locked #xchips, body.filters-loc
     <p class="gate-sub">One place for your people, priorities and team insights.</p>
     <div id="connectBody"><div class="empty">Loading…</div></div>
   </div>
-  <p class="gate-ver">3.41.0</p>
+  <p class="gate-ver">3.41.3</p>
 </section>
 
-<div id="app" hidden><aside class="sidebar" aria-label="Workspace navigation"><div class="brand dashboard-identity">      <h1><span id="title">Team Dashboard</span><span class="ver" id="ver" title="Version 3.41.0">3.41.0</span></h1><p class="brand-tag">One place for your people, priorities and team insights.</p>      <span class="sync" id="sync" role="status"><i></i><span id="syncText">Loading…</span></span></div><div class="nav-label">WORKSPACE</div>      <nav class="tabs" role="tablist" aria-label="Pages" aria-orientation="vertical">
+<div id="app" hidden><aside class="sidebar" aria-label="Workspace navigation"><div class="brand dashboard-identity">      <h1><span id="title">Team Dashboard</span><span class="ver" id="ver" title="Version 3.41.3">3.41.3</span></h1><p class="brand-tag">One place for your people, priorities and team insights.</p>      <span class="sync" id="sync" role="status"><i></i><span id="syncText">Loading…</span></span></div><div class="nav-label">WORKSPACE</div>      <nav class="tabs" role="tablist" aria-label="Pages" aria-orientation="vertical">
         <button class="tab on" role="tab" aria-controls="pageSummary" data-view="summary" aria-selected="true" data-icon="🏠" data-short="Home">Overview</button>
         <button class="tab" role="tab" aria-controls="pageEmployees" data-view="employees" aria-selected="false" data-icon="👥" data-short="People">Employees</button>
       <button class="tab" role="tab" aria-controls="pageAttendance" data-view="attendance" aria-selected="false" data-icon="🗓️" data-short="Attend.">Attendance</button>
@@ -7681,8 +7681,9 @@ function renderCard(el, opts = {}) {
       const list = T[C.tab].slice().sort((a, b) => nm(a.r).localeCompare(nm(b.r)));
       const listCopy = C.tab === 'late' || !canBackup() ? tableData(['Employee', 'Client', 'Code', 'Status'], list.map(x => [nm(x.r), cl(x.r), String(x.v).trim().toUpperCase(), x.c === 'applied' ? 'Awaiting approval' : labelOf(x.v)]), (C.tab === 'late' ? 'Late comings' : C.tab === 'half' ? 'Half days' : 'Out') + ' on ' + longDate(rd)) : (() => {
         /* v3.36.0: client copy: date + title on top, then pseudo name · backup · remarks (blank to fill in) */
+        const pOfRow = r => { try { const w = rowRoster(r), v = w && pseudoCol ? String(g(w, pseudoCol) ?? '').trim() : ''; return v || pOf(r.name.trim()); } catch { return r.name.trim(); } };   /* v3.41.3: pseudo name via the matched workforce row (Emp ID first) */
         const pOf = n => { if (!pseudoCol || !n) return n; try { const w = rosterRows().find(r => personKey(gs(r, 'name_column')) === personKey(n)); const v = w ? String(g(w, pseudoCol) ?? '').trim() : ''; return v || n; } catch { return n; } };
-        const recs = list.filter(x => { if (x.c === 'applied') return false; const b = bkGet(personKey(x.r.name), rdIso); return !!b && !bkLive(b); }).map(x => {   /* v3.40.2: only days marked Backup Provided / Not Provided */ const k = personKey(x.r.name), b = bkGet(k, rdIso); return [pOf(x.r.name.trim()), (bkYes(b) ? 'Backup Provided' : 'Backup Not Provided') + (b && b.half ? ' (half day)' : ''), bkRemark(k, rdIso)]; });
+        const recs = list.filter(x => { if (x.c === 'applied') return false; const b = bkGet(personKey(x.r.name), rdIso); return !!b && !bkLive(b); }).map(x => {   /* v3.40.2: only days marked Backup Provided / Not Provided */ const k = personKey(x.r.name), b = bkGet(k, rdIso); return [pOfRow(x.r), (bkYes(b) ? 'Backup Provided' : 'Backup Not Provided') + (b && b.half ? ' (half day)' : ''), bkRemark(k, rdIso)]; });
         return { headers: [pseudoCol ? 'Name' : 'Employee', 'Backup', 'Remarks'], records: recs, caption: (isToday ? "Today's attendance record" : 'Attendance record') + ' · ' + longDate(rd), top: [longDate(rd), isToday ? "Today's attendance record" : 'Attendance record'] };
       })();
       renderCard._copy = { ...renderCard._copy, today: listCopy };
@@ -7690,7 +7691,7 @@ function renderCard(el, opts = {}) {
       const miniList = list.length ? `<ul class="att-mini">${list.map(x => `<li><span class="att-mini-n">${esc(nm(x.r))}${can('att.info') ? `<button type="button" class="rq-i" data-lainfo="${esc(x.r.name.trim())}" aria-label="Past and upcoming leave of ${esc(nm(x.r))}">i</button>` : ''}</span><span class="att-mini-c">${esc(cl(x.r))}</span><span class="ph-chip c-${esc(x.c)}">${esc(String(x.v).trim().toUpperCase())}</span><span class="att-mini-s">${esc(x.c === 'applied' ? 'Awaiting approval' : labelOf(x.v))}</span>${C.tab === 'late' || !canBackup() ? '<span></span>' : (() => { const k = personKey(x.r.name), b = bkGet(k, rdIso); return `<span class="att-bkc"><em class="bk-yn ${bkYNCls(b)}" title="Backup provided: ${bkYN(b)}">${bkYN(b)}</em>` + (b ? `<button type="button" class="att-bk ${b.live ? 'live' : b.none || b.no ? 'none' : 'set'}" data-bk="${esc(k)}" ${canBackup() ? '' : 'disabled'} title="${esc(bkLabel(b))}">${b.live ? '◉ ' + (b.b ? esc(b.b) : 'Shown live') + (b.half ? ' · ½' : '') : (b.no ? '✕ ' : '↪ ') + (b.b ? esc(b.b) : b.no ? 'Not provided' : 'Provided') + (b.half ? ' · ½' : '')}</button>` : canBackup() ? `<button type="button" class="att-bk add" data-bk="${esc(k)}">+ Backup</button>` : '<span class="att-bk-no">No backup</span>') + '</span>'; })()}</li>`).join('')}</ul>` : `<div class="att-mini-empty">${emptyTxt}</div>`;
       const needBk = C.tab === 'late' ? [] : list, covered = needBk.filter(x => { const b = bkGet(personKey(x.r.name), rdIso); return b && !b.no; }).length;
       const bkLine = needBk.length && canBackup() ? `<div class="att-bk-sum ${covered === needBk.length ? 'ok' : ''}">Backups: <b>${covered} of ${needBk.length}</b> covered${covered < needBk.length ? ' · ' + (needBk.length - covered) + ' without a backup' : ''}</div>` : '';
-      html = head2 + `<div class="att-tabs">${tabBtn('leave', nFull, ' on leave', (nHalf ? ` <em>incl. ${nHalf} half day</em>` : '') + (nLa ? ` <em>+${nLa} awaiting</em>` : ''))}${tabBtn('late', T.late.length, ' late')}<span class="grow"></span>${copyBtn('today', listCopy)}${listCopy.top && listCopy.records.length ? `<button class="btn mini" data-att-mail title="Compose the attendance update email (opens in Outlook or your mail app)">✉ Email</button>` : ''}${pseudoCol ? `<button type="button" class="btn mini names1" data-att-names="${C.names === 'pseudo' ? 'real' : 'pseudo'}" aria-pressed="${C.names === 'pseudo'}" title="Switch between real and pseudo names">${C.names === 'pseudo' ? 'Pseudo names ⇄' : 'Real names ⇄'}</button>` : ''}</div>` + bkLine + miniList;
+      html = head2 + `<div class="att-tabs">${tabBtn('leave', nFull, ' on leave', (nHalf ? ` <em>incl. ${nHalf} half day</em>` : '') + (nLa ? ` <em>+${nLa} awaiting</em>` : ''))}${tabBtn('late', T.late.length, ' late')}<span class="grow"></span>${copyBtn('today', listCopy)}${listCopy.top && listCopy.records.length ? `<button class="btn mini" data-att-mail title="Opens a new Outlook email for the client (pseudo names). The update is copied: press Ctrl+V above your signature.">✉ Email</button><button class="btn mini ghost" data-att-mailset title="Set who the email goes to (To / Cc)" aria-label="Email recipients">⚙</button>` : ''}${pseudoCol ? `<button type="button" class="btn mini names1" data-att-names="${C.names === 'pseudo' ? 'real' : 'pseudo'}" aria-pressed="${C.names === 'pseudo'}" title="Switch between real and pseudo names">${C.names === 'pseudo' ? 'Pseudo names ⇄' : 'Real names ⇄'}</button>` : ''}</div>` + bkLine + miniList;
     }
   }
   if (S.status === 'ready' && S.ctx && hasRoster()) { const n = rosterGaps().missing.length, u = rosterGaps().notInRoster.length; const bits = []; if (n) bits.push(`${n} ${n === 1 ? 'person' : 'people'} in the workforce file ${n === 1 ? 'isn’t' : 'aren’t'} in the attendance tracker yet`); if (u) bits.push(`${u} tracker ${u === 1 ? 'name doesn’t' : 'names don’t'} match the workforce file`); if (bits.length) html += `<div class="hint" style="margin-top:12px">${bits.join(' · ')}. <button class="linkbtn" data-att-go="health">Fix in Action center</button></div>`; }
@@ -7704,7 +7705,8 @@ function renderCard(el, opts = {}) {
   el.querySelectorAll('[data-att-names]').forEach(b => b.addEventListener('click', () => { S.ui.card.names = b.dataset.attNames; saveCardUi(); again(); }));
   if (!opts.hist) leaveTipDelegate(el);
   el.querySelectorAll('[data-att-go]').forEach(b => b.addEventListener('click', () => { const v = b.dataset.attGo; if (v === 'who' && refDay().getTime() !== TODAY.getTime()) S.ui.who.start = isoDate(refDay()); go(v); if (b.dataset.attNew) setTimeout(() => ACTIONS['new-month'](), 60); }));
-  el.querySelector('[data-att-mail]')?.addEventListener('click', () => { const t = (renderCard._copy || {}).today; if (t) openAttMail(t, refDay()); });
+  el.querySelector('[data-att-mail]')?.addEventListener('click', () => { const t = (renderCard._copy || {}).today; if (t) sendAttMail(t, refDay()); });
+  el.querySelector('[data-att-mailset]')?.addEventListener('click', openAttMailSettings);
   el.querySelectorAll('[data-att-copy]').forEach(b => b.addEventListener('click', async () => {
     const text = (renderCard._copy || {})[b.dataset.attCopy];
     if (!text?.records.length) { toast('Nothing to copy.'); return; }
@@ -7734,44 +7736,68 @@ function attMailHtml(data, dt) {
   const table = `<table style="border-collapse:collapse;font-family:Calibri,'Segoe UI',Arial,sans-serif;font-size:11pt"><thead><tr>${data.headers.map(h => `<th style="${th}">${e(h)}</th>`).join('')}</tr></thead><tbody>${data.records.map(r => `<tr>${r.map(v => `<td style="${td}">${e(v) || '&nbsp;'}</td>`).join('')}</tr>`).join('')}</tbody></table>`;
   return { day, table };
 }
+/* v3.41.3: one click: copy the update (pseudo names) and open a new Outlook email with your signature */
+const attMailTo = () => { try { return JSON.parse(localStorage.getItem(MAIL_KEY) || '{}') || {}; } catch { return {}; } };
+async function sendAttMail(data, dt) {
+  const { day, table } = attMailHtml(data, dt), isToday = dt.getTime() === TODAY.getTime(), saved = attMailTo();
+  const subj = 'Attendance Update – ' + day, hi = 'Hi Team,', intro = 'Please see below for ' + (isToday ? 'today’s' : 'the') + ' attendance update as of ' + day + '.';
+  const e = v => String(v ?? '').replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;');
+  const html = `<div style="font-family:Calibri,'Segoe UI',Arial,sans-serif;font-size:11pt;color:#1f2937"><p style="margin:0 0 12px">${e(hi)}</p><p style="margin:0 0 12px">${e(intro)}</p>${table}<p style="margin:12px 0 0">&nbsp;</p></div>`;
+  const plain = hi + '\n\n' + intro + '\n\n' + [data.headers, ...data.records].map(r => r.join('\t')).join('\n');
+  let copied = false; try { await navigator.clipboard.write([new ClipboardItem({ 'text/html': new Blob([html], { type: 'text/html' }), 'text/plain': new Blob([plain], { type: 'text/plain' }) })]); copied = true; } catch { try { await navigator.clipboard.writeText(plain); copied = true; } catch { } }
+  const addrs = v => String(v || '').split(/[;,]/).map(x => x.trim()).filter(Boolean).join(';');
+  const q = ['subject=' + encodeURIComponent(subj), saved.cc ? 'cc=' + encodeURIComponent(addrs(saved.cc)) : '', copied ? '' : 'body=' + encodeURIComponent(plain)].filter(Boolean).join('&');
+  const a = document.createElement('a'); a.href = 'mailto:' + encodeURIComponent(addrs(saved.to)).replace(/%40/g, '@').replace(/%3B/g, ';') + '?' + q; a.click();
+  toast(copied ? 'Outlook is opening. Click above your signature and press Ctrl+V to paste the update.' : 'Outlook is opening. Copying was blocked, so the update is in the body as plain text.');
+}
+function openAttMailSettings() {
+  const saved = attMailTo();
+  const m = openModal({ title: 'Attendance email recipients',
+    body: `<div class="form"><label class="full">To<input type="text" id="am-to" value="${esc(saved.to || '')}" placeholder="name@client.com; another@client.com" autocomplete="off"></label><label class="full">Cc<input type="text" id="am-cc" value="${esc(saved.cc || '')}" placeholder="optional" autocomplete="off"></label></div><p class="sm muted" style="margin:10px 0 0">Saved on this browser. ✉ Email then opens Outlook straight away with these filled in.</p>`,
+    footer: `<span class="grow"></span><button class="btn" data-close>Cancel</button><button class="btn primary" id="am-save">Save</button>` });
+  $('#am-save', m).onclick = () => { try { localStorage.setItem(MAIL_KEY, JSON.stringify({ to: $('#am-to', m).value.trim(), cc: $('#am-cc', m).value.trim() })); } catch { } closeModal(); toast('Recipients saved.'); };
+}
+const MAIL_SIG_KEY = 'td_mail_sig_v1';
+/* keep pasted signatures safe: no scripts, no event handlers, no javascript: links */
+const cleanSig = html => { const t = document.createElement('template'); t.innerHTML = String(html || ''); t.content.querySelectorAll('script,style,iframe,object,embed,link,meta').forEach(n => n.remove()); t.content.querySelectorAll('*').forEach(n => { for (const at of [...n.attributes]) { if (/^on/i.test(at.name) || /^\s*javascript:/i.test(at.value)) n.removeAttribute(at.name); } }); return t.innerHTML.trim(); };
 function openAttMail(data, dt) {
+  /* v3.41.1: a short box: To, Cc and the signature (set once). Subject, greeting and opening line are automatic. */
   let saved = {}; try { saved = JSON.parse(localStorage.getItem(MAIL_KEY) || '{}') || {}; } catch { }
+  let sig = ''; try { sig = localStorage.getItem(MAIL_SIG_KEY) || ''; } catch { }
   const { day, table } = attMailHtml(data, dt), isToday = dt.getTime() === TODAY.getTime();
-  const subj0 = 'Attendance Update – ' + day, intro0 = 'Please see below for ' + (isToday ? 'today’s' : 'the') + ' attendance update as of ' + day + '.';
+  const subj = 'Attendance Update – ' + day, hi = 'Hi Team,', intro = 'Please see below for ' + (isToday ? 'today’s' : 'the') + ' attendance update as of ' + day + '.';
   const m = openModal({ title: 'Email the attendance update', wide: true,
     body: `<div class="form"><label>To<input type="text" id="am-to" value="${esc(saved.to || '')}" placeholder="name@client.com; another@client.com" autocomplete="off"></label>
-      <label>Cc<input type="text" id="am-cc" value="${esc(saved.cc || '')}" placeholder="optional" autocomplete="off"></label>
-      <label class="full">Subject<input type="text" id="am-subj" value="${esc(subj0)}"></label>
-      <label class="full">Greeting<input type="text" id="am-hi" value="${esc(saved.hi || 'Hi Team,')}"></label>
-      <label class="full">Opening line<input type="text" id="am-intro" value="${esc(intro0)}"></label></div>
-      <p class="sm" style="margin:12px 0 6px;font-weight:600">Preview</p>
-      <div id="am-prev" style="border:1px solid var(--border,#e3e6ec);border-radius:10px;padding:14px 16px;background:#fff;color:#1f2937;font-family:Calibri,'Segoe UI',Arial,sans-serif;font-size:11pt;max-height:300px;overflow:auto"></div>
-      <div class="err" id="am-err"></div>`,
-    footer: `<span class="sm muted">To and Cc are remembered on this browser.</span><span class="grow"></span><button class="btn" id="am-mailto" title="Opens your default mail app and copies the table, so you paste it into the message">Default mail app</button><button class="btn primary" id="am-eml" title="Opens a ready-to-send draft in Outlook (classic) or the app that opens .eml files">Open in Outlook</button>` });
+      <label>Cc<input type="text" id="am-cc" value="${esc(saved.cc || '')}" placeholder="optional" autocomplete="off"></label></div>
+
+      <p class="sm" style="margin:12px 0 6px;font-weight:600">Preview <span class="muted" style="font-weight:400">· ${esc(subj)}</span></p>
+      <div id="am-prev" style="border:1px solid var(--border,#e3e6ec);border-radius:10px;padding:14px 16px;background:#fff;color:#1f2937;font-family:Calibri,'Segoe UI',Arial,sans-serif;font-size:11pt;max-height:280px;overflow:auto"></div>`,
+    footer: `<span class="sm muted" style="max-width:52%">Opens a new Outlook email with your default signature. The update is copied: click above the signature and press <b>Ctrl+V</b>.</span><span class="grow"></span><button class="btn" id="am-eml" title="Saves a ready-to-send draft file (.eml). Outlook does not add a signature to drafts opened from a file.">Save as draft file</button><button class="btn primary" id="am-mailto" title="Opens a new email in Outlook (or your default mail app) with your signature, and copies the update to paste">Open in Outlook</button>` });
   const val = id => $('#' + id, m).value.trim();
   const e = v => String(v ?? '').replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;');
-  const bodyHtml = () => `<div style="font-family:Calibri,'Segoe UI',Arial,sans-serif;font-size:11pt;color:#1f2937"><p style="margin:0 0 12px">${e(val('am-hi'))}</p><p style="margin:0 0 12px">${e(val('am-intro'))}</p>${table}<p style="margin:12px 0 0">&nbsp;</p></div>`;
+  const sigHtml = () => '';   /* v3.41.2: Outlook adds your own default signature to the new message */
+  const bodyHtml = () => `<div style="font-family:Calibri,'Segoe UI',Arial,sans-serif;font-size:11pt;color:#1f2937"><p style="margin:0 0 12px">${e(hi)}</p><p style="margin:0 0 12px">${e(intro)}</p>${table}<p style="margin:12px 0 0">&nbsp;</p>${sigHtml() ? '<div style="margin-top:6px">' + sigHtml() + '</div>' : ''}</div>`;
   const prev = () => { $('#am-prev', m).innerHTML = bodyHtml(); };
-  m.querySelectorAll('input').forEach(i => i.addEventListener('input', prev)); prev();
-  const remember = () => { try { localStorage.setItem(MAIL_KEY, JSON.stringify({ to: val('am-to'), cc: val('am-cc'), hi: val('am-hi') })); } catch { } };
+  prev();
+  const remember = () => { try { localStorage.setItem(MAIL_KEY, JSON.stringify({ to: val('am-to'), cc: val('am-cc') })); } catch { } };
   const b64 = str => { const bytes = new TextEncoder().encode(str); let bin = ''; for (let i = 0; i < bytes.length; i += 0x8000) bin += String.fromCharCode(...bytes.subarray(i, i + 0x8000)); return btoa(bin).replace(/.{76}/g, '$&\r\n'); };
   const addrs = v => v.split(/[;,]/).map(x => x.trim()).filter(Boolean).join(', ');
   $('#am-eml', m).onclick = () => {
     remember();
     const html = '<!doctype html><html><head><meta charset="utf-8"></head><body>' + bodyHtml() + '</body></html>';
-    const subjEnc = '=?UTF-8?B?' + b64(val('am-subj')).replace(/\r\n/g, '') + '?=';
-    const eml = [val('am-to') ? 'To: ' + addrs(val('am-to')) : 'To: ', val('am-cc') ? 'Cc: ' + addrs(val('am-cc')) : null, 'Subject: ' + subjEnc, 'X-Unsent: 1', 'MIME-Version: 1.0', 'Content-Type: text/html; charset=UTF-8', 'Content-Transfer-Encoding: base64', '', b64(html)].filter(x => x != null).join('\r\n');
-    const a = document.createElement('a'); a.href = URL.createObjectURL(new Blob([eml], { type: 'message/rfc822' })); a.download = (val('am-subj').replace(/[\u2013\u2014]/g, '-').replace(/[^\x20-\x7e]/g, '').replace(/[\\/:*?"<>|]+/g, '-').trim().slice(0, 80) || 'Attendance update') + '.eml';   /* plain ASCII: some browsers drop non-ASCII names */
+    const eml = ['To: ' + addrs(val('am-to')), val('am-cc') ? 'Cc: ' + addrs(val('am-cc')) : null, 'Subject: =?UTF-8?B?' + b64(subj).replace(/\r\n/g, '') + '?=', 'X-Unsent: 1', 'MIME-Version: 1.0', 'Content-Type: text/html; charset=UTF-8', 'Content-Transfer-Encoding: base64', '', b64(html)].filter(x => x != null).join('\r\n');
+    const a = document.createElement('a'); a.href = URL.createObjectURL(new Blob([eml], { type: 'message/rfc822' }));
+    a.download = (subj.replace(/[–—]/g, '-').replace(/[^\x20-\x7e]/g, '').replace(/[\\/:*?"<>|]+/g, '-').trim().slice(0, 80) || 'Attendance update') + '.eml';   /* plain ASCII: some browsers drop non-ASCII names */
     document.body.append(a); a.click(); setTimeout(() => { URL.revokeObjectURL(a.href); a.remove(); }, 2000);
     closeModal(); toast('Draft saved. Open it from your downloads: it opens in Outlook as a new email, ready to send.');
   };
   $('#am-mailto', m).onclick = async () => {
     remember();
-    const html = bodyHtml(), plain = val('am-hi') + '\n\n' + val('am-intro') + '\n\n' + [data.headers, ...data.records].map(r => r.join('\t')).join('\n');
+    const html = bodyHtml(), plain = hi + '\n\n' + intro + '\n\n' + [data.headers, ...data.records].map(r => r.join('\t')).join('\n');
     let copied = false; try { await navigator.clipboard.write([new ClipboardItem({ 'text/html': new Blob([html], { type: 'text/html' }), 'text/plain': new Blob([plain], { type: 'text/plain' }) })]); copied = true; } catch { try { await navigator.clipboard.writeText(plain); copied = true; } catch { } }
-    const q = ['subject=' + encodeURIComponent(val('am-subj')), val('am-cc') ? 'cc=' + encodeURIComponent(addrs(val('am-cc'))) : '', 'body=' + encodeURIComponent(copied ? '(Paste here: Ctrl+V)' : val('am-hi') + '\n\n' + val('am-intro'))].filter(Boolean).join('&');
+    const q = ['subject=' + encodeURIComponent(subj), val('am-cc') ? 'cc=' + encodeURIComponent(addrs(val('am-cc'))) : '', 'body=' + encodeURIComponent(copied ? '' : hi + '\n\n' + intro)].filter(Boolean).join('&');
     const a = document.createElement('a'); a.href = 'mailto:' + encodeURIComponent(addrs(val('am-to'))).replace(/%40/g, '@').replace(/%2C%20/g, ',') + '?' + q; a.click();
-    closeModal(); toast(copied ? 'Mail app opening. The greeting and table are copied: select the body and press Ctrl+V.' : 'Mail app opening. Copying was blocked, so paste the table with Copy table.');
+    closeModal(); toast(copied ? 'Outlook is opening with your signature. Click above the signature and press Ctrl+V to paste the update.' : 'Mail app opening. Copying was blocked, so use Copy table and paste it.');
   };
 }
 const C_set = iso => { S.ui.card.date = iso && iso !== isoDate(TODAY) ? iso : null; };
@@ -8217,7 +8243,7 @@ async function poll() {
 }
 
 /* ============================== filtering ============================== */
-const APP = { title: "Team Dashboard", version: "3.41.0", released: "30 Sep 2026" };
+const APP = { title: "Team Dashboard", version: "3.41.3", released: "30 Sep 2026" };
 const BASE_DIMS = { status: "status_column", desig: "designation_column", client: "client_column", mode: "mode_column" };
 const STANDARD_STATUSES = ["Active", "Manager", "OJT", "Bench", "New", "Projected", "Left", "Moved"];
 const TILE_ORDER = ["Active", "Manager", "OJT", "Bench", "New", "Projected"];
