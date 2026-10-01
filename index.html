@@ -4,7 +4,7 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <link rel="icon" href="data:,">
-<title>Team Dashboard · 3.43.4</title>
+<title>Team Dashboard · 3.44.0</title>
 <style>
 :root {
   color-scheme: light;
@@ -1814,10 +1814,10 @@ body.filters-locked #cleanFilters, body.filters-locked #xchips, body.filters-loc
     <p class="gate-sub">One place for your people, priorities and team insights.</p>
     <div id="connectBody"><div class="empty">Loading…</div></div>
   </div>
-  <p class="gate-ver">3.43.4</p>
+  <p class="gate-ver">3.44.0</p>
 </section>
 
-<div id="app" hidden><aside class="sidebar" aria-label="Workspace navigation"><div class="brand dashboard-identity">      <h1><span id="title">Team Dashboard</span><span class="ver" id="ver" title="Version 3.43.4">3.43.4</span></h1><p class="brand-tag">One place for your people, priorities and team insights.</p>      <span class="sync" id="sync" role="status"><i></i><span id="syncText">Loading…</span></span></div><div class="nav-label">WORKSPACE</div>      <nav class="tabs" role="tablist" aria-label="Pages" aria-orientation="vertical">
+<div id="app" hidden><aside class="sidebar" aria-label="Workspace navigation"><div class="brand dashboard-identity">      <h1><span id="title">Team Dashboard</span><span class="ver" id="ver" title="Version 3.44.0">3.44.0</span></h1><p class="brand-tag">One place for your people, priorities and team insights.</p>      <span class="sync" id="sync" role="status"><i></i><span id="syncText">Loading…</span></span></div><div class="nav-label">WORKSPACE</div>      <nav class="tabs" role="tablist" aria-label="Pages" aria-orientation="vertical">
         <button class="tab on" role="tab" aria-controls="pageSummary" data-view="summary" aria-selected="true" data-icon="🏠" data-short="Home">Overview</button>
         <button class="tab" role="tab" aria-controls="pageEmployees" data-view="employees" aria-selected="false" data-icon="👥" data-short="People">Employees</button>
       <button class="tab" role="tab" aria-controls="pageAttendance" data-view="attendance" aria-selected="false" data-icon="🗓️" data-short="Attend.">Attendance</button>
@@ -5285,6 +5285,8 @@ function applicationList(entries) {
   }).join('');
 }
 function laWithBackup(cells, code) {
+  /* v3.44.0: leave applications are approved straight away; the backup is asked one day before the leave (see bkDueCheck) */
+  return resolveApplications(cells, code);
   if (code === 'RJ' || !cells.length) return resolveApplications(cells, code);
   const es = cells.map(c => { const [u, i] = c.split(':'); return { r: rowByUid(u), i: +i }; }).filter(x => x.r);
   if (!es.length) return resolveApplications(cells, code);
@@ -7348,13 +7350,13 @@ function openBackupBox(pKey, iso, onDone, opts = {}) {
     ${opts.collect ? `<p class="sm" style="margin:-4px 0 12px;padding:8px 10px;border-radius:10px;background:color-mix(in srgb,#d97706 10%,transparent);color:var(--ink-2,#445)"><b>Backup is required.</b> Choose one option; the leave is saved together with it.</p>` : ''}
     <div class="bkx-opts" role="radiogroup" aria-label="Backup">${OPT.map(([k, t, sub, c, ico]) => `<button type="button" class="bkx-o" role="radio" data-bkx="${k}" aria-checked="${curK === k}" style="--oc:${c}"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">${ico}</svg><b>${t}</b><small>${sub}</small></button>`).join('')}</div>
     <div class="bkx-yes${curK === 'no' ? ' no' : curK === 'live' ? ' live' : ''}" id="bkx-yes" ${curK ? '' : 'hidden'}>
-      <div class="bkx-row">Cover for <span class="bkx-seg" role="group" aria-label="Cover for"><button type="button" data-bkh="full" aria-pressed="${!(cur && cur.half)}">Full day</button><button type="button" data-bkh="half" aria-pressed="${!!(cur && cur.half)}">Half day</button></span></div>
+      <div class="bkx-row">Cover for <em style="font-style:normal;font-weight:400;color:#c63b3a">required</em> <span class="bkx-seg" role="group" aria-label="Cover for"><button type="button" data-bkh="full" aria-pressed="false">Full day</button><button type="button" data-bkh="half" aria-pressed="false">Half day</button></span></div>
       ${nmMode === 'off' ? '' : `<label id="bkx-pwrap" ${curK === 'no' ? 'style="display:none"' : ''}><span id="bkx-plbl">${curK === 'live' ? 'Taken care of by' : 'Backup person'}</span> <em id="bkx-pem">${nmMode === 'optional' || curK !== 'yes' ? 'optional · anyone in the current team' : 'anyone in the current team'}</em><input type="text" id="bk-name" list="bk-list" value="${esc(cur && cur.b ? cur.b : '')}" placeholder="${nmMode === 'optional' ? 'Type or pick a name, or leave blank' : 'Type or pick a name'}" autocomplete="off"><datalist id="bk-list">${team.map(t => `<option value="${esc(t.name)}" label="${esc([t.id && 'ID ' + t.id, t.sub, t.out ? 'also off that day' : ''].filter(Boolean).join(' · '))}"></option>`).join('')}</datalist></label>`}
     </div>
     <label class="bkx-rm" id="bkx-rm" ${opts.collect || curK ? '' : 'hidden'}>${opts.collect ? 'Comments / remarks <em style="color:#c63b3a">required</em>' : 'Remarks <em>optional · copied as written</em>'}<textarea id="bk-rm" rows="2" maxlength="200" placeholder="${opts.collect ? 'Write a comment' : 'Optional note'}">${esc(bkRemark(pKey, iso))}</textarea></label>
     <div class="err" id="bk-err"></div>`,
     footer: `<span class="grow"></span><button class="btn" data-close>Cancel</button><button class="btn primary" id="bk-go" ${curK ? '' : 'disabled'}>${esc(opts.confirm || 'Save')}</button>` });
-  let pick = curK, half = !!(cur && cur.half);
+  let pick = curK, half = null;   /* v3.44.0: Full day / Half day is always chosen on purpose (blank to start) */
   const kind = () => pick, isHalf = () => half;
   m.querySelectorAll('[data-bkx]').forEach(b => b.addEventListener('click', () => {
     pick = b.dataset.bkx; m.querySelectorAll('[data-bkx]').forEach(x => x.setAttribute('aria-checked', String(x === b)));
@@ -7378,6 +7380,7 @@ function openBackupBox(pKey, iso, onDone, opts = {}) {
   $('#bk-go', m).onclick = async () => {
     const write = v => write0(v ? { ...v, remark: rmv() } : v);
     /* v3.43.4: when approving or recording leave, a comment is required */
+    if (kind() && half === null) { $('#bk-err', m).textContent = 'Choose Cover for: Full day or Half day.'; return; }
     if (opts.collect && rmv().trim().length < 2) { $('#bk-err', m).textContent = 'Add a comment / remark first.'; $('#bk-rm', m)?.focus(); return; }
     try {
       if (kind() === 'live') { const vl = !$('#bk-name', m) ? '' : $('#bk-name', m).value.trim(), hl = vl ? team.find(t => t.name.toLowerCase() === vl.toLowerCase()) : null;
@@ -7442,6 +7445,45 @@ function approveWithBackup(pKey, name, isos, approve, label) {
   const days = [...new Set(isos)].sort();
   openBackupBox(pKey, days[0], null, { days, confirm: label || 'Save backup & approve', collect: async val => { await approve(val, days); } });
 }
+
+/* v3.44.0: one day before (and on the day), admins must set the backup for everyone on leave who doesn't have one yet.
+   A reminder box lists them; "Remind me in 1 minute" closes it and it comes back a minute later until every one is set. */
+const BKDUE = { snooze: 0, timer: null, box: null };
+function bkDueList() {
+  if (S.status !== 'ready' || !S.ctx || !canBackup()) return [];
+  const d = D(true), out = new Map(), days = [TODAY, new Date(TODAY.getTime() + 86400000)];
+  for (const dt of days) {
+    const ms = Engine.monthSerial(dt.getUTCFullYear(), dt.getUTCMonth()), i = dt.getUTCDate() - 1, iso = isoDate(dt);
+    for (const r of d.byMonth.get(ms) || []) {
+      const c = catOf(r.days[i]); if (!c || !LEAVE_CATS.has(c)) continue;
+      const k = personKey(r.name); if (bkGet(k, iso) || !bkActive(k)) continue;
+      const o = out.get(k) || { key: k, name: r.name.trim(), items: [] }; o.items.push({ iso, code: String(r.days[i]).trim().toUpperCase() }); out.set(k, o);
+    }
+  }
+  return [...out.values()];
+}
+function bkDueCheck(force) {
+  if (!force && Date.now() < BKDUE.snooze) return;
+  if (BKDUE.box && BKDUE.box.isConnected) return;
+  if (document.querySelector('.veil, .cel-veil, [role=alertdialog]') || (ROOT && ROOT.querySelector && ROOT.querySelector('.veil'))) return;   // another box is open: try again later
+  const list = bkDueList(); if (!list.length) return;
+  const v = document.createElement('div'); BKDUE.box = v; v.style.cssText = 'position:fixed;inset:0;z-index:9990;background:rgba(10,14,24,.5);display:grid;place-items:center;padding:16px';
+  const day = iso => iso === isoDate(TODAY) ? 'today' : 'tomorrow';
+  v.innerHTML = `<div role="alertdialog" aria-modal="true" aria-label="Backup needed" style="background:var(--surface,#fff);color:var(--ink,#1f2937);border:1px solid var(--border,#e3e6ec);border-top:4px solid #e34948;border-radius:14px;padding:18px 20px;width:min(560px,100%);max-height:calc(100vh - 32px);overflow:auto;box-shadow:0 20px 60px rgba(0,0,0,.35)">
+    <h3 style="margin:0 0 6px;font-size:17px">Backup needed for upcoming leave</h3>
+    <p style="margin:0 0 12px;font-size:13.5px;color:var(--ink-2,#445)">${list.length === 1 ? 'This person is' : 'These people are'} on leave today or tomorrow and no backup is set yet. Choose <b>Backup Provided</b>, <b>Backup Not Provided</b> or <b>Seat Shown Live</b> for each.</p>
+    <div style="border:1px solid var(--border,#e3e6ec);border-radius:10px;overflow:hidden">${list.map(o => `<div style="display:flex;align-items:center;gap:10px;padding:9px 12px;border-top:1px solid var(--border,#e3e6ec)"><div style="flex:1;min-width:0"><b>${esc(o.name)}</b><div style="font-size:12px;color:var(--muted,#667)">${o.items.map(x => esc(x.code) + ' ' + day(x.iso) + ' (' + esc(longDate(new Date(x.iso + 'T00:00:00Z'))) + ')').join(' · ')}</div></div><button type="button" class="btn" data-due="${esc(o.key)}" style="background:var(--accent,#2f6b4f);color:#fff;border-color:transparent">Set backup</button></div>`).join('')}</div>
+    <div style="display:flex;justify-content:flex-end;gap:8px;margin-top:14px"><button type="button" class="btn" data-due-later style="padding:7px 14px">Remind me in 1 minute</button></div></div>`;
+  const close = () => { v.remove(); BKDUE.box = null; };
+  v.addEventListener('click', e => {
+    const b = e.target.closest('[data-due]');
+    if (b) { const o = list.find(x => x.key === b.dataset.due); close(); BKDUE.snooze = Date.now() + 60000;
+      const days = o.items.map(x => x.iso); openBackupBox(o.key, days[0], () => { BKDUE.snooze = 0; setTimeout(() => bkDueCheck(), 400); }, { days, confirm: 'Save backup' }); return; }
+    if (e.target.closest('[data-due-later]')) { close(); BKDUE.snooze = Date.now() + 60000; toast('OK. You’ll be reminded again in 1 minute.'); }
+  });
+  document.body.append(v); v.querySelector('[data-due]')?.focus();
+}
+function bkDueStart() { if (BKDUE.timer) return; BKDUE.timer = setInterval(() => { try { bkDueCheck(); } catch (e) { console.error(e); } }, 15000); setTimeout(() => { try { bkDueCheck(); } catch { } }, 4000); }
 
 /* ---------- v3.29.0: backup report by pay cycle: "Oct 2026" = 26 Sep – 25 Oct 2026 (the month the cycle ends in) ---------- */
 const BKR = { month: null, client: 'all', sub: 'all', status: null, desig: 'all', q: '', view: 'grid', names: 'real', yn: 'all', span: 'cycle', week: 0, day: '' };
@@ -7669,6 +7711,7 @@ function bkCharts(R, clientView) {
 const BKG_CSS = `.bkg-title{text-align:center;font-weight:700;font-size:15px;margin:4px 0 10px}.bkg-legend{display:flex;flex-wrap:wrap;justify-content:flex-end;gap:6px 14px;font-size:12.5px;margin:0 0 10px}.bkg-legend>span{display:inline-flex;align-items:center;gap:5px}.bkg-wrap{overflow:auto;border:1px solid #e3e6ec;border-radius:10px}.bkg{border-collapse:collapse;font-size:12.5px;min-width:100%}.bkg th,.bkg td{padding:4px 3px;text-align:center;border-bottom:1px solid #eef0f4}.bkg thead th{font-size:11.5px;vertical-align:bottom;background:#f7f8fa;position:sticky;top:0}.bkg thead th .wd{display:block;writing-mode:vertical-rl;transform:rotate(180deg);margin:0 auto 4px;font-weight:700}.bkg thead th b{display:block}.bkg .nm{text-align:left;white-space:nowrap;padding:4px 10px;position:sticky;left:0;background:#fff}.bkg thead .nm{background:#f7f8fa;z-index:2}.bkg-c{display:inline-flex;align-items:center;justify-content:center;min-width:24px;height:22px;padding:0 3px;font-size:11px;font-weight:700;border:1px solid transparent;border-radius:2px;box-sizing:border-box}.bkg-c.p{background:#c6f7c6;border-color:#4caf50;color:#1d3d1d}.bkg-c.hd{background:#ffff66;border-color:#c9b600;color:#333}.bkg-c.h{background:#1ee3ef;border-color:#0aa;color:#023}.bkg-c.br{background:#8bc34a;border-color:#5b8f22;color:#fff}.bkg-c.sr{background:#111;border-color:#111;color:#fff}.bkg-c.l{background:#ff8a8a;border-color:#e06666}.bkg-c.x{background:#eee;border-color:#bbb;color:#333}.bkg-c.ed{cursor:pointer}.bkg-m{font-size:10.5px;color:#667;border:1px solid #d9dde5;border-radius:8px;padding:0 5px;margin-left:4px;cursor:help}.bkg-c.ed:hover{outline:2px solid #334;outline-offset:1px}`;
 const BKR_CSS = BKG_CSS + `.bkc{display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1.6fr);gap:12px;margin:0 0 14px}.bkc.one{grid-template-columns:1fr}.bkc-panel{border:1px solid #e3e6ec;border-radius:12px;padding:10px 12px}.bkc-panel h5{margin:0 0 8px;font-size:12px;display:flex;gap:10px;align-items:center}.bkc-panel h5 em{font-style:normal;font-weight:500;color:#667;font-size:11px;display:inline-flex;gap:4px;align-items:center;margin-left:auto}.bkc-panel h5 em i{display:inline-block;width:9px;height:9px;border-radius:2px;margin-left:6px}.bkc .p{background:#22a05a}.bkc .n{background:#e34948}.bkc-row{display:grid;grid-template-columns:minmax(0,90px) 1fr 38px;gap:8px;align-items:center;font-size:12px;padding:3px 0}.bkc-row span{overflow:hidden;text-overflow:ellipsis;white-space:nowrap}.bkc-row b{text-align:right}.bkc-bar{display:flex;height:12px;border-radius:6px;overflow:hidden;background:#eef0f4}.bkc-cols{display:flex;align-items:flex-end;gap:4px;height:130px;padding-top:4px;overflow-x:auto}.bkc-col{flex:1 0 22px;max-width:40px;height:100%;display:flex;flex-direction:column;justify-content:flex-end;align-items:center}.bkc-stack{width:70%;display:flex;flex-direction:column;border-radius:4px 4px 0 0;overflow:hidden;min-height:3px}.bkc-stack i{display:block;min-height:0}.bkc-col span{font-size:10.5px;line-height:1.1;margin-top:3px;text-align:center;color:#556}.bkc-col small{display:block;font-size:9px;color:#889}@media (max-width:800px){.bkc{grid-template-columns:1fr}}.bkr-title h3{margin:0 0 2px;font-size:17px}.bkr-title p{margin:0 0 12px;color:#556;font-size:12.5px}.bkr-tiles{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:10px;margin-bottom:10px}.bkr-tiles.two{grid-template-columns:repeat(2,minmax(0,1fr))}.bkr-t{border:1px solid #e3e6ec;border-radius:12px;padding:10px 14px;display:flex;flex-direction:column;border-top:3px solid var(--tc)}.bkr-t b{font-size:22px}.bkr-t span{font-weight:650;font-size:12.5px}.bkr-t em{font-style:normal;font-size:12px;color:#667}.bkr-t.b{--tc:#22a05a}.bkr-t.l{--tc:#3b6cf6}.bkr-t.n{--tc:#e34948}.bkr-bar2{display:flex;height:10px;border-radius:6px;overflow:hidden;background:#eef0f4;margin:0 0 16px}.bkr-bar2 .b{background:#22a05a}.bkr-bar2 .l{background:#3b6cf6}.bkr-bar2 .n{background:#e34948}h4{margin:16px 0 6px;font-size:13px}.bkr-tbl{width:100%;border-collapse:collapse;font-size:12.5px}.bkr-tbl th{text-align:left;font-size:11px;text-transform:uppercase;letter-spacing:.04em;color:#667;border-bottom:1px solid #e3e6ec;padding:6px 8px}.bkr-tbl td{padding:6px 8px;border-bottom:1px solid #eef0f4}.bkr-tbl td.bad{color:#c63b3a;font-weight:650}.bkr-st{display:inline-block;padding:1px 8px;border-radius:999px;font-size:11.5px;font-weight:600}.bkr-st.backup{background:#e3f4ea;color:#1c7a45}.bkr-st.live{background:#e6edfe;color:#3558c8}.bkr-st.none{background:#fde8e8;color:#c63b3a}.bk-yn{font-style:normal;font-size:10.5px;font-weight:700;padding:1px 7px;border-radius:6px}.bk-yn.y{background:#e3f4ea;color:#1c7a45}.bk-yn.n{background:#fde8e8;color:#c63b3a}.bk-yn.l{background:#e6edfe;color:#3558c8}`;
 function renderCard(el, opts = {}) {
+  if (S.status === 'ready' && S.ctx) { try { bkDueStart(); } catch { } }
   if (!el) return; if (!opts.hist) renderCard.el = el;
   const C = S.ui.card, goBtns = can('ov.openatt') && can('page.attendance') ? `<button class="btn mini" data-att-go="grid">Open attendance →</button>` : '';
   const head = sub => `<div class="card-head"><div class="grow"><h2>Attendance</h2><div class="sub">${sub}</div></div>${goBtns}</div>`;
@@ -8319,7 +8362,7 @@ async function poll() {
 }
 
 /* ============================== filtering ============================== */
-const APP = { title: "Team Dashboard", version: "3.43.4", released: "30 Sep 2026" };
+const APP = { title: "Team Dashboard", version: "3.44.0", released: "30 Sep 2026" };
 const BASE_DIMS = { status: "status_column", desig: "designation_column", client: "client_column", mode: "mode_column" };
 const STANDARD_STATUSES = ["Active", "Manager", "OJT", "Bench", "New", "Projected", "Left", "Moved"];
 const TILE_ORDER = ["Active", "Manager", "OJT", "Bench", "New", "Projected"];
