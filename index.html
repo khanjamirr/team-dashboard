@@ -4,7 +4,7 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <link rel="icon" href="data:,">
-<title>Team Dashboard · 3.41.3</title>
+<title>Team Dashboard · 3.41.4</title>
 <style>
 :root {
   color-scheme: light;
@@ -1810,10 +1810,10 @@ body.filters-locked #cleanFilters, body.filters-locked #xchips, body.filters-loc
     <p class="gate-sub">One place for your people, priorities and team insights.</p>
     <div id="connectBody"><div class="empty">Loading…</div></div>
   </div>
-  <p class="gate-ver">3.41.3</p>
+  <p class="gate-ver">3.41.4</p>
 </section>
 
-<div id="app" hidden><aside class="sidebar" aria-label="Workspace navigation"><div class="brand dashboard-identity">      <h1><span id="title">Team Dashboard</span><span class="ver" id="ver" title="Version 3.41.3">3.41.3</span></h1><p class="brand-tag">One place for your people, priorities and team insights.</p>      <span class="sync" id="sync" role="status"><i></i><span id="syncText">Loading…</span></span></div><div class="nav-label">WORKSPACE</div>      <nav class="tabs" role="tablist" aria-label="Pages" aria-orientation="vertical">
+<div id="app" hidden><aside class="sidebar" aria-label="Workspace navigation"><div class="brand dashboard-identity">      <h1><span id="title">Team Dashboard</span><span class="ver" id="ver" title="Version 3.41.4">3.41.4</span></h1><p class="brand-tag">One place for your people, priorities and team insights.</p>      <span class="sync" id="sync" role="status"><i></i><span id="syncText">Loading…</span></span></div><div class="nav-label">WORKSPACE</div>      <nav class="tabs" role="tablist" aria-label="Pages" aria-orientation="vertical">
         <button class="tab on" role="tab" aria-controls="pageSummary" data-view="summary" aria-selected="true" data-icon="🏠" data-short="Home">Overview</button>
         <button class="tab" role="tab" aria-controls="pageEmployees" data-view="employees" aria-selected="false" data-icon="👥" data-short="People">Employees</button>
       <button class="tab" role="tab" aria-controls="pageAttendance" data-view="attendance" aria-selected="false" data-icon="🗓️" data-short="Attend.">Attendance</button>
@@ -7739,21 +7739,25 @@ function attMailHtml(data, dt) {
 /* v3.41.3: one click: copy the update (pseudo names) and open a new Outlook email with your signature */
 const attMailTo = () => { try { return JSON.parse(localStorage.getItem(MAIL_KEY) || '{}') || {}; } catch { return {}; } };
 async function sendAttMail(data, dt) {
+  /* v3.41.4: the update goes in the email body itself (mailto: carries plain text only), and the mail app opens first,
+     straight from the click, so the browser doesn't block it. The formatted table is also copied, to paste over the text. */
   const { day, table } = attMailHtml(data, dt), isToday = dt.getTime() === TODAY.getTime(), saved = attMailTo();
   const subj = 'Attendance Update – ' + day, hi = 'Hi Team,', intro = 'Please see below for ' + (isToday ? 'today’s' : 'the') + ' attendance update as of ' + day + '.';
+  const lines = data.records.map(r => '• ' + r.filter((v, i) => i < 2 || String(v || '').trim()).join(' – '));
+  const plain = hi + '\r\n\r\n' + intro + '\r\n\r\n' + data.headers.join(' – ') + '\r\n' + lines.join('\r\n') + '\r\n\r\n';
+  const addrs = v => String(v || '').split(/[;,]/).map(x => x.trim()).filter(Boolean).join(';');
+  const q = ['subject=' + encodeURIComponent(subj), saved.cc ? 'cc=' + encodeURIComponent(addrs(saved.cc)).replace(/%40/g, '@').replace(/%3B/g, ';') : '', 'body=' + encodeURIComponent(plain)].filter(Boolean).join('&');
+  window.location.href = 'mailto:' + encodeURIComponent(addrs(saved.to)).replace(/%40/g, '@').replace(/%3B/g, ';') + '?' + q;
   const e = v => String(v ?? '').replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;');
   const html = `<div style="font-family:Calibri,'Segoe UI',Arial,sans-serif;font-size:11pt;color:#1f2937"><p style="margin:0 0 12px">${e(hi)}</p><p style="margin:0 0 12px">${e(intro)}</p>${table}<p style="margin:12px 0 0">&nbsp;</p></div>`;
-  const plain = hi + '\n\n' + intro + '\n\n' + [data.headers, ...data.records].map(r => r.join('\t')).join('\n');
-  let copied = false; try { await navigator.clipboard.write([new ClipboardItem({ 'text/html': new Blob([html], { type: 'text/html' }), 'text/plain': new Blob([plain], { type: 'text/plain' }) })]); copied = true; } catch { try { await navigator.clipboard.writeText(plain); copied = true; } catch { } }
-  const addrs = v => String(v || '').split(/[;,]/).map(x => x.trim()).filter(Boolean).join(';');
-  const q = ['subject=' + encodeURIComponent(subj), saved.cc ? 'cc=' + encodeURIComponent(addrs(saved.cc)) : '', copied ? '' : 'body=' + encodeURIComponent(plain)].filter(Boolean).join('&');
-  const a = document.createElement('a'); a.href = 'mailto:' + encodeURIComponent(addrs(saved.to)).replace(/%40/g, '@').replace(/%3B/g, ';') + '?' + q; a.click();
-  toast(copied ? 'Outlook is opening. Click above your signature and press Ctrl+V to paste the update.' : 'Outlook is opening. Copying was blocked, so the update is in the body as plain text.');
+  try { await navigator.clipboard.write([new ClipboardItem({ 'text/html': new Blob([html], { type: 'text/html' }), 'text/plain': new Blob([plain], { type: 'text/plain' }) })]); } catch { }
+  toast('Email opening with the update in the body. Want the formatted table instead? Select the text and press Ctrl+V. If it opens in the wrong app, see ⚙.');
 }
 function openAttMailSettings() {
   const saved = attMailTo();
   const m = openModal({ title: 'Attendance email recipients',
-    body: `<div class="form"><label class="full">To<input type="text" id="am-to" value="${esc(saved.to || '')}" placeholder="name@client.com; another@client.com" autocomplete="off"></label><label class="full">Cc<input type="text" id="am-cc" value="${esc(saved.cc || '')}" placeholder="optional" autocomplete="off"></label></div><p class="sm muted" style="margin:10px 0 0">Saved on this browser. ✉ Email then opens Outlook straight away with these filled in.</p>`,
+    body: `<div class="form"><label class="full">To<input type="text" id="am-to" value="${esc(saved.to || '')}" placeholder="name@client.com; another@client.com" autocomplete="off"></label><label class="full">Cc<input type="text" id="am-cc" value="${esc(saved.cc || '')}" placeholder="optional" autocomplete="off"></label></div><p class="sm muted" style="margin:10px 0 0">Saved on this browser. ✉ Email then opens your mail app straight away with these filled in.</p>
+      <div class="sm" style="margin-top:12px;padding:10px 12px;border-radius:10px;background:var(--surface-2,#f4f6f9);line-height:1.5"><b>Make it open in Outlook (classic)</b><br>1. Windows <b>Settings → Apps → Default apps</b>, search <b>MAILTO</b>, pick <b>Outlook (classic)</b> (not “Outlook (new)” or “Mail”).<br>2. In Chrome or Edge, open <code>chrome://settings/handlers</code> (Edge: <code>edge://settings/content/handlers</code>) and remove any website set for email, such as Gmail or Outlook on the web.<br>3. In Outlook classic: <b>File → Options → General</b>, tick “Make Outlook the default program for E-mail”.</div>`,
     footer: `<span class="grow"></span><button class="btn" data-close>Cancel</button><button class="btn primary" id="am-save">Save</button>` });
   $('#am-save', m).onclick = () => { try { localStorage.setItem(MAIL_KEY, JSON.stringify({ to: $('#am-to', m).value.trim(), cc: $('#am-cc', m).value.trim() })); } catch { } closeModal(); toast('Recipients saved.'); };
 }
@@ -8243,7 +8247,7 @@ async function poll() {
 }
 
 /* ============================== filtering ============================== */
-const APP = { title: "Team Dashboard", version: "3.41.3", released: "30 Sep 2026" };
+const APP = { title: "Team Dashboard", version: "3.41.4", released: "30 Sep 2026" };
 const BASE_DIMS = { status: "status_column", desig: "designation_column", client: "client_column", mode: "mode_column" };
 const STANDARD_STATUSES = ["Active", "Manager", "OJT", "Bench", "New", "Projected", "Left", "Moved"];
 const TILE_ORDER = ["Active", "Manager", "OJT", "Bench", "New", "Projected"];
