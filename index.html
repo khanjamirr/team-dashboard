@@ -4,7 +4,7 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <link rel="icon" href="data:,">
-<title>Team Dashboard · 3.42.3</title>
+<title>Team Dashboard · 3.43.0</title>
 <style>
 :root {
   color-scheme: light;
@@ -1814,10 +1814,10 @@ body.filters-locked #cleanFilters, body.filters-locked #xchips, body.filters-loc
     <p class="gate-sub">One place for your people, priorities and team insights.</p>
     <div id="connectBody"><div class="empty">Loading…</div></div>
   </div>
-  <p class="gate-ver">3.42.3</p>
+  <p class="gate-ver">3.43.0</p>
 </section>
 
-<div id="app" hidden><aside class="sidebar" aria-label="Workspace navigation"><div class="brand dashboard-identity">      <h1><span id="title">Team Dashboard</span><span class="ver" id="ver" title="Version 3.42.3">3.42.3</span></h1><p class="brand-tag">One place for your people, priorities and team insights.</p>      <span class="sync" id="sync" role="status"><i></i><span id="syncText">Loading…</span></span></div><div class="nav-label">WORKSPACE</div>      <nav class="tabs" role="tablist" aria-label="Pages" aria-orientation="vertical">
+<div id="app" hidden><aside class="sidebar" aria-label="Workspace navigation"><div class="brand dashboard-identity">      <h1><span id="title">Team Dashboard</span><span class="ver" id="ver" title="Version 3.43.0">3.43.0</span></h1><p class="brand-tag">One place for your people, priorities and team insights.</p>      <span class="sync" id="sync" role="status"><i></i><span id="syncText">Loading…</span></span></div><div class="nav-label">WORKSPACE</div>      <nav class="tabs" role="tablist" aria-label="Pages" aria-orientation="vertical">
         <button class="tab on" role="tab" aria-controls="pageSummary" data-view="summary" aria-selected="true" data-icon="🏠" data-short="Home">Overview</button>
         <button class="tab" role="tab" aria-controls="pageEmployees" data-view="employees" aria-selected="false" data-icon="👥" data-short="People">Employees</button>
       <button class="tab" role="tab" aria-controls="pageAttendance" data-view="attendance" aria-selected="false" data-icon="🗓️" data-short="Attend.">Attendance</button>
@@ -4577,6 +4577,34 @@ async function askName() {
   if (n) { BE.setUser(n); await kv.set('user', n); updateWho(); if (S.act) render(); }
 }
 function updateWho() { const b = document.getElementById('btnWho'); if (b) { const n = BE.userName(); b.textContent = n === 'You' ? 'Set your name' : n; b.title = 'Your name in the activity log: ' + n + '. Click to change.'; } }
+/* v3.43.0: before anything replaces an entry already in the tracker, list what will change and ask first */
+function overwriteList(p, dates, code) {
+  const out = []; const nc = String(code || '').trim().toUpperCase();
+  for (const t0 of dates) {
+    const t = t0 instanceof Date ? t0 : new Date(t0 + 'T00:00:00Z'), ms = Engine.monthSerial(t.getUTCFullYear(), t.getUTCMonth()), i = t.getUTCDate() - 1;
+    const row = p && p.rows ? p.rows.find(r => r.month === ms) : null, cur = row ? row.days[i] : null;
+    if (cur == null || String(cur).trim() === '') continue;
+    const oc = String(cur).trim().toUpperCase(); if (oc === nc) continue;
+    out.push({ t, from: oc, to: nc });
+  }
+  return out;
+}
+function confirmOverwrite(name, list) {
+  if (!list.length) return Promise.resolve(true);
+  return new Promise(res => {
+    const v = document.createElement('div'); v.style.cssText = 'position:fixed;inset:0;z-index:10000;background:rgba(10,14,24,.5);display:grid;place-items:center;padding:16px';
+    const rows = list.slice(0, 31).map(x => `<tr><td style="padding:5px 10px;border-bottom:1px solid var(--border,#e3e6ec)">${esc(longDate(x.t))}</td><td style="padding:5px 10px;border-bottom:1px solid var(--border,#e3e6ec)"><b>${esc(x.from)}</b> <span style="color:var(--muted,#667)">(${esc(labelOf(x.from))})</span></td><td style="padding:5px 6px;border-bottom:1px solid var(--border,#e3e6ec)">→</td><td style="padding:5px 10px;border-bottom:1px solid var(--border,#e3e6ec)"><b>${esc(x.to || 'blank')}</b>${x.to ? ` <span style="color:var(--muted,#667)">(${esc(labelOf(x.to))})</span>` : ''}</td></tr>`).join('');
+    v.innerHTML = `<div role="alertdialog" aria-modal="true" aria-label="Replace existing entries?" style="background:var(--surface,#fff);color:var(--ink,#1f2937);border:1px solid var(--border,#e3e6ec);border-top:4px solid #d97706;border-radius:14px;padding:18px 20px;width:min(560px,100%);max-height:calc(100vh - 32px);overflow:auto;box-shadow:0 20px 60px rgba(0,0,0,.35)">
+      <h3 style="margin:0 0 6px;font-size:17px">⚠ Replace existing ${list.length === 1 ? 'entry' : list.length + ' entries'}?</h3>
+      <p style="margin:0 0 12px;font-size:13.5px;color:var(--ink-2,#445)"><b>${esc(name)}</b> already has ${list.length === 1 ? 'an entry' : 'entries'} in the attendance tracker for ${list.length === 1 ? 'this day' : 'these days'}. Saving will replace ${list.length === 1 ? 'it' : 'them'}:</p>
+      <table style="border-collapse:collapse;font-size:13px;width:100%">${rows}</table>${list.length > 31 ? `<p style="font-size:12px;color:var(--muted,#667)">…and ${list.length - 31} more.</p>` : ''}
+      <div style="display:flex;justify-content:flex-end;gap:8px;margin-top:16px"><button type="button" class="btn" data-ow="0" style="padding:7px 14px">Cancel, keep existing</button><button type="button" class="btn" data-ow="1" style="padding:7px 14px;background:#d97706;color:#fff;border-color:#d97706">Yes, replace</button></div></div>`;
+    const key = e => { if (e.key === 'Escape') done(false); };
+    const done = r => { v.remove(); document.removeEventListener('keydown', key, true); res(r); };
+    v.addEventListener('click', e => { const b = e.target.closest('[data-ow]'); if (b) done(b.dataset.ow === '1'); else if (e.target === v) done(false); });
+    document.addEventListener('keydown', key, true); document.body.append(v); v.querySelector('[data-ow="0"]').focus();
+  });
+}
 function confirmBox(title, text, okLabel) {
   if (!active()) return hostDialog({ title, text, ok: okLabel });
   return new Promise(res => {
@@ -5973,9 +6001,11 @@ function openPop(td) {
   ROOT.appendChild(p); bindBk();
   const r = td.getBoundingClientRect(), w = p.offsetWidth, h = p.offsetHeight; let x = Math.min(Math.max(8, r.left + r.width / 2 - w / 2), innerWidth - w - 8), y = r.bottom + 6; if (y + h > innerHeight - 8) y = Math.max(8, r.top - h - 6); p.style.left = x + 'px'; p.style.top = y + 'px';
   const inp = $('#popIn', p); inp.focus(); inp.select();
-  const apply = code => {
+  const apply = async code => {
     const old = row.days[i]; const nv = code === '' ? null : code; if ((old ?? null) === nv) { closePop(); return; }
-    closePop(); mutate(`${row.name.trim()} · ${longDate(dateOf(row.month, i))}: ${old ?? 'blank'} → ${nv ?? 'blank'}`, () => setDay(row, i, code), { cells: true });
+    closePop();
+    if (old != null && String(old).trim() !== '' && !(await confirmOverwrite(row.name.trim(), [{ t: dateOf(row.month, i), from: String(old).trim().toUpperCase(), to: nv ? String(nv).trim().toUpperCase() : '' }]))) return;
+    mutate(`${row.name.trim()} · ${longDate(dateOf(row.month, i))}: ${old ?? 'blank'} → ${nv ?? 'blank'}`, () => setDay(row, i, code), { cells: true });
   };
   p.addEventListener('click', e => { const b = e.target.closest('[data-code]'); if (b) apply(b.dataset.code); const ed = e.target.closest('[data-edit]'); if (ed) { closePop(); if (!can('att.rows')) return toast('Your passcode can’t edit rows in the attendance tracker. Ask the admin for the right in Settings.'); openRowEditor(+ed.dataset.edit); } });
   inp.addEventListener('input', () => { const v = inp.value.trim().toUpperCase(); $('#popMsg', p).textContent = !v ? 'Enter clears the cell (blank = present)' : knownCode(v) ? labelOf(v) : 'Unknown code'; });
@@ -6419,8 +6449,9 @@ function openLogLeave(preKey) {
     inp.addEventListener('blur', () => setTimeout(close, 120));
   }
   m.addEventListener('input', show); m.addEventListener('change', show); show(); if (!pre) $('#l-name', m).focus(); else $('#l-code', m).focus();
-  $('#l-go', m).onclick = () => {
+  $('#l-go', m).onclick = async () => {
     const pl = plan(); if (pl.err) return;
+    if (!(await confirmOverwrite(pl.p.name, overwriteList(pl.p, pl.set.map(x => x.t), pl.code)))) return;
     if (needsApproval()) { const note = ($('#l-note', m) || {}).value || ''; closeModal(); sendLeaveRequest(pl, note); return; }
     closeModal();
     mutate(`Logged ${pl.code} for ${pl.p.name} · ${pl.set.length} day${pl.set.length === 1 ? '' : 's'} (${longDate(pl.set[0].t)}${pl.set.length > 1 ? ' – ' + longDate(pl.set[pl.set.length - 1].t) : ''})`, () => {
@@ -6521,6 +6552,7 @@ async function approveRequestOnce(id, code) {
   const p = resolvePerson(req.name); if (!p) { toast(`${req.name} is no longer in the workforce file or the tracker.`); return; }
   const requestedCode = LOG_TYPES.includes(code) ? code : req.code;
   const use = requestedCode === 'LA' ? 'AL' : requestedCode;
+  if (!(await confirmOverwrite(req.name, overwriteList(p, req.dates, use).filter(x => x.from !== 'LA')))) return;
   const previous = snapshot(), undoLength = S.undo.length;
   const ok = applyApproved(p, use, req.dates, `Approved ${use} for ${req.name} · ${reqDatesText(req.dates)} (asked by ${req.by})`);
   if (ok === false) return;
@@ -8263,7 +8295,7 @@ async function poll() {
 }
 
 /* ============================== filtering ============================== */
-const APP = { title: "Team Dashboard", version: "3.42.3", released: "30 Sep 2026" };
+const APP = { title: "Team Dashboard", version: "3.43.0", released: "30 Sep 2026" };
 const BASE_DIMS = { status: "status_column", desig: "designation_column", client: "client_column", mode: "mode_column" };
 const STANDARD_STATUSES = ["Active", "Manager", "OJT", "Bench", "New", "Projected", "Left", "Moved"];
 const TILE_ORDER = ["Active", "Manager", "OJT", "Bench", "New", "Projected"];
