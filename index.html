@@ -4,7 +4,7 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <link rel="icon" href="data:,">
-<title>Team Dashboard · 3.43.2</title>
+<title>Team Dashboard · 3.43.3</title>
 <style>
 :root {
   color-scheme: light;
@@ -1814,10 +1814,10 @@ body.filters-locked #cleanFilters, body.filters-locked #xchips, body.filters-loc
     <p class="gate-sub">One place for your people, priorities and team insights.</p>
     <div id="connectBody"><div class="empty">Loading…</div></div>
   </div>
-  <p class="gate-ver">3.43.2</p>
+  <p class="gate-ver">3.43.3</p>
 </section>
 
-<div id="app" hidden><aside class="sidebar" aria-label="Workspace navigation"><div class="brand dashboard-identity">      <h1><span id="title">Team Dashboard</span><span class="ver" id="ver" title="Version 3.43.2">3.43.2</span></h1><p class="brand-tag">One place for your people, priorities and team insights.</p>      <span class="sync" id="sync" role="status"><i></i><span id="syncText">Loading…</span></span></div><div class="nav-label">WORKSPACE</div>      <nav class="tabs" role="tablist" aria-label="Pages" aria-orientation="vertical">
+<div id="app" hidden><aside class="sidebar" aria-label="Workspace navigation"><div class="brand dashboard-identity">      <h1><span id="title">Team Dashboard</span><span class="ver" id="ver" title="Version 3.43.3">3.43.3</span></h1><p class="brand-tag">One place for your people, priorities and team insights.</p>      <span class="sync" id="sync" role="status"><i></i><span id="syncText">Loading…</span></span></div><div class="nav-label">WORKSPACE</div>      <nav class="tabs" role="tablist" aria-label="Pages" aria-orientation="vertical">
         <button class="tab on" role="tab" aria-controls="pageSummary" data-view="summary" aria-selected="true" data-icon="🏠" data-short="Home">Overview</button>
         <button class="tab" role="tab" aria-controls="pageEmployees" data-view="employees" aria-selected="false" data-icon="👥" data-short="People">Employees</button>
       <button class="tab" role="tab" aria-controls="pageAttendance" data-view="attendance" aria-selected="false" data-icon="🗓️" data-short="Attend.">Attendance</button>
@@ -6464,9 +6464,18 @@ function openLogLeave(preKey) {
     if (!(await confirmOverwrite(pl.p.name, [...overwriteList(pl.p, pl.set.map(x => x.t), pl.code), ...pendingClash(pl.p.key, pl.set.map(x => isoDate(x.t)), pl.code)]))) return;
     if (needsApproval()) { const note = ($('#l-note', m) || {}).value || ''; closeModal(); sendLeaveRequest(pl, note); return; }
     closeModal();
-    mutate(`Logged ${pl.code} for ${pl.p.name} · ${pl.set.length} day${pl.set.length === 1 ? '' : 's'} (${longDate(pl.set[0].t)}${pl.set.length > 1 ? ' – ' + longDate(pl.set[pl.set.length - 1].t) : ''})`, () => {
+    const doLog = val => mutate(`Logged ${pl.code} for ${pl.p.name} · ${pl.set.length} day${pl.set.length === 1 ? '' : 's'} (${longDate(pl.set[0].t)}${pl.set.length > 1 ? ' – ' + longDate(pl.set[pl.set.length - 1].t) : ''})`, () => {
       const idn = identityOf(pl.p); for (const s of pl.set) { let row = S.rows.find(r => r.month === s.ms && personKey(r.name) === pl.p.key); if (!row) { row = newRow(s.ms, idn.name, { empId: idn.empId, client: idn.client }); insertRow(row); } setDay(row, s.i, pl.code); }
+      if (val) bkWrite(pl.p.key, pl.set.map(x => isoDate(x.t)), val);
     }, { cells: true, log: true });
+    /* v3.43.3: admins recording leave or a half day (HD1 / HD2) for an active employee give the backup in the same step */
+    const cat = catOf(pl.code);
+    if ((LEAVE_CATS.has(cat)) && bkRequired(pl.p.key)) {
+      const days = pl.set.map(x => isoDate(x.t));
+      openBackupBox(pl.p.key, days[0], null, { days, confirm: 'Save backup & record ' + pl.code, collect: async val => { const ok = doLog(val); if (ok !== false) { if (renderCard.el) renderCard(renderCard.el); toast('Recorded ' + pl.code + ' · backup: ' + bkLabel(val) + '.'); } } });
+      return;
+    }
+    doLog(null);
   };
 }
 
@@ -7336,7 +7345,7 @@ function openBackupBox(pKey, iso, onDone, opts = {}) {
       @media (max-width:560px){.bkx-opts{grid-template-columns:1fr}.bkx-o{flex-direction:row;align-items:center}.bkx-o small{display:none}}
     </style>
     <div class="bkx-when">${cur && !opts.collect ? '<span class="bkx-clr" id="bkx-clr"><button type="button" class="btn mini" id="bk-clear-ask" title="Remove the saved backup for this day">Clear</button></span>' : ''}<span class="bkx-cal"><i>${MONTHS[dt.getUTCMonth()]}</i><b>${dt.getUTCDate()}</b></span><div style="padding-right:90px"><b>${esc(name)}</b> is on leave<span>${esc(opts.days && opts.days.length > 1 ? longDate(new Date(opts.days[0] + 'T00:00:00Z')) + ' – ' + longDate(new Date(opts.days[opts.days.length - 1] + 'T00:00:00Z')) + ' · ' + opts.days.length + ' days' : longDate(dt))} · who covers the work?</span></div></div>
-    ${opts.collect ? `<p class="sm" style="margin:-4px 0 12px;padding:8px 10px;border-radius:10px;background:color-mix(in srgb,#d97706 10%,transparent);color:var(--ink-2,#445)"><b>Backup is required to approve.</b> Choose one option; the leave is approved when you save.</p>` : ''}
+    ${opts.collect ? `<p class="sm" style="margin:-4px 0 12px;padding:8px 10px;border-radius:10px;background:color-mix(in srgb,#d97706 10%,transparent);color:var(--ink-2,#445)"><b>Backup is required.</b> Choose one option; the leave is saved together with it.</p>` : ''}
     <div class="bkx-opts" role="radiogroup" aria-label="Backup">${OPT.map(([k, t, sub, c, ico]) => `<button type="button" class="bkx-o" role="radio" data-bkx="${k}" aria-checked="${curK === k}" style="--oc:${c}"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">${ico}</svg><b>${t}</b><small>${sub}</small></button>`).join('')}</div>
     <div class="bkx-yes${curK === 'no' ? ' no' : curK === 'live' ? ' live' : ''}" id="bkx-yes" ${curK ? '' : 'hidden'}>
       <div class="bkx-row">Cover for <span class="bkx-seg" role="group" aria-label="Cover for"><button type="button" data-bkh="full" aria-pressed="${!(cur && cur.half)}">Full day</button><button type="button" data-bkh="half" aria-pressed="${!!(cur && cur.half)}">Half day</button></span></div>
@@ -8308,7 +8317,7 @@ async function poll() {
 }
 
 /* ============================== filtering ============================== */
-const APP = { title: "Team Dashboard", version: "3.43.2", released: "30 Sep 2026" };
+const APP = { title: "Team Dashboard", version: "3.43.3", released: "30 Sep 2026" };
 const BASE_DIMS = { status: "status_column", desig: "designation_column", client: "client_column", mode: "mode_column" };
 const STANDARD_STATUSES = ["Active", "Manager", "OJT", "Bench", "New", "Projected", "Left", "Moved"];
 const TILE_ORDER = ["Active", "Manager", "OJT", "Bench", "New", "Projected"];
