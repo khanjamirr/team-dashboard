@@ -4,7 +4,7 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <link rel="icon" href="data:,">
-<title>Team Dashboard · 3.44.0</title>
+<title>Team Dashboard · 3.45.0</title>
 <style>
 :root {
   color-scheme: light;
@@ -1801,6 +1801,39 @@ body.filters-locked #cleanFilters, body.filters-locked #xchips, body.filters-loc
 .bkr-bar { display:flex; flex-wrap:wrap; align-items:center; gap:8px 12px; margin:0 0 14px; }
 .bkr-bar label { display:inline-flex; align-items:center; gap:6px; font-size:12.5px; color:var(--ink-2); }
 .bkr-bar select { height:32px; }
+</style><style id="v345-colour">
+/* v3.45.0: a touch of colour, kept calm and professional */
+:root:not([data-theme="dark"]) body { background:
+  radial-gradient(1100px 520px at 105% -8%, #e6edff 0, rgba(230,237,255,0) 62%),
+  radial-gradient(900px 480px at -8% 108%, #e3f6f0 0, rgba(227,246,240,0) 60%), #f4f6fb !important; background-attachment: fixed !important; }
+@media (prefers-color-scheme: dark) { :root:not([data-theme="light"]) body { background: var(--bg) !important; } }
+@media (min-width: 701px) {
+  .sidebar { background: linear-gradient(180deg, #14213d 0%, #1a2d5a 55%, #20407c 100%) !important; color: #dbe4f5 !important; border-right: 0 !important; box-shadow: 2px 0 18px rgba(16,30,60,.14); }
+  .sidebar .brand, .sidebar .brand h1, .sidebar #title { color: #fff !important; }
+  .sidebar .brand-tag, .sidebar .nav-label, .sidebar .sidebar-bottom, .sidebar .local-label, .sidebar .sync, .sidebar small { color: #a9b8d6 !important; }
+  .sidebar .ver { background: rgba(255,255,255,.12) !important; color: #e3ebff !important; border-color: transparent !important; }
+  .sidebar .tab { color: #c9d5ee !important; }
+  .sidebar .tab:hover { background: rgba(255,255,255,.08) !important; color: #fff !important; }
+  .sidebar .tab.on, .sidebar .tab[aria-selected="true"] { background: rgba(255,255,255,.15) !important; color: #fff !important; box-shadow: inset 3px 0 #5eead4 !important; }
+  .sidebar a, .sidebar .linkbtn, .sidebar button.linkbtn { color: #bcd2ff !important; }
+}
+/* overview cards: one colour each, as a top band and a small dot by the title */
+#pageSummary.ov #cardAttendance, body #cardAttendance { border-top: 3px solid #0d9488 !important; }
+#pageSummary.ov #ovRequests, body #ovRequests { border-top: 3px solid #4f46e5 !important; }
+#pageSummary.ov #ovUpcoming, body #ovUpcoming { border-top: 3px solid #9333ea !important; }
+#pageSummary.ov #cardWatch, body #cardWatch { border-top: 3px solid #e11d48 !important; }
+#cardAttendance h2::before, #ovRequests h2::before, #ovUpcoming h2::before, #cardWatch h2::before { content: ""; display: inline-block; width: 9px; height: 9px; border-radius: 3px; margin: 0 8px 1px 0; vertical-align: middle; }
+#cardAttendance h2::before { background: #0d9488; } #ovRequests h2::before { background: #4f46e5; } #ovUpcoming h2::before { background: #9333ea; } #cardWatch h2::before { background: #e11d48; }
+/* primary actions: a teal-to-blue gradient */
+.btn.primary:not(.danger) { background: linear-gradient(135deg, #0f766e 0%, #1d4ed8 100%) !important; border-color: transparent !important; color: #fff !important; }
+.btn.primary:not(.danger):hover { filter: brightness(1.08); }
+/* tables: a tinted header row */
+:root:not([data-theme="dark"]) #tbl thead th { background: #eef3fb !important; color: #24324a !important; }
+/* page title with a coloured underline */
+.pinned-top header.top h1 { position: relative; }
+.pinned-top header.top h1::after { content: ""; display: block; width: 36px; height: 3px; border-radius: 3px; margin-top: 4px; background: linear-gradient(90deg, #0d9488, #4f46e5); }
+/* card surfaces lift a little */
+:root:not([data-theme="dark"]) .card, :root:not([data-theme="dark"]) #ovRequests, :root:not([data-theme="dark"]) #ovUpcoming { box-shadow: 0 1px 2px rgba(20,40,110,.05), 0 8px 24px -14px rgba(20,40,110,.22) !important; }
 </style></head>
 
 
@@ -1814,10 +1847,10 @@ body.filters-locked #cleanFilters, body.filters-locked #xchips, body.filters-loc
     <p class="gate-sub">One place for your people, priorities and team insights.</p>
     <div id="connectBody"><div class="empty">Loading…</div></div>
   </div>
-  <p class="gate-ver">3.44.0</p>
+  <p class="gate-ver">3.45.0</p>
 </section>
 
-<div id="app" hidden><aside class="sidebar" aria-label="Workspace navigation"><div class="brand dashboard-identity">      <h1><span id="title">Team Dashboard</span><span class="ver" id="ver" title="Version 3.44.0">3.44.0</span></h1><p class="brand-tag">One place for your people, priorities and team insights.</p>      <span class="sync" id="sync" role="status"><i></i><span id="syncText">Loading…</span></span></div><div class="nav-label">WORKSPACE</div>      <nav class="tabs" role="tablist" aria-label="Pages" aria-orientation="vertical">
+<div id="app" hidden><aside class="sidebar" aria-label="Workspace navigation"><div class="brand dashboard-identity">      <h1><span id="title">Team Dashboard</span><span class="ver" id="ver" title="Version 3.45.0">3.45.0</span></h1><p class="brand-tag">One place for your people, priorities and team insights.</p>      <span class="sync" id="sync" role="status"><i></i><span id="syncText">Loading…</span></span></div><div class="nav-label">WORKSPACE</div>      <nav class="tabs" role="tablist" aria-label="Pages" aria-orientation="vertical">
         <button class="tab on" role="tab" aria-controls="pageSummary" data-view="summary" aria-selected="true" data-icon="🏠" data-short="Home">Overview</button>
         <button class="tab" role="tab" aria-controls="pageEmployees" data-view="employees" aria-selected="false" data-icon="👥" data-short="People">Employees</button>
       <button class="tab" role="tab" aria-controls="pageAttendance" data-view="attendance" aria-selected="false" data-icon="🗓️" data-short="Attend.">Attendance</button>
@@ -7466,6 +7499,8 @@ function bkDueCheck(force) {
   if (!force && Date.now() < BKDUE.snooze) return;
   if (BKDUE.box && BKDUE.box.isConnected) return;
   if (document.querySelector('.veil, .cel-veil, [role=alertdialog]') || (ROOT && ROOT.querySelector && ROOT.querySelector('.veil'))) return;   // another box is open: try again later
+  const isSup = !!(window.PERM && PERM.isSuper && PERM.isSuper());
+  if (isSup) { try { if (localStorage.getItem('td_bkdue_skip') === isoDate(TODAY)) return; } catch { } }
   const list = bkDueList(); if (!list.length) return;
   const v = document.createElement('div'); BKDUE.box = v; v.style.cssText = 'position:fixed;inset:0;z-index:9990;background:rgba(10,14,24,.5);display:grid;place-items:center;padding:16px';
   const day = iso => iso === isoDate(TODAY) ? 'today' : 'tomorrow';
@@ -7473,12 +7508,13 @@ function bkDueCheck(force) {
     <h3 style="margin:0 0 6px;font-size:17px">Backup needed for upcoming leave</h3>
     <p style="margin:0 0 12px;font-size:13.5px;color:var(--ink-2,#445)">${list.length === 1 ? 'This person is' : 'These people are'} on leave today or tomorrow and no backup is set yet. Choose <b>Backup Provided</b>, <b>Backup Not Provided</b> or <b>Seat Shown Live</b> for each.</p>
     <div style="border:1px solid var(--border,#e3e6ec);border-radius:10px;overflow:hidden">${list.map(o => `<div style="display:flex;align-items:center;gap:10px;padding:9px 12px;border-top:1px solid var(--border,#e3e6ec)"><div style="flex:1;min-width:0"><b>${esc(o.name)}</b><div style="font-size:12px;color:var(--muted,#667)">${o.items.map(x => esc(x.code) + ' ' + day(x.iso) + ' (' + esc(longDate(new Date(x.iso + 'T00:00:00Z'))) + ')').join(' · ')}</div></div><button type="button" class="btn" data-due="${esc(o.key)}" style="background:var(--accent,#2f6b4f);color:#fff;border-color:transparent">Set backup</button></div>`).join('')}</div>
-    <div style="display:flex;justify-content:flex-end;gap:8px;margin-top:14px"><button type="button" class="btn" data-due-later style="padding:7px 14px">Remind me in 1 minute</button></div></div>`;
+    <div style="display:flex;justify-content:flex-end;gap:8px;margin-top:14px">${isSup ? '<button type="button" class="btn" data-due-skip style="padding:7px 14px;margin-right:auto" title="Super admin only: no more reminders today">Skip for today</button>' : ''}<button type="button" class="btn" data-due-later style="padding:7px 14px">Remind me in 1 minute</button></div></div>`;
   const close = () => { v.remove(); BKDUE.box = null; };
   v.addEventListener('click', e => {
     const b = e.target.closest('[data-due]');
     if (b) { const o = list.find(x => x.key === b.dataset.due); close(); BKDUE.snooze = Date.now() + 60000;
       const days = o.items.map(x => x.iso); openBackupBox(o.key, days[0], () => { BKDUE.snooze = 0; setTimeout(() => bkDueCheck(), 400); }, { days, confirm: 'Save backup' }); return; }
+    if (e.target.closest('[data-due-skip]')) { close(); try { localStorage.setItem('td_bkdue_skip', isoDate(TODAY)); } catch { } toast('Backup reminders skipped for today.'); return; }
     if (e.target.closest('[data-due-later]')) { close(); BKDUE.snooze = Date.now() + 60000; toast('OK. You’ll be reminded again in 1 minute.'); }
   });
   document.body.append(v); v.querySelector('[data-due]')?.focus();
@@ -8362,7 +8398,7 @@ async function poll() {
 }
 
 /* ============================== filtering ============================== */
-const APP = { title: "Team Dashboard", version: "3.44.0", released: "30 Sep 2026" };
+const APP = { title: "Team Dashboard", version: "3.45.0", released: "30 Sep 2026" };
 const BASE_DIMS = { status: "status_column", desig: "designation_column", client: "client_column", mode: "mode_column" };
 const STANDARD_STATUSES = ["Active", "Manager", "OJT", "Bench", "New", "Projected", "Left", "Moved"];
 const TILE_ORDER = ["Active", "Manager", "OJT", "Bench", "New", "Projected"];
