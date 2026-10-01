@@ -4,7 +4,7 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <link rel="icon" href="data:,">
-<title>Team Dashboard · 3.41.5</title>
+<title>Team Dashboard · 3.41.6</title>
 <style>
 :root {
   color-scheme: light;
@@ -1814,10 +1814,10 @@ body.filters-locked #cleanFilters, body.filters-locked #xchips, body.filters-loc
     <p class="gate-sub">One place for your people, priorities and team insights.</p>
     <div id="connectBody"><div class="empty">Loading…</div></div>
   </div>
-  <p class="gate-ver">3.41.5</p>
+  <p class="gate-ver">3.41.6</p>
 </section>
 
-<div id="app" hidden><aside class="sidebar" aria-label="Workspace navigation"><div class="brand dashboard-identity">      <h1><span id="title">Team Dashboard</span><span class="ver" id="ver" title="Version 3.41.5">3.41.5</span></h1><p class="brand-tag">One place for your people, priorities and team insights.</p>      <span class="sync" id="sync" role="status"><i></i><span id="syncText">Loading…</span></span></div><div class="nav-label">WORKSPACE</div>      <nav class="tabs" role="tablist" aria-label="Pages" aria-orientation="vertical">
+<div id="app" hidden><aside class="sidebar" aria-label="Workspace navigation"><div class="brand dashboard-identity">      <h1><span id="title">Team Dashboard</span><span class="ver" id="ver" title="Version 3.41.6">3.41.6</span></h1><p class="brand-tag">One place for your people, priorities and team insights.</p>      <span class="sync" id="sync" role="status"><i></i><span id="syncText">Loading…</span></span></div><div class="nav-label">WORKSPACE</div>      <nav class="tabs" role="tablist" aria-label="Pages" aria-orientation="vertical">
         <button class="tab on" role="tab" aria-controls="pageSummary" data-view="summary" aria-selected="true" data-icon="🏠" data-short="Home">Overview</button>
         <button class="tab" role="tab" aria-controls="pageEmployees" data-view="employees" aria-selected="false" data-icon="👥" data-short="People">Employees</button>
       <button class="tab" role="tab" aria-controls="pageAttendance" data-view="attendance" aria-selected="false" data-icon="🗓️" data-short="Attend.">Attendance</button>
@@ -7754,10 +7754,11 @@ async function sendAttMail(data, dt) {
      is on the clipboard: one Ctrl+V puts it above the signature. "text": the plain list is filled in for you. */
   const tableMode = saved.mode !== 'text';
   const q = ['subject=' + encodeURIComponent(subj), saved.cc ? 'cc=' + encodeURIComponent(addrs(saved.cc)).replace(/%40/g, '@').replace(/%3B/g, ';') : '', tableMode ? '' : 'body=' + encodeURIComponent(plain)].filter(Boolean).join('&');
-  window.location.href = 'mailto:' + encodeURIComponent(addrs(saved.to)).replace(/%40/g, '@').replace(/%3B/g, ';') + '?' + q;
   const e = v => String(v ?? '').replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;');
   const html = `<div style="font-family:Calibri,'Segoe UI',Arial,sans-serif;font-size:11pt;color:#1f2937"><p style="margin:0 0 12px">${e(hi)}</p><p style="margin:0 0 12px">${e(intro)}</p>${table}<p style="margin:12px 0 0">&nbsp;</p></div>`;
   let ok = false; try { await navigator.clipboard.write([new ClipboardItem({ 'text/html': new Blob([html], { type: 'text/html' }), 'text/plain': new Blob([plain], { type: 'text/plain' }) })]); ok = true; } catch { }
+  /* v3.41.6: copy first, then open Outlook: once Outlook has the focus the browser may refuse the clipboard */
+  window.location.href = 'mailto:' + encodeURIComponent(addrs(saved.to)).replace(/%40/g, '@').replace(/%3B/g, ';') + '?' + q;
   if (tableMode) attMailPasteHint(ok); else toast('Email opening with the update in the body. If it opens in the wrong app, see ⚙.');
 }
 function attMailPasteHint(ok) {
@@ -8260,7 +8261,7 @@ async function poll() {
 }
 
 /* ============================== filtering ============================== */
-const APP = { title: "Team Dashboard", version: "3.41.5", released: "30 Sep 2026" };
+const APP = { title: "Team Dashboard", version: "3.41.6", released: "30 Sep 2026" };
 const BASE_DIMS = { status: "status_column", desig: "designation_column", client: "client_column", mode: "mode_column" };
 const STANDARD_STATUSES = ["Active", "Manager", "OJT", "Bench", "New", "Projected", "Left", "Moved"];
 const TILE_ORDER = ["Active", "Manager", "OJT", "Bench", "New", "Projected"];
