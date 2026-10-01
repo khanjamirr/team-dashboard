@@ -4,7 +4,7 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <link rel="icon" href="data:,">
-<title>Team Dashboard · 3.42.2</title>
+<title>Team Dashboard · 3.41.3</title>
 <style>
 :root {
   color-scheme: light;
@@ -1785,10 +1785,6 @@ body.filters-locked #cleanFilters, body.filters-locked #xchips, body.filters-loc
 @media (max-width:650px) { .att-mini li { grid-template-columns:minmax(0,1fr) 40px minmax(0,1.2fr) !important; } }
 .btn.names1[aria-pressed="true"] { background:var(--accent-soft, #e7efe9); border-color:var(--accent); }
 .att-topbtns { display:flex; flex-wrap:wrap; gap:6px; margin:-4px 0 10px; }
-/* v3.41.5: paste hint after ✉ Email */
-.am-hint { position:fixed; left:50%; bottom:24px; transform:translateX(-50%); z-index:300; max-width:min(560px,calc(100vw - 24px)); background:#1f2a44; color:#fff; padding:12px 40px 12px 16px; border-radius:12px; box-shadow:0 12px 32px rgba(0,0,0,.3); font-size:13.5px; line-height:1.45; }
-.am-hint kbd { background:#fff; color:#1f2a44; border-radius:4px; padding:0 5px; font-weight:700; font-size:12px; }
-.am-hint button { position:absolute; top:8px; right:8px; border:0; background:transparent; color:#fff; cursor:pointer; font-size:14px; }
 /* v3.28.2: backup report */
 .att-bkc { justify-self:end; display:inline-flex; align-items:center; gap:6px; min-width:0; max-width:100%; }
 .att-bkc .att-bk { min-width:0; }
@@ -1814,10 +1810,10 @@ body.filters-locked #cleanFilters, body.filters-locked #xchips, body.filters-loc
     <p class="gate-sub">One place for your people, priorities and team insights.</p>
     <div id="connectBody"><div class="empty">Loading…</div></div>
   </div>
-  <p class="gate-ver">3.42.2</p>
+  <p class="gate-ver">3.41.3</p>
 </section>
 
-<div id="app" hidden><aside class="sidebar" aria-label="Workspace navigation"><div class="brand dashboard-identity">      <h1><span id="title">Team Dashboard</span><span class="ver" id="ver" title="Version 3.42.2">3.42.2</span></h1><p class="brand-tag">One place for your people, priorities and team insights.</p>      <span class="sync" id="sync" role="status"><i></i><span id="syncText">Loading…</span></span></div><div class="nav-label">WORKSPACE</div>      <nav class="tabs" role="tablist" aria-label="Pages" aria-orientation="vertical">
+<div id="app" hidden><aside class="sidebar" aria-label="Workspace navigation"><div class="brand dashboard-identity">      <h1><span id="title">Team Dashboard</span><span class="ver" id="ver" title="Version 3.41.3">3.41.3</span></h1><p class="brand-tag">One place for your people, priorities and team insights.</p>      <span class="sync" id="sync" role="status"><i></i><span id="syncText">Loading…</span></span></div><div class="nav-label">WORKSPACE</div>      <nav class="tabs" role="tablist" aria-label="Pages" aria-orientation="vertical">
         <button class="tab on" role="tab" aria-controls="pageSummary" data-view="summary" aria-selected="true" data-icon="🏠" data-short="Home">Overview</button>
         <button class="tab" role="tab" aria-controls="pageEmployees" data-view="employees" aria-selected="false" data-icon="👥" data-short="People">Employees</button>
       <button class="tab" role="tab" aria-controls="pageAttendance" data-view="attendance" aria-selected="false" data-icon="🗓️" data-short="Attend.">Attendance</button>
@@ -7695,7 +7691,7 @@ function renderCard(el, opts = {}) {
       const miniList = list.length ? `<ul class="att-mini">${list.map(x => `<li><span class="att-mini-n">${esc(nm(x.r))}${can('att.info') ? `<button type="button" class="rq-i" data-lainfo="${esc(x.r.name.trim())}" aria-label="Past and upcoming leave of ${esc(nm(x.r))}">i</button>` : ''}</span><span class="att-mini-c">${esc(cl(x.r))}</span><span class="ph-chip c-${esc(x.c)}">${esc(String(x.v).trim().toUpperCase())}</span><span class="att-mini-s">${esc(x.c === 'applied' ? 'Awaiting approval' : labelOf(x.v))}</span>${C.tab === 'late' || !canBackup() ? '<span></span>' : (() => { const k = personKey(x.r.name), b = bkGet(k, rdIso); return `<span class="att-bkc"><em class="bk-yn ${bkYNCls(b)}" title="Backup provided: ${bkYN(b)}">${bkYN(b)}</em>` + (b ? `<button type="button" class="att-bk ${b.live ? 'live' : b.none || b.no ? 'none' : 'set'}" data-bk="${esc(k)}" ${canBackup() ? '' : 'disabled'} title="${esc(bkLabel(b))}">${b.live ? '◉ ' + (b.b ? esc(b.b) : 'Shown live') + (b.half ? ' · ½' : '') : (b.no ? '✕ ' : '↪ ') + (b.b ? esc(b.b) : b.no ? 'Not provided' : 'Provided') + (b.half ? ' · ½' : '')}</button>` : canBackup() ? `<button type="button" class="att-bk add" data-bk="${esc(k)}">+ Backup</button>` : '<span class="att-bk-no">No backup</span>') + '</span>'; })()}</li>`).join('')}</ul>` : `<div class="att-mini-empty">${emptyTxt}</div>`;
       const needBk = C.tab === 'late' ? [] : list, covered = needBk.filter(x => { const b = bkGet(personKey(x.r.name), rdIso); return b && !b.no; }).length;
       const bkLine = needBk.length && canBackup() ? `<div class="att-bk-sum ${covered === needBk.length ? 'ok' : ''}">Backups: <b>${covered} of ${needBk.length}</b> covered${covered < needBk.length ? ' · ' + (needBk.length - covered) + ' without a backup' : ''}</div>` : '';
-      html = head2 + `<div class="att-tabs">${tabBtn('leave', nFull, ' on leave', (nHalf ? ` <em>incl. ${nHalf} half day</em>` : '') + (nLa ? ` <em>+${nLa} awaiting</em>` : ''))}${tabBtn('late', T.late.length, ' late')}<span class="grow"></span>${copyBtn('today', listCopy)}${listCopy.top && listCopy.records.length ? `<button class="btn mini" data-att-mail title="Opens a new Outlook email with the subject filled in and your signature. The update is copied: press Ctrl+V.">✉ Email</button><button class="btn mini ghost" data-att-mailcopy title="Just copy the subject and body">⧉</button>` : ''}${pseudoCol ? `<button type="button" class="btn mini names1" data-att-names="${C.names === 'pseudo' ? 'real' : 'pseudo'}" aria-pressed="${C.names === 'pseudo'}" title="Switch between real and pseudo names">${C.names === 'pseudo' ? 'Pseudo names ⇄' : 'Real names ⇄'}</button>` : ''}</div>` + bkLine + miniList;
+      html = head2 + `<div class="att-tabs">${tabBtn('leave', nFull, ' on leave', (nHalf ? ` <em>incl. ${nHalf} half day</em>` : '') + (nLa ? ` <em>+${nLa} awaiting</em>` : ''))}${tabBtn('late', T.late.length, ' late')}<span class="grow"></span>${copyBtn('today', listCopy)}${listCopy.top && listCopy.records.length ? `<button class="btn mini" data-att-mail title="Opens a new Outlook email for the client (pseudo names). The update is copied: press Ctrl+V above your signature.">✉ Email</button><button class="btn mini ghost" data-att-mailset title="Set who the email goes to (To / Cc)" aria-label="Email recipients">⚙</button>` : ''}${pseudoCol ? `<button type="button" class="btn mini names1" data-att-names="${C.names === 'pseudo' ? 'real' : 'pseudo'}" aria-pressed="${C.names === 'pseudo'}" title="Switch between real and pseudo names">${C.names === 'pseudo' ? 'Pseudo names ⇄' : 'Real names ⇄'}</button>` : ''}</div>` + bkLine + miniList;
     }
   }
   if (S.status === 'ready' && S.ctx && hasRoster()) { const n = rosterGaps().missing.length, u = rosterGaps().notInRoster.length; const bits = []; if (n) bits.push(`${n} ${n === 1 ? 'person' : 'people'} in the workforce file ${n === 1 ? 'isn’t' : 'aren’t'} in the attendance tracker yet`); if (u) bits.push(`${u} tracker ${u === 1 ? 'name doesn’t' : 'names don’t'} match the workforce file`); if (bits.length) html += `<div class="hint" style="margin-top:12px">${bits.join(' · ')}. <button class="linkbtn" data-att-go="health">Fix in Action center</button></div>`; }
@@ -7709,8 +7705,8 @@ function renderCard(el, opts = {}) {
   el.querySelectorAll('[data-att-names]').forEach(b => b.addEventListener('click', () => { S.ui.card.names = b.dataset.attNames; saveCardUi(); again(); }));
   if (!opts.hist) leaveTipDelegate(el);
   el.querySelectorAll('[data-att-go]').forEach(b => b.addEventListener('click', () => { const v = b.dataset.attGo; if (v === 'who' && refDay().getTime() !== TODAY.getTime()) S.ui.who.start = isoDate(refDay()); go(v); if (b.dataset.attNew) setTimeout(() => ACTIONS['new-month'](), 60); }));
-  el.querySelector('[data-att-mail]')?.addEventListener('click', () => { const t = (renderCard._copy || {}).today; if (t) openAttOutlook(t, refDay()); });
-  el.querySelector('[data-att-mailcopy]')?.addEventListener('click', () => { const t = (renderCard._copy || {}).today; if (t) sendAttMail(t, refDay()); });
+  el.querySelector('[data-att-mail]')?.addEventListener('click', () => { const t = (renderCard._copy || {}).today; if (t) sendAttMail(t, refDay()); });
+  el.querySelector('[data-att-mailset]')?.addEventListener('click', openAttMailSettings);
   el.querySelectorAll('[data-att-copy]').forEach(b => b.addEventListener('click', async () => {
     const text = (renderCard._copy || {})[b.dataset.attCopy];
     if (!text?.records.length) { toast('Nothing to copy.'); return; }
@@ -7742,40 +7738,24 @@ function attMailHtml(data, dt) {
 }
 /* v3.41.3: one click: copy the update (pseudo names) and open a new Outlook email with your signature */
 const attMailTo = () => { try { return JSON.parse(localStorage.getItem(MAIL_KEY) || '{}') || {}; } catch { return {}; } };
-/* v3.42.1: ✉ Email = a small panel to copy the subject and the body (greeting, opening line, boxed table) into your own email */
-/* v3.42.2: one click: copy the body, then open a new email (Outlook classic when it's the default mail app) with the
-   subject filled in and your signature; the cursor sits above the signature, so Ctrl+V drops the update in. */
-async function openAttOutlook(data, dt) {
-  const { day, table } = attMailHtml(data, dt), isToday = dt.getTime() === TODAY.getTime();
+async function sendAttMail(data, dt) {
+  const { day, table } = attMailHtml(data, dt), isToday = dt.getTime() === TODAY.getTime(), saved = attMailTo();
   const subj = 'Attendance Update – ' + day, hi = 'Hi Team,', intro = 'Please see below for ' + (isToday ? 'today’s' : 'the') + ' attendance update as of ' + day + '.';
   const e = v => String(v ?? '').replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;');
   const html = `<div style="font-family:Calibri,'Segoe UI',Arial,sans-serif;font-size:11pt;color:#1f2937"><p style="margin:0 0 12px">${e(hi)}</p><p style="margin:0 0 12px">${e(intro)}</p>${table}<p style="margin:12px 0 0">&nbsp;</p></div>`;
-  const plain = hi + '\r\n\r\n' + intro + '\r\n\r\n' + [data.headers, ...data.records].map(r => r.join('\t')).join('\r\n');
-  let ok = false; try { await navigator.clipboard.write([new ClipboardItem({ 'text/html': new Blob([html], { type: 'text/html' }), 'text/plain': new Blob([plain], { type: 'text/plain' }) })]); ok = true; } catch { try { await navigator.clipboard.writeText(plain); ok = true; } catch { } }
-  window.location.href = 'mailto:?subject=' + encodeURIComponent(subj);
-  attMailPasteHint(ok);
+  const plain = hi + '\n\n' + intro + '\n\n' + [data.headers, ...data.records].map(r => r.join('\t')).join('\n');
+  let copied = false; try { await navigator.clipboard.write([new ClipboardItem({ 'text/html': new Blob([html], { type: 'text/html' }), 'text/plain': new Blob([plain], { type: 'text/plain' }) })]); copied = true; } catch { try { await navigator.clipboard.writeText(plain); copied = true; } catch { } }
+  const addrs = v => String(v || '').split(/[;,]/).map(x => x.trim()).filter(Boolean).join(';');
+  const q = ['subject=' + encodeURIComponent(subj), saved.cc ? 'cc=' + encodeURIComponent(addrs(saved.cc)) : '', copied ? '' : 'body=' + encodeURIComponent(plain)].filter(Boolean).join('&');
+  const a = document.createElement('a'); a.href = 'mailto:' + encodeURIComponent(addrs(saved.to)).replace(/%40/g, '@').replace(/%3B/g, ';') + '?' + q; a.click();
+  toast(copied ? 'Outlook is opening. Click above your signature and press Ctrl+V to paste the update.' : 'Outlook is opening. Copying was blocked, so the update is in the body as plain text.');
 }
-function sendAttMail(data, dt) {
-  const { day, table } = attMailHtml(data, dt), isToday = dt.getTime() === TODAY.getTime();
-  const subj = 'Attendance Update – ' + day, hi = 'Hi Team,', intro = 'Please see below for ' + (isToday ? 'today’s' : 'the') + ' attendance update as of ' + day + '.';
-  const e = v => String(v ?? '').replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;');
-  const html = `<div style="font-family:Calibri,'Segoe UI',Arial,sans-serif;font-size:11pt;color:#1f2937"><p style="margin:0 0 12px">${e(hi)}</p><p style="margin:0 0 12px">${e(intro)}</p>${table}</div>`;
-  const plain = hi + '\r\n\r\n' + intro + '\r\n\r\n' + [data.headers, ...data.records].map(r => r.join('\t')).join('\r\n');
-  const m = openModal({ title: 'Email the attendance update', wide: true,
-    body: `<div style="display:flex;align-items:center;gap:8px;margin:0 0 6px"><b class="sm" style="flex:none">Subject</b><input type="text" readonly id="am-subj" value="${esc(subj)}" style="flex:1;min-width:0"><button class="btn primary" id="am-cs" style="background:var(--accent,#2f6b4f);color:#fff;border-color:transparent;flex:none">Copy subject</button></div>
-      <div style="display:flex;align-items:center;gap:8px;margin:14px 0 6px"><b class="sm">Body</b><span class="grow"></span><button class="btn primary" id="am-cb" style="background:var(--accent,#2f6b4f);color:#fff;border-color:transparent;flex:none">Copy body</button></div>
-      <div style="border:1px solid var(--border,#e3e6ec);border-radius:10px;padding:14px 16px;background:#fff;color:#1f2937;max-height:340px;overflow:auto">${html}</div>
-      <p class="sm muted" style="margin:10px 0 0">Copy the subject into your email’s Subject line, then copy the body and paste it into the message with Ctrl+V.</p>`,
-    footer: `<span class="grow"></span><button class="btn" data-close>Close</button>` });
-  const done = (b, t) => { const o = b.textContent; b.textContent = 'Copied ✓'; setTimeout(() => { if (b.isConnected) b.textContent = o; }, 1600); toast(t); };
-  $('#am-cs', m).onclick = async e2 => { try { await navigator.clipboard.writeText(subj); done(e2.currentTarget || $('#am-cs', m), 'Subject copied.'); } catch { $('#am-subj', m).select(); toast('Press Ctrl+C to copy the subject.'); } };
-  $('#am-cb', m).onclick = async () => { const b = $('#am-cb', m); try { await navigator.clipboard.write([new ClipboardItem({ 'text/html': new Blob([html], { type: 'text/html' }), 'text/plain': new Blob([plain], { type: 'text/plain' }) })]); done(b, 'Body copied: paste it into the email with Ctrl+V.'); } catch { try { await navigator.clipboard.writeText(plain); done(b, 'Body copied as text.'); } catch { toast('The browser blocked copying.'); } } };
-}
-function attMailPasteHint(ok) {
-  document.querySelector('.am-hint')?.remove();
-  const d = document.createElement('div'); d.className = 'am-hint'; d.setAttribute('role', 'status');
-  d.innerHTML = ok ? '<b>Outlook is opening.</b> The update table is copied — click at the top of the message (above your signature) and press <kbd>Ctrl</kbd> + <kbd>V</kbd>.<button type="button" aria-label="Close">✕</button>' : '<b>Outlook is opening,</b> but the browser blocked copying. Use “Copy table” and paste it above your signature.<button type="button" aria-label="Close">✕</button>';
-  d.querySelector('button').onclick = () => d.remove(); document.body.append(d); setTimeout(() => d.remove(), 15000);
+function openAttMailSettings() {
+  const saved = attMailTo();
+  const m = openModal({ title: 'Attendance email recipients',
+    body: `<div class="form"><label class="full">To<input type="text" id="am-to" value="${esc(saved.to || '')}" placeholder="name@client.com; another@client.com" autocomplete="off"></label><label class="full">Cc<input type="text" id="am-cc" value="${esc(saved.cc || '')}" placeholder="optional" autocomplete="off"></label></div><p class="sm muted" style="margin:10px 0 0">Saved on this browser. ✉ Email then opens Outlook straight away with these filled in.</p>`,
+    footer: `<span class="grow"></span><button class="btn" data-close>Cancel</button><button class="btn primary" id="am-save">Save</button>` });
+  $('#am-save', m).onclick = () => { try { localStorage.setItem(MAIL_KEY, JSON.stringify({ to: $('#am-to', m).value.trim(), cc: $('#am-cc', m).value.trim() })); } catch { } closeModal(); toast('Recipients saved.'); };
 }
 const MAIL_SIG_KEY = 'td_mail_sig_v1';
 /* keep pasted signatures safe: no scripts, no event handlers, no javascript: links */
@@ -8263,7 +8243,7 @@ async function poll() {
 }
 
 /* ============================== filtering ============================== */
-const APP = { title: "Team Dashboard", version: "3.42.2", released: "30 Sep 2026" };
+const APP = { title: "Team Dashboard", version: "3.41.3", released: "30 Sep 2026" };
 const BASE_DIMS = { status: "status_column", desig: "designation_column", client: "client_column", mode: "mode_column" };
 const STANDARD_STATUSES = ["Active", "Manager", "OJT", "Bench", "New", "Projected", "Left", "Moved"];
 const TILE_ORDER = ["Active", "Manager", "OJT", "Bench", "New", "Projected"];
