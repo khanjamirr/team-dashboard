@@ -3,8 +3,9 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
+<link rel="preconnect" href="https://iiogwevtyzgedhoaqlrn.supabase.co" crossorigin><link rel="dns-prefetch" href="https://iiogwevtyzgedhoaqlrn.supabase.co">
 <link rel="icon" href="data:,">
-<title>Team Dashboard · 3.45.0</title>
+<title>Team Dashboard · 3.45.1</title>
 <style>
 :root {
   color-scheme: light;
@@ -1847,10 +1848,10 @@ body.filters-locked #cleanFilters, body.filters-locked #xchips, body.filters-loc
     <p class="gate-sub">One place for your people, priorities and team insights.</p>
     <div id="connectBody"><div class="empty">Loading…</div></div>
   </div>
-  <p class="gate-ver">3.45.0</p>
+  <p class="gate-ver">3.45.1</p>
 </section>
 
-<div id="app" hidden><aside class="sidebar" aria-label="Workspace navigation"><div class="brand dashboard-identity">      <h1><span id="title">Team Dashboard</span><span class="ver" id="ver" title="Version 3.45.0">3.45.0</span></h1><p class="brand-tag">One place for your people, priorities and team insights.</p>      <span class="sync" id="sync" role="status"><i></i><span id="syncText">Loading…</span></span></div><div class="nav-label">WORKSPACE</div>      <nav class="tabs" role="tablist" aria-label="Pages" aria-orientation="vertical">
+<div id="app" hidden><aside class="sidebar" aria-label="Workspace navigation"><div class="brand dashboard-identity">      <h1><span id="title">Team Dashboard</span><span class="ver" id="ver" title="Version 3.45.1">3.45.1</span></h1><p class="brand-tag">One place for your people, priorities and team insights.</p>      <span class="sync" id="sync" role="status"><i></i><span id="syncText">Loading…</span></span></div><div class="nav-label">WORKSPACE</div>      <nav class="tabs" role="tablist" aria-label="Pages" aria-orientation="vertical">
         <button class="tab on" role="tab" aria-controls="pageSummary" data-view="summary" aria-selected="true" data-icon="🏠" data-short="Home">Overview</button>
         <button class="tab" role="tab" aria-controls="pageEmployees" data-view="employees" aria-selected="false" data-icon="👥" data-short="People">Employees</button>
       <button class="tab" role="tab" aria-controls="pageAttendance" data-view="attendance" aria-selected="false" data-icon="🗓️" data-short="Attend.">Attendance</button>
@@ -3688,13 +3689,15 @@ const Engine = (() => {
   });
   const encode = s => String(s).replace(/[\u0000-\u0008\u000B\u000C\u000E-\u001F]/g, '')
     .replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;');
-  const attr = (s, name) => { const m = s.match(new RegExp('(?:^|\\s)' + name + '="([^"]*)"')); return m ? decode(m[1]) : null; };
+  const ATTR_RE = new Map();   /* v3.45.1: one compiled pattern per attribute name, decode only when needed (faster workbook loading) */
+  const attr = (s, name) => { let re = ATTR_RE.get(name); if (!re) { re = new RegExp('(?:^|\\s)' + name + '="([^"]*)"'); ATTR_RE.set(name, re); } const m = re.exec(s); return m ? (m[1].indexOf('&') < 0 ? m[1] : decode(m[1])) : null; };
 
   /* ---- Excel date helpers (1900 system, first-of-month serials) ---- */
   const serialToDate = n => new Date(Math.round((n - 25569) * 86400000));            // UTC date
   const dateToSerial = d => Math.round(d.getTime() / 86400000) + 25569;
   const monthSerial = (y, m0) => dateToSerial(new Date(Date.UTC(y, m0, 1)));
-  const daysInMonth = serial => { const d = serialToDate(serial); return new Date(Date.UTC(d.getUTCFullYear(), d.getUTCMonth() + 1, 0)).getUTCDate(); };
+  const DIM = new Map();
+  const daysInMonth = serial => { let n = DIM.get(serial); if (n === undefined) { const d = serialToDate(serial); n = new Date(Date.UTC(d.getUTCFullYear(), d.getUTCMonth() + 1, 0)).getUTCDate(); DIM.set(serial, n); } return n; };
 
   /* ---- The three formula columns, replicated exactly (COUNTIF is case-insensitive, no trimming) ---- */
   const upper = v => (v == null ? '' : String(v).toUpperCase());
@@ -5272,9 +5275,14 @@ function reportsView() {
 
 /* ---------- WHO'S OUT ---------- */
 function pendingApplications(all = false) {
+  /* v3.45.1: cached until the tracker or the filters change; past months are skipped (only today onwards counts) */
+  const ck = S.ver + '|' + (all ? 'all' : curSig()) + '|' + rosterRows().length + '|' + TODAY_MS;
+  const C = pendingApplications.c || (pendingApplications.c = {});
+  if (C[all ? 'a' : 's'] && C[all ? 'a' : 's'].k === ck) return C[all ? 'a' : 's'].v.slice();
   const out = [];
-  for (const r of (all ? S.rows : D().rows)) for (let i = 0; i < 31; i++) { if (up(r.days[i]) !== 'LA') continue; if (i >= Engine.daysInMonth(r.month)) continue; const dt = dateOf(r.month, i); if (dt >= TODAY) out.push({ r, i, dt }); }
-  return out.sort((a, b) => a.dt - b.dt || a.r.name.localeCompare(b.r.name));
+  for (const r of (all ? S.rows : D().rows)) { if (r.month < TODAY_MS) continue; for (let i = 0; i < 31; i++) { if (up(r.days[i]) !== 'LA') continue; if (i >= Engine.daysInMonth(r.month)) continue; const dt = dateOf(r.month, i); if (dt >= TODAY) out.push({ r, i, dt }); } }
+  out.sort((a, b) => a.dt - b.dt || a.r.name.localeCompare(b.r.name));
+  C[all ? 'a' : 's'] = { k: ck, v: out }; return out.slice();
 }
 function staleApplications(all = false) {
   const out = [];
@@ -8210,7 +8218,9 @@ function go(view, personKeyArg) {
 }
 /* the status boxes / filters changed: redraw what is on screen */
 function refresh() { if (active() && S.sig !== curSig()) render(); }
-function leave() { closePop(); closeModal(); tipEl().classList.remove('on'); S.visible = false; }
+/* v3.45.1: only close boxes when actually leaving the attendance page. Before, every Overview refresh (auto-sync, new
+   requests) called this and shut an open Record attendance / backup box, so it had to be clicked again. */
+function leave() { if (!S.visible) return; closePop(); closeModal(); tipEl().classList.remove('on'); S.visible = false; }
 /* the host says which page the attendance UI is on now (it moves the element there first) */
 function show(mode) { const changed = S.mode !== mode || !S.visible; if(mode==='reports')S.ui.client='all'; S.mode = mode; S.visible = true; if (changed) { closePop(); closeModal(); } render(); }
 const healthCount = () => (S.status === 'ready' && S.ctx ? healthIssues().filter(i => i.count && i.sev !== 'info').length : null);
@@ -8398,7 +8408,7 @@ async function poll() {
 }
 
 /* ============================== filtering ============================== */
-const APP = { title: "Team Dashboard", version: "3.45.0", released: "30 Sep 2026" };
+const APP = { title: "Team Dashboard", version: "3.45.1", released: "30 Sep 2026" };
 const BASE_DIMS = { status: "status_column", desig: "designation_column", client: "client_column", mode: "mode_column" };
 const STANDARD_STATUSES = ["Active", "Manager", "OJT", "Bench", "New", "Projected", "Left", "Moved"];
 const TILE_ORDER = ["Active", "Manager", "OJT", "Bench", "New", "Projected"];
@@ -11257,10 +11267,11 @@ async function openWorkbook(name) {
   catch (e) { renderConnect({ step: "files", files: connectFiles, selected: name, folder: BE.folderName(), error: e.message }); }
 }
 async function enterApp() {
-  if (window.loadTeamSettings) await loadTeamSettings();
-  await loadData(false);
+  /* v3.45.1: faster start: team settings and the workforce file load at the same time, and the distance settings load in
+     the background instead of holding up the first screen */
+  await Promise.all([window.loadTeamSettings ? loadTeamSettings() : null, loadData(false)]);
   if (window.applyFixedFilters) applyFixedFilters();
-  await initGoogleDistance();
+  initGoogleDistance().catch(e => console.warn('distance settings', e));
   document.title = APP.title + " · " + APP.version;
   $("#title").textContent = APP.title;
   $("#ver").textContent = APP.version;
