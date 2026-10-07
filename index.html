@@ -5,7 +5,7 @@
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <link rel="preconnect" href="https://iiogwevtyzgedhoaqlrn.supabase.co" crossorigin><link rel="dns-prefetch" href="https://iiogwevtyzgedhoaqlrn.supabase.co">
 <link rel="icon" href="data:,">
-<title>Team Dashboard · 3.46.0</title>
+<title>Team Dashboard · 3.46.1</title>
 <style>
 :root {
   color-scheme: light;
@@ -1848,10 +1848,10 @@ body.filters-locked #cleanFilters, body.filters-locked #xchips, body.filters-loc
     <p class="gate-sub">One place for your people, priorities and team insights.</p>
     <div id="connectBody"><div class="empty">Loading…</div></div>
   </div>
-  <p class="gate-ver">3.46.0</p>
+  <p class="gate-ver">3.46.1</p>
 </section>
 
-<div id="app" hidden><aside class="sidebar" aria-label="Workspace navigation"><div class="brand dashboard-identity">      <h1><span id="title">Team Dashboard</span><span class="ver" id="ver" title="Version 3.46.0">3.46.0</span></h1><p class="brand-tag">One place for your people, priorities and team insights.</p>      <span class="sync" id="sync" role="status"><i></i><span id="syncText">Loading…</span></span></div><div class="nav-label">WORKSPACE</div>      <nav class="tabs" role="tablist" aria-label="Pages" aria-orientation="vertical">
+<div id="app" hidden><aside class="sidebar" aria-label="Workspace navigation"><div class="brand dashboard-identity">      <h1><span id="title">Team Dashboard</span><span class="ver" id="ver" title="Version 3.46.1">3.46.1</span></h1><p class="brand-tag">One place for your people, priorities and team insights.</p>      <span class="sync" id="sync" role="status"><i></i><span id="syncText">Loading…</span></span></div><div class="nav-label">WORKSPACE</div>      <nav class="tabs" role="tablist" aria-label="Pages" aria-orientation="vertical">
         <button class="tab on" role="tab" aria-controls="pageSummary" data-view="summary" aria-selected="true" data-icon="🏠" data-short="Home">Overview</button>
         <button class="tab" role="tab" aria-controls="pageEmployees" data-view="employees" aria-selected="false" data-icon="👥" data-short="People">Employees</button>
       <button class="tab" role="tab" aria-controls="pageAttendance" data-view="attendance" aria-selected="false" data-icon="🗓️" data-short="Attend.">Attendance</button>
@@ -7480,8 +7480,10 @@ function bkSave(pKey, name, which, val) {
   if (renderCard.el) renderCard(renderCard.el); notify();
   return ok;
 }
+/* v3.46.1: only people on a live seat (status exactly "Active") are asked for a backup. Manager, OJT, Bench, New,
+   Projected, Left and Moved are not, in Record attendance, request approvals and the backup reminder alike. */
 function bkActive(pKey) {
-  try { if (!hasRoster()) return true; return rosterRows().some(r => personKey(gs(r, 'name_column')) === pKey && isCurrent(r) && !goneKind(r)); } catch { return true; }
+  try { if (!hasRoster()) return true; return rosterRows().some(r => personKey(gs(r, 'name_column')) === pKey && isActive(r) && !goneKind(r)); } catch { return true; }
 }
 const bkRequired = pKey => canBackup() && (window.PERM && PERM.online()) && bkActive(pKey);
 /* ask for the backup, then run approve(); the backup is written once the approval has gone through */
@@ -8412,7 +8414,7 @@ async function poll() {
 }
 
 /* ============================== filtering ============================== */
-const APP = { title: "Team Dashboard", version: "3.46.0", released: "7 Oct 2026" };
+const APP = { title: "Team Dashboard", version: "3.46.1", released: "7 Oct 2026" };
 const BASE_DIMS = { status: "status_column", desig: "designation_column", client: "client_column", mode: "mode_column" };
 const STANDARD_STATUSES = ["Active", "Manager", "OJT", "Bench", "New", "Projected", "Left", "Moved"];
 const TILE_ORDER = ["Active", "Manager", "OJT", "Bench", "New", "Projected"];
