@@ -5,7 +5,7 @@
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <link rel="preconnect" href="https://iiogwevtyzgedhoaqlrn.supabase.co" crossorigin><link rel="dns-prefetch" href="https://iiogwevtyzgedhoaqlrn.supabase.co">
 <link rel="icon" href="data:,">
-<title>Team Dashboard · 3.45.1</title>
+<title>Team Dashboard · 3.46.0</title>
 <style>
 :root {
   color-scheme: light;
@@ -1848,10 +1848,10 @@ body.filters-locked #cleanFilters, body.filters-locked #xchips, body.filters-loc
     <p class="gate-sub">One place for your people, priorities and team insights.</p>
     <div id="connectBody"><div class="empty">Loading…</div></div>
   </div>
-  <p class="gate-ver">3.45.1</p>
+  <p class="gate-ver">3.46.0</p>
 </section>
 
-<div id="app" hidden><aside class="sidebar" aria-label="Workspace navigation"><div class="brand dashboard-identity">      <h1><span id="title">Team Dashboard</span><span class="ver" id="ver" title="Version 3.45.1">3.45.1</span></h1><p class="brand-tag">One place for your people, priorities and team insights.</p>      <span class="sync" id="sync" role="status"><i></i><span id="syncText">Loading…</span></span></div><div class="nav-label">WORKSPACE</div>      <nav class="tabs" role="tablist" aria-label="Pages" aria-orientation="vertical">
+<div id="app" hidden><aside class="sidebar" aria-label="Workspace navigation"><div class="brand dashboard-identity">      <h1><span id="title">Team Dashboard</span><span class="ver" id="ver" title="Version 3.46.0">3.46.0</span></h1><p class="brand-tag">One place for your people, priorities and team insights.</p>      <span class="sync" id="sync" role="status"><i></i><span id="syncText">Loading…</span></span></div><div class="nav-label">WORKSPACE</div>      <nav class="tabs" role="tablist" aria-label="Pages" aria-orientation="vertical">
         <button class="tab on" role="tab" aria-controls="pageSummary" data-view="summary" aria-selected="true" data-icon="🏠" data-short="Home">Overview</button>
         <button class="tab" role="tab" aria-controls="pageEmployees" data-view="employees" aria-selected="false" data-icon="👥" data-short="People">Employees</button>
       <button class="tab" role="tab" aria-controls="pageAttendance" data-view="attendance" aria-selected="false" data-icon="🗓️" data-short="Attend.">Attendance</button>
@@ -3313,6 +3313,8 @@ const CLOUD = (() => {
       if (res.status === 404 && /function|schema cache/i.test(code)) throw cloudErr(500, 'The Supabase database is not set up yet. Run supabase/setup.sql in the SQL Editor.');
       if (res.status === 401) { if (!SUPABASE_CONFIG.anonKey) ls.set(LS_CFG, null); throw cloudErr(401, 'Supabase rejected the anon key. Paste the “anon public” key again from Supabase → Project Settings → API.', { badKey: true }); }
       if (code === 'SESSION_EXPIRED') { dropSession(); throw cloudErr(401, code); }
+      /* v3.46: an admin saving a setting before the database was updated gets told what to do */
+      if (code === 'ADMIN_ONLY' && session && session.role === 'admin' && fn === 'td_admin_set_setting') throw cloudErr(403, 'The database still only lets the super admin save settings. Ask the super admin to run supabase/admin-settings.sql once in Supabase → SQL Editor, then try again.');
       throw cloudErr(code === 'CONFLICT' ? 409 : code === 'ADMIN_ONLY' ? 403 : res.status, code);
     }
     return j;
@@ -3514,7 +3516,7 @@ const CLOUD = (() => {
     document.querySelectorAll('.cloud-links').forEach((el, i, all) => { if (i < all.length - 1) el.remove(); });
   }
   /* v3.11: "Manage passcodes" is now Settings > People & access */
-  function openAdmin() { if (session && session.role === 'superadmin' && window.openSettings) window.openSettings('people'); }
+  function openAdmin() { if (session && window.openSettings) window.openSettings(session.role === 'superadmin' ? 'people' : undefined); }
   /* v3.19.1: custom dashboards are saved one at a time; the database checks who owns each one */
   const saveDashboard = (dash, remove) => rpc('td_save_dashboard', { p_token: tok(), p_dash: dash, p_remove: !!remove });
   return { SUPABASE_CONFIG, saveDashboard, chat, changeMyPasscode, card, resume, mode, decorate, signOut, useLocalFiles, openAdmin, configured, isAdmin, refreshMe, user, getSettings, setSetting, setShared, saveLeaveRequest, admin, _rpc: rpc };
@@ -3569,9 +3571,11 @@ window.PERM = {
   },
   online: () => CLOUD.mode() === 'cloud' && !!CLOUD.user(),
   /* the super admin (or anyone on Excel files on this computer) manages people, rights and fixed filters */
-  isSuper() { return !this.online() || CLOUD.user().role === 'superadmin'; },
+  /* v3.46: admins get every setting and right the super admin has; only People & access (passcodes, logins, rights) stays with the super admin */
+  isSuper() { return !this.online() || ['superadmin', 'admin'].includes(CLOUD.user().role); },
+  isOwner() { return !this.online() || CLOUD.user().role === 'superadmin'; },
   isAdmin() { return this.isSuper(); },
-  rights() { const u = CLOUD.user(); if (!this.online() || u.role === 'superadmin' || !u.permissions || !u.permissions._v) return pick(PERM_KEYS); return u.permissions; },
+  rights() { const u = CLOUD.user(); if (!this.online() || u.role === 'superadmin' || u.role === 'admin' || !u.permissions || !u.permissions._v) return pick(PERM_KEYS); return u.permissions; },
   /* rights saved by an older version: fill in the ones that did not exist yet the way they used to behave */
   upgrade(p) {
     if (!p || !p._v) return p;
@@ -3597,7 +3601,7 @@ window.PERM = {
     return q;
   },
   can(k) {
-    if (!this.online()) return true; const u = CLOUD.user(); if (u.role === 'superadmin') return true;
+    if (!this.online()) return true; const u = CLOUD.user(); if (u.role === 'superadmin' || u.role === 'admin') return true;
     const p = u.permissions || {};
     if (!p._v) return true;   // rights never set: full access, as before
     /* v3.18: upgrade once per rights object instead of on every check (this runs thousands of times per screen) */
@@ -6174,11 +6178,11 @@ function fieldGrantOf(u, name) {
 }
 async function drawFieldAccess(box, names) {
   if (!box) return;
-  const users = (await CLOUD.admin.users()).filter(u => u.role !== 'superadmin');
+  const users = (await CLOUD.admin.users()).filter(u => u.role !== 'superadmin' && u.role !== 'admin');
   if (!box.isConnected) return;
-  if (!users.length) { box.innerHTML = '<p class="sm muted">No admins or users yet. Super admins can always log every field.</p>'; return; }
+  if (!users.length) { box.innerHTML = '<p class="sm muted">No users yet. Super admins and admins can always log every field.</p>'; return; }
   box.innerHTML = `<div style="display:flex;align-items:center;gap:8px;margin:4px 0"><b style="font-size:13px">Who gets a “Log” button</b><span class="grow"></span><button class="btn sm" type="button" id="xfa-all">Tick all</button><button class="btn sm" type="button" id="xfa-none">Clear all</button></div>
-    <div class="sm muted">Super admins can always log every field. Tick a box to give that admin or user a “Log &lt;field&gt;” button on the Attendance pages.</div>
+    <div class="sm muted">Super admins and admins can always log every field. Tick a box to give that user a “Log &lt;field&gt;” button on the Attendance pages.</div>
     <div class="fld-accwrap"><table class="fld-acc"><thead><tr><th>Person</th>${names.map((n, j) => `<th><label style="cursor:pointer" title="Tick or clear this whole column"><input type="checkbox" data-xfcol="${j}"> ${esc(n)}</label></th>`).join('')}</tr></thead><tbody>
     ${users.map(u => `<tr><td><b>${esc(u.name)}</b> <span class="sm muted">ID ${esc(u.login_id || '—')} · ${esc(PERM.roleNames[u.role] || u.role)}${u.active ? '' : ' · can’t sign in'}</span></td>${names.map((n, j) => `<td><input type="checkbox" data-xfu="${esc(String(u.id))}" data-xfj="${j}" aria-label="${esc(u.name)} can log ${esc(n)}"${fieldGrantOf(u, n) ? ' checked' : ''}></td>`).join('')}</tr>`).join('')}</tbody></table></div>
     <div style="display:flex;gap:8px;align-items:center;margin-bottom:12px"><button class="btn primary sm" type="button" id="xfa-save">Save who can log</button><span class="sm muted" id="xfa-msg"></span></div>`;
@@ -6213,7 +6217,7 @@ let FM_TAB = 'fields';
 function openFieldsManager(sel, tab) {
   if (tab) FM_TAB = tab;
   const names = attUserFields(), fillNames = names.filter(canFillField), canAdd = can('att.fields'), canFill = fillNames.length > 0;
-  const superAccess = names.length > 0 && window.PERM && PERM.online() && PERM.isSuper();
+  const superAccess = names.length > 0 && window.PERM && PERM.online() && PERM.isOwner();
   const d = D(), month = S.ui.grid.month || d.latestMonth, fieldSel = sel && fillNames.includes(sel) ? sel : fillNames[0];
   const monthRows = (d.byMonth.get(month) || []).slice().sort((a, b) => a.name.localeCompare(b.name));
   const pendingNote = n => (S.newFields || []).some(x => x.toLowerCase() === n.toLowerCase()) ? ' <span class="tag">added · saves with the next sync</span>' : '';
@@ -8408,7 +8412,7 @@ async function poll() {
 }
 
 /* ============================== filtering ============================== */
-const APP = { title: "Team Dashboard", version: "3.45.1", released: "30 Sep 2026" };
+const APP = { title: "Team Dashboard", version: "3.46.0", released: "7 Oct 2026" };
 const BASE_DIMS = { status: "status_column", desig: "designation_column", client: "client_column", mode: "mode_column" };
 const STANDARD_STATUSES = ["Active", "Manager", "OJT", "Bench", "New", "Projected", "Left", "Moved"];
 const TILE_ORDER = ["Active", "Manager", "OJT", "Bench", "New", "Projected"];
@@ -11688,7 +11692,7 @@ async function chatSync(force) {
     for (const [k, n] of Object.entries(CHAT.unread)) if (n > (before[k] || 0) && n > (CHAT.notified[k] || 0) && !(CHAT.open && CHAT.withId === k)) { toast('💬 New message ' + (k === 'all' ? 'in Everyone' : 'from ' + chatName(k))); CHAT.notified[k] = n; }
     for (const k of Object.keys(CHAT.notified)) if (!CHAT.unread[k]) delete CHAT.notified[k];
     /* the super admin also sees people who have not signed in since chat was added */
-    if (PERM.isSuper() && Date.now() - CHAT.extraAt > 300000) { CHAT.extraAt = Date.now(); CLOUD.admin.users().then(us => { CHAT.extra = new Map((us || []).filter(u => u.active !== false).map(u => [String(u.id), { id: String(u.id), name: u.name, role: u.role, login_id: u.login_id, never: true }])); if (CHAT.open) chatDraw(); }).catch(() => { }); }
+    if (PERM.isOwner() && Date.now() - CHAT.extraAt > 300000) { CHAT.extraAt = Date.now(); CLOUD.admin.users().then(us => { CHAT.extra = new Map((us || []).filter(u => u.active !== false).map(u => [String(u.id), { id: String(u.id), name: u.name, role: u.role, login_id: u.login_id, never: true }])); if (CHAT.open) chatDraw(); }).catch(() => { }); }
   } catch (e) {
     const m = String(e && e.message || e);
     if (/NO_CHAT$/.test(m)) { CHAT.blocked = true; }
@@ -11937,7 +11941,7 @@ function confirmButton(label, sure, fn, cls = 'btn danger') {
 const checkLine = (text, checked, attrs = {}) => { const c = h('input', { type: 'checkbox', checked, ...attrs }); return { box: c, el: h('label', { class: 'chk-line' }, c, h('span', {}, text)) }; };
 
 const MODULES = [
-  { id: 'people', name: 'People & access', show: () => PERM.online() && PERM.isSuper(), draw: drawPeople },
+  { id: 'people', name: 'People & access', show: () => PERM.online() && PERM.isOwner(), draw: drawPeople },
   { id: 'fields', name: 'Mandatory fields', show: () => PERM.isSuper() || PERM.can('set.fields'), draw: drawFields },
   { id: 'choices', name: 'Fields & drop-downs', show: () => PERM.isSuper() || PERM.can('set.fields'), draw: drawChoices },
   { id: 'sync', name: 'Save & sync', show: () => PERM.can('sync.view'), draw: drawSync },
@@ -11970,6 +11974,7 @@ const onSettings = () => typeof state !== 'undefined' && state.view === 'setting
 function rightsSummary(u) {
   const role = PERM.roleNames[u.role] || 'User';
   if (u.role === 'superadmin') return 'Super admin · every right';
+  if (u.role === 'admin') return 'Admin · every right except People & access';
   const p = PERM.upgrade(u.permissions || {});
   if (!p._v) return role + ' · full access';
   for (const [name, preset] of Object.entries(PERM.presets)) if (PERM.keys.every(k => !!p[k] === !!preset[k])) return role + ' · ' + name;
@@ -12207,7 +12212,7 @@ function drawEditor(box, u, reload, users = [], template = null, groups = []) {
     h('p', { class: 'rmod-note' }, 'They start with these filters every time they sign in. Without “Change the filters” they can’t change or clear them.'));
   /* rights, one card per module: the module's page on top, what they can do in it underneath */
   const boxes = {}, syncs = [];
-  const isSuper = () => role.value === 'superadmin';
+  const isSuper = () => role.value === 'superadmin' || role.value === 'admin';
   const modules = PERM.groups.map(g => {
     const items = g.items.map(([k, label]) => { const c = checkLine(label, !!start[k], { 'data-k': k }); boxes[k] = c.box; return c; });
     const subItems = ((g.sub && g.sub.items) || []).map(([k, label]) => { const c = checkLine(label, !!start[k], { 'data-k': k }); boxes[k] = c.box; return c; });
@@ -12268,10 +12273,11 @@ function drawEditor(box, u, reload, users = [], template = null, groups = []) {
   const presetNow = h('small', { class: 'rpre-now' });
   const presets = h('div', { class: 'rights-presets' }, h('span', {}, 'Quick start:'), ...presetBtns, presetNow);
   const superNote = h('p', { class: 'set-hint sup-note' }, '⭐ Super admins can open and change everything, and manage people, groups and access. Nothing to tick.');
+  const adminNote = h('p', { class: 'set-hint sup-note' }, '⭐ Admins get every right and every setting, the same as a super admin, except People & access: they can’t see or change passcodes, logins, groups or rights. Nothing to tick.');
   const roleNote = h('p', { class: 'set-hint' }, 'Pick a quick start, then tick Hide, View or Edit for each area. Open “Fine-tune” on a line only if you need something in between; the line then shows “Custom”.');
-  const rights = h('div', { class: 'rights' }, superNote, roleNote, presets, h('div', { class: 'rrows' }, h('div', { class: 'rgrid-head', 'aria-hidden': 'true' }, h('span', {}, 'Area'), h('span', {}, 'Hide'), h('span', {}, 'View'), h('span', {}, 'Edit'), h('span', {}, '')), ...modules));
+  const rights = h('div', { class: 'rights' }, superNote, adminNote, roleNote, presets, h('div', { class: 'rrows' }, h('div', { class: 'rgrid-head', 'aria-hidden': 'true' }, h('span', {}, 'Area'), h('span', {}, 'Hide'), h('span', {}, 'View'), h('span', {}, 'Edit'), h('span', {}, '')), ...modules));
   rights.addEventListener('change', () => setTimeout(paintPresets)); rights.addEventListener('click', e => { if (e.target.closest('.rseg-b, .rchk')) setTimeout(paintPresets); });
-  const syncRole = () => { const sup = isSuper(); rights.classList.toggle('is-admin', sup); superNote.hidden = !sup; roleNote.hidden = sup; presets.hidden = sup; fixedBox.hidden = sup; audienceBox.hidden = sup; fieldBox.hidden = sup; syncs.forEach(f => f()); };
+  const syncRole = () => { const sup = isSuper(); rights.classList.toggle('is-admin', sup); superNote.hidden = role.value !== 'superadmin'; adminNote.hidden = role.value !== 'admin'; roleNote.hidden = sup; presets.hidden = sup; fixedBox.hidden = sup; audienceBox.hidden = sup; fieldBox.hidden = sup; syncs.forEach(f => f()); };
   role.addEventListener('change', () => { if (isNew && role.value === 'admin') { for (const k of PERM.keys) boxes[k].checked = !!PERM.presets['Admin'][k]; } syncRole(); paintPresets(); });
   syncRole(); paintPresets();
   const rightsNow = () => Object.fromEntries([['_v', PERM.version], ...PERM.keys.map(k => [k, boxes[k].checked])]);
@@ -12491,7 +12497,7 @@ async function drawAttFieldNames(pane, tabs, sup) {
       const to = inp.value.replace(/\s+/g, ' ').trim(); err.textContent = '';
       if (!ATT.renameField(n, to)) return;
       /* people who could log the old field keep that right under the new name */
-      if (PERM.online()) { try { const us = await CLOUD.admin.users(); for (const u of us) { const f = u.permissions && u.permissions._attendanceFields; if (Array.isArray(f) && f.includes(n)) await CLOUD.admin.save(u.id, u.name, u.passcode, u.role, u.active, { ...u.permissions, _attendanceFields: f.map(x => x === n ? to : x) }, u.login_id); } } catch (e) { err.textContent = 'Renamed, but the Log buttons could not be moved for everyone: ' + e.message; } }
+      if (PERM.online() && PERM.isOwner()) { try { const us = await CLOUD.admin.users(); for (const u of us) { const f = u.permissions && u.permissions._attendanceFields; if (Array.isArray(f) && f.includes(n)) await CLOUD.admin.save(u.id, u.name, u.passcode, u.role, u.active, { ...u.permissions, _attendanceFields: f.map(x => x === n ? to : x) }, u.login_id); } } catch (e) { err.textContent = 'Renamed, but the Log buttons could not be moved for everyone: ' + e.message; } }
       toast('Renamed “' + n + '” to “' + to + '”. It is written to Excel with the next save.'); drawAttFieldNames(pane, tabs, sup);
     } }, 'Rename');
     inp.addEventListener('input', () => { const v = inp.value.trim(); b.disabled = !v || v === n; });
