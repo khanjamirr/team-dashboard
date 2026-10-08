@@ -5,7 +5,7 @@
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <link rel="preconnect" href="https://iiogwevtyzgedhoaqlrn.supabase.co" crossorigin><link rel="dns-prefetch" href="https://iiogwevtyzgedhoaqlrn.supabase.co">
 <link rel="icon" href="data:,">
-<title>Team Dashboard · 3.48.0</title>
+<title>Team Dashboard · 3.48.1</title>
 <link rel="preconnect" href="https://fonts.googleapis.com"><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin><link href="https://fonts.googleapis.com/css2?family=Public+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet">
 <style>
 :root {
@@ -1864,7 +1864,7 @@ body { font-feature-settings:"tnum" 1, "lnum" 1; -webkit-font-smoothing:antialia
   .sidebar { background:var(--navy) !important; box-shadow:none !important; border-right:1px solid rgba(255,255,255,.06) !important; }
   .sidebar .brand { padding-bottom:18px !important; border-bottom:1px solid rgba(255,255,255,.1) !important; }
   .sidebar .brand h1 { display:flex !important; align-items:center; flex-wrap:wrap; gap:8px 10px; font-size:16px !important; font-weight:800 !important; letter-spacing:-.01em; }
-  .sidebar .brand h1::before { content:"TD"; display:inline-grid; place-items:center; width:32px; height:32px; border-radius:7px; background:var(--signal); color:#fff; font-size:13px; font-weight:800; letter-spacing:.02em; box-shadow:inset 0 -3px 0 rgba(0,0,0,.18); }
+  .sidebar .brand h1::before { content:""; display:inline-grid; width:32px; height:32px; border-radius:7px; background:var(--signal) url("data:image/svg+xml,%3Csvg%20xmlns%3D%27http%3A//www.w3.org/2000/svg%27%20viewBox%3D%270%200%2024%2024%27%20fill%3D%27none%27%20stroke%3D%27white%27%20stroke-width%3D%272%27%20stroke-linecap%3D%27round%27%20stroke-linejoin%3D%27round%27%3E%3Ccircle%20cx%3D%279%27%20cy%3D%278%27%20r%3D%273.2%27/%3E%3Cpath%20d%3D%27M3.5%2019c.6-3.2%202.8-5%205.5-5s4.9%201.8%205.5%205%27/%3E%3Ccircle%20cx%3D%2716.8%27%20cy%3D%279.2%27%20r%3D%272.4%27/%3E%3Cpath%20d%3D%27M15.6%2014.2c2.4-.3%204.3%201.2%204.9%204.3%27/%3E%3C/svg%3E") center / 20px 20px no-repeat; box-shadow:inset 0 -3px 0 rgba(0,0,0,.18); }
   .sidebar .ver { font-size:10.5px !important; font-weight:700 !important; padding:1px 7px !important; border-radius:4px !important; background:rgba(255,255,255,.1) !important; color:#c9d4e6 !important; }
   .sidebar .brand-tag { color:#8fa1bf !important; font-size:12px !important; }
   .sidebar .nav-label { color:#6f84a6 !important; letter-spacing:.08em !important; font-size:10.5px !important; font-weight:700 !important; }
@@ -1925,7 +1925,7 @@ body { font-feature-settings:"tnum" 1, "lnum" 1; -webkit-font-smoothing:antialia
 .coming-avatar.bday { background:var(--royal) !important; } .coming-avatar.anniv { background:#0f8b6e !important; }
 #pinnedHeader .workspace-heading { padding-top:14px !important; padding-bottom:4px !important; }
 #pinnedHeader header.top { padding-top:10px !important; }
-@media (min-width:701px) { .sidebar .brand h1 { display:grid !important; grid-template-columns:32px minmax(0,1fr); grid-template-rows:auto auto; column-gap:10px; row-gap:2px; align-items:center; } .sidebar .brand h1::before { grid-row:1 / span 2; } .sidebar .brand h1 #title { line-height:1.15; } .sidebar .brand h1 .ver { grid-column:2; justify-self:start; margin:0 !important; } }
+@media (min-width:701px) { .sidebar .brand h1 { display:grid !important; grid-template-columns:32px minmax(0,1fr); grid-template-rows:auto auto; column-gap:10px; row-gap:2px; align-items:center; } .sidebar .brand h1::before { grid-row:1 / span 2; } .sidebar .brand h1 #title { line-height:1.15; white-space:nowrap; font-size:15.5px; } .sidebar .brand h1::before { grid-row:auto !important; } .sidebar .brand h1 .ver { grid-column:2; justify-self:start; margin:0 !important; } }
 </style><style id="v348-simple">
 /* ================= v3.48.0: simpler pages. Less text, secondary actions in "More" menus ================= */
 .sidebar .brand-tag, .sidebar .nav-label { display:none !important; }
@@ -1955,10 +1955,9 @@ body.filters-locked #pinnedHeader .scope-line { color:#9fb0cb !important; margin
     <p class="gate-sub">One place for your people, priorities and team insights.</p>
     <div id="connectBody"><div class="empty">Loading…</div></div>
   </div>
-  <p class="gate-ver">3.48.0</p>
 </section>
 
-<div id="app" hidden><aside class="sidebar" aria-label="Workspace navigation"><div class="brand dashboard-identity">      <h1><span id="title">Team Dashboard</span><span class="ver" id="ver" title="Version 3.48.0">3.48.0</span></h1><p class="brand-tag">One place for your people, priorities and team insights.</p>      <span class="sync" id="sync" role="status"><i></i><span id="syncText">Loading…</span></span></div><div class="nav-label">WORKSPACE</div>      <nav class="tabs" role="tablist" aria-label="Pages" aria-orientation="vertical">
+<div id="app" hidden><aside class="sidebar" aria-label="Workspace navigation"><div class="brand dashboard-identity">      <h1><span id="title">Team Dashboard</span></h1><p class="brand-tag">One place for your people, priorities and team insights.</p>      <span class="sync" id="sync" role="status"><i></i><span id="syncText">Loading…</span></span></div><div class="nav-label">WORKSPACE</div>      <nav class="tabs" role="tablist" aria-label="Pages" aria-orientation="vertical">
         <button class="tab on" role="tab" aria-controls="pageSummary" data-view="summary" aria-selected="true" data-icon="🏠" data-short="Home">Overview</button>
         <button class="tab" role="tab" aria-controls="pageEmployees" data-view="employees" aria-selected="false" data-icon="👥" data-short="People">Employees</button>
       <button class="tab" role="tab" aria-controls="pageAttendance" data-view="attendance" aria-selected="false" data-icon="🗓️" data-short="Attend.">Attendance</button>
@@ -8552,7 +8551,7 @@ async function poll() {
 }
 
 /* ============================== filtering ============================== */
-const APP = { title: "Team Dashboard", version: "3.48.0", released: "8 Oct 2026" };
+const APP = { title: "Team Dashboard", version: "3.48.1", released: "8 Oct 2026" };
 const BASE_DIMS = { status: "status_column", desig: "designation_column", client: "client_column", mode: "mode_column" };
 const STANDARD_STATUSES = ["Active", "Manager", "OJT", "Bench", "New", "Projected", "Left", "Moved"];
 const TILE_ORDER = ["Active", "Manager", "OJT", "Bench", "New", "Projected"];
@@ -11420,8 +11419,7 @@ async function enterApp() {
   initGoogleDistance().catch(e => console.warn('distance settings', e));
   document.title = APP.title + " · " + APP.version;
   $("#title").textContent = APP.title;
-  $("#ver").textContent = APP.version;
-  $("#ver").title = "Version " + APP.version + " · " + APP.released;
+  /* v3.48.1: the version shows only in the browser tab title */
   $("#userchip").textContent = state.file + " · " + BE.folderName();
   $("#connect").hidden = true; $("#app").hidden = false;
   state.view = ["employees", "attendance", "actions", "reports", "settings"].includes(location.hash.slice(1)) ? location.hash.slice(1) : "summary";
