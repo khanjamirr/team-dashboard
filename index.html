@@ -5,7 +5,7 @@
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <link rel="preconnect" href="https://iiogwevtyzgedhoaqlrn.supabase.co" crossorigin><link rel="dns-prefetch" href="https://iiogwevtyzgedhoaqlrn.supabase.co">
 <link rel="icon" href="data:,">
-<title>Team Dashboard · 3.48.1</title>
+<title>Team Dashboard · 3.48.2</title>
 <link rel="preconnect" href="https://fonts.googleapis.com"><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin><link href="https://fonts.googleapis.com/css2?family=Public+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet">
 <style>
 :root {
@@ -1874,18 +1874,31 @@ body { font-feature-settings:"tnum" 1, "lnum" 1; -webkit-font-smoothing:antialia
   .sidebar .tabn, .sidebar .nav-badge { background:var(--signal) !important; color:#fff !important; }
 }
 
-/* ---- masthead: the page title and filters sit on a navy band ---- */
-.sticky-top.pinned-top#pinnedHeader { background:linear-gradient(180deg, var(--navy) 0, var(--navy) calc(100% - 3px), var(--signal) calc(100% - 3px)) !important; border:0 !important; box-shadow:0 6px 16px -10px rgba(11,31,58,.55) !important; margin:0 -36px 18px -36px !important; padding:0 36px 16px !important; color:#e7edf6; }
-#pinnedHeader .workspace-heading h2, #pinnedHeader #cleanPageTitle { color:#fff !important; font-size:26px !important; font-weight:800 !important; letter-spacing:-.02em !important; }
-#pinnedHeader .workspace-heading p, #pinnedHeader .workspace-heading .eyebrow { color:#9fb0cb !important; }
-#pinnedHeader header.top, #pinnedHeader header.top .btn.ghost, #pinnedHeader header.top .userchip, #pinnedHeader header.top .autosync { color:#dbe4f2 !important; border-color:transparent !important; }
-#pinnedHeader header.top .btn.ghost:hover { background:rgba(255,255,255,.1) !important; color:#fff !important; }
-#pinnedHeader .bell-n { background:var(--signal) !important; box-shadow:0 0 0 2px var(--navy) !important; }
-#pinnedHeader .pinned-filters, #pinnedHeader .workspace-filters { background:var(--surface) !important; border:0 !important; border-radius:var(--r-card) !important; box-shadow:0 10px 24px -14px rgba(0,0,0,.6) !important; padding:10px 12px 8px !important; margin:0 !important; color:var(--ink); }
-#pinnedHeader .scope-line { color:var(--ink-2) !important; }
+/* ---- v3.48.2: page header. Light and open: title on top, filters as one tidy row (no boxed panel) ---- */
+.sticky-top.pinned-top#pinnedHeader { background:var(--surface) !important; border:0 !important; border-bottom:1px solid var(--border) !important; box-shadow:0 1px 0 rgba(11,31,58,.03), 0 8px 18px -16px rgba(11,31,58,.35) !important; margin:0 -36px 20px -36px !important; padding:0 36px 12px !important; color:var(--ink); }
+#pinnedHeader .workspace-heading h2, #pinnedHeader #cleanPageTitle { color:var(--ink) !important; font-size:24px !important; font-weight:800 !important; letter-spacing:-.02em !important; }
+#pinnedHeader .workspace-heading p, #pinnedHeader .workspace-heading .eyebrow { color:var(--muted) !important; }
+#pinnedHeader header.top, #pinnedHeader header.top .btn.ghost, #pinnedHeader header.top .userchip, #pinnedHeader header.top .autosync { color:var(--ink-2) !important; border-color:transparent !important; }
+#pinnedHeader header.top .btn.ghost:hover { background:var(--surface-2) !important; color:var(--ink) !important; }
+#pinnedHeader .bell-n { background:var(--signal) !important; box-shadow:0 0 0 2px var(--surface) !important; }
+#pinnedHeader .pinned-filters, #pinnedHeader .workspace-filters { background:transparent !important; border:0 !important; border-radius:0 !important; box-shadow:none !important; padding:0 !important; margin:0 !important; color:var(--ink); }
 #pinnedHeader h1::after, .pinned-top header.top h1::after { display:none !important; }
-@media (max-width:1250px) { .sticky-top.pinned-top#pinnedHeader { margin:0 -16px 16px -16px !important; padding:0 16px 14px !important; } }
-@media (max-width:700px) { .sticky-top.pinned-top#pinnedHeader { margin:0 -12px 12px !important; padding:0 12px 12px !important; } #pinnedHeader .workspace-heading h2, #pinnedHeader #cleanPageTitle { font-size:21px !important; } }
+@media (min-width:701px) {
+  #pinnedHeader .filters { display:flex !important; flex-wrap:wrap; align-items:center; gap:8px !important; }
+  #pinnedHeader .filters .search { flex:1 1 240px !important; width:auto !important; max-width:360px; min-width:180px; grid-column:auto !important; }
+  #pinnedHeader .filters .msel { flex:0 1 170px !important; width:170px; min-width:120px; }
+  #pinnedHeader .bar, #pinnedHeader #cleanFilters, #pinnedHeader #cleanFilters > summary + * { border:0 !important; background:transparent !important; box-shadow:none !important; padding:0 !important; margin:0 !important; border-radius:0 !important; }
+  #pinnedHeader .filters .input, #pinnedHeader .msel { height:38px !important; background:var(--surface) !important; border:1px solid var(--border) !important; border-radius:var(--r-ctl) !important; }
+  #pinnedHeader .filters .msel:hover, #pinnedHeader .filters .input:hover { border-color:var(--axis) !important; }
+  #pinnedHeader #fClear, #pinnedHeader #fMoreOpts { height:38px; padding:0 10px !important; color:var(--royal) !important; font-weight:650 !important; background:transparent !important; border:0 !important; }
+  #pinnedHeader #fClear:hover, #pinnedHeader #fMoreOpts:hover { background:var(--wash) !important; }
+  #pinnedHeader .scope-line { color:var(--muted) !important; font-size:12px !important; margin-top:8px !important; }
+  #pinnedHeader .saved-filter-row { margin-top:10px; padding-top:10px; border-top:1px dashed var(--border); }
+}
+#pinnedHeader .scope-line { color:var(--muted) !important; }
+body.filters-locked #pinnedHeader .scope-line { color:var(--muted) !important; }
+@media (max-width:1250px) { .sticky-top.pinned-top#pinnedHeader { margin:0 -16px 16px -16px !important; padding:0 16px 12px !important; } }
+@media (max-width:700px) { .sticky-top.pinned-top#pinnedHeader { margin:0 -12px 12px !important; padding:0 12px 10px !important; } #pinnedHeader .workspace-heading h2, #pinnedHeader #cleanPageTitle { font-size:21px !important; } }
 
 /* ---- controls ---- */
 .btn { border-radius:var(--r-ctl) !important; font-weight:600; }
@@ -1925,7 +1938,7 @@ body { font-feature-settings:"tnum" 1, "lnum" 1; -webkit-font-smoothing:antialia
 .coming-avatar.bday { background:var(--royal) !important; } .coming-avatar.anniv { background:#0f8b6e !important; }
 #pinnedHeader .workspace-heading { padding-top:14px !important; padding-bottom:4px !important; }
 #pinnedHeader header.top { padding-top:10px !important; }
-@media (min-width:701px) { .sidebar .brand h1 { display:grid !important; grid-template-columns:32px minmax(0,1fr); grid-template-rows:auto auto; column-gap:10px; row-gap:2px; align-items:center; } .sidebar .brand h1::before { grid-row:1 / span 2; } .sidebar .brand h1 #title { line-height:1.15; white-space:nowrap; font-size:15.5px; } .sidebar .brand h1::before { grid-row:auto !important; } .sidebar .brand h1 .ver { grid-column:2; justify-self:start; margin:0 !important; } }
+@media (min-width:701px) { .sidebar .brand h1 { display:grid !important; grid-template-columns:32px minmax(0,1fr); grid-template-rows:auto auto; column-gap:10px; row-gap:2px; align-items:center; } .sidebar .brand h1::before { grid-row:1 / span 2; } .sidebar .brand h1 #title { line-height:1.15; white-space:nowrap; font-size:14.5px; overflow:hidden; text-overflow:ellipsis; } .sidebar .brand h1::before { grid-row:auto !important; } .sidebar .brand h1 .ver { grid-column:2; justify-self:start; margin:0 !important; } }
 </style><style id="v348-simple">
 /* ================= v3.48.0: simpler pages. Less text, secondary actions in "More" menus ================= */
 .sidebar .brand-tag, .sidebar .nav-label { display:none !important; }
@@ -1934,7 +1947,7 @@ body.sf-open .saved-filter-row { display:flex !important; }
 #fMoreOpts { white-space:nowrap; }
 body.filters-locked #fMoreOpts { display:none !important; }
 body.filters-locked #pinnedHeader .pinned-filters, body.filters-locked #pinnedHeader .workspace-filters { background:transparent !important; box-shadow:none !important; padding:0 0 2px !important; }
-body.filters-locked #pinnedHeader .scope-line { color:#9fb0cb !important; margin-top:0 !important; }
+body.filters-locked #pinnedHeader .scope-line { margin-top:0 !important; }
 .info-i { display:inline-grid; place-items:center; width:15px; height:15px; margin-left:6px; border-radius:50%; border:1px solid var(--border); color:var(--muted); font:italic 700 10px/1 Georgia, serif; vertical-align:2px; cursor:help; }
 #cardAttendance .card-head { align-items:flex-start; gap:8px; flex-wrap:nowrap !important; } #cardAttendance .card-head > .grow { min-width:0; }
 #cardAttendance .att-navrow { margin:10px 0 2px; }
@@ -8551,7 +8564,7 @@ async function poll() {
 }
 
 /* ============================== filtering ============================== */
-const APP = { title: "Team Dashboard", version: "3.48.1", released: "8 Oct 2026" };
+const APP = { title: "Team Dashboard", version: "3.48.2", released: "8 Oct 2026" };
 const BASE_DIMS = { status: "status_column", desig: "designation_column", client: "client_column", mode: "mode_column" };
 const STANDARD_STATUSES = ["Active", "Manager", "OJT", "Bench", "New", "Projected", "Left", "Moved"];
 const TILE_ORDER = ["Active", "Manager", "OJT", "Bench", "New", "Projected"];
