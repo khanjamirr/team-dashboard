@@ -5,7 +5,7 @@
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <link rel="preconnect" href="https://iiogwevtyzgedhoaqlrn.supabase.co" crossorigin><link rel="dns-prefetch" href="https://iiogwevtyzgedhoaqlrn.supabase.co">
 <link rel="icon" href="data:,">
-<title>Team Dashboard · 3.52.2</title>
+<title>Team Dashboard · 3.53.0</title>
 <link rel="preconnect" href="https://fonts.googleapis.com"><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin><link href="https://fonts.googleapis.com/css2?family=Public+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet">
 <style>
 :root {
@@ -457,6 +457,7 @@ body { font-size:14px; }
 .tab::before { content:'◫'; font-size:19px; width:22px; text-align:center; }
 .tab[data-view=employees]::before { content:'☷'; }
 .tab[data-view=reports]::before { content:'▥'; }
+.tab[data-view=backups]::before { content:'⛨'; }
 .tab.on,:root[data-theme=dark] .tab.on { color:white; background:#5260db; box-shadow:none; }
 .tab:hover { background:#ffffff12; } .tab.on:hover { background:#626fea; }
 .sidebar-bottom { margin-top:auto; padding:18px 10px 0; font-size:11px; color:#95a4bb; line-height:1.8; }
@@ -1538,6 +1539,7 @@ body.filters-locked #cleanFilters, body.filters-locked #xchips, body.filters-loc
   .sidebar nav.tabs .tab[data-view="attendance"]::before { -webkit-mask-image:url("data:image/svg+xml,%3Csvg%20xmlns%3D%27http%3A//www.w3.org/2000/svg%27%20viewBox%3D%270%200%2024%2024%27%20fill%3D%27none%27%20stroke%3D%27black%27%20stroke-width%3D%272%27%20stroke-linecap%3D%27round%27%20stroke-linejoin%3D%27round%27%3E%3Crect%20x%3D%273%27%20y%3D%275%27%20width%3D%2718%27%20height%3D%2716%27%20rx%3D%272%27/%3E%3Cpath%20d%3D%27M3%2010h18M8%203v4M16%203v4M8%2014h2M14%2014h2M8%2017.5h2%27/%3E%3C/svg%3E"); mask-image:url("data:image/svg+xml,%3Csvg%20xmlns%3D%27http%3A//www.w3.org/2000/svg%27%20viewBox%3D%270%200%2024%2024%27%20fill%3D%27none%27%20stroke%3D%27black%27%20stroke-width%3D%272%27%20stroke-linecap%3D%27round%27%20stroke-linejoin%3D%27round%27%3E%3Crect%20x%3D%273%27%20y%3D%275%27%20width%3D%2718%27%20height%3D%2716%27%20rx%3D%272%27/%3E%3Cpath%20d%3D%27M3%2010h18M8%203v4M16%203v4M8%2014h2M14%2014h2M8%2017.5h2%27/%3E%3C/svg%3E"); }
   .sidebar nav.tabs .tab[data-view="actions"]::before { -webkit-mask-image:url("data:image/svg+xml,%3Csvg%20xmlns%3D%27http%3A//www.w3.org/2000/svg%27%20viewBox%3D%270%200%2024%2024%27%20fill%3D%27none%27%20stroke%3D%27black%27%20stroke-width%3D%272%27%20stroke-linecap%3D%27round%27%20stroke-linejoin%3D%27round%27%3E%3Cpath%20d%3D%27M9%2011l3%203%208-8%27/%3E%3Cpath%20d%3D%27M20%2012v7a2%202%200%200%201-2%202H6a2%202%200%200%201-2-2V6a2%202%200%200%201%202-2h9%27/%3E%3C/svg%3E"); mask-image:url("data:image/svg+xml,%3Csvg%20xmlns%3D%27http%3A//www.w3.org/2000/svg%27%20viewBox%3D%270%200%2024%2024%27%20fill%3D%27none%27%20stroke%3D%27black%27%20stroke-width%3D%272%27%20stroke-linecap%3D%27round%27%20stroke-linejoin%3D%27round%27%3E%3Cpath%20d%3D%27M9%2011l3%203%208-8%27/%3E%3Cpath%20d%3D%27M20%2012v7a2%202%200%200%201-2%202H6a2%202%200%200%201-2-2V6a2%202%200%200%201%202-2h9%27/%3E%3C/svg%3E"); }
   .sidebar nav.tabs .tab[data-view="reports"]::before { -webkit-mask-image:url("data:image/svg+xml,%3Csvg%20xmlns%3D%27http%3A//www.w3.org/2000/svg%27%20viewBox%3D%270%200%2024%2024%27%20fill%3D%27none%27%20stroke%3D%27black%27%20stroke-width%3D%272%27%20stroke-linecap%3D%27round%27%20stroke-linejoin%3D%27round%27%3E%3Cpath%20d%3D%27M4%2020V10M10%2020V4M16%2020v-7M22%2020H2%27/%3E%3C/svg%3E"); mask-image:url("data:image/svg+xml,%3Csvg%20xmlns%3D%27http%3A//www.w3.org/2000/svg%27%20viewBox%3D%270%200%2024%2024%27%20fill%3D%27none%27%20stroke%3D%27black%27%20stroke-width%3D%272%27%20stroke-linecap%3D%27round%27%20stroke-linejoin%3D%27round%27%3E%3Cpath%20d%3D%27M4%2020V10M10%2020V4M16%2020v-7M22%2020H2%27/%3E%3C/svg%3E"); }
+  .sidebar nav.tabs .tab[data-view="backups"]::before { -webkit-mask-image:url("data:image/svg+xml,%3Csvg%20xmlns%3D%27http%3A//www.w3.org/2000/svg%27%20viewBox%3D%270%200%2024%2024%27%20fill%3D%27none%27%20stroke%3D%27black%27%20stroke-width%3D%272%27%20stroke-linecap%3D%27round%27%20stroke-linejoin%3D%27round%27%3E%3Cpath%20d%3D%27M12%203l7%203v5c0%204.5-3%208.3-7%2010-4-1.7-7-5.5-7-10V6z%27/%3E%3Cpath%20d%3D%27M9%2012l2%202%204-4%27/%3E%3C/svg%3E"); mask-image:url("data:image/svg+xml,%3Csvg%20xmlns%3D%27http%3A//www.w3.org/2000/svg%27%20viewBox%3D%270%200%2024%2024%27%20fill%3D%27none%27%20stroke%3D%27black%27%20stroke-width%3D%272%27%20stroke-linecap%3D%27round%27%20stroke-linejoin%3D%27round%27%3E%3Cpath%20d%3D%27M12%203l7%203v5c0%204.5-3%208.3-7%2010-4-1.7-7-5.5-7-10V6z%27/%3E%3Cpath%20d%3D%27M9%2012l2%202%204-4%27/%3E%3C/svg%3E"); }
   .sidebar nav.tabs .tab[data-view="settings"]::before { -webkit-mask-image:url("data:image/svg+xml,%3Csvg%20xmlns%3D%27http%3A//www.w3.org/2000/svg%27%20viewBox%3D%270%200%2024%2024%27%20fill%3D%27none%27%20stroke%3D%27black%27%20stroke-width%3D%272%27%20stroke-linecap%3D%27round%27%20stroke-linejoin%3D%27round%27%3E%3Ccircle%20cx%3D%2712%27%20cy%3D%2712%27%20r%3D%273%27/%3E%3Cpath%20d%3D%27M19.4%2015a1.7%201.7%200%200%200%20.3%201.8l.1.1a2%202%200%201%201-2.8%202.8l-.1-.1a1.7%201.7%200%200%200-2.9%201.2V21a2%202%200%201%201-4%200v-.1a1.7%201.7%200%200%200-2.9-1.2l-.1.1a2%202%200%201%201-2.8-2.8l.1-.1A1.7%201.7%200%200%200%203%2015H3a2%202%200%201%201%200-4h.1a1.7%201.7%200%200%200%201.2-2.9l-.1-.1a2%202%200%201%201%202.8-2.8l.1.1A1.7%201.7%200%200%200%2010%204V3a2%202%200%201%201%204%200v.1a1.7%201.7%200%200%200%202.9%201.2l.1-.1a2%202%200%201%201%202.8%202.8l-.1.1a1.7%201.7%200%200%200%201.2%202.9H21a2%202%200%201%201%200%204h-.1a1.7%201.7%200%200%200-1.5%201z%27/%3E%3C/svg%3E"); mask-image:url("data:image/svg+xml,%3Csvg%20xmlns%3D%27http%3A//www.w3.org/2000/svg%27%20viewBox%3D%270%200%2024%2024%27%20fill%3D%27none%27%20stroke%3D%27black%27%20stroke-width%3D%272%27%20stroke-linecap%3D%27round%27%20stroke-linejoin%3D%27round%27%3E%3Ccircle%20cx%3D%2712%27%20cy%3D%2712%27%20r%3D%273%27/%3E%3Cpath%20d%3D%27M19.4%2015a1.7%201.7%200%200%200%20.3%201.8l.1.1a2%202%200%201%201-2.8%202.8l-.1-.1a1.7%201.7%200%200%200-2.9%201.2V21a2%202%200%201%201-4%200v-.1a1.7%201.7%200%200%200-2.9-1.2l-.1.1a2%202%200%201%201-2.8-2.8l.1-.1A1.7%201.7%200%200%200%203%2015H3a2%202%200%201%201%200-4h.1a1.7%201.7%200%200%200%201.2-2.9l-.1-.1a2%202%200%201%201%202.8-2.8l.1.1A1.7%201.7%200%200%200%2010%204V3a2%202%200%201%201%204%200v.1a1.7%201.7%200%200%200%202.9%201.2l.1-.1a2%202%200%201%201%202.8%202.8l-.1.1a1.7%201.7%200%200%200%201.2%202.9H21a2%202%200%201%201%200%204h-.1a1.7%201.7%200%200%200-1.5%201z%27/%3E%3C/svg%3E"); }
 
   .sidebar nav.tabs .tab::after { content:attr(data-short); font-size:10.5px; font-weight:600; letter-spacing:.01em; }
@@ -1902,6 +1904,7 @@ body.filters-locked #pinnedHeader .scope-line { margin-top:0 !important; }
 #cardAttendance .att-topbtns { display:none !important; }
 #empMore .tdmore-menu { right:0; }
 .watch-head .tdmore .tdmore-menu label { color:var(--ink-2); }
+#pageBackups .bkr-page { padding:18px 22px 22px; } #pageBackups .bkr-page .body { padding:0; }
 #pageReports .card > .card-head { flex-wrap:nowrap !important; align-items:flex-start; } #pageReports .card > .card-head > .grow { min-width:0; } #pageReports .card { overflow:visible !important; }
 
 </style></head>
@@ -1925,6 +1928,7 @@ body.filters-locked #pinnedHeader .scope-line { margin-top:0 !important; }
       <button class="tab" role="tab" aria-controls="pageAttendance" data-view="attendance" aria-selected="false" data-icon="🗓️" data-short="Attend.">Attendance</button>
       <button class="tab" role="tab" aria-controls="pageActions" data-view="actions" aria-selected="false" data-icon="✅" data-short="Actions">Action center<span class="tabn" id="tabActionsN" hidden></span></button>
       <button class="tab" role="tab" aria-controls="pageReports" data-view="reports" aria-selected="false" data-icon="📊" data-short="Reports">Reports</button>
+      <button class="tab" role="tab" aria-controls="pageBackups" data-view="backups" aria-selected="false" data-icon="⛨" data-short="Backups">Backup report</button>
       <button class="tab" role="tab" aria-controls="pageSettings" data-view="settings" aria-selected="false" data-icon="⚙️" data-short="Settings">Settings</button></nav><div class="sidebar-bottom"><div class="local-label"><i></i> Connected to your workbook</div></div></aside>
   <div class="sticky-top pinned-top" id="pinnedHeader">
     <header class="top">
@@ -2021,6 +2025,7 @@ body.filters-locked #pinnedHeader .scope-line { margin-top:0 !important; }
       <div id="slotHealth" hidden></div>
     </div>
     <div id="pageSettings" hidden></div>
+    <div id="pageBackups" hidden><section class="card bkr-page"><div class="body bkr" id="bkPageHost"></div></section></div>
     <div id="pageEmployees" hidden>
       <section class="card c-emp" aria-label="Employee table">
         <div class="tools">
@@ -3695,7 +3700,10 @@ window.PERM = {
   /* filters the super admin fixed for this passcode (optional) */
   fixedFilters() { const u = this.online() ? CLOUD.user() : null; const f = u && u.permissions && u.permissions._filters; return f && typeof f === 'object' ? f : null; },
   canWrite() { return (this.online() && Array.isArray(CLOUD.user()?.permissions?._attendanceFields) && CLOUD.user().permissions._attendanceFields.length > 0) || ['emp.edit', 'emp.add', 'emp.delete', 'emp.bulk', 'emp.fields', 'att.log', 'att.edit', 'att.rows', 'att.addemp', 'att.approve', 'att.holidays', 'att.fields'].some(k => this.can(k)); },
-  canView(view) { return view === 'settings' || this.can(PAGE_OF[view] || 'page.overview'); },
+  /* v3.53.0: the Backup report is its own page: the super admin, and only the people they tick for it (admins included) */
+  canBkReport() { if (!this.online()) return true; const u = CLOUD.user(); return u.role === 'superadmin' || !!(u.permissions && u.permissions._bkReport); },
+  canBkRevenue() { if (!this.online()) return true; const u = CLOUD.user(); return u.role === 'superadmin' || !!(u.permissions && u.permissions._bkReport && u.permissions._bkRevenue); },
+  canView(view) { return view === 'settings' || (view === 'backups' ? this.canBkReport() : this.can(PAGE_OF[view] || 'page.overview')); },
   firstView() { return Object.keys(PAGE_OF).find(v => this.canView(v)) || 'summary'; },
   /* v3.20: user groups. People in the same group see each other's attendance requests and request notifications.
      Kept in the team settings (key user_groups) as [{ id, name, members: [{ id, name }] }]; only the super admin changes them. */
@@ -5630,7 +5638,8 @@ function gridView() {
         can('att.addemp') ? `<button class="btn" data-act="add-row">Add employee</button>` : '',
         can('att.holidays') ? `<button class="btn" data-act="holiday" data-tip="Mark a whole day as a holiday (H) for everyone in one go">Add holiday</button>` : '',
         can('att.addemp') ? `<button class="btn" data-act="new-month">Start / update month</button>` : '',
-        canBackup() ? `<button class="btn" data-act="bk-report" data-tip="Backups for the 26th–25th cycle, with copy and edit">Backup report</button><button class="btn" data-act="bk-marks" aria-pressed="${g.bk !== false}" data-tip="Show or hide a Yes / No backup mark on each leave day">${g.bk === false ? 'Show backup marks' : 'Hide backup marks'}</button>` : '',
+        canBkRep() ? `<button class="btn" data-act="bk-report" data-tip="Backups for the 26th–25th cycle, with copy and edit">Backup report</button>` : '',
+        canBackup() ? `<button class="btn" data-act="bk-marks" aria-pressed="${g.bk !== false}" data-tip="Show or hide a Yes / No backup mark on each leave day">${g.bk === false ? 'Show backup marks' : 'Hide backup marks'}</button>` : '',
         ...(fieldMenuItems().length ? ['<hr>', ...fieldMenuItems()] : [])])}</div>
     ${leaveFilterBar(gridBaseRows())}
     <div class="sm muted" style="margin-bottom:8px"><b class="num">${rows.length}</b> employees${hl ? ` with ${esc(kindNames)} · <b class="num">${fmt(kindDays)}</b> days of that type (other codes faded)` : ''} · <b class="num">${fmt(tot)}</b> leave days <span class="info-i" data-tip="Click any day to set its code, or a day number at the top to mark a holiday for everyone. A blank day counts as present (P), and blank Saturdays / Sundays are week offs.">i</span></div>
@@ -7135,7 +7144,7 @@ const ACTIONS = {
   'track-one'(el) { const rr = rosterRowById(el.dataset.id); if (rr) trackRoster([rr]); },
   'mark-gone'() { openMarkGone(); },
   'bk-marks'() { S.ui.grid.bk = S.ui.grid.bk === false; render(); },
-  'bk-report'() { if (canBackup()) openBackupReport(); },
+  'bk-report'() { openBackupReport(); },
   'ask-name'() { askName(); },
   'act-refresh'() { S.act.items = null; render(); },
   'act-more'() { S.ui.act.shown += 100; render(); },
@@ -7705,8 +7714,11 @@ async function bkCopy(cycle, client, names = BKR.names, yn = 'all', range = null
     try { const ta = document.createElement('textarea'); ta.value = txt; ta.style.position = 'fixed'; ta.style.opacity = '0'; document.body.append(ta); ta.select(); const ok = document.execCommand('copy'); ta.remove(); toast(ok ? 'Backups copied.' : 'The browser blocked copying.'); } catch { toast('The browser blocked copying.'); }
   }
 }
+const canBkRep = () => !window.PERM || PERM.canBkReport();
 function openBackupReport() {
-  if (!canBackup()) { toast('Backups are handled by admins only.'); return; }
+  /* v3.53.0: the report lives on its own page now */
+  if (!canBkRep()) { toast('The Backup report needs access from the super admin.'); return; }
+  if (window.setView) { window.setView('backups'); return; }
   const body = document.createElement('div'); body.className = 'body bkr';
   const close = document.createElement('button'); close.className = 'btn ghost'; close.textContent = '✕'; close.setAttribute('aria-label', 'Close'); close.onclick = () => closeDrawer();
   const hd = document.createElement('header'); const h2 = document.createElement('h2'); h2.textContent = 'Backup report'; hd.append(h2, close);
@@ -7715,7 +7727,8 @@ function openBackupReport() {
 }
 /* v3.36.0: the same report can live in a drawer or inline on Reports > Leave backups */
 function mountBackupReport(body) {
-  if (!canBackup()) { body.innerHTML = '<p class="sm muted">Backups are handled by admins only.</p>'; return; }
+  if (!canBkRep()) { body.innerHTML = '<p class="sm muted">The Backup report needs access from the super admin.</p>'; return; }
+  if (!document.getElementById('liGlobalCss')) { const st = document.createElement('style'); st.id = 'liGlobalCss'; st.textContent = PAST_CSS + LI_CSS + BKR_CSS; document.head.append(st); }
   const cycles = bkCycles();
   if (!BKR.month || !cycles.includes(BKR.month)) BKR.month = cycOf(TODAY);
   const allClients = [...new Set(D(true).rows.map(bkClientOf))].sort();
@@ -7856,7 +7869,7 @@ async function bkGridCopy(G, title, names) {
 /* ---------- v3.52.0: revenue estimate. Admins set a monthly rate per seat (pseudo name); each working day (Mon–Fri) of the
    cycle earns rate ÷ working days. Days not billed are deducted: leave without a backup, half days (½), days the seat
    was empty. Holidays, Seat Shown Live and days covered by a backup are billed. Rates are kept in the team settings. ---------- */
-const isRevAdmin = () => { try { return !(window.PERM && PERM.online()) || isAdminRole(); } catch { return false; } };
+const isRevAdmin = () => { try { return !window.PERM || PERM.canBkRevenue(); } catch { return false; } };
 const seatKey = n => String(n || '').trim().toLowerCase();
 const revSettings = () => { const v = (window.TD_SETTINGS || {}).seat_rates; return v && typeof v === 'object' ? { currency: v.currency || '₹', rates: { ...(v.rates || {}) } } : { currency: '₹', rates: {} }; };
 const revMoney = (n, cur) => (cur || '') + (Math.round(n || 0)).toLocaleString(cur === '₹' ? 'en-IN' : 'en-US');
@@ -8023,7 +8036,7 @@ function renderCard(el, opts = {}) {
     const rows = d.byMonth.get(rms) || [], sub = `${longDate(rd)}${isToday ? ' · today' : rd < TODAY ? ' · past day' : ' · upcoming day'}`, subTip = esc(S.fileName + ' · ' + hostSummary());   /* v3.48.0: file and filters in the tooltip only */
     const nav = `<div class="att-nav" role="group" aria-label="Choose the day"><button class="btn mini" data-att-step="-1" title="Previous day" aria-label="Previous day">‹</button><input type="date" class="input mini" data-att-date value="${rdIso}" aria-label="Show this day"><button class="btn mini" data-att-step="1" title="Next day" aria-label="Next day">›</button><button class="btn mini" data-att-day="today" ${isToday ? 'disabled' : ''}>Today</button></div>`;
     /* v3.48.0: one clean header: title, Open attendance and a More menu; the day picker on its own line */
-    const moreBtns = window.tdMore(['<button type="button" class="btn mini" data-att-hist>History &amp; upcoming</button>', canBackup() ? '<button type="button" class="btn mini" data-bk-report>Backup report</button>' : '']);
+    const moreBtns = window.tdMore(['<button type="button" class="btn mini" data-att-hist>History &amp; upcoming</button>', canBkRep() ? '<button type="button" class="btn mini" data-bk-report>Backup report</button>' : '']);
     const head2 = `<div class="card-head"><div class="grow"><h2>Attendance</h2><div class="sub" title="${subTip}">${sub}</div></div>${goBtns}${moreBtns}</div><div class="att-navrow">${nav}</div>`;
     /* day strip: a compact heat-strip from N days back to M days ahead - a dot per day (darker = more people out), month
        shown only where it changes, full detail in the hover tip. Click a day to see it. Keeps working at any past/next width. */
@@ -8668,7 +8681,7 @@ async function poll() {
 }
 
 /* ============================== filtering ============================== */
-const APP = { title: "Team Dashboard", version: "3.52.2", released: "12 Oct 2026" };
+const APP = { title: "Team Dashboard", version: "3.53.0", released: "12 Oct 2026" };
 const BASE_DIMS = { status: "status_column", desig: "designation_column", client: "client_column", mode: "mode_column" };
 const STANDARD_STATUSES = ["Active", "Manager", "OJT", "Bench", "New", "Projected", "Left", "Moved"];
 const TILE_ORDER = ["Active", "Manager", "OJT", "Bench", "New", "Projected"];
@@ -9691,7 +9704,7 @@ function renderCharts() {
   if (window.REPORT_TABLES && !renderCharts._init) { renderCharts._init = true; for (const c of document.querySelectorAll("#charts > .card")) if (!state.chartView[c.id]) state.chartView[c.id] = "table"; }
   
   const groups = { backups: [], team: ["cardStatus","cardClient","cardSub","cardDesig","cardMode","cardGender","cardLang","cardAge"], growth: ["cardTenure","cardTrend"], location: ["cardArea","cardDist"], attendance: [], custom: [] };
-  const ob = $("#optBackups"), okBk = !!(window.ATT && ATT.canBackup && ATT.canBackup()); if (ob) ob.hidden = !okBk;
+  const ob = $("#optBackups"), okBk = false;   /* v3.53.0: Leave backups moved to its own page (Backup report) */ if (ob) ob.hidden = !okBk;
   if ($("#reportGroup").value === "backups" && !okBk) $("#reportGroup").value = "team";
   const chosen = $("#reportGroup").value; $("#charts").hidden = chosen === "attendance" || chosen === "custom" || chosen === "backups";
   const rt = $("#repTables"); if (rt) rt.hidden = chosen === "custom" || chosen === "backups";
@@ -10142,9 +10155,10 @@ function renderReview() {
 function syncView() {
   window.placeSavedFilters?.();
   document.body.classList.toggle("clean-overview",state.view === "summary");
-  document.getElementById("cleanPageTitle").textContent = ({summary:"Overview",employees:"Employees",attendance:"Attendance",actions:"Action center",reports:"Reports",settings:"Settings"})[state.view] || "Overview";
+  document.getElementById("cleanPageTitle").textContent = ({summary:"Overview",employees:"Employees",attendance:"Attendance",actions:"Action center",reports:"Reports",backups:"Backup report",settings:"Settings"})[state.view] || "Overview";
   $("#pageSettings").hidden = state.view !== "settings";
   $("#pageReports").hidden = state.view !== "reports";
+  $("#pageBackups").hidden = state.view !== "backups";
   document.querySelectorAll('.tab').forEach(t => t.tabIndex = t.dataset.view === state.view ? 0 : -1);
   for (const t of document.querySelectorAll(".tab")) { const on = t.dataset.view === state.view; t.setAttribute("aria-selected", on ? "true" : "false"); t.classList.toggle("on", on); }
   $("#quickAdd").hidden = true;
@@ -10901,6 +10915,7 @@ function renderAll() {
   $("#todayLabel").textContent = new Date().toLocaleDateString(undefined,{weekday:"short",month:"short",day:"numeric"});
   setTimeout(celebratePopup, 400);
   if (state.view === "summary") { window.ATT?.renderApprovalRequests(); renderComing(); renderHolidays(); setTimeout(organizeOverview, 0); renderStrip(); if (window.ATT) { ATT.renderCard($("#cardAttendance")); if (window.PERM && PERM.can("ov.watch")) ATT.renderWatch($("#cardWatch")); } } else if (state.view === "reports") renderCharts(); else if (state.view === "actions") { renderActions(); renderReview(); } else if (state.view === "attendance" || state.view === "settings") { /* these pages draw themselves */ } else renderTable();
+  if (state.view === "backups") { const host = $("#bkPageHost"); const busy = host && (host.contains(document.activeElement) && document.activeElement !== document.body || host.querySelector('[data-rev-save]:not([disabled])')); if (host && !busy) { try { ATT.mountBackupReport(host); } catch (e) { host.textContent = "The attendance workbook isn't ready yet."; } } }
   syncActionTabs(); attSync();
 }
 
@@ -12083,7 +12098,7 @@ const onSettings = () => typeof state !== 'undefined' && state.view === 'setting
 function rightsSummary(u) {
   const role = PERM.roleNames[u.role] || 'User';
   if (u.role === 'superadmin') return 'Super admin · every right';
-  if (u.role === 'admin') return 'Admin · every right except People & access';
+  if (u.role === 'admin') return 'Admin · every right except People & access' + (u.permissions && u.permissions._bkReport ? ' · Backup report' : '');
   const p = PERM.upgrade(u.permissions || {});
   if (!p._v) return role + ' · full access';
   for (const [name, preset] of Object.entries(PERM.presets)) if (PERM.keys.every(k => !!p[k] === !!preset[k])) return role + ' · ' + name;
@@ -12382,16 +12397,22 @@ function drawEditor(box, u, reload, users = [], template = null, groups = []) {
   const presetNow = h('small', { class: 'rpre-now' });
   const presets = h('div', { class: 'rights-presets' }, h('span', {}, 'Quick start:'), ...presetBtns, presetNow);
   const superNote = h('p', { class: 'set-hint sup-note' }, '⭐ Super admins can open and change everything, and manage people, groups and access. Nothing to tick.');
-  const adminNote = h('p', { class: 'set-hint sup-note' }, '⭐ Admins get every right and every setting, the same as a super admin, except People & access: they can’t see or change passcodes, logins, groups or rights. Nothing to tick.');
+  const adminNote = h('p', { class: 'set-hint sup-note' }, '⭐ Admins get every right and every setting, the same as a super admin, except People & access (passcodes, logins, groups, rights) and the Backup report page, which you tick below.');
   const roleNote = h('p', { class: 'set-hint' }, 'Pick a quick start, then tick Hide, View or Edit for each area. Open “Fine-tune” on a line only if you need something in between; the line then shows “Custom”.');
-  const rights = h('div', { class: 'rights' }, superNote, adminNote, roleNote, presets, h('div', { class: 'rrows' }, h('div', { class: 'rgrid-head', 'aria-hidden': 'true' }, h('span', {}, 'Area'), h('span', {}, 'Hide'), h('span', {}, 'View'), h('span', {}, 'Edit'), h('span', {}, '')), ...modules));
+  /* v3.53.0: the Backup report page is given on purpose, also to admins */
+  const bkRep = checkLine('Can open the Backup report page', !!(accessSource && accessSource.permissions && accessSource.permissions._bkReport));
+  const bkRev = checkLine('…including Revenue (seat rates and estimated revenue)', !!(accessSource && accessSource.permissions && accessSource.permissions._bkRevenue));
+  const bkSync = () => { bkRev.box.disabled = !bkRep.box.checked; if (!bkRep.box.checked) bkRev.box.checked = false; }; bkRep.box.addEventListener('change', bkSync); bkSync();
+  const bkBox = h('div', { class: 'rmod-extra bk-access' }, h('p', { class: 'rmod-subt' }, 'Backup report'), bkRep.el, bkRev.el, h('p', { class: 'set-hint' }, 'Off unless you tick it, for admins too. Super admins always have it.'));
+  const bkPerms = () => role.value === 'superadmin' ? {} : { _bkReport: bkRep.box.checked, _bkRevenue: bkRep.box.checked && bkRev.box.checked };
+  const rights = h('div', { class: 'rights' }, superNote, adminNote, bkBox, roleNote, presets, h('div', { class: 'rrows' }, h('div', { class: 'rgrid-head', 'aria-hidden': 'true' }, h('span', {}, 'Area'), h('span', {}, 'Hide'), h('span', {}, 'View'), h('span', {}, 'Edit'), h('span', {}, '')), ...modules));
   rights.addEventListener('change', () => setTimeout(paintPresets)); rights.addEventListener('click', e => { if (e.target.closest('.rseg-b, .rchk')) setTimeout(paintPresets); });
-  const syncRole = () => { const sup = isSuper(); rights.classList.toggle('is-admin', sup); superNote.hidden = role.value !== 'superadmin'; adminNote.hidden = role.value !== 'admin'; roleNote.hidden = sup; presets.hidden = sup; fixedBox.hidden = sup; audienceBox.hidden = sup; fieldBox.hidden = sup; syncs.forEach(f => f()); };
+  const syncRole = () => { const sup = isSuper(); rights.classList.toggle('is-admin', sup); superNote.hidden = role.value !== 'superadmin'; bkBox.hidden = role.value === 'superadmin'; adminNote.hidden = role.value !== 'admin'; roleNote.hidden = sup; presets.hidden = sup; fixedBox.hidden = sup; audienceBox.hidden = sup; fieldBox.hidden = sup; syncs.forEach(f => f()); };
   role.addEventListener('change', () => { if (isNew && role.value === 'admin') { for (const k of PERM.keys) boxes[k].checked = !!PERM.presets['Admin'][k]; } syncRole(); paintPresets(); });
   syncRole(); paintPresets();
   const rightsNow = () => Object.fromEntries([['_v', PERM.version], ...PERM.keys.map(k => [k, boxes[k].checked])]);
   /* v3.16: copy rights between people, duplicate a person, or hand these rights to several people at once */
-  const permsNow = () => isSuper() ? {} : { ...rightsNow(), _attendanceFields: fieldChecks.filter(c => c.box.checked).map(c => c.field), _notificationAudience: { mode: audienceMode.value, users: audienceChecks.filter(c => c.box.checked).map(c => c.id) }, ...(fixed ? { _filters: fixed } : {}) };
+  const permsNow = () => isSuper() ? bkPerms() : { ...bkPerms(), ...rightsNow(), _attendanceFields: fieldChecks.filter(c => c.box.checked).map(c => c.field), _notificationAudience: { mode: audienceMode.value, users: audienceChecks.filter(c => c.box.checked).map(c => c.id) }, ...(fixed ? { _filters: fixed } : {}) };
   const others = users.filter(x => !u || x.id !== u.id);
   const sourceSelect = h('select', { class: 'input', 'aria-label': 'Copy rights from' }, h('option', { value: '' }, 'Choose a person…'), ...others.map(x => h('option', { value: String(x.id) }, x.name + ' · ID ' + (x.login_id || '—') + ' · ' + (PERM.roleNames[x.role] || x.role))));
   const alsoRole = checkLine('Also copy their role', false);
@@ -12468,7 +12489,7 @@ function drawEditor(box, u, reload, users = [], template = null, groups = []) {
       if (!lid) throw new Error('Enter a login ID. Use their Emp ID (pick the linked employee and it fills in).');
       if (linked === undefined) throw new Error('Pick the linked employee from the list, or leave it empty.');
       const link = linked ? { _emp: linked.code, _empName: linked.name } : {};
-      const perms = isSuper() ? link : { ...rightsNow(), ...link, _attendanceFields: fieldChecks.filter(c=>c.box.checked).map(c=>c.field), _notificationAudience: { mode: audienceMode.value, users: audienceChecks.filter(c => c.box.checked).map(c => c.id) }, ...(fixed ? { _filters: fixed } : {}) };
+      const perms = isSuper() ? { ...link, ...bkPerms() } : { ...rightsNow(), ...link, ...bkPerms(), _attendanceFields: fieldChecks.filter(c=>c.box.checked).map(c=>c.field), _notificationAudience: { mode: audienceMode.value, users: audienceChecks.filter(c => c.box.checked).map(c => c.id) }, ...(fixed ? { _filters: fixed } : {}) };
       const r = await CLOUD.admin.save(u ? u.id : null, nm, pc, role.value, active.box.checked, perms, lid);
       const savedId = (r && r.id) || (u && u.id);
       if (savedId != null) { try { await saveGroupsFor(savedId, nm); } catch (ge) { toast('Saved, but the groups could not be updated: ' + ge.message, true); } }
