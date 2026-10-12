@@ -5,7 +5,7 @@
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <link rel="preconnect" href="https://iiogwevtyzgedhoaqlrn.supabase.co" crossorigin><link rel="dns-prefetch" href="https://iiogwevtyzgedhoaqlrn.supabase.co">
 <link rel="icon" href="data:,">
-<title>Team Dashboard · 3.50.0</title>
+<title>Team Dashboard · 3.51.1</title>
 <link rel="preconnect" href="https://fonts.googleapis.com"><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin><link href="https://fonts.googleapis.com/css2?family=Public+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet">
 <style>
 :root {
@@ -1750,7 +1750,7 @@ body.filters-locked #cleanFilters, body.filters-locked #xchips, body.filters-loc
 .bkr-day { display:inline-flex; align-items:center; gap:4px; } .bkr-day input { height:30px; }
 .att-bk-sum [data-bk-copy]{margin-left:10px;font-size:12px}.bkr-cyc{margin:-4px 0 10px}
 .bkr-bar { display:flex; flex-wrap:wrap; align-items:center; gap:8px 12px; margin:0 0 14px; }
-/* v3.49.1: report views as tabs */
+/* v3.51.1: report views as tabs */
 .bkr-views { display:flex; gap:4px; margin:0 0 14px; border-bottom:1px solid var(--border); }
 .bkr-views button { border:0; background:transparent; padding:9px 16px 10px; font:inherit; font-weight:650; font-size:14px; color:var(--ink-2); border-bottom:3px solid transparent; margin-bottom:-1px; cursor:pointer; border-radius:6px 6px 0 0; }
 .bkr-views button:hover { color:var(--ink); background:var(--surface-2); }
@@ -7889,7 +7889,7 @@ function mountBackupReport(body) {
     const tg = (key, opts) => `<div class="att-toggle" role="group">${opts.map(([v, l]) => `<button type="button" data-bkr-t="${key}" data-v="${v}" aria-pressed="${BKR[key] === v}">${l}</button>`).join('')}</div>`;
     const tile = (cls, n, l, sub) => `<div class="bkr-t ${cls}"><b>${n}</b><span>${l}</span><em>${sub}</em></div>`;
     const pl = n => n + ' ' + (n === 1 ? 'person' : 'people'), dl = n => fmt(n) + ' day' + (n === 1 ? '' : 's');
-    /* v3.49.1: the views as tabs on their own row, so switching between Calendar and the Billing grid is one obvious click */
+    /* v3.51.1: the views as tabs on their own row, so switching between Calendar and the Billing grid is one obvious click */
     body.innerHTML = `<div class="bkr-views" role="tablist" aria-label="Report view">${[['cal', 'Calendar', 'Absenteeism and backups, week by week'], ['grid', 'Billing grid', 'One row per person, one cell per day'], ['report', 'Summary', 'Totals, charts and the day-by-day list']].map(([v, l, t]) => `<button type="button" role="tab" data-bkr-t="view" data-v="${v}" aria-selected="${BKR.view === v}" title="${t}">${l}</button>`).join('')}</div>
       <div class="bkr-bar"><label>Cycle <select data-bkr="month">${cycles.map(m => `<option value="${m}"${m === BKR.month ? ' selected' : ''}>${esc(cycLabel(m))}</option>`).join('')}</select></label>
         <label>Client <select data-bkr="client"><option value="all">All clients</option>${allClients.map(c => `<option${c === BKR.client ? ' selected' : ''}>${esc(c)}</option>`).join('')}</select></label>
@@ -7922,7 +7922,7 @@ function mountBackupReport(body) {
       body.querySelector('#bkrSheet').innerHTML = `<div class="bkg-title">${esc(gTitle)}</div><p class="sm muted" style="text-align:center;margin:-6px 0 10px">${esc(cycRange(BKR.month))} · ${G.people.length} people · billed days = P + H + BR (HD and BR½ count half)</p>${bkGridLegend()}<div class="bkg-wrap">${bkGridHTML(G, gTitle, BKR.names)}</div>`;
       body.querySelectorAll('[data-bkg-k]').forEach(el => { const go = () => openBackupBox(el.dataset.bkgK, el.dataset.iso, draw); el.addEventListener('click', go); el.addEventListener('keydown', e => { if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); go(); } }); });
     }
-    /* v3.49.0: calendar view: one block per week (Mon–Fri), each day lists who was on backup, absent or late */
+    /* v3.51.0: calendar view: one block per week (Mon–Fri), each day lists who was on backup, absent or late */
     let CAL = null;
     if (BKR.view === 'cal') {
       CAL = bkCalData(BKR.month, BKR.client, BKR.sub, RG, BKR.late === 'on');
@@ -8008,7 +8008,7 @@ async function bkGridCopy(G, title, names) {
   try { if (window.ClipboardItem && navigator.clipboard?.write) await navigator.clipboard.write([new ClipboardItem({ 'text/plain': new Blob([txt], { type: 'text/plain' }), 'text/html': new Blob([html], { type: 'text/html' }) })]); else await navigator.clipboard.writeText(txt); toast('Grid copied: paste into Excel, Outlook or Teams.'); }
   catch { toast('The browser blocked copying.'); }
 }
-/* ---------- v3.49.0: backup calendar. Weeks as rows, Monday to Friday as columns; under each date a short list of
+/* ---------- v3.51.0: backup calendar. Weeks as rows, Monday to Friday as columns; under each date a short list of
    name + what happened: Backup, Absent (no backup), Half day, Few hours late. Seat Shown Live is left out, because the
    client sees that person as present. ---------- */
 function bkCalData(cycle, client, sub, range, withLate) {
@@ -8759,7 +8759,7 @@ async function poll() {
 }
 
 /* ============================== filtering ============================== */
-const APP = { title: "Team Dashboard", version: "3.50.0", released: "11 Oct 2026" };
+const APP = { title: "Team Dashboard", version: "3.51.1", released: "12 Oct 2026" };
 const BASE_DIMS = { status: "status_column", desig: "designation_column", client: "client_column", mode: "mode_column" };
 const STANDARD_STATUSES = ["Active", "Manager", "OJT", "Bench", "New", "Projected", "Left", "Moved"];
 const TILE_ORDER = ["Active", "Manager", "OJT", "Bench", "New", "Projected"];
