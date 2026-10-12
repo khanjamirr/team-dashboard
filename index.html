@@ -5,7 +5,7 @@
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <link rel="preconnect" href="https://iiogwevtyzgedhoaqlrn.supabase.co" crossorigin><link rel="dns-prefetch" href="https://iiogwevtyzgedhoaqlrn.supabase.co">
 <link rel="icon" href="data:,">
-<title>Team Dashboard · 3.52.0</title>
+<title>Team Dashboard · 3.52.2</title>
 <link rel="preconnect" href="https://fonts.googleapis.com"><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin><link href="https://fonts.googleapis.com/css2?family=Public+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet">
 <style>
 :root {
@@ -457,7 +457,6 @@ body { font-size:14px; }
 .tab::before { content:'◫'; font-size:19px; width:22px; text-align:center; }
 .tab[data-view=employees]::before { content:'☷'; }
 .tab[data-view=reports]::before { content:'▥'; }
-.tab[data-view=onboarding]::before { content:'☎'; }
 .tab.on,:root[data-theme=dark] .tab.on { color:white; background:#5260db; box-shadow:none; }
 .tab:hover { background:#ffffff12; } .tab.on:hover { background:#626fea; }
 .sidebar-bottom { margin-top:auto; padding:18px 10px 0; font-size:11px; color:#95a4bb; line-height:1.8; }
@@ -1539,7 +1538,6 @@ body.filters-locked #cleanFilters, body.filters-locked #xchips, body.filters-loc
   .sidebar nav.tabs .tab[data-view="attendance"]::before { -webkit-mask-image:url("data:image/svg+xml,%3Csvg%20xmlns%3D%27http%3A//www.w3.org/2000/svg%27%20viewBox%3D%270%200%2024%2024%27%20fill%3D%27none%27%20stroke%3D%27black%27%20stroke-width%3D%272%27%20stroke-linecap%3D%27round%27%20stroke-linejoin%3D%27round%27%3E%3Crect%20x%3D%273%27%20y%3D%275%27%20width%3D%2718%27%20height%3D%2716%27%20rx%3D%272%27/%3E%3Cpath%20d%3D%27M3%2010h18M8%203v4M16%203v4M8%2014h2M14%2014h2M8%2017.5h2%27/%3E%3C/svg%3E"); mask-image:url("data:image/svg+xml,%3Csvg%20xmlns%3D%27http%3A//www.w3.org/2000/svg%27%20viewBox%3D%270%200%2024%2024%27%20fill%3D%27none%27%20stroke%3D%27black%27%20stroke-width%3D%272%27%20stroke-linecap%3D%27round%27%20stroke-linejoin%3D%27round%27%3E%3Crect%20x%3D%273%27%20y%3D%275%27%20width%3D%2718%27%20height%3D%2716%27%20rx%3D%272%27/%3E%3Cpath%20d%3D%27M3%2010h18M8%203v4M16%203v4M8%2014h2M14%2014h2M8%2017.5h2%27/%3E%3C/svg%3E"); }
   .sidebar nav.tabs .tab[data-view="actions"]::before { -webkit-mask-image:url("data:image/svg+xml,%3Csvg%20xmlns%3D%27http%3A//www.w3.org/2000/svg%27%20viewBox%3D%270%200%2024%2024%27%20fill%3D%27none%27%20stroke%3D%27black%27%20stroke-width%3D%272%27%20stroke-linecap%3D%27round%27%20stroke-linejoin%3D%27round%27%3E%3Cpath%20d%3D%27M9%2011l3%203%208-8%27/%3E%3Cpath%20d%3D%27M20%2012v7a2%202%200%200%201-2%202H6a2%202%200%200%201-2-2V6a2%202%200%200%201%202-2h9%27/%3E%3C/svg%3E"); mask-image:url("data:image/svg+xml,%3Csvg%20xmlns%3D%27http%3A//www.w3.org/2000/svg%27%20viewBox%3D%270%200%2024%2024%27%20fill%3D%27none%27%20stroke%3D%27black%27%20stroke-width%3D%272%27%20stroke-linecap%3D%27round%27%20stroke-linejoin%3D%27round%27%3E%3Cpath%20d%3D%27M9%2011l3%203%208-8%27/%3E%3Cpath%20d%3D%27M20%2012v7a2%202%200%200%201-2%202H6a2%202%200%200%201-2-2V6a2%202%200%200%201%202-2h9%27/%3E%3C/svg%3E"); }
   .sidebar nav.tabs .tab[data-view="reports"]::before { -webkit-mask-image:url("data:image/svg+xml,%3Csvg%20xmlns%3D%27http%3A//www.w3.org/2000/svg%27%20viewBox%3D%270%200%2024%2024%27%20fill%3D%27none%27%20stroke%3D%27black%27%20stroke-width%3D%272%27%20stroke-linecap%3D%27round%27%20stroke-linejoin%3D%27round%27%3E%3Cpath%20d%3D%27M4%2020V10M10%2020V4M16%2020v-7M22%2020H2%27/%3E%3C/svg%3E"); mask-image:url("data:image/svg+xml,%3Csvg%20xmlns%3D%27http%3A//www.w3.org/2000/svg%27%20viewBox%3D%270%200%2024%2024%27%20fill%3D%27none%27%20stroke%3D%27black%27%20stroke-width%3D%272%27%20stroke-linecap%3D%27round%27%20stroke-linejoin%3D%27round%27%3E%3Cpath%20d%3D%27M4%2020V10M10%2020V4M16%2020v-7M22%2020H2%27/%3E%3C/svg%3E"); }
-  .sidebar nav.tabs .tab[data-view="onboarding"]::before { -webkit-mask-image:url("data:image/svg+xml,%3Csvg%20xmlns%3D%27http%3A//www.w3.org/2000/svg%27%20viewBox%3D%270%200%2024%2024%27%20fill%3D%27none%27%20stroke%3D%27black%27%20stroke-width%3D%272%27%20stroke-linecap%3D%27round%27%20stroke-linejoin%3D%27round%27%3E%3Cpath%20d%3D%27M22%2016.9v3a2%202%200%200%201-2.2%202%2019.8%2019.8%200%200%201-8.6-3.1%2019.5%2019.5%200%200%201-6-6A19.8%2019.8%200%200%201%202.1%204.2%202%202%200%200%201%204.1%202h3a2%202%200%200%201%202%201.7c.1.9.4%201.8.7%202.7a2%202%200%200%201-.5%202.1L8%209.8a16%2016%200%200%200%206%206l1.3-1.3a2%202%200%200%201%202.1-.4c.9.3%201.8.6%202.7.7a2%202%200%200%201%201.7%202z%27/%3E%3C/svg%3E"); mask-image:url("data:image/svg+xml,%3Csvg%20xmlns%3D%27http%3A//www.w3.org/2000/svg%27%20viewBox%3D%270%200%2024%2024%27%20fill%3D%27none%27%20stroke%3D%27black%27%20stroke-width%3D%272%27%20stroke-linecap%3D%27round%27%20stroke-linejoin%3D%27round%27%3E%3Cpath%20d%3D%27M22%2016.9v3a2%202%200%200%201-2.2%202%2019.8%2019.8%200%200%201-8.6-3.1%2019.5%2019.5%200%200%201-6-6A19.8%2019.8%200%200%201%202.1%204.2%202%202%200%200%201%204.1%202h3a2%202%200%200%201%202%201.7c.1.9.4%201.8.7%202.7a2%202%200%200%201-.5%202.1L8%209.8a16%2016%200%200%200%206%206l1.3-1.3a2%202%200%200%201%202.1-.4c.9.3%201.8.6%202.7.7a2%202%200%200%201%201.7%202z%27/%3E%3C/svg%3E"); }
   .sidebar nav.tabs .tab[data-view="settings"]::before { -webkit-mask-image:url("data:image/svg+xml,%3Csvg%20xmlns%3D%27http%3A//www.w3.org/2000/svg%27%20viewBox%3D%270%200%2024%2024%27%20fill%3D%27none%27%20stroke%3D%27black%27%20stroke-width%3D%272%27%20stroke-linecap%3D%27round%27%20stroke-linejoin%3D%27round%27%3E%3Ccircle%20cx%3D%2712%27%20cy%3D%2712%27%20r%3D%273%27/%3E%3Cpath%20d%3D%27M19.4%2015a1.7%201.7%200%200%200%20.3%201.8l.1.1a2%202%200%201%201-2.8%202.8l-.1-.1a1.7%201.7%200%200%200-2.9%201.2V21a2%202%200%201%201-4%200v-.1a1.7%201.7%200%200%200-2.9-1.2l-.1.1a2%202%200%201%201-2.8-2.8l.1-.1A1.7%201.7%200%200%200%203%2015H3a2%202%200%201%201%200-4h.1a1.7%201.7%200%200%200%201.2-2.9l-.1-.1a2%202%200%201%201%202.8-2.8l.1.1A1.7%201.7%200%200%200%2010%204V3a2%202%200%201%201%204%200v.1a1.7%201.7%200%200%200%202.9%201.2l.1-.1a2%202%200%201%201%202.8%202.8l-.1.1a1.7%201.7%200%200%200%201.2%202.9H21a2%202%200%201%201%200%204h-.1a1.7%201.7%200%200%200-1.5%201z%27/%3E%3C/svg%3E"); mask-image:url("data:image/svg+xml,%3Csvg%20xmlns%3D%27http%3A//www.w3.org/2000/svg%27%20viewBox%3D%270%200%2024%2024%27%20fill%3D%27none%27%20stroke%3D%27black%27%20stroke-width%3D%272%27%20stroke-linecap%3D%27round%27%20stroke-linejoin%3D%27round%27%3E%3Ccircle%20cx%3D%2712%27%20cy%3D%2712%27%20r%3D%273%27/%3E%3Cpath%20d%3D%27M19.4%2015a1.7%201.7%200%200%200%20.3%201.8l.1.1a2%202%200%201%201-2.8%202.8l-.1-.1a1.7%201.7%200%200%200-2.9%201.2V21a2%202%200%201%201-4%200v-.1a1.7%201.7%200%200%200-2.9-1.2l-.1.1a2%202%200%201%201-2.8-2.8l.1-.1A1.7%201.7%200%200%200%203%2015H3a2%202%200%201%201%200-4h.1a1.7%201.7%200%200%200%201.2-2.9l-.1-.1a2%202%200%201%201%202.8-2.8l.1.1A1.7%201.7%200%200%200%2010%204V3a2%202%200%201%201%204%200v.1a1.7%201.7%200%200%200%202.9%201.2l.1-.1a2%202%200%201%201%202.8%202.8l-.1.1a1.7%201.7%200%200%200%201.2%202.9H21a2%202%200%201%201%200%204h-.1a1.7%201.7%200%200%200-1.5%201z%27/%3E%3C/svg%3E"); }
 
   .sidebar nav.tabs .tab::after { content:attr(data-short); font-size:10.5px; font-weight:600; letter-spacing:.01em; }
@@ -1906,63 +1904,6 @@ body.filters-locked #pinnedHeader .scope-line { margin-top:0 !important; }
 .watch-head .tdmore .tdmore-menu label { color:var(--ink-2); }
 #pageReports .card > .card-head { flex-wrap:nowrap !important; align-items:flex-start; } #pageReports .card > .card-head > .grow { min-width:0; } #pageReports .card { overflow:visible !important; }
 
-/* ---- v3.50.0: Onboarding page ---- */
-#pageOnboarding { display:flex; flex-direction:column; gap:16px; }
-#pageOnboarding[hidden] { display:none; }
-.onb-bar { display:flex; flex-wrap:wrap; align-items:center; gap:8px; }
-.onb-seg { display:inline-flex; border:1px solid var(--border); border-radius:var(--r-ctl); overflow:hidden; background:var(--surface); }
-.onb-seg button { border:0; background:transparent; padding:8px 13px; font:inherit; font-size:13px; font-weight:600; color:var(--ink-2); cursor:pointer; }
-.onb-seg button + button { border-left:1px solid var(--border); }
-.onb-seg button[aria-pressed="true"] { background:var(--ink); color:var(--surface); }
-.onb-bar .input { height:36px; width:auto; }
-.onb-whosel { min-width:180px; }
-.onb-err { padding:10px 14px; border-radius:8px; background:#fdecee; color:#8a1020; font-size:13px; }
-.onb-kpis { display:grid; grid-template-columns:repeat(4,minmax(0,1fr)); border:1px solid var(--border); border-radius:var(--r-card); background:var(--surface); box-shadow:var(--lift); overflow:hidden; }
-.onb-kpi { position:relative; display:flex; flex-direction:column; gap:2px; padding:16px 20px 14px; border-left:1px solid var(--border); min-width:0; }
-.onb-kpi:first-child { border-left:0; }
-.onb-kpi::before { content:""; position:absolute; left:0; right:0; top:0; height:4px; background:var(--tone); }
-.onb-kpi b { font-size:32px; font-weight:800; letter-spacing:-.03em; line-height:1.15; font-variant-numeric:tabular-nums; }
-.onb-kpi span { font-size:13px; font-weight:650; color:var(--ink); }
-.onb-kpi em { font-style:normal; font-size:12px; color:var(--muted); white-space:nowrap; overflow:hidden; text-overflow:ellipsis; }
-.onb-grid { display:grid; grid-template-columns:minmax(0,1.7fr) minmax(0,1fr); gap:16px; align-items:start; }
-.onb-card { padding:18px 20px; }
-.onb-card .card-head { margin-bottom:12px; }
-.onb-list { list-style:none; margin:0; padding:0; display:flex; flex-direction:column; }
-.onb-row { display:grid; grid-template-columns:150px minmax(0,1fr); grid-template-rows:auto auto; column-gap:14px; padding:10px 0; border-top:1px solid var(--grid); }
-.onb-row:first-child { border-top:0; }
-.onb-who { grid-row:1 / span 2; display:flex; flex-direction:column; justify-content:center; min-width:0; }
-.onb-who b { font-weight:700; white-space:nowrap; overflow:hidden; text-overflow:ellipsis; } .onb-who small { color:var(--muted); font-size:11.5px; }
-.onb-bars { position:relative; height:22px; }
-.onb-calls { position:absolute; inset:0 auto 0 0; background:color-mix(in srgb,var(--ink) 10%,var(--surface)); border-radius:4px; }
-.onb-stack { position:absolute; left:0; top:4px; bottom:4px; right:0; display:flex; }
-.onb-stack i { display:block; height:100%; min-width:2px; } .onb-stack i:first-child { border-radius:3px 0 0 3px; } .onb-stack i:last-child { border-radius:0 3px 3px 0; }
-.onb-says { font-size:12.5px; color:var(--ink-2); margin-top:4px; font-variant-numeric:tabular-nums; } .onb-says span { color:var(--muted); margin:0 3px; } .onb-says b { color:var(--ink); }
-.onb-legend { display:flex; flex-wrap:wrap; gap:6px 16px; margin-top:12px; font-size:12px; color:var(--ink-2); } .onb-legend span { display:inline-flex; align-items:center; gap:6px; }
-.onb-sw { display:inline-block; width:12px; height:10px; border-radius:2px; } .onb-sw.calls { background:color-mix(in srgb,var(--ink) 14%,var(--surface)); }
-.onb-tbl { width:100%; border-collapse:collapse; font-size:13px; font-variant-numeric:tabular-nums; }
-.onb-tbl th, .onb-tbl td { padding:8px 10px; border-bottom:1px solid var(--grid); text-align:left; }
-.onb-tbl thead th { background:var(--surface-2); color:var(--ink-2); font-size:12px; font-weight:700; border-bottom:1px solid var(--border); }
-.onb-tbl .n { text-align:right; } .onb-tbl tbody th { font-weight:600; }
-.onb-tbl tfoot th, .onb-tbl tfoot td { border-top:2px solid var(--border); border-bottom:0; font-weight:700; }
-.onb-scroll { overflow:auto; max-height:420px; border:1px solid var(--border); border-radius:8px; } .onb-scroll thead th { position:sticky; top:0; z-index:1; }
-.onb-entries td.onb-note { max-width:220px; white-space:nowrap; overflow:hidden; text-overflow:ellipsis; color:var(--ink-2); }
-.onb-none, .onb-empty { padding:22px; text-align:center; color:var(--ink-2); }
-.onb-trend { display:flex; align-items:flex-end; gap:6px; height:160px; padding-top:6px; overflow-x:auto; }
-.onb-day { flex:1 0 22px; display:flex; flex-direction:column; align-items:center; gap:4px; height:100%; }
-.onb-col { flex:1; width:100%; display:flex; align-items:flex-end; justify-content:center; gap:2px; }
-.onb-col i { display:block; width:30%; max-width:12px; border-radius:2px 2px 0 0; min-height:1px; }
-.onb-col i.c { background:color-mix(in srgb,var(--ink) 16%,var(--surface)); } .onb-col i.s { background:#7da2e8; } .onb-col i.d { background:#0f8b6e; }
-.onb-day small { font-size:10.5px; color:var(--muted); }
-.onb-drawer .onb-form-top { display:grid; grid-template-columns:1fr 1.3fr; gap:12px; }
-.onb-drawer .onb-form { display:grid; grid-template-columns:repeat(auto-fill,minmax(150px,1fr)); gap:0 12px; }
-.onb-drawer .onb-num { font-size:16px; font-weight:650; font-variant-numeric:tabular-nums; }
-.onb-drawer .onb-h3 { font-size:13px; margin:4px 0 8px; color:var(--ink); }
-.onb-drawer .onb-spoke { margin:-4px 0 14px; font-size:13px; color:var(--ink-2); }
-.onb-drawer .onb-inact { margin:-4px 0 12px; font-size:13px; }
-.onb-drawer .onb-actions { display:flex; gap:8px; align-items:center; margin-top:6px; }
-.onb-drawer .field small.hint { font-size:11.5px; color:var(--muted); margin-top:-2px; }
-@media (max-width:1100px) { .onb-grid { grid-template-columns:minmax(0,1fr); } }
-@media (max-width:760px) { .onb-seg { width:100%; } .onb-seg button { flex:1 1 0; padding:8px 4px; font-size:12px; } .onb-kpis { grid-template-columns:repeat(2,minmax(0,1fr)); } .onb-kpi:nth-child(3) { border-left:0; } .onb-kpi:nth-child(n+3) { border-top:1px solid var(--border); } .onb-row { grid-template-columns:96px minmax(0,1fr); } .onb-drawer .onb-form-top { grid-template-columns:1fr; } }
 </style></head>
 
 
@@ -1984,7 +1925,6 @@ body.filters-locked #pinnedHeader .scope-line { margin-top:0 !important; }
       <button class="tab" role="tab" aria-controls="pageAttendance" data-view="attendance" aria-selected="false" data-icon="🗓️" data-short="Attend.">Attendance</button>
       <button class="tab" role="tab" aria-controls="pageActions" data-view="actions" aria-selected="false" data-icon="✅" data-short="Actions">Action center<span class="tabn" id="tabActionsN" hidden></span></button>
       <button class="tab" role="tab" aria-controls="pageReports" data-view="reports" aria-selected="false" data-icon="📊" data-short="Reports">Reports</button>
-      <button class="tab" role="tab" aria-controls="pageOnboarding" data-view="onboarding" aria-selected="false" data-icon="☎" data-short="Onboard.">Onboarding</button>
       <button class="tab" role="tab" aria-controls="pageSettings" data-view="settings" aria-selected="false" data-icon="⚙️" data-short="Settings">Settings</button></nav><div class="sidebar-bottom"><div class="local-label"><i></i> Connected to your workbook</div></div></aside>
   <div class="sticky-top pinned-top" id="pinnedHeader">
     <header class="top">
@@ -2067,7 +2007,6 @@ body.filters-locked #pinnedHeader .scope-line { margin-top:0 !important; }
         <div class="card chart" id="cardAge"></div>
       </section><div id="customDash" class="cd-page" hidden></div><div id="bkReportsWrap" class="card" hidden><div class="section-heading"><div><h2>Leave backups</h2><p>Backup Provided / Not Provided for each leave day, by 26th–25th cycle. Edit and copy from here.</p></div></div><div id="bkReportsHost" class="bkr"></div></div><div id="attReportsWrap" hidden><div class="section-heading"><div><h2>Attendance</h2><p>Leave, unplanned absences and who is out · from the attendance workbook · linked to your report selection</p></div></div><div id="slotReports"></div></div></div>
     <div id="pageAttendance" hidden><div id="slotAttendance"><div id="attHost"></div></div></div>
-    <div id="pageOnboarding" hidden></div>
     <div id="pageActions" hidden>
       <div class="section-heading"><div><h2>Action center</h2><p>Everything that needs a decision or a fix, in one place · independent of search and report filters</p></div><span id="todayLabel"></span></div>
       <div class="atabs" role="tablist" aria-label="Action center sections">
@@ -2416,7 +2355,7 @@ async function openBook(u8, sheetPref) {
     name: s.getAttribute("name"), state: s.getAttribute("state") || "visible",
     path: resolvePath("xl/workbook.xml", relMap[s.getAttributeNS(NS_REL, "id")]),
   }));
-  const notData = n => n === "Attendance Tracker" || n === "Activity Log";   // v3.11: the activity sheet is never the workforce sheet
+  const notData = n => n === "Attendance Tracker" || n === "Activity Log" || n === "Onboarding Log";   /* v3.52.1: a leftover Onboarding Log sheet is never the workforce sheet */   // v3.11: the activity sheet is never the workforce sheet
   const sheet = sheets.find(s => s.name === sheetPref) || sheets.find(s => s.state === "visible" && !notData(s.name)) || sheets.find(s => !notData(s.name)) || sheets.find(s => s.state === "visible") || sheets[0];
   if (!sheet) throw new ApiErr(400, "The workbook has no sheets.");
   const sheetBytes = await zip.get(sheet.path);
@@ -2905,100 +2844,6 @@ async function flushActivity() {
   try { await serial(async () => { if (!LOGQ.length) return; const { fh, u8 } = await readFile(); await writeBlob(fh, new Blob([u8]), []); Conn.cache = null; }); }
   catch (_) { scheduleLogFlush(30000); }
 }
-/* ------------------------------ v3.50.0: onboarding numbers are a sheet in the workbook ------------------------------
-   One row per onboarder per day in an "Onboarding Log" sheet (plus one "Inactive" row per day for the team). Each save
-   reads the latest workbook, replaces only the rows that changed and writes it back, so entries from several people
-   at the same time all land. The last (hidden) column keeps the row as data for the dashboard. */
-const ONB_SHEET = "Onboarding Log";
-const ONB_FIELDS = [["calls", "Calls made"], ["lt", "Live transfer"], ["sl", "Schedule later"], ["ac", "Already completed"], ["lb", "Local branch"], ["self", "Self"], ["done", "Completed onboarding"]];
-const ONB_HEAD = ["Date", "Onboarder", ...ONB_FIELDS.map(f => f[1]), "Notes", "Entered by", "Updated", "Data (used by the dashboard)"];
-const onbKey = (d, w) => String(d) + "|" + String(w || "").trim().toLowerCase();
-async function sheetLocate(zip, name) {
-  const wbx = td.decode(await zip.get("xl/workbook.xml")), rels = td.decode(await zip.get("xl/_rels/workbook.xml.rels"));
-  let rid = null, target = null;
-  for (const m of wbx.matchAll(/<(?:\w+:)?sheet\b[^>]*>/g)) if (xattr(m[0], "name") === name) rid = xattr(m[0], "r:id");
-  if (rid) for (const m of rels.matchAll(/<Relationship\b[^>]*>/g)) if (xattr(m[0], "Id") === rid) target = xattr(m[0], "Target");
-  return { wbx, rels, path: target ? resolvePath("xl/workbook.xml", target) : null };
-}
-async function onbRead(zip, loc) {
-  const e = loc.path && zip.find(loc.path); if (!e) return [];
-  const doc = parseXml(await zip.get(loc.path)), sd = doc.getElementsByTagNameNS(NS_MAIN, "sheetData")[0], out = [];
-  let shared = null, head = null;
-  const sharedStr = async i => { if (!shared) { shared = []; const b = await zip.get("xl/sharedStrings.xml"); if (b) for (const si of kids(parseXml(b).documentElement, "si")) shared.push(siText(si)); } return shared[i] ?? ""; };
-  if (sd) for (const row of kids(sd, "row")) {
-    const v = {};
-    for (const c of kids(row, "c")) {
-      const ref = splitRef(c.getAttribute("r")); if (!ref) continue;
-      const t = c.getAttribute("t");
-      if (t === "inlineStr") { const is = firstKid(c, "is"); v[ref.col] = is ? siText(is) : ""; }
-      else { const ve = firstKid(c, "v"); if (ve) v[ref.col] = t === "s" ? await sharedStr(+ve.textContent) : ve.textContent; }
-    }
-    if (!head) { head = v; continue; }
-    const col = name => { for (const [k, x] of Object.entries(head)) if (String(x).trim().toLowerCase() === name.toLowerCase()) return v[k]; return undefined; };
-    let item = null; const js = col(ONB_HEAD[ONB_HEAD.length - 1]);
-    if (js) { try { item = JSON.parse(js); } catch (_) { item = null; } }
-    if (!item) {   /* typed in Excel: read the visible columns */
-      let d = col("Date"); if (d != null && /^\d+(\.\d+)?$/.test(String(d))) d = new Date(Date.UTC(1899, 11, 30) + Math.floor(+d) * 86400000).toISOString().slice(0, 10);
-      item = { date: String(d || "").slice(0, 10), who: String(col("Onboarder") || "").trim(), vals: {}, notes: String(col("Notes") || ""), by: String(col("Entered by") || ""), at: String(col("Updated") || "") };
-      for (const [k, l] of ONB_FIELDS) { const n = Number(col(l)); if (Number.isFinite(n) && String(col(l) ?? "") !== "") item.vals[k] = n; }
-    }
-    if (item && /^\d{4}-\d{2}-\d{2}$/.test(item.date || "") && item.who) out.push(item);
-  }
-  return out;
-}
-async function onbWrite(zip, loc, items) {
-  const rows = [ONB_HEAD, ...items.map(e => [e.date, e.who, ...ONB_FIELDS.map(([k]) => (e.vals && Number.isFinite(e.vals[k]) ? e.vals[k] : "")), e.notes || "", e.by || "", e.at || "", JSON.stringify(e)])];
-  const cell = (ref, v) => (v === "" || v == null ? "" : typeof v === "number" ? `<c r="${ref}"><v>${v}</v></c>` : `<c r="${ref}" t="inlineStr"><is><t xml:space="preserve">${xmlEsc(String(v).slice(0, 32000))}</t></is></c>`);
-  const body = rows.map((r, i) => `<row r="${i + 1}">` + r.map((v, j) => cell(idxToCol(j + 1) + (i + 1), v)).join("") + "</row>").join("");
-  const widths = [12, 22, ...ONB_FIELDS.map(() => 14), 30, 18, 19, 12], last = ONB_HEAD.length;
-  const xml = '<?xml version="1.0" encoding="UTF-8" standalone="yes"?>\r\n' +
-    `<worksheet xmlns="${NS_MAIN}" xmlns:r="${NS_REL}"><dimension ref="A1:${idxToCol(last)}${rows.length}"/>` +
-    '<sheetViews><sheetView workbookViewId="0"><pane ySplit="1" topLeftCell="A2" activePane="bottomLeft" state="frozen"/></sheetView></sheetViews>' +
-    '<sheetFormatPr defaultRowHeight="15"/><cols>' + widths.map((w, i) => `<col min="${i + 1}" max="${i + 1}" width="${w}" customWidth="1"${i === last - 1 ? ' hidden="1"' : ""}/>`).join("") + "</cols>" +
-    `<sheetData>${body}</sheetData><pageMargins left="0.7" right="0.7" top="0.75" bottom="0.75" header="0.3" footer="0.3"/></worksheet>`;
-  let path = loc.path;
-  if (!path) {
-    let n = 1; while (zip.find("xl/worksheets/sheet" + n + ".xml")) n++;
-    path = "xl/worksheets/sheet" + n + ".xml";
-    const ids = [...loc.rels.matchAll(/\sId="rId(\d+)"/g)].map(m => +m[1]); const rid = "rId" + (Math.max(0, ...ids) + 1);
-    const sheetIds = [...loc.wbx.matchAll(/\ssheetId="(\d+)"/g)].map(m => +m[1]); const sid = Math.max(0, ...sheetIds) + 1;
-    const pre = (/<(\w+:)?sheets\b/.exec(loc.wbx) || [])[1] || "";
-    const wbx = loc.wbx.replace(new RegExp("</" + pre + "sheets>"), `<${pre}sheet name="${ONB_SHEET}" sheetId="${sid}" r:id="${rid}" xmlns:r="${NS_REL}"/></${pre}sheets>`);
-    const rels = loc.rels.replace("</Relationships>", `<Relationship Id="${rid}" Type="http://schemas.openxmlformats.org/officeDocument/2006/relationships/worksheet" Target="worksheets/sheet${n}.xml"/></Relationships>`);
-    let ct = td.decode(await zip.get("[Content_Types].xml"));
-    if (!ct.includes(`PartName="/${path}"`)) ct = ct.replace("</Types>", `<Override PartName="/${path}" ContentType="application/vnd.openxmlformats-officedocument.spreadsheetml.worksheet+xml"/></Types>`);
-    await zip.set("xl/workbook.xml", te.encode(wbx)); await zip.set("xl/_rels/workbook.xml.rels", te.encode(rels)); await zip.set("[Content_Types].xml", te.encode(ct));
-  }
-  await zip.set(path, te.encode(xml));
-}
-async function onbLoad() {
-  const { u8 } = await readFile(), zip = await Zip.open(u8);
-  return onbRead(zip, await sheetLocate(zip, ONB_SHEET));
-}
-/* changes: [{ put: entry } | { del: { date, who } }]; log: activity entries for the same save */
-async function onbSave(changes, log) {
-  return serial(async () => {
-    for (let attempt = 0; ; attempt++) {
-      try {
-        const { fh, f, u8 } = await readFile(), zip = await Zip.open(u8), loc = await sheetLocate(zip, ONB_SHEET);
-        let items = await onbRead(zip, loc);
-        for (const c of changes) {
-          const e = c.put || c.del, k = onbKey(e.date, e.who);
-          items = items.filter(x => onbKey(x.date, x.who) !== k);
-          if (c.put) items.push(c.put);
-        }
-        items.sort((a, b) => b.date.localeCompare(a.date) || (a.who === "Inactive") - (b.who === "Inactive") || a.who.localeCompare(b.who));
-        await onbWrite(zip, loc, items);
-        const out = await zip.build();
-        if (sigOf(await fh.getFile()) !== sigOf(f)) throw new ApiErr(409, "The workbook changed during saving.", null, "CONFLICT");
-        try { await backup(u8); } catch (_) { /* the save itself matters more */ }
-        await writeBlob(fh, out, (log || []).map(e => ({ time: nowText(), user: ME, ...e })));
-        Conn.cache = null;
-        return items;
-      } catch (e) { if (!isRace(e) || attempt >= 2) throw e; Conn.cache = null; await sleep(300 + attempt * 600); }
-    }
-  });
-}
 const isCloud = () => !!(Conn.dir && Conn.dir.name === "Supabase");
 let ME = "You";   /* the name shown next to this person's changes in Activity (set from the Attendance page or the header) */
 const userName = () => ME;
@@ -3429,7 +3274,6 @@ return {
   folderName: () => (Conn.dir ? Conn.dir.name : ""),
   /* used by the Attendance page (same folder, same backups folder, same activity log) */
   dir: () => Conn.dir, kvGet, kvSet, backup, writeBlob, appendActivity, nowText, readActivity, readData, writeData, isCloud, flushActivity, ACT_VERBS, actDetails,
-  onbLoad, onbSave, ONB_FIELDS, onbKey,
   userName, setUser: n => { ME = String(n || "").trim() || "You"; },
   async isLocked(name) { for (const cand of ["~$" + name, "~$" + name.slice(2)]) { try { await Conn.dir.getFileHandle(cand); return true; } catch (e) { /* not there */ } } return false; },
   fileName: () => Conn.fileName,
@@ -3777,7 +3621,6 @@ const PERM_GROUPS = [
     sub: { title: 'Types in Record attendance', items: [['log.LA', 'LA · Leave application (pending)'], ['log.AL', 'AL · Approved leave'], ['log.CL', 'CL · Casual leave'], ['log.SL', 'SL · Sick leave'], ['log.UL', 'UL · Unplanned leave'], ['log.AB', 'AB · Absent'], ['log.HD1', 'HD1 · Half day, 1st half'], ['log.HD2', 'HD2 · Half day, 2nd half'], ['log.R', 'R · Remote'], ['log.L', 'L · Late coming'], ['log.C', 'C · Cab late']] } },
   { name: 'Action center', page: 'page.actions', items: [['act.items', 'See Action items'], ['act.review', 'See Designation reviews'], ['act.health', 'See Attendance data health']] },
   { name: 'Reports', page: 'page.reports', items: [['rep.team', 'Team composition'], ['rep.growth', 'Tenure & growth'], ['rep.location', 'Location & travel'], ['rep.attendance', 'Attendance reports'], ['rep.custom', 'See custom dashboards (their own and shared ones)'], ['rep.export', 'Copy report tables and charts'], ['rep.build', 'Create and edit custom dashboards']] },
-  { name: 'Onboarding', page: 'page.onboarding', items: [['onb.enter', 'Enter their own daily onboarding numbers'], ['onb.all', 'Enter or fix anyone’s numbers, and the team’s Inactive counts']] },
   { name: 'Save & sync', items: [['sync.view', 'Open the Save & sync settings'], ['sync.auto', 'Start or stop auto-sync'], ['sync.save', 'Save now and undo']] },
 
   { name: 'ⓘ Leave card', items: [['att.info', 'See the ⓘ button next to names (Request Center, Applications ahead, attendance card) with anyone’s past and upcoming leave and late comings']] },
@@ -3791,13 +3634,13 @@ const LOG_CODES = ['AL', 'CL', 'SL', 'UL', 'AB', 'HD1', 'HD2', 'LA', 'R', 'L', '
 const oldLogKeys = p => LOG_CODES.filter(c => ['AL', 'CL', 'SL'].includes(c) ? p['att.approve'] : c === 'LA' ? true : p['att.edit']).map(c => 'log.' + c);
 const PAGES = PERM_GROUPS.filter(g => g.page).map(g => g.page);
 const PERM_KEYS = [...PAGES, ...PERM_GROUPS.flatMap(g => [...g.items, ...((g.sub && g.sub.items) || [])].map(i => i[0]))];
-const PAGE_OF = { summary: 'page.overview', employees: 'page.employees', attendance: 'page.attendance', actions: 'page.actions', reports: 'page.reports', onboarding: 'page.onboarding' };
+const PAGE_OF = { summary: 'page.overview', employees: 'page.employees', attendance: 'page.attendance', actions: 'page.actions', reports: 'page.reports' };
 const pick = keys => Object.fromEntries([['_v', PERM_VERSION], ...PERM_KEYS.map(k => [k, ['notifications.view', 'requests.own', 'requests.rejected'].includes(k) || (k === 'requests.approvals' && keys.includes('att.approve')) || keys.includes(k)])]);
 const ROLE_NAMES = { superadmin: 'Super admin', admin: 'Admin', user: 'User' };
 /* v3.14: what a page shows by default once someone may open it (red flags and new fields stay off until ticked) */
 const VIEW_KEYS = ['ov.attendance', 'ov.coming', 'ov.holidays', 'act.items', 'act.review', 'act.health', 'rep.team', 'rep.growth', 'rep.location', 'rep.attendance', 'rep.custom', 'rep.export'];
 /* v3.17: rights that change data; everything else only lets someone see things. Used by the None / View / Edit switch per module. */
-const EDIT_KEYS = new Set(['onb.enter', 'onb.all', 'att.approve', 'emp.edit', 'emp.add', 'emp.delete', 'emp.bulk', 'emp.fields', 'att.log', 'att.direct', 'att.edit', 'att.rows', 'att.holidays', 'att.fields', 'att.addemp', ...LOG_CODES.map(c => 'log.' + c), 'sync.auto', 'sync.save', 'filters.custom', 'set.fields', 'set.workbook', 'chat.all', 'rep.build']);
+const EDIT_KEYS = new Set(['att.approve', 'emp.edit', 'emp.add', 'emp.delete', 'emp.bulk', 'emp.fields', 'att.log', 'att.direct', 'att.edit', 'att.rows', 'att.holidays', 'att.fields', 'att.addemp', ...LOG_CODES.map(c => 'log.' + c), 'sync.auto', 'sync.save', 'filters.custom', 'set.fields', 'set.workbook', 'chat.all', 'rep.build']);
 const UPG = new WeakMap();
 window.PERM = {
   groups: PERM_GROUPS, keys: PERM_KEYS, roleNames: ROLE_NAMES, version: PERM_VERSION, isEditKey: k => EDIT_KEYS.has(k),
@@ -3806,7 +3649,6 @@ window.PERM = {
     'Admin': pick(PERM_KEYS),
     'Editor': pick([...PAGES, ...VIEW_KEYS, 'ov.openatt', 'rep.build', ...oldLogKeys({ 'att.edit': true }), 'emp.edit', 'emp.add', 'emp.bulk', 'att.who', 'att.grid', 'att.log', 'att.edit', 'att.rows', 'att.addemp', 'filters.custom', 'activity.view', 'tools.distance', 'sync.view', 'sync.auto', 'sync.save']),
     'Leave approver': pick([...PAGES, ...VIEW_KEYS, 'att.info', 'ov.openatt', ...LOG_CODES.map(c => 'log.' + c), 'att.direct', 'ov.watch', 'att.who', 'att.grid', 'att.log', 'att.edit', 'att.rows', 'att.approve', 'filters.custom', 'activity.view', 'sync.view', 'sync.auto', 'sync.save']),
-    'Onboarder': pick(['page.onboarding', 'onb.enter']),
     'Leave logger': pick(['page.overview', 'page.attendance', 'ov.attendance', 'ov.coming', 'att.who', 'att.log', 'log.LA', 'sync.save']),
     'View only': pick([...PAGES, ...VIEW_KEYS, 'att.who', 'att.grid']),
   },
@@ -3827,7 +3669,6 @@ window.PERM = {
     /* v3.17: the Open attendance button must be given on purpose; the holidays card is shown to anyone who sees the Overview */
     /* v3.19: custom dashboards: anyone who can open Reports sees them; building them must be given on purpose */
     /* v3.26.3: the ⓘ leave card got its own right; keep what people could see before (grid or approvers) */
-    if (q._v < 14) { q['page.onboarding'] = false; q['onb.enter'] = false; q['onb.all'] = false; }   /* v3.50: Onboarding is given on purpose */
     if (q._v < 13) q['att.info'] = !!q['att.approve'];
     if (q._v < 12) { q['rep.custom'] = !!q['page.reports']; q['rep.build'] = false; }
     if (q._v < 10) { q['ov.openatt'] = false; q['ov.holidays'] = !!q['page.overview']; }
@@ -3853,7 +3694,7 @@ window.PERM = {
   linkedEmp() { const u = this.online() ? CLOUD.user() : null; const p = (u && u.permissions) || {}; return p._emp ? { code: String(p._emp), name: p._empName || '' } : null; },
   /* filters the super admin fixed for this passcode (optional) */
   fixedFilters() { const u = this.online() ? CLOUD.user() : null; const f = u && u.permissions && u.permissions._filters; return f && typeof f === 'object' ? f : null; },
-  canWrite() { return (this.online() && Array.isArray(CLOUD.user()?.permissions?._attendanceFields) && CLOUD.user().permissions._attendanceFields.length > 0) || ['emp.edit', 'emp.add', 'emp.delete', 'emp.bulk', 'emp.fields', 'att.log', 'att.edit', 'att.rows', 'att.addemp', 'att.approve', 'att.holidays', 'att.fields', 'onb.enter', 'onb.all'].some(k => this.can(k)); },
+  canWrite() { return (this.online() && Array.isArray(CLOUD.user()?.permissions?._attendanceFields) && CLOUD.user().permissions._attendanceFields.length > 0) || ['emp.edit', 'emp.add', 'emp.delete', 'emp.bulk', 'emp.fields', 'att.log', 'att.edit', 'att.rows', 'att.addemp', 'att.approve', 'att.holidays', 'att.fields'].some(k => this.can(k)); },
   canView(view) { return view === 'settings' || this.can(PAGE_OF[view] || 'page.overview'); },
   firstView() { return Object.keys(PAGE_OF).find(v => this.canView(v)) || 'summary'; },
   /* v3.20: user groups. People in the same group see each other's attendance requests and request notifications.
@@ -7930,10 +7771,10 @@ function mountBackupReport(body) {
     let CAL = null;
     if (BKR.view === 'cal') {
       CAL = bkCalData(BKR.month, BKR.client, BKR.sub, RG, BKR.late === 'on');
-      const n = CAL.count, out = n.bDays + n.nDays, cov = out ? Math.round(n.bDays / out * 100) : 100;
+      const n = CAL.count, out = n.bDays + n.nDays + n.uDays, cov = out ? Math.round(n.bDays / out * 100) : 100;
       const spanTxt = BKR.span === 'cycle' ? 'Month · ' + cycRange(BKR.month) : (BKR.span === 'week' ? 'Week · ' : 'Day · ') + bkRangeLabel(RG);
       body.querySelector('#bkrSheet').innerHTML = `<div class="bkg-title">${esc(gTitle)}</div><p class="sm muted" style="text-align:center;margin:-6px 0 10px">${esc(spanTxt)}</p>
-        <div class="bkr-tiles bkcal-tiles">${tile('a', dl(out), 'Absent (leave days)', pl(n.pOut))}${tile('b', dl(n.bDays), 'Backup Provided', pl(n.pB))}${tile('n', dl(n.nDays), 'Backup Not Provided', pl(n.pN))}${tile('c', cov + '%', 'Covered by a backup', n.live ? n.live + ' seat shown live, not counted' : 'of absent days')}${BKR.late === 'on' ? tile('t', String(n.late), 'Late comings', pl(n.pL)) : ''}</div>
+        <div class="bkr-tiles bkcal-tiles">${tile('a', dl(out), 'Absent (leave days)', pl(n.pOut))}${tile('b', dl(n.bDays), 'Backup Provided', pl(n.pB))}${tile('n', dl(n.nDays), 'Backup Not Provided', pl(n.pN))}${n.uDays ? tile('u', dl(n.uDays), 'Not updated yet', pl(n.pU) + ' · click a name to set it') : ''}${tile('c', cov + '%', 'Covered by a backup', n.live ? n.live + ' seat shown live, not counted' : 'of absent days')}${BKR.late === 'on' ? tile('t', String(n.late), 'Late comings', pl(n.pL)) : ''}</div>
         <div class="bkcal-wrap">${bkCalHTML(CAL, BKR.names)}</div>`;
       body.querySelectorAll('[data-bkcal-k]').forEach(el => { const go = () => openBackupBox(el.dataset.bkcalK, el.dataset.iso, draw); el.addEventListener('click', go); el.addEventListener('keydown', e => { if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); go(); } }); });
     }
@@ -8081,7 +7922,7 @@ function bkCalData(cycle, client, sub, range, withLate) {
   const d = D(true), { start, end } = cycParts(cycle), from = range ? range.from : isoDate(start), to = range ? range.to : isoDate(end);
   const f = new Date(from + 'T00:00:00Z'), t = new Date(to + 'T00:00:00Z');
   const mon = new Date(f.getTime() - ((f.getUTCDay() + 6) % 7) * 86400000);   /* the Monday on or before the first day */
-  const weeks = [], count = { backup: 0, absent: 0, late: 0, live: 0, bDays: 0, nDays: 0 }, pp = { pOut: new Set(), pB: new Set(), pN: new Set(), pL: new Set() };
+  const weeks = [], count = { backup: 0, none: 0, unset: 0, late: 0, live: 0, bDays: 0, nDays: 0, uDays: 0 }, pp = { pOut: new Set(), pB: new Set(), pN: new Set(), pU: new Set(), pL: new Set() };
   for (let w = new Date(mon); w <= t; w = new Date(w.getTime() + 7 * 86400000)) {
     const days = [];
     for (let k = 0; k < 5; k++) {
@@ -8098,12 +7939,14 @@ function bkCalData(cycle, client, sub, range, withLate) {
             const b = bkGet(key, iso);
             if (bkLive(b)) { count.live++; continue; }
             const dd = c === 'half' ? 0.5 : 1; pp.pOut.add(key);
-            if (bkYes(b)) { st = 'backup'; label = 'Backup' + (b.half && c !== 'half' ? ' (half day)' : ''); if (b.half && c !== 'half') { count.bDays += dd / 2; count.nDays += dd / 2; pp.pN.add(key); } else count.bDays += dd; pp.pB.add(key); }
-            else if (c === 'half') { st = 'half'; label = 'Half day'; count.nDays += dd; pp.pN.add(key); }
-            else { st = 'absent'; label = 'Absent'; count.nDays += dd; pp.pN.add(key); }
+            /* v3.52.2: say plainly whether a backup was provided: Provided, Not Provided, or Not updated (nobody recorded it yet) */
+            const hd = c === 'half' ? ' (½ day leave)' : '';
+            if (bkYes(b)) { st = 'backup'; label = 'Backup Provided' + (b.half && c !== 'half' ? ' (½ day)' : hd); if (b.half && c !== 'half') { count.bDays += dd / 2; count.nDays += dd / 2; pp.pN.add(key); } else count.bDays += dd; pp.pB.add(key); }
+            else if (b) { st = 'none'; label = 'Backup Not Provided' + hd; count.nDays += dd; pp.pN.add(key); }
+            else { st = 'unset'; label = 'Not updated' + hd; count.uDays += dd; pp.pU.add(key); }
           }
           if (!st) continue;
-          count[st === 'half' ? 'absent' : st]++;
+          count[st]++;
           entries.push({ key, iso, name: r.name.trim(), pseudo: bkPseudo(r), st, label, leave: st !== 'late', set: !!bkGet(key, iso), remark: st !== 'late' ? bkRemark(key, iso) : '' });
         }
         entries.sort((a, b) => a.name.localeCompare(b.name));
@@ -8119,7 +7962,7 @@ const monthName = ms => ['January', 'February', 'March', 'April', 'May', 'June',
 function bkCalHTML(C, names, forCopy) {
   const nm = e => names === 'pseudo' ? e.pseudo : e.name, ed = !forCopy && canBackup();
   const B = 'border:2px solid #000;', thin = 'border-left:1px solid #000;border-right:1px solid #000;border-bottom:1px solid #d0d4da;';
-  const stCol = { backup: '#1b7f3b', absent: '#c62828', half: '#a15c00', late: '#a15c00' };
+  const stCol = { backup: '#1b7f3b', none: '#c62828', unset: '#6b7280', late: '#a15c00' };
   const dayLbl = (x, first) => x.dt.getUTCDate() + (first || x.dt.getUTCDate() === 1 ? ' ' + MONTHS[x.dt.getUTCMonth()] : '');
   const rowsOf = wk => Math.max(3, ...wk.map(x => x.entries.length));
   const total = C.weeks.reduce((a, wk) => a + 1 + rowsOf(wk), 0);
@@ -8128,8 +7971,8 @@ function bkCalHTML(C, names, forCopy) {
     const n = rowsOf(wk);
     out += '<tr class="dh">' + (wi === 0 ? `<td class="mon" rowspan="${total}"${forCopy ? ` style="${B}padding:6px 10px;font-weight:700;vertical-align:middle;text-align:center"` : ''}>${esc(C.month)}</td>` : '')
       + wk.map(x => { const l = x.inRange ? dayLbl(x, firstShown) : ''; if (x.inRange) firstShown = false;
-        const nb = x.entries.filter(e => e.st === 'backup').length, nn = x.entries.filter(e => e.st === 'absent' || e.st === 'half').length;
-        const cnt = !forCopy && x.inRange && (nb + nn) ? `<span class="bkcal-cnt">${nn ? `<i class="n" title="Backup not provided">${nn}</i>` : ''}${nb ? `<i class="b" title="Backup provided">${nb}</i>` : ''}</span>` : '';
+        const nb = x.entries.filter(e => e.st === 'backup').length, nn = x.entries.filter(e => e.st === 'none').length, nu = x.entries.filter(e => e.st === 'unset').length;
+        const cnt = !forCopy && x.inRange && (nb + nn + nu) ? `<span class="bkcal-cnt">${nb ? `<i class="b" title="Backup provided">${nb}</i>` : ''}${nn ? `<i class="n" title="Backup not provided">${nn}</i>` : ''}${nu ? `<i class="u" title="Not updated yet">${nu}</i>` : ''}</span>` : '';
         return `<th colspan="2" class="${x.inRange ? '' : 'out'}"${forCopy ? ` style="${B}padding:3px;text-align:center;font-weight:600;${x.inRange ? '' : 'background:#f3f4f6'}"` : ''}>${esc(l)}${cnt}</th>`; }).join('') + '</tr>';
     for (let r = 0; r < n; r++) {
       out += '<tr>' + wk.map(x => {
@@ -8157,7 +8000,7 @@ async function bkCalCopy(C, title, names) {
   try { if (window.ClipboardItem && navigator.clipboard?.write) await navigator.clipboard.write([new ClipboardItem({ 'text/plain': new Blob([lines.join('\n')], { type: 'text/plain' }), 'text/html': new Blob([html], { type: 'text/html' }) })]); else await navigator.clipboard.writeText(lines.join('\n')); toast('Calendar copied: paste into Excel, Outlook or Teams.'); }
   catch { toast('The browser blocked copying.'); }
 }
-const BKCAL_CSS = `.rev-tools{display:flex;flex-wrap:wrap;align-items:center;gap:8px 12px;margin:4px 0 10px}.rev-tools label{display:inline-flex;align-items:center;gap:6px;font-size:12.5px;color:#475569}.rev-tools input{height:30px;border:1px solid #cbd5e1;border-radius:6px;padding:0 8px;font:inherit}.rev-tbl{border-collapse:collapse;width:100%;font-size:12.5px}.rev-tbl th,.rev-tbl td{padding:5px 8px;border-bottom:1px solid #e5e9f0;text-align:left;white-space:nowrap}.rev-tbl thead th{background:#f3f6fa;font-weight:700;color:#334155;position:sticky;top:0}.rev-tbl .n{text-align:right;font-variant-numeric:tabular-nums}.rev-tbl td.ded{color:#c62828}.rev-tbl td.est{color:#0b1f3a}.rev-tbl tr.vac td{color:#94a3b8}.rev-in{display:inline-flex;align-items:center;gap:4px;color:#64748b}.rev-in input{width:110px;height:28px;border:1px solid #cbd5e1;border-radius:6px;padding:0 6px;font:inherit;text-align:right}.rev-in input:focus{outline:2px solid #1652c9;border-color:#1652c9}.bkr-t.a{--tc:#0b1f3a}.bkr-t.c{--tc:#1652c9}.bkr-t.t{--tc:#c98a00}.bkcal-cnt{display:inline-flex;gap:3px;margin-left:8px;vertical-align:1px}.bkcal-cnt i{font-style:normal;font-size:10.5px;font-weight:700;color:#fff;border-radius:8px;padding:0 6px;line-height:16px}.bkcal-cnt i.n{background:#c62828}.bkcal-cnt i.b{background:#1b7f3b}.bkcal-tiles{grid-template-columns:repeat(auto-fit,minmax(150px,1fr)) !important}.bkcal-wrap{overflow:auto}.bkcal{border-collapse:collapse;font-size:12.5px;min-width:100%;background:#fff;color:#1f2937}.bkcal td,.bkcal th{border-left:1px solid #1f2937;border-right:1px solid #1f2937}.bkcal .mon{border:1px solid #1f2937;font-weight:700;padding:6px 14px;text-align:center;vertical-align:middle;background:#f7f8fa}.bkcal tr.dh th{border:1px solid #1f2937;padding:4px;font-weight:650;text-align:center;background:#f7f8fa}.bkcal th.out,.bkcal td.out{background:#f3f4f6}.bkcal td{padding:3px 8px;height:22px;border-bottom:1px solid #e3e6ec;white-space:nowrap}.bkcal td.n{min-width:96px;border-left:2px solid #1f2937 !important;border-right:1px solid #e3e6ec !important}.bkcal td.s{min-width:70px;font-weight:600;border-right:2px solid #1f2937 !important;border-left:0 !important}.bkcal tr.dh th{border:2px solid #1f2937 !important}.bkcal .mon{border:2px solid #1f2937 !important}.bkcal tr:has(+ tr.dh) td,.bkcal tbody > tr:last-child td{border-bottom:2px solid #1f2937 !important}.bkcal tr:has(+ tr.dh) td,.bkcal tbody > tr:last-child td{border-bottom:1px solid #1f2937}.bkcal td.s.backup{color:#1b7f3b}.bkcal td.s.absent{color:#c62828}.bkcal td.s.half,.bkcal td.s.late{color:#a15c00}.bkcal td.s.unset{font-style:italic}.bkcal td.ed{cursor:pointer}.bkcal td.ed:hover,.bkcal td.ed:hover+td{background:#eef3fb}`;
+const BKCAL_CSS = `.rev-tools{display:flex;flex-wrap:wrap;align-items:center;gap:8px 12px;margin:4px 0 10px}.rev-tools label{display:inline-flex;align-items:center;gap:6px;font-size:12.5px;color:#475569}.rev-tools input{height:30px;border:1px solid #cbd5e1;border-radius:6px;padding:0 8px;font:inherit}.rev-tbl{border-collapse:collapse;width:100%;font-size:12.5px}.rev-tbl th,.rev-tbl td{padding:5px 8px;border-bottom:1px solid #e5e9f0;text-align:left;white-space:nowrap}.rev-tbl thead th{background:#f3f6fa;font-weight:700;color:#334155;position:sticky;top:0}.rev-tbl .n{text-align:right;font-variant-numeric:tabular-nums}.rev-tbl td.ded{color:#c62828}.rev-tbl td.est{color:#0b1f3a}.rev-tbl tr.vac td{color:#94a3b8}.rev-in{display:inline-flex;align-items:center;gap:4px;color:#64748b}.rev-in input{width:110px;height:28px;border:1px solid #cbd5e1;border-radius:6px;padding:0 6px;font:inherit;text-align:right}.rev-in input:focus{outline:2px solid #1652c9;border-color:#1652c9}.bkr-t.a{--tc:#0b1f3a}.bkr-t.c{--tc:#1652c9}.bkr-t.t{--tc:#c98a00}.bkcal-cnt{display:inline-flex;gap:3px;margin-left:8px;vertical-align:1px}.bkcal-cnt i{font-style:normal;font-size:10.5px;font-weight:700;color:#fff;border-radius:8px;padding:0 6px;line-height:16px}.bkcal-cnt i.n{background:#c62828}.bkcal-cnt i.u{background:#9ca3af}.bkr-t.u{--tc:#9ca3af}.bkcal-cnt i.b{background:#1b7f3b}.bkcal-tiles{grid-template-columns:repeat(auto-fit,minmax(150px,1fr)) !important}.bkcal-wrap{overflow:auto}.bkcal{border-collapse:collapse;font-size:12.5px;min-width:100%;background:#fff;color:#1f2937}.bkcal td,.bkcal th{border-left:1px solid #1f2937;border-right:1px solid #1f2937}.bkcal .mon{border:1px solid #1f2937;font-weight:700;padding:6px 14px;text-align:center;vertical-align:middle;background:#f7f8fa}.bkcal tr.dh th{border:1px solid #1f2937;padding:4px;font-weight:650;text-align:center;background:#f7f8fa}.bkcal th.out,.bkcal td.out{background:#f3f4f6}.bkcal td{padding:3px 8px;height:22px;border-bottom:1px solid #e3e6ec;white-space:nowrap}.bkcal td.n{min-width:96px;border-left:2px solid #1f2937 !important;border-right:1px solid #e3e6ec !important}.bkcal td.s{min-width:70px;font-weight:600;border-right:2px solid #1f2937 !important;border-left:0 !important}.bkcal tr.dh th{border:2px solid #1f2937 !important}.bkcal .mon{border:2px solid #1f2937 !important}.bkcal tr:has(+ tr.dh) td,.bkcal tbody > tr:last-child td{border-bottom:2px solid #1f2937 !important}.bkcal tr:has(+ tr.dh) td,.bkcal tbody > tr:last-child td{border-bottom:1px solid #1f2937}.bkcal td.s.backup{color:#1b7f3b}.bkcal td.s.none{color:#c62828}.bkcal td.s.late{color:#a15c00}.bkcal td.s.unset{color:#6b7280;font-style:italic;font-weight:500}.bkcal td.ed{cursor:pointer}.bkcal td.ed:hover,.bkcal td.ed:hover+td{background:#eef3fb}`;
 function bkCharts(R, clientView) {
   const byDate = new Map(); for (const x of R.items) { const o = byDate.get(x.iso) || { p: 0, n: 0 }; const pv = x.st === 'backup' ? (x.half ? x.days / 2 : x.days) : x.st === 'live' ? x.days : 0; o.p += pv; o.n += x.days - pv; byDate.set(x.iso, o); }
   const dates = [...byDate.keys()].sort(), mx = Math.max(1, ...[...byDate.values()].map(o => o.p + o.n));
@@ -8825,7 +8668,7 @@ async function poll() {
 }
 
 /* ============================== filtering ============================== */
-const APP = { title: "Team Dashboard", version: "3.52.0", released: "12 Oct 2026" };
+const APP = { title: "Team Dashboard", version: "3.52.2", released: "12 Oct 2026" };
 const BASE_DIMS = { status: "status_column", desig: "designation_column", client: "client_column", mode: "mode_column" };
 const STANDARD_STATUSES = ["Active", "Manager", "OJT", "Bench", "New", "Projected", "Left", "Moved"];
 const TILE_ORDER = ["Active", "Manager", "OJT", "Bench", "New", "Projected"];
@@ -10299,10 +10142,9 @@ function renderReview() {
 function syncView() {
   window.placeSavedFilters?.();
   document.body.classList.toggle("clean-overview",state.view === "summary");
-  document.getElementById("cleanPageTitle").textContent = ({summary:"Overview",employees:"Employees",attendance:"Attendance",actions:"Action center",reports:"Reports",onboarding:"Onboarding",settings:"Settings"})[state.view] || "Overview";
+  document.getElementById("cleanPageTitle").textContent = ({summary:"Overview",employees:"Employees",attendance:"Attendance",actions:"Action center",reports:"Reports",settings:"Settings"})[state.view] || "Overview";
   $("#pageSettings").hidden = state.view !== "settings";
   $("#pageReports").hidden = state.view !== "reports";
-  $("#pageOnboarding").hidden = state.view !== "onboarding";
   document.querySelectorAll('.tab').forEach(t => t.tabIndex = t.dataset.view === state.view ? 0 : -1);
   for (const t of document.querySelectorAll(".tab")) { const on = t.dataset.view === state.view; t.setAttribute("aria-selected", on ? "true" : "false"); t.classList.toggle("on", on); }
   $("#quickAdd").hidden = true;
@@ -11059,7 +10901,6 @@ function renderAll() {
   $("#todayLabel").textContent = new Date().toLocaleDateString(undefined,{weekday:"short",month:"short",day:"numeric"});
   setTimeout(celebratePopup, 400);
   if (state.view === "summary") { window.ATT?.renderApprovalRequests(); renderComing(); renderHolidays(); setTimeout(organizeOverview, 0); renderStrip(); if (window.ATT) { ATT.renderCard($("#cardAttendance")); if (window.PERM && PERM.can("ov.watch")) ATT.renderWatch($("#cardWatch")); } } else if (state.view === "reports") renderCharts(); else if (state.view === "actions") { renderActions(); renderReview(); } else if (state.view === "attendance" || state.view === "settings") { /* these pages draw themselves */ } else renderTable();
-  if (state.view === "onboarding") window.renderOnboarding?.();
   syncActionTabs(); attSync();
 }
 
@@ -13060,231 +12901,6 @@ function drawPrefs(pane) {
  document.addEventListener('keydown',e=>{if(e.key==='Escape'){customize.open=false;const m=document.querySelector('.filter-more');if(m)m.open=false;}});
  document.addEventListener('click',e=>{if(customize.open&&!customize.contains(e.target))customize.open=false;});
  renderCustomFieldFilters();
-})();</script><script>
-/* ============================== v3.50.0: Onboarding ==============================
-   Each onboarder enters their numbers for the day: calls made, how the people they reached ended up
-   (Live transfer, Schedule later, Already completed, Local branch, Self) and how many onboardings they completed on
-   the phone. A lead can also enter the team's Inactive counts. The page answers "how many people did they actually
-   deal with": calls -> people spoken to -> how those ended -> completed on the phone. Stored in the workbook
-   ("Onboarding Log" sheet), so it is shared with the whole team and can be opened in Excel. */
-(() => {
-const ONB = { items: null, loading: null, err: '', range: 'today', from: '', to: '', who: 'all', names: 'real' };
-try { Object.assign(ONB, JSON.parse(localStorage.getItem('td_onb_ui') || '{}'), { items: null, loading: null, err: '' }); } catch { }
-const saveUi = () => { try { localStorage.setItem('td_onb_ui', JSON.stringify({ range: ONB.range, from: ONB.from, to: ONB.to, who: ONB.who, names: ONB.names })); } catch { } };
-const OUT = [['lt', 'Live transfer', '#1652c9'], ['sl', 'Schedule later', '#7c5cff'], ['ac', 'Already completed', '#0f8b6e'], ['lb', 'Local branch', '#c98a00'], ['self', 'Self', '#64738a']];
-const INACTIVE = 'Inactive';
-const esc = s => String(s ?? '').replace(/[&<>"']/g, c => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c]));
-const n0 = v => (Number.isFinite(+v) ? +v : 0);
-const pct = (a, b) => (b > 0 ? Math.round(a / b * 100) + '%' : '—');
-const iso = d => d.toISOString().slice(0, 10);
-const today = () => { const d = new Date(); return new Date(Date.UTC(d.getFullYear(), d.getMonth(), d.getDate())); };
-const addD = (d, k) => new Date(d.getTime() + k * 86400000);
-const nice = s => { const d = new Date(s + 'T00:00:00Z'); return d.toLocaleDateString(undefined, { weekday: 'short', day: 'numeric', month: 'short', timeZone: 'UTC' }); };
-const can = k => !window.PERM || PERM.can(k);
-const canEnterOwn = () => can('onb.enter') || can('onb.all');
-const me = () => { try { const ln = PERM.linkedEmp && PERM.linkedEmp(); if (ln && ln.name) return ln.name; const u = PERM.online() ? CLOUD.user() : null; return (u && u.name) || BE.userName(); } catch { return 'You'; } };
-const spoke = v => OUT.reduce((a, [k]) => a + n0(v && v[k]), 0);
-
-/* the date range on screen. Weeks run Sunday to Saturday, like the rest of the dashboard */
-function range() {
-  const t = today();
-  if (ONB.range === 'yesterday') { const y = addD(t, -1); return [iso(y), iso(y), 'Yesterday']; }
-  if (ONB.range === 'week') { const s = addD(t, -t.getUTCDay()); return [iso(s), iso(t), 'This week']; }
-  if (ONB.range === 'month') return [iso(new Date(Date.UTC(t.getUTCFullYear(), t.getUTCMonth(), 1))), iso(t), 'This month'];
-  if (ONB.range === 'custom' && ONB.from && ONB.to) { const [a, b] = ONB.from <= ONB.to ? [ONB.from, ONB.to] : [ONB.to, ONB.from]; return [a, b, nice(a) + ' – ' + nice(b)]; }
-  return [iso(t), iso(t), 'Today'];
-}
-/* real or pseudo names (the workforce "Pseudo Names" column), for sharing with the client */
-function pseudoMap() {
-  const m = new Map();
-  try { const pc = typeof colByName === 'function' ? colByName(/pseudo/i) : null; if (!pc || !state.rows) return m;
-    for (const r of state.rows) { const nm = gs(r, 'name_column').trim(), p = String(g(r, pc) ?? '').trim(); if (nm && p) m.set(nm.toLowerCase(), p); } } catch { }
-  return m;
-}
-const hasPseudo = () => pseudoMap().size > 0;
-const show = who => { if (who === INACTIVE || ONB.names !== 'pseudo') return who; return pseudoMap().get(String(who).toLowerCase()) || who; };
-
-async function load(force) {
-  if (ONB.loading && !force) return ONB.loading;
-  ONB.loading = (async () => { try { ONB.items = await BE.onbLoad(); ONB.err = ''; } catch (e) { ONB.err = e.message || String(e); ONB.items = ONB.items || []; } finally { ONB.loading = null; } })();
-  return ONB.loading;
-}
-function inRange() {
-  const [a, b] = range();
-  return (ONB.items || []).filter(e => e.date >= a && e.date <= b);
-}
-function people(list) {
-  const by = new Map();
-  for (const e of list) { if (e.who === INACTIVE) continue; const k = e.who.trim().toLowerCase(), o = by.get(k) || { who: e.who.trim(), v: {}, days: new Set() }; for (const [f] of BE.ONB_FIELDS) o.v[f] = n0(o.v[f]) + n0(e.vals && e.vals[f]); o.days.add(e.date); by.set(k, o); }
-  return [...by.values()].sort((x, y) => n0(y.v.calls) - n0(x.v.calls) || x.who.localeCompare(y.who));
-}
-function sum(list) { const v = {}; for (const e of list) for (const [f] of BE.ONB_FIELDS) v[f] = n0(v[f]) + n0((e.v || e.vals || {})[f]); return v; }
-const knownNames = () => { const s = new Map(); for (const e of ONB.items || []) if (e.who !== INACTIVE) s.set(e.who.toLowerCase(), e.who); try { for (const r of state.rows || []) { const d = gs(r, 'designation_column'); if (/onboard/i.test(d)) { const nm = gs(r, 'name_column').trim(); if (nm) s.set(nm.toLowerCase(), nm); } } } catch { } return [...s.values()].sort((a, b) => a.localeCompare(b)); };
-
-/* ---------------- the page ---------------- */
-function render() {
-  const root = document.getElementById('pageOnboarding'); if (!root || root.hidden) return;
-  if (ONB.items === null) { root.innerHTML = '<div class="card onb-empty">Loading onboarding numbers…</div>'; load().then(render); return; }
-  const [a, b, label] = range(), all = inRange(), onlyMe = !can('onb.all') && !can('page.onboarding') ? me() : null;
-  let list = all; if (ONB.who !== 'all') list = list.filter(e => e.who.toLowerCase() === ONB.who.toLowerCase() || e.who === INACTIVE);
-  const ppl = people(list), tot = sum(ppl), inact = sum(list.filter(e => e.who === INACTIVE)), spokeT = spoke(tot);
-  const names = knownNames(), single = ONB.who !== 'all';
-  const seg = [['today', 'Today'], ['yesterday', 'Yesterday'], ['week', 'This week'], ['month', 'This month'], ['custom', 'Custom']].map(([k, l]) => `<button type="button" data-onb-range="${k}" aria-pressed="${ONB.range === k}">${l}</button>`).join('');
-  const more = window.tdMore([
-    `<button class="btn" type="button" data-onb-copy>Copy summary</button>`,
-    hasPseudo() ? `<button class="btn" type="button" data-onb-names>${ONB.names === 'pseudo' ? 'Show real names' : 'Show pseudo names'}</button>` : '',
-    `<button class="btn" type="button" data-onb-reload>Refresh</button>`]);
-  const kpi = (v, l, sub, tone) => `<div class="onb-kpi" style="--tone:${tone}"><b>${v}</b><span>${l}</span><em>${sub}</em></div>`;
-  const maxCalls = Math.max(1, ...ppl.map(p => Math.max(n0(p.v.calls), spoke(p.v))));
-  const rows = ppl.map(p => {
-    const sp = spoke(p.v), w = x => (x / maxCalls * 100).toFixed(2) + '%';
-    const segs = OUT.map(([k, l, c]) => n0(p.v[k]) ? `<i style="width:${w(n0(p.v[k]))};background:${c}" title="${esc(l)}: ${n0(p.v[k])}"></i>` : '').join('');
-    return `<li class="onb-row">
-      <div class="onb-who"><b>${esc(show(p.who))}</b><small>${p.days.size > 1 ? p.days.size + ' days' : ''}</small></div>
-      <div class="onb-bars"><div class="onb-calls" style="width:${w(n0(p.v.calls))}" title="Calls made: ${n0(p.v.calls)}"></div><div class="onb-stack">${segs}</div></div>
-      <div class="onb-says">${n0(p.v.calls)} calls <span>→</span> spoke with <b>${sp}</b> <span>→</span> <b>${n0(p.v.done)}</b> completed</div></li>`;
-  }).join('');
-  const legend = `<div class="onb-legend"><span><i class="onb-sw calls"></i>Calls made</span>${OUT.map(([, l, c]) => `<span><i class="onb-sw" style="background:${c}"></i>${esc(l)}</span>`).join('')}</div>`;
-  const outRows = OUT.map(([k, l]) => `<tr><th scope="row">${esc(l)}</th><td class="n">${n0(tot[k])}</td><td class="n">${n0(inact[k])}</td><td class="n"><b>${n0(tot[k]) + n0(inact[k])}</b></td></tr>`).join('');
-  const days = []; for (let d = new Date(a + 'T00:00:00Z'); iso(d) <= b; d = addD(d, 1)) days.push(iso(d));
-  const perDay = days.map(d => { const v = sum(list.filter(e => e.date === d && e.who !== INACTIVE)); return { d, calls: n0(v.calls), done: n0(v.done), sp: spoke(v) }; });
-  const maxDay = Math.max(1, ...perDay.map(x => Math.max(x.calls, x.sp)));
-  const trend = days.length > 1 && days.length <= 62 ? `<section class="card onb-card"><div class="card-head"><div class="grow"><h2>Day by day</h2><div class="sub">Calls made, people spoken to and completed onboardings</div></div></div>
-      <div class="onb-trend">${perDay.map(x => `<div class="onb-day" title="${esc(nice(x.d))}: ${x.calls} calls · spoke with ${x.sp} · ${x.done} completed"><div class="onb-col"><i class="c" style="height:${x.calls / maxDay * 100}%"></i><i class="s" style="height:${x.sp / maxDay * 100}%"></i><i class="d" style="height:${x.done / maxDay * 100}%"></i></div><small>${new Date(x.d + 'T00:00:00Z').getUTCDate()}</small></div>`).join('')}</div>
-      <div class="onb-legend"><span><i class="onb-sw calls"></i>Calls made</span><span><i class="onb-sw" style="background:#7da2e8"></i>Spoken to</span><span><i class="onb-sw" style="background:#0f8b6e"></i>Completed</span></div></section>` : '';
-  const entries = list.slice().sort((x, y) => y.date.localeCompare(x.date) || (x.who === INACTIVE) - (y.who === INACTIVE) || x.who.localeCompare(y.who));
-  const mayEdit = e => can('onb.all') || (can('onb.enter') && e.who !== INACTIVE && e.who.toLowerCase() === me().toLowerCase());
-  const entryRows = entries.map(e => `<tr><td>${esc(nice(e.date))}</td><td>${e.who === INACTIVE ? '<i>Inactive (team)</i>' : esc(show(e.who))}</td>${BE.ONB_FIELDS.map(([k]) => `<td class="n">${e.vals && e.vals[k] != null ? n0(e.vals[k]) : ''}</td>`).join('')}<td class="onb-note">${esc(e.notes || '')}</td><td class="sm muted">${esc(e.by || '')}</td><td>${mayEdit(e) ? `<button class="btn mini" type="button" data-onb-edit="${esc(e.date)}|${esc(e.who)}">Edit</button>` : ''}</td></tr>`).join('');
-
-  root.innerHTML = `
-    <div class="onb-bar">
-      <div class="seg onb-seg" role="group" aria-label="Period">${seg}</div>
-      ${ONB.range === 'custom' ? `<input type="date" class="input" data-onb-from value="${esc(ONB.from || a)}" aria-label="From"><span class="muted">to</span><input type="date" class="input" data-onb-to value="${esc(ONB.to || b)}" aria-label="To">` : ''}
-      <select class="input onb-whosel" data-onb-who aria-label="Onboarder"><option value="all">All onboarders</option>${names.map(nm => `<option value="${esc(nm)}"${ONB.who.toLowerCase() === nm.toLowerCase() ? ' selected' : ''}>${esc(show(nm))}</option>`).join('')}</select>
-      <span class="grow"></span>
-      ${canEnterOwn() ? '<button class="btn primary" type="button" data-onb-add>+ Enter numbers</button>' : ''}
-      ${more}
-    </div>
-    ${ONB.err ? `<div class="onb-err">Couldn’t read the onboarding numbers: ${esc(ONB.err)}</div>` : ''}
-    <div class="onb-kpis">
-      ${kpi(n0(tot.calls), 'Calls made', esc(label) + (single ? ' · ' + esc(show(ONB.who)) : ' · ' + ppl.length + ' onboarder' + (ppl.length === 1 ? '' : 's')), '#0b1f3a')}
-      ${kpi(spokeT, 'People spoken to', pct(spokeT, n0(tot.calls)) + ' of calls reached someone', '#1652c9')}
-      ${kpi(n0(tot.done), 'Completed onboarding', pct(n0(tot.done), spokeT) + ' of the people spoken to', '#0f8b6e')}
-      ${kpi(n0(tot.done) ? (n0(tot.calls) / n0(tot.done)).toFixed(1) : '—', 'Calls per completion', 'calls made for each onboarding finished', '#c98a00')}
-    </div>
-    <div class="onb-grid">
-      <section class="card onb-card">
-        <div class="card-head"><div class="grow"><h2>How each onboarder’s calls ended</h2><div class="sub" title="Spoken to = Live transfer + Schedule later + Already completed + Local branch + Self">The grey bar is calls made; the coloured bar is the people they spoke with, by outcome</div></div></div>
-        ${ppl.length ? `<ul class="onb-list">${rows}</ul>${legend}` : `<div class="onb-none">No numbers entered for ${esc(label.toLowerCase())} yet.${canEnterOwn() ? ' <button class="linkbtn" type="button" data-onb-add>Enter numbers</button>' : ''}</div>`}
-      </section>
-      <section class="card onb-card">
-        <div class="card-head"><div class="grow"><h2>Outcome totals</h2><div class="sub">${esc(label)}</div></div></div>
-        <table class="onb-tbl"><thead><tr><th>Outcome</th><th class="n">Assigned to onboarders</th><th class="n">Inactive</th><th class="n">Total</th></tr></thead><tbody>${outRows}</tbody>
-          <tfoot><tr><th scope="row">Completed onboarding</th><td class="n">${n0(tot.done)}</td><td></td><td class="n"><b>${n0(tot.done)}</b></td></tr></tfoot></table>
-      </section>
-    </div>
-    ${trend}
-    <section class="card onb-card">
-      <div class="card-head"><div class="grow"><h2>Entries</h2><div class="sub">${entries.length} for ${esc(label.toLowerCase())}</div></div></div>
-      ${entries.length ? `<div class="onb-scroll"><table class="onb-tbl onb-entries"><thead><tr><th>Date</th><th>Onboarder</th>${BE.ONB_FIELDS.map(([, l]) => `<th class="n">${esc(l)}</th>`).join('')}<th>Notes</th><th>Entered by</th><th></th></tr></thead><tbody>${entryRows}</tbody></table></div>` : '<div class="onb-none">Nothing entered for this period.</div>'}
-    </section>`;
-  wire(root);
-}
-function wire(root) {
-  root.querySelectorAll('[data-onb-range]').forEach(b => b.onclick = () => { ONB.range = b.dataset.onbRange; if (ONB.range === 'custom' && !ONB.from) { const t = today(); ONB.from = iso(addD(t, -6)); ONB.to = iso(t); } saveUi(); render(); });
-  root.querySelector('[data-onb-from]')?.addEventListener('change', e => { ONB.from = e.target.value; saveUi(); render(); });
-  root.querySelector('[data-onb-to]')?.addEventListener('change', e => { ONB.to = e.target.value; saveUi(); render(); });
-  root.querySelector('[data-onb-who]')?.addEventListener('change', e => { ONB.who = e.target.value; saveUi(); render(); });
-  root.querySelectorAll('[data-onb-add]').forEach(b => b.onclick = () => openEntry());
-  root.querySelector('[data-onb-copy]')?.addEventListener('click', copySummary);
-  root.querySelector('[data-onb-names]')?.addEventListener('click', () => { ONB.names = ONB.names === 'pseudo' ? 'real' : 'pseudo'; saveUi(); render(); });
-  root.querySelector('[data-onb-reload]')?.addEventListener('click', async () => { await load(true); render(); toast('Onboarding numbers refreshed.'); });
-  root.querySelectorAll('[data-onb-edit]').forEach(b => b.onclick = () => { const [d, ...w] = b.dataset.onbEdit.split('|'); openEntry(d, w.join('|')); });
-}
-
-/* ---------------- entering numbers ---------------- */
-function openEntry(date, who) {
-  const all = can('onb.all');
-  const d0 = date || iso(today()), w0 = who || (all && ONB.who !== 'all' ? ONB.who : me());
-  const dateIn = h('input', { class: 'input', type: 'date', value: d0, max: iso(today()), id: 'onbDate' });
-  const names = knownNames(); if (!names.some(n => n.toLowerCase() === me().toLowerCase())) names.unshift(me());
-  const whoIn = all ? h('input', { class: 'input', id: 'onbWho', list: 'onbWhoList', value: w0, placeholder: 'Onboarder’s name', autocomplete: 'off' }) : h('input', { class: 'input', id: 'onbWho', value: me(), disabled: true });
-  const dl = h('datalist', { id: 'onbWhoList' }, ...names.map(n => h('option', { value: n })));
-  const inact = all ? h('label', { class: 'chk-line onb-inact' }, h('input', { type: 'checkbox', checked: w0 === INACTIVE }), h('span', {}, 'These are the team’s Inactive counts (not one onboarder)')) : null;
-  const num = (k, l, hint) => { const i = h('input', { class: 'input onb-num', type: 'number', min: '0', step: '1', inputmode: 'numeric', id: 'onb_' + k, 'data-k': k, placeholder: '0' }); return { k, i, el: h('div', { class: 'field onb-f onb-f-' + k }, h('label', { for: 'onb_' + k }, l), i, hint ? h('small', { class: 'hint' }, hint) : null) }; };
-  const F = [num('calls', 'Calls made', 'Every call dialled'), ...OUT.map(([k, l]) => num(k, l)), num('done', 'Completed onboarding', 'Helped and finished on the phone')];
-  const notes = h('input', { class: 'input', id: 'onbNotes', maxlength: '300', placeholder: 'Optional' });
-  const spokeOut = h('b', {}, '0'), err = h('p', { class: 'err', role: 'alert' });
-  const del = h('button', { class: 'btn danger', type: 'button', hidden: true }, 'Delete entry');
-  const save = h('button', { class: 'btn primary', type: 'button' }, 'Save');
-  const curWho = () => (inact && inact.querySelector('input').checked ? INACTIVE : (whoIn.value || '').trim());
-  const existing = () => (ONB.items || []).find(e => BE.onbKey(e.date, e.who) === BE.onbKey(dateIn.value, curWho()));
-  const fill = () => {
-    const e = existing(), isIn = curWho() === INACTIVE;
-    for (const f of F) { f.i.value = e && e.vals && e.vals[f.k] != null ? e.vals[f.k] : ''; f.el.hidden = isIn && (f.k === 'calls' || f.k === 'done' || f.k === 'ac'); }
-    whoIn.disabled = !all || isIn; notes.value = e ? e.notes || '' : '';
-    del.hidden = !e; save.textContent = e ? 'Save changes' : 'Save';
-    head.textContent = e ? 'Edit onboarding numbers' : 'Enter onboarding numbers'; calc();
-  };
-  const calc = () => { spokeOut.textContent = String(OUT.reduce((a, [k]) => a + n0(document.getElementById('onb_' + k)?.value), 0)); };
-  const head = h('h2', {}, 'Enter onboarding numbers');
-  dateIn.addEventListener('change', fill); whoIn.addEventListener('change', fill); inact?.querySelector('input').addEventListener('change', fill);
-  F.forEach(f => f.i.addEventListener('input', calc));
-  save.onclick = async () => {
-    err.textContent = '';
-    const d = dateIn.value, w = curWho();
-    if (!/^\d{4}-\d{2}-\d{2}$/.test(d)) { err.textContent = 'Choose the date.'; return; }
-    if (d > iso(today())) { err.textContent = 'The date can’t be in the future.'; return; }
-    if (!w) { err.textContent = 'Type the onboarder’s name.'; return; }
-    const vals = {};
-    for (const f of F) { if (f.el.hidden) continue; const v = f.i.value.trim(); if (v === '') continue; const n = Number(v); if (!Number.isInteger(n) || n < 0) { err.textContent = f.el.querySelector('label').textContent + ' must be a whole number, 0 or more.'; f.i.focus(); return; } vals[f.k] = n; }
-    if (!Object.keys(vals).length) { err.textContent = 'Fill in at least one number.'; return; }
-    if (w !== INACTIVE && vals.calls != null && spoke(vals) > vals.calls) { err.textContent = 'The outcomes add up to ' + spoke(vals) + ', more than the ' + vals.calls + ' calls made. Check the numbers.'; return; }
-    const entry = { date: d, who: w, vals, notes: notes.value.trim(), by: me(), at: new Date().toISOString().slice(0, 16).replace('T', ' ') };
-    save.disabled = true; save.textContent = 'Saving…';
-    try {
-      ONB.items = await BE.onbSave([{ put: entry }], [{ action: 'settings', key: '', name: 'Onboarding', details: { note: (existing() ? 'Updated' : 'Entered') + ' onboarding numbers for ' + (w === INACTIVE ? 'Inactive (team)' : w) + ' · ' + d } }]);
-      closeDrawer(); toast('Saved the onboarding numbers for ' + (w === INACTIVE ? 'Inactive' : w) + ', ' + nice(d) + '.'); render();
-    } catch (e) { err.textContent = 'Couldn’t save: ' + (e.message || e); save.disabled = false; save.textContent = 'Save'; }
-  };
-  let armed = false;
-  del.onclick = async () => {
-    if (!armed) { armed = true; del.textContent = 'Click again to delete'; setTimeout(() => { armed = false; del.textContent = 'Delete entry'; }, 4000); return; }
-    del.disabled = true;
-    try { const d = dateIn.value, w = curWho(); ONB.items = await BE.onbSave([{ del: { date: d, who: w } }], [{ action: 'settings', key: '', name: 'Onboarding', details: { note: 'Deleted onboarding numbers for ' + w + ' · ' + d } }]); closeDrawer(); toast('Entry deleted.'); render(); }
-    catch (e) { err.textContent = 'Couldn’t delete: ' + (e.message || e); del.disabled = false; }
-  };
-  mountDrawer(h('aside', { class: 'drawer onb-drawer', role: 'dialog', 'aria-modal': 'true', 'aria-label': 'Onboarding numbers' },
-    h('header', {}, head, h('button', { class: 'btn ghost', onclick: closeDrawer, 'aria-label': 'Close' }, '✕')),
-    h('div', { class: 'body' },
-      h('div', { class: 'onb-form-top' }, h('div', { class: 'field' }, h('label', { for: 'onbDate' }, 'Date'), dateIn), h('div', { class: 'field' }, h('label', { for: 'onbWho' }, 'Onboarder'), whoIn, dl)),
-      inact,
-      h('div', { class: 'onb-form' }, F[0].el),
-      h('h3', { class: 'onb-h3' }, 'How the people they spoke with ended up'),
-      h('div', { class: 'onb-form' }, ...F.slice(1, 6).map(f => f.el)),
-      h('p', { class: 'onb-spoke' }, 'People spoken to: ', spokeOut),
-      h('div', { class: 'onb-form' }, F[6].el),
-      h('div', { class: 'field' }, h('label', { for: 'onbNotes' }, 'Notes'), notes),
-      err,
-      h('div', { class: 'onb-actions' }, save, h('button', { class: 'btn', type: 'button', onclick: closeDrawer }, 'Cancel'), h('span', { class: 'grow' }), del))));
-  fill(); setTimeout(() => (F[0].el.hidden ? F[1].i : F[0].i).focus(), 40);
-}
-
-/* ---------------- copy, in the same shape as the daily update ---------------- */
-async function copySummary() {
-  const [, , label] = range(), list = inRange(), ppl = people(list), tot = sum(ppl), inact = sum(list.filter(e => e.who === INACTIVE));
-  const L = [];
-  L.push('Onboarding · ' + label, '');
-  for (const p of ppl) { L.push(show(p.who) + ' · ' + n0(p.v.calls) + ' calls · spoke with ' + spoke(p.v) + ' · ' + n0(p.v.done) + ' completed'); for (const [k, l] of OUT) L.push(String(n0(p.v[k])).padStart(2, '0') + ' - ' + l.toLowerCase()); L.push(''); }
-  for (const [k, l] of OUT) { L.push('Total ' + l + ' - ' + (n0(tot[k]) + n0(inact[k]))); L.push(l + ' assigned to Onboarder’s - ' + n0(tot[k])); }
-  L.push('', 'Inactive'); for (const [k, l] of OUT) L.push(l + ' - ' + n0(inact[k]));
-  L.push('', 'Completed onboarding'); for (const p of ppl.slice().sort((x, y) => n0(y.v.done) - n0(x.v.done))) L.push(show(p.who) + ' - ' + n0(p.v.done));
-  try { await navigator.clipboard.writeText(L.join('\n')); toast('Summary copied. Paste it into an email or chat.'); } catch { toast('Couldn’t copy. Allow clipboard access and try again.', true); }
-}
-
-window.renderOnboarding = () => { try { render(); } catch (e) { console.error(e); } };
-setInterval(() => { const r = document.getElementById('pageOnboarding'); if (r && !r.hidden && !document.hidden && !document.querySelector('.onb-drawer')) load(true).then(render); }, 120000);
-})();
-</script>
+})();</script>
 </body>
 </html>
