@@ -5,7 +5,7 @@
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <link rel="preconnect" href="https://iiogwevtyzgedhoaqlrn.supabase.co" crossorigin><link rel="dns-prefetch" href="https://iiogwevtyzgedhoaqlrn.supabase.co">
 <link rel="icon" href="data:,">
-<title>Team Dashboard · 3.53.0</title>
+<title>Team Dashboard · 3.53.1</title>
 <link rel="preconnect" href="https://fonts.googleapis.com"><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin><link href="https://fonts.googleapis.com/css2?family=Public+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet">
 <style>
 :root {
@@ -7445,6 +7445,41 @@ function bkStretch(p, iso) {
   for (const dir of [-1, 1]) { let d = t0, gap = 0; for (let k = 0; k < 60; k++) { d = new Date(d.getTime() + dir * 86400000); if (isLeave(d)) { out.push(isoDate(d)); gap = 0; } else if (isOff(d) && gap < 4) gap++; else break; } }
   return out.sort();
 }
+/* v3.53.1: earlier remarks, so the admin can see what was told before and reuse it in one click.
+   "This person": their last remarks (newest first) with the date and what was recorded.
+   "Recent remarks": the latest different remarks for anyone in the past 60 days. */
+function bkPastRemarks(pKey, skip, limit = 6) {
+  const p = D(true).people.get(pKey); if (!p) return [];
+  const out = [], skipSet = new Set(skip || []);
+  for (const r of p.rows) {
+    const k = Object.keys(r.extra || {}).find(q => q.toLowerCase() === BKM_FIELD.toLowerCase()); if (!k) continue;
+    const d0 = Engine.serialToDate(r.month);
+    for (const [day, txt] of bkParse(r.extra[k])) { const iso = isoDate(new Date(Date.UTC(d0.getUTCFullYear(), d0.getUTCMonth(), day))); if (skipSet.has(iso) || !String(txt).trim()) continue; out.push({ iso, txt: String(txt).trim(), st: bkLabel(bkGet(pKey, iso)) || '' }); }
+  }
+  return out.sort((a, b) => b.iso.localeCompare(a.iso)).slice(0, limit);
+}
+function bkRecentRemarks(skipTexts, limit = 8) {
+  const since = isoDate(new Date(TODAY.getTime() - 60 * 86400000)), seen = new Set((skipTexts || []).map(t => t.toLowerCase())), all = [];
+  for (const r of S.rows) {
+    if (r.month < Engine.monthSerial(new Date(since + 'T00:00:00Z').getUTCFullYear(), new Date(since + 'T00:00:00Z').getUTCMonth())) continue;
+    const k = Object.keys(r.extra || {}).find(q => q.toLowerCase() === BKM_FIELD.toLowerCase()); if (!k) continue;
+    const d0 = Engine.serialToDate(r.month);
+    for (const [day, txt] of bkParse(r.extra[k])) { const iso = isoDate(new Date(Date.UTC(d0.getUTCFullYear(), d0.getUTCMonth(), day))); if (iso >= since && String(txt).trim()) all.push({ iso, txt: String(txt).trim() }); }
+  }
+  const out = []; for (const x of all.sort((a, b) => b.iso.localeCompare(a.iso))) { const l = x.txt.toLowerCase(); if (seen.has(l)) continue; seen.add(l); out.push(x.txt); if (out.length >= limit) break; }
+  return out;
+}
+function bkPrevHtml(pKey, days, show) {
+  let mine = [], recent = [];
+  try { mine = bkPastRemarks(pKey, days); recent = bkRecentRemarks(mine.map(x => x.txt)); } catch { }
+  if (!mine.length && !recent.length) return '';
+  const nice = iso => { const t = new Date(iso + 'T00:00:00Z'); return t.getUTCDate() + ' ' + MONTHS[t.getUTCMonth()] + (t.getUTCFullYear() !== TODAY.getUTCFullYear() ? ' ' + t.getUTCFullYear() : ''); };
+  return `<div class="bkx-prev" id="bkx-prev" ${show ? '' : 'hidden'}>
+    ${mine.length ? `<div class="bkx-prev-h">Earlier for this person <span>click to use again</span></div><ul class="bkx-prev-l">${mine.map(x => `<li><button type="button" data-bkprev="${esc(x.txt)}" title="Use this remark"><b>${esc(nice(x.iso))}</b>${x.st ? `<em>${esc(x.st)}</em>` : ''}<span>${esc(x.txt)}</span></button></li>`).join('')}</ul>` : ''}
+    ${recent.length ? `<div class="bkx-prev-h">Recent remarks <span>anyone, last 60 days</span></div><div class="bkx-prev-c">${recent.map(t => `<button type="button" data-bkprev="${esc(t)}" title="Use this remark">${esc(t)}</button>`).join('')}</div>` : ''}
+  </div>
+  <style>.bkx-prev{margin:-4px 0 10px;padding:8px 10px;border:1px solid var(--line,#e3e6ec);border-radius:10px;background:var(--surface-2,#f6f8fb)}.bkx-prev-h{font-size:11.5px;font-weight:700;color:var(--ink-2,#445);margin:2px 0 4px}.bkx-prev-h span{font-weight:400;color:var(--ink-3,#778);margin-left:6px}.bkx-prev-l{list-style:none;margin:0 0 6px;padding:0;display:flex;flex-direction:column;gap:2px;max-height:132px;overflow:auto}.bkx-prev-l button{all:unset;box-sizing:border-box;display:flex;gap:8px;align-items:baseline;width:100%;padding:4px 6px;border-radius:6px;cursor:pointer;font-size:12.5px}.bkx-prev-l button:hover,.bkx-prev-l button:focus-visible{background:color-mix(in srgb,var(--accent,#1652c9) 10%,transparent)}.bkx-prev-l b{flex:none;width:52px;font-weight:650}.bkx-prev-l em{flex:none;font-style:normal;font-size:11px;color:var(--ink-3,#778);max-width:150px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}.bkx-prev-l span{flex:1;min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;color:var(--ink,#1f2937)}.bkx-prev-c{display:flex;flex-wrap:wrap;gap:5px}.bkx-prev-c button{border:1px solid var(--line-2,#d5dbe5);background:var(--surface,#fff);border-radius:999px;padding:2px 10px;font:inherit;font-size:12px;cursor:pointer;max-width:260px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}.bkx-prev-c button:hover{border-color:var(--accent,#1652c9)}</style>`;
+}
 function openBackupBox(pKey, iso, onDone, opts = {}) {
   if (!canBackup()) { toast('Your passcode can’t set backups.'); return; }
   const d = D(true), p = d.people.get(pKey); const name = p ? p.name : pKey;
@@ -7493,12 +7528,14 @@ function openBackupBox(pKey, iso, onDone, opts = {}) {
       ${nmMode === 'off' ? '' : `<label id="bkx-pwrap" ${curK === 'no' ? 'style="display:none"' : ''}><span id="bkx-plbl">${curK === 'live' ? 'Taken care of by' : 'Backup person'}</span> <em id="bkx-pem">${nmMode === 'optional' || curK !== 'yes' ? 'optional · anyone in the current team' : 'anyone in the current team'}</em><input type="text" id="bk-name" list="bk-list" value="${esc(cur && cur.b ? cur.b : '')}" placeholder="${nmMode === 'optional' ? 'Type or pick a name, or leave blank' : 'Type or pick a name'}" autocomplete="off"><datalist id="bk-list">${team.map(t => `<option value="${esc(t.name)}" label="${esc([t.id && 'ID ' + t.id, t.sub, t.out ? 'also off that day' : ''].filter(Boolean).join(' · '))}"></option>`).join('')}</datalist></label>`}
     </div>
     <label class="bkx-rm" id="bkx-rm" ${opts.collect || curK ? '' : 'hidden'}>${opts.collect ? 'Comments / remarks <em style="color:#c63b3a">required</em>' : 'Remarks <em>optional · copied as written</em>'}<textarea id="bk-rm" rows="2" maxlength="200" placeholder="${opts.collect ? 'Write a comment' : 'Optional note'}">${esc(bkRemark(pKey, iso))}</textarea></label>
+    ${bkPrevHtml(pKey, opts.days && opts.days.length ? opts.days : [iso], opts.collect || curK)}
     <div class="err" id="bk-err"></div>`,
     footer: `<span class="grow"></span><button class="btn" data-close>Cancel</button><button class="btn primary" id="bk-go" ${curK ? '' : 'disabled'}>${esc(opts.confirm || 'Save')}</button>` });
   let pick = curK, half = null;   /* v3.44.0: Full day / Half day is always chosen on purpose (blank to start) */
   const kind = () => pick, isHalf = () => half;
   m.querySelectorAll('[data-bkx]').forEach(b => b.addEventListener('click', () => {
     pick = b.dataset.bkx; m.querySelectorAll('[data-bkx]').forEach(x => x.setAttribute('aria-checked', String(x === b)));
+    if ($('#bkx-prev', m)) $('#bkx-prev', m).hidden = !pick;
     $('#bkx-yes', m).hidden = !pick; $('#bkx-yes', m).classList.toggle('live', pick === 'live'); $('#bkx-yes', m).classList.toggle('no', pick === 'no'); if ($('#bkx-pwrap', m)) $('#bkx-pwrap', m).style.display = pick === 'no' ? 'none' : ''; if ($('#bkx-plbl', m)) { $('#bkx-plbl', m).textContent = pick === 'live' ? 'Taken care of by' : 'Backup person'; $('#bkx-pem', m).textContent = (nmMode === 'optional' || pick !== 'yes' ? 'optional · ' : '') + 'anyone in the current team'; } $('#bkx-rm', m).hidden = !pick && !opts.collect; $('#bkx-yes', m).classList.toggle('no', pick === 'no'); $('#bk-go', m).disabled = false; $('#bk-err', m).textContent = '';
     setTimeout(() => $('#bk-name', m)?.focus(), 0);
   }));
@@ -7516,6 +7553,8 @@ function openBackupBox(pKey, iso, onDone, opts = {}) {
     toast((val ? (val.none ? '' : val.no ? 'Marked as Backup Not Provided for ' + name + (which.length > 1 ? ' (' + which.length + ' days).' : '.') : !val.b ? 'Marked as backup provided for ' + name + (which.length > 1 ? ' (' + which.length + ' days).' : '.') : val.b + ' is covering for ' + name + (which.length > 1 ? ' (' + which.length + ' days).' : '.')) : 'Backup cleared.') + (S.auto ? '' : ' Saved to Excel with the next sync.') + (missing.length ? ' ' + missing.length + ' day(s) had no tracker row and were skipped.' : ''));
   };
   const write0 = write, rmv = () => ($('#bk-rm', m) ? $('#bk-rm', m).value : '');
+  /* v3.53.1: click an earlier remark to use it again */
+  m.querySelectorAll('[data-bkprev]').forEach(b => b.addEventListener('click', () => { const t = $('#bk-rm', m); if (!t) return; t.value = b.dataset.bkprev; t.dispatchEvent(new Event('input', { bubbles: true })); t.focus(); }));
   $('#bk-go', m).onclick = async () => {
     const write = v => write0(v ? { ...v, remark: rmv() } : v);
     /* v3.43.4: when approving or recording leave, a comment is required */
@@ -8681,7 +8720,7 @@ async function poll() {
 }
 
 /* ============================== filtering ============================== */
-const APP = { title: "Team Dashboard", version: "3.53.0", released: "12 Oct 2026" };
+const APP = { title: "Team Dashboard", version: "3.53.1", released: "12 Oct 2026" };
 const BASE_DIMS = { status: "status_column", desig: "designation_column", client: "client_column", mode: "mode_column" };
 const STANDARD_STATUSES = ["Active", "Manager", "OJT", "Bench", "New", "Projected", "Left", "Moved"];
 const TILE_ORDER = ["Active", "Manager", "OJT", "Bench", "New", "Projected"];
