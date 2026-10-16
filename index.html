@@ -5,7 +5,7 @@
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <link rel="preconnect" href="https://iiogwevtyzgedhoaqlrn.supabase.co" crossorigin><link rel="dns-prefetch" href="https://iiogwevtyzgedhoaqlrn.supabase.co">
 <link rel="icon" href="data:,">
-<title>Team Dashboard · 3.54.0</title>
+<title>Team Dashboard · 3.55.0</title>
 <link rel="preconnect" href="https://fonts.googleapis.com"><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin><link href="https://fonts.googleapis.com/css2?family=Public+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet">
 <style>
 :root {
@@ -1928,6 +1928,22 @@ body.filters-locked #pinnedHeader .scope-line { margin-top:0 !important; }
 @media (prefers-color-scheme: dark) { :root:not([data-theme="light"]) { --seg-track:rgba(118,118,128,.24); --seg-thumb:#636366; --seg-div:rgba(235,235,245,.18); } }
 @media (prefers-reduced-motion: reduce) { :is(.seg > button,.att-toggle > button,.ov-tabs > button,.li-tabs > button,.htabs > button,.fm-tabs > button,.bkx-seg > button,.ppl-tabs > button,.seg-set > button,.subnav > button,.bkr-views > button,.atabs > button,.att-seg > button,.ppl-tabs > .ppl-tab,.atabs > .atab) { transition:none; } }
 @media (max-width:700px) { :is(.seg,.att-toggle,.ov-tabs,.li-tabs,.htabs,.fm-tabs,.bkx-seg,.ppl-tabs,.seg-set,.subnav,.bkr-views,.atabs,.att-seg) { overflow-x:auto !important; } :is(.seg > button,.att-toggle > button,.ov-tabs > button,.li-tabs > button,.htabs > button,.fm-tabs > button,.bkx-seg > button,.ppl-tabs > button,.seg-set > button,.subnav > button,.bkr-views > button,.atabs > button,.att-seg > button,.ppl-tabs > .ppl-tab,.atabs > .atab) { padding:4px 10px !important; font-size:12.5px !important; } }
+
+/* v3.55.0: roles */
+.role-ic { flex:none; display:inline-grid; place-items:center; width:34px; height:34px; border-radius:9px; background:color-mix(in srgb,var(--royal,#1652c9) 12%,var(--surface)); color:var(--royal,#1652c9); font-weight:800; font-size:14px; }
+.role-ic.adm { background:color-mix(in srgb,#c98a00 16%,var(--surface)); color:#9a6a00; }
+.role-ic.lg { width:46px; height:46px; font-size:18px; border-radius:12px; }
+.role-n { flex:none; min-width:24px; height:22px; padding:0 7px; border-radius:999px; background:var(--surface-2); color:var(--ink-2); font-size:12px; font-weight:700; display:inline-grid; place-items:center; }
+.role-picks { display:grid; grid-template-columns:repeat(auto-fill,minmax(220px,1fr)); gap:8px; }
+.role-pick { all:unset; box-sizing:border-box; display:flex; gap:10px; align-items:flex-start; padding:11px 12px; border:1px solid var(--border); border-radius:10px; background:var(--surface); cursor:pointer; transition:border-color .15s, box-shadow .15s, background .15s; }
+.role-pick:hover { border-color:var(--axis); }
+.role-pick:focus-visible { outline:2px solid var(--royal,#1652c9); outline-offset:1px; }
+.role-pick[aria-checked="true"] { border-color:var(--royal,#1652c9); background:color-mix(in srgb,var(--royal,#1652c9) 6%,var(--surface)); box-shadow:0 0 0 1px var(--royal,#1652c9) inset; }
+.role-pick .ppl-it { min-width:0; } .role-pick b { display:block; font-size:13.5px; } .role-pick small { display:block; font-size:11.5px; color:var(--muted); margin-top:2px; line-height:1.35; }
+.role-dot { flex:none; width:16px; height:16px; margin-top:1px; border-radius:50%; border:2px solid var(--axis); background:var(--surface); }
+.role-pick[aria-checked="true"] .role-dot { border-color:var(--royal,#1652c9); box-shadow:inset 0 0 0 3px var(--surface); background:var(--royal,#1652c9); }
+.role-pick.adm b::after { content:"Admin"; margin-left:6px; font-size:10px; font-weight:700; padding:1px 6px; border-radius:999px; background:color-mix(in srgb,#c98a00 16%,var(--surface)); color:#9a6a00; vertical-align:1px; }
+.ppl-role.r-none { background:var(--surface-2); color:var(--muted); }
 </style></head>
 
 
@@ -2082,6 +2098,24 @@ body.filters-locked #pinnedHeader .scope-line { margin-top:0 !important; }
 <div id="tip" hidden role="tooltip"></div>
 <div id="toast" aria-live="polite"></div>
 
+<script>
+/* v3.55.0: roles. The super admin creates roles (name, rights, filters, notifications, field buttons, Backup report access)
+   in Settings > People & access > Roles and gives each person a role. A person's stored rights carry "_role"; while that
+   role exists, its current rights apply. Without a role a person keeps the rights they already had. */
+window.tdRoles = () => { const r = (window.TD_SETTINGS || {}).user_roles; return Array.isArray(r) ? r.filter(x => x && x.id && x.name) : []; };
+window.tdRoleOf = p => (p && p._role ? window.tdRoles().find(r => r.id === p._role) || null : null);
+window.tdRolePerms = r => ({ ...(r.rights || {}), ...(r.extras || {}), _role: r.id });
+(() => {
+  const memo = new WeakMap();
+  window.tdResolvePerms = p => {
+    if (!p || !p._role) return p || {};
+    const roles = (window.TD_SETTINGS || {}).user_roles; let m = memo.get(p);
+    if (m && m.roles === roles) return m.out;
+    const r = window.tdRoleOf(p), out = r ? { ...window.tdRolePerms(r), ...(p._emp ? { _emp: p._emp, _empName: p._empName } : {}) } : p;
+    memo.set(p, { roles, out }); return out;
+  };
+})();
+</script>
 <script>
 /* v3.48.0: one "More" menu for secondary actions, so every card shows only what is used daily.
    The buttons stay in the page (inside a <details>), so their click handlers keep working. */
@@ -3504,7 +3538,7 @@ const CLOUD = (() => {
     if (!session || mode() !== 'cloud') return null;
     try { const me = await rpc('td_me', { p_token: session.token }); session = { ...session, ...me }; ls.set(LS_SESSION, session); return session; } catch (e) { return null; }
   }
-  const user = () => session ? { name: session.name, role: session.role, id: session.user_id, loginId: session.login_id || '', selfPasscode: session.role === 'superadmin' || session.self_passcode !== false, permissions: session.permissions || {} } : null;
+  const user = () => session ? { name: session.name, role: session.role, id: session.user_id, loginId: session.login_id || '', selfPasscode: session.role === 'superadmin' || session.self_passcode !== false, permissions: window.tdResolvePerms ? window.tdResolvePerms(session.permissions || {}) : (session.permissions || {}), rawPermissions: session.permissions || {} } : null;   /* v3.55.0: rights come from the person's role when they have one */
   /* v3.18: change your own passcode (after typing the current one) */
   const changeMyPasscode = (oldCode, newCode) => rpc('td_change_my_passcode', { p_token: tok(), p_old: oldCode, p_new: newCode });
   const getSettings = () => rpc('td_get_settings', { p_token: tok() });
@@ -3685,7 +3719,7 @@ window.PERM = {
   isSuper() { return !this.online() || ['superadmin', 'admin'].includes(CLOUD.user().role); },
   isOwner() { return !this.online() || CLOUD.user().role === 'superadmin'; },
   isAdmin() { return this.isSuper(); },
-  rights() { const u = CLOUD.user(); if (!this.online() || u.role === 'superadmin' || u.role === 'admin' || !u.permissions || !u.permissions._v) return pick(PERM_KEYS); return u.permissions; },
+  rights() { const u = CLOUD.user(); if (!this.online() || u.role === 'superadmin' || (u.role === 'admin' && !u.permissions._role) || !u.permissions || !u.permissions._v) return pick(PERM_KEYS); return u.permissions; },
   /* rights saved by an older version: fill in the ones that did not exist yet the way they used to behave */
   upgrade(p) {
     if (!p || !p._v) return p;
@@ -3710,7 +3744,7 @@ window.PERM = {
     return q;
   },
   can(k) {
-    if (!this.online()) return true; const u = CLOUD.user(); if (u.role === 'superadmin' || u.role === 'admin') return true;
+    if (!this.online()) return true; const u = CLOUD.user(); if (u.role === 'superadmin' || (u.role === 'admin' && !(u.permissions && u.permissions._role))) return true;   /* v3.55.0: an admin with a role gets that role's rights */
     const p = u.permissions || {};
     if (!p._v) return true;   // rights never set: full access, as before
     /* v3.18: upgrade once per rights object instead of on every check (this runs thousands of times per screen) */
@@ -8742,7 +8776,7 @@ async function poll() {
 }
 
 /* ============================== filtering ============================== */
-const APP = { title: "Team Dashboard", version: "3.54.0", released: "12 Oct 2026" };
+const APP = { title: "Team Dashboard", version: "3.55.0", released: "12 Oct 2026" };
 const BASE_DIMS = { status: "status_column", desig: "designation_column", client: "client_column", mode: "mode_column" };
 const STANDARD_STATUSES = ["Active", "Manager", "OJT", "Bench", "New", "Projected", "Left", "Moved"];
 const TILE_ORDER = ["Active", "Manager", "OJT", "Bench", "New", "Projected"];
@@ -12159,6 +12193,7 @@ const onSettings = () => typeof state !== 'undefined' && state.view === 'setting
 function rightsSummary(u) {
   const role = PERM.roleNames[u.role] || 'User';
   if (u.role === 'superadmin') return 'Super admin · every right';
+  { const r = u.permissions && u.permissions._role ? tdRoles().find(x => x.id === u.permissions._role) : null; if (r) return 'Role ' + r.name; }
   if (u.role === 'admin') return 'Admin · every right except People & access' + (u.permissions && u.permissions._bkReport ? ' · Backup report' : '');
   const p = PERM.upgrade(u.permissions || {});
   if (!p._v) return role + ' · full access';
@@ -12178,17 +12213,18 @@ async function drawPeople(pane, selectId) {
   window.refreshResetBadge && window.refreshResetBadge();
   const [users, requests, settings] = await Promise.all([CLOUD.admin.users(), CLOUD.admin.resetRequests().catch(() => []), CLOUD.getSettings().catch(() => ({}))]);
   const groups = groupsFrom(settings);
-  window.TD_SETTINGS = { ...(window.TD_SETTINGS || {}), user_groups: settings.user_groups || [] };
+  window.TD_SETTINGS = { ...(window.TD_SETTINGS || {}), user_groups: settings.user_groups || [], user_roles: settings.user_roles || [] };
   const me = CLOUD.user();
   const pending = (requests || []).filter(r => r.status === 'pending');
   const reload = id => drawPeople(pane, id);
   const body = h('div', { class: 'ppl-body' });
   const tabBtn = (id, label, n, hot) => h('button', { type: 'button', class: 'ppl-tab', role: 'tab', 'aria-selected': String(PPL.tab === id), onclick: () => { PPL.tab = id; drawPeople(pane, selectId); } }, label, n != null ? h('span', { class: 'ppl-tab-n' + (hot ? ' hot' : '') }, String(n)) : null);
   const tabs = h('div', { class: 'ppl-tabs', role: 'tablist', 'aria-label': 'People & access' },
-    tabBtn('people', 'People', users.length), tabBtn('groups', 'Groups', groups.length), tabBtn('passcodes', 'Passcodes', pending.length || null, pending.length > 0));
+    tabBtn('people', 'People', users.length), tabBtn('roles', 'Roles', tdRoles().length), tabBtn('groups', 'Groups', groups.length), tabBtn('passcodes', 'Passcodes', pending.length || null, pending.length > 0));
   fill(pane, tabs, body);
 
   if (PPL.tab === 'groups') { drawGroups(body, users, groups, () => reload(selectId)); return; }
+  if (PPL.tab === 'roles') { drawRoles(body, users, () => reload(selectId)); return; }
 
   if (PPL.tab === 'passcodes') {
     const selfOn = settings.self_passcode !== false;
@@ -12216,7 +12252,7 @@ async function drawPeople(pane, selectId) {
   /* People: searchable list on the left, one editor on the right */
   const list = h('div', { class: 'ppl-list', role: 'list' }), editor = h('div', { class: 'ppl-editor' });
   const search = h('input', { class: 'input', type: 'search', placeholder: 'Find a person or ID…', 'aria-label': 'Find a person', value: PPL.q });
-  const roleF = h('select', { class: 'input', 'aria-label': 'Show' }, ...[['all', 'Everyone'], ['superadmin', 'Super admins'], ['admin', 'Admins'], ['user', 'Users'], ['off', 'Can’t sign in']].map(([v, t]) => h('option', { value: v, selected: PPL.role === v }, t)));
+  const roleF = h('select', { class: 'input', 'aria-label': 'Show' }, ...[['all', 'Everyone'], ['superadmin', 'Super admins'], ...tdRoles().map(r => ['role:' + r.id, r.name]), ['none', 'No role'], ['off', 'Can’t sign in']].map(([v, t]) => h('option', { value: v, selected: PPL.role === v }, t)));
   let selId = null;
   const select = u => {
     selId = u ? u.id : 'new';
@@ -12225,15 +12261,15 @@ async function drawPeople(pane, selectId) {
   };
   const drawList = () => {
     const q = PPL.q.trim().toLowerCase();
-    const shown = users.filter(u => (PPL.role === 'all' || (PPL.role === 'off' ? !u.active : u.role === PPL.role)) && (!q || (u.name + ' ' + (u.login_id || '')).toLowerCase().includes(q)));
+    const shown = users.filter(u => (PPL.role === 'all' || (PPL.role === 'off' ? !u.active : PPL.role === 'none' ? u.role !== 'superadmin' && !roleOfUser(u) : PPL.role.startsWith('role:') ? (roleOfUser(u) || {}).id === PPL.role.slice(5) : u.role === PPL.role)) && (!q || (u.name + ' ' + (u.login_id || '')).toLowerCase().includes(q)));
     fill(list, ...shown.map(u => {
       const gs2 = groups.filter(g => memberOf(g, u.id));
       return h('button', { class: 'ppl-item' + (u.active ? '' : ' off'), type: 'button', role: 'listitem', 'data-id': String(u.id), 'aria-current': String(String(u.id) === String(selId)), onclick: () => select(u) },
         h('span', { class: 'ppl-av r-' + u.role }, pplInitials(u.name)),
         h('span', { class: 'ppl-it' }, h('b', {}, u.name + (u.id === me.id ? ' (you)' : '')),
-          h('small', {}, 'ID ' + (u.login_id || '—') + ' · ' + (u.active ? rightsSummary(u).replace(/^[^·]+· /, '').replace(/^custom \(.*$/, 'custom access').replace(/^every right$/, 'everything') : 'can’t sign in')),
+          h('small', {}, 'ID ' + (u.login_id || '—') + (u.active ? '' : ' · can’t sign in')),
           gs2.length ? h('span', { class: 'ppl-gchips' }, ...gs2.map(g => h('em', {}, g.name))) : null),
-        h('span', { class: 'ppl-role r-' + u.role }, PERM.roleNames[u.role] || 'User'));
+        h('span', { class: 'ppl-role r-' + (u.role === 'superadmin' ? 'superadmin' : roleOfUser(u) ? (roleOfUser(u).admin ? 'admin' : 'user') : 'none') }, roleLabel(u)));
     }), shown.length ? null : h('p', { class: 'set-hint', style: 'padding:10px 12px;margin:0' }, 'No one matches.'));
   };
   search.addEventListener('input', () => { PPL.q = search.value; drawList(); });
@@ -12298,35 +12334,12 @@ function filterText(f) {
   return parts.join(' · ') || 'no filters (everyone)';
 }
 window.filterText = filterText;
-function drawEditor(box, u, reload, users = [], template = null, groups = []) {
-  const me = CLOUD.user(), isNew = !u, self = u && u.id === me.id;
-  const err = h('p', { class: 'err', role: 'alert' });
-  const name = h('input', { class: 'input', value: u ? u.name : template ? template.name + ' (copy)' : '', 'aria-label': 'Name', autocomplete: 'off' });
-  const code = h('input', { class: 'input', type: isNew ? 'text' : 'password', value: u ? u.passcode : CLOUD.admin.genCode(), 'aria-label': 'Passcode', autocomplete: 'off', spellcheck: 'false' });
-  const eye = h('button', { class: 'btn', type: 'button', onclick: () => { code.type = code.type === 'password' ? 'text' : 'password'; eye.textContent = code.type === 'password' ? 'Show' : 'Hide'; } }, isNew ? 'Hide' : 'Show');
-  const fresh = h('button', { class: 'btn', type: 'button', onclick: () => { code.value = CLOUD.admin.genCode(); code.type = 'text'; eye.textContent = 'Hide'; } }, 'New');
-  /* v3.18: login ID, usually the Emp ID; filled in from the linked employee */
-  const loginId = h('input', { class: 'input', list: 'setLoginList', value: u ? (u.login_id || '') : '', placeholder: 'Emp ID', 'aria-label': 'Login ID', autocomplete: 'off', spellcheck: 'false', maxlength: 100 });
-  let loginAuto = !u || !u.login_id;
-  loginId.addEventListener('input', () => { loginAuto = !loginId.value.trim(); });
-  const curRole = u ? u.role : template ? template.role : 'user';
-  const role = h('select', { class: 'input', 'aria-label': 'Role' }, ...['user', 'admin', 'superadmin'].map(r => h('option', { value: r, selected: curRole === r }, PERM.roleNames[r])));
-  const active = checkLine('Can sign in', u ? u.active : true);
-  /* optional link to an employee in the workforce sheet */
-  const empOpts = (typeof state !== 'undefined' && state.schema ? state.rows : []).map(r => ({ code: String(gs(r, 'key_column') || ''), name: gs(r, 'name_column').trim() })).filter(x => x.code && x.name).sort((a, b) => a.name.localeCompare(b.name));
-  const labelOf = x => x.name + ' · ' + x.code;
-  const curEmp = u && u.permissions && u.permissions._emp ? empOpts.find(x => x.code === String(u.permissions._emp)) || { code: String(u.permissions._emp), name: u.permissions._empName || '' } : null;
-  const emp = h('input', { class: 'input', list: 'setEmpList', value: curEmp ? labelOf(curEmp) : '', placeholder: 'Not linked', 'aria-label': 'Linked employee (optional)', autocomplete: 'off' });
-  const empList = h('datalist', { id: 'setEmpList' }, ...empOpts.map(x => h('option', { value: labelOf(x) })));
-  const usedIds = new Set(users.filter(x => !u || x.id !== u.id).map(x => String(x.login_id || '').toLowerCase()));
-  const loginList = h('datalist', { id: 'setLoginList' }, ...empOpts.filter(x => !usedIds.has(x.code.toLowerCase())).map(x => h('option', { value: x.code, label: x.name })));
-  loginId.addEventListener('change', () => { const e = empOpts.find(x => x.code.toLowerCase() === loginId.value.trim().toLowerCase()); if (e && !emp.value.trim()) emp.value = labelOf(e); if (e && isNew && !name.value.trim()) name.value = e.name; });
-  const empPick = () => { const v = emp.value.trim(); if (!v) return null; return empOpts.find(x => labelOf(x) === v) || empOpts.find(x => x.code === v) || empOpts.find(x => x.name.toLowerCase() === v.toLowerCase()); };
-  emp.addEventListener('change', () => { const e = empPick(); if (e && (loginAuto || !loginId.value.trim())) { loginId.value = e.code; loginAuto = true; } if (e && isNew && !name.value.trim()) name.value = e.name; });
-  const accessSource = u || template;
-  const start = accessSource && accessSource.permissions && accessSource.permissions._v ? PERM.upgrade(accessSource.permissions) : accessSource ? PERM.presets['Full access'] : PERM.presets['Editor'];
+/* v3.55.0: the access form of a role (rights grid, presets, Backup report, fixed filters, notifications, field buttons) */
+function buildAccessForm(src, users = []) {
+  const accessSource = { permissions: { ...((src && src.rights) || {}), ...((src && src.extras) || {}) } };
+  const start = accessSource.permissions._v ? PERM.upgrade(accessSource.permissions) : PERM.presets['View only'];
   const audience = accessSource?.permissions?._notificationAudience || { mode: 'all', users: [] };
-  const audienceMode = h('select', { class: 'input', 'aria-label': 'Whose request notifications this person can see' },
+  const audienceMode = h('select', { class: 'input', 'aria-label': 'Whose request notifications people in this role can see' },
     ...[['all','All users'],['own','Only their own requests'],['selected','Their own + selected users']].map(([value,label]) => h('option',{value,selected:audience.mode === value},label)));
  const audienceChecks = users.map(person => ({ id: String(person.id), ...checkLine(person.name + ' · ID ' + (person.login_id || '—'), (audience.users || []).map(String).includes(String(person.id))) }));
   const audienceList = h('div', {class:'rmod-items',hidden:audienceMode.value !== 'selected'}, ...audienceChecks.map(c => c.el));
@@ -12336,7 +12349,7 @@ function drawEditor(box, u, reload, users = [], template = null, groups = []) {
   const knownFields = [...new Set([...(window.ATT?.fieldNames() || []),...(accessSource?.permissions?._attendanceFields || [])])];
   const priorFields = accessSource?.permissions?._attendanceFields;
   const fieldChecks = knownFields.map(field => ({field,...checkLine(field,Array.isArray(priorFields)?priorFields.includes(field):!!(start['att.edit'] || start['att.fields']))}));
-  const fieldBox = h('div',{class:'rmod-extra'},h('p',{class:'rmod-subt'},'Field logging buttons'),knownFields.length?h('div',{class:'rmod-subtools'},h('button',{class:'linkbtn',type:'button',onclick:()=>fieldChecks.forEach(c=>{c.box.checked=true;})},'All'),' · ',h('button',{class:'linkbtn',type:'button',onclick:()=>fieldChecks.forEach(c=>{c.box.checked=false;})},'None')):null,h('p',{class:'rmod-note'},'Select which fields this person can enter through Log [field] buttons. Values belong to the selected employee and month. Adding fields is a separate right.'),...fieldChecks.map(c=>c.el), !knownFields.length?h('p',{class:'rmod-note'},'No attendance fields yet. Add them on the Attendance page with the “Fields” button (open the Attendance page once so they are listed here).'):h('p',{class:'rmod-note'},'Tip: Attendance › Fields shows every person and field in one table.'));
+  const fieldBox = h('div',{class:'rmod-extra'},h('p',{class:'rmod-subt'},'Field logging buttons'),knownFields.length?h('div',{class:'rmod-subtools'},h('button',{class:'linkbtn',type:'button',onclick:()=>fieldChecks.forEach(c=>{c.box.checked=true;})},'All'),' · ',h('button',{class:'linkbtn',type:'button',onclick:()=>fieldChecks.forEach(c=>{c.box.checked=false;})},'None')):null,h('p',{class:'rmod-note'},'Select which fields people in this role can enter through Log [field] buttons. Values belong to the selected employee and month. Adding fields is a separate right.'),...fieldChecks.map(c=>c.el), !knownFields.length?h('p',{class:'rmod-note'},'No attendance fields yet. Add them on the Attendance page with the “Fields” button (open the Attendance page once so they are listed here).'):h('p',{class:'rmod-note'},'Tip: Attendance › Fields shows every person and field in one table.'));
   /* fixed filters for this person */
   let fixed = accessSource?.permissions?._filters ? JSON.parse(JSON.stringify(accessSource.permissions._filters)) : null;
   const fsum = h('p', { class: 'rmod-note' });
@@ -12397,14 +12410,14 @@ function drawEditor(box, u, reload, users = [], template = null, groups = []) {
     h('p', { class: 'rmod-note' }, 'They start with these filters every time they sign in. Without “Change the filters” they can’t change or clear them.'));
   /* rights, one card per module: the module's page on top, what they can do in it underneath */
   const boxes = {}, syncs = [];
-  const isSuper = () => role.value === 'superadmin' || role.value === 'admin';
+  const isSuper = () => false;
   const modules = PERM.groups.map(g => {
     const items = g.items.map(([k, label]) => { const c = checkLine(label, !!start[k], { 'data-k': k }); boxes[k] = c.box; return c; });
     const subItems = ((g.sub && g.sub.items) || []).map(([k, label]) => { const c = checkLine(label, !!start[k], { 'data-k': k }); boxes[k] = c.box; return c; });
     const subBox = subItems.length ? h('div', { class: 'rmod-sub' }, h('p', { class: 'rmod-subt' }, g.sub.title),
       h('div', { class: 'rmod-subtools' }, h('button', { class: 'linkbtn', type: 'button', onclick: () => { subItems.forEach(c => { if (!c.box.disabled) c.box.checked = true; }); } }, 'All'), ' · ', h('button', { class: 'linkbtn', type: 'button', onclick: () => { subItems.forEach(c => { if (!c.box.disabled) c.box.checked = false; }); } }, 'None')),
       h('div', { class: 'rmod-chips' }, ...subItems.map(c => c.el)),
-      h('p', { class: 'rmod-note' }, g.name === 'Overview' ? 'Choose which Request Center cards this person can see and whether they can approve or reject requests.' : 'Only these types appear in the Type list of Record attendance. A ticked type can be logged even without “Approve or reject leave” or “Mark and edit attendance”; changing a day that already holds approved leave still needs “Approve or reject leave”.')) : null;
+      h('p', { class: 'rmod-note' }, g.name === 'Overview' ? 'Choose which Request Center cards people in this role can see and whether they can approve or reject requests.' : 'Only these types appear in the Type list of Record attendance. A ticked type can be logged even without “Approve or reject leave” or “Mark and edit attendance”; changing a day that already holds approved leave still needs “Approve or reject leave”.')) : null;
     let head;
     if (g.page) { const c = checkLine('', !!start[g.page], { 'data-k': g.page, 'aria-label': 'Can open ' + g.name }); boxes[g.page] = c.box; head = h('label', { class: 'rmod-head' }, c.box, h('span', {}, 'Can open the ' + g.name + ' page')); }
     else head = null;
@@ -12457,119 +12470,200 @@ function drawEditor(box, u, reload, users = [], template = null, groups = []) {
   const paintPresets = () => { const m = Object.entries(PERM.presets).find(([n, p]) => n !== 'Admin' && PERM.keys.every(k => !!p[k] === !!boxes[k].checked)); presetBtns.forEach(b => b.setAttribute('aria-pressed', String(!!m && b.dataset.n === m[0]))); presetNow.textContent = m ? 'Matches “' + m[0] + '”' : 'Custom access'; };
   const presetNow = h('small', { class: 'rpre-now' });
   const presets = h('div', { class: 'rights-presets' }, h('span', {}, 'Quick start:'), ...presetBtns, presetNow);
-  const superNote = h('p', { class: 'set-hint sup-note' }, '⭐ Super admins can open and change everything, and manage people, groups and access. Nothing to tick.');
-  const adminNote = h('p', { class: 'set-hint sup-note' }, '⭐ Admins get every right and every setting, the same as a super admin, except People & access (passcodes, logins, groups, rights) and the Backup report page, which you tick below.');
   const roleNote = h('p', { class: 'set-hint' }, 'Pick a quick start, then tick Hide, View or Edit for each area. Open “Fine-tune” on a line only if you need something in between; the line then shows “Custom”.');
   /* v3.53.0: the Backup report page is given on purpose, also to admins */
   const bkRep = checkLine('Can open the Backup report page', !!(accessSource && accessSource.permissions && accessSource.permissions._bkReport));
   const bkRev = checkLine('…including Revenue (seat rates and estimated revenue)', !!(accessSource && accessSource.permissions && accessSource.permissions._bkRevenue));
   const bkSync = () => { bkRev.box.disabled = !bkRep.box.checked; if (!bkRep.box.checked) bkRev.box.checked = false; }; bkRep.box.addEventListener('change', bkSync); bkSync();
-  const bkBox = h('div', { class: 'rmod-extra bk-access' }, h('p', { class: 'rmod-subt' }, 'Backup report'), bkRep.el, bkRev.el, h('p', { class: 'set-hint' }, 'Off unless you tick it, for admins too. Super admins always have it.'));
-  const bkPerms = () => role.value === 'superadmin' ? {} : { _bkReport: bkRep.box.checked, _bkRevenue: bkRep.box.checked && bkRev.box.checked };
-  const rights = h('div', { class: 'rights' }, superNote, adminNote, bkBox, roleNote, presets, h('div', { class: 'rrows' }, h('div', { class: 'rgrid-head', 'aria-hidden': 'true' }, h('span', {}, 'Area'), h('span', {}, 'Hide'), h('span', {}, 'View'), h('span', {}, 'Edit'), h('span', {}, '')), ...modules));
+  const bkBox = h('div', { class: 'rmod-extra bk-access' }, h('p', { class: 'rmod-subt' }, 'Backup report'), bkRep.el, bkRev.el, h('p', { class: 'set-hint' }, 'Off unless ticked. Super admins always have it.'));
+  const bkPerms = () => ({ _bkReport: bkRep.box.checked, _bkRevenue: bkRep.box.checked && bkRev.box.checked });
+  const rights = h('div', { class: 'rights' }, roleNote, bkBox, presets, h('div', { class: 'rrows' }, h('div', { class: 'rgrid-head', 'aria-hidden': 'true' }, h('span', {}, 'Area'), h('span', {}, 'Hide'), h('span', {}, 'View'), h('span', {}, 'Edit'), h('span', {}, '')), ...modules));
   rights.addEventListener('change', () => setTimeout(paintPresets)); rights.addEventListener('click', e => { if (e.target.closest('.rseg-b, .rchk')) setTimeout(paintPresets); });
-  const syncRole = () => { const sup = isSuper(); rights.classList.toggle('is-admin', sup); superNote.hidden = role.value !== 'superadmin'; bkBox.hidden = role.value === 'superadmin'; adminNote.hidden = role.value !== 'admin'; roleNote.hidden = sup; presets.hidden = sup; fixedBox.hidden = sup; audienceBox.hidden = sup; fieldBox.hidden = sup; syncs.forEach(f => f()); };
-  role.addEventListener('change', () => { if (isNew && role.value === 'admin') { for (const k of PERM.keys) boxes[k].checked = !!PERM.presets['Admin'][k]; } syncRole(); paintPresets(); });
+  const syncRole = () => { syncs.forEach(f => f()); };
   syncRole(); paintPresets();
   const rightsNow = () => Object.fromEntries([['_v', PERM.version], ...PERM.keys.map(k => [k, boxes[k].checked])]);
   /* v3.16: copy rights between people, duplicate a person, or hand these rights to several people at once */
-  const permsNow = () => isSuper() ? bkPerms() : { ...bkPerms(), ...rightsNow(), _attendanceFields: fieldChecks.filter(c => c.box.checked).map(c => c.field), _notificationAudience: { mode: audienceMode.value, users: audienceChecks.filter(c => c.box.checked).map(c => c.id) }, ...(fixed ? { _filters: fixed } : {}) };
-  const others = users.filter(x => !u || x.id !== u.id);
-  const sourceSelect = h('select', { class: 'input', 'aria-label': 'Copy rights from' }, h('option', { value: '' }, 'Choose a person…'), ...others.map(x => h('option', { value: String(x.id) }, x.name + ' · ID ' + (x.login_id || '—') + ' · ' + (PERM.roleNames[x.role] || x.role))));
-  const alsoRole = checkLine('Also copy their role', false);
-  const applySource = source => {
-    if (alsoRole.box.checked) role.value = source.role;
-    if (source.role === 'superadmin' && !alsoRole.box.checked) { for (const key of PERM.keys) boxes[key].checked = true; fieldChecks.forEach(c => { c.box.checked = true; }); syncRole(); err.textContent = source.name + ' is a super admin, so every right was ticked. Review and save to apply.'; return; }
-    const p = source.permissions?._v ? PERM.upgrade(source.permissions) : { ...PERM.presets['Full access'], ...(source.permissions || {}) };
-    for (const key of PERM.keys) boxes[key].checked = !!p[key];
-    fixed = p._filters ? JSON.parse(JSON.stringify(p._filters)) : null; drawFixed(); fillEditor();
-    const aud = p._notificationAudience || { mode: 'all', users: [] }; audienceMode.value = aud.mode; audienceList.hidden = aud.mode !== 'selected'; audienceChecks.forEach(c => { c.box.checked = (aud.users || []).map(String).includes(c.id); });
-    fieldChecks.forEach(c => { c.box.checked = Array.isArray(p._attendanceFields) ? p._attendanceFields.includes(c.field) : !!(p['att.edit'] || p['att.fields']); });
-    syncRole(); err.textContent = 'Rights copied from ' + source.name + ' into this form. Review, then press ' + (isNew ? '“Add person”' : '“Save changes”') + ' to apply.';
+  return { el: rights, read: () => ({ rights: rightsNow(), extras: { ...bkPerms(), _attendanceFields: fieldChecks.filter(c => c.box.checked).map(c => c.field), _notificationAudience: { mode: audienceMode.value, users: audienceChecks.filter(c => c.box.checked).map(c => c.id) }, ...(fixed ? { _filters: fixed } : {}) } }), summary: () => PERM.keys.filter(k => boxes[k].checked).length };
+}
+/* ----- v3.55.0: roles ----- */
+const roleId = () => 'r' + Date.now().toString(36) + Math.random().toString(36).slice(2, 5);
+const roleOfUser = u => (u && u.role !== 'superadmin' && u.permissions && u.permissions._role ? tdRoles().find(r => r.id === u.permissions._role) || null : null);
+const roleLabel = u => u.role === 'superadmin' ? 'Super admin' : (roleOfUser(u) || {}).name || 'No role';
+const rolePages = r => { const p = r.rights || {}; return PERM.groups.filter(g => g.page && p[g.page]).map(g => g.name); };
+const roleSummary = r => { const pg = rolePages(r), n = PERM.keys.filter(k => (r.rights || {})[k]).length; return (r.admin ? 'Admin · ' : '') + (pg.length ? pg.join(', ') : 'no pages') + ' · ' + n + ' rights' + (r.extras && r.extras._bkReport ? ' · Backup report' : ''); };
+const keepLink = p => (p && p._emp ? { _emp: p._emp, _empName: p._empName } : {});
+async function saveRoles(next, note) { await saveTeamSetting('user_roles', next, note ? { name: 'Roles', text: note } : null); }
+/* write a role's rights into each member's account, so the server checks the same rights */
+async function syncRoleMembers(role, members, onStep) {
+  const failed = [];
+  for (const x of members) {
+    try {
+      const dbRole = x.role === 'superadmin' ? 'superadmin' : role.admin ? 'admin' : 'user';
+      await CLOUD.admin.save(x.id, x.name, x.passcode, dbRole, x.active, { ...tdRolePerms(role), ...keepLink(x.permissions) }, x.login_id);
+      onStep && onStep(x);
+    } catch (e) { failed.push(x.name + ' (' + e.message + ')'); }
+  }
+  return failed;
+}
+const SUGGESTED_ROLES = () => [
+  { name: 'Admin', admin: true, preset: 'Full access', note: 'Everything, plus the Settings pages (not People & access)' },
+  { name: 'Editor', admin: false, preset: 'Editor' },
+  { name: 'Leave approver', admin: false, preset: 'Leave approver' },
+  { name: 'Leave logger', admin: false, preset: 'Leave logger' },
+  { name: 'View only', admin: false, preset: 'View only' },
+].filter(x => PERM.presets[x.preset]).map(x => ({ id: roleId() + x.name.length, name: x.name, admin: x.admin, rights: { _v: PERM.version, ...PERM.presets[x.preset] }, extras: { _notificationAudience: { mode: 'all', users: [] } } }));
+
+function drawRoles(box, users, reload) {
+  const roles = tdRoles();
+  const list = h('div', { class: 'ppl-list role-list', role: 'list' }), editor = h('div', { class: 'ppl-editor role-editor' });
+  let selId = null;
+  const membersOf = r => users.filter(u => u.role !== 'superadmin' && u.permissions && u.permissions._role === r.id);
+  const select = r => { selId = r ? r.id : 'new'; list.querySelectorAll('.role-item').forEach(b => b.setAttribute('aria-current', String(b.dataset.id === selId))); drawRoleEditor(editor, r, users, roles, reload); };
+  const drawList = () => fill(list, ...roles.map(r => h('button', { class: 'ppl-item role-item', type: 'button', role: 'listitem', 'data-id': r.id, 'aria-current': String(r.id === selId), onclick: () => select(r) },
+      h('span', { class: 'role-ic' + (r.admin ? ' adm' : '') }, (r.name || '?').trim()[0].toUpperCase()),
+      h('span', { class: 'ppl-it' }, h('b', {}, r.name), h('small', {}, roleSummary(r))),
+      h('span', { class: 'role-n', title: 'People with this role' }, String(membersOf(r).length)))),
+    roles.length ? null : h('div', { class: 'grp-empty', style: 'margin:0' }, h('b', {}, 'No roles yet'), h('p', {}, 'A role is a named set of access, like “Team Leader”. Give it to people instead of ticking boxes for each one.'),
+      h('button', { class: 'btn', type: 'button', onclick: async e => { e.currentTarget.disabled = true; try { await saveRoles(SUGGESTED_ROLES(), 'Added suggested roles'); toast('Suggested roles added. Change them as you like.'); reload(); } catch (er) { toast(er.message, true); e.currentTarget.disabled = false; } } }, 'Start with suggested roles')));
+  drawList();
+  fill(box, h('div', { class: 'ppl' }, h('div', { class: 'ppl-side' }, h('button', { class: 'btn primary', type: 'button', onclick: () => select(null) }, '+ New role'), list), editor));
+  const first = roles.find(r => r.id === drawRoles.sel) || roles[0] || null;
+  selId = first ? first.id : 'new'; drawList(); select(first);
+}
+function drawRoleEditor(box, r, users, roles, reload) {
+  const isNew = !r, err = h('p', { class: 'err', role: 'alert' });
+  drawRoles.sel = r ? r.id : null;
+  const nm = h('input', { class: 'input', value: r ? r.name : '', placeholder: 'e.g. Team Leader', maxlength: 40, 'aria-label': 'Role name' });
+  const adm = checkLine('Admin: can also change dashboard settings (every Settings page except People & access)', !!(r && r.admin));
+  const form = buildAccessForm(r, users);
+  const members = r ? users.filter(u => u.role !== 'superadmin' && u.permissions && u.permissions._role === r.id) : [];
+  const add = new Set(), drop = new Set();
+  const memBox = h('div', { class: 'grp-members' });
+  const others = users.filter(u => u.role !== 'superadmin' && !(r && u.permissions && u.permissions._role === r.id));
+  const addSel = h('select', { class: 'input', 'aria-label': 'Add a person to this role' });
+  const drawMembers = () => {
+    const now = [...members.filter(m => !drop.has(m.id)), ...others.filter(o => add.has(o.id))];
+    fill(memBox, ...now.map(m => h('span', { class: 'grp-chip' }, h('span', { class: 'ppl-av sm' }, pplInitials(m.name)), m.name + (add.has(m.id) ? ' (new)' : ''),
+      h('button', { type: 'button', title: 'Remove from this role', 'aria-label': 'Remove ' + m.name, onclick: () => { if (add.has(m.id)) add.delete(m.id); else drop.add(m.id); drawMembers(); } }, '×'))),
+      now.length ? null : h('p', { class: 'rmod-note', style: 'margin:6px 0' }, 'No one has this role yet.'));
+    fill(addSel, h('option', { value: '' }, '+ Add people…'), ...[...others.filter(o => !add.has(o.id)), ...members.filter(m => drop.has(m.id))].sort((a, b) => a.name.localeCompare(b.name)).map(o => h('option', { value: String(o.id) }, o.name + ' · ' + roleLabel(o))));
   };
-  const copyBtn = h('button', { class: 'btn', type: 'button', onclick: () => { const source = users.find(x => String(x.id) === sourceSelect.value); if (!source) { err.textContent = 'Choose whose rights to copy.'; return; } applySource(source); } }, 'Copy into this form');
-  const dupBtn = u ? h('button', { class: 'btn', type: 'button', title: 'A new account with the same role, rights, filters and field buttons. It gets its own new passcode.', onclick: () => drawEditor(box, null, reload, users, u, groups) }, 'Duplicate ' + u.name) : null;
-  /* give the rights in this form to other people (their names, passcodes and linked employees stay as they are) */
-  const targets = others.filter(x => x.role !== 'superadmin').map(x => ({ x, ...checkLine(x.name + ' · ID ' + (x.login_id || '—') + ' · ' + (PERM.roleNames[x.role] || x.role), false) }));
-  const targetRole = checkLine('Also give them this role', false);
-  const giveMsg = h('p', { class: 'rmod-note' });
-  const giveBtn = h('button', { class: 'btn primary', type: 'button', onclick: async () => {
-    const picked = targets.filter(t => t.box.checked).map(t => t.x);
-    if (!picked.length) { giveMsg.textContent = 'Tick at least one person.'; return; }
-    const who = picked.map(x => x.name).join(', ');
-    if (!confirm(`Replace the rights of ${who} with the rights in this form${targetRole.box.checked ? ' and make them ' + PERM.roleNames[role.value] : ''}? Their names and passcodes stay the same.`)) return;
-    giveBtn.disabled = true; giveMsg.textContent = 'Saving…';
-    const done = [], failed = [];
-    for (const x of picked) {
-      try {
-        const newRole = targetRole.box.checked ? role.value : x.role;
-        const keep = { ...(x.permissions?._emp ? { _emp: x.permissions._emp, _empName: x.permissions._empName } : {}) };
-        const perms = newRole === 'superadmin' ? keep : { ...(role.value === 'superadmin' ? PERM.presets['Full access'] : permsNow()), ...keep };
-        await CLOUD.admin.save(x.id, x.name, x.passcode, newRole, x.active, perms);
-        done.push(x.name);
-      } catch (e) { failed.push(x.name + ' (' + e.message + ')'); }
-    }
-    if (done.length) BE.appendActivity([{ time: BE.nowText(), user: BE.userName(), action: 'settings', key: '', name: done.join(', '), details: { note: 'Copied access from ' + (name.value.trim() || 'a draft') + ' to ' + done.join(', ') } }]);
-    giveBtn.disabled = false;
-    if (failed.length) { giveMsg.textContent = (done.length ? 'Saved for ' + done.join(', ') + '. ' : '') + 'Not saved: ' + failed.join('; '); return; }
-    toast('Rights copied to ' + done.join(', ') + '. They apply within a minute.');
-    await reload(u ? u.id : null);
-  } }, 'Give these rights to the ticked people');
-  const copyControls = h('details', { class: 'rmod copy-access', open: !!template || null },
-    h('summary', {}, h('b', {}, 'Copy or duplicate access'), h('small', {}, ' · copy from someone, duplicate this person, or give these rights to others')),
-    h('p', { class: 'rmod-subt' }, 'Copy rights into this form'),
-    h('div', { class: 'set-actions flat' }, sourceSelect, copyBtn, alsoRole.el),
-    dupBtn ? h('p', { class: 'rmod-subt' }, 'Duplicate') : null,
-    dupBtn ? h('div', { class: 'set-actions flat' }, dupBtn, h('small', { class: 'rmod-note' }, 'Opens a new account pre-filled with the same role and rights, with a fresh passcode.')) : null,
-    !isNew && others.length ? h('p', { class: 'rmod-subt' }, 'Give the rights in this form to other people') : null,
-    !isNew && others.length ? h('div', { class: 'rmod-items copy-targets' }, ...targets.map(t => t.el)) : null,
-    !isNew && others.length ? h('div', { class: 'set-actions flat' }, targetRole.el, giveBtn) : null,
-    !isNew && others.length ? giveMsg : null);
-  /* v3.20: which user groups this person is in */
-  const grpSrc = u || template;
+  addSel.addEventListener('change', () => { const id = addSel.value; if (!id) return; const m = members.find(x => String(x.id) === id); if (m) drop.delete(m.id); else add.add(others.find(x => String(x.id) === id).id); drawMembers(); });
+  drawMembers();
+  const save = h('button', { class: 'btn primary', type: 'button', onclick: async () => {
+    err.textContent = '';
+    const name = nm.value.replace(/\s+/g, ' ').trim();
+    if (!name) { err.textContent = 'Give the role a name.'; nm.focus(); return; }
+    if (roles.some(x => x.name.toLowerCase() === name.toLowerCase() && (!r || x.id !== r.id))) { err.textContent = 'There is already a role with that name.'; return; }
+    save.disabled = true; save.textContent = 'Saving…';
+    try {
+      const v = form.read(), role = { id: r ? r.id : roleId(), name, admin: adm.box.checked, rights: v.rights, extras: v.extras };
+      const next = r ? roles.map(x => x.id === r.id ? role : x) : [...roles, role];
+      await saveRoles(next, (isNew ? 'Created role ' : 'Updated role ') + name);
+      const keep = [...members.filter(m => !drop.has(m.id)), ...others.filter(o => add.has(o.id))];
+      let failed = await syncRoleMembers(role, keep, () => { save.textContent = 'Updating people…'; });
+      for (const x of members.filter(m => drop.has(m.id))) { try { const p = { ...(x.permissions || {}) }; delete p._role; await CLOUD.admin.save(x.id, x.name, x.passcode, x.role, x.active, p, x.login_id); } catch (e) { failed.push(x.name + ' (' + e.message + ')'); } }
+      BE.appendActivity([{ time: BE.nowText(), user: BE.userName(), action: 'settings', key: '', name: 'Role ' + name, details: { note: (isNew ? 'Created role ' : 'Updated role ') + name + ' · ' + roleSummary(role) + ' · ' + keep.length + ' people' } }]);
+      if (failed.length) toast('Role saved, but not updated for: ' + failed.join('; '), true); else toast('Role saved. ' + (keep.length ? keep.length + (keep.length === 1 ? ' person gets' : ' people get') + ' it within a minute.' : ''));
+      drawRoles.sel = role.id; reload();
+    } catch (e) { err.textContent = e.message; save.disabled = false; save.textContent = isNew ? 'Create role' : 'Save role'; }
+  } }, isNew ? 'Create role' : 'Save role');
+  const del = r ? confirmButton('Delete role', members.length ? 'Click again: ' + members.length + ' people keep its access, with no role' : 'Click again to delete', async () => {
+    try {
+      await saveRoles(roles.filter(x => x.id !== r.id), 'Deleted role ' + r.name);
+      for (const x of members) { const p = { ...tdRolePerms(r), ...keepLink(x.permissions) }; delete p._role; try { await CLOUD.admin.save(x.id, x.name, x.passcode, x.role, x.active, p, x.login_id); } catch { } }
+      toast('Role deleted. Its people keep the same access, with no role.'); drawRoles.sel = null; reload();
+    } catch (e) { err.textContent = e.message; }
+  }) : null;
+  const sec = (n, title, hint, ...kids) => h('section', { class: 'ped-sec' }, h('div', { class: 'ped-h' }, h('span', { class: 'ped-n' }, n), h('div', {}, h('b', {}, title), hint ? h('small', {}, hint) : null)), ...kids);
+  fill(box,
+    h('div', { class: 'ped-top' }, h('span', { class: 'role-ic lg' + (r && r.admin ? ' adm' : '') }, r ? r.name.trim()[0].toUpperCase() : '+'),
+      h('div', { class: 'ped-id' }, h('h4', { class: 'ppl-name' }, r ? r.name : 'New role'), h('small', {}, r ? roleSummary(r) + ' · ' + members.length + (members.length === 1 ? ' person' : ' people') : 'Name it, choose what it can open and change, then add people.'))),
+    sec('1', 'Role', 'Name and level', h('div', { class: 'ppl-row' }, h('label', {}, 'Role name', nm)), adm.el),
+    sec('2', 'Access', 'What people with this role can open and change', form.el),
+    sec('3', 'People', 'Who has this role', memBox, h('div', { class: 'grp-add' }, addSel)),
+    h('div', { class: 'set-actions ped-save' }, save, err, h('span', { class: 'spacer' }), del));
+  if (isNew) nm.focus();
+}
+
+function drawEditor(box, u, reload, users = [], template = null, groups = []) {
+  const me = CLOUD.user(), isNew = !u, self = u && u.id === me.id;
+  const err = h('p', { class: 'err', role: 'alert' });
+  const name = h('input', { class: 'input', value: u ? u.name : '', 'aria-label': 'Name', autocomplete: 'off' });
+  const code = h('input', { class: 'input', type: isNew ? 'text' : 'password', value: u ? u.passcode : CLOUD.admin.genCode(), 'aria-label': 'Passcode', autocomplete: 'off', spellcheck: 'false' });
+  const eye = h('button', { class: 'btn', type: 'button', onclick: () => { code.type = code.type === 'password' ? 'text' : 'password'; eye.textContent = code.type === 'password' ? 'Show' : 'Hide'; } }, isNew ? 'Hide' : 'Show');
+  const fresh = h('button', { class: 'btn', type: 'button', onclick: () => { code.value = CLOUD.admin.genCode(); code.type = 'text'; eye.textContent = 'Hide'; } }, 'New');
+  const loginId = h('input', { class: 'input', list: 'setLoginList', value: u ? (u.login_id || '') : '', placeholder: 'Emp ID', 'aria-label': 'Login ID', autocomplete: 'off', spellcheck: 'false', maxlength: 100 });
+  let loginAuto = !u || !u.login_id;
+  loginId.addEventListener('input', () => { loginAuto = !loginId.value.trim(); });
+  const active = checkLine('Can sign in', u ? u.active : true);
+  const empOpts = (typeof state !== 'undefined' && state.schema ? state.rows : []).map(r => ({ code: String(gs(r, 'key_column') || ''), name: gs(r, 'name_column').trim() })).filter(x => x.code && x.name).sort((a, b) => a.name.localeCompare(b.name));
+  const labelOf = x => x.name + ' · ' + x.code;
+  const curEmp = u && u.permissions && u.permissions._emp ? empOpts.find(x => x.code === String(u.permissions._emp)) || { code: String(u.permissions._emp), name: u.permissions._empName || '' } : null;
+  const emp = h('input', { class: 'input', list: 'setEmpList', value: curEmp ? labelOf(curEmp) : '', placeholder: 'Not linked', 'aria-label': 'Linked employee (optional)', autocomplete: 'off' });
+  const empList = h('datalist', { id: 'setEmpList' }, ...empOpts.map(x => h('option', { value: labelOf(x) })));
+  const usedIds = new Set(users.filter(x => !u || x.id !== u.id).map(x => String(x.login_id || '').toLowerCase()));
+  const loginList = h('datalist', { id: 'setLoginList' }, ...empOpts.filter(x => !usedIds.has(x.code.toLowerCase())).map(x => h('option', { value: x.code, label: x.name })));
+  loginId.addEventListener('change', () => { const e = empOpts.find(x => x.code.toLowerCase() === loginId.value.trim().toLowerCase()); if (e && !emp.value.trim()) emp.value = labelOf(e); if (e && isNew && !name.value.trim()) name.value = e.name; });
+  const empPick = () => { const v = emp.value.trim(); if (!v) return null; return empOpts.find(x => labelOf(x) === v) || empOpts.find(x => x.code === v) || empOpts.find(x => x.name.toLowerCase() === v.toLowerCase()); };
+  emp.addEventListener('change', () => { const e = empPick(); if (e && (loginAuto || !loginId.value.trim())) { loginId.value = e.code; loginAuto = true; } if (e && isNew && !name.value.trim()) name.value = e.name; });
+  /* v3.55.0: access comes from a role. Pick Super admin, one of the roles, or No role (keeps the access they already have) */
+  const roles = tdRoles(), curRole = roleOfUser(u);
+  let pick = u ? (u.role === 'superadmin' ? 'super' : curRole ? curRole.id : 'none') : (roles[0] ? roles[0].id : 'none');
+  const pickBox = h('div', { class: 'role-picks', role: 'radiogroup', 'aria-label': 'Role' });
+  const noneSub = isNew ? 'View only until you give them a role' : u.role === 'admin' ? 'Keeps the access they have now (admin, everything)' : 'Keeps the access they have now (' + rightsSummary({ role: u.role, permissions: u.permissions }).replace(/^[^·]+· /, '') + ')';
+  const opts = [['super', 'Super admin', 'Every right, and manages people, roles and passcodes', false], ...roles.map(r => [r.id, r.name, roleSummary(r), r.admin]), ['none', 'No role', noneSub, false]];
+  const drawPicks = () => fill(pickBox, ...opts.map(([id, t, sub, adm]) => h('button', { type: 'button', class: 'role-pick' + (adm && !/^admin$/i.test(t) ? ' adm' : ''), role: 'radio', 'aria-checked': String(pick === id), onclick: () => { pick = id; drawPicks(); } },
+    h('span', { class: 'role-dot' }), h('span', { class: 'ppl-it' }, h('b', {}, t), h('small', {}, sub)))));
+  drawPicks();
+  const grpSrc = u;
   const groupChecks = groups.map(g => ({ g, ...checkLine(g.name + ' · ' + g.members.length + (g.members.length === 1 ? ' person' : ' people'), !!grpSrc && memberOf(g, grpSrc.id)) }));
-  const groupBox = groups.length ? h('div', { class: 'grp-picks' }, ...groupChecks.map(c => c.el))
-    : h('p', { class: 'rmod-note', style: 'margin:0' }, 'No groups yet. Make one in the Groups tab above.');
-  const saveGroupsFor = async (id, nm) => {
+  const groupBox = groups.length ? h('div', { class: 'grp-picks' }, ...groupChecks.map(c => c.el)) : h('p', { class: 'rmod-note', style: 'margin:0' }, 'No groups yet. Make one in the Groups tab above.');
+  const saveGroupsFor = async (id, nmv) => {
     if (!groups.length) return;
     await loadTeamSettings(); const latest = groupsFrom(window.TD_SETTINGS);
     let changed = false;
     const next = latest.map(g => {
       const want = groupChecks.find(c => c.g.id === g.id)?.box.checked, has = memberOf(g, id);
-      if (want && !has) { changed = true; return { ...g, members: [...g.members, { id: String(id), name: nm }] }; }
+      if (want && !has) { changed = true; return { ...g, members: [...g.members, { id: String(id), name: nmv }] }; }
       if (want === false && has) { changed = true; return { ...g, members: g.members.filter(m => m.id !== String(id)) }; }
-      if (has) return { ...g, members: g.members.map(m => m.id === String(id) && m.name !== nm ? (changed = true, { ...m, name: nm }) : m) };
+      if (has) return { ...g, members: g.members.map(m => m.id === String(id) && m.name !== nmv ? (changed = true, { ...m, name: nmv }) : m) };
       return g;
     });
-    if (changed) await saveGroups(next, 'Groups for ' + nm + ': ' + (next.filter(g => memberOf(g, id)).map(g => g.name).join(', ') || 'none'));
+    if (changed) await saveGroups(next, 'Groups for ' + nmv + ': ' + (next.filter(g => memberOf(g, id)).map(g => g.name).join(', ') || 'none'));
   };
   const save = h('button', { class: 'btn primary', type: 'button', onclick: async () => {
     err.textContent = ''; save.disabled = true; save.textContent = 'Saving…';
     try {
-      const nm = name.value.trim(), pc = code.value.trim(), linked = empPick(), lid = loginId.value.trim();
+      const nmv = name.value.trim(), pc = code.value.trim(), linked = empPick(), lid = loginId.value.trim();
       if (!lid) throw new Error('Enter a login ID. Use their Emp ID (pick the linked employee and it fills in).');
       if (linked === undefined) throw new Error('Pick the linked employee from the list, or leave it empty.');
       const link = linked ? { _emp: linked.code, _empName: linked.name } : {};
-      const perms = isSuper() ? { ...link, ...bkPerms() } : { ...rightsNow(), ...link, ...bkPerms(), _attendanceFields: fieldChecks.filter(c=>c.box.checked).map(c=>c.field), _notificationAudience: { mode: audienceMode.value, users: audienceChecks.filter(c => c.box.checked).map(c => c.id) }, ...(fixed ? { _filters: fixed } : {}) };
-      const r = await CLOUD.admin.save(u ? u.id : null, nm, pc, role.value, active.box.checked, perms, lid);
-      const savedId = (r && r.id) || (u && u.id);
-      if (savedId != null) { try { await saveGroupsFor(savedId, nm); } catch (ge) { toast('Saved, but the groups could not be updated: ' + ge.message, true); } }
-      if (self) { CLOUD.admin.selfUpdated(nm); await CLOUD.refreshMe(); applyAccess(); }
-      BE.appendActivity([{ time: BE.nowText(), user: BE.userName(), action: 'settings', key: '', name: nm, details: { note: (isNew ? 'Added ' : 'Updated access for ') + nm + ' · ' + rightsSummary({ role: role.value, permissions: perms }) + (fixed && !isSuper() ? ' · fixed filters: ' + filterText(fixed) : '') + (active.box.checked ? '' : ' · sign-in disabled') } }]);
-      toast(isNew ? 'Added ' + nm + '. Give them their login ID (' + lid + ') and passcode.' : 'Saved. ' + (u.passcode !== pc ? 'The new passcode works now; the old one has stopped.' : 'Their rights apply within a minute.'));
-      await reload(r && r.id);
+      let dbRole, perms;
+      if (pick === 'super') { dbRole = 'superadmin'; perms = link; }
+      else if (pick === 'none') {
+        const old = { ...((u && u.permissions) || {}) }; delete old._role; delete old._emp; delete old._empName;
+        dbRole = u && u.role !== 'superadmin' ? u.role : 'user';
+        perms = u && u.role !== 'superadmin' ? { ...old, ...link } : { _v: PERM.version, ...PERM.presets['View only'], _notificationAudience: { mode: 'own', users: [] }, ...link };
+      } else { const r = roles.find(x => x.id === pick); dbRole = r.admin ? 'admin' : 'user'; perms = { ...tdRolePerms(r), ...link }; }
+      const r0 = await CLOUD.admin.save(u ? u.id : null, nmv, pc, dbRole, active.box.checked, perms, lid);
+      const savedId = (r0 && r0.id) || (u && u.id);
+      if (savedId != null) { try { await saveGroupsFor(savedId, nmv); } catch (ge) { toast('Saved, but the groups could not be updated: ' + ge.message, true); } }
+      if (self) { CLOUD.admin.selfUpdated(nmv); await CLOUD.refreshMe(); applyAccess(); }
+      const roleTxt = pick === 'super' ? 'Super admin' : pick === 'none' ? 'no role' : 'role ' + roles.find(x => x.id === pick).name;
+      BE.appendActivity([{ time: BE.nowText(), user: BE.userName(), action: 'settings', key: '', name: nmv, details: { note: (isNew ? 'Added ' : 'Updated ') + nmv + ' · ' + roleTxt + (active.box.checked ? '' : ' · sign-in disabled') } }]);
+      toast(isNew ? 'Added ' + nmv + '. Give them their login ID (' + lid + ') and passcode.' : 'Saved. ' + (u.passcode !== pc ? 'The new passcode works now; the old one has stopped.' : 'Their access applies within a minute.'));
+      await reload(r0 && r0.id);
     } catch (e) { err.textContent = e.message; save.disabled = false; save.textContent = isNew ? 'Add person' : 'Save changes'; }
   } }, isNew ? 'Add person' : 'Save changes');
   const del = !isNew && !self ? confirmButton('Delete', 'Click again to delete', async () => {
     try { await CLOUD.admin.remove(u.id); toast(u.name + ' deleted. Their passcode no longer works.'); await reload(null); } catch (e) { err.textContent = e.message; }
   }) : null;
   const sec = (n, title, hint, ...kids) => h('section', { class: 'ped-sec' }, h('div', { class: 'ped-h' }, h('span', { class: 'ped-n' }, n), h('div', {}, h('b', {}, title), hint ? h('small', {}, hint) : null)), ...kids);
-  const shownName = isNew ? (template ? 'New person · copy of ' + template.name : 'New person') : u.name;
   fill(box,
-    h('div', { class: 'ped-top' }, h('span', { class: 'ppl-av lg r-' + curRole }, pplInitials(isNew ? '+' : u.name)),
-      h('div', { class: 'ped-id' }, h('h4', { class: 'ppl-name' }, shownName),
-        h('small', {}, isNew ? 'Fill in the account, choose access, then press “Add person”.' : ('ID ' + (u.login_id || '—') + ' · ' + rightsSummary(u) + (u.last_login ? ' · last signed in ' + when(u.last_login) : ' · never signed in'))))),
-    template ? h('p', { class: 'set-hint' }, 'Same role, access, filters and groups as ' + template.name + '. Enter the name and login ID (Emp ID), note the new passcode, then press “Add person”.') : null,
+    h('div', { class: 'ped-top' }, h('span', { class: 'ppl-av lg r-' + (u ? u.role : 'user') }, pplInitials(isNew ? '+' : u.name)),
+      h('div', { class: 'ped-id' }, h('h4', { class: 'ppl-name' }, isNew ? 'New person' : u.name),
+        h('small', {}, isNew ? 'Fill in the account, pick a role, then press “Add person”.' : ('ID ' + (u.login_id || '—') + ' · ' + roleLabel(u) + (u.last_login ? ' · last signed in ' + when(u.last_login) : ' · never signed in'))))),
     sec('1', 'Account', 'How they sign in',
       h('div', { class: 'ppl-row' },
         h('label', {}, 'Name', name),
@@ -12577,11 +12671,8 @@ function drawEditor(box, u, reload, users = [], template = null, groups = []) {
         h('label', {}, 'Passcode', h('div', { class: 'pc-wrap' }, code, eye, fresh)),
         h('label', {}, 'Linked employee (optional)', emp, empList)),
       active.el),
-    sec('2', 'Role & access', 'What they can open and change',
-      h('div', { class: 'ppl-row' }, h('label', {}, 'Role', role)), rights),
+    sec('2', 'Role', roles.length ? 'What they can open and change comes from their role' : 'Create roles in the Roles tab above, then pick one here', pickBox),
     sec('3', 'Groups', 'People in the same group see each other’s requests and request notifications', groupBox),
-    h('details', { class: 'ped-more copy-access', open: !!template || null },
-      h('summary', {}, h('b', {}, 'More: copy, duplicate or share this access')), ...[...copyControls.childNodes].slice(1)),
     h('div', { class: 'set-actions ped-save' }, save, err, h('span', { class: 'spacer' }), del));
   if (isNew) name.focus();
 }
