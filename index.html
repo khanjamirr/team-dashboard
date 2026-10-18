@@ -5,7 +5,7 @@
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <link rel="preconnect" href="https://iiogwevtyzgedhoaqlrn.supabase.co" crossorigin><link rel="dns-prefetch" href="https://iiogwevtyzgedhoaqlrn.supabase.co">
 <link rel="icon" href="data:,">
-<title>Team Dashboard · 3.56.0</title>
+<title>Team Dashboard · 3.56.1</title>
 <link rel="preconnect" href="https://fonts.googleapis.com"><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin><link href="https://fonts.googleapis.com/css2?family=Public+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet">
 <style>
 :root {
@@ -2013,6 +2013,41 @@ button.ovx-chip { cursor:pointer; } button.ovx-chip:hover { filter:brightness(.9
 .ovx-day small { display:block; margin-top:4px; font-size:11.5px; color:var(--ov-ink2); } .ovx-day.on small { font-weight:700; color:var(--ov-ink); }
 @media (max-width:1100px) { #pageSummary.ov { grid-template-columns:minmax(0,1fr) !important; grid-template-areas:"glance" "att" "req" "up" !important; } .ovx-tiles { grid-template-columns:repeat(2,minmax(0,1fr)); } }
 @media (max-width:700px) { .ovx-hero { flex-direction:column; align-items:stretch; } .ovx-hero h1 { font-size:22px; } .ovx-t { min-height:120px; padding:16px; border-radius:18px; } .ovx-t > b { font-size:34px; } .ovx-spark { width:40%; height:32px; } .ovx-tiles { gap:10px; } }
+
+/* v3.56.1: compact Overview + date picker */
+.ovx-hero { margin:0 0 12px !important; align-items:center !important; }
+.ovx-hero h1 { font-size:22px !important; }
+.ovx-hero p { font-size:13px !important; margin-top:2px !important; }
+.ovx-ctrls { display:flex; align-items:center; gap:10px; flex-wrap:wrap; justify-content:flex-end; }
+.ovx-datebox { display:inline-flex; align-items:center; gap:2px; background:#e9e4dc; padding:3px; border-radius:12px; }
+.ovx-datebox .ovx-date { height:30px !important; border:0 !important; background:#fff !important; border-radius:9px !important; padding:0 8px !important; font-weight:600; width:auto; min-width:0; }
+.ovx-step { all:unset; cursor:pointer; width:28px; height:30px; display:grid; place-items:center; border-radius:8px; font-size:17px; font-weight:700; color:var(--ov-ink2); } .ovx-step:hover { background:rgba(255,255,255,.6); }
+.ovx-today { all:unset; cursor:pointer; margin:0 6px 0 4px; font-size:12.5px; font-weight:650; color:var(--royal); }
+:root[data-theme="dark"] .ovx-datebox { background:var(--surface-2); } :root[data-theme="dark"] .ovx-datebox .ovx-date { background:var(--surface) !important; }
+@media (prefers-color-scheme: dark) { :root:not([data-theme="light"]) .ovx-datebox { background:var(--surface-2); } :root:not([data-theme="light"]) .ovx-datebox .ovx-date { background:var(--surface) !important; } }
+.ovx-period.att-seg > button { padding:5px 12px !important; }
+#pageSummary.ov { gap:12px !important; }
+.ovx-tiles { gap:12px !important; }
+.ovx-t { min-height:104px !important; padding:14px 18px !important; border-radius:18px !important; }
+.ovx-t small { font-size:12px !important; }
+.ovx-t > b { font-size:30px !important; margin:2px 0 2px !important; }
+.ovx-t > b span { font-size:13px !important; }
+.ovx-t em { font-size:12px !important; }
+.ovx-spark { bottom:14px !important; height:40px !important; }
+.ovx-bar { height:6px !important; margin:4px 0 6px !important; }
+.ovx-needs { margin-top:6px !important; gap:3px !important; } .ovx-needs button { padding:4px 9px !important; font-size:12.5px !important; } .ovx-needs b { font-size:13.5px !important; }
+.ovx-ok { font-size:15px !important; }
+#pageSummary.ov #cardAttendance, #pageSummary.ov #ovRequests, #pageSummary.ov #ovUpcoming { padding:14px 18px !important; border-radius:18px !important; }
+#pageSummary.ov h2 { font-size:15px !important; }
+.ovx-list li { padding:6px 0 !important; gap:10px !important; }
+.ovx-av { width:26px !important; height:26px !important; font-size:10px !important; }
+.ovx-nm b { font-size:13px; } .ovx-nm small { font-size:11.5px !important; }
+.ovx-chip { padding:3px 9px !important; font-size:11px !important; }
+.ovx-week { margin-top:10px !important; padding-top:10px !important; }
+.ovx-bars { height:36px !important; } .ovx-bars i { width:12px !important; }
+.ovx-day small { font-size:11px !important; margin-top:2px !important; }
+#pageSummary.ov .coming-row, #pageSummary.ov .coming li { padding-top:6px !important; padding-bottom:6px !important; }
+@media (max-width:700px) { .ovx-ctrls { justify-content:stretch; } .ovx-datebox { flex:1; } .ovx-datebox .ovx-date { flex:1; } }
 </style></head>
 
 
@@ -8189,11 +8224,14 @@ const BKR_CSS = BKG_CSS + BKCAL_CSS + `.bkc{display:grid;grid-template-columns:m
 /* ---------- v3.56.0: new Overview (Concept A layout, Concept F look). One "Who is out" card for Today / This week /
    This month (the 26th–25th cycle), each person with their leave code and backup status, plus a Mon–Fri week bar chart.
    The headline tiles on top read ATT.overviewStats(). ---------- */
-const OVP = { p: (() => { try { return localStorage.getItem('td_ovp') || 'today'; } catch { return 'today'; } })(), f: 'all', all: false };
+const OVP = { p: (() => { try { return localStorage.getItem('td_ovp') || 'today'; } catch { return 'today'; } })(), f: 'all', all: false, d: null };
+/* v3.56.1: the Overview can look at any date (OVP.d); empty = today */
+const ovDay = () => { if (OVP.d && /^\d{4}-\d\d-\d\d$/.test(OVP.d)) { const t = new Date(OVP.d + 'T00:00:00Z'); if (!isNaN(t)) return t; } return TODAY; };
 const ovRange = p => {
-  if (p === 'week') { const s = addDays(TODAY, -TODAY.getUTCDay()); return { from: s, to: addDays(s, 6), label: 'This week' }; }
-  if (p === 'month') { const { start, end } = cycParts(cycOf(TODAY)); return { from: start, to: end, label: 'This month' }; }
-  return { from: TODAY, to: TODAY, label: 'Today' };
+  const T = ovDay(), isT = T.getTime() === TODAY.getTime();
+  if (p === 'week') { const s = addDays(T, -T.getUTCDay()); return { from: s, to: addDays(s, 6), label: isT ? 'This week' : 'Week' }; }
+  if (p === 'month') { const { start, end } = cycParts(cycOf(T)); return { from: start, to: end, label: isT ? 'This month' : monthLabel(cycOf(T)) }; }
+  return { from: T, to: T, label: isT ? 'Today' : bkFmtD(isoDate(T)) };
 };
 function ovEntries(from, to) {
   const d = D(), out = [];
@@ -8213,12 +8251,12 @@ function ovEntries(from, to) {
 const OV_ST = { backup: ['Backup provided', 'cy'], none: ['No backup', 'cn'], unset: ['Not updated', 'cu'], live: ['Seat shown live', 'cl'], late: ['Late', 'ct'], applied: ['Awaiting approval', 'ca'] };
 function overviewStats() {
   if (S.status !== 'ready' || !S.ctx) return null;
-  const d = D(), tracked = (d.byMonth.get(TODAY_MS) || []).length, today = ovEntries(TODAY, TODAY);
+  const T = ovDay(), d = D(), tracked = (d.byMonth.get(Engine.monthSerial(T.getUTCFullYear(), T.getUTCMonth())) || []).length, today = ovEntries(T, T);
   const full = today.filter(e => e.c !== 'half' && e.st !== 'late' && e.st !== 'applied').length, half = today.filter(e => e.c === 'half').length, late = today.filter(e => e.st === 'late').length;
   const leave = today.filter(e => ['backup', 'none', 'unset'].includes(e.st)), cov = leave.length ? Math.round(leave.filter(e => e.st === 'backup').length / leave.length * 100) : null;
   /* present on the last 10 working days, for the small trend line */
-  const trend = []; for (let k = 0, t = TODAY; trend.length < 10 && k < 20; k++, t = addDays(t, -1)) { if (t.getUTCDay() % 6 === 0) continue; const rows = d.byMonth.get(Engine.monthSerial(t.getUTCFullYear(), t.getUTCMonth())) || [], i = t.getUTCDate() - 1; trend.unshift(rows.length - rows.filter(r => { const c = catOf(r.days[i]); return c && LEAVE_CATS.has(c) && c !== 'half'; }).length); }
-  return { tracked, present: tracked - full, full, half, late, cov, covered: leave.filter(e => e.st === 'backup').length, leaveN: leave.length, trend,
+  const trend = []; for (let k = 0, t = T; trend.length < 10 && k < 20; k++, t = addDays(t, -1)) { if (t.getUTCDay() % 6 === 0) continue; const rows = d.byMonth.get(Engine.monthSerial(t.getUTCFullYear(), t.getUTCMonth())) || [], i = t.getUTCDate() - 1; trend.unshift(rows.length - rows.filter(r => { const c = catOf(r.days[i]); return c && LEAVE_CATS.has(c) && c !== 'half'; }).length); }
+  return { day: T, isToday: T.getTime() === TODAY.getTime(), tracked, present: tracked - full, full, half, late, cov, covered: leave.filter(e => e.st === 'backup').length, leaveN: leave.length, trend,
     toSet: canBackup() ? bkDueList().reduce((a, o) => a + o.items.length, 0) : 0, toDecide: requestsToDecide().length };
 }
 function ovClientRecords(list) {
@@ -8241,11 +8279,11 @@ function renderOutCard(el) {
   const rows = shown.map(e => { const [t, c] = OV_ST[e.st], act = ed && ['backup', 'none', 'unset', 'live'].includes(e.st);
     return `<li><span class="ovx-av">${esc(ini(e.r.name))}</span><span class="ovx-nm"><b>${esc(e.r.name.trim())}</b><small>${esc([OVP.p === 'today' ? '' : bkFmtD(e.iso), cl(e.r), dg(e.r)].filter(Boolean).join(' · '))}</small></span><span class="ovx-code" title="${esc(labelOf(e.v))}">${esc(e.v)}</span>${act ? `<button type="button" class="ovx-chip ${c}" data-ovbk="${esc(e.key)}" data-iso="${e.iso}" title="Set or change the backup">${t}</button>` : `<span class="ovx-chip ${c}">${t}</span>`}</li>`; }).join('');
   /* this week, Monday to Friday: covered (green) and not covered (red) */
-  const ws = addDays(TODAY, -TODAY.getUTCDay()), days = [1, 2, 3, 4, 5].map(k => addDays(ws, k)), wk = days.map(dt => { const es = ovEntries(dt, dt).filter(e => ['backup', 'none', 'unset'].includes(e.st)); return { dt, cov: es.filter(e => e.st === 'backup').length, not: es.length - es.filter(e => e.st === 'backup').length, fut: dt > TODAY }; });
+  const T0 = ovDay(), ws = addDays(T0, -T0.getUTCDay()), days = [1, 2, 3, 4, 5].map(k => addDays(ws, k)), wk = days.map(dt => { const es = ovEntries(dt, dt).filter(e => ['backup', 'none', 'unset'].includes(e.st)); return { dt, cov: es.filter(e => e.st === 'backup').length, not: es.length - es.filter(e => e.st === 'backup').length, fut: dt > TODAY }; });
   const mx = Math.max(1, ...wk.map(x => x.cov + x.not));
-  const week = `<div class="ovx-week"><div class="ovx-wh">This week <span><i class="g"></i>covered <i class="r"></i>no backup</span></div><div class="ovx-days">${wk.map(x => { const isT = x.dt.getTime() === TODAY.getTime(); return `<div class="ovx-day${isT ? ' on' : ''}${x.fut ? ' fut' : ''}" title="${esc(longDate(x.dt))}: ${x.cov} covered · ${x.not} without a backup"><div class="ovx-bars"><i class="g" style="height:${x.cov / mx * 100}%"></i><i class="r" style="height:${x.not / mx * 100}%"></i></div><small>${WEEKDAYS[x.dt.getUTCDay()]} ${x.dt.getUTCDate()}${x.fut && x.cov + x.not ? ' · ' + (x.cov + x.not) + ' planned' : ''}</small></div>`; }).join('')}</div></div>`;
+  const week = `<div class="ovx-week"><div class="ovx-wh">${T0.getTime() === TODAY.getTime() ? 'This week' : 'That week'} <span><i class="g"></i>covered <i class="r"></i>no backup</span></div><div class="ovx-days">${wk.map(x => { const isT = x.dt.getTime() === T0.getTime(); return `<div class="ovx-day${isT ? ' on' : ''}${x.fut ? ' fut' : ''}" title="${esc(longDate(x.dt))}: ${x.cov} covered · ${x.not} without a backup"><div class="ovx-bars"><i class="g" style="height:${x.cov / mx * 100}%"></i><i class="r" style="height:${x.not / mx * 100}%"></i></div><small>${WEEKDAYS[x.dt.getUTCDay()]} ${x.dt.getUTCDate()}${x.fut && x.cov + x.not ? ' · ' + (x.cov + x.not) + ' planned' : ''}</small></div>`; }).join('')}</div></div>`;
   el.innerHTML = `<div class="ovx-head"><h2>Who is out <span class="ovx-sub">${esc(R.label)}${OVP.p === 'today' ? '' : ' · ' + esc(bkShortD(isoDate(R.from)) + ' – ' + bkShortD(isoDate(R.to)))}</span></h2>${seg}<button type="button" class="btn mini" data-ov-copy title="Pseudo name, Backup Provided / Not Provided and remarks, ready to paste">Copy for client</button>${more}</div>
-    ${rows ? `<ul class="ovx-list">${rows}</ul>` : `<div class="ovx-empty">${OVP.f === 'nob' ? 'Everyone out has a backup.' : OVP.f === 'late' ? 'No late comings.' : OVP.p === 'today' ? 'Nobody is out today.' : 'Nobody is out in this period.'}</div>`}
+    ${rows ? `<ul class="ovx-list">${rows}</ul>` : `<div class="ovx-empty">${OVP.f === 'nob' ? 'Everyone out has a backup.' : OVP.f === 'late' ? 'No late comings.' : OVP.p === 'today' ? (ovDay().getTime() === TODAY.getTime() ? 'Nobody is out today.' : 'Nobody was out on this day.') : 'Nobody is out in this period.'}</div>`}
     ${list.length > 8 ? `<button type="button" class="ovx-all" data-ov-all>${OVP.all ? 'Show fewer' : 'Show all ' + list.length}</button>` : ''}
     ${OVP.p !== 'month' ? week : ''}`;
   el.querySelectorAll('[data-ovf]').forEach(b => b.addEventListener('click', () => { OVP.f = b.dataset.ovf; OVP.all = false; renderOutCard(el); }));
@@ -8254,9 +8292,9 @@ function renderOutCard(el) {
   el.querySelectorAll('[data-att-go]').forEach(b => b.addEventListener('click', () => go(b.dataset.attGo)));
   el.querySelector('[data-att-hist]')?.addEventListener('click', openAttHistory);
   el.querySelector('[data-bk-report]')?.addEventListener('click', openBackupReport);
-  const data = () => ({ headers: [...(OVP.p === 'today' ? [] : ['Date']), 'Name', 'Backup', 'Remarks'], records: ovClientRecords(all), caption: (OVP.p === 'today' ? "Today's attendance record" : 'Attendance record') + ' · ' + R.label, top: [OVP.p === 'today' ? longDate(TODAY) : bkShortD(isoDate(R.from)) + ' – ' + bkShortD(isoDate(R.to)), OVP.p === 'today' ? "Today's attendance record" : 'Attendance record'] });
+  const data = () => ({ headers: [...(OVP.p === 'today' ? [] : ['Date']), 'Name', 'Backup', 'Remarks'], records: ovClientRecords(all), caption: (OVP.p === 'today' && ovDay().getTime() === TODAY.getTime() ? "Today's attendance record" : 'Attendance record') + ' · ' + R.label, top: [OVP.p === 'today' ? longDate(ovDay()) : bkShortD(isoDate(R.from)) + ' – ' + bkShortD(isoDate(R.to)), OVP.p === 'today' && ovDay().getTime() === TODAY.getTime() ? "Today's attendance record" : 'Attendance record'] });
   el.querySelector('[data-ov-copy]').addEventListener('click', async e => { const t = data(); if (!t.records.length) { toast('Nothing to copy: only days marked Backup Provided or Not Provided are copied.'); return; } if (await copyAttendanceTable(t)) { toast('Copied. Paste into Excel or an email.'); e.target.textContent = 'Copied ✓'; setTimeout(() => { e.target.textContent = 'Copy for client'; }, 1600); } else toast('The browser blocked copying.'); });
-  el.querySelector('[data-ov-mail]')?.addEventListener('click', () => { const t = data(); if (!t.records.length) { toast('Nothing to send yet.'); return; } openAttOutlook(t, TODAY); });
+  el.querySelector('[data-ov-mail]')?.addEventListener('click', () => { const t = data(); if (!t.records.length) { toast('Nothing to send yet.'); return; } openAttOutlook(t, ovDay()); });
 }
 function renderCard(el, opts = {}) {
   if (S.status === 'ready' && S.ctx) { try { bkDueStart(); } catch { } }
@@ -8740,6 +8778,7 @@ return {
   /* v3.19: every recorded code between two dates (UTC ms, null = open), for custom dashboards; follows the attendance scope */
   entries: (from, to) => { if (S.status !== 'ready' || !S.ctx) return null; const d = D(), out = []; for (const m of d.months) { const dim = Engine.daysInMonth(m); for (const r of d.byMonth.get(m) || []) for (let i = 0; i < dim; i++) { const v = r.days[i]; if (v == null || v === '') continue; const dt = dateOf(m, i), t = dt.getTime(); if ((from != null && t < from) || (to != null && t > to)) continue; const cat = catOf(v); out.push({ name: r.name.trim(), empId: r.empId, client: r.client ? String(r.client).trim() : '', date: dt, code: String(v).trim().toUpperCase(), cat, catLabel: CATS[cat] || 'Other' }); } } return out; },
   bkDueNow: () => { BKDUE.snooze = 0; bkDueCheck(true); },
+  ovDate: v => { if (v !== undefined) { OVP.d = v && v !== isoDate(TODAY) ? v : null; OVP.all = false; } return isoDate(ovDay()); },
   overviewStats, ovPeriod: v => { if (v) { OVP.p = v; OVP.all = false; try { localStorage.setItem('td_ovp', v); } catch { } } return OVP.p; },
   todayStats: () => { if (S.status !== 'ready' || !S.ctx) return null; const rows = D().byMonth.get(TODAY_MS) || [], i = TODAY.getUTCDate() - 1, cats = rows.map(r => catOf(r.days[i])); return { full: cats.filter(c => c === 'approved' || c === 'sick' || c === 'unplanned').length, half: cats.filter(c => c === 'half').length, late: cats.filter(c => c === 'late').length, tracked: rows.length }; }, redraw: () => { if (active()) render(); }, state: () => S, dirty: () => S.changes.length,
   prepareSignOut, save: () => save(), undo: () => undo(), toggleAuto: () => { setAuto(!S.auto); if (S.auto) autoTick(); }, setAutoSync: on => { setAuto(on); if (S.auto) autoTick(); }, canWrite: attCanWrite,
@@ -8919,7 +8958,7 @@ async function poll() {
 }
 
 /* ============================== filtering ============================== */
-const APP = { title: "Team Dashboard", version: "3.56.0", released: "12 Oct 2026" };
+const APP = { title: "Team Dashboard", version: "3.56.1", released: "12 Oct 2026" };
 const BASE_DIMS = { status: "status_column", desig: "designation_column", client: "client_column", mode: "mode_column" };
 const STANDARD_STATUSES = ["Active", "Manager", "OJT", "Bench", "New", "Projected", "Left", "Moved"];
 const TILE_ORDER = ["Active", "Manager", "OJT", "Bench", "New", "Projected"];
@@ -10162,18 +10201,24 @@ function renderGlance() {
   if (st && st.toSet) needs.push([st.toSet, st.toSet === 1 ? "backup to set" : "backups to set", () => { window.ATT?.bkDueNow && ATT.bkDueNow(); }]);
   if (actN) needs.push([actN, actN === 1 ? "employee record to fix" : "employee records to fix", () => openActionCenter("actions")]);
   const nNeed = needs.reduce((a, x) => a + x[0], 0);
-  const seg = attOk ? h("div", { class: "att-seg ovx-period", role: "group", "aria-label": "Period" }, ...[["today", "Today"], ["week", "This week"], ["month", "This month"]].map(([v, l]) => h("button", { type: "button", "aria-pressed": String(per === v), onclick: () => { ATT.ovPeriod(v); renderGlance(); ATT.renderCard($("#cardAttendance")); } }, l))) : null;
+  const redraw = () => { renderGlance(); ATT.renderCard($("#cardAttendance")); };
+  const isToday = !st || st.isToday, dayIso = attOk && ATT.ovDate ? ATT.ovDate() : "";
+  const seg = attOk ? h("div", { class: "att-seg ovx-period", role: "group", "aria-label": "Period" }, ...[["today", isToday ? "Today" : "Day"], ["week", isToday ? "This week" : "Week"], ["month", isToday ? "This month" : "Month"]].map(([v, l]) => h("button", { type: "button", "aria-pressed": String(per === v), onclick: () => { ATT.ovPeriod(v); redraw(); } }, l))) : null;
+  /* v3.56.1: pick any date to see the Overview as it was (or will be) on that day */
+  const step = n => { const t = new Date(dayIso + "T00:00:00Z"); t.setUTCDate(t.getUTCDate() + n); ATT.ovDate(t.toISOString().slice(0, 10)); redraw(); };
+  const dateIn = attOk ? h("input", { type: "date", class: "input ovx-date", value: dayIso, "aria-label": "Show the Overview for this date", onchange: e => { if (e.target.value) { ATT.ovDate(e.target.value); redraw(); } } }) : null;
+  const dateBox = attOk ? h("div", { class: "ovx-datebox" }, h("button", { type: "button", class: "ovx-step", "aria-label": "Previous day", title: "Previous day", onclick: () => step(-1) }, "‹"), dateIn, h("button", { type: "button", class: "ovx-step", "aria-label": "Next day", title: "Next day", onclick: () => step(1) }, "›"), isToday ? null : h("button", { type: "button", class: "ovx-today", onclick: () => { ATT.ovDate(""); redraw(); } }, "Back to today")) : null;
   const hero = h("div", { class: "ovx-hero" }, h("div", { class: "grow" },
       h("h1", {}, (hr < 12 ? "Good morning" : hr < 17 ? "Good afternoon" : "Good evening") + (first ? ", " + first : "")),
-      h("p", {}, DOW_LONG[now.getDay()] + ", " + now.getDate() + " " + MON_LONG[now.getMonth()] + (st ? " · " + st.tracked + " people tracked" : "") + " · " + (nNeed ? nNeed + (nNeed === 1 ? " thing needs" : " things need") + " you" : "nothing needs you right now"))), seg);
+      h("p", {}, (st && !st.isToday ? "Showing " + DOW_LONG[st.day.getUTCDay()] + ", " + st.day.getUTCDate() + " " + MON_LONG[st.day.getUTCMonth()] + " " + st.day.getUTCFullYear() : DOW_LONG[now.getDay()] + ", " + now.getDate() + " " + MON_LONG[now.getMonth()]) + (st ? " · " + st.tracked + " people tracked" : "") + " · " + (nNeed ? nNeed + (nNeed === 1 ? " thing needs" : " things need") + " you" : "nothing needs you right now"))), h("div", { class: "ovx-ctrls" }, dateBox, seg));
   const tiles = [];
   if (st) {
     const tr = st.trend, mn = Math.min(...tr), mx = Math.max(...tr), W = 220, H = 44;
     const pts = tr.map((v, i) => (i * W / Math.max(1, tr.length - 1)).toFixed(1) + "," + (mx === mn ? H / 2 : H - 4 - (v - mn) / (mx - mn) * (H - 8)).toFixed(1)).join(" ");
     const spark = h("span", { class: "ovx-spark", "aria-hidden": "true" }); spark.innerHTML = `<svg viewBox="0 0 ${W} ${H}" preserveAspectRatio="none"><polyline fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" points="${pts}"/></svg>`;
-    tiles.push(h("div", { class: "ovx-t ovx-green" }, h("small", {}, "Present today"), h("b", {}, String(st.present), h("span", {}, " of " + st.tracked)), h("em", {}, "Last 10 working days"), spark));
-    tiles.push(h("button", { type: "button", class: "ovx-t ovx-peach", onclick: () => { ATT.ovPeriod("today"); renderGlance(); ATT.renderCard($("#cardAttendance")); $("#cardAttendance")?.scrollIntoView({ behavior: "smooth", block: "center" }); } }, h("small", {}, "Out today"), h("b", {}, String(st.full + st.half)), h("em", {}, st.full + " leave · " + st.half + " half day · " + st.late + " late")));
-    if (window.ATT.canBackup && ATT.canBackup()) tiles.push(h("div", { class: "ovx-t" }, h("small", {}, "Backup cover today"), h("b", {}, st.cov == null ? "–" : st.cov + "%"), h("div", { class: "ovx-bar" }, h("i", { style: "width:" + (st.cov == null ? 0 : st.cov) + "%" })), h("em", {}, st.leaveN ? st.covered + " of " + st.leaveN + " covered" : "nobody on leave")));
+    tiles.push(h("div", { class: "ovx-t ovx-green" }, h("small", {}, isToday ? "Present today" : "Present"), h("b", {}, String(st.present), h("span", {}, " of " + st.tracked)), h("em", {}, "Last 10 working days"), spark));
+    tiles.push(h("button", { type: "button", class: "ovx-t ovx-peach", onclick: () => { ATT.ovPeriod("today"); redraw(); $("#cardAttendance")?.scrollIntoView({ behavior: "smooth", block: "center" }); } }, h("small", {}, isToday ? "Out today" : "Out"), h("b", {}, String(st.full + st.half)), h("em", {}, st.full + " leave · " + st.half + " half day · " + st.late + " late")));
+    if (window.ATT.canBackup && ATT.canBackup()) tiles.push(h("div", { class: "ovx-t" }, h("small", {}, isToday ? "Backup cover today" : "Backup cover"), h("b", {}, st.cov == null ? "–" : st.cov + "%"), h("div", { class: "ovx-bar" }, h("i", { style: "width:" + (st.cov == null ? 0 : st.cov) + "%" })), h("em", {}, st.leaveN ? st.covered + " of " + st.leaveN + " covered" : "nobody on leave")));
   } else if (can("ov.coming") && state.schema) {
     let b = 0, a = 0; const toSat = 6 - new Date().getDay(); try { b = upcoming("dob_column", "bday", toSat).length; a = upcoming("doj_column", "anniv", toSat).length; } catch { }
     tiles.push(h("div", { class: "ovx-t ovx-peach" }, h("small", {}, "Celebrations this week"), h("b", {}, String(b + a)), h("em", {}, b + " birthday" + (b === 1 ? "" : "s") + " · " + a + " anniversar" + (a === 1 ? "y" : "ies"))));
