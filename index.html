@@ -5,7 +5,7 @@
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <link rel="preconnect" href="https://iiogwevtyzgedhoaqlrn.supabase.co" crossorigin><link rel="dns-prefetch" href="https://iiogwevtyzgedhoaqlrn.supabase.co">
 <link rel="icon" href="data:,">
-<title>Team Dashboard · 3.55.0</title>
+<title>Team Dashboard · 3.56.0</title>
 <link rel="preconnect" href="https://fonts.googleapis.com"><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin><link href="https://fonts.googleapis.com/css2?family=Public+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet">
 <style>
 :root {
@@ -1944,6 +1944,75 @@ body.filters-locked #pinnedHeader .scope-line { margin-top:0 !important; }
 .role-pick[aria-checked="true"] .role-dot { border-color:var(--royal,#1652c9); box-shadow:inset 0 0 0 3px var(--surface); background:var(--royal,#1652c9); }
 .role-pick.adm b::after { content:"Admin"; margin-left:6px; font-size:10px; font-weight:700; padding:1px 6px; border-radius:999px; background:color-mix(in srgb,#c98a00 16%,var(--surface)); color:#9a6a00; vertical-align:1px; }
 .ppl-role.r-none { background:var(--surface-2); color:var(--muted); }
+
+/* ================= v3.56.0: Overview, Concept A layout in the Concept F (bento) look ================= */
+:root { --ov-bg:#f4f1ec; --ov-card:#ffffff; --ov-ink:#1c1c1a; --ov-ink2:#5b5b55; --ov-line:#efe9df; --ov-green:#1f3d36; --ov-green-ink:#e9f2ee; --ov-green-sub:#a9c8bd; --ov-spark:#6fd3a6; --ov-peach:#f6d9c4; --ov-lav:#dcd9f6; --ov-chip:#efe9df; }
+:root[data-theme="dark"] { --ov-bg:var(--bg); --ov-card:var(--surface); --ov-ink:var(--ink); --ov-ink2:var(--ink-2); --ov-line:var(--grid); --ov-green:#173a31; --ov-peach:#4a3427; --ov-lav:#2f2c55; --ov-chip:var(--surface-2); }
+@media (prefers-color-scheme: dark) { :root:not([data-theme="light"]) { --ov-bg:var(--bg); --ov-card:var(--surface); --ov-ink:var(--ink); --ov-ink2:var(--ink-2); --ov-line:var(--grid); --ov-green:#173a31; --ov-peach:#4a3427; --ov-lav:#2f2c55; --ov-chip:var(--surface-2); } }
+html:root body.clean-overview { background:var(--ov-bg) !important; }
+#pageSummary.ov { display:grid !important; gap:16px !important; grid-template-columns:minmax(0,1.55fr) minmax(0,1fr) !important; grid-template-areas:"glance glance" "att req" "att up" !important; grid-template-rows:auto auto 1fr !important; align-items:start; }
+#pageSummary.ov > .ov-glance { grid-area:glance !important; display:block !important; border:0 !important; background:transparent !important; box-shadow:none !important; border-radius:0 !important; overflow:visible !important; padding:0 !important; }
+#pageSummary.ov #cardAttendance { grid-area:att !important; grid-column:att !important; grid-row:att !important; align-self:stretch !important; }
+#pageSummary.ov #ovRequests { grid-area:req !important; grid-column:req !important; grid-row:req !important; align-self:start !important; }
+#pageSummary.ov #ovUpcoming { grid-area:up !important; grid-column:up !important; grid-row:up !important; align-self:stretch !important; }
+#pageSummary.ov #cardAttendance, #pageSummary.ov #ovRequests, #pageSummary.ov #ovUpcoming { background:var(--ov-card) !important; border:0 !important; border-radius:22px !important; box-shadow:0 1px 2px rgba(28,28,26,.04), 0 10px 30px -22px rgba(28,28,26,.25) !important; padding:20px 22px !important; color:var(--ov-ink); }
+#pageSummary.ov #cardAttendance h2::before, #pageSummary.ov #ovRequests h2::before, #pageSummary.ov #ovUpcoming h2::before { display:none !important; }
+#pageSummary.ov h2 { font-size:16px !important; font-weight:700 !important; letter-spacing:-.01em; }
+/* greeting */
+.ovx-hero { display:flex; align-items:flex-end; gap:16px; margin:2px 0 16px; }
+.ovx-hero .grow { flex:1; min-width:0; }
+.ovx-hero h1 { margin:0; font-size:28px; font-weight:700; letter-spacing:-.02em; color:var(--ov-ink); }
+.ovx-hero p { margin:4px 0 0; color:var(--ov-ink2); font-size:14px; }
+.ovx-period.att-seg { background:#e9e4dc !important; border-radius:12px !important; padding:3px !important; }
+.ovx-period.att-seg > button { border-radius:9px !important; padding:6px 16px !important; }
+:root[data-theme="dark"] .ovx-period.att-seg { background:var(--surface-2) !important; }
+/* tiles */
+.ovx-tiles { display:grid; grid-template-columns:repeat(var(--n,4),minmax(0,1fr)); gap:14px; }
+.ovx-t { all:unset; box-sizing:border-box; position:relative; overflow:hidden; display:flex; flex-direction:column; min-height:150px; padding:20px 22px; border-radius:22px; background:var(--ov-card); color:var(--ov-ink); box-shadow:0 1px 2px rgba(28,28,26,.04); }
+button.ovx-t { cursor:pointer; transition:transform .15s ease; } button.ovx-t:hover { transform:translateY(-1px); } button.ovx-t:focus-visible { outline:2px solid var(--royal); outline-offset:2px; }
+.ovx-t small { font-size:12.5px; font-weight:650; color:var(--ov-ink2); }
+.ovx-t > b { font-size:44px; font-weight:650; letter-spacing:-.04em; line-height:1.1; margin:6px 0 4px; font-variant-numeric:tabular-nums; }
+.ovx-t > b span { font-size:16px; font-weight:500; letter-spacing:0; opacity:.75; }
+.ovx-t em { font-style:normal; font-size:12.5px; font-weight:600; color:var(--ov-ink2); margin-top:auto; }
+.ovx-green { background:var(--ov-green); color:var(--ov-green-ink); grid-column:span 2; } .ovx-green small, .ovx-green em { color:var(--ov-green-sub); }
+.ovx-spark { position:absolute; right:24px; bottom:22px; width:46%; height:56px; color:var(--ov-spark); } .ovx-spark svg { width:100%; height:100%; display:block; }
+.ovx-peach { background:var(--ov-peach); }
+.ovx-lav { background:var(--ov-lav); }
+.ovx-bar { height:8px; border-radius:4px; background:#fbe1dd; overflow:hidden; margin:6px 0 10px; } .ovx-bar i { display:block; height:100%; background:#2f8f62; border-radius:4px; }
+.ovx-needs { list-style:none; margin:10px 0 0; padding:0; display:flex; flex-direction:column; gap:4px; }
+.ovx-needs button { all:unset; cursor:pointer; display:block; width:100%; box-sizing:border-box; padding:6px 10px; border-radius:10px; background:rgba(255,255,255,.55); font-size:13.5px; color:var(--ov-ink); }
+.ovx-needs button:hover { background:rgba(255,255,255,.85); } .ovx-needs b { font-size:15px; }
+:root[data-theme="dark"] .ovx-needs button { background:rgba(255,255,255,.06); }
+.ovx-dark-fix{}
+@media (prefers-color-scheme: dark) { :root:not([data-theme="light"]) .ovx-period.att-seg { background:var(--surface-2) !important; } :root:not([data-theme="light"]) .ovx-needs button { background:rgba(255,255,255,.06); } :root:not([data-theme="light"]) .ovx-bar { background:#3a2328; } }
+:root[data-theme="dark"] .ovx-bar { background:#3a2328; }
+@media (max-width:700px) { .ovx-green em { display:none; } .ovx-spark { width:55%; } }
+.ovx-ok { margin:auto 0 0; font-size:18px; font-weight:650; color:#1b6b45; }
+/* who is out */
+.ovx-head { display:flex; align-items:center; gap:10px; flex-wrap:wrap; margin-bottom:6px; }
+.ovx-head h2 { flex:1; margin:0; min-width:150px; } .ovx-sub { font-size:12.5px; font-weight:500; color:var(--ov-ink2); margin-left:6px; }
+.ovx-head .att-seg > button b { font-weight:700; margin-left:2px; opacity:.7; }
+.ovx-list { list-style:none; margin:0; padding:0; }
+.ovx-list li { display:flex; align-items:center; gap:12px; padding:10px 0; border-top:1px solid var(--ov-line); }
+.ovx-list li:first-child { border-top:0; }
+.ovx-av { flex:none; width:32px; height:32px; border-radius:50%; background:var(--ov-chip); display:grid; place-items:center; font-size:11px; font-weight:700; color:var(--ov-ink2); }
+.ovx-nm { flex:1; min-width:0; } .ovx-nm b { display:block; font-weight:600; white-space:nowrap; overflow:hidden; text-overflow:ellipsis; } .ovx-nm small { display:block; font-size:12px; color:var(--ov-ink2); white-space:nowrap; overflow:hidden; text-overflow:ellipsis; }
+.ovx-code { flex:none; font-size:12px; font-weight:700; color:var(--ov-ink2); min-width:34px; text-align:right; }
+.ovx-chip { flex:none; border:0; font:inherit; font-size:11.5px; font-weight:650; padding:4px 11px; border-radius:999px; white-space:nowrap; }
+button.ovx-chip { cursor:pointer; } button.ovx-chip:hover { filter:brightness(.96); box-shadow:0 0 0 2px rgba(0,0,0,.06); }
+.ovx-chip.cy { background:#dff1e7; color:#1b6b45; } .ovx-chip.cn { background:#fbe1dd; color:#b4372a; } .ovx-chip.cu { background:var(--ov-chip); color:var(--ov-ink2); }
+.ovx-chip.cl { background:#e3ebff; color:#2948a8; } .ovx-chip.ct { background:#fdf0d5; color:#8a5a00; } .ovx-chip.ca { background:#ece7fb; color:#5b3fc4; }
+.ovx-all { all:unset; cursor:pointer; display:inline-block; margin-top:8px; font-weight:650; color:var(--royal); }
+.ovx-empty { padding:26px 6px; color:var(--ov-ink2); text-align:center; }
+.ovx-week { margin-top:16px; padding-top:14px; border-top:1px solid var(--ov-line); }
+.ovx-wh { display:flex; align-items:center; gap:10px; font-weight:650; color:var(--ov-ink2); font-size:12.5px; margin-bottom:8px; } .ovx-wh span { margin-left:auto; font-weight:500; display:inline-flex; align-items:center; gap:5px; }
+.ovx-wh i, .ovx-bars i { display:inline-block; } .ovx-wh i { width:9px; height:9px; border-radius:2px; margin-left:8px; } .ovx-wh i.g, .ovx-bars i.g { background:#2f8f62; } .ovx-wh i.r, .ovx-bars i.r { background:#d9534f; }
+.ovx-days { display:grid; grid-template-columns:repeat(5,minmax(0,1fr)); gap:8px; }
+.ovx-day { text-align:center; border-radius:12px; padding:6px 4px 4px; } .ovx-day.on { background:var(--ov-chip); } .ovx-day.fut { opacity:.6; }
+.ovx-bars { height:52px; display:flex; align-items:flex-end; justify-content:center; gap:4px; } .ovx-bars i { width:16px; min-height:2px; border-radius:4px 4px 2px 2px; }
+.ovx-day small { display:block; margin-top:4px; font-size:11.5px; color:var(--ov-ink2); } .ovx-day.on small { font-weight:700; color:var(--ov-ink); }
+@media (max-width:1100px) { #pageSummary.ov { grid-template-columns:minmax(0,1fr) !important; grid-template-areas:"glance" "att" "req" "up" !important; } .ovx-tiles { grid-template-columns:repeat(2,minmax(0,1fr)); } }
+@media (max-width:700px) { .ovx-hero { flex-direction:column; align-items:stretch; } .ovx-hero h1 { font-size:22px; } .ovx-t { min-height:120px; padding:16px; border-radius:18px; } .ovx-t > b { font-size:34px; } .ovx-spark { width:40%; height:32px; } .ovx-tiles { gap:10px; } }
 </style></head>
 
 
@@ -2009,7 +2078,6 @@ body.filters-locked #pinnedHeader .scope-line { margin-top:0 !important; }
       <div class="ov-glance" id="ovGlance" aria-label="Today at a glance"></div>
       <div class="ov-main">
         <div class="card c-att" id="cardAttendance" aria-label="Attendance"></div>
-        <div class="card c-watch" id="cardWatch" aria-label="Leave watch" hidden></div>
       </div>
       <aside class="ov-side">
         <section class="request-cards card" id="ovRequests" aria-labelledby="requestCenterTitle"><div class="ov-up-head"><div class="rc-headrow"><h2 id="requestCenterTitle">Request Center</h2><button class="btn primary rc-record" id="rcRecord" type="button" hidden title="Record leave, remote, late or half day. Without the manager right it goes to a manager for approval.">+ Record attendance</button></div><div class="ov-tabs" id="rcTabs" role="tablist" aria-label="Request Center"></div></div><section id="cardMyRequests" style="grid-column:1 / -1;min-width:0" aria-label="Your requests" hidden></section><section id="cardRejectedRequests" style="grid-column:1 / -1;min-width:0" aria-label="Rejected request log" hidden></section><section id="cardLeaveApps" style="grid-column:1 / -1;min-width:0" aria-label="Leave applications" hidden></section><section id="cardApprovalRequests" style="grid-column:1 / -1;min-width:0" aria-label="Approval requests" hidden></section></section>
@@ -3675,7 +3743,7 @@ const CLOUD = (() => {
 (() => {
 /* v3.13: rights are grouped by module. A module with a page has a "can open" box; its items sit underneath. */
 const PERM_GROUPS = [
-  { name: 'Overview', page: 'page.overview', items: [['ov.attendance', 'See the attendance card'], ['ov.openatt', 'See the “Open attendance →” button on the attendance card'], ['ov.coming', 'See birthdays and work anniversaries'], ['ov.holidays', 'See USA and India holidays'], ['ov.watch', 'See leave red flags and day patterns']], sub: { title: 'Request Center', items: [['requests.own', 'See Waiting and History (their own and their group’s requests)'], ['requests.rejected', 'Also see rejected requests from their notification audience in History'], ['att.approve', 'Manager: approve or reject leave requests (shows the To approve tab) and edit approved leave']] } },
+  { name: 'Overview', page: 'page.overview', items: [['ov.attendance', 'See the attendance card'], ['ov.openatt', 'See the “Open attendance →” button on the attendance card'], ['ov.coming', 'See birthdays and work anniversaries'], ['ov.holidays', 'See USA and India holidays']], sub: { title: 'Request Center', items: [['requests.own', 'See Waiting and History (their own and their group’s requests)'], ['requests.rejected', 'Also see rejected requests from their notification audience in History'], ['att.approve', 'Manager: approve or reject leave requests (shows the To approve tab) and edit approved leave']] } },
   { name: 'Employees', page: 'page.employees', items: [['emp.edit', 'Edit employee details'], ['emp.add', 'Add employees'], ['emp.delete', 'Delete employees'], ['emp.bulk', 'Fill in bulk and add columns'], ['emp.fields', 'Add or delete fields (Excel columns)']] },
   { name: 'Attendance', page: 'page.attendance', items: [['att.who', 'See leave applications (LA) waiting in the tracker'], ['att.grid', 'See the attendance grid and People'], ['att.log', 'Use Record attendance (with the types ticked below)'], ['att.direct', 'Record attendance straight into the tracker (no manager approval)'], ['att.edit', 'Mark attendance in day cells'], ['att.rows', 'Edit any cell or row in the tracker (names, Emp IDs, clients, days) and delete rows'], ['att.holidays', 'Add holidays for everyone'], ['att.fields', 'Add or delete fields in the attendance tracker'], ['att.addemp', 'Add employees to the attendance tracker (new rows, start a month)']],
     /* v3.14.2: which leave types appear in the Log leave “Type” list */
@@ -8118,9 +8186,82 @@ function bkCharts(R, clientView) {
 }
 const BKG_CSS = `.bkg-title{text-align:center;font-weight:700;font-size:15px;margin:4px 0 10px}.bkg-legend{display:flex;flex-wrap:wrap;justify-content:flex-end;gap:6px 14px;font-size:12.5px;margin:0 0 10px}.bkg-legend>span{display:inline-flex;align-items:center;gap:5px}.bkg-wrap{overflow:auto;border:1px solid #e3e6ec;border-radius:10px}.bkg{border-collapse:collapse;font-size:12.5px;min-width:100%}.bkg th,.bkg td{padding:4px 3px;text-align:center;border-bottom:1px solid #eef0f4}.bkg thead th{font-size:11.5px;vertical-align:bottom;background:#f7f8fa;position:sticky;top:0}.bkg thead th .wd{display:block;writing-mode:vertical-rl;transform:rotate(180deg);margin:0 auto 4px;font-weight:700}.bkg thead th b{display:block}.bkg .nm{text-align:left;white-space:nowrap;padding:4px 10px;position:sticky;left:0;background:#fff}.bkg thead .nm{background:#f7f8fa;z-index:2}.bkg-c{display:inline-flex;align-items:center;justify-content:center;min-width:24px;height:22px;padding:0 3px;font-size:11px;font-weight:700;border:1px solid transparent;border-radius:2px;box-sizing:border-box}.bkg-c.p{background:#c6f7c6;border-color:#4caf50;color:#1d3d1d}.bkg-c.hd{background:#ffff66;border-color:#c9b600;color:#333}.bkg-c.h{background:#1ee3ef;border-color:#0aa;color:#023}.bkg-c.br{background:#8bc34a;border-color:#5b8f22;color:#fff}.bkg-c.sr{background:#111;border-color:#111;color:#fff}.bkg-c.l{background:#ff8a8a;border-color:#e06666}.bkg-c.x{background:#eee;border-color:#bbb;color:#333}.bkg-c.ed{cursor:pointer}.bkg-m{font-size:10.5px;color:#667;border:1px solid #d9dde5;border-radius:8px;padding:0 5px;margin-left:4px;cursor:help}.bkg-c.ed:hover{outline:2px solid #334;outline-offset:1px}`;
 const BKR_CSS = BKG_CSS + BKCAL_CSS + `.bkc{display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1.6fr);gap:12px;margin:0 0 14px}.bkc.one{grid-template-columns:1fr}.bkc-panel{border:1px solid #e3e6ec;border-radius:12px;padding:10px 12px}.bkc-panel h5{margin:0 0 8px;font-size:12px;display:flex;gap:10px;align-items:center}.bkc-panel h5 em{font-style:normal;font-weight:500;color:#667;font-size:11px;display:inline-flex;gap:4px;align-items:center;margin-left:auto}.bkc-panel h5 em i{display:inline-block;width:9px;height:9px;border-radius:2px;margin-left:6px}.bkc .p{background:#22a05a}.bkc .n{background:#e34948}.bkc-row{display:grid;grid-template-columns:minmax(0,90px) 1fr 38px;gap:8px;align-items:center;font-size:12px;padding:3px 0}.bkc-row span{overflow:hidden;text-overflow:ellipsis;white-space:nowrap}.bkc-row b{text-align:right}.bkc-bar{display:flex;height:12px;border-radius:6px;overflow:hidden;background:#eef0f4}.bkc-cols{display:flex;align-items:flex-end;gap:4px;height:130px;padding-top:4px;overflow-x:auto}.bkc-col{flex:1 0 22px;max-width:40px;height:100%;display:flex;flex-direction:column;justify-content:flex-end;align-items:center}.bkc-stack{width:70%;display:flex;flex-direction:column;border-radius:4px 4px 0 0;overflow:hidden;min-height:3px}.bkc-stack i{display:block;min-height:0}.bkc-col span{font-size:10.5px;line-height:1.1;margin-top:3px;text-align:center;color:#556}.bkc-col small{display:block;font-size:9px;color:#889}@media (max-width:800px){.bkc{grid-template-columns:1fr}}.bkr-title h3{margin:0 0 2px;font-size:17px}.bkr-title p{margin:0 0 12px;color:#556;font-size:12.5px}.bkr-tiles{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:10px;margin-bottom:10px}.bkr-tiles.two{grid-template-columns:repeat(2,minmax(0,1fr))}.bkr-t{border:1px solid #e3e6ec;border-radius:12px;padding:10px 14px;display:flex;flex-direction:column;border-top:3px solid var(--tc)}.bkr-t b{font-size:22px}.bkr-t span{font-weight:650;font-size:12.5px}.bkr-t em{font-style:normal;font-size:12px;color:#667}.bkr-t.b{--tc:#22a05a}.bkr-t.l{--tc:#3b6cf6}.bkr-t.n{--tc:#e34948}.bkr-bar2{display:flex;height:10px;border-radius:6px;overflow:hidden;background:#eef0f4;margin:0 0 16px}.bkr-bar2 .b{background:#22a05a}.bkr-bar2 .l{background:#3b6cf6}.bkr-bar2 .n{background:#e34948}h4{margin:16px 0 6px;font-size:13px}.bkr-tbl{width:100%;border-collapse:collapse;font-size:12.5px}.bkr-tbl th{text-align:left;font-size:11px;text-transform:uppercase;letter-spacing:.04em;color:#667;border-bottom:1px solid #e3e6ec;padding:6px 8px}.bkr-tbl td{padding:6px 8px;border-bottom:1px solid #eef0f4}.bkr-tbl td.bad{color:#c63b3a;font-weight:650}.bkr-st{display:inline-block;padding:1px 8px;border-radius:999px;font-size:11.5px;font-weight:600}.bkr-st.backup{background:#e3f4ea;color:#1c7a45}.bkr-st.live{background:#e6edfe;color:#3558c8}.bkr-st.none{background:#fde8e8;color:#c63b3a}.bk-yn{font-style:normal;font-size:10.5px;font-weight:700;padding:1px 7px;border-radius:6px}.bk-yn.y{background:#e3f4ea;color:#1c7a45}.bk-yn.n{background:#fde8e8;color:#c63b3a}.bk-yn.l{background:#e6edfe;color:#3558c8}`;
+/* ---------- v3.56.0: new Overview (Concept A layout, Concept F look). One "Who is out" card for Today / This week /
+   This month (the 26th–25th cycle), each person with their leave code and backup status, plus a Mon–Fri week bar chart.
+   The headline tiles on top read ATT.overviewStats(). ---------- */
+const OVP = { p: (() => { try { return localStorage.getItem('td_ovp') || 'today'; } catch { return 'today'; } })(), f: 'all', all: false };
+const ovRange = p => {
+  if (p === 'week') { const s = addDays(TODAY, -TODAY.getUTCDay()); return { from: s, to: addDays(s, 6), label: 'This week' }; }
+  if (p === 'month') { const { start, end } = cycParts(cycOf(TODAY)); return { from: start, to: end, label: 'This month' }; }
+  return { from: TODAY, to: TODAY, label: 'Today' };
+};
+function ovEntries(from, to) {
+  const d = D(), out = [];
+  for (let t = from.getTime(); t <= to.getTime(); t += 86400000) {
+    const dt = new Date(t), iso = isoDate(dt), rows = d.byMonth.get(Engine.monthSerial(dt.getUTCFullYear(), dt.getUTCMonth())) || [], i = dt.getUTCDate() - 1;
+    for (const r of rows) {
+      const v = r.days[i], c = catOf(v); if (!c) continue;
+      let st = null;
+      if (c === 'late') st = 'late';
+      else if (c === 'applied') st = 'applied';
+      else if (LEAVE_CATS.has(c)) { const b = bkGet(personKey(r.name), iso); st = bkLive(b) ? 'live' : bkYes(b) ? 'backup' : b ? 'none' : 'unset'; }
+      if (st) out.push({ r, iso, dt, v: String(v).trim().toUpperCase(), c, st, key: personKey(r.name) });
+    }
+  }
+  return out;
+}
+const OV_ST = { backup: ['Backup provided', 'cy'], none: ['No backup', 'cn'], unset: ['Not updated', 'cu'], live: ['Seat shown live', 'cl'], late: ['Late', 'ct'], applied: ['Awaiting approval', 'ca'] };
+function overviewStats() {
+  if (S.status !== 'ready' || !S.ctx) return null;
+  const d = D(), tracked = (d.byMonth.get(TODAY_MS) || []).length, today = ovEntries(TODAY, TODAY);
+  const full = today.filter(e => e.c !== 'half' && e.st !== 'late' && e.st !== 'applied').length, half = today.filter(e => e.c === 'half').length, late = today.filter(e => e.st === 'late').length;
+  const leave = today.filter(e => ['backup', 'none', 'unset'].includes(e.st)), cov = leave.length ? Math.round(leave.filter(e => e.st === 'backup').length / leave.length * 100) : null;
+  /* present on the last 10 working days, for the small trend line */
+  const trend = []; for (let k = 0, t = TODAY; trend.length < 10 && k < 20; k++, t = addDays(t, -1)) { if (t.getUTCDay() % 6 === 0) continue; const rows = d.byMonth.get(Engine.monthSerial(t.getUTCFullYear(), t.getUTCMonth())) || [], i = t.getUTCDate() - 1; trend.unshift(rows.length - rows.filter(r => { const c = catOf(r.days[i]); return c && LEAVE_CATS.has(c) && c !== 'half'; }).length); }
+  return { tracked, present: tracked - full, full, half, late, cov, covered: leave.filter(e => e.st === 'backup').length, leaveN: leave.length, trend,
+    toSet: canBackup() ? bkDueList().reduce((a, o) => a + o.items.length, 0) : 0, toDecide: requestsToDecide().length };
+}
+function ovClientRecords(list) {
+  const pc = typeof colByName === 'function' ? colByName(/pseudo/i) : null;
+  const pOf = r => { try { const w = rowRoster(r), v = w && pc ? String(g(w, pc) ?? '').trim() : ''; return v || r.name.trim(); } catch { return r.name.trim(); } };
+  return list.filter(e => e.st === 'backup' || e.st === 'none').map(e => [...(OVP.p === 'today' ? [] : [bkFmtD(e.iso)]), pOf(e.r), e.st === 'backup' ? 'Backup Provided' : 'Backup Not Provided', bkRemark(e.key, e.iso)]);
+}
+function renderOutCard(el) {
+  if (S.status !== 'ready' || !S.ctx) { el.innerHTML = `<div class="ovx-head"><h2>Who is out</h2></div><div class="ovx-empty">${S.status === 'loading' || S.status === 'idle' ? 'Loading attendance…' : 'The attendance workbook isn’t connected yet. <button class="linkbtn" data-att-go="grid">Set it up</button>'}</div>`; el.querySelector('[data-att-go]')?.addEventListener('click', () => go('grid')); return; }
+  const R = ovRange(OVP.p), all = ovEntries(R.from, R.to).sort((a, b) => a.iso.localeCompare(b.iso) || a.r.name.localeCompare(b.r.name));
+  const n = { all: all.length, nob: all.filter(e => e.st === 'none' || e.st === 'unset').length, late: all.filter(e => e.st === 'late').length };
+  if (!n[OVP.f] && OVP.f !== 'all') OVP.f = 'all';
+  const list = OVP.f === 'nob' ? all.filter(e => e.st === 'none' || e.st === 'unset') : OVP.f === 'late' ? all.filter(e => e.st === 'late') : all;
+  const shown = OVP.all ? list : list.slice(0, 8), ed = canBackup();
+  const cl = r => { if (r.client) return String(r.client).trim(); const w = rowRoster(r); return w ? gs(w, 'client_column') : ''; };
+  const dg = r => { const w = rowRoster(r); return w ? gs(w, 'designation_column') : ''; };
+  const ini = s => (s || '?').trim().split(/\s+/).slice(0, 2).map(x => x[0]).join('').toUpperCase();
+  const seg = `<div class="att-seg" role="group" aria-label="Show">${[['all', 'All', n.all], ['nob', 'No backup', n.nob], ['late', 'Late', n.late]].map(([k, l, c]) => `<button type="button" data-ovf="${k}" aria-pressed="${OVP.f === k}">${l} <b>${c}</b></button>`).join('')}</div>`;
+  const more = window.tdMore([`<button type="button" class="btn" data-ov-mail>Email the update</button>`, can('ov.openatt') && can('page.attendance') ? `<button type="button" class="btn" data-att-go="grid">Open attendance</button>` : '', `<button type="button" class="btn" data-att-hist>History &amp; upcoming</button>`, (!window.PERM || PERM.canBkReport()) ? `<button type="button" class="btn" data-bk-report>Backup report</button>` : '']);
+  const rows = shown.map(e => { const [t, c] = OV_ST[e.st], act = ed && ['backup', 'none', 'unset', 'live'].includes(e.st);
+    return `<li><span class="ovx-av">${esc(ini(e.r.name))}</span><span class="ovx-nm"><b>${esc(e.r.name.trim())}</b><small>${esc([OVP.p === 'today' ? '' : bkFmtD(e.iso), cl(e.r), dg(e.r)].filter(Boolean).join(' · '))}</small></span><span class="ovx-code" title="${esc(labelOf(e.v))}">${esc(e.v)}</span>${act ? `<button type="button" class="ovx-chip ${c}" data-ovbk="${esc(e.key)}" data-iso="${e.iso}" title="Set or change the backup">${t}</button>` : `<span class="ovx-chip ${c}">${t}</span>`}</li>`; }).join('');
+  /* this week, Monday to Friday: covered (green) and not covered (red) */
+  const ws = addDays(TODAY, -TODAY.getUTCDay()), days = [1, 2, 3, 4, 5].map(k => addDays(ws, k)), wk = days.map(dt => { const es = ovEntries(dt, dt).filter(e => ['backup', 'none', 'unset'].includes(e.st)); return { dt, cov: es.filter(e => e.st === 'backup').length, not: es.length - es.filter(e => e.st === 'backup').length, fut: dt > TODAY }; });
+  const mx = Math.max(1, ...wk.map(x => x.cov + x.not));
+  const week = `<div class="ovx-week"><div class="ovx-wh">This week <span><i class="g"></i>covered <i class="r"></i>no backup</span></div><div class="ovx-days">${wk.map(x => { const isT = x.dt.getTime() === TODAY.getTime(); return `<div class="ovx-day${isT ? ' on' : ''}${x.fut ? ' fut' : ''}" title="${esc(longDate(x.dt))}: ${x.cov} covered · ${x.not} without a backup"><div class="ovx-bars"><i class="g" style="height:${x.cov / mx * 100}%"></i><i class="r" style="height:${x.not / mx * 100}%"></i></div><small>${WEEKDAYS[x.dt.getUTCDay()]} ${x.dt.getUTCDate()}${x.fut && x.cov + x.not ? ' · ' + (x.cov + x.not) + ' planned' : ''}</small></div>`; }).join('')}</div></div>`;
+  el.innerHTML = `<div class="ovx-head"><h2>Who is out <span class="ovx-sub">${esc(R.label)}${OVP.p === 'today' ? '' : ' · ' + esc(bkShortD(isoDate(R.from)) + ' – ' + bkShortD(isoDate(R.to)))}</span></h2>${seg}<button type="button" class="btn mini" data-ov-copy title="Pseudo name, Backup Provided / Not Provided and remarks, ready to paste">Copy for client</button>${more}</div>
+    ${rows ? `<ul class="ovx-list">${rows}</ul>` : `<div class="ovx-empty">${OVP.f === 'nob' ? 'Everyone out has a backup.' : OVP.f === 'late' ? 'No late comings.' : OVP.p === 'today' ? 'Nobody is out today.' : 'Nobody is out in this period.'}</div>`}
+    ${list.length > 8 ? `<button type="button" class="ovx-all" data-ov-all>${OVP.all ? 'Show fewer' : 'Show all ' + list.length}</button>` : ''}
+    ${OVP.p !== 'month' ? week : ''}`;
+  el.querySelectorAll('[data-ovf]').forEach(b => b.addEventListener('click', () => { OVP.f = b.dataset.ovf; OVP.all = false; renderOutCard(el); }));
+  el.querySelector('[data-ov-all]')?.addEventListener('click', () => { OVP.all = !OVP.all; renderOutCard(el); });
+  el.querySelectorAll('[data-ovbk]').forEach(b => b.addEventListener('click', () => openBackupBox(b.dataset.ovbk, b.dataset.iso, () => { renderOutCard(el); window.organizeOverview?.(); })));
+  el.querySelectorAll('[data-att-go]').forEach(b => b.addEventListener('click', () => go(b.dataset.attGo)));
+  el.querySelector('[data-att-hist]')?.addEventListener('click', openAttHistory);
+  el.querySelector('[data-bk-report]')?.addEventListener('click', openBackupReport);
+  const data = () => ({ headers: [...(OVP.p === 'today' ? [] : ['Date']), 'Name', 'Backup', 'Remarks'], records: ovClientRecords(all), caption: (OVP.p === 'today' ? "Today's attendance record" : 'Attendance record') + ' · ' + R.label, top: [OVP.p === 'today' ? longDate(TODAY) : bkShortD(isoDate(R.from)) + ' – ' + bkShortD(isoDate(R.to)), OVP.p === 'today' ? "Today's attendance record" : 'Attendance record'] });
+  el.querySelector('[data-ov-copy]').addEventListener('click', async e => { const t = data(); if (!t.records.length) { toast('Nothing to copy: only days marked Backup Provided or Not Provided are copied.'); return; } if (await copyAttendanceTable(t)) { toast('Copied. Paste into Excel or an email.'); e.target.textContent = 'Copied ✓'; setTimeout(() => { e.target.textContent = 'Copy for client'; }, 1600); } else toast('The browser blocked copying.'); });
+  el.querySelector('[data-ov-mail]')?.addEventListener('click', () => { const t = data(); if (!t.records.length) { toast('Nothing to send yet.'); return; } openAttOutlook(t, TODAY); });
+}
 function renderCard(el, opts = {}) {
   if (S.status === 'ready' && S.ctx) { try { bkDueStart(); } catch { } }
   if (!el) return; if (!opts.hist) renderCard.el = el;
+  if (!opts.hist && el.id === 'cardAttendance') { renderOutCard(el); return; }   /* v3.56.0: the Overview card is the new Who is out card */
   const C = S.ui.card, goBtns = can('ov.openatt') && can('page.attendance') ? `<button class="btn mini" data-att-go="grid">Open</button>` : '';
   const head = sub => `<div class="card-head"><div class="grow"><h2>Attendance</h2><div class="sub">${sub}</div></div>${goBtns}</div>`;
   let html;
@@ -8598,6 +8739,8 @@ return {
   fieldNames: attUserFields, hasTracker: Engine.hasTracker, refresh, init: () => { mount(); return connect(); }, askName, decorateTable, healthCount, chooseFileEarly, savedFile: async () => (await kv.get('file')) || ((await kv.get('handle')) || {}).name || '', show, leave, renderCard, renderWatch, drawerPanel, go, renderApprovalRequests, renderRequestHistory, requestCounts, renderAppsCard, openBackupBox, mountBackupReport: el => mountBackupReport(el), canBackup: () => canBackup(), renameField: (a, b) => renameAttField(a, b), attReady: () => S.status === 'ready' && !!S.ctx, recordAttendance: () => openLogLeave(), canRecord: () => canLog(), requestsToDecide: () => requestsToDecide().length + laToDecide(),
   /* v3.19: every recorded code between two dates (UTC ms, null = open), for custom dashboards; follows the attendance scope */
   entries: (from, to) => { if (S.status !== 'ready' || !S.ctx) return null; const d = D(), out = []; for (const m of d.months) { const dim = Engine.daysInMonth(m); for (const r of d.byMonth.get(m) || []) for (let i = 0; i < dim; i++) { const v = r.days[i]; if (v == null || v === '') continue; const dt = dateOf(m, i), t = dt.getTime(); if ((from != null && t < from) || (to != null && t > to)) continue; const cat = catOf(v); out.push({ name: r.name.trim(), empId: r.empId, client: r.client ? String(r.client).trim() : '', date: dt, code: String(v).trim().toUpperCase(), cat, catLabel: CATS[cat] || 'Other' }); } } return out; },
+  bkDueNow: () => { BKDUE.snooze = 0; bkDueCheck(true); },
+  overviewStats, ovPeriod: v => { if (v) { OVP.p = v; OVP.all = false; try { localStorage.setItem('td_ovp', v); } catch { } } return OVP.p; },
   todayStats: () => { if (S.status !== 'ready' || !S.ctx) return null; const rows = D().byMonth.get(TODAY_MS) || [], i = TODAY.getUTCDate() - 1, cats = rows.map(r => catOf(r.days[i])); return { full: cats.filter(c => c === 'approved' || c === 'sick' || c === 'unplanned').length, half: cats.filter(c => c === 'half').length, late: cats.filter(c => c === 'late').length, tracked: rows.length }; }, redraw: () => { if (active()) render(); }, state: () => S, dirty: () => S.changes.length,
   prepareSignOut, save: () => save(), undo: () => undo(), toggleAuto: () => { setAuto(!S.auto); if (S.auto) autoTick(); }, setAutoSync: on => { setAuto(on); if (S.auto) autoTick(); }, canWrite: attCanWrite,
   syncInfo: () => { const d = D(true), sc = scopeCounts(); return { fileName: S.fileName, changes: S.changes.length, undoLen: S.undo.length, saving: S.saving, auto: S.auto, autoErr: S.autoErr, autoAt: S.autoAt, diskChanged: S.diskChanged, rows: S.rows.length, people: d.people.size, monthFrom: d.months[0], monthTo: d.latestMonth, unmatched: sc.unmatched, hasRoster: hasRoster() }; },
@@ -8776,7 +8919,7 @@ async function poll() {
 }
 
 /* ============================== filtering ============================== */
-const APP = { title: "Team Dashboard", version: "3.55.0", released: "12 Oct 2026" };
+const APP = { title: "Team Dashboard", version: "3.56.0", released: "12 Oct 2026" };
 const BASE_DIMS = { status: "status_column", desig: "designation_column", client: "client_column", mode: "mode_column" };
 const STANDARD_STATUSES = ["Active", "Manager", "OJT", "Bench", "New", "Projected", "Left", "Moved"];
 const TILE_ORDER = ["Active", "Manager", "OJT", "Bench", "New", "Projected"];
@@ -10006,39 +10149,41 @@ function organizeUpcoming() {
   ovTabs(bar, tabs, OV.up, id => { OV.up = id; organizeUpcoming(); });
 }
 function renderGlance() {
+  /* v3.56.0: greeting, period switch and four headline tiles (Present · Out · Backup cover · Needs you) */
   const box = $("#ovGlance"); if (!box) return;
-  const can = k => !window.PERM || PERM.can(k), tiles = [];
-  /* v3.28.2: one summary strip with drawn icons (emoji and flags don't show on every computer) */
-  const ICONS = { leave: '<path d="M3 21h18"/><path d="M12 3a9 9 0 0 1 9 9H3a9 9 0 0 1 9-9z"/><path d="M12 12v9"/>', req: '<rect x="5" y="3" width="14" height="18" rx="2"/><path d="M9 8h6M9 12h6M9 16h3"/>', cel: '<path d="M20 12v9H4v-9"/><rect x="2" y="7" width="20" height="5" rx="1"/><path d="M12 22V7"/><path d="M12 7c-2-4-6-4-6-1.5S10 7 12 7zM12 7c2-4 6-4 6-1.5S14 7 12 7z"/>', hol: '<rect x="3" y="5" width="18" height="16" rx="2"/><path d="M3 10h18M8 3v4M16 3v4"/><circle cx="12" cy="15" r="2"/>' };
-  const svg = k => { const sp = h("span", { class: "ov-ic", "aria-hidden": "true" }); sp.innerHTML = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">' + ICONS[k] + '</svg>'; return sp; };
-  const tile = (icon, tone, label, value, sub, go, badge) => h("button", { type: "button", class: "ov-tile " + tone, onclick: go },
-    h("span", { class: "ov-top" }, svg(icon), h("small", {}, label)),
-    h("span", { class: "ov-val" }, h("b", {}, value), badge ? h("i", { class: "ov-badge" }, badge) : null),
-    h("em", {}, sub));
-  const jump = (sel, fn) => () => { if (fn) fn(); const e = $(sel); if (e) e.scrollIntoView({ behavior: "smooth", block: "start" }); };
-  if (can("ov.attendance") && window.ATT && (!window.PERM || PERM.canView("attendance"))) {
-    const t = ATT.todayStats && ATT.todayStats();
-    tiles.push(tile("leave", "t-leave", "On leave today", t ? String(t.full) : "–", t ? (t.half + " half day · " + t.late + " late") : "attendance not connected", jump("#cardAttendance")));
+  const can = k => !window.PERM || PERM.can(k), attOk = can("ov.attendance") && window.ATT && (!window.PERM || PERM.canView("attendance"));
+  const st = attOk && ATT.overviewStats ? ATT.overviewStats() : null;
+  const now = new Date(), hr = now.getHours(), who = (() => { try { return (typeof CLOUD !== "undefined" && CLOUD.user && CLOUD.user() || {}).name || (typeof BE !== "undefined" && BE.userName ? BE.userName() : "") || ""; } catch { return ""; } })();
+  const first = String(who).trim().split(/\s+/)[0] || "";
+  const per = attOk && ATT.ovPeriod ? ATT.ovPeriod() : "today";
+  let actN = 0; try { if (can("act.items")) actN = actionCounts().actions || 0; } catch { }
+  const needs = [];
+  if (st && st.toDecide) needs.push([st.toDecide, st.toDecide === 1 ? "leave to approve" : "leaves to approve", () => { OV.rc = "approvals"; organizeRequests(); $("#ovRequests")?.scrollIntoView({ behavior: "smooth", block: "center" }); }]);
+  if (st && st.toSet) needs.push([st.toSet, st.toSet === 1 ? "backup to set" : "backups to set", () => { window.ATT?.bkDueNow && ATT.bkDueNow(); }]);
+  if (actN) needs.push([actN, actN === 1 ? "employee record to fix" : "employee records to fix", () => openActionCenter("actions")]);
+  const nNeed = needs.reduce((a, x) => a + x[0], 0);
+  const seg = attOk ? h("div", { class: "att-seg ovx-period", role: "group", "aria-label": "Period" }, ...[["today", "Today"], ["week", "This week"], ["month", "This month"]].map(([v, l]) => h("button", { type: "button", "aria-pressed": String(per === v), onclick: () => { ATT.ovPeriod(v); renderGlance(); ATT.renderCard($("#cardAttendance")); } }, l))) : null;
+  const hero = h("div", { class: "ovx-hero" }, h("div", { class: "grow" },
+      h("h1", {}, (hr < 12 ? "Good morning" : hr < 17 ? "Good afternoon" : "Good evening") + (first ? ", " + first : "")),
+      h("p", {}, DOW_LONG[now.getDay()] + ", " + now.getDate() + " " + MON_LONG[now.getMonth()] + (st ? " · " + st.tracked + " people tracked" : "") + " · " + (nNeed ? nNeed + (nNeed === 1 ? " thing needs" : " things need") + " you" : "nothing needs you right now"))), seg);
+  const tiles = [];
+  if (st) {
+    const tr = st.trend, mn = Math.min(...tr), mx = Math.max(...tr), W = 220, H = 44;
+    const pts = tr.map((v, i) => (i * W / Math.max(1, tr.length - 1)).toFixed(1) + "," + (mx === mn ? H / 2 : H - 4 - (v - mn) / (mx - mn) * (H - 8)).toFixed(1)).join(" ");
+    const spark = h("span", { class: "ovx-spark", "aria-hidden": "true" }); spark.innerHTML = `<svg viewBox="0 0 ${W} ${H}" preserveAspectRatio="none"><polyline fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" points="${pts}"/></svg>`;
+    tiles.push(h("div", { class: "ovx-t ovx-green" }, h("small", {}, "Present today"), h("b", {}, String(st.present), h("span", {}, " of " + st.tracked)), h("em", {}, "Last 10 working days"), spark));
+    tiles.push(h("button", { type: "button", class: "ovx-t ovx-peach", onclick: () => { ATT.ovPeriod("today"); renderGlance(); ATT.renderCard($("#cardAttendance")); $("#cardAttendance")?.scrollIntoView({ behavior: "smooth", block: "center" }); } }, h("small", {}, "Out today"), h("b", {}, String(st.full + st.half)), h("em", {}, st.full + " leave · " + st.half + " half day · " + st.late + " late")));
+    if (window.ATT.canBackup && ATT.canBackup()) tiles.push(h("div", { class: "ovx-t" }, h("small", {}, "Backup cover today"), h("b", {}, st.cov == null ? "–" : st.cov + "%"), h("div", { class: "ovx-bar" }, h("i", { style: "width:" + (st.cov == null ? 0 : st.cov) + "%" })), h("em", {}, st.leaveN ? st.covered + " of " + st.leaveN + " covered" : "nobody on leave")));
+  } else if (can("ov.coming") && state.schema) {
+    let b = 0, a = 0; const toSat = 6 - new Date().getDay(); try { b = upcoming("dob_column", "bday", toSat).length; a = upcoming("doj_column", "anniv", toSat).length; } catch { }
+    tiles.push(h("div", { class: "ovx-t ovx-peach" }, h("small", {}, "Celebrations this week"), h("b", {}, String(b + a)), h("em", {}, b + " birthday" + (b === 1 ? "" : "s") + " · " + a + " anniversar" + (a === 1 ? "y" : "ies"))));
   }
-  if (can("att.approve") && window.ATT) {
-    const n = ATT.requestsToDecide ? ATT.requestsToDecide() : 0;
-    const rc = ATT.requestCounts ? ATT.requestCounts() : { approvals: n, la: 0 };
-    tiles.push(tile("req", "t-req" + (n ? " hot" : ""), "Waiting for approval", String(n), n ? [rc.approvals ? rc.approvals + " request" + (rc.approvals === 1 ? "" : "s") : "", rc.la ? rc.la + " leave application" + (rc.la === 1 ? "" : "s") : ""].filter(Boolean).join(" · ") : "all caught up", jump("#ovRequests", () => { OV.rc = rc.approvals || !rc.la ? "approvals" : "la"; organizeRequests(); })));
-  }
-  if (can("ov.coming") && state.schema) {
-    let b = 0, a = 0; const toSat = 6 - new Date().getDay();   /* v3.34.1: "this week" = today to Saturday (weeks run Sunday → Saturday) */
-    try { b = upcoming("dob_column", "bday", toSat).length; a = upcoming("doj_column", "anniv", toSat).length; } catch { }
-    tiles.push(tile("cel", "t-cel", "Celebrations this week", String(b + a), b + " birthday" + (b === 1 ? "" : "s") + " · " + a + " anniversar" + (a === 1 ? "y" : "ies"), jump("#ovUpcoming", () => { OV.up = b || !a ? "bday" : "anniv"; organizeUpcoming(); })));
-  }
-  if (can("ov.holidays")) {
-    const t = new Date(), today = Date.UTC(t.getFullYear(), t.getMonth(), t.getDate()), ys = [t.getFullYear(), t.getFullYear() + 1];
-    const all = [...ys.flatMap(usHolidays).map(x => ({ ...x, f: "USA" })), ...ys.flatMap(inHolidays).map(x => ({ ...x, f: "India" }))].filter(x => x.obs.getTime() >= today).sort((a, b) => a.obs - b.obs);
-    const nx = all[0];
-    if (nx) { const n = Math.round((nx.obs.getTime() - today) / 86400000); tiles.push(tile("hol", "t-hol", "Next holiday", nx.name, (n === 0 ? "today" : n === 1 ? "tomorrow" : "in " + n + " days") + " · " + DOW[nx.obs.getUTCDay()] + " " + nx.obs.getUTCDate() + " " + MON[nx.obs.getUTCMonth()], jump("#ovUpcoming", () => { OV.up = "hol"; organizeUpcoming(); }), nx.f)); }
-  }
-  box.replaceChildren(...tiles); box.hidden = !tiles.length;
-  box.style.setProperty("--n", Math.max(1, tiles.length));
+  tiles.push(h("div", { class: "ovx-t ovx-lav" + (nNeed ? "" : " ok") }, h("small", {}, "Needs you"),
+    nNeed ? h("ul", { class: "ovx-needs" }, ...needs.map(([n, t, fn]) => h("li", {}, h("button", { type: "button", onclick: fn }, h("b", {}, String(n)), " " + t)))) : h("p", { class: "ovx-ok" }, "All caught up ✓")));
+  box.replaceChildren(hero, h("div", { class: "ovx-tiles", style: "--n:" + (tiles.length + (st ? 1 : 0)) }, ...tiles));
+  box.hidden = false;
 }
+const DOW_LONG = ["Sunday", "Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday"], MON_LONG = ["January", "February", "March", "April", "May", "June", "July", "August", "September", "October", "November", "December"];
 function organizeOverview() { if (typeof state === "undefined" || state.view !== "summary" || document.getElementById("pageSummary")?.hidden) return; for (const f of [organizeRequests, organizeUpcoming, renderGlance]) { try { f(); } catch (e) { console.warn(e); } } }
 window.organizeOverview = organizeOverview;
 
