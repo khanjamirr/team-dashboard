@@ -5,7 +5,7 @@
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <link rel="preconnect" href="https://iiogwevtyzgedhoaqlrn.supabase.co" crossorigin><link rel="dns-prefetch" href="https://iiogwevtyzgedhoaqlrn.supabase.co">
 <link rel="icon" href="data:,">
-<title>Team Dashboard · 3.58.1</title>
+<title>Team Dashboard · 3.58.2</title>
 <link rel="preconnect" href="https://fonts.googleapis.com"><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin><link href="https://fonts.googleapis.com/css2?family=Public+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet">
 <style>
 :root {
@@ -2082,6 +2082,8 @@ html body .sidebar nav.tabs .tab[data-view="backups"], html body .tab[data-view=
 .ovx-nsw input:checked + i { background:#34c759; }
 .ovx-nsw input:checked + i::after { transform:translateX(14px); }
 .ovx-nsw input:focus-visible + i { outline:2px solid var(--accent); outline-offset:2px; }
+.ovx-code .ovx-half { display:inline-block; margin-left:5px; padding:1px 6px; border-radius:6px; background:#fff3c4; color:#7a5a00; font-style:normal; font-size:10.5px; font-weight:700; vertical-align:1px; }
+@media (prefers-color-scheme: dark) { .ovx-code .ovx-half { background:rgba(255,204,0,.18); color:#ffd75e; } }
 </style></head>
 
 
@@ -8135,7 +8137,7 @@ function bkGridData(cycle, client, sub, range, merge) {
       if (v == null) k = !trackedOn(r, i) ? 'SR' : (w === 0 || w === 6) ? 'L' : 'P';
       else if (c === 'off') k = code === 'H' ? 'H' : 'L';
       else if (c === 'moved' || c === 'na') k = 'SR';
-      else if (c === 'half' || LEAVE_CATS.has(c) || c === 'applied') { const b = bkGet(key, iso); k = bkLive(b) ? 'LIVE' : bkYes(b) ? 'BR' : c === 'half' ? 'HD' : 'L'; if (k === 'BR' && b.half && c !== 'half') k = 'BRH'; }
+      else if (c === 'half' || LEAVE_CATS.has(c) || c === 'applied') { const b = bkGet(key, iso); k = bkLive(b) ? 'LIVE' : bkYes(b) ? 'BR' : (c === 'half' || (b && b.half)) ? 'HD' : 'L'; if (k === 'BR' && b.half && c !== 'half') k = 'BRH'; }   /* v3.58.2: "Cover for: Half day" bills the seat as a half day even when the tracker says full-day leave */
       else if (c === 'present' || c === 'remote' || c === 'late') k = 'P';
       else k = 'X';
       const b = k === 'BR' || k === 'BRH' ? bkGet(key, iso) : null;
@@ -8360,27 +8362,41 @@ function ovEntries(from, to) {
       let st = null;
       if (c === 'late') st = 'late';
       else if (c === 'applied') st = 'applied';
-      else if (LEAVE_CATS.has(c)) { const b = bkGet(personKey(r.name), iso); st = bkLive(b) ? 'live' : bkYes(b) ? 'backup' : b ? 'none' : 'unset'; }
-      if (st) out.push({ r, iso, dt, v: String(v).trim().toUpperCase(), c, st, key: personKey(r.name) });
+      else if (LEAVE_CATS.has(c)) { const b = bkGet(personKey(r.name), iso); st = bkLive(b) ? 'live' : bkYes(b) ? 'backup' : b ? 'none' : 'unset'; var hf = !!(b && b.half) && c !== 'half'; }
+      if (st) out.push({ r, iso, dt, v: String(v).trim().toUpperCase(), c, st, key: personKey(r.name), half: st !== 'late' && st !== 'applied' && !!hf }); hf = false;
     }
   }
   return out;
 }
 const OV_ST = { backup: ['Backup provided', 'cy'], none: ['No backup', 'cn'], unset: ['Not updated', 'cu'], live: ['Seat shown live', 'cl'], late: ['Late', 'ct'], applied: ['Awaiting approval', 'ca'] };
 function overviewStats() {
+  /* v3.58.2: the tiles follow the filters at the top (through D()) and the Today / Week / Month switch and date */
   if (S.status !== 'ready' || !S.ctx) return null;
-  const T = ovDay(), d = D(), tracked = (d.byMonth.get(Engine.monthSerial(T.getUTCFullYear(), T.getUTCMonth())) || []).length, today = ovEntries(T, T);
-  const full = today.filter(e => e.c !== 'half' && e.st !== 'late' && e.st !== 'applied').length, half = today.filter(e => e.c === 'half').length, late = today.filter(e => e.st === 'late').length;
-  const leave = today.filter(e => ['backup', 'none', 'unset'].includes(e.st)), cov = leave.length ? Math.round(leave.filter(e => e.st === 'backup').length / leave.length * 100) : null;
-  /* present on the last 10 working days, for the small trend line */
-  const trend = []; for (let k = 0, t = T; trend.length < 10 && k < 20; k++, t = addDays(t, -1)) { if (t.getUTCDay() % 6 === 0) continue; const rows = d.byMonth.get(Engine.monthSerial(t.getUTCFullYear(), t.getUTCMonth())) || [], i = t.getUTCDate() - 1; trend.unshift(rows.length - rows.filter(r => { const c = catOf(r.days[i]); return c && LEAVE_CATS.has(c) && c !== 'half'; }).length); }
-  return { day: T, isToday: T.getTime() === TODAY.getTime(), tracked, present: tracked - full, full, half, late, cov, covered: leave.filter(e => e.st === 'backup').length, leaveN: leave.length, trend,
-    toSet: canBackup() ? bkDueList().reduce((a, o) => a + o.items.length, 0) : 0, toDecide: requestsToDecide().length };
+  const T = ovDay(), d = D(), per = OVP.p, R = ovRange(per), rowsOn = t => d.byMonth.get(Engine.monthSerial(t.getUTCFullYear(), t.getUTCMonth())) || [];
+  const tracked = rowsOn(T).length, wk = t => t.getUTCDay() % 6 !== 0;
+  /* a week or month that includes today is counted up to today; one fully in the past or future is counted whole */
+  const end = per !== 'today' && R.from <= TODAY && TODAY <= R.to ? TODAY : R.to;
+  const days = []; for (let t = R.from; t <= end; t = addDays(t, 1)) if (per === 'today' || wk(t)) days.push(t);
+  const span = per === 'today' ? [T] : days, inSpan = new Set(span.map(t => t.getTime()));
+  const ent = ovEntries(R.from, end).filter(e => inSpan.has(e.dt.getTime()));
+  const full = ent.filter(e => e.c !== 'half' && e.st !== 'late' && e.st !== 'applied').length, half = ent.filter(e => e.c === 'half').length, late = ent.filter(e => e.st === 'late').length;
+  const leave = ent.filter(e => ['backup', 'none', 'unset'].includes(e.st)), covered = leave.filter(e => e.st === 'backup').length, cov = leave.length ? Math.round(covered / leave.length * 100) : null;
+  const seatDays = span.reduce((a, t) => a + rowsOn(t).length, 0), n = Math.max(1, span.length);
+  const absDays = full + half * 0.5, rate = seatDays ? Math.max(0, Math.round((seatDays - absDays) / seatDays * 100)) : 100;
+  const presentOn = t => { const rows = rowsOn(t), i = t.getUTCDate() - 1; return rows.length - rows.filter(r => { const c = catOf(r.days[i]); return c && LEAVE_CATS.has(c) && c !== 'half'; }).length; };
+  /* the small trend line: each working day of the chosen week / month, or the last 10 working days for a single day */
+  let trend = [];
+  if (per !== 'today' && days.length > 1) trend = days.map(presentOn);
+  else for (let k = 0, t = T; trend.length < 10 && k < 20; k++, t = addDays(t, -1)) { if (!wk(t)) continue; trend.unshift(presentOn(t)); }
+  const mine = new Set(d.people.keys());
+  return { day: T, isToday: T.getTime() === TODAY.getTime(), per, label: R.label, days: span.length, tracked, present: per === 'today' ? tracked - full : (v => v >= 100 ? Math.round(v) : Math.round(v * 10) / 10)((seatDays - full) / n), rate: per === 'today' ? Math.round((tracked - full) / Math.max(1, tracked) * 100) : rate,
+    full, half, late, cov, covered, leaveN: leave.length, trend,
+    toSet: canBackup() ? bkDueList().filter(o => mine.has(o.key)).reduce((a, o) => a + o.items.length, 0) : 0, toDecide: requestsToDecide().length };
 }
 function ovClientRecords(list) {
   const pc = typeof colByName === 'function' ? colByName(/pseudo/i) : null;
   const pOf = r => { try { const w = rowRoster(r), v = w && pc ? String(g(w, pc) ?? '').trim() : ''; return v || r.name.trim(); } catch { return r.name.trim(); } };
-  return list.filter(e => e.st === 'backup' || e.st === 'none').map(e => [...(OVP.p === 'today' ? [] : [bkFmtD(e.iso)]), pOf(e.r), e.st === 'backup' ? 'Backup Provided' : 'Backup Not Provided', bkRemark(e.key, e.iso)]);
+  return list.filter(e => e.st === 'backup' || e.st === 'none').map(e => [...(OVP.p === 'today' ? [] : [bkFmtD(e.iso)]), pOf(e.r), (e.st === 'backup' ? 'Backup Provided' : 'Backup Not Provided') + (e.half ? ' (Half day)' : ''), bkRemark(e.key, e.iso)]);
 }
 function renderOutCard(el) {
   if (S.status !== 'ready' || !S.ctx) { el.innerHTML = `<div class="ovx-head"><h2>Who is out</h2></div><div class="ovx-empty">${S.status === 'loading' || S.status === 'idle' ? 'Loading attendance…' : 'The attendance workbook isn’t connected yet. <button class="linkbtn" data-att-go="grid">Set it up</button>'}</div>`; el.querySelector('[data-att-go]')?.addEventListener('click', () => go('grid')); return; }
@@ -8404,7 +8420,7 @@ function renderOutCard(el) {
   const pz = OVP.names === 'pseudo', nmOf = r => pz ? (bkPseudo(r) || r.name.trim()) : r.name.trim();
   const more = window.tdMore([`<button type="button" class="btn" data-ov-mail>Email the update</button>`, can('ov.openatt') && can('page.attendance') ? `<button type="button" class="btn" data-att-go="grid">Open attendance</button>` : '', `<button type="button" class="btn" data-att-hist>History &amp; upcoming</button>`, `<hr>`, `<label class="ovx-nsw" title="Show pseudo names instead of real names in this list"><span>Pseudo names</span><input type="checkbox" role="switch" data-ov-names${pz ? ' checked' : ''}><i aria-hidden="true"></i></label>`], "More", "left");
   const rows = shown.map(e => { const [t, c] = OV_ST[e.st], act = ed && ['backup', 'none', 'unset', 'live'].includes(e.st);
-    return `<li><span class="ovx-av">${esc(ini(nmOf(e.r)))}</span><span class="ovx-nm"><b>${esc(nmOf(e.r))}</b><small>${esc([OVP.p === 'today' ? '' : bkFmtD(e.iso), cl(e.r), dg(e.r)].filter(Boolean).join(' · '))}</small></span><span class="ovx-code" title="${esc(labelOf(e.v))}">${esc(e.v)}</span>${act ? `<button type="button" class="ovx-chip ${c}" data-ovbk="${esc(e.key)}" data-iso="${e.iso}" title="Set or change the backup">${t}</button>` : `<span class="ovx-chip ${c}">${t}</span>`}</li>`; }).join('');
+    return `<li><span class="ovx-av">${esc(ini(nmOf(e.r)))}</span><span class="ovx-nm"><b>${esc(nmOf(e.r))}</b><small>${esc([OVP.p === 'today' ? '' : bkFmtD(e.iso), cl(e.r), dg(e.r)].filter(Boolean).join(' · '))}</small></span>${e.half ? (pz ? `<span class="ovx-code" title="${esc(labelOf(e.v))} in attendance · billed as a half day">HD</span>` : `<span class="ovx-code" title="${esc(labelOf(e.v))} · cover set for half a day, billed as a half day">${esc(e.v)}<em class="ovx-half">½ day</em></span>`) : `<span class="ovx-code" title="${esc(labelOf(e.v))}">${esc(e.v)}</span>`}${act ? `<button type="button" class="ovx-chip ${c}" data-ovbk="${esc(e.key)}" data-iso="${e.iso}" title="Set or change the backup">${t}</button>` : `<span class="ovx-chip ${c}">${t}</span>`}</li>`; }).join('');
   /* this week, Monday to Friday: covered (green) and not covered (red) */
   const T0 = ovDay(), ws = addDays(T0, -T0.getUTCDay()), days = [1, 2, 3, 4, 5].map(k => addDays(ws, k)), wk = days.map(dt => { const es = ovEntries(dt, dt).filter(e => ['backup', 'none', 'unset'].includes(e.st)); return { dt, cov: es.filter(e => e.st === 'backup').length, not: es.length - es.filter(e => e.st === 'backup').length, fut: dt > TODAY }; });
   const mx = Math.max(1, ...wk.map(x => x.cov + x.not));
@@ -9089,7 +9105,7 @@ async function poll() {
 }
 
 /* ============================== filtering ============================== */
-const APP = { title: "Team Dashboard", version: "3.58.1", released: "19 Oct 2026" };
+const APP = { title: "Team Dashboard", version: "3.58.2", released: "19 Oct 2026" };
 const BASE_DIMS = { status: "status_column", desig: "designation_column", client: "client_column", mode: "mode_column" };
 const STANDARD_STATUSES = ["Active", "Manager", "OJT", "Bench", "New", "Projected", "Left", "Moved"];
 const TILE_ORDER = ["Active", "Manager", "OJT", "Bench", "New", "Projected"];
@@ -10347,9 +10363,11 @@ function renderGlance() {
     const tr = st.trend, mn = Math.min(...tr), mx = Math.max(...tr), W = 220, H = 44;
     const pts = tr.map((v, i) => (i * W / Math.max(1, tr.length - 1)).toFixed(1) + "," + (mx === mn ? H / 2 : H - 4 - (v - mn) / (mx - mn) * (H - 8)).toFixed(1)).join(" ");
     const spark = h("span", { class: "ovx-spark", "aria-hidden": "true" }); spark.innerHTML = `<svg viewBox="0 0 ${W} ${H}" preserveAspectRatio="none"><polyline fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" points="${pts}"/></svg>`;
-    spark.title = "Present on the last 10 working days"; tiles.push(h("div", { class: "ovx-t ovx-green" }, h("small", {}, isToday ? "Present today" : "Present"), h("b", {}, String(st.present), h("span", {}, " of " + st.tracked)), h("em", {}, Math.round(st.present / Math.max(1, st.tracked) * 100) + "% attendance"), spark));
-    tiles.push(h("button", { type: "button", class: "ovx-t ovx-peach", onclick: () => { ATT.ovPeriod("today"); redraw(); $("#cardAttendance")?.scrollIntoView({ behavior: "smooth", block: "center" }); } }, h("small", {}, isToday ? "Out today" : "Out"), h("b", {}, String(st.full + st.half)), h("em", {}, st.full + " leave · " + st.half + " half day · " + st.late + " late")));
-    if (window.ATT.canBackup && ATT.canBackup()) tiles.push(h("div", { class: "ovx-t" }, h("small", {}, isToday ? "Backup cover today" : "Backup cover"), h("b", {}, st.cov == null ? "–" : st.cov + "%"), h("div", { class: "ovx-bar" }, h("i", { style: "width:" + (st.cov == null ? 0 : st.cov) + "%" })), h("em", {}, st.leaveN ? st.covered + " of " + st.leaveN + " covered" : "nobody on leave")));
+    const one = st.per === "today", pl = one ? (isToday ? " today" : "") : " · " + st.label.toLowerCase().replace(/^this /, "this ");
+    spark.title = one ? "Present on the last 10 working days" : "Present on each working day of the " + (st.per === "week" ? "week" : "month");
+    tiles.push(h("div", { class: "ovx-t ovx-green" }, h("small", {}, "Present" + pl), h("b", {}, String(st.present), h("span", {}, " of " + st.tracked + (one ? "" : " a day"))), h("em", { title: one ? "" : "Over " + st.days + " working day" + (st.days === 1 ? "" : "s") }, st.rate + "% attendance"), spark));
+    tiles.push(h("button", { type: "button", class: "ovx-t ovx-peach", onclick: () => { $("#cardAttendance")?.scrollIntoView({ behavior: "smooth", block: "center" }); } }, h("small", {}, (one ? "Out" : "Leave days") + pl), h("b", {}, String(st.full + st.half)), h("em", {}, st.full + " leave · " + st.half + " half day · " + st.late + " late")));
+    if (window.ATT.canBackup && ATT.canBackup()) tiles.push(h("div", { class: "ovx-t" }, h("small", {}, "Backup cover" + pl), h("b", {}, st.cov == null ? "–" : st.cov + "%"), h("div", { class: "ovx-bar" }, h("i", { style: "width:" + (st.cov == null ? 0 : st.cov) + "%" })), h("em", {}, st.leaveN ? st.covered + " of " + st.leaveN + (one ? " covered" : " leave days covered") : "nobody on leave")));
   } else if (can("ov.coming") && state.schema) {
     let b = 0, a = 0; const toSat = 6 - new Date().getDay(); try { b = upcoming("dob_column", "bday", toSat).length; a = upcoming("doj_column", "anniv", toSat).length; } catch { }
     tiles.push(h("div", { class: "ovx-t ovx-peach" }, h("small", {}, "Celebrations this week"), h("b", {}, String(b + a)), h("em", {}, b + " birthday" + (b === 1 ? "" : "s") + " · " + a + " anniversar" + (a === 1 ? "y" : "ies"))));
