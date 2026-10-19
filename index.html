@@ -5,7 +5,7 @@
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <link rel="preconnect" href="https://iiogwevtyzgedhoaqlrn.supabase.co" crossorigin><link rel="dns-prefetch" href="https://iiogwevtyzgedhoaqlrn.supabase.co">
 <link rel="icon" href="data:,">
-<title>Team Dashboard · 3.58.2</title>
+<title>Team Dashboard · 3.58.3</title>
 <link rel="preconnect" href="https://fonts.googleapis.com"><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin><link href="https://fonts.googleapis.com/css2?family=Public+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet">
 <style>
 :root {
@@ -8433,6 +8433,10 @@ function renderOutCard(el) {
   el.querySelectorAll('[data-ovbk]').forEach(b => b.addEventListener('click', () => openBackupBox(b.dataset.ovbk, b.dataset.iso, () => { renderOutCard(el); window.organizeOverview?.(); })));
   el.querySelectorAll('[data-att-go]').forEach(b => b.addEventListener('click', () => go(b.dataset.attGo)));
   el.querySelector('[data-att-hist]')?.addEventListener('click', openAttHistory);
+  /* v3.58.3: the More menu floats above the page (position fixed) so the card edge never cuts it off, and it flips to stay on screen */
+  { const dd = el.querySelector('details.tdmore'), menu = dd && dd.querySelector('.tdmore-menu');
+    if (dd && menu) { const place = () => { if (!dd.open) return; const b = dd.querySelector('summary').getBoundingClientRect(); menu.style.position = 'fixed'; menu.style.right = 'auto'; menu.style.zIndex = '1000'; const w = menu.offsetWidth, hgt = menu.offsetHeight, vw = innerWidth, vh = innerHeight; const lim = Math.min(vw - 8, el.getBoundingClientRect().right - 8); let left = b.left; if (left + w > lim) left = Math.max(8, b.right - w); let top = b.bottom + 4; if (top + hgt > vh - 8 && b.top - 4 - hgt > 8) top = b.top - 4 - hgt; menu.style.left = left + 'px'; menu.style.top = top + 'px'; };
+      dd.addEventListener('toggle', () => { if (dd.open) { place(); addEventListener('scroll', place, true); addEventListener('resize', place); } else { removeEventListener('scroll', place, true); removeEventListener('resize', place); } }); if (dd.open) place(); } }
   el.querySelector('[data-ov-names]')?.addEventListener('change', e => { OVP.names = e.target.checked ? 'pseudo' : 'real'; try { localStorage.setItem('td_ov_names', OVP.names); } catch { } renderOutCard(el); const d = el.querySelector('details.tdmore'); if (d) d.open = true; });
   el.querySelector('[data-bk-report]')?.addEventListener('click', openBackupReport);
   const data = () => ({ headers: [...(OVP.p === 'today' ? [] : ['Date']), 'Name', 'Backup', 'Remarks'], records: ovClientRecords(all), caption: (OVP.p === 'today' && ovDay().getTime() === TODAY.getTime() ? "Today's attendance record" : 'Attendance record') + ' · ' + R.label, top: [OVP.p === 'today' ? longDate(ovDay()) : bkShortD(isoDate(R.from)) + ' – ' + bkShortD(isoDate(R.to)), OVP.p === 'today' && ovDay().getTime() === TODAY.getTime() ? "Today's attendance record" : 'Attendance record'] });
@@ -9105,7 +9109,7 @@ async function poll() {
 }
 
 /* ============================== filtering ============================== */
-const APP = { title: "Team Dashboard", version: "3.58.2", released: "19 Oct 2026" };
+const APP = { title: "Team Dashboard", version: "3.58.3", released: "19 Oct 2026" };
 const BASE_DIMS = { status: "status_column", desig: "designation_column", client: "client_column", mode: "mode_column" };
 const STANDARD_STATUSES = ["Active", "Manager", "OJT", "Bench", "New", "Projected", "Left", "Moved"];
 const TILE_ORDER = ["Active", "Manager", "OJT", "Bench", "New", "Projected"];
