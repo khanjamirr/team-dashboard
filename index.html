@@ -5,7 +5,7 @@
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <link rel="preconnect" href="https://iiogwevtyzgedhoaqlrn.supabase.co" crossorigin><link rel="dns-prefetch" href="https://iiogwevtyzgedhoaqlrn.supabase.co">
 <link rel="icon" href="data:,">
-<title>Team Dashboard · 3.58.3</title>
+<title>Team Dashboard · 3.59.0</title>
 <link rel="preconnect" href="https://fonts.googleapis.com"><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin><link href="https://fonts.googleapis.com/css2?family=Public+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet">
 <style>
 :root {
@@ -2919,6 +2919,8 @@ async function dataDir() {
 // Avoid OPFS createWritable(), which can be rejected by browser file-access policy.
 let backupChain = Promise.resolve();
 function backup(u8, fileName) {
+  /* v3.59.0: online (Supabase) the database keeps the copies; nothing from the workbook is kept in this browser */
+  if (isCloud()) return Promise.resolve();
   const bytes = new Uint8Array(u8).slice();
   const pair = Conn.pairId, name = fileName || Conn.fileName;
   const result = backupChain.then(async () => {
@@ -3019,10 +3021,20 @@ async function actWrite(zip, loc, items) {
   const e = zip.find(path); actCache.key = e.crc + ":" + e.usize; actCache.items = items.slice();
 }
 /* merge new entries into the sheet, keep only the past 30 days, newest first */
+/* v3.59.0: phone and WhatsApp numbers never go into the Activity Log; old entries are cleaned on the next save */
+const PHONE_COL_RE = /phone|mobile|whats\s*app|contact\s*(no\.?|number)|^contact$/i;
+const hideNum = v => (v == null || v === "" ? v : "(hidden)");
+function scrubActivity(e) {
+  const d = e && e.details; if (!d || typeof d !== "object") return e;
+  let hit = false; const nd = { ...d };
+  for (const [k, v] of Object.entries(d)) if (PHONE_COL_RE.test(k) && v && typeof v === "object" && "to" in v) { nd[k] = { from: hideNum(v.from), to: hideNum(v.to) }; hit = true; }
+  if (typeof d.note === "string" && /(phone|mobile|whats\s*app)[^:·]*:/i.test(d.note)) { nd.note = d.note.replace(/((?:phone|mobile|whats\s*app)[^:·]*:)\s*[^·]*/gi, "$1 (hidden) "); hit = true; }
+  return hit ? { ...e, details: nd } : e;
+}
 async function withActivity(blob, entries) {
   const zip = await Zip.open(new Uint8Array(await blob.arrayBuffer())), loc = await actLocate(zip);
   const since = Date.now() - ACT_DAYS * 86400000, seen = new Set();
-  let items = [...await actRead(zip, loc), ...entries].filter(e => { const t = activityTime(e); return !Number.isFinite(t) || t >= since; });
+  let items = [...await actRead(zip, loc), ...entries].map(scrubActivity).filter(e => { const t = activityTime(e); return !Number.isFinite(t) || t >= since; });
   items = items.filter(e => { const k = actJson(e); if (seen.has(k)) return false; seen.add(k); return true; });
   items.sort((a, b) => (activityTime(b) || 0) - (activityTime(a) || 0));
   if (items.length > ACT_MAX) items = items.slice(0, ACT_MAX);
@@ -3064,7 +3076,26 @@ async function readData(name) {
     const text = await (await fh.getFile()).text(); await kvSet(key, text); return text;
   } catch (_) { return null; }
 }
-async function writeData(name, text) { await kvSet(metadataKey(name), text); }
+async function writeData(name, text) { if (isCloud() && NO_LOCAL_COPY.has(name)) text = null; await kvSet(metadataKey(name), text); }
+/* v3.59.0: online, the sheet snapshots (copies of employee and attendance rows) are not kept in the browser */
+const NO_LOCAL_COPY = new Set(["snapshot.json", "att-snapshot.json"]);
+/* v3.59.0: a copy of the workbook with some cells changed (used for the decrypted download) */
+async function rewriteCells(u8, fn) {
+  const book = await openBook(u8, Conn.sheetName), H = book.headers;
+  for (const row of book.rows) for (let i = 0; i < H.length; i++) {
+    const v = row.vals[i], nv = await fn(H[i], v); if (nv === undefined || nv === v) continue;
+    writeCell(book, getOrCreateCell(book, book.rowEls.get(row.r), i + 1), nv);
+  }
+  return new Uint8Array(await (await serializeBook(book)).arrayBuffer());
+}
+async function purgeLocalCopies() {
+  const db = await idb();
+  try { await new Promise((res, rej) => {
+    const tx = db.transaction("kv", "readwrite"), st = tx.objectStore("kv"), q = st.openCursor();
+    q.onsuccess = () => { const c = q.result; if (!c) return; const k = String(c.key); if (/^recovery-|^att:pending_v1$|snapshot\.json/.test(k)) c.delete(); c.continue(); };
+    tx.oncomplete = () => res(); tx.onerror = tx.onabort = () => rej(tx.error);
+  }); } finally { db.close(); }
+}
 
 /* ------------------------------ changes made directly in Excel ------------------------------ */
 /* After every load or save the dashboard keeps a small copy of the sheet's values (snapshot.json). When the file has a
@@ -3476,7 +3507,7 @@ return {
   supported: () => typeof window.showOpenFilePicker === "function" && !!window.indexedDB,
   folderName: () => (Conn.dir ? Conn.dir.name : ""),
   /* used by the Attendance page (same folder, same backups folder, same activity log) */
-  dir: () => Conn.dir, kvGet, kvSet, backup, writeBlob, appendActivity, nowText, readActivity, readData, writeData, isCloud, flushActivity, ACT_VERBS, actDetails,
+  dir: () => Conn.dir, kvGet, kvSet, backup, purgeLocalCopies, rewriteCells, writeBlob, appendActivity, nowText, readActivity, readData, writeData, isCloud, flushActivity, ACT_VERBS, actDetails,
   userName, setUser: n => { ME = String(n || "").trim() || "You"; },
   async isLocked(name) { for (const cand of ["~$" + name, "~$" + name.slice(2)]) { try { await Conn.dir.getFileHandle(cand); return true; } catch (e) { /* not there */ } } return false; },
   fileName: () => Conn.fileName,
@@ -3661,6 +3692,7 @@ const CLOUD = (() => {
     BE.useCloud([h], h.name, 'supabase:' + c.url.replace(/^https?:\/\//, ''));
     BE.setUser(session.name);
     await BE.kvSet('att:handle', null); await BE.kvSet('att:file', h.name); ATT.state().folderKey = null;
+    try { await BE.purgeLocalCopies(); } catch (e) { console.warn('Could not clear old browser copies', e); }
     ls.set(LS_MODE, 'cloud');
     await enterApp(); decorate();
   }
@@ -3806,7 +3838,8 @@ const CLOUD = (() => {
   function openAdmin() { if (session && window.openSettings) window.openSettings(session.role === 'superadmin' ? 'people' : undefined); }
   /* v3.19.1: custom dashboards are saved one at a time; the database checks who owns each one */
   const saveDashboard = (dash, remove) => rpc('td_save_dashboard', { p_token: tok(), p_dash: dash, p_remove: !!remove });
-  return { SUPABASE_CONFIG, saveDashboard, changeMyPasscode, card, resume, mode, decorate, signOut, useLocalFiles, openAdmin, configured, isAdmin, refreshMe, user, getSettings, setSetting, setShared, saveLeaveRequest, admin, _rpc: rpc };
+  const phoneKey = () => rpc('td_phone_key', { p_token: tok() });   /* v3.59.0: only the super admin and people they allow get the key */
+  return { phoneKey, SUPABASE_CONFIG, saveDashboard, changeMyPasscode, card, resume, mode, decorate, signOut, useLocalFiles, openAdmin, configured, isAdmin, refreshMe, user, getSettings, setSetting, setShared, saveLeaveRequest, admin, _rpc: rpc };
 })();
 
 /* =====================================================================
@@ -4650,7 +4683,7 @@ function queuePending(value) {
 function schedulePendingSave() { clearTimeout(pendingTimer); pendingTimer = setTimeout(() => persistPending().catch(console.error), 400); }
 function flushPendingNow() { clearTimeout(pendingTimer); return persistPending(); }
 async function persistPending() {
-    if (!S.ctx || !S.changes.length) { await clearPending(); return; }
+    if (!S.ctx || !S.changes.length || BE.isCloud()) { await clearPending(); return; }   /* v3.59.0: online, unsaved edits are never copied into the browser */
     const rows = S.rows.map(r => ({ uid: r.uid, r0: r.r0, month: r.month, empId: r.empId, name: r.name, client: r.client, days: r.days.slice(), reg: r.reg, styles: { ...r.styles }, variant: r.variant, extra: { ...(r.extra || {}) } }));
     await queuePending({ fileName: S.fileName, mtime: S.mtime, savedAt: Date.now(), n: S.changes.length, rows, fields: (S.newFields || []).slice(), removed: (S.removedFields || []).slice(), renamed: (S.renamedFields || []).slice() });
 }
@@ -9009,10 +9042,98 @@ const state = {
   visible: null, chartView: {}, flashId: null, online: true,
 };
 
+/* ============================== v3.59.0: phone & WhatsApp privacy ==============================
+   Online (Supabase), phone and WhatsApp cells are stored encrypted (AES-GCM) inside the workbook in the database, as
+   "ENC1:…". The key lives in the database and is handed out only to the super admin and to people the super admin
+   ticked "Can see phone & WhatsApp numbers" for (checked by td_phone_key). Everyone else sees the cells blank and can't
+   change them. The key is kept in memory only, never in the browser's storage. Local (Excel file) mode is unchanged. */
+const PHONE = (() => {
+  const PFX = "ENC1:", plain = new Map();
+  let key = null, keyState = "none", keyP = null, warned = false, migrating = false;
+  const online = () => { try { return !!(BE.isCloud() && typeof CLOUD !== "undefined" && CLOUD.user()); } catch { return false; } };
+  const canSee = () => { if (!online()) return true; const u = CLOUD.user(); return u.role === "superadmin" || !!(u.rawPermissions && u.rawPermissions._phones); };
+  const RE = /phone|mobile|whats\s*app|contact\s*(no\.?|number)|^contact$/i;
+  const colsOf = sch => !sch || !sch.columns ? [] : sch.columns.map(c => c.name).filter(n => RE.test(n) || n === sch.phone_column || n === sch.whatsapp_column);
+  const isCol = n => RE.test(String(n || "")) || !!(state.schema && n && (n === state.schema.phone_column || n === state.schema.whatsapp_column));
+  const isEnc = v => typeof v === "string" && v.startsWith(PFX);
+  const b64 = u8 => { let t = ""; for (let i = 0; i < u8.length; i++) t += String.fromCharCode(u8[i]); return btoa(t); };
+  const unb = t => Uint8Array.from(atob(t), c => c.charCodeAt(0));
+  function getKey() {
+    if (key) return Promise.resolve(key);
+    if (!online() || !canSee() || keyState === "nosql" || keyState === "denied") return Promise.resolve(null);
+    if (keyP) return keyP;
+    keyP = (async () => {
+      try { const k = await CLOUD.phoneKey(); key = await crypto.subtle.importKey("raw", unb(String(k).trim()), "AES-GCM", false, ["encrypt", "decrypt"]); keyState = "ok"; return key; }
+      catch (e) { keyState = /not set up|function/i.test(e.message || "") ? "nosql" : (e.code === "PHONES_HIDDEN" || /PHONES_HIDDEN/.test(e.message || "")) ? "denied" : "err"; console.warn("Phone key:", e.message); return null; }
+      finally { keyP = null; }
+    })();
+    return keyP;
+  }
+  async function enc(v) {
+    const iv = crypto.getRandomValues(new Uint8Array(12)), ct = new Uint8Array(await crypto.subtle.encrypt({ name: "AES-GCM", iv }, key, new TextEncoder().encode(String(v))));
+    const out = new Uint8Array(12 + ct.length); out.set(iv); out.set(ct, 12); const t = PFX + b64(out); plain.set(t, String(v)); return t;
+  }
+  async function dec(t) {
+    if (plain.has(t)) return plain.get(t); if (!key) return null;
+    try { const u = unb(t.slice(PFX.length)), pt = await crypto.subtle.decrypt({ name: "AES-GCM", iv: u.slice(0, 12) }, key, u.slice(12)), x = new TextDecoder().decode(pt); plain.set(t, x); return x; } catch { return null; }
+  }
+  /* what the database sends back: decrypted for people who may see the numbers, blank for everyone else */
+  async function fixVals(v, idx, see) {
+    const out = v.slice();
+    for (const i of idx) { const x = out[i]; if (x == null || x === "") continue; out[i] = isEnc(x) ? (see && key ? await dec(x) : null) : (see ? x : null); }
+    return out;
+  }
+  async function outbound(res) {
+    if (!res || typeof res !== "object" || !online()) return res;
+    const sch = res.schema || state.schema; const cols = colsOf(sch); if (!cols.length) return res;
+    const names = res.schema ? res.schema.columns.map(c => c.name) : (state.cols || []).map(c => c.name), idx = cols.map(n => names.indexOf(n)).filter(i => i >= 0);
+    if (!idx.length) return res;
+    const see = canSee(); if (see) await getKey();
+    const out = { ...res };
+    if (Array.isArray(res.rows)) out.rows = await Promise.all(res.rows.map(async r => r && Array.isArray(r.v) ? { ...r, v: await fixVals(r.v, idx, see) } : r));
+    if (Array.isArray(res.v)) out.v = await fixVals(res.v, idx, see);
+    if (res.schema && Array.isArray(res.rows)) {
+      const plainRows = res.rows.map(r => ({ id: r.id, values: Object.fromEntries(idx.filter(i => r.v[i] != null && r.v[i] !== "" && !isEnc(r.v[i])).map(i => [names[i], r.v[i]])) })).filter(u => Object.keys(u.values).length);
+      Object.defineProperty(out, "_phone", { value: { plain: plainRows.length, todo: see && key ? plainRows : [] }, enumerable: false });
+    }
+    return out;
+  }
+  /* what goes to the database: numbers are encrypted first; people without access can't change them */
+  async function fixIn(values) {
+    if (!values || typeof values !== "object") return values;
+    const ks = Object.keys(values).filter(isCol); if (!ks.length) return values;
+    const out = { ...values }, see = canSee(); if (see) await getKey();
+    for (const k of ks) { const v = out[k]; if (!see) { delete out[k]; continue; } if (v == null || v === "" || isEnc(v)) continue; if (key) out[k] = await enc(v); }
+    return out;
+  }
+  async function inbound(method, path, body) {
+    if (!online() || !body || method === "GET") return body;
+    if (body.values) return { ...body, values: await fixIn(body.values) };
+    if (Array.isArray(body.updates)) return { ...body, updates: await Promise.all(body.updates.map(async u => ({ ...u, values: await fixIn(u.values) }))) };
+    return body;
+  }
+  /* after loading: the first time the super admin opens the dashboard, numbers still in plain text get encrypted */
+  async function afterLoad(d) {
+    const ph = d && d._phone; if (!ph || !online()) return;
+    if (ph.plain && !ph.todo.length && !warned && CLOUD.user().role === "superadmin") { warned = true; toast(keyState === "nosql" ? "Phone numbers are not encrypted yet: run phone-privacy.sql once in Supabase → SQL Editor, then reload." : "Phone numbers could not be encrypted right now. They stay as they are; reload to try again.", true); }
+    if (!ph.todo.length || migrating || !(window.PERM && PERM.can("emp.bulk"))) return;
+    migrating = true;
+    try { await api("POST", "/api/bulk", { updates: ph.todo, note: "Encrypted phone and WhatsApp numbers" }); toast("Encrypted " + ph.todo.length + " " + (ph.todo.length === 1 ? "person's" : "people's") + " phone and WhatsApp numbers in the database."); await loadData(true); }
+    catch (e) { toast("Could not encrypt the phone numbers yet: " + e.message, true); }
+    finally { migrating = false; }
+  }
+  /* the downloaded workbook: readable numbers for people who may see them, still encrypted for everyone else */
+  async function plainCopy(u8) {
+    if (!online() || !canSee() || !(await getKey())) return u8;
+    return BE.rewriteCells(u8, async (h, v) => RE.test(String(h || "")) && isEnc(v) ? ((await dec(v)) ?? undefined) : undefined);
+  }
+  return { inbound, outbound, afterLoad, canSee, isCol, plainCopy, locked: n => online() && isCol(n) && !canSee(), state: () => keyState };
+})();
 async function api(method, path, body) {
-  try { return await BE.call(method, path, body); }
+  try { body = await PHONE.inbound(method, path, body); return await PHONE.outbound(await BE.call(method, path, body)); }
   catch (e) {
     const err = e instanceof ApiErr ? e : new ApiErr(500, (e && e.message) || String(e));
+    if (err.data && err.data.row) { try { err.data = { ...err.data, row: await PHONE.outbound(err.data.row) }; } catch { } }
     if (err.status === 401 && state.schema) showConnect({ folder: BE.folderName(), granted: false, error: "Reconnect to keep editing." });
     throw err;
   }
@@ -9082,6 +9203,7 @@ async function loadData(silent) {
     ingest(d);
     setSync(true);
     renderAll();
+    setTimeout(() => PHONE.afterLoad(d), 0);
     if (d.external) toast("The Excel file was changed outside the dashboard (" + d.external + (d.external === 1 ? " change" : " changes") + "). See Activity for who and what.");
   } finally {
     document.body.classList.remove("refreshing");
@@ -9109,7 +9231,7 @@ async function poll() {
 }
 
 /* ============================== filtering ============================== */
-const APP = { title: "Team Dashboard", version: "3.58.3", released: "19 Oct 2026" };
+const APP = { title: "Team Dashboard", version: "3.59.0", released: "19 Oct 2026" };
 const BASE_DIMS = { status: "status_column", desig: "designation_column", client: "client_column", mode: "mode_column" };
 const STANDARD_STATUSES = ["Active", "Manager", "OJT", "Bench", "New", "Projected", "Left", "Moved"];
 const TILE_ORDER = ["Active", "Manager", "OJT", "Bench", "New", "Projected"];
@@ -11488,9 +11610,11 @@ setInterval(()=>void tickGoogleDistance(),10000);
 
 
 /* ============================== drawer: edit / add ============================== */
-let drawerEl = null, lastFocus = null, employeePending = false;
+let drawerEl = null, lastFocus = null, employeePending = false, employeeDirty = false;
 function closeDrawer() {
   if (employeePending) { toast("Wait for the employee changes to save, or resolve the save error.", true); return; }
+  if (employeeDirty && drawerEl && !confirm("Close without saving? Your changes to this employee will be lost.")) return;
+  employeeDirty = false;
   if (drawerEl) { drawerEl.remove(); drawerEl = null; }
   $("#overlay").replaceChildren();
   if (lastFocus && document.contains(lastFocus)) lastFocus.focus();
@@ -11591,7 +11715,7 @@ function openDrawer(row) {
   const fields = [];
   const body = h("div", { class: "body" });
   const errBox = h("div", { role: "alert" });
-  const saveBtn = h("button", { class: "btn primary" }, isNew ? "Add to Excel" : "Save to Excel");
+  const saveBtn = h("button", { class: "btn primary" }, isNew ? "Add employee" : "Save changes");
   const delArea = h("span", {});
   const title = h("h2", {}, isNew ? "Add employee" : gs(row, "name_column") || row.id);
 
@@ -11612,6 +11736,7 @@ function openDrawer(row) {
           if (c.name === sch.doj_column) val = todaySerial();
         }
         const f = buildField(c, val, isNew);
+        if (PHONE.locked(c.name)) { f.get = () => (base ? base.v[state.idx[c.name]] : null); f.wrap.querySelectorAll("input,select,textarea").forEach(el => { el.disabled = true; el.dataset.locked = "1"; el.value = ""; el.placeholder = "🔒 Hidden"; el.title = "Only the super admin and people they allow can see phone and WhatsApp numbers"; }); }
         fields.push(f); mine.push(f); grid.append(f.wrap);
       }
       const cnt = h("small", { class: "emp-cnt" });
@@ -11648,11 +11773,11 @@ function openDrawer(row) {
     body.scrollTop = 0;
   }
 
+  /* v3.59.0: nothing is saved while typing. Edits wait in the form until "Save changes" is clicked, then go straight to the database. */
   let autoTimer, saving = false;
-  if (!isNew) body.addEventListener('input', () => {
-    employeePending = true; saveBtn.textContent = 'Changes pending…';
-    clearTimeout(autoTimer); autoTimer = setTimeout(() => saveBtn.click(), 1000);
-  });
+  if (!isNew) { saveBtn.disabled = true; saveBtn.textContent = "Save changes"; }
+  const markDirty = () => { if (saving) return; employeeDirty = true; saveBtn.disabled = false; saveBtn.textContent = isNew ? "Add employee" : "Save changes"; };
+  body.addEventListener('input', markDirty); body.addEventListener('change', markDirty);
   saveBtn.addEventListener("click", async () => {
     if (saving) return;
     clearTimeout(autoTimer);
@@ -11666,7 +11791,7 @@ function openDrawer(row) {
       const same = c.type === "date" ? (cur == null ? !isNum(orig) : cur === orig) : S(orig) === String(cur == null ? "" : cur);
       if (!same) changes[f.name] = cur === "" ? null : cur;
     }
-    if (!isNew && !Object.keys(changes).length) { employeePending = false; saveBtn.textContent = "Saved to Excel"; return; }
+    if (!isNew && !Object.keys(changes).length) { employeePending = false; employeeDirty = false; saveBtn.textContent = "Saved"; saveBtn.disabled = true; return; }
     saving = true; employeePending = true;
     body.querySelectorAll("input,select,textarea").forEach(el=>el.disabled=true);
     saveBtn.disabled = true; saveBtn.textContent = "Saving…";
@@ -11689,17 +11814,17 @@ function openDrawer(row) {
       applyRow(res);
       state.version = res.version;
       state.flashId = res.id;
-      employeePending = false;
+      employeePending = false; employeeDirty = false;
       if (isNew) closeDrawer();
-      else { base = {id:res.id,etag:res.etag,v:res.v.slice()}; saveBtn.textContent = "Saved to Excel"; }
+      else { base = {id:res.id,etag:res.etag,v:res.v.slice()}; saveBtn.textContent = "Saved"; saveBtn.disabled = true; }
       renderAll();
-      toast((isNew ? "Added " : "Saved ") + (res.name || res.id) + " to Excel");
+      toast((isNew ? "Added " : "Saved ") + (res.name || res.id) + (BE.isCloud() ? " to the database" : " to Excel"));
     } catch (e) {
-      saveBtn.disabled = false; saveBtn.textContent = isNew ? "Add to Excel" : "Save to Excel";
+      employeePending = false; saveBtn.disabled = false; saveBtn.textContent = isNew ? "Add employee" : "Save changes";
       if (e.status === 409 && e.data && e.data.row) showErr(e.message, prep(e.data.row));
       else showErr(e.message);
       if (e.status === 423) autoTimer = setTimeout(() => { if (body.isConnected) saveBtn.click(); }, 15000);
-    } finally { saving = false; saveBtn.disabled = false; body.querySelectorAll("input,select,textarea").forEach(el=>el.disabled=false); }
+    } finally { saving = false; if (employeeDirty || isNew) saveBtn.disabled = false; body.querySelectorAll("input,select,textarea").forEach(el=>{ if (!el.dataset.locked) el.disabled=false; }); }
   });
 
   if (!isNew) {
@@ -12538,7 +12663,7 @@ function rightsSummary(u) {
   const role = PERM.roleNames[u.role] || 'User';
   if (u.role === 'superadmin') return 'Super admin · every right';
   { const r = u.permissions && u.permissions._role ? tdRoles().find(x => x.id === u.permissions._role) : null; if (r) return 'Role ' + r.name; }
-  if (u.role === 'admin') return 'Admin · every right except People & access' + (u.permissions && u.permissions._bkReport ? ' · Backup report' : '');
+  if (u.role === 'admin') return 'Admin · every right except People & access' + (u.permissions && u.permissions._bkReport ? ' · Backup report' : '') + (u.permissions && u.permissions._phones ? ' · Phone numbers' : '');
   const p = PERM.upgrade(u.permissions || {});
   if (!p._v) return role + ' · full access';
   for (const [name, preset] of Object.entries(PERM.presets)) if (PERM.keys.every(k => !!p[k] === !!preset[k])) return role + ' · ' + name;
@@ -12820,8 +12945,10 @@ function buildAccessForm(src, users = []) {
   const bkRev = checkLine('…including Revenue (seat rates and estimated revenue)', !!(accessSource && accessSource.permissions && accessSource.permissions._bkRevenue));
   const bkSync = () => { bkRev.box.disabled = !bkRep.box.checked; if (!bkRep.box.checked) bkRev.box.checked = false; }; bkRep.box.addEventListener('change', bkSync); bkSync();
   const bkBox = h('div', { class: 'rmod-extra bk-access' }, h('p', { class: 'rmod-subt' }, 'Backup report'), bkRep.el, bkRev.el, h('p', { class: 'set-hint' }, 'Off unless ticked. Super admins always have it.'));
-  const bkPerms = () => ({ _bkReport: bkRep.box.checked, _bkRevenue: bkRep.box.checked && bkRev.box.checked });
-  const rights = h('div', { class: 'rights' }, roleNote, bkBox, presets, h('div', { class: 'rrows' }, h('div', { class: 'rgrid-head', 'aria-hidden': 'true' }, h('span', {}, 'Area'), h('span', {}, 'Hide'), h('span', {}, 'View'), h('span', {}, 'Edit'), h('span', {}, '')), ...modules));
+  const phSee = checkLine('Can see and edit phone & WhatsApp numbers', !!(accessSource && accessSource.permissions && accessSource.permissions._phones));
+  const phBox = h('div', { class: 'rmod-extra bk-access' }, h('p', { class: 'rmod-subt' }, 'Phone & WhatsApp numbers'), phSee.el, h('p', { class: 'set-hint' }, 'Stored encrypted in the database. Off unless ticked: everyone else sees these fields blank. Super admins always see them.'));
+  const bkPerms = () => ({ _bkReport: bkRep.box.checked, _bkRevenue: bkRep.box.checked && bkRev.box.checked, _phones: phSee.box.checked });
+  const rights = h('div', { class: 'rights' }, roleNote, bkBox, phBox, presets, h('div', { class: 'rrows' }, h('div', { class: 'rgrid-head', 'aria-hidden': 'true' }, h('span', {}, 'Area'), h('span', {}, 'Hide'), h('span', {}, 'View'), h('span', {}, 'Edit'), h('span', {}, '')), ...modules));
   rights.addEventListener('change', () => setTimeout(paintPresets)); rights.addEventListener('click', e => { if (e.target.closest('.rseg-b, .rchk')) setTimeout(paintPresets); });
   const syncRole = () => { syncs.forEach(f => f()); };
   syncRole(); paintPresets();
@@ -12834,8 +12961,8 @@ const roleId = () => 'r' + Date.now().toString(36) + Math.random().toString(36).
 const roleOfUser = u => (u && u.role !== 'superadmin' && u.permissions && u.permissions._role ? tdRoles().find(r => r.id === u.permissions._role) || null : null);
 const roleLabel = u => u.role === 'superadmin' ? 'Super admin' : (roleOfUser(u) || {}).name || 'No role';
 const rolePages = r => { const p = r.rights || {}; return PERM.groups.filter(g => g.page && p[g.page]).map(g => g.name); };
-const roleSummary = r => { const pg = rolePages(r), n = PERM.keys.filter(k => (r.rights || {})[k]).length; return (r.admin ? 'Admin · ' : '') + (pg.length ? pg.join(', ') : 'no pages') + ' · ' + n + ' rights' + (r.extras && r.extras._bkReport ? ' · Backup report' : ''); };
-const keepLink = p => (p && p._emp ? { _emp: p._emp, _empName: p._empName } : {});
+const roleSummary = r => { const pg = rolePages(r), n = PERM.keys.filter(k => (r.rights || {})[k]).length; return (r.admin ? 'Admin · ' : '') + (pg.length ? pg.join(', ') : 'no pages') + ' · ' + n + ' rights' + (r.extras && r.extras._bkReport ? ' · Backup report' : '') + (r.extras && r.extras._phones ? ' · Phone numbers' : ''); };
+const keepLink = p => ({ ...(p && p._emp ? { _emp: p._emp, _empName: p._empName } : {}), ...(p && p._phones ? { _phones: true } : {}) });   /* v3.59.0: a person's phone access survives role changes */
 async function saveRoles(next, note) { await saveTeamSetting('user_roles', next, note ? { name: 'Roles', text: note } : null); }
 /* write a role's rights into each member's account, so the server checks the same rights */
 async function syncRoleMembers(role, members, onStep) {
@@ -12941,6 +13068,7 @@ function drawEditor(box, u, reload, users = [], template = null, groups = []) {
   let loginAuto = !u || !u.login_id;
   loginId.addEventListener('input', () => { loginAuto = !loginId.value.trim(); });
   const active = checkLine('Can sign in', u ? u.active : true);
+  const phonesOn = checkLine('Can see and edit phone & WhatsApp numbers (stored encrypted; super admins always can)', !!(u && u.permissions && u.permissions._phones));
   const empOpts = (typeof state !== 'undefined' && state.schema ? state.rows : []).map(r => ({ code: String(gs(r, 'key_column') || ''), name: gs(r, 'name_column').trim() })).filter(x => x.code && x.name).sort((a, b) => a.name.localeCompare(b.name));
   const labelOf = x => x.name + ' · ' + x.code;
   const curEmp = u && u.permissions && u.permissions._emp ? empOpts.find(x => x.code === String(u.permissions._emp)) || { code: String(u.permissions._emp), name: u.permissions._empName || '' } : null;
@@ -12990,6 +13118,7 @@ function drawEditor(box, u, reload, users = [], template = null, groups = []) {
         dbRole = u && u.role !== 'superadmin' ? u.role : 'user';
         perms = u && u.role !== 'superadmin' ? { ...old, ...link } : { _v: PERM.version, ...PERM.presets['View only'], _notificationAudience: { mode: 'own', users: [] }, ...link };
       } else { const r = roles.find(x => x.id === pick); dbRole = r.admin ? 'admin' : 'user'; perms = { ...tdRolePerms(r), ...link }; }
+      if (dbRole !== 'superadmin') perms = { ...perms, _phones: phonesOn.box.checked || !!(pick !== 'none' && perms && perms._phones) };   /* v3.59.0 */
       const r0 = await CLOUD.admin.save(u ? u.id : null, nmv, pc, dbRole, active.box.checked, perms, lid);
       const savedId = (r0 && r0.id) || (u && u.id);
       if (savedId != null) { try { await saveGroupsFor(savedId, nmv); } catch (ge) { toast('Saved, but the groups could not be updated: ' + ge.message, true); } }
@@ -13015,7 +13144,7 @@ function drawEditor(box, u, reload, users = [], template = null, groups = []) {
         h('label', {}, 'Passcode', h('div', { class: 'pc-wrap' }, code, eye, fresh)),
         h('label', {}, 'Linked employee (optional)', emp, empList)),
       active.el),
-    sec('2', 'Role', roles.length ? 'What they can open and change comes from their role' : 'Create roles in the Roles tab above, then pick one here', pickBox),
+    sec('2', 'Role', roles.length ? 'What they can open and change comes from their role' : 'Create roles in the Roles tab above, then pick one here', pickBox, h('div', { class: 'ped-phones' }, phonesOn.el)),
     sec('3', 'Groups', 'People in the same group see each other’s requests and request notifications', groupBox),
     h('div', { class: 'set-actions ped-save' }, save, err, h('span', { class: 'spacer' }), del));
   if (isNew) name.focus();
@@ -13203,7 +13332,7 @@ async function drawWorkbook(pane) {
       h('div', { class: 'set-actions flat' }, h('button', { class: 'btn', type: 'button', onclick: () => el('btnLogout').click() }, 'Open a different workbook')), err);
     return;
   }
-  const dl = h('button', { class: 'btn', type: 'button', onclick: () => run(async () => download(state.file || 'Team Dashboard.xlsx', await CLOUD.admin.download())) }, 'Download current workbook');
+  const dl = h('button', { class: 'btn', type: 'button', onclick: () => run(async () => download(state.file || 'Team Dashboard.xlsx', await PHONE.plainCopy(await CLOUD.admin.download()))) }, 'Download current workbook');
   if (!PERM.can('set.workbook')) { fill(pane, h('p', { class: 'set-hint' }, 'Download a copy of the team workbook to open in Excel. Changes made in the copy are not sent back.'), h('div', { class: 'set-actions flat' }, dl), err); return; }
   fill(pane, h('p', { class: 'set-hint' }, 'Loading history…'));
   const hist = await CLOUD.admin.history();
