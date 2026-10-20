@@ -5,7 +5,7 @@
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <link rel="preconnect" href="https://iiogwevtyzgedhoaqlrn.supabase.co" crossorigin><link rel="dns-prefetch" href="https://iiogwevtyzgedhoaqlrn.supabase.co">
 <link rel="icon" href="data:,">
-<title>Team Dashboard · 3.60.1</title>
+<title>Team Dashboard · 3.61.0</title>
 <link rel="preconnect" href="https://fonts.googleapis.com"><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin><link href="https://fonts.googleapis.com/css2?family=Public+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet">
 <style>
 :root {
@@ -2084,6 +2084,26 @@ html body .sidebar nav.tabs .tab[data-view="backups"], html body .tab[data-view=
 .ovx-nsw input:focus-visible + i { outline:2px solid var(--accent); outline-offset:2px; }
 .ovx-code .ovx-half { display:inline-block; margin-left:5px; padding:1px 6px; border-radius:6px; background:#fff3c4; color:#7a5a00; font-style:normal; font-size:10.5px; font-weight:700; vertical-align:1px; }
 @media (prefers-color-scheme: dark) { .ovx-code .ovx-half { background:rgba(255,204,0,.18); color:#ffd75e; } }
+/* v3.61.0: Pseudo names panel */
+.psn-drawer { width:min(760px, 100vw) !important; }
+.psn { display:flex; flex-direction:column; gap:10px; }
+.psn-bar { display:flex; gap:10px; align-items:center; flex-wrap:wrap; } .psn-bar .input { flex:1 1 240px; }
+.psn-note { margin:0; }
+.psn-people { display:flex; flex-direction:column; }
+.psn-row { display:flex; align-items:center; gap:12px; padding:9px 4px; border-bottom:1px solid var(--border, var(--line)); }
+.psn-row.on { background:color-mix(in srgb, var(--accent) 7%, transparent); }
+.psn-who { flex:1; min-width:0; display:flex; flex-direction:column; } .psn-who small { color:var(--ink-2); font-size:11.5px; }
+.psn-val { font-weight:700; padding:2px 10px; border-radius:999px; background:color-mix(in srgb, var(--accent) 12%, var(--surface)); white-space:nowrap; }
+.psn-val.none { font-weight:500; color:var(--ink-2); background:var(--surface-2); }
+.psn-edit { display:flex; flex-wrap:wrap; align-items:center; gap:8px; padding:8px 4px 12px; border-bottom:1px solid var(--border, var(--line)); }
+.psn-edit .input { flex:1 1 200px; } .psn-edit small { flex-basis:100%; }
+.psn-err { color:var(--danger, #c62828); font-size:12.5px; font-weight:600; }
+.psn-tbl { width:100%; border-collapse:collapse; font-size:13px; } .psn-tbl th, .psn-tbl td { text-align:left; padding:7px 6px; border-bottom:1px solid var(--border, var(--line)); vertical-align:top; }
+.psn-tbl th { font-size:11.5px; color:var(--ink-2); font-weight:650; } .psn-tbl small { color:var(--ink-2); } .psn-n { display:block; }
+.psn-now { color:#1c7a45; font-weight:700; }
+/* v3.61.0: password dialog */
+.td-pw { display:flex; flex-direction:column; gap:4px; margin:8px 0 0; font-size:12.5px; font-weight:600; color:var(--ink-2); text-align:left; }
+.td-pw-err { min-height:1em; margin:6px 0 0; color:var(--danger, #c62828); font-size:12.5px; font-weight:600; }
 </style></head>
 
 
@@ -2208,6 +2228,7 @@ html body .sidebar nav.tabs .tab[data-view="backups"], html body .tab[data-view=
           <h2 style="margin-right:6px">Employees</h2>
           <span class="count" id="count"></span>
           <span class="spacer"></span>
+          <button class="btn" id="btnPseudo" type="button" title="Set pseudo names (one per person) and search who used a pseudo name before">Pseudo names</button>
           <button class="btn" id="btnCols" aria-haspopup="true" data-pop="1" title="Choose which fields show in the table, and their order">Columns</button>
           <details class="tdmore" id="empMore"><summary class="btn tdmore-b" title="More actions">More <span aria-hidden="true">▾</span></summary><div class="tdmore-menu" role="menu">
           <button class="btn" id="btnFill" title="Fill or correct one field for many people in one table, then save once">Fill in bulk</button>
@@ -2237,6 +2258,77 @@ html body .sidebar nav.tabs .tab[data-view="backups"], html body .tab[data-view=
 <div id="tip" hidden role="tooltip"></div>
 <div id="toast" aria-live="polite"></div>
 
+<script>
+/* cfb.js 1.2.2 (C) 2013-present SheetJS, Apache License 2.0 (http://www.apache.org/licenses/LICENSE-2.0): reads and writes the compound file that holds a password-protected Excel file. Kept in its own scope. */
+window.CFB = (function () { var module, exports, define, require;
+/* cfb.js (C) 2013-present SheetJS -- http://sheetjs.com */
+var Base64_map="ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789+/=";function Base64_encode(e){var r="";var t=0,i=0,n=0,a=0,f=0,s=0,l=0;for(var h=0;h<e.length;){t=e.charCodeAt(h++);a=t>>2;i=e.charCodeAt(h++);f=(t&3)<<4|i>>4;n=e.charCodeAt(h++);s=(i&15)<<2|n>>6;l=n&63;if(isNaN(i))s=l=64;else if(isNaN(n))l=64;r+=Base64_map.charAt(a)+Base64_map.charAt(f)+Base64_map.charAt(s)+Base64_map.charAt(l)}return r}function Base64_decode(e){var r="";var t=0,i=0,n=0,a=0,f=0,s=0,l=0;e=e.replace(/[^\w\+\/\=]/g,"");for(var h=0;h<e.length;){a=Base64_map.indexOf(e.charAt(h++));f=Base64_map.indexOf(e.charAt(h++));t=a<<2|f>>4;r+=String.fromCharCode(t);s=Base64_map.indexOf(e.charAt(h++));i=(f&15)<<4|s>>2;if(s!==64)r+=String.fromCharCode(i);l=Base64_map.indexOf(e.charAt(h++));n=(s&3)<<6|l;if(l!==64)r+=String.fromCharCode(n)}return r}var has_buf=function(){return typeof Buffer!=="undefined"&&typeof process!=="undefined"&&typeof process.versions!=="undefined"&&!!process.versions.node}();var Buffer_from=function(){if(typeof Buffer!=="undefined"){var e=!Buffer.from;if(!e)try{Buffer.from("foo","utf8")}catch(r){e=true}return e?function(e,r){return r?new Buffer(e,r):new Buffer(e)}:Buffer.from.bind(Buffer)}return function(){}}();function new_raw_buf(e){if(has_buf){if(Buffer.alloc)return Buffer.alloc(e);var r=new Buffer(e);r.fill(0);return r}return typeof Uint8Array!="undefined"?new Uint8Array(e):new Array(e)}function new_unsafe_buf(e){if(has_buf)return Buffer.allocUnsafe?Buffer.allocUnsafe(e):new Buffer(e);return typeof Uint8Array!="undefined"?new Uint8Array(e):new Array(e)}var s2a=function e(r){if(has_buf)return Buffer_from(r,"binary");return r.split("").map(function(e){return e.charCodeAt(0)&255})};var chr0=/\u0000/g,chr1=/[\u0001-\u0006]/g;var __toBuffer=function(e){var r=[];for(var t=0;t<e[0].length;++t){r.push.apply(r,e[0][t])}return r};var ___toBuffer=__toBuffer;var __utf16le=function(e,r,t){var i=[];for(var n=r;n<t;n+=2)i.push(String.fromCharCode(__readUInt16LE(e,n)));return i.join("").replace(chr0,"")};var ___utf16le=__utf16le;var __hexlify=function(e,r,t){var i=[];for(var n=r;n<r+t;++n)i.push(("0"+e[n].toString(16)).slice(-2));return i.join("")};var ___hexlify=__hexlify;var __bconcat=function(e){if(Array.isArray(e[0]))return[].concat.apply([],e);var r=0,t=0;for(t=0;t<e.length;++t)r+=e[t].length;var i=new Uint8Array(r);for(t=0,r=0;t<e.length;r+=e[t].length,++t)i.set(e[t],r);return i};var bconcat=__bconcat;if(has_buf){__utf16le=function(e,r,t){if(!Buffer.isBuffer(e))return ___utf16le(e,r,t);return e.toString("utf16le",r,t).replace(chr0,"")};__hexlify=function(e,r,t){return Buffer.isBuffer(e)?e.toString("hex",r,r+t):___hexlify(e,r,t)};__toBuffer=function(e){return e[0].length>0&&Buffer.isBuffer(e[0][0])?Buffer.concat(e[0]):___toBuffer(e)};s2a=function(e){return Buffer_from(e,"binary")};bconcat=function(e){return Buffer.isBuffer(e[0])?Buffer.concat(e):__bconcat(e)}}var __readUInt8=function(e,r){return e[r]};var __readUInt16LE=function(e,r){return e[r+1]*(1<<8)+e[r]};var __readInt16LE=function(e,r){var t=e[r+1]*(1<<8)+e[r];return t<32768?t:(65535-t+1)*-1};var __readUInt32LE=function(e,r){return e[r+3]*(1<<24)+(e[r+2]<<16)+(e[r+1]<<8)+e[r]};var __readInt32LE=function(e,r){return(e[r+3]<<24)+(e[r+2]<<16)+(e[r+1]<<8)+e[r]};function ReadShift(e,r){var t,i,n=0;switch(e){case 1:t=__readUInt8(this,this.l);break;case 2:t=(r!=="i"?__readUInt16LE:__readInt16LE)(this,this.l);break;case 4:t=__readInt32LE(this,this.l);break;case 16:n=2;i=__hexlify(this,this.l,e);}this.l+=e;if(n===0)return t;return i}var __writeUInt32LE=function(e,r,t){e[t]=r&255;e[t+1]=r>>>8&255;e[t+2]=r>>>16&255;e[t+3]=r>>>24&255};var __writeInt32LE=function(e,r,t){e[t]=r&255;e[t+1]=r>>8&255;e[t+2]=r>>16&255;e[t+3]=r>>24&255};function WriteShift(e,r,t){var i=0,n=0;switch(t){case"hex":for(;n<e;++n){this[this.l++]=parseInt(r.slice(2*n,2*n+2),16)||0}return this;case"utf16le":var a=this.l+e;for(n=0;n<Math.min(r.length,e);++n){var f=r.charCodeAt(n);this[this.l++]=f&255;this[this.l++]=f>>8}while(this.l<a)this[this.l++]=0;return this;}switch(e){case 1:i=1;this[this.l]=r&255;break;case 2:i=2;this[this.l]=r&255;r>>>=8;this[this.l+1]=r&255;break;case 4:i=4;__writeUInt32LE(this,r,this.l);break;case-4:i=4;__writeInt32LE(this,r,this.l);break;}this.l+=i;return this}function CheckField(e,r){var t=__hexlify(this,this.l,e.length>>1);if(t!==e)throw new Error(r+"Expected "+e+" saw "+t);this.l+=e.length>>1}function prep_blob(e,r){e.l=r;e.read_shift=ReadShift;e.chk=CheckField;e.write_shift=WriteShift}function new_buf(e){var r=new_raw_buf(e);prep_blob(r,0);return r}var CRC32=function(){var e={};e.version="1.2.1";function r(){var e=0,r=new Array(256);for(var t=0;t!=256;++t){e=t;e=e&1?-306674912^e>>>1:e>>>1;e=e&1?-306674912^e>>>1:e>>>1;e=e&1?-306674912^e>>>1:e>>>1;e=e&1?-306674912^e>>>1:e>>>1;e=e&1?-306674912^e>>>1:e>>>1;e=e&1?-306674912^e>>>1:e>>>1;e=e&1?-306674912^e>>>1:e>>>1;e=e&1?-306674912^e>>>1:e>>>1;r[t]=e}return typeof Int32Array!=="undefined"?new Int32Array(r):r}var t=r();function i(e){var r=0,t=0,i=0,n=typeof Int32Array!=="undefined"?new Int32Array(4096):new Array(4096);for(i=0;i!=256;++i)n[i]=e[i];for(i=0;i!=256;++i){t=e[i];for(r=256+i;r<4096;r+=256)t=n[r]=t>>>8^e[t&255]}var a=[];for(i=1;i!=16;++i)a[i-1]=typeof Int32Array!=="undefined"?n.subarray(i*256,i*256+256):n.slice(i*256,i*256+256);return a}var n=i(t);var a=n[0],f=n[1],s=n[2],l=n[3],h=n[4];var o=n[5],u=n[6],c=n[7],v=n[8],_=n[9];var d=n[10],w=n[11],p=n[12],g=n[13],b=n[14];function F(e,r){var i=r^-1;for(var n=0,a=e.length;n<a;)i=i>>>8^t[(i^e.charCodeAt(n++))&255];return~i}function y(e,r){var i=r^-1,n=e.length-15,F=0;for(;F<n;)i=b[e[F++]^i&255]^g[e[F++]^i>>8&255]^p[e[F++]^i>>16&255]^w[e[F++]^i>>>24]^d[e[F++]]^_[e[F++]]^v[e[F++]]^c[e[F++]]^u[e[F++]]^o[e[F++]]^h[e[F++]]^l[e[F++]]^s[e[F++]]^f[e[F++]]^a[e[F++]]^t[e[F++]];n+=15;while(F<n)i=i>>>8^t[(i^e[F++])&255];return~i}function m(e,r){var i=r^-1;for(var n=0,a=e.length,f=0,s=0;n<a;){f=e.charCodeAt(n++);if(f<128){i=i>>>8^t[(i^f)&255]}else if(f<2048){i=i>>>8^t[(i^(192|f>>6&31))&255];i=i>>>8^t[(i^(128|f&63))&255]}else if(f>=55296&&f<57344){f=(f&1023)+64;s=e.charCodeAt(n++)&1023;i=i>>>8^t[(i^(240|f>>8&7))&255];i=i>>>8^t[(i^(128|f>>2&63))&255];i=i>>>8^t[(i^(128|s>>6&15|(f&3)<<4))&255];i=i>>>8^t[(i^(128|s&63))&255]}else{i=i>>>8^t[(i^(224|f>>12&15))&255];i=i>>>8^t[(i^(128|f>>6&63))&255];i=i>>>8^t[(i^(128|f&63))&255]}}return~i}e.table=t;e.bstr=F;e.buf=y;e.str=m;return e}();var CFB=function r(){var e={};e.version="1.2.2";function r(e,r){var t=e.split("/"),i=r.split("/");for(var n=0,a=0,f=Math.min(t.length,i.length);n<f;++n){if(a=t[n].length-i[n].length)return a;if(t[n]!=i[n])return t[n]<i[n]?-1:1}return t.length-i.length}function t(e){if(e.charAt(e.length-1)=="/")return e.slice(0,-1).indexOf("/")===-1?e:t(e.slice(0,-1));var r=e.lastIndexOf("/");return r===-1?e:e.slice(0,r+1)}function i(e){if(e.charAt(e.length-1)=="/")return i(e.slice(0,-1));var r=e.lastIndexOf("/");return r===-1?e:e.slice(r+1)}function n(e,r){if(typeof r==="string")r=new Date(r);var t=r.getHours();t=t<<6|r.getMinutes();t=t<<5|r.getSeconds()>>>1;e.write_shift(2,t);var i=r.getFullYear()-1980;i=i<<4|r.getMonth()+1;i=i<<5|r.getDate();e.write_shift(2,i)}function a(e){var r=e.read_shift(2)&65535;var t=e.read_shift(2)&65535;var i=new Date;var n=t&31;t>>>=5;var a=t&15;t>>>=4;i.setMilliseconds(0);i.setFullYear(t+1980);i.setMonth(a-1);i.setDate(n);var f=r&31;r>>>=5;var s=r&63;r>>>=6;i.setHours(r);i.setMinutes(s);i.setSeconds(f<<1);return i}function f(e){prep_blob(e,0);var r={};var t=0;while(e.l<=e.length-4){var i=e.read_shift(2);var n=e.read_shift(2),a=e.l+n;var f={};switch(i){case 21589:{t=e.read_shift(1);if(t&1)f.mtime=e.read_shift(4);if(n>5){if(t&2)f.atime=e.read_shift(4);if(t&4)f.ctime=e.read_shift(4)}if(f.mtime)f.mt=new Date(f.mtime*1e3)}break;}e.l=a;r[i]=f}return r}var s;function l(){return s||(s=require("fs"))}function h(e,r){if(e[0]==80&&e[1]==75)return ye(e,r);if((e[0]|32)==109&&(e[1]|32)==105)return ke(e,r);if(e.length<512)throw new Error("CFB file size "+e.length+" < 512");var t=3;var i=512;var n=0;var a=0;var f=0;var s=0;var l=0;var h=[];var _=e.slice(0,512);prep_blob(_,0);var w=o(_);t=w[0];switch(t){case 3:i=512;break;case 4:i=4096;break;case 0:if(w[1]==0)return ye(e,r);default:throw new Error("Major Version: Expected 3 or 4 saw "+t);}if(i!==512){_=e.slice(0,i);prep_blob(_,28)}var b=e.slice(0,i);u(_,t);var F=_.read_shift(4,"i");if(t===3&&F!==0)throw new Error("# Directory Sectors: Expected 0 saw "+F);_.l+=4;f=_.read_shift(4,"i");_.l+=4;_.chk("00100000","Mini Stream Cutoff Size: ");s=_.read_shift(4,"i");n=_.read_shift(4,"i");l=_.read_shift(4,"i");a=_.read_shift(4,"i");for(var y=-1,m=0;m<109;++m){y=_.read_shift(4,"i");if(y<0)break;h[m]=y}var x=c(e,i);d(l,a,x,i,h);var I=p(x,f,h,i);I[f].name="!Directory";if(n>0&&s!==E)I[s].name="!MiniFAT";I[h[0]].name="!FAT";I.fat_addrs=h;I.ssz=i;var C={},A=[],B=[],S=[];g(f,I,x,A,n,C,B,s);v(B,S,A);A.shift();var k={FileIndex:B,FullPaths:S};if(r&&r.raw)k.raw={header:b,sectors:x};return k}function o(e){if(e[e.l]==80&&e[e.l+1]==75)return[0,0];e.chk(S,"Header Signature: ");e.l+=16;var r=e.read_shift(2,"u");return[e.read_shift(2,"u"),r]}function u(e,r){var t=9;e.l+=2;switch(t=e.read_shift(2)){case 9:if(r!=3)throw new Error("Sector Shift: Expected 9 saw "+t);break;case 12:if(r!=4)throw new Error("Sector Shift: Expected 12 saw "+t);break;default:throw new Error("Sector Shift: Expected 9 or 12 saw "+t);}e.chk("0600","Mini Sector Shift: ");e.chk("000000000000","Reserved: ")}function c(e,r){var t=Math.ceil(e.length/r)-1;var i=[];for(var n=1;n<t;++n)i[n-1]=e.slice(n*r,(n+1)*r);i[t-1]=e.slice(t*r);return i}function v(e,r,t){var i=0,n=0,a=0,f=0,s=0,l=t.length;var h=[],o=[];for(;i<l;++i){h[i]=o[i]=i;r[i]=t[i]}for(;s<o.length;++s){i=o[s];n=e[i].L;a=e[i].R;f=e[i].C;if(h[i]===i){if(n!==-1&&h[n]!==n)h[i]=h[n];if(a!==-1&&h[a]!==a)h[i]=h[a]}if(f!==-1)h[f]=i;if(n!==-1&&i!=h[i]){h[n]=h[i];if(o.lastIndexOf(n)<s)o.push(n)}if(a!==-1&&i!=h[i]){h[a]=h[i];if(o.lastIndexOf(a)<s)o.push(a)}}for(i=1;i<l;++i)if(h[i]===i){if(a!==-1&&h[a]!==a)h[i]=h[a];else if(n!==-1&&h[n]!==n)h[i]=h[n]}for(i=1;i<l;++i){if(e[i].type===0)continue;s=i;if(s!=h[s])do{s=h[s];r[i]=r[s]+"/"+r[i]}while(s!==0&&-1!==h[s]&&s!=h[s]);h[i]=-1}r[0]+="/";for(i=1;i<l;++i){if(e[i].type!==2)r[i]+="/"}}function _(e,r,t){var i=e.start,n=e.size;var a=[];var f=i;while(t&&n>0&&f>=0){a.push(r.slice(f*B,f*B+B));n-=B;f=__readInt32LE(t,f*4)}if(a.length===0)return new_buf(0);return bconcat(a).slice(0,e.size)}function d(e,r,t,i,n){var a=E;if(e===E){if(r!==0)throw new Error("DIFAT chain shorter than expected")}else if(e!==-1){var f=t[e],s=(i>>>2)-1;if(!f)return;for(var l=0;l<s;++l){if((a=__readInt32LE(f,l*4))===E)break;n.push(a)}if(r>=1)d(__readInt32LE(f,i-4),r-1,t,i,n)}}function w(e,r,t,i,n){var a=[],f=[];if(!n)n=[];var s=i-1,l=0,h=0;for(l=r;l>=0;){n[l]=true;a[a.length]=l;f.push(e[l]);var o=t[Math.floor(l*4/i)];h=l*4&s;if(i<4+h)throw new Error("FAT boundary crossed: "+l+" 4 "+i);if(!e[o])break;l=__readInt32LE(e[o],h)}return{nodes:a,data:__toBuffer([f])}}function p(e,r,t,i){var n=e.length,a=[];var f=[],s=[],l=[];var h=i-1,o=0,u=0,c=0,v=0;for(o=0;o<n;++o){s=[];c=o+r;if(c>=n)c-=n;if(f[c])continue;l=[];var _=[];for(u=c;u>=0;){_[u]=true;f[u]=true;s[s.length]=u;l.push(e[u]);var d=t[Math.floor(u*4/i)];v=u*4&h;if(i<4+v)throw new Error("FAT boundary crossed: "+u+" 4 "+i);if(!e[d])break;u=__readInt32LE(e[d],v);if(_[u])break}a[c]={nodes:s,data:__toBuffer([l])}}return a}function g(e,r,t,i,n,a,f,s){var l=0,h=i.length?2:0;var o=r[e].data;var u=0,c=0,v;for(;u<o.length;u+=128){var d=o.slice(u,u+128);prep_blob(d,64);c=d.read_shift(2);v=__utf16le(d,0,c-h);i.push(v);var p={name:v,type:d.read_shift(1),color:d.read_shift(1),L:d.read_shift(4,"i"),R:d.read_shift(4,"i"),C:d.read_shift(4,"i"),clsid:d.read_shift(16),state:d.read_shift(4,"i"),start:0,size:0};var g=d.read_shift(2)+d.read_shift(2)+d.read_shift(2)+d.read_shift(2);if(g!==0)p.ct=b(d,d.l-8);var F=d.read_shift(2)+d.read_shift(2)+d.read_shift(2)+d.read_shift(2);if(F!==0)p.mt=b(d,d.l-8);p.start=d.read_shift(4,"i");p.size=d.read_shift(4,"i");if(p.size<0&&p.start<0){p.size=p.type=0;p.start=E;p.name=""}if(p.type===5){l=p.start;if(n>0&&l!==E)r[l].name="!StreamData"}else if(p.size>=4096){p.storage="fat";if(r[p.start]===undefined)r[p.start]=w(t,p.start,r.fat_addrs,r.ssz);r[p.start].name=p.name;p.content=r[p.start].data.slice(0,p.size)}else{p.storage="minifat";if(p.size<0)p.size=0;else if(l!==E&&p.start!==E&&r[l]){p.content=_(p,r[l].data,(r[s]||{}).data)}}if(p.content)prep_blob(p.content,0);a[v]=p;f.push(p)}}function b(e,r){return new Date((__readUInt32LE(e,r+4)/1e7*Math.pow(2,32)+__readUInt32LE(e,r)/1e7-11644473600)*1e3)}function F(e,r){l();return h(s.readFileSync(e),r)}function y(e,r){var t=r&&r.type;if(!t){if(has_buf&&Buffer.isBuffer(e))t="buffer"}switch(t||"base64"){case"file":return F(e,r);case"base64":return h(s2a(Base64_decode(e)),r);case"binary":return h(s2a(e),r);}return h(e,r)}function m(e,r){var t=r||{},i=t.root||"Root Entry";if(!e.FullPaths)e.FullPaths=[];if(!e.FileIndex)e.FileIndex=[];if(e.FullPaths.length!==e.FileIndex.length)throw new Error("inconsistent CFB structure");if(e.FullPaths.length===0){e.FullPaths[0]=i+"/";e.FileIndex[0]={name:i,type:5}}if(t.CLSID)e.FileIndex[0].clsid=t.CLSID;x(e)}function x(e){var r="Sh33tJ5";if(CFB.find(e,"/"+r))return;var t=new_buf(4);t[0]=55;t[1]=t[3]=50;t[2]=54;e.FileIndex.push({name:r,type:2,content:t,size:4,L:69,R:69,C:69});e.FullPaths.push(e.FullPaths[0]+r);I(e)}function I(e,n){m(e);var a=false,f=false;for(var s=e.FullPaths.length-1;s>=0;--s){var l=e.FileIndex[s];switch(l.type){case 0:if(f)a=true;else{e.FileIndex.pop();e.FullPaths.pop()}break;case 1:;case 2:;case 5:f=true;if(isNaN(l.R*l.L*l.C))a=true;if(l.R>-1&&l.L>-1&&l.R==l.L)a=true;break;default:a=true;break;}}if(!a&&!n)return;var h=new Date(1987,1,19),o=0;var u=Object.create?Object.create(null):{};var c=[];for(s=0;s<e.FullPaths.length;++s){u[e.FullPaths[s]]=true;if(e.FileIndex[s].type===0)continue;c.push([e.FullPaths[s],e.FileIndex[s]])}for(s=0;s<c.length;++s){var v=t(c[s][0]);f=u[v];while(!f){while(t(v)&&!u[t(v)])v=t(v);c.push([v,{name:i(v).replace("/",""),type:1,clsid:U,ct:h,mt:h,content:null}]);u[v]=true;v=t(c[s][0]);f=u[v]}}c.sort(function(e,t){return r(e[0],t[0])});e.FullPaths=[];e.FileIndex=[];for(s=0;s<c.length;++s){e.FullPaths[s]=c[s][0];e.FileIndex[s]=c[s][1]}for(s=0;s<c.length;++s){var _=e.FileIndex[s];var d=e.FullPaths[s];_.name=i(d).replace("/","");_.L=_.R=_.C=-(_.color=1);_.size=_.content?_.content.length:0;_.start=0;_.clsid=_.clsid||U;if(s===0){_.C=c.length>1?1:-1;_.size=0;_.type=5}else if(d.slice(-1)=="/"){for(o=s+1;o<c.length;++o)if(t(e.FullPaths[o])==d)break;_.C=o>=c.length?-1:o;for(o=s+1;o<c.length;++o)if(t(e.FullPaths[o])==t(d))break;_.R=o>=c.length?-1:o;_.type=1}else{if(t(e.FullPaths[s+1]||"")==t(d))_.R=s+1;_.type=2}}}function C(e,r){var t=r||{};if(t.fileType=="mad")return Ue(e,t);I(e);switch(t.fileType){case"zip":return xe(e,t);}var i=function(e){var r=0,t=0;for(var i=0;i<e.FileIndex.length;++i){var n=e.FileIndex[i];if(!n.content)continue;var a=n.content.length;if(a>0){if(a<4096)r+=a+63>>6;else t+=a+511>>9}}var f=e.FullPaths.length+3>>2;var s=r+7>>3;var l=r+127>>7;var h=s+t+f+l;var o=h+127>>7;var u=o<=109?0:Math.ceil((o-109)/127);while(h+o+u+127>>7>o)u=++o<=109?0:Math.ceil((o-109)/127);var c=[1,u,o,l,f,t,r,0];e.FileIndex[0].size=r<<6;c[7]=(e.FileIndex[0].start=c[0]+c[1]+c[2]+c[3]+c[4]+c[5])+(c[6]+7>>3);return c}(e);var n=new_buf(i[7]<<9);var a=0,f=0;{for(a=0;a<8;++a)n.write_shift(1,k[a]);for(a=0;a<8;++a)n.write_shift(2,0);n.write_shift(2,62);n.write_shift(2,3);n.write_shift(2,65534);n.write_shift(2,9);n.write_shift(2,6);for(a=0;a<3;++a)n.write_shift(2,0);n.write_shift(4,0);n.write_shift(4,i[2]);n.write_shift(4,i[0]+i[1]+i[2]+i[3]-1);n.write_shift(4,0);n.write_shift(4,1<<12);n.write_shift(4,i[3]?i[0]+i[1]+i[2]-1:E);n.write_shift(4,i[3]);n.write_shift(-4,i[1]?i[0]-1:E);n.write_shift(4,i[1]);for(a=0;a<109;++a)n.write_shift(-4,a<i[2]?i[1]+a:-1)}if(i[1]){for(f=0;f<i[1];++f){for(;a<236+f*127;++a)n.write_shift(-4,a<i[2]?i[1]+a:-1);n.write_shift(-4,f===i[1]-1?E:f+1)}}var s=function(e){for(f+=e;a<f-1;++a)n.write_shift(-4,a+1);if(e){++a;n.write_shift(-4,E)}};f=a=0;for(f+=i[1];a<f;++a)n.write_shift(-4,R.DIFSECT);for(f+=i[2];a<f;++a)n.write_shift(-4,R.FATSECT);s(i[3]);s(i[4]);var l=0,h=0;var o=e.FileIndex[0];for(;l<e.FileIndex.length;++l){o=e.FileIndex[l];if(!o.content)continue;h=o.content.length;if(h<4096)continue;o.start=f;s(h+511>>9)}s(i[6]+7>>3);while(n.l&511)n.write_shift(-4,R.ENDOFCHAIN);f=a=0;for(l=0;l<e.FileIndex.length;++l){o=e.FileIndex[l];if(!o.content)continue;h=o.content.length;if(!h||h>=4096)continue;o.start=f;s(h+63>>6)}while(n.l&511)n.write_shift(-4,R.ENDOFCHAIN);for(a=0;a<i[4]<<2;++a){var u=e.FullPaths[a];if(!u||u.length===0){for(l=0;l<17;++l)n.write_shift(4,0);for(l=0;l<3;++l)n.write_shift(4,-1);for(l=0;l<12;++l)n.write_shift(4,0);continue}o=e.FileIndex[a];if(a===0)o.start=o.size?o.start-1:E;var c=a===0&&t.root||o.name;if(c.length>32){console.error("Name "+c+" will be truncated to "+c.slice(0,32));c=c.slice(0,32)}h=2*(c.length+1);n.write_shift(64,c,"utf16le");n.write_shift(2,h);n.write_shift(1,o.type);n.write_shift(1,o.color);n.write_shift(-4,o.L);n.write_shift(-4,o.R);n.write_shift(-4,o.C);if(!o.clsid)for(l=0;l<4;++l)n.write_shift(4,0);else n.write_shift(16,o.clsid,"hex");n.write_shift(4,o.state||0);n.write_shift(4,0);n.write_shift(4,0);n.write_shift(4,0);n.write_shift(4,0);n.write_shift(4,o.start);n.write_shift(4,o.size);n.write_shift(4,0)}for(a=1;a<e.FileIndex.length;++a){o=e.FileIndex[a];if(o.size>=4096){n.l=o.start+1<<9;if(has_buf&&Buffer.isBuffer(o.content)){o.content.copy(n,n.l,0,o.size);n.l+=o.size+511&-512}else{for(l=0;l<o.size;++l)n.write_shift(1,o.content[l]);for(;l&511;++l)n.write_shift(1,0)}}}for(a=1;a<e.FileIndex.length;++a){o=e.FileIndex[a];if(o.size>0&&o.size<4096){if(has_buf&&Buffer.isBuffer(o.content)){o.content.copy(n,n.l,0,o.size);n.l+=o.size+63&-64}else{for(l=0;l<o.size;++l)n.write_shift(1,o.content[l]);for(;l&63;++l)n.write_shift(1,0)}}}if(has_buf){n.l=n.length}else{while(n.l<n.length)n.write_shift(1,0)}return n}function A(e,r){var t=e.FullPaths.map(function(e){return e.toUpperCase()});var i=t.map(function(e){var r=e.split("/");return r[r.length-(e.slice(-1)=="/"?2:1)]});var n=false;if(r.charCodeAt(0)===47){n=true;r=t[0].slice(0,-1)+r}else n=r.indexOf("/")!==-1;var a=r.toUpperCase();var f=n===true?t.indexOf(a):i.indexOf(a);if(f!==-1)return e.FileIndex[f];var s=!a.match(chr1);a=a.replace(chr0,"");if(s)a=a.replace(chr1,"!");for(f=0;f<t.length;++f){if((s?t[f].replace(chr1,"!"):t[f]).replace(chr0,"")==a)return e.FileIndex[f];if((s?i[f].replace(chr1,"!"):i[f]).replace(chr0,"")==a)return e.FileIndex[f]}return null}var B=64;var E=-2;var S="d0cf11e0a1b11ae1";var k=[208,207,17,224,161,177,26,225];var U="00000000000000000000000000000000";var R={MAXREGSECT:-6,DIFSECT:-4,FATSECT:-3,ENDOFCHAIN:E,FREESECT:-1,HEADER_SIGNATURE:S,HEADER_MINOR_VERSION:"3e00",MAXREGSID:-6,NOSTREAM:-1,HEADER_CLSID:U,EntryTypes:["unknown","storage","stream","lockbytes","property","root"]};function z(e,r,t){l();var i=C(e,t);s.writeFileSync(r,i)}function L(e){var r=new Array(e.length);for(var t=0;t<e.length;++t)r[t]=String.fromCharCode(e[t]);return r.join("")}function P(e,r){var t=C(e,r);switch(r&&r.type||"buffer"){case"file":l();s.writeFileSync(r.filename,t);return t;case"binary":return typeof t=="string"?t:L(t);case"base64":return Base64_encode(typeof t=="string"?t:L(t));case"buffer":if(has_buf)return Buffer.isBuffer(t)?t:Buffer_from(t);case"array":return typeof t=="string"?s2a(t):t;}return t}var D;function M(e){try{var r=e.InflateRaw;var t=new r;t._processChunk(new Uint8Array([3,0]),t._finishFlushFlag);if(t.bytesRead)D=e;else throw new Error("zlib does not expose bytesRead")}catch(i){console.error("cannot use native zlib: "+(i.message||i))}}function O(e,r){if(!D)return be(e,r);var t=D.InflateRaw;var i=new t;var n=i._processChunk(e.slice(e.l),i._finishFlushFlag);e.l+=i.bytesRead;return n}function T(e){return D?D.deflateRawSync(e):ue(e)}var N=[16,17,18,0,8,7,9,6,10,5,11,4,12,3,13,2,14,1,15];var j=[3,4,5,6,7,8,9,10,11,13,15,17,19,23,27,31,35,43,51,59,67,83,99,115,131,163,195,227,258];var H=[1,2,3,4,5,7,9,13,17,25,33,49,65,97,129,193,257,385,513,769,1025,1537,2049,3073,4097,6145,8193,12289,16385,24577];function $(e){var r=(e<<1|e<<11)&139536|(e<<5|e<<15)&558144;return(r>>16|r>>8|r)&255}var J=typeof Uint8Array!=="undefined";var q=J?new Uint8Array(1<<8):[];for(var G=0;G<1<<8;++G)q[G]=$(G);function V(e,r){var t=q[e&255];if(r<=8)return t>>>8-r;t=t<<8|q[e>>8&255];if(r<=16)return t>>>16-r;t=t<<8|q[e>>16&255];return t>>>24-r}function X(e,r){var t=r&7,i=r>>>3;return(e[i]|(t<=6?0:e[i+1]<<8))>>>t&3}function W(e,r){var t=r&7,i=r>>>3;return(e[i]|(t<=5?0:e[i+1]<<8))>>>t&7}function Y(e,r){var t=r&7,i=r>>>3;return(e[i]|(t<=4?0:e[i+1]<<8))>>>t&15}function Z(e,r){var t=r&7,i=r>>>3;return(e[i]|(t<=3?0:e[i+1]<<8))>>>t&31}function K(e,r){var t=r&7,i=r>>>3;return(e[i]|(t<=1?0:e[i+1]<<8))>>>t&127}function Q(e,r,t){var i=r&7,n=r>>>3,a=(1<<t)-1;var f=e[n]>>>i;if(t<8-i)return f&a;f|=e[n+1]<<8-i;if(t<16-i)return f&a;f|=e[n+2]<<16-i;if(t<24-i)return f&a;f|=e[n+3]<<24-i;return f&a}function ee(e,r,t){var i=r&7,n=r>>>3;if(i<=5)e[n]|=(t&7)<<i;else{e[n]|=t<<i&255;e[n+1]=(t&7)>>8-i}return r+3}function re(e,r,t){var i=r&7,n=r>>>3;t=(t&1)<<i;e[n]|=t;return r+1}function te(e,r,t){var i=r&7,n=r>>>3;t<<=i;e[n]|=t&255;t>>>=8;e[n+1]=t;return r+8}function ie(e,r,t){var i=r&7,n=r>>>3;t<<=i;e[n]|=t&255;t>>>=8;e[n+1]=t&255;e[n+2]=t>>>8;return r+16}function ne(e,r){var t=e.length,i=2*t>r?2*t:r+5,n=0;if(t>=r)return e;if(has_buf){var a=new_unsafe_buf(i);if(e.copy)e.copy(a);else for(;n<e.length;++n)a[n]=e[n];return a}else if(J){var f=new Uint8Array(i);if(f.set)f.set(e);else for(;n<t;++n)f[n]=e[n];return f}e.length=i;return e}function ae(e){var r=new Array(e);for(var t=0;t<e;++t)r[t]=0;return r}function fe(e,r,t){var i=1,n=0,a=0,f=0,s=0,l=e.length;var h=J?new Uint16Array(32):ae(32);for(a=0;a<32;++a)h[a]=0;for(a=l;a<t;++a)e[a]=0;l=e.length;var o=J?new Uint16Array(l):ae(l);for(a=0;a<l;++a){h[n=e[a]]++;if(i<n)i=n;o[a]=0}h[0]=0;for(a=1;a<=i;++a)h[a+16]=s=s+h[a-1]<<1;for(a=0;a<l;++a){s=e[a];if(s!=0)o[a]=h[s+16]++}var u=0;for(a=0;a<l;++a){u=e[a];if(u!=0){s=V(o[a],i)>>i-u;for(f=(1<<i+4-u)-1;f>=0;--f)r[s|f<<u]=u&15|a<<4}}return i}var se=J?new Uint16Array(512):ae(512);var le=J?new Uint16Array(32):ae(32);if(!J){for(var he=0;he<512;++he)se[he]=0;for(he=0;he<32;++he)le[he]=0}(function(){var e=[];var r=0;for(;r<32;r++)e.push(5);fe(e,le,32);var t=[];r=0;for(;r<=143;r++)t.push(8);for(;r<=255;r++)t.push(9);for(;r<=279;r++)t.push(7);for(;r<=287;r++)t.push(8);fe(t,se,288)})();var oe=function Me(){var e=J?new Uint8Array(32768):[];var r=0,t=0;for(;r<H.length-1;++r){for(;t<H[r+1];++t)e[t]=r}for(;t<32768;++t)e[t]=29;var i=J?new Uint8Array(259):[];for(r=0,t=0;r<j.length-1;++r){for(;t<j[r+1];++t)i[t]=r}function n(e,r){var t=0;while(t<e.length){var i=Math.min(65535,e.length-t);var n=t+i==e.length;r.write_shift(1,+n);r.write_shift(2,i);r.write_shift(2,~i&65535);while(i-- >0)r[r.l++]=e[t++]}return r.l}function a(r,t){var n=0;var a=0;var f=J?new Uint16Array(32768):[];while(a<r.length){var s=Math.min(65535,r.length-a);if(s<10){n=ee(t,n,+!!(a+s==r.length));if(n&7)n+=8-(n&7);t.l=n/8|0;t.write_shift(2,s);t.write_shift(2,~s&65535);while(s-- >0)t[t.l++]=r[a++];n=t.l*8;continue}n=ee(t,n,+!!(a+s==r.length)+2);var l=0;while(s-- >0){var h=r[a];l=(l<<5^h)&32767;var o=-1,u=0;if(o=f[l]){o|=a&~32767;if(o>a)o-=32768;if(o<a)while(r[o+u]==r[a+u]&&u<250)++u}if(u>2){h=i[u];if(h<=22)n=te(t,n,q[h+1]>>1)-1;else{te(t,n,3);n+=5;te(t,n,q[h-23]>>5);n+=3}var c=h<8?0:h-4>>2;if(c>0){ie(t,n,u-j[h]);n+=c}h=e[a-o];n=te(t,n,q[h]>>3);n-=3;var v=h<4?0:h-2>>1;if(v>0){ie(t,n,a-o-H[h]);n+=v}for(var _=0;_<u;++_){f[l]=a&32767;l=(l<<5^r[a])&32767;++a}s-=u-1}else{if(h<=143)h=h+48;else n=re(t,n,1);n=te(t,n,q[h]);f[l]=a&32767;++a}}n=te(t,n,0)-1}t.l=(n+7)/8|0;return t.l}return function f(e,r){if(e.length<8)return n(e,r);return a(e,r)}}();function ue(e){var r=new_buf(50+Math.floor(e.length*1.1));var t=oe(e,r);return r.slice(0,t)}var ce=J?new Uint16Array(32768):ae(32768);var ve=J?new Uint16Array(32768):ae(32768);var _e=J?new Uint16Array(128):ae(128);var de=1,we=1;function pe(e,r){var t=Z(e,r)+257;r+=5;var i=Z(e,r)+1;r+=5;var n=Y(e,r)+4;r+=4;var a=0;var f=J?new Uint8Array(19):ae(19);var s=[0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0];var l=1;var h=J?new Uint8Array(8):ae(8);var o=J?new Uint8Array(8):ae(8);var u=f.length;for(var c=0;c<n;++c){f[N[c]]=a=W(e,r);if(l<a)l=a;h[a]++;r+=3}var v=0;h[0]=0;for(c=1;c<=l;++c)o[c]=v=v+h[c-1]<<1;for(c=0;c<u;++c)if((v=f[c])!=0)s[c]=o[v]++;var _=0;for(c=0;c<u;++c){_=f[c];if(_!=0){v=q[s[c]]>>8-_;for(var d=(1<<7-_)-1;d>=0;--d)_e[v|d<<_]=_&7|c<<3}}var w=[];l=1;for(;w.length<t+i;){v=_e[K(e,r)];r+=v&7;switch(v>>>=3){case 16:a=3+X(e,r);r+=2;v=w[w.length-1];while(a-- >0)w.push(v);break;case 17:a=3+W(e,r);r+=3;while(a-- >0)w.push(0);break;case 18:a=11+K(e,r);r+=7;while(a-- >0)w.push(0);break;default:w.push(v);if(l<v)l=v;break;}}var p=w.slice(0,t),g=w.slice(t);for(c=t;c<286;++c)p[c]=0;for(c=i;c<30;++c)g[c]=0;de=fe(p,ce,286);we=fe(g,ve,30);return r}function ge(e,r){if(e[0]==3&&!(e[1]&3)){return[new_raw_buf(r),2]}var t=0;var i=0;var n=new_unsafe_buf(r?r:1<<18);var a=0;var f=n.length>>>0;var s=0,l=0;while((i&1)==0){i=W(e,t);t+=3;if(i>>>1==0){if(t&7)t+=8-(t&7);var h=e[t>>>3]|e[(t>>>3)+1]<<8;t+=32;if(h>0){if(!r&&f<a+h){n=ne(n,a+h);f=n.length}while(h-- >0){n[a++]=e[t>>>3];t+=8}}continue}else if(i>>1==1){s=9;l=5}else{t=pe(e,t);s=de;l=we}for(;;){if(!r&&f<a+32767){n=ne(n,a+32767);f=n.length}var o=Q(e,t,s);var u=i>>>1==1?se[o]:ce[o];t+=u&15;u>>>=4;if((u>>>8&255)===0)n[a++]=u;else if(u==256)break;else{u-=257;var c=u<8?0:u-4>>2;if(c>5)c=0;var v=a+j[u];if(c>0){v+=Q(e,t,c);t+=c}o=Q(e,t,l);u=i>>>1==1?le[o]:ve[o];t+=u&15;u>>>=4;var _=u<4?0:u-2>>1;var d=H[u];if(_>0){d+=Q(e,t,_);t+=_}if(!r&&f<v){n=ne(n,v+100);f=n.length}while(a<v){n[a]=n[a-d];++a}}}}if(r)return[n,t+7>>>3];return[n.slice(0,a),t+7>>>3]}function be(e,r){var t=e.slice(e.l||0);var i=ge(t,r);e.l+=i[1];return i[0]}function Fe(e,r){if(e){if(typeof console!=="undefined")console.error(r)}else throw new Error(r)}function ye(e,r){var t=e;prep_blob(t,0);var i=[],n=[];var a={FileIndex:i,FullPaths:n};m(a,{root:r.root});var s=t.length-4;while((t[s]!=80||t[s+1]!=75||t[s+2]!=5||t[s+3]!=6)&&s>=0)--s;t.l=s+4;t.l+=4;var l=t.read_shift(2);t.l+=6;var h=t.read_shift(4);t.l=h;for(s=0;s<l;++s){t.l+=20;var o=t.read_shift(4);var u=t.read_shift(4);var c=t.read_shift(2);var v=t.read_shift(2);var _=t.read_shift(2);t.l+=8;var d=t.read_shift(4);var w=f(t.slice(t.l+c,t.l+c+v));t.l+=c+v+_;var p=t.l;t.l=d+4;me(t,o,u,a,w);t.l=p}return a}function me(e,r,t,i,n){e.l+=2;var s=e.read_shift(2);var l=e.read_shift(2);var h=a(e);if(s&8257)throw new Error("Unsupported ZIP encryption");var o=e.read_shift(4);var u=e.read_shift(4);var c=e.read_shift(4);var v=e.read_shift(2);var _=e.read_shift(2);var d="";for(var w=0;w<v;++w)d+=String.fromCharCode(e[e.l++]);if(_){var p=f(e.slice(e.l,e.l+_));if((p[21589]||{}).mt)h=p[21589].mt;if(((n||{})[21589]||{}).mt)h=n[21589].mt}e.l+=_;var g=e.slice(e.l,e.l+u);switch(l){case 8:g=O(e,c);break;case 0:break;default:throw new Error("Unsupported ZIP Compression method "+l);}var b=false;if(s&8){o=e.read_shift(4);if(o==134695760){o=e.read_shift(4);b=true}u=e.read_shift(4);c=e.read_shift(4)}if(u!=r)Fe(b,"Bad compressed size: "+r+" != "+u);if(c!=t)Fe(b,"Bad uncompressed size: "+t+" != "+c);var F=CRC32.buf(g,0);if(o>>0!=F>>0)Fe(b,"Bad CRC32 checksum: "+o+" != "+F);ze(i,d,g,{unsafe:true,mt:h})}function xe(e,r){var t=r||{};var i=[],a=[];var f=new_buf(1);var s=t.compression?8:0,l=0;var h=false;if(h)l|=8;var o=0,u=0;var c=0,v=0;var _=e.FullPaths[0],d=_,w=e.FileIndex[0];var p=[];var g=0;for(o=1;o<e.FullPaths.length;++o){d=e.FullPaths[o].slice(_.length);w=e.FileIndex[o];if(!w.size||!w.content||d=="Sh33tJ5")continue;var b=c;var F=new_buf(d.length);for(u=0;u<d.length;++u)F.write_shift(1,d.charCodeAt(u)&127);F=F.slice(0,F.l);p[v]=CRC32.buf(w.content,0);var y=w.content;if(s==8)y=T(y);f=new_buf(30);f.write_shift(4,67324752);f.write_shift(2,20);f.write_shift(2,l);f.write_shift(2,s);if(w.mt)n(f,w.mt);else f.write_shift(4,0);f.write_shift(-4,l&8?0:p[v]);f.write_shift(4,l&8?0:y.length);f.write_shift(4,l&8?0:w.content.length);f.write_shift(2,F.length);f.write_shift(2,0);c+=f.length;i.push(f);c+=F.length;i.push(F);c+=y.length;i.push(y);if(l&8){f=new_buf(12);f.write_shift(-4,p[v]);f.write_shift(4,y.length);f.write_shift(4,w.content.length);c+=f.l;i.push(f)}f=new_buf(46);f.write_shift(4,33639248);f.write_shift(2,0);f.write_shift(2,20);f.write_shift(2,l);f.write_shift(2,s);f.write_shift(4,0);f.write_shift(-4,p[v]);f.write_shift(4,y.length);f.write_shift(4,w.content.length);f.write_shift(2,F.length);f.write_shift(2,0);f.write_shift(2,0);f.write_shift(2,0);f.write_shift(2,0);f.write_shift(4,0);f.write_shift(4,b);g+=f.l;a.push(f);g+=F.length;a.push(F);++v}f=new_buf(22);f.write_shift(4,101010256);f.write_shift(2,0);f.write_shift(2,0);f.write_shift(2,v);f.write_shift(2,v);f.write_shift(4,g);f.write_shift(4,c);f.write_shift(2,0);return bconcat([bconcat(i),bconcat(a),f])}var Ie={htm:"text/html",xml:"text/xml",gif:"image/gif",jpg:"image/jpeg",png:"image/png",mso:"application/x-mso",thmx:"application/vnd.ms-officetheme",sh33tj5:"application/octet-stream"};function Ce(e,r){if(e.ctype)return e.ctype;var t=e.name||"",i=t.match(/\.([^\.]+)$/);if(i&&Ie[i[1]])return Ie[i[1]];if(r){i=(t=r).match(/[\.\\]([^\.\\])+$/);if(i&&Ie[i[1]])return Ie[i[1]]}return"application/octet-stream"}function Ae(e){var r=Base64_encode(e);var t=[];for(var i=0;i<r.length;i+=76)t.push(r.slice(i,i+76));return t.join("\r\n")+"\r\n"}function Be(e){var r=e.replace(/[\x00-\x08\x0B\x0C\x0E-\x1F\x7E-\xFF=]/g,function(e){var r=e.charCodeAt(0).toString(16).toUpperCase();return"="+(r.length==1?"0"+r:r)});r=r.replace(/ $/gm,"=20").replace(/\t$/gm,"=09");if(r.charAt(0)=="\n")r="=0D"+r.slice(1);r=r.replace(/\r(?!\n)/gm,"=0D").replace(/\n\n/gm,"\n=0A").replace(/([^\r\n])\n/gm,"$1=0A");var t=[],i=r.split("\r\n");for(var n=0;n<i.length;++n){var a=i[n];if(a.length==0){t.push("");continue}for(var f=0;f<a.length;){var s=76;var l=a.slice(f,f+s);if(l.charAt(s-1)=="=")s--;else if(l.charAt(s-2)=="=")s-=2;else if(l.charAt(s-3)=="=")s-=3;l=a.slice(f,f+s);f+=s;if(f<a.length)l+="=";t.push(l)}}return t.join("\r\n")}function Ee(e){var r=[];for(var t=0;t<e.length;++t){var i=e[t];while(t<=e.length&&i.charAt(i.length-1)=="=")i=i.slice(0,i.length-1)+e[++t];r.push(i)}for(var n=0;n<r.length;++n)r[n]=r[n].replace(/[=][0-9A-Fa-f]{2}/g,function(e){return String.fromCharCode(parseInt(e.slice(1),16))});return s2a(r.join("\r\n"))}function Se(e,r,t){var i="",n="",a="",f;var s=0;for(;s<10;++s){var l=r[s];if(!l||l.match(/^\s*$/))break;var h=l.match(/^(.*?):\s*([^\s].*)$/);if(h)switch(h[1].toLowerCase()){case"content-location":i=h[2].trim();break;case"content-type":a=h[2].trim();break;case"content-transfer-encoding":n=h[2].trim();break;}}++s;switch(n.toLowerCase()){case"base64":f=s2a(Base64_decode(r.slice(s).join("")));break;case"quoted-printable":f=Ee(r.slice(s));break;default:throw new Error("Unsupported Content-Transfer-Encoding "+n);}var o=ze(e,i.slice(t.length),f,{unsafe:true});if(a)o.ctype=a}function ke(e,r){if(L(e.slice(0,13)).toLowerCase()!="mime-version:")throw new Error("Unsupported MAD header");var t=r&&r.root||"";var i=(has_buf&&Buffer.isBuffer(e)?e.toString("binary"):L(e)).split("\r\n");var n=0,a="";for(n=0;n<i.length;++n){a=i[n];if(!/^Content-Location:/i.test(a))continue;a=a.slice(a.indexOf("file"));if(!t)t=a.slice(0,a.lastIndexOf("/")+1);if(a.slice(0,t.length)==t)continue;while(t.length>0){t=t.slice(0,t.length-1);t=t.slice(0,t.lastIndexOf("/")+1);if(a.slice(0,t.length)==t)break}}var f=(i[1]||"").match(/boundary="(.*?)"/);if(!f)throw new Error("MAD cannot find boundary");var s="--"+(f[1]||"");var l=[],h=[];var o={FileIndex:l,FullPaths:h};m(o);var u,c=0;for(n=0;n<i.length;++n){var v=i[n];if(v!==s&&v!==s+"--")continue;if(c++)Se(o,i.slice(u,n),t);u=n}return o}function Ue(e,r){
+var t=r||{};var i=t.boundary||"SheetJS";i="------="+i;var n=["MIME-Version: 1.0",'Content-Type: multipart/related; boundary="'+i.slice(2)+'"',"","",""];var a=e.FullPaths[0],f=a,s=e.FileIndex[0];for(var l=1;l<e.FullPaths.length;++l){f=e.FullPaths[l].slice(a.length);s=e.FileIndex[l];if(!s.size||!s.content||f=="Sh33tJ5")continue;f=f.replace(/[\x00-\x08\x0B\x0C\x0E-\x1F\x7E-\xFF]/g,function(e){return"_x"+e.charCodeAt(0).toString(16)+"_"}).replace(/[\u0080-\uFFFF]/g,function(e){return"_u"+e.charCodeAt(0).toString(16)+"_"});var h=s.content;var o=has_buf&&Buffer.isBuffer(h)?h.toString("binary"):L(h);var u=0,c=Math.min(1024,o.length),v=0;for(var _=0;_<=c;++_)if((v=o.charCodeAt(_))>=32&&v<128)++u;var d=u>=c*4/5;n.push(i);n.push("Content-Location: "+(t.root||"file:///C:/SheetJS/")+f);n.push("Content-Transfer-Encoding: "+(d?"quoted-printable":"base64"));n.push("Content-Type: "+Ce(s,f));n.push("");n.push(d?Be(o):Ae(o))}n.push(i+"--\r\n");return n.join("\r\n")}function Re(e){var r={};m(r,e);return r}function ze(e,r,t,n){var a=n&&n.unsafe;if(!a)m(e);var f=!a&&CFB.find(e,r);if(!f){var s=e.FullPaths[0];if(r.slice(0,s.length)==s)s=r;else{if(s.slice(-1)!="/")s+="/";s=(s+r).replace("//","/")}f={name:i(r),type:2};e.FileIndex.push(f);e.FullPaths.push(s);if(!a)CFB.utils.cfb_gc(e)}f.content=t;f.size=t?t.length:0;if(n){if(n.CLSID)f.clsid=n.CLSID;if(n.mt)f.mt=n.mt;if(n.ct)f.ct=n.ct}return f}function Le(e,r){m(e);var t=CFB.find(e,r);if(t)for(var i=0;i<e.FileIndex.length;++i)if(e.FileIndex[i]==t){e.FileIndex.splice(i,1);e.FullPaths.splice(i,1);return true}return false}function Pe(e,r,t){m(e);var n=CFB.find(e,r);if(n)for(var a=0;a<e.FileIndex.length;++a)if(e.FileIndex[a]==n){e.FileIndex[a].name=i(t);e.FullPaths[a]=t;return true}return false}function De(e){I(e,true)}e.find=A;e.read=y;e.parse=h;e.write=P;e.writeFile=z;e.utils={cfb_new:Re,cfb_add:ze,cfb_del:Le,cfb_mov:Pe,cfb_gc:De,ReadShift:ReadShift,CheckField:CheckField,prep_blob:prep_blob,bconcat:bconcat,use_zlib:M,_deflateRaw:ue,_inflateRaw:be,consts:R};return e}();if(typeof require!=="undefined"&&typeof module!=="undefined"&&typeof DO_NOT_EXPORT_CFB==="undefined"){module.exports=CFB}
+
+return CFB; })();
+/* v3.61.0: password-protected Excel files, the same format Excel uses for File › Info › Protect Workbook › Encrypt with
+   Password (ECMA-376 "agile" encryption: AES-256-CBC, SHA-512, 100,000 rounds). Excel asks for the password when opening. */
+window.OFFCRYPT = (() => {
+  const C = crypto.subtle, te = new TextEncoder();
+  const cat = (...a) => { const n = a.reduce((s, x) => s + x.length, 0), o = new Uint8Array(n); let i = 0; for (const x of a) { o.set(x, i); i += x.length; } return o; };
+  const le32 = n => { const b = new Uint8Array(4); new DataView(b.buffer).setUint32(0, n, true); return b; };
+  const sha = async b => new Uint8Array(await C.digest("SHA-512", b));
+  const rnd = n => crypto.getRandomValues(new Uint8Array(n));
+  const b64 = u => { let s = ""; for (let i = 0; i < u.length; i += 0x8000) s += String.fromCharCode.apply(null, u.subarray(i, i + 0x8000)); return btoa(s); };
+  const fit = (b, n, pad) => { if (b.length >= n) return b.slice(0, n); const o = new Uint8Array(n).fill(pad); o.set(b); return o; };
+  /* AES-CBC without padding: zero-pad to the block size, encrypt, drop the extra block WebCrypto adds */
+  async function cbc(keyBytes, iv, data) {
+    const k = await C.importKey("raw", keyBytes, "AES-CBC", false, ["encrypt"]);
+    const len = Math.ceil(data.length / 16) * 16, p = new Uint8Array(len); p.set(data);
+    return new Uint8Array(await C.encrypt({ name: "AES-CBC", iv }, k, p)).slice(0, len);
+  }
+  const BK = { vIn: [0xfe, 0xa7, 0xd2, 0x76, 0x3b, 0x4b, 0x9e, 0x79], vHash: [0xd7, 0xaa, 0x0f, 0x6d, 0x30, 0x61, 0x34, 0x4e], key: [0x14, 0x6e, 0x0b, 0xe7, 0xab, 0xac, 0xd0, 0xd6], hmacKey: [0x5f, 0xb2, 0xad, 0x01, 0x0c, 0xb9, 0xe1, 0xf6], hmacVal: [0xa0, 0x67, 0x7f, 0x02, 0xb2, 0x2c, 0x84, 0x33] };
+  const SPIN = 100000;
+  async function encrypt(xlsx, password) {
+    const pkgKey = rnd(32), keySalt = rnd(16), pwSalt = rnd(16);
+    /* 1) the file itself, in 4096-byte segments, each with its own IV */
+    const segs = [];
+    for (let i = 0, n = 0; i < xlsx.length; i += 4096, n++) segs.push(await cbc(pkgKey, (await sha(cat(keySalt, le32(n)))).slice(0, 16), xlsx.subarray(i, i + 4096)));
+    const sizeHdr = new Uint8Array(8); new DataView(sizeHdr.buffer).setUint32(0, xlsx.length, true);
+    const pkg = cat(sizeHdr, ...segs);
+    /* 2) integrity: HMAC-SHA512 of the encrypted package */
+    const hmacKey = rnd(64), hk = await C.importKey("raw", hmacKey, { name: "HMAC", hash: "SHA-512" }, false, ["sign"]);
+    const hmacVal = new Uint8Array(await C.sign("HMAC", hk, pkg));
+    const ivOf = async blk => (await sha(cat(keySalt, new Uint8Array(blk)))).slice(0, 16);
+    const encHmacKey = await cbc(pkgKey, await ivOf(BK.hmacKey), hmacKey), encHmacVal = await cbc(pkgKey, await ivOf(BK.hmacVal), hmacVal);
+    /* 3) the password: SHA-512 stretched 100,000 times, then one key per purpose */
+    const pw = new Uint8Array(password.length * 2); for (let i = 0; i < password.length; i++) { const c = password.charCodeAt(i); pw[i * 2] = c & 255; pw[i * 2 + 1] = c >> 8; }
+    let H = await sha(cat(pwSalt, pw)); const buf = new Uint8Array(68), dv = new DataView(buf.buffer);
+    for (let i = 0; i < SPIN; i++) { dv.setUint32(0, i, true); buf.set(H, 4); H = await sha(buf); }
+    const keyFor = async blk => fit(await sha(cat(H, new Uint8Array(blk))), 32, 0x36);
+    const vIn = rnd(16);
+    const encVIn = await cbc(await keyFor(BK.vIn), pwSalt, vIn), encVHash = await cbc(await keyFor(BK.vHash), pwSalt, await sha(vIn)), encKey = await cbc(await keyFor(BK.key), pwSalt, pkgKey);
+    const attrs = 'saltSize="16" blockSize="16" keyBits="256" hashSize="64" cipherAlgorithm="AES" cipherChaining="ChainingModeCBC" hashAlgorithm="SHA512"';
+    const xml = '<?xml version="1.0" encoding="UTF-8" standalone="yes"?>\r\n<encryption xmlns="http://schemas.microsoft.com/office/2006/encryption" xmlns:p="http://schemas.microsoft.com/office/2006/keyEncryptor/password" xmlns:c="http://schemas.microsoft.com/office/2006/keyEncryptor/certificate">' +
+      `<keyData ${attrs} saltValue="${b64(keySalt)}"/><dataIntegrity encryptedHmacKey="${b64(encHmacKey)}" encryptedHmacValue="${b64(encHmacVal)}"/>` +
+      `<keyEncryptors><keyEncryptor uri="http://schemas.microsoft.com/office/2006/keyEncryptor/password"><p:encryptedKey spinCount="${SPIN}" ${attrs} saltValue="${b64(pwSalt)}" encryptedVerifierHashInput="${b64(encVIn)}" encryptedVerifierHashValue="${b64(encVHash)}" encryptedKeyValue="${b64(encKey)}"/></keyEncryptor></keyEncryptors></encryption>`;
+    const info = cat(new Uint8Array([4, 0, 4, 0, 0x40, 0, 0, 0]), te.encode(xml));
+    /* 4) the compound file Excel opens: EncryptionInfo + EncryptedPackage + the \u0006DataSpaces description */
+    const hx = s => new Uint8Array(s.match(/../g).map(x => parseInt(x, 16)));
+    const u16 = s => { const o = new Uint8Array(s.length * 2); for (let i = 0; i < s.length; i++) { o[i * 2] = s.charCodeAt(i); } return o; };
+    const lenStr = s => cat(le32(s.length * 2), u16(s), new Uint8Array((4 - (s.length * 2) % 4) % 4));
+    const version = cat(lenStr("Microsoft.Container.DataSpaces"), le32(1), le32(1), le32(1));
+    const dsMap = cat(le32(8), le32(1), le32(0x68), le32(1), le32(0), lenStr("EncryptedPackage"), lenStr("StrongEncryptionDataSpace"));
+    const dsInfo = cat(le32(8), le32(1), lenStr("StrongEncryptionTransform"));
+    const primary = cat(le32(0x58), le32(1), lenStr("{FF9A3F03-56EF-4613-BDD5-5A41C1D07246}"), lenStr("Microsoft.Container.EncryptionTransform"), le32(1), le32(1), le32(1), le32(0), le32(0), le32(0), le32(4));
+    void hx;
+    const cfb = CFB.utils.cfb_new(); CFB.utils.cfb_del(cfb, "\u0001Sh33tJ5");
+    CFB.utils.cfb_add(cfb, "/EncryptionInfo", info);
+    CFB.utils.cfb_add(cfb, "/EncryptedPackage", pkg);
+    CFB.utils.cfb_add(cfb, "/\u0006DataSpaces/Version", version);
+    CFB.utils.cfb_add(cfb, "/\u0006DataSpaces/DataSpaceMap", dsMap);
+    CFB.utils.cfb_add(cfb, "/\u0006DataSpaces/DataSpaceInfo/StrongEncryptionDataSpace", dsInfo);
+    CFB.utils.cfb_add(cfb, "/\u0006DataSpaces/TransformInfo/StrongEncryptionTransform/\u0006Primary", primary);
+    return new Uint8Array(CFB.write(cfb, { type: "array", fileType: "cfb" }));
+  }
+  return { encrypt };
+})();
+</script>
 <script>
 /* v3.55.0: roles. The super admin creates roles (name, rights, filters, notifications, field buttons, Backup report access)
    in Settings > People & access > Roles and gives each person a role. A person's stored rights carry "_role"; while that
@@ -3031,6 +3123,118 @@ function scrubActivity(e) {
   if (typeof d.note === "string" && /(phone|mobile|whats\s*app)[^:·]*:/i.test(d.note)) { nd.note = d.note.replace(/((?:phone|mobile|whats\s*app)[^:·]*:)\s*[^·]*/gi, "$1 (hidden) "); hit = true; }
   return hit ? { ...e, details: nd } : e;
 }
+/* ------------------------------ v3.61.0: pseudo names ------------------------------
+   One pseudo name belongs to one current person (anyone not Left / Moved / Resigned…). A person who left keeps theirs in
+   the history, so the seat can pass to someone new. Every assignment is kept in a "Pseudo Name History" sheet in the same
+   workbook: who held which pseudo name, from when to when, and who set it. */
+const PSEUDO_SHEET = "Pseudo Name History";
+const PSH_HEAD = ["Pseudo name", "Emp Code", "Employee", "From", "To", "Set by", "Ended by", "Note"];
+const PSEUDO_RE = /pseudo/i;
+const pseudoColOf = H => (H || []).find(h => PSEUDO_RE.test(String(h || ""))) || null;
+const INACT_RE_BE = /^(left|moved|resign(ed|ation)?|terminated|exited|absconded|inactive|separated|relieved)$/i;
+function pseudoClash(book, schema, value, selfRow, extra) {
+  const H = book.headers, pcol = pseudoColOf(H); if (!pcol) return null;
+  const v = keystr(value).trim().toLowerCase(); if (!v) return null;
+  const pi = H.indexOf(pcol), si = H.indexOf(schema.status_column), ni = H.indexOf(schema.name_column), ki = H.indexOf(schema.key_column);
+  const inact = new Set((schema.inactive_statuses || []).map(x => String(x).toLowerCase()));
+  const gone = r => { if (si < 0) return false; const st = keystr(r.vals[si]).trim(); return INACT_RE_BE.test(st) || inact.has(st.toLowerCase()); };
+  for (const r of book.rows) {
+    if (r === selfRow || keystr(r.vals[pi]).trim().toLowerCase() !== v || gone(r)) continue;
+    if (extra && extra.has(keystr(r.vals[ki]))) continue;   // that person is getting another pseudo name in the same save
+    return keystr(r.vals[ni]) || keystr(r.vals[ki]);
+  }
+  return null;
+}
+const pseudoErr = (val, who) => new ApiErr(400, "The pseudo name “" + keystr(val).trim() + "” already belongs to " + who + ". One pseudo name can be given to only one person: give " + who + " a different one first, or mark them as Left.");
+async function sheetLocate(zip, name) {
+  const wbx = td.decode(await zip.get("xl/workbook.xml")), rels = td.decode(await zip.get("xl/_rels/workbook.xml.rels"));
+  let rid = null, target = null;
+  for (const m of wbx.matchAll(/<(?:\w+:)?sheet\b[^>]*>/g)) if (xattr(m[0], "name") === name) rid = xattr(m[0], "r:id");
+  if (rid) for (const m of rels.matchAll(/<Relationship\b[^>]*>/g)) if (xattr(m[0], "Id") === rid) target = xattr(m[0], "Target");
+  return { wbx, rels, path: target ? resolvePath("xl/workbook.xml", target) : null };
+}
+async function sheetReadRows(zip, loc) {
+  const e = loc.path && zip.find(loc.path); if (!e) return null;
+  const doc = parseXml(await zip.get(loc.path)), sd = doc.getElementsByTagNameNS(NS_MAIN, "sheetData")[0], out = [];
+  let shared = null;
+  const sharedStr = async i => { if (!shared) { shared = []; const b = await zip.get("xl/sharedStrings.xml"); if (b) for (const si of kids(parseXml(b).documentElement, "si")) shared.push(siText(si)); } return shared[i] ?? ""; };
+  if (sd) for (const row of kids(sd, "row")) {
+    if (row.getAttribute("r") === "1") continue;
+    const v = [];
+    for (const c of kids(row, "c")) {
+      const ref = splitRef(c.getAttribute("r")); if (!ref) continue;
+      const t = c.getAttribute("t");
+      if (t === "inlineStr") { const is = firstKid(c, "is"); v[ref.col - 1] = is ? siText(is) : ""; }
+      else { const ve = firstKid(c, "v"); if (ve) v[ref.col - 1] = t === "s" ? await sharedStr(+ve.textContent) : ve.textContent; }
+    }
+    if (v.some(x => x != null && x !== "")) out.push(Array.from({ length: PSH_HEAD.length }, (_, i) => v[i] == null ? "" : String(v[i])));
+  }
+  return out;
+}
+async function sheetWriteRows(zip, loc, name, head, rows, widths) {
+  const all = [head, ...rows];
+  const cell = (ref, v) => (v === "" || v == null ? "" : `<c r="${ref}" t="inlineStr"><is><t xml:space="preserve">${xmlEsc(String(v).slice(0, 32000))}</t></is></c>`);
+  const body = all.map((r, i) => `<row r="${i + 1}">` + r.map((v, j) => cell(idxToCol(j + 1) + (i + 1), v)).join("") + "</row>").join("");
+  const xml = '<?xml version="1.0" encoding="UTF-8" standalone="yes"?>\r\n' +
+    `<worksheet xmlns="${NS_MAIN}" xmlns:r="${NS_REL}"><dimension ref="A1:${idxToCol(head.length)}${all.length}"/>` +
+    '<sheetViews><sheetView workbookViewId="0"><pane ySplit="1" topLeftCell="A2" activePane="bottomLeft" state="frozen"/></sheetView></sheetViews>' +
+    '<sheetFormatPr defaultRowHeight="15"/><cols>' + widths.map((w, i) => `<col min="${i + 1}" max="${i + 1}" width="${w}" customWidth="1"/>`).join("") + "</cols>" +
+    `<sheetData>${body}</sheetData><autoFilter ref="A1:${idxToCol(head.length)}${all.length}"/><pageMargins left="0.7" right="0.7" top="0.75" bottom="0.75" header="0.3" footer="0.3"/></worksheet>`;
+  let path = loc.path;
+  if (!path) {
+    let n = 1; while (zip.find("xl/worksheets/sheet" + n + ".xml")) n++;
+    path = "xl/worksheets/sheet" + n + ".xml";
+    const ids = [...loc.rels.matchAll(/\sId="rId(\d+)"/g)].map(m => +m[1]); const rid = "rId" + (Math.max(0, ...ids) + 1);
+    const sheetIds = [...loc.wbx.matchAll(/\ssheetId="(\d+)"/g)].map(m => +m[1]); const sid = Math.max(0, ...sheetIds) + 1;
+    const pre = (/<(\w+:)?sheets\b/.exec(loc.wbx) || [])[1] || "";
+    const wbx = loc.wbx.replace(new RegExp("</" + pre + "sheets>"), `<${pre}sheet name="${xmlEsc(name)}" sheetId="${sid}" r:id="${rid}" xmlns:r="${NS_REL}"/></${pre}sheets>`);
+    const rels = loc.rels.replace("</Relationships>", `<Relationship Id="${rid}" Type="http://schemas.openxmlformats.org/officeDocument/2006/relationships/worksheet" Target="worksheets/sheet${n}.xml"/></Relationships>`);
+    let ct = td.decode(await zip.get("[Content_Types].xml"));
+    if (!ct.includes(`PartName="/${path}"`)) ct = ct.replace("</Types>", `<Override PartName="/${path}" ContentType="application/vnd.openxmlformats-officedocument.spreadsheetml.worksheet+xml"/></Types>`);
+    await zip.set("xl/workbook.xml", te.encode(wbx)); await zip.set("xl/_rels/workbook.xml.rels", te.encode(rels)); await zip.set("[Content_Types].xml", te.encode(ct));
+  }
+  await zip.set(path, te.encode(xml));
+}
+/* keep the history sheet in step with this save: seed it the first time, then close / open assignments */
+async function pseudoHistoryUpdate(zip, u8, entries) {
+  const book = await openBook(u8, Conn.sheetName); const H = book.headers, pcol = pseudoColOf(H); if (!pcol) return;
+  const schema = buildSchema(book), pi = H.indexOf(pcol), ki = H.indexOf(schema.key_column), ni = H.indexOf(schema.name_column), si = H.indexOf(schema.status_column);
+  const loc = await sheetLocate(zip, PSEUDO_SHEET); let rows = await sheetReadRows(zip, loc);
+  const now = nowText(), who = ME;
+  let changed = false;
+  if (!rows) {   // first time: everyone's pseudo name as it was before this save
+    rows = []; changed = true;
+    const before = new Map();
+    for (const e of entries || []) { const d = e && e.details; if (!d || typeof d !== "object") continue; for (const [k, ch] of Object.entries(d)) if (PSEUDO_RE.test(k) && ch && typeof ch === "object" && "to" in ch && !before.has(keystr(e.key))) before.set(keystr(e.key), keystr(ch.from).trim()); }
+    for (const r of book.rows) { const id = keystr(r.vals[ki]), pv = before.has(id) ? before.get(id) : keystr(r.vals[pi]).trim(); if (!pv) continue; const st = si >= 0 ? keystr(r.vals[si]).trim() : ""; rows.push([pv, id, keystr(r.vals[ni]), "", INACT_RE_BE.test(st) ? "(" + st + ")" : "", "", "", "Already assigned when the history started (" + now.slice(0, 10) + ")"]); }
+  }
+  {
+    for (const e of entries || []) {
+      const d = e && e.details; if (!d || typeof d !== "object") continue;
+      for (const [k, ch] of Object.entries(d)) {
+        if (!PSEUDO_RE.test(k) || !ch || typeof ch !== "object" || !("to" in ch)) continue;
+        const from = keystr(ch.from).trim(), to = keystr(ch.to).trim(), key = keystr(e.key), t = e.time || now, by = e.user || who;
+        if (from === to) continue;
+        if (from) for (const r of rows) if (r[0].toLowerCase() === from.toLowerCase() && r[1] === key && !r[4]) { r[4] = t; r[6] = by; changed = true; }
+        if (to) {
+          for (const r of rows) if (r[0].toLowerCase() === to.toLowerCase() && r[1] !== key && !r[4]) { r[4] = t; r[6] = by; r[7] = (r[7] ? r[7] + " · " : "") + "Seat passed to " + (e.name || key); changed = true; }
+          rows.push([to, key, e.name || "", t, "", by, "", /^external/.test(e.action || "") ? "Changed in Excel" : e.action === "add" ? "New employee" : ""]); changed = true;
+        }
+      }
+    }
+  }
+  if (changed) await sheetWriteRows(zip, loc, PSEUDO_SHEET, PSH_HEAD, rows, [18, 12, 26, 18, 18, 18, 18, 46]);
+}
+async function addSheetToCopy(u8, name, head, rows, widths) {
+  const zip = await Zip.open(u8), loc = await sheetLocate(zip, name);
+  await sheetWriteRows(zip, loc, name, head, rows, widths || head.map(() => 18));
+  return new Uint8Array(await (await zip.build()).arrayBuffer());
+}
+async function readPseudoHistory() {
+  const { u8 } = await readFile(), zip = await Zip.open(u8), loc = await sheetLocate(zip, PSEUDO_SHEET);
+  const rows = await sheetReadRows(zip, loc);
+  return (rows || []).map(r => ({ pseudo: r[0], key: r[1], name: r[2], from: r[3], to: r[4], by: r[5], endedBy: r[6], note: r[7] }));
+}
 async function withActivity(blob, entries) {
   const zip = await Zip.open(new Uint8Array(await blob.arrayBuffer())), loc = await actLocate(zip);
   const since = Date.now() - ACT_DAYS * 86400000, seen = new Set();
@@ -3039,6 +3243,7 @@ async function withActivity(blob, entries) {
   items.sort((a, b) => (activityTime(b) || 0) - (activityTime(a) || 0));
   if (items.length > ACT_MAX) items = items.slice(0, ACT_MAX);
   await actWrite(zip, loc, items);
+  try { await pseudoHistoryUpdate(zip, new Uint8Array(await blob.arrayBuffer()), entries); } catch (e) { console.warn("Pseudo name history:", e); }
   return zip.build();
 }
 function stampActivity(e) {
@@ -3254,6 +3459,7 @@ async function addRow(values) {
     if (ncol && H.includes(ncol) && !name) throw new ApiErr(400, lab(ncol) + " is required.");
     if (book.rows.some(r => keystr(r.vals[ki]).toLowerCase() === key.toLowerCase())) throw new ApiErr(409, lab(kcol) + " '" + key + "' already exists.");
     const prof = profile(book), nv = {};
+    { const pc = pseudoColOf(H); if (pc && !isBlank(values[pc])) { const who = pseudoClash(book, schema, values[pc], null); if (who) throw pseudoErr(values[pc], who); } }
     H.forEach((h, i) => {
       if (h in values && !sets.autoCols.has(h)) nv[h] = coerce(schema, sets, h, values[h], prof[i]);
       else if (h in schema.add_defaults && isBlank(values[h])) nv[h] = schema.add_defaults[h];
@@ -3271,7 +3477,7 @@ async function addRow(values) {
     });
     await extendRanges(book, last.r, R);
     const vals = rowVals(book, R);
-    return { res: { id: keystr(vals[ki]), etag: etagOf(vals), v: vals, name }, log: [{ action: "add", key: keystr(vals[ki]), name, details: {} }], verify: chk => chk.rows.length === book.rows.length + 1 && chk.rows[chk.rows.length - 1].vals.every((v, i) => v === vals[i]), };
+    return { res: { id: keystr(vals[ki]), etag: etagOf(vals), v: vals, name }, log: [{ action: "add", key: keystr(vals[ki]), name, details: (() => { const pc = pseudoColOf(H); return pc && !isBlank(nv[pc]) ? { [pc]: { from: null, to: nv[pc] } } : {}; })() }], verify: chk => chk.rows.length === book.rows.length + 1 && chk.rows[chk.rows.length - 1].vals.every((v, i) => v === vals[i]), };
   });
 }
 
@@ -3293,6 +3499,7 @@ async function updateRow(rid, values, etag) {
     }
     const dcol = schema.doj_column, tcol = schema.tenure_column;
     if (dcol && dcol in changes && tcol && H.includes(tcol) && !(tcol in changes)) changes[tcol] = { from: row.vals[H.indexOf(tcol)], to: tenureValue(schema, changes[dcol].to) };
+    { const pc = pseudoColOf(H); if (pc && pc in changes && !isBlank(changes[pc].to)) { const who = pseudoClash(book, schema, changes[pc].to, row); if (who) throw pseudoErr(changes[pc].to, who); } }
     const rowEl = book.rowEls.get(row.r);
     for (const [h, ch] of Object.entries(changes)) { const i = H.indexOf(h), c = getOrCreateCell(book, rowEl, i + 1); writeCell(book, c, ch.to); ensureDateStyle(book, c, sets, h, i); }
     const vals = rowVals(book, row.r);
@@ -3444,6 +3651,12 @@ async function bulkUpdate(updates, note) {
   let logs = [];
   const res = await mutate(async (book, schema, sets) => {
     const H = book.headers, prof = profile(book), expect = []; logs = [];
+    /* v3.61.0: pseudo names stay unique, also within one bulk save */
+    { const pc = pseudoColOf(H); if (pc) { const moving = new Set(updates.filter(u => u.values && pc in u.values).map(u => String(u.id))), seenP = new Map();
+      for (const u of updates) { if (!u.values || !(pc in u.values) || isBlank(u.values[pc])) continue; const v = keystr(u.values[pc]).trim(), lk = v.toLowerCase(), row = findRow(book, schema, String(u.id));
+        if (seenP.has(lk) && seenP.get(lk) !== String(u.id)) throw new ApiErr(400, "The pseudo name “" + v + "” is given to two people in this save. One pseudo name can be given to only one person.");
+        seenP.set(lk, String(u.id)); if (keystr(row.vals[H.indexOf(pc)]).trim().toLowerCase() === lk) continue;
+        const who = pseudoClash(book, schema, v, row, moving); if (who) throw pseudoErr(v, who); } } }
     for (const u of updates) {
       const row = findRow(book, schema, String(u.id)), rowEl = book.rowEls.get(row.r), changes = {};
       for (const [h, raw] of Object.entries(u.values || {})) {
@@ -3507,7 +3720,7 @@ return {
   supported: () => typeof window.showOpenFilePicker === "function" && !!window.indexedDB,
   folderName: () => (Conn.dir ? Conn.dir.name : ""),
   /* used by the Attendance page (same folder, same backups folder, same activity log) */
-  dir: () => Conn.dir, kvGet, kvSet, backup, purgeLocalCopies, rewriteCells, writeBlob, appendActivity, nowText, readActivity, readData, writeData, isCloud, flushActivity, ACT_VERBS, actDetails,
+  dir: () => Conn.dir, kvGet, kvSet, backup, purgeLocalCopies, rewriteCells, readPseudoHistory, addSheetToCopy, writeBlob, appendActivity, nowText, readActivity, readData, writeData, isCloud, flushActivity, ACT_VERBS, actDetails,
   userName, setUser: n => { ME = String(n || "").trim() || "You"; },
   async isLocked(name) { for (const cand of ["~$" + name, "~$" + name.slice(2)]) { try { await Conn.dir.getFileHandle(cand); return true; } catch (e) { /* not there */ } } return false; },
   fileName: () => Conn.fileName,
@@ -3649,6 +3862,34 @@ const CLOUD = (() => {
   function dropSession() { session = null; ls.set(LS_SESSION, null); }
   const b64 = blob => new Promise((res, rej) => { const r = new FileReader(); r.onload = () => res(String(r.result).split(',')[1] || ''); r.onerror = () => rej(r.error); r.readAsDataURL(blob); });
   const unb64 = s => { const bin = atob(s), u = new Uint8Array(bin.length); for (let i = 0; i < bin.length; i++) u[i] = bin.charCodeAt(i); return u; };
+  /* v3.61.0: the whole workbook is stored encrypted (AES-256-GCM): "TDENC1:" + 12-byte IV + ciphertext. The key comes from
+     td_data_key after sign-in and is kept in memory only. Without the database update the workbook stays as it was. */
+  const AT_REST = new TextEncoder().encode('TDENC1:');
+  const isSealed = u8 => u8 && u8.length > AT_REST.length + 12 && AT_REST.every((b, i) => u8[i] === b);
+  let dataKey = null, dataKeyP = null, dataKeyState = 'none';
+  function getDataKey() {
+    if (dataKey) return Promise.resolve(dataKey);
+    if (dataKeyState === 'nosql' || !session) return Promise.resolve(null);
+    if (dataKeyP) return dataKeyP;
+    dataKeyP = (async () => {
+      try { const k = await rpc('td_data_key', { p_token: tok() }); dataKey = await crypto.subtle.importKey('raw', unb64(String(k).trim()), 'AES-GCM', false, ['encrypt', 'decrypt']); dataKeyState = 'ok'; return dataKey; }
+      catch (e) { dataKeyState = /not set up|function/i.test(e.message || '') ? 'nosql' : 'err'; if (dataKeyState === 'err') console.warn('Data key:', e.message); return null; }
+      finally { dataKeyP = null; }
+    })();
+    return dataKeyP;
+  }
+  async function seal(u8) {
+    const key = await getDataKey(); if (!key) return u8;
+    const iv = crypto.getRandomValues(new Uint8Array(12)), ct = new Uint8Array(await crypto.subtle.encrypt({ name: 'AES-GCM', iv }, key, u8));
+    const out = new Uint8Array(AT_REST.length + 12 + ct.length); out.set(AT_REST); out.set(iv, AT_REST.length); out.set(ct, AT_REST.length + 12); return out;
+  }
+  async function unseal(u8) {
+    if (!isSealed(u8)) return u8;
+    const key = await getDataKey();
+    if (!key) throw cloudErr(500, dataKeyState === 'nosql' ? 'The workbook is encrypted, but this database is missing td_data_key. Ask the super admin to run encryption.sql in Supabase → SQL Editor.' : 'The workbook is encrypted and the key could not be fetched for your sign-in. Sign in again, or ask the super admin.');
+    try { return new Uint8Array(await crypto.subtle.decrypt({ name: 'AES-GCM', iv: u8.slice(AT_REST.length, AT_REST.length + 12) }, key, u8.slice(AT_REST.length + 12))); }
+    catch { throw cloudErr(500, 'The workbook could not be decrypted with the current key. Nothing was changed.'); }
+  }
 
   /* Behaves like a picked Excel file, so every dashboard feature works unchanged. The version number is the lock. */
   class CloudHandle {
@@ -3665,7 +3906,10 @@ const CLOUD = (() => {
       const m = await this.meta(); if (!m) throw cloudErr(404, 'FILE_NOT_FOUND');
       if (this._file && this._ver === m.version) return this._file;
       const g = await rpc('td_get_file', { p_token: tok(), p_name: this.name });
-      this._file = new File([unb64(g.data)], this.name, { type: XLSX_TYPE, lastModified: Date.parse(g.updated_at) || Date.now() }); this._ver = g.version;
+      const raw = unb64(g.data), plainAtRest = !isSealed(raw);
+      this._file = new File([await unseal(raw)], this.name, { type: XLSX_TYPE, lastModified: Date.parse(g.updated_at) || Date.now() }); this._ver = g.version;
+      /* the first time the super admin opens a workbook that is still stored as plain Excel, it is encrypted and saved back */
+      if (plainAtRest && session && session.role === 'superadmin' && !this._sealing) { this._sealing = true; setTimeout(() => this.sealAtRest().catch(e => console.warn('Encrypting the workbook:', e.message)).finally(() => { this._sealing = false; }), 0); }
       this._meta = { version: g.version, size: g.size, mtime: this._file.lastModified, by: g.updated_by }; this._metaAt = Date.now();
       return this._file;
     }
@@ -3673,10 +3917,16 @@ const CLOUD = (() => {
       const parts = [], self = this;
       return { async write(d) { parts.push(d && d.type === 'write' ? d.data : d); }, async close() { await self.put(new Blob(parts, { type: XLSX_TYPE })); }, async abort() { parts.length = 0; } };
     }
+    async sealAtRest() {
+      if (!(await getDataKey()) || !this._file) return;
+      const f = this._file; await this.put(f, this._ver);
+      try { toast('The workbook is now stored encrypted in the database.'); } catch { }
+    }
     async put(blob, base) {
       const force = !!this._force; this._force = false;   // set by BE.writeBlob when the person chose "Overwrite"
       try {
-        const r = await rpc('td_put_file', { p_token: tok(), p_name: this.name, p_data: await b64(blob), p_base_version: base ?? this._ver ?? 0, p_force: force });
+        const sealed = new Blob([await seal(new Uint8Array(await blob.arrayBuffer()))]);
+        const r = await rpc('td_put_file', { p_token: tok(), p_name: this.name, p_data: await b64(sealed), p_base_version: base ?? this._ver ?? 0, p_force: force });
         this._ver = r.version; this._file = new File([blob], this.name, { type: XLSX_TYPE, lastModified: Date.parse(r.updated_at) || Date.now() });
         this._meta = { version: r.version, size: blob.size, mtime: this._file.lastModified, by: session && session.name }; this._metaAt = Date.now();
       } catch (e) { if (e.code === 'CONFLICT') { this._metaAt = 0; this._file = null; } throw e; }
@@ -3726,7 +3976,7 @@ const CLOUD = (() => {
     closeReset: (id, status) => rpc('td_admin_close_reset', { p_token: tok(), p_id: id, p_status: status }),
     remove: id => rpc('td_admin_delete_user', { p_token: tok(), p_id: id }),
     history: () => rpc('td_admin_history', { p_token: tok() }),
-    backup: async (name, day) => unb64((await rpc('td_admin_get_backup', { p_token: tok(), p_name: name, p_day: day })).data),
+    backup: async (name, day) => unseal(unb64((await rpc('td_admin_get_backup', { p_token: tok(), p_name: name, p_day: day })).data)),
     async download() { const f = await wb().getFile(); return new Uint8Array(await f.arrayBuffer()); },
     async replace(file) {
       const blob = await checkWorkbook(file);
@@ -3839,7 +4089,7 @@ const CLOUD = (() => {
   /* v3.19.1: custom dashboards are saved one at a time; the database checks who owns each one */
   const saveDashboard = (dash, remove) => rpc('td_save_dashboard', { p_token: tok(), p_dash: dash, p_remove: !!remove });
   const phoneKey = () => rpc('td_phone_key', { p_token: tok() });   /* v3.59.0: only the super admin and people they allow get the key */
-  return { phoneKey, SUPABASE_CONFIG, saveDashboard, changeMyPasscode, card, resume, mode, decorate, signOut, useLocalFiles, openAdmin, configured, isAdmin, refreshMe, user, getSettings, setSetting, setShared, saveLeaveRequest, admin, _rpc: rpc };
+  return { phoneKey, atRest: () => dataKeyState, SUPABASE_CONFIG, saveDashboard, changeMyPasscode, card, resume, mode, decorate, signOut, useLocalFiles, openAdmin, configured, isAdmin, refreshMe, user, getSettings, setSetting, setShared, saveLeaveRequest, admin, _rpc: rpc };
 })();
 
 /* =====================================================================
@@ -7765,7 +8015,8 @@ const bkGet = (key, iso) => {
   return bkAll()[key + '|' + iso] || null;   // backups saved before 3.28.2 (shared settings)
 };
 /* v3.33.0: backups are for admins and super admins only (users don't see or change them). Local mode (no sign-in) = the owner. */
-const canBackup = () => { try { return !(window.PERM && PERM.online()) || isAdminRole(); } catch { return false; } };
+/* v3.61.0: a role can be allowed or kept from setting backups ("Can set backups"); without that setting, admins can and users can't */
+const canBackup = () => { try { if (!(window.PERM && PERM.online())) return true; const u = CLOUD.user(); if (!u) return false; if (u.role === 'superadmin') return true; const p = u.permissions || {}; if (p._backupEdit === false) return false; if (p._backupEdit === true) return true; return isAdminRole(); } catch { return false; } };
 const bkLabel = x => !x ? '' : (x.live ? 'Seat Shown Live' : x.no ? 'Backup Not Provided' : 'Backup Provided') + (x.b ? ' · ' + x.b : '') + (x.half ? ' (half day)' : '');
 /* v3.30.1: backup settings: is the backup person's name optional (default), required, or not asked at all */
 const bkNameMode = () => { const m = ((window.TD_SETTINGS || {}).backup_opts || {}).name; return ['optional', 'required', 'off'].includes(m) ? m : 'optional'; };
@@ -9282,7 +9533,7 @@ async function poll() {
 }
 
 /* ============================== filtering ============================== */
-const APP = { title: "Team Dashboard", version: "3.60.1", released: "19 Oct 2026" };
+const APP = { title: "Team Dashboard", version: "3.61.0", released: "19 Oct 2026" };
 const BASE_DIMS = { status: "status_column", desig: "designation_column", client: "client_column", mode: "mode_column" };
 const STANDARD_STATUSES = ["Active", "Manager", "OJT", "Bench", "New", "Projected", "Left", "Moved"];
 const TILE_ORDER = ["Active", "Manager", "OJT", "Bench", "New", "Projected"];
@@ -11190,6 +11441,7 @@ async function fillSave() {
   } catch (e) { toast("Could not save: " + ((e && e.message) || e), true); }
   finally { FILL.saving = false; FILL.sig = ""; renderFill(); syncActionTabs(); }
 }
+$("#btnPseudo").addEventListener("click", () => openPseudoNames());
 $("#btnFill").addEventListener("click", () => {
   const ids = sortedRows(tableRows(null)).map(r => r.id);
   openFill({ ids, idsLabel: "the Employees table (with its current filters)", mode: "all" });
@@ -11758,6 +12010,85 @@ function buildField(c, value, isNew) {
   return { wrap, get, name, control };
 }
 
+/* ============================== v3.61.0: Pseudo names ==============================
+   Set a pseudo name for each person (a name can belong to only one current person) and search who held a pseudo name
+   before. The history lives in the "Pseudo Name History" sheet of the same workbook. */
+const pseudoCol = () => ((state.cols || []).find(c => /pseudo/i.test(c.name)) || {}).name || null;
+async function openPseudoNames(focusId) {
+  if (employeePending) { toast("Finish saving the current employee first.", true); return; }
+  const canEdit = !window.PERM || PERM.can("emp.edit");
+  const body = h("div", { class: "body psn" });
+  const aside = h("aside", { class: "drawer psn-drawer", role: "dialog", "aria-label": "Pseudo names" },
+    h("header", {}, h("h2", {}, "Pseudo names"), h("button", { class: "btn ghost", type: "button", "aria-label": "Close", onclick: () => closeDrawer() }, "✕")), body);
+  mountDrawer(aside);
+  const pc = pseudoCol();
+  if (!pc) {
+    const can = !window.PERM || PERM.can("emp.fields");
+    body.append(h("p", {}, "The workforce sheet has no Pseudo Name column yet."),
+      can ? h("button", { class: "btn primary", type: "button", onclick: async e => { e.target.disabled = true; try { await api("POST", "/api/columns", { name: "Pseudo Name" }); await loadData(true); closeDrawer(); openPseudoNames(); } catch (err) { e.target.disabled = false; toast(err.message, true); } } }, "Add a Pseudo Name column") : h("p", { class: "hint" }, "Ask the super admin to add one."));
+    return;
+  }
+  let hist = null, q = "", tab = "current", editing = focusId || null, busy = false;
+  const pv = r => S(g(r, pc)).trim(), nm = r => gs(r, "name_column") || String(r.id);
+  const holders = () => { const m = new Map(); for (const r of state.rows) { const v = pv(r); if (!v || isInactive(r)) continue; m.set(v.toLowerCase(), r); } return m; };
+  const freeNames = () => { const cur = holders(), out = new Set(); for (const r of state.rows) { const v = pv(r); if (v && isInactive(r) && !cur.has(v.toLowerCase())) out.add(v); } for (const x of hist || []) if (x.pseudo && !cur.has(x.pseudo.toLowerCase())) out.add(x.pseudo); return [...out].sort((a, b) => a.localeCompare(b, undefined, { numeric: true })); };
+  const search = h("input", { class: "input", type: "search", placeholder: "Search a pseudo name, person or Emp ID", "aria-label": "Search pseudo names", value: q });
+  const tabs = h("div", { class: "seg psn-tabs", role: "group", "aria-label": "Show" });
+  const listBox = h("div", { class: "psn-list" });
+  const note = h("p", { class: "hint psn-note" }, "One pseudo name can belong to only one current person. When someone leaves, their pseudo name stays in the history and can be given to someone new.");
+  body.append(h("div", { class: "psn-bar" }, search, tabs), note, listBox);
+  search.addEventListener("input", () => { q = search.value.trim().toLowerCase(); drawList(); });
+  const hit = (...xs) => !q || xs.some(x => String(x || "").toLowerCase().includes(q));
+  function drawTabs() {
+    tabs.replaceChildren(...[["current", "People"], ["history", "History" + (hist ? " · " + hist.length : "")]].map(([k, l]) => h("button", { type: "button", "aria-pressed": String(tab === k), onclick: () => { tab = k; drawTabs(); drawList(); } }, l)));
+  }
+  function drawList() {
+    if (tab === "history") {
+      if (!hist) { listBox.replaceChildren(h("p", { class: "hint" }, "Loading the history…")); return; }
+      const rows = hist.filter(x => hit(x.pseudo, x.name, x.key)).sort((a, b) => String(b.from || "").localeCompare(String(a.from || "")));
+      listBox.replaceChildren(rows.length ? h("table", { class: "psn-tbl" }, h("thead", {}, h("tr", {}, ...["Pseudo name", "Person", "From", "To", "Set by"].map(t => h("th", {}, t)))),
+        h("tbody", {}, ...rows.slice(0, 500).map(x => h("tr", {}, h("td", {}, h("b", {}, x.pseudo)), h("td", {}, x.name || "—", x.key ? h("small", {}, " · " + x.key) : null),
+          h("td", {}, x.from || h("span", { class: "hint" }, "before history")), h("td", {}, x.to ? x.to : h("span", { class: "psn-now" }, "Current")), h("td", {}, x.by || "—", x.note ? h("small", { class: "psn-n" }, x.note) : null))))) : h("p", { class: "hint" }, q ? "Nobody has used a pseudo name matching “" + q + "”." : "No history yet. It starts with the next save."));
+      return;
+    }
+    const cur = holders();
+    const rows = state.rows.filter(r => !isInactive(r) && hit(nm(r), pv(r), r.id)).sort((a, b) => nm(a).localeCompare(nm(b)));
+    const list = h("div", { class: "psn-people" });
+    for (const r of rows.slice(0, 400)) {
+      const v = pv(r), past = (hist || []).filter(x => x.key === String(r.id) && x.to).map(x => x.pseudo);
+      const line = h("div", { class: "psn-row" + (editing === r.id ? " on" : "") },
+        h("div", { class: "psn-who" }, h("b", {}, nm(r)), h("small", {}, [r.id, gs(r, "status_column"), past.length ? "earlier: " + [...new Set(past)].join(", ") : ""].filter(Boolean).join(" · "))),
+        h("span", { class: "psn-val" + (v ? "" : " none") }, v || "No pseudo name"),
+        canEdit && editing !== r.id ? h("button", { class: "btn mini", type: "button", onclick: () => { editing = r.id; drawList(); } }, v ? "Change" : "Set") : null);
+      list.append(line);
+      if (editing === r.id) {
+        const inp = h("input", { class: "input", type: "text", value: v, maxlength: "60", list: "psnFree", placeholder: "Type a pseudo name", "aria-label": "Pseudo name for " + nm(r) });
+        const err = h("span", { class: "psn-err", role: "alert" });
+        const save = h("button", { class: "btn primary mini", type: "button" }, "Save");
+        const check = () => { const t = inp.value.trim(), o = t && cur.get(t.toLowerCase()); err.textContent = o && o.id !== r.id ? "Already belongs to " + nm(o) + "." : ""; save.disabled = !!err.textContent || busy || t === v; };
+        inp.addEventListener("input", check); inp.addEventListener("keydown", e => { if (e.key === "Enter" && !save.disabled) save.click(); if (e.key === "Escape") { editing = null; drawList(); } });
+        save.addEventListener("click", async () => {
+          const t = inp.value.trim(); busy = true; check(); save.textContent = "Saving…";
+          try {
+            const res = await api("PUT", "/api/rows/" + encodeURIComponent(r.id), { values: { [pc]: t || null }, etag: r.etag });
+            applyRow(res); state.version = res.version; editing = null; renderAll(); toast(t ? "“" + t + "” is now " + nm(r) + "’s pseudo name." : "Removed " + nm(r) + "’s pseudo name.");
+            hist = null; drawTabs(); drawList(); try { hist = await BE.readPseudoHistory(); } catch { hist = []; } drawTabs(); drawList();
+          } catch (e) { err.textContent = e.message; save.textContent = "Save"; } finally { busy = false; check(); }
+        });
+        const free = freeNames();
+        list.append(h("div", { class: "psn-edit" }, inp, save, h("button", { class: "btn mini", type: "button", onclick: () => { editing = null; drawList(); } }, "Cancel"), err,
+          h("datalist", { id: "psnFree" }, ...free.map(f => h("option", { value: f }))), free.length ? h("small", { class: "hint" }, "Free to reuse: " + free.slice(0, 12).join(", ") + (free.length > 12 ? "…" : "")) : null));
+        setTimeout(() => { inp.focus(); inp.select(); check(); }, 0);
+      }
+    }
+    const used = rows.filter(r => pv(r)).length;
+    listBox.replaceChildren(h("p", { class: "hint" }, rows.length + " current " + (rows.length === 1 ? "person" : "people") + " · " + used + " with a pseudo name" + (q ? " (matching your search)" : "")), list);
+  }
+  drawTabs(); drawList();
+  try { hist = await BE.readPseudoHistory(); } catch (e) { hist = []; console.warn(e); }
+  drawTabs(); drawList();
+}
+window.openPseudoNames = openPseudoNames;
 function openDrawer(row) {
   if (employeePending) { toast("Finish saving the current employee first.",true); return; }
   const isNew = !row;
@@ -12482,6 +12813,7 @@ window.applyAccess = () => {
   const show = (sel, on) => document.querySelectorAll(sel).forEach(x => { x.hidden = !on; });
   show('#btnAdd', PERM.can('emp.add'));
   show('#btnFill', PERM.can('emp.bulk'));
+  show('#btnPseudo', PERM.can('emp.edit') || PERM.can('page.employees'));
   show('.atab[data-atab="fill"]', PERM.can('emp.bulk'));
   show('.atab[data-atab="health"]', PERM.canView('attendance') && PERM.can('act.health'));
   show('.atab[data-atab="actions"]', PERM.can('act.items'));
@@ -12667,6 +12999,48 @@ window.addEventListener('focus', () => { if (typeof poll === 'function') poll();
 /* ---------- the Settings dialog ---------- */
 const when = t => t ? new Date(t).toLocaleString(undefined, { day: 'numeric', month: 'short', hour: '2-digit', minute: '2-digit' }) : '—';
 const XLSX = 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet';
+/* ---------- v3.61.0: download the workbook as one Excel file, readable or password-protected ---------- */
+function askPassword() {
+  return new Promise(res => {
+    const v = document.createElement('div'); v.className = 'td-choice-veil';
+    v.innerHTML = `<div class="td-choice" role="dialog" aria-modal="true" aria-labelledby="tdPwT"><h3 id="tdPwT">Set a password for the file</h3><p>Excel asks for this password every time the file is opened. Keep it safe: it can't be recovered.</p>
+      <label class="td-pw">Password<input type="password" class="input" id="tdPw1" autocomplete="new-password" minlength="6"></label>
+      <label class="td-pw">Type it again<input type="password" class="input" id="tdPw2" autocomplete="new-password"></label>
+      <p class="td-pw-err" id="tdPwE" role="alert"></p>
+      <div class="td-choice-btns"><button type="button" class="btn" data-x="0">Cancel</button><button type="button" class="btn primary" data-x="1">Download</button></div></div>`;
+    const done = val => { v.remove(); res(val); };
+    const go = () => { const a = v.querySelector('#tdPw1').value, b = v.querySelector('#tdPw2').value, e = v.querySelector('#tdPwE');
+      if (a.length < 6) { e.textContent = 'Use at least 6 characters.'; return; } if (a !== b) { e.textContent = 'The two passwords are different.'; return; } done(a); };
+    v.addEventListener('click', e => { const b = e.target.closest('[data-x]'); if (b) b.dataset.x === '1' ? go() : done(null); });
+    v.addEventListener('keydown', e => { if (e.key === 'Escape') done(null); if (e.key === 'Enter') go(); });
+    v.addEventListener('input', () => { v.querySelector('#tdPwE').textContent = ''; });
+    (document.querySelector('dialog[open]') || document.body).appendChild(v); v.querySelector('#tdPw1').focus();
+  });
+}
+const REQ_HEAD = ['Employee', 'Leave type', 'Dates', 'Days', 'Status', 'Sent by', 'Sent at', 'Decided by', 'Decided at', 'Note', 'Reason'];
+async function fullCopy(u8) {
+  /* readable phone numbers for people who may see them, plus the leave requests (they live in the database, not the workbook) */
+  u8 = await PHONE.plainCopy(u8);
+  const reqs = ((window.TD_SETTINGS || {}).leave_requests || []).filter(r => r && r.name);
+  if (reqs.length) {
+    const fmtD = x => { const d = new Date(x); return isNaN(d) ? String(x || '') : d.toISOString().slice(0, 16).replace('T', ' '); };
+    const rows = reqs.map(r => [r.name, r.code || '', (r.dates || []).join(', '), String((r.dates || []).length), r.status || '', r.by || '', fmtD(r.at), r.decidedBy || '', r.decidedAt ? fmtD(r.decidedAt) : '', r.note || '', r.reason || '']);
+    try { u8 = await BE.addSheetToCopy(u8, 'Leave Requests', REQ_HEAD, rows, [26, 10, 34, 6, 11, 20, 17, 20, 17, 30, 30]); } catch (e) { console.warn('Leave requests sheet:', e); }
+  }
+  return u8;
+}
+async function downloadWorkbook(name, getBytes) {
+  const pick = await tdChoice({ title: 'Download the workbook', text: 'You get one Excel file with all the data: employees, attendance and backups, the activity log, the pseudo name history and the leave requests. Choose how it should be protected.',
+    buttons: [{ label: 'Cancel', value: null }, { label: 'Readable Excel', value: 'plain' }, { label: 'Password-protected Excel', value: 'locked', kind: 'primary' }] });
+  if (!pick) return;
+  let pw = null; if (pick === 'locked') { pw = await askPassword(); if (!pw) return; }
+  let u8 = await fullCopy(await getBytes());
+  if (pw) { toast('Encrypting the file…'); u8 = await OFFCRYPT.encrypt(u8, pw); }
+  const base = String(name || 'Team Dashboard.xlsx').replace(/\.xlsx$/i, '');
+  download(base + (pw ? ' (password protected)' : '') + '.xlsx', u8);
+  toast(pw ? 'Downloaded. Excel will ask for the password when the file is opened.' : 'Downloaded a readable copy.');
+}
+window.fullCopy = fullCopy; window.downloadWorkbook = downloadWorkbook;
 const download = (name, bytes) => { const a = h('a', { href: URL.createObjectURL(new Blob([bytes], { type: XLSX })), download: name }); document.body.append(a); a.click(); setTimeout(() => { URL.revokeObjectURL(a.href); a.remove(); }, 2000); };
 const pickXlsx = () => new Promise(res => { const i = Object.assign(document.createElement('input'), { type: 'file', accept: '.xlsx,.xlsm' }); i.onchange = () => res(i.files[0] || null); i.click(); });
 /* a button that asks \"Are you sure?\" in place, because pop-up dialogs would sit behind Settings */
@@ -12996,10 +13370,12 @@ function buildAccessForm(src, users = []) {
   const bkRep = checkLine('Can open the Backup report page', !!(accessSource && accessSource.permissions && accessSource.permissions._bkReport));
   const bkRev = checkLine('…including Revenue (seat rates and estimated revenue)', !!(accessSource && accessSource.permissions && accessSource.permissions._bkRevenue));
   const bkSync = () => { bkRev.box.disabled = !bkRep.box.checked; if (!bkRep.box.checked) bkRev.box.checked = false; }; bkRep.box.addEventListener('change', bkSync); bkSync();
-  const bkBox = h('div', { class: 'rmod-extra bk-access' }, h('p', { class: 'rmod-subt' }, 'Backup report'), bkRep.el, bkRev.el, h('p', { class: 'set-hint' }, 'Off unless ticked. Super admins always have it.'));
+  const bkBox = h('div', { class: 'rmod-extra bk-access' }, h('p', { class: 'rmod-subt' }, 'Backups'), bkEdit.el, h('p', { class: 'set-hint' }, 'Untick to keep people in this role from setting or changing backups; they still see them, and leave they record or approve is saved without the backup question.'), bkRep.el, bkRev.el, h('p', { class: 'set-hint' }, 'Backup report: off unless ticked. Super admins always have everything.'));
   const phSee = checkLine('Can see and edit phone & WhatsApp numbers', !!(accessSource && accessSource.permissions && accessSource.permissions._phones));
+  const bkEditOn = accessSource.permissions && '_backupEdit' in accessSource.permissions ? !!accessSource.permissions._backupEdit : !!(src && src.admin);
+  const bkEdit = checkLine('Can set backups (Backup Provided, Not Provided, Seat Shown Live)', bkEditOn);
   const phBox = h('div', { class: 'rmod-extra bk-access' }, h('p', { class: 'rmod-subt' }, 'Phone & WhatsApp numbers'), phSee.el, h('p', { class: 'set-hint' }, 'Stored encrypted in the database. Off unless ticked: everyone else sees these fields blank. Super admins always see them.'));
-  const bkPerms = () => ({ _bkReport: bkRep.box.checked, _bkRevenue: bkRep.box.checked && bkRev.box.checked, _phones: phSee.box.checked });
+  const bkPerms = () => ({ _bkReport: bkRep.box.checked, _bkRevenue: bkRep.box.checked && bkRev.box.checked, _phones: phSee.box.checked, _backupEdit: bkEdit.box.checked });
   const rights = h('div', { class: 'rights' }, roleNote, bkBox, phBox, presets, h('div', { class: 'rrows' }, h('div', { class: 'rgrid-head', 'aria-hidden': 'true' }, h('span', {}, 'Area'), h('span', {}, 'Hide'), h('span', {}, 'View'), h('span', {}, 'Edit'), h('span', {}, '')), ...modules));
   rights.addEventListener('change', () => setTimeout(paintPresets)); rights.addEventListener('click', e => { if (e.target.closest('.rseg-b, .rchk')) setTimeout(paintPresets); });
   const syncRole = () => { syncs.forEach(f => f()); };
@@ -13013,7 +13389,7 @@ const roleId = () => 'r' + Date.now().toString(36) + Math.random().toString(36).
 const roleOfUser = u => (u && u.role !== 'superadmin' && u.permissions && u.permissions._role ? tdRoles().find(r => r.id === u.permissions._role) || null : null);
 const roleLabel = u => u.role === 'superadmin' ? 'Super admin' : (roleOfUser(u) || {}).name || 'No role';
 const rolePages = r => { const p = r.rights || {}; return PERM.groups.filter(g => g.page && p[g.page]).map(g => g.name); };
-const roleSummary = r => { const pg = rolePages(r), n = PERM.keys.filter(k => (r.rights || {})[k]).length; return (r.admin ? 'Admin · ' : '') + (pg.length ? pg.join(', ') : 'no pages') + ' · ' + n + ' rights' + (r.extras && r.extras._bkReport ? ' · Backup report' : '') + (r.extras && r.extras._phones ? ' · Phone numbers' : ''); };
+const roleSummary = r => { const pg = rolePages(r), n = PERM.keys.filter(k => (r.rights || {})[k]).length; return (r.admin ? 'Admin · ' : '') + (pg.length ? pg.join(', ') : 'no pages') + ' · ' + n + ' rights' + (r.extras && r.extras._bkReport ? ' · Backup report' : '') + (r.extras && r.extras._phones ? ' · Phone numbers' : '') + (r.extras && r.extras._backupEdit === false && r.admin ? ' · no backup editing' : r.extras && r.extras._backupEdit && !r.admin ? ' · sets backups' : ''); };
 const keepLink = p => ({ ...(p && p._emp ? { _emp: p._emp, _empName: p._empName } : {}), ...(p && p._phones ? { _phones: true } : {}) });   /* v3.59.0: a person's phone access survives role changes */
 async function saveRoles(next, note) { await saveTeamSetting('user_roles', next, note ? { name: 'Roles', text: note } : null); }
 /* write a role's rights into each member's account, so the server checks the same rights */
@@ -13384,7 +13760,7 @@ async function drawWorkbook(pane) {
       h('div', { class: 'set-actions flat' }, h('button', { class: 'btn', type: 'button', onclick: () => el('btnLogout').click() }, 'Open a different workbook')), err);
     return;
   }
-  const dl = h('button', { class: 'btn', type: 'button', onclick: () => run(async () => download(state.file || 'Team Dashboard.xlsx', await PHONE.plainCopy(await CLOUD.admin.download()))) }, 'Download current workbook');
+  const dl = h('button', { class: 'btn', type: 'button', onclick: () => run(async () => downloadWorkbook(state.file || 'Team Dashboard.xlsx', () => CLOUD.admin.download())) }, 'Download current workbook');
   if (!PERM.can('set.workbook')) { fill(pane, h('p', { class: 'set-hint' }, 'Download a copy of the team workbook to open in Excel. Changes made in the copy are not sent back.'), h('div', { class: 'set-actions flat' }, dl), err); return; }
   fill(pane, h('p', { class: 'set-hint' }, 'Loading history…'));
   const hist = await CLOUD.admin.history();
@@ -13398,7 +13774,7 @@ async function drawWorkbook(pane) {
     h('p', { class: 'set-hint' }, 'The team workbook is stored online. The first save of each day keeps a backup for 30 days. To restore one, download it and use Replace workbook.'),
     h('div', { class: 'set-actions flat' }, dl, replace), err,
     h('div', { class: 'set-grid' },
-      h('div', { class: 'set-card' }, h('h4', {}, 'Daily backups (30 days)'), list(hist.backups, b => [h('b', {}, String(b.day)), ` · ${Math.round(b.size / 1024)} KB · v${b.version} `, h('button', { class: 'linkbtn', type: 'button', onclick: () => run(async () => download(String(b.name).replace(/\.xlsx$/i, '') + ' backup ' + b.day + '.xlsx', await CLOUD.admin.backup(b.name, b.day))) }, 'Download')], 'No backups yet. The first save of each day keeps one.')),
+      h('div', { class: 'set-card' }, h('h4', {}, 'Daily backups (30 days)'), list(hist.backups, b => [h('b', {}, String(b.day)), ` · ${Math.round(b.size / 1024)} KB · v${b.version} `, h('button', { class: 'linkbtn', type: 'button', onclick: () => run(async () => downloadWorkbook(String(b.name).replace(/\.xlsx$/i, '') + ' backup ' + b.day + '.xlsx', () => CLOUD.admin.backup(b.name, b.day))) }, 'Download')], 'No backups yet. The first save of each day keeps one.')),
       h('div', { class: 'set-card' }, h('h4', {}, 'Recent sign-ins'), list(hist.logins.slice(0, 10), l => [h('span', { class: l.ok ? '' : 'bad' }, (l.login_id ? l.login_id + ' · ' : '') + (l.name || '?') + ' · ' + signinReason(l)), ' · ' + when(l.at)], 'None yet.'), h('button', { class: 'linkbtn', type: 'button', onclick: () => window.openSettings('signins') }, 'Open the full sign-in log')),
       h('div', { class: 'set-card' }, h('h4', {}, 'Recent saves'), list(hist.saves.slice(0, 25), x => [h('b', {}, x.saved_by || '?'), ' · ' + when(x.at) + ' · v' + x.version], 'None yet.'))));
 }
