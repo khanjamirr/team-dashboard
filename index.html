@@ -5,7 +5,7 @@
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <link rel="preconnect" href="https://iiogwevtyzgedhoaqlrn.supabase.co" crossorigin><link rel="dns-prefetch" href="https://iiogwevtyzgedhoaqlrn.supabase.co">
 <link rel="icon" href="data:,">
-<title>Team Dashboard · 3.64.0</title>
+<title>Team Dashboard · 3.65.0</title>
 <link rel="preconnect" href="https://fonts.googleapis.com"><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin><link href="https://fonts.googleapis.com/css2?family=Public+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet">
 <style>
 :root {
@@ -2256,6 +2256,21 @@ article.al-d { --alc:#c62828; }
 .emp2-foot .btn.primary { min-width:150px; }
 @media (max-width:820px) { .drawer.emp2 { top:0 !important; width:100vw !important; height:100vh; border-radius:0; } .drawer.emp2 > .body { grid-template-columns:1fr; } .drawer.emp2 .emp-nav { grid-row:auto; position:sticky; top:-16px; z-index:3; flex-direction:row; overflow-x:auto; background:var(--surface-2); padding:6px 0; } .drawer.emp2 .emp-jump { width:auto; } .drawer.emp2 > .body > *, .drawer.emp2 .emp-nav { grid-column:1; } .emp2-head { grid-template-columns:auto minmax(0,1fr) auto; } .emp2-acts { grid-column:1 / -1; justify-content:flex-start; } }
 /* v3.63.1: download screen */
+/* v3.65.0: private details */
+.dt-dlg { width:min(560px, calc(100vw - 32px)) !important; max-width:none !important; }
+.dt-ask { display:flex; flex-direction:column; gap:8px; } .dt-ask .dlw-l { margin:6px 0 0; } .dt-ask textarea { width:100%; }
+.dt-res { max-height:240px; } .dt-pick { width:100%; border:0; background:none; text-align:left; font:inherit; color:inherit; }
+.dt-who { display:flex; align-items:center; gap:10px; padding:10px 12px; border-radius:12px; background:var(--surface-2); } .dt-who b { display:block; } .dt-who small { color:var(--ink-2); font-size:12px; }
+.dt-fields { display:flex; flex-wrap:wrap; gap:6px; align-items:center; } .dt-open { color:#17824a !important; border-color:#bfe6cf !important; background:#eefaf3 !important; } .dt-empty { opacity:.55; }
+.dt-banner { display:flex; align-items:center; gap:10px; margin:0 0 12px; padding:10px 14px; border-radius:12px; background:#fff7e8; border:1px solid #f3dcae; }
+.dt-banner.open { background:#eefaf3; border-color:#bfe6cf; } .dt-banner b { display:block; font-size:13px; } .dt-banner small { color:var(--ink-2); font-size:12px; } .dt-bi { font-size:18px; }
+.dt-ask-f { margin-left:6px; border:0; background:none; color:var(--accent); font:inherit; font-size:11.5px; font-weight:650; cursor:pointer; padding:0; }
+.priv-cell { color:var(--ink-2); opacity:.7; }
+.dt-cols { display:flex; flex-wrap:wrap; gap:6px; margin-top:8px; }
+.ib-box { margin:0 0 14px; display:flex; flex-direction:column; gap:12px; } .ib-box:empty { display:none; }
+.ib-s { border:1px solid var(--border, var(--line)); border-radius:14px; padding:12px 14px; background:var(--surface); }
+.ib-s h4 { margin:0 0 8px; font-size:13.5px; display:flex; align-items:center; gap:8px; } .ib-head { display:flex; align-items:center; gap:8px; } .ib-head h4 { margin:0; } .ib-s > .set-hint { margin:6px 0 8px; }
+.ib-s .tm-req:last-child { margin-bottom:0; } .ib-s .tm-live:last-child { border-bottom:0; }
 /* v3.64.0: teams + team access */
 .teampill { position:relative; display:inline-flex; align-items:center; gap:4px; font-weight:650; }
 .teampill .tm-plus { margin-left:5px; padding:0 6px; border-radius:999px; background:color-mix(in srgb, #22a05a 16%, transparent); color:#17824a; font-size:11px; line-height:17px; }
@@ -2969,9 +2984,10 @@ function buildSchema(book) {
   const tenureHdr = H.includes(CFG.tenure) ? CFG.tenure : (H.find(h => /^\d{1,2}-[A-Za-z]{3}-\d{2,4}$/.test(h)) || "");
   const dateHint = /date|doj|dob|joining|birth|handover|live\s*seat|^left|exit|resign|expiry|due$/i;
   const stat = H.map((h, i) => {
-    const vals = rows.map(r => r.vals[i]).filter(v => !isBlank(v)), nf = vals.length;
+    /* v3.65.0: an encrypted private detail counts as the kind of value it holds (ENC3:<who>:<field>:<n|d|s|b>:…) */
+    const vals = rows.map(r => { const v = r.vals[i]; if (typeof v !== "string" || !v.startsWith("ENC3:")) return v; const t = v.split(":")[3]; return t === "d" ? 40000 : t === "n" ? 1 : t === "b" ? true : "x"; }).filter(v => !isBlank(v)), nf = vals.length;
     const nums = vals.filter(v => typeof v === "number");
-    const dstyle = rows.filter(r => r.vals[i] != null && r.st[i] != null && book.dateXf.has(r.st[i])).length;
+    const dstyle = rows.filter(r => r.vals[i] != null && ((r.st[i] != null && book.dateXf.has(r.st[i])) || (typeof r.vals[i] === "string" && r.vals[i].startsWith("ENC3:") && r.vals[i].split(":")[3] === "d"))).length;
     const distinct = new Set(vals.map(v => String(v).trim().toLowerCase())).size;
     const inRange = nums.filter(v => v >= 20000 && v <= 70000).length;
     return { nf, numFrac: nf ? nums.length / nf : 0, dateStyleFrac: nf ? dstyle / nf : 0, dateRangeFrac: nf ? inRange / nf : 0, distinct, maxNum: nums.length ? Math.max(...nums) : 0 };
@@ -3335,7 +3351,7 @@ const hideNum = v => (v == null || v === "" ? v : "(hidden)");
 function scrubActivity(e) {
   const d = e && e.details; if (!d || typeof d !== "object") return e;
   let hit = false; const nd = { ...d };
-  for (const [k, v] of Object.entries(d)) if (PHONE_COL_RE.test(k) && v && typeof v === "object" && "to" in v) { nd[k] = { from: hideNum(v.from), to: hideNum(v.to) }; hit = true; }
+  for (const [k, v] of Object.entries(d)) if ((PHONE_COL_RE.test(k) || (typeof window !== "undefined" && window.tdPrivate && window.tdPrivate(k))) && v && typeof v === "object" && "to" in v) { nd[k] = { from: hideNum(v.from), to: hideNum(v.to) }; hit = true; }
   if (typeof d.note === "string" && /(phone|mobile|whats\s*app)[^:·]*:/i.test(d.note)) { nd.note = d.note.replace(/((?:phone|mobile|whats\s*app)[^:·]*:)\s*[^·]*/gi, "$1 (hidden) "); hit = true; }
   return hit ? { ...e, details: nd } : e;
 }
@@ -3654,6 +3670,7 @@ function profile(book) {
 function coerce(schema, sets, h, v, mostlyInt) {
   const label = (schema.columns.find(c => c.name === h) || {}).label || h;
   if (isBlank(v)) return null;
+  if (typeof v === "string" && /^ENC[123]:/.test(v)) return v;   /* v3.65.0: an encrypted private detail is stored as it is */
   if (sets.dateCols.has(h)) { const n = Number(v); if (!Number.isFinite(n) || n < 1 || n > 80000) throw new ApiErr(400, "'" + label + "' must be a valid date."); return n; }
   if (sets.numCols.has(h)) { const n = Number(String(v).replace(/,/g, "").trim()); if (!Number.isFinite(n)) throw new ApiErr(400, "'" + label + "' must be a number."); return n; }
   if (typeof v === "boolean" || typeof v === "number") return v;
@@ -4350,6 +4367,13 @@ const CLOUD = (() => {
   const phoneKey = () => rpc('td_phone_key', { p_token: tok() });   /* v3.59.0: only the super admin and people they allow get the key */
   /* v3.64.0: teams, access requests and per-employee contact keys (teams.sql) */
   const contactKeys = ids => rpc('td_contact_keys', { p_token: tok(), p_ids: ids });
+  /* v3.65.0: private details, field by field (private-details.sql) */
+  const fieldKeys = pairs => rpc('td_field_keys', { p_token: tok(), p_pairs: pairs });
+  const details = {
+    get: () => rpc('td_details_get', { p_token: tok() }),
+    request: (emp, empName, fields, labels, reason) => rpc('td_detail_request', { p_token: tok(), p_emp: emp, p_emp_name: empName, p_fields: fields, p_labels: labels, p_reason: reason }),
+    decide: (id, action) => rpc('td_detail_decide', { p_token: tok(), p_id: id, p_action: action })
+  };
   const teams = {
     get: () => rpc('td_teams_get', { p_token: tok() }),
     save: team => rpc('td_team_save', { p_token: tok(), p_team: team }),
@@ -4357,7 +4381,7 @@ const CLOUD = (() => {
     request: (team, hours, reason) => rpc('td_access_request', { p_token: tok(), p_team: team, p_hours: hours, p_reason: reason }),
     decide: (id, action, hours) => rpc('td_access_decide', { p_token: tok(), p_id: id, p_action: action, p_hours: hours ?? null })
   };
-  return { phoneKey, contactKeys, teams, atRest: () => dataKeyState, SUPABASE_CONFIG, saveDashboard, changeMyPasscode, card, resume, mode, decorate, signOut, useLocalFiles, openAdmin, configured, isAdmin, refreshMe, user, getSettings, setSetting, setShared, saveLeaveRequest, admin, _rpc: rpc };
+  return { phoneKey, contactKeys, fieldKeys, details, teams, atRest: () => dataKeyState, SUPABASE_CONFIG, saveDashboard, changeMyPasscode, card, resume, mode, decorate, signOut, useLocalFiles, openAdmin, configured, isAdmin, refreshMe, user, getSettings, setSetting, setShared, saveLeaveRequest, admin, _rpc: rpc };
 })();
 
 /* =====================================================================
@@ -9719,165 +9743,263 @@ const TEAMS = (() => {
   };
 })();
 window.TEAMS = TEAMS;
-/* ============================== v3.59.0 / v3.64.0: phone & WhatsApp privacy ==============================
-   Online (Supabase), phone and WhatsApp cells are stored encrypted (AES-GCM) inside the workbook in the database.
-   3.64.0: each employee's numbers have their own key ("ENC2:<employee>:…"). td_contact_keys hands a key out only to the
-   super admin, to people ticked "Can see phone & WhatsApp numbers", and to the team lead of that employee's team (or a
-   lead with approved access that has not run out). Older "ENC1:" cells (one key for everyone allowed) are still read, and
-   the super admin's dashboard quietly moves them to the new form. Keys are kept in memory only, never in the browser. */
-const PHONE = (() => {
-  const PFX = "ENC1:", PFX2 = "ENC2:", plain = new Map(), ek = new Map(), denied = new Set();
-  let key = null, keyState = "none", keyP = null, warned = false, migrating = false, v2 = "unknown", gen = 0;
-  const tried = new Set();   /* one try per person per session, so a cell that can't be moved never loops */
+/* ============================== v3.65.0: requests for private details ==============================
+   Someone who is not an admin asks for a person's private fields (one or more). An admin approves it in the notification
+   center; those fields then open for that person for 15 minutes and lock again on their own (the server stops handing
+   out the keys, and the page forgets what it decrypted). */
+const DETAILS = (() => {
+  let data = null, st = "none", loadP = null, skew = 0, lastSig = null, seenPending = null;
   const online = () => { try { return !!(BE.isCloud() && typeof CLOUD !== "undefined" && CLOUD.user()); } catch { return false; } };
-  const canSee = () => { if (!online()) return true; const u = CLOUD.user(); return u.role === "superadmin" || !!(u.rawPermissions && u.rawPermissions._phones); };
-  const canSeeRow = id => canSee() || (id != null && TEAMS.contactOk(id));
-  const RE = /phone|mobile|whats\s*app|contact\s*(no\.?|number)|^contact$/i;
-  const colsOf = sch => !sch || !sch.columns ? [] : sch.columns.map(c => c.name).filter(n => RE.test(n) || n === sch.phone_column || n === sch.whatsapp_column);
-  const isCol = n => RE.test(String(n || "")) || !!(state.schema && n && (n === state.schema.phone_column || n === state.schema.whatsapp_column));
-  const isEnc = v => typeof v === "string" && (v.startsWith(PFX) || v.startsWith(PFX2));
-  const envId = t => { if (typeof t !== "string" || !t.startsWith(PFX2)) return null; const j = t.indexOf(":", PFX2.length); return j < 0 ? null : decodeURIComponent(t.slice(PFX2.length, j)); };
+  const myId = () => String((CLOUD.user() || {}).id ?? "");
+  const isAdmin = () => { const u = CLOUD.user(); return !!u && (u.role === "admin" || u.role === "superadmin"); };
+  const now = () => Date.now() + skew;
+  const items = () => (data && data.owner === myId() && data.items) || [];
+  const live = () => items().filter(a => String(a.user_id) === myId() && a.status === "approved" && Date.parse(a.expires_at) > now());
+  const has = (e, f) => live().some(a => String(a.emp_id) === String(e) && (a.fields || []).includes(f));
+  const pending = () => items().filter(a => a.status === "pending");
+  const sig = () => live().map(a => a.id).sort().join(",");
+  function check() {
+    const s = sig();
+    if (lastSig === null) { lastSig = s; return; }
+    if (s === lastSig) return;
+    lastSig = s;
+    try { PHONE.forget(); } catch { }
+    if (state.schema) loadData(true).catch(() => { });
+  }
+  function set(d) {
+    data = { items: (d && d.items) || [], now: d && d.now, owner: myId() };
+    if (d && d.now) skew = Date.parse(d.now) - Date.now();
+    st = "ok"; check();
+    try { dispatchEvent(new CustomEvent("details:changed")); } catch { }
+    return data;
+  }
+  async function load() {
+    if (!online()) return null;
+    if (loadP) return loadP;
+    loadP = (async () => {
+      try { return set(await CLOUD.details.get()); }
+      catch (e) { if (/not set up|function|schema cache|does not exist/i.test(e.message || "")) st = "nosql"; else if (st !== "ok") st = "err"; return null; }
+      finally { loadP = null; }
+    })();
+    return loadP;
+  }
+  const ensure = () => { if (data && data.owner !== myId()) { data = null; st = "none"; lastSig = null; } return (st === "none" && online()) ? load() : Promise.resolve(data); };
+  async function call(fn) { return set(await fn()); }
+  setInterval(() => { if (online()) check(); }, 3000);
+  setInterval(() => { if (online() && !document.hidden && st !== "nosql") load(); }, 12000);
+  addEventListener("focus", () => { if (online() && st !== "nosql") load(); });
+  return { load, ensure, call, has, live, items, pending, now, isAdmin, myId, state: () => st, seenPending: v => (v === undefined ? seenPending : (seenPending = v)) };
+})();
+window.DETAILS = DETAILS;
+/* ============================== v3.65.0: private details ==============================
+   Phone, WhatsApp, date of birth, email, address and the other private fields (Settings › Fields & drop-downs › Private
+   details) are stored encrypted in the database, each person's each field with its own key: "ENC3:<employee>:<field>:<type>:…".
+   td_field_keys hands a key only to admins and the super admin, or to someone whose request for exactly that person and
+   that field was approved and has not run out (15 minutes). Everyone else sees "🔒 Private". Keys and decrypted values
+   stay in memory only. Older "ENC1:"/"ENC2:" cells are still read, and an admin's dashboard quietly moves them over. */
+const PRIV_DEFAULT_RE = /phone|mobile|whats\s*app|contact\s*(no\.?|number)|^contact$|^dob$|date\s*of\s*birth|birth\s*date|birthday|e-?mail|address|aadha+r|^pan(\s*(no\.?|number|card))?$|passport|bank|account\s*(no\.?|number)|ifsc|emergency|salary|^ctc$/i;
+function tdPrivate(name) {
+  const n = String(name || "").trim(); if (!n) return false;
+  const L = (window.TD_SETTINGS || {}).private_fields;
+  if (Array.isArray(L)) return L.some(x => String(x).trim().toLowerCase() === n.toLowerCase());
+  return PRIV_DEFAULT_RE.test(n) || !!(typeof state !== "undefined" && state.schema && (n === state.schema.phone_column || n === state.schema.whatsapp_column || n === state.schema.dob_column));
+}
+window.tdPrivate = tdPrivate;
+const PHONE = (() => {
+  const P1 = "ENC1:", P2 = "ENC2:", P3 = "ENC3:", plain = new Map(), ek = new Map(), fk = new Map(), denied = new Set();
+  let key = null, keyState = "none", keyP = null, warned = false, migrating = false, v3 = "unknown", gen = 0;
+  const tried = new Set();   /* one try per person per session, so a cell that can't be moved never loops */
+  const env = new Map();     /* row id -> { column: { e, f } } of the cells as stored, so a request names exactly what is locked */
+  const online = () => { try { return !!(BE.isCloud() && typeof CLOUD !== "undefined" && CLOUD.user()); } catch { return false; } };
+  const isAdmin = () => { const u = CLOUD.user(); return !!u && (u.role === "superadmin" || u.role === "admin"); };
+  const canSee = () => !online() || isAdmin();
+  const F = n => String(n || "").trim().toLowerCase();
+  const pk = (e, f) => String(e) + "\u0001" + F(f);
+  const isCol = n => tdPrivate(n);
+  const isEnc = v => typeof v === "string" && (v.startsWith(P1) || v.startsWith(P2) || v.startsWith(P3));
+  const parse3 = t => { if (typeof t !== "string" || !t.startsWith(P3)) return null; const p = t.slice(P3.length).split(":"); if (p.length < 4) return null; return { e: decodeURIComponent(p[0]), f: decodeURIComponent(p[1]), t: p[2], body: p.slice(3).join(":") }; };
+  const envId2 = t => { if (typeof t !== "string" || !t.startsWith(P2)) return null; const j = t.indexOf(":", P2.length); return j < 0 ? null : decodeURIComponent(t.slice(P2.length, j)); };
   const b64 = u8 => { let t = ""; for (let i = 0; i < u8.length; i++) t += String.fromCharCode(u8[i]); return btoa(t); };
   const unb = t => Uint8Array.from(atob(t), c => c.charCodeAt(0));
   const imp = raw => crypto.subtle.importKey("raw", unb(String(raw).trim()), "AES-GCM", false, ["encrypt", "decrypt"]);
-  /* the older shared key, only for people who may see every number */
+  /* what someone may see right now */
+  const granted = (e, f) => { try { return DETAILS.has(String(e), F(f)); } catch { return false; } };
+  const canSeeCell = (e, f) => canSee() || (e != null && granted(e, f));
+  /* the older keys, only for admins */
   function getKey() {
     if (key) return Promise.resolve(key);
     if (!online() || !canSee() || keyState === "nosql" || keyState === "denied") return Promise.resolve(null);
     if (keyP) return keyP;
     keyP = (async () => {
       try { key = await imp(await CLOUD.phoneKey()); keyState = "ok"; return key; }
-      catch (e) { keyState = /not set up|function/i.test(e.message || "") ? "nosql" : (e.code === "PHONES_HIDDEN" || /PHONES_HIDDEN/.test(e.message || "")) ? "denied" : "err"; console.warn("Phone key:", e.message); return null; }
+      catch (e) { keyState = /not set up|function/i.test(e.message || "") ? "nosql" : /PHONES_HIDDEN/.test(e.message || "") ? "denied" : "err"; return null; }
       finally { keyP = null; }
     })();
     return keyP;
   }
-  /* per-employee keys: asked for in one go, the server answers only for the employees this person may see */
   async function empKeys(ids) {
-    if (!online() || v2 === "nosql") return;
-    const want = [...new Set(ids.filter(i => i != null && i !== "").map(String))].filter(i => !ek.has(i) && !denied.has(i) && (canSee() || TEAMS.contactOk(i)));
+    if (!online() || !canSee()) return;
+    const want = [...new Set(ids.filter(i => i != null && i !== "").map(String))].filter(i => !ek.has(i));
+    for (let i = 0; i < want.length; i += 400) {
+      let got; try { got = await CLOUD.contactKeys(want.slice(i, i + 400)); } catch { return; }
+      if (!got || typeof got !== "object") return;
+      for (const [id, k] of Object.entries(got)) ek.set(id, await imp(k));
+    }
+  }
+  /* one key per person and field: asked for in one go, the server answers only for what this person may see */
+  async function fieldKeys(pairs) {
+    if (!online() || v3 === "nosql") return;
+    const seen = new Set(), want = [];
+    for (const p of pairs) { if (!p || p.e == null || p.e === "" || !p.f) continue; const k = pk(p.e, p.f); if (seen.has(k) || fk.has(k) || denied.has(k) || !canSeeCell(p.e, p.f)) continue; seen.add(k); want.push({ e: String(p.e), f: F(p.f) }); }
     if (!want.length) return;
     const g0 = gen;
-    for (let i = 0; i < want.length; i += 400) {
-      const part = want.slice(i, i + 400);
-      let got;
-      try { got = await CLOUD.contactKeys(part); if (!got || typeof got !== "object") { v2 = "nosql"; return; } v2 = "ok"; }
-      catch (e) { if (/not set up|function|schema cache|does not exist/i.test(e.message || "")) { v2 = "nosql"; return; } console.warn("Contact keys:", e.message); return; }
-      if (g0 !== gen) return;   /* access changed meanwhile */
-      for (const id of part) { if (got && got[id]) ek.set(id, await imp(got[id])); else denied.add(id); }
+    for (let i = 0; i < want.length; i += 500) {
+      const part = want.slice(i, i + 500); let got;
+      try { got = await CLOUD.fieldKeys(part); if (!Array.isArray(got)) { v3 = "nosql"; return; } v3 = "ok"; }
+      catch (e) { if (/not set up|function|schema cache|does not exist/i.test(e.message || "")) v3 = "nosql"; else console.warn("Field keys:", e.message); return; }
+      if (g0 !== gen) return;
+      const back = new Set();
+      for (const x of got) { const k = pk(x.e, x.f); fk.set(k, await imp(x.k)); back.add(k); }
+      for (const p of part) { const k = pk(p.e, p.f); if (!back.has(k)) denied.add(k); }
     }
   }
-  async function enc(v, id) {
-    const iv = crypto.getRandomValues(new Uint8Array(12));
-    let k = null, pfx = null;
-    if (id != null && ek.has(String(id))) { k = ek.get(String(id)); pfx = PFX2 + encodeURIComponent(String(id)) + ":"; }
-    else if (key && (v2 === "nosql" || v2 === "unknown")) { k = key; pfx = PFX; }
-    if (!k) return null;
-    const ct = new Uint8Array(await crypto.subtle.encrypt({ name: "AES-GCM", iv }, k, new TextEncoder().encode(String(v))));
-    const out = new Uint8Array(12 + ct.length); out.set(iv); out.set(ct, 12); const t = pfx + b64(out); plain.set(t, String(v)); return t;
+  const typeOf = (v, col) => typeof v === "number" ? ((state.schema && (state.schema.columns.find(c => c.name === col) || {}).type === "date") ? "d" : "n") : typeof v === "boolean" ? "b" : "s";
+  async function enc(v, e, col) {
+    const k = fk.get(pk(e, col));
+    if (!k) {
+      /* private-details.sql not run yet: text is still locked the older way (admins only), so nothing goes in plain */
+      if (v3 === "nosql" && canSee() && typeof v === "string" && (await getKey())) { const iv = crypto.getRandomValues(new Uint8Array(12)), ct = new Uint8Array(await crypto.subtle.encrypt({ name: "AES-GCM", iv }, key, new TextEncoder().encode(v))); const o = new Uint8Array(12 + ct.length); o.set(iv); o.set(ct, 12); const t = P1 + b64(o); plain.set(t, v); return t; }
+      return null;
+    }
+    const iv = crypto.getRandomValues(new Uint8Array(12)), ct = new Uint8Array(await crypto.subtle.encrypt({ name: "AES-GCM", iv }, k, new TextEncoder().encode(String(v))));
+    const out = new Uint8Array(12 + ct.length); out.set(iv); out.set(ct, 12);
+    const t = P3 + encodeURIComponent(String(e)) + ":" + encodeURIComponent(F(col)) + ":" + typeOf(v, col) + ":" + b64(out); plain.set(t, v); return t;
   }
+  async function aes(k, body) { const u = unb(body); return new TextDecoder().decode(await crypto.subtle.decrypt({ name: "AES-GCM", iv: u.slice(0, 12) }, k, u.slice(12))); }
   async function dec(t) {
     if (plain.has(t)) return plain.get(t);
-    let k = null, body = null;
-    if (t.startsWith(PFX2)) { const id = envId(t); k = id != null ? ek.get(id) : null; body = t.slice(t.indexOf(":", PFX2.length) + 1); }
-    else { k = key; body = t.slice(PFX.length); }
-    if (!k) return null;
-    try { const u = unb(body), pt = await crypto.subtle.decrypt({ name: "AES-GCM", iv: u.slice(0, 12) }, k, u.slice(12)), x = new TextDecoder().decode(pt); plain.set(t, x); return x; } catch { return null; }
+    try {
+      let x = null;
+      const p3 = parse3(t);
+      if (p3) { const k = fk.get(pk(p3.e, p3.f)); if (!k) return null; const s = await aes(k, p3.body); x = p3.t === "n" || p3.t === "d" ? Number(s) : p3.t === "b" ? s === "true" : s; }
+      else if (t.startsWith(P2)) { const id = envId2(t), k = id != null ? ek.get(id) : null; if (!k) return null; x = await aes(k, t.slice(t.indexOf(":", P2.length) + 1)); }
+      else { if (!key) return null; x = await aes(key, t.slice(P1.length)); }
+      plain.set(t, x); return x;
+    } catch { return null; }
   }
-  /* what the database sends back: decrypted for people who may see that person's numbers, blank for everyone else */
-  async function fixVals(v, idx, see) {
-    const out = v.slice();
-    for (const i of idx) { const x = out[i]; if (x == null || x === "") continue; out[i] = isEnc(x) ? (see ? await dec(x) : null) : (see ? x : null); }
-    return out;
-  }
-  async function prefetch(rows, idx) {
-    const ids = [];
-    let old = false;
+  const colsOf = sch => !sch || !sch.columns ? [] : sch.columns.map(c => c.name).filter(isCol);
+  async function prefetch(rows, names, allIdx) {
+    const pairs = [], ids = []; let old = false;
     for (const r of rows) {
-      if (!r || !Array.isArray(r.v) || !canSeeRow(r.id)) continue;
-      ids.push(String(r.id));
-      for (const i of idx) { const x = r.v[i]; const e = envId(x); if (e != null) ids.push(e); else if (typeof x === "string" && x.startsWith(PFX)) old = true; }
+      if (!r || !Array.isArray(r.v)) continue;
+      for (const i of allIdx) {
+        const x = r.v[i]; const p = parse3(x);
+        if (p) { if (canSeeCell(p.e, p.f)) pairs.push(p); }
+        else if (typeof x === "string" && x.startsWith(P2)) { if (canSee()) ids.push(envId2(x)); }
+        else if (typeof x === "string" && x.startsWith(P1)) old = true;
+        if (isCol(names[i]) && canSee()) pairs.push({ e: r.id, f: names[i] });   /* admins: the key a save will need */
+      }
     }
-    await empKeys(ids);
-    if (canSee() && (old || v2 === "nosql")) await getKey();
+    await fieldKeys(pairs);
+    if (canSee()) { if (ids.length) await empKeys(ids); if (old || v3 === "nosql") await getKey(); }
+  }
+  async function fixVals(r, names, idx) {
+    const out = r.v.slice(), me = {};
+    for (const i of idx) {
+      const x = out[i];
+      if (isCol(names[i])) me[names[i]] = { e: String(r.id), f: F(names[i]), has: !(x == null || x === "") };
+      if (x == null || x === "") continue;
+      const p = parse3(x); if (p) me[names[i]] = { e: p.e, f: p.f, has: true };
+      const priv = isCol(names[i]);
+      if (!isEnc(x)) { out[i] = priv && !canSeeCell(r.id, names[i]) ? null : x; continue; }
+      const see = p ? canSeeCell(p.e, p.f) : canSee();
+      out[i] = see ? await dec(x) : null;
+    }
+    if (r.id != null) env.set(String(r.id), me);
+    return out;
   }
   async function outbound(res) {
     if (!res || typeof res !== "object" || !online()) return res;
-    const sch = res.schema || state.schema; const cols = colsOf(sch); if (!cols.length) return res;
-    const names = res.schema ? res.schema.columns.map(c => c.name) : (state.cols || []).map(c => c.name), idx = cols.map(n => names.indexOf(n)).filter(i => i >= 0);
-    if (!idx.length) return res;
-    const single = Array.isArray(res.v) ? { id: res.id ?? (res.row && res.row.id), v: res.v } : null;
-    await prefetch([...(Array.isArray(res.rows) ? res.rows : []), ...(single ? [single] : [])], idx);
+    if (!window.__tdSettingsReady && window.loadTeamSettings) { try { await loadTeamSettings(); } catch { } window.__tdSettingsReady = true; }
+    const sch = res.schema || state.schema; if (!sch || !sch.columns) return res;
+    const names = sch.columns.map(c => c.name), privIdx = names.map((n, i) => isCol(n) ? i : -1).filter(i => i >= 0);
+    const rowsIn = [...(Array.isArray(res.rows) ? res.rows : []), ...(Array.isArray(res.v) ? [{ id: res.id ?? (res.row && res.row.id), v: res.v }] : [])];
+    /* encrypted cells can also sit in a column that is no longer private: look at every column for them */
+    const encIdx = names.map((n, i) => i).filter(i => privIdx.includes(i) || rowsIn.some(r => r && Array.isArray(r.v) && isEnc(r.v[i])));
+    if (!encIdx.length) return res;
+    await prefetch(rowsIn, names, encIdx);
     const out = { ...res };
-    if (Array.isArray(res.rows)) out.rows = await Promise.all(res.rows.map(async r => r && Array.isArray(r.v) ? { ...r, v: await fixVals(r.v, idx, canSeeRow(r.id)) } : r));
-    if (single) out.v = await fixVals(res.v, idx, canSeeRow(single.id));
+    if (Array.isArray(res.rows)) out.rows = await Promise.all(res.rows.map(async r => r && Array.isArray(r.v) ? { ...r, v: await fixVals(r, names, encIdx) } : r));
+    if (Array.isArray(res.v)) out.v = await fixVals(rowsIn[rowsIn.length - 1], names, encIdx);
     if (res.schema && Array.isArray(res.rows)) {
-      /* cells still in plain text, in the older form, or under an old employee number: moved to the per-employee form */
-      const full = canSee(), todo = [];
-      let plainN = 0;
+      /* admins: plain private cells get encrypted, older or misplaced ones moved, and cells of a field that is no longer private opened */
+      const todo = []; let plainN = 0;
+      const listSet = Array.isArray((window.TD_SETTINGS || {}).private_fields);
       res.rows.forEach((r, n) => {
         if (!r || !Array.isArray(r.v)) return; const vals = {};
-        for (const i of idx) {
-          const x = r.v[i]; if (x == null || x === "") continue;
-          const stale = !isEnc(x) || (v2 === "ok" && (x.startsWith(PFX) || (envId(x) != null && envId(x) !== String(r.id))));
-          if (!isEnc(x)) plainN++;
-          const pv = out.rows[n].v[i];
-          if (stale && pv != null && pv !== "") vals[names[i]] = pv;
+        for (const i of encIdx) {
+          const x = r.v[i], col = names[i]; if (x == null || x === "") continue;
+          const pv = out.rows[n].v[i]; if (pv == null || pv === "") continue;
+          if (isCol(col)) { const p = parse3(x); if (!isEnc(x)) plainN++; if (v3 === "nosql") { if (!isEnc(x) && typeof x === "string") vals[col] = pv; } else if (!p || p.e !== String(r.id) || p.f !== F(col)) vals[col] = pv; }
+          else if (listSet && isEnc(x)) vals[col] = pv;
         }
         if (Object.keys(vals).length) todo.push({ id: r.id, values: vals });
       });
-      Object.defineProperty(out, "_phone", { value: { plain: plainN, todo: full && (key || v2 === "ok") ? todo : [] }, enumerable: false });
+      Object.defineProperty(out, "_phone", { value: { plain: plainN, todo: canSee() && (v3 === "ok" || (v3 === "nosql" && key)) ? todo : [] }, enumerable: false });
     }
     return out;
   }
-  /* what goes to the database: numbers are encrypted first; people without access to that person can't change them */
+  /* what goes to the database: private fields are encrypted first; people without access to that field can't change it */
   async function fixIn(values, id, alt) {
     if (!values || typeof values !== "object") return values;
     const ks = Object.keys(values).filter(isCol); if (!ks.length) return values;
-    const out = { ...values }, see = canSeeRow(id) || (alt != null && canSeeRow(alt)) || (id == null && canSee());
-    if (see) { await empKeys([id, alt]); if (canSee() && v2 !== "ok") await getKey(); }
-    const use = id != null && ek.has(String(id)) ? id : alt;
+    const out = { ...values }, use = id ?? alt, blocked = [];
+    await fieldKeys(ks.map(k => ({ e: use, f: k })));
     for (const k of ks) {
-      const v = out[k]; if (!see) { delete out[k]; continue; }
+      const v = out[k];
+      if (!canSeeCell(use, k) && !(alt != null && canSeeCell(alt, k))) { delete out[k]; if (v != null && v !== "") blocked.push(k); continue; }
       if (v == null || v === "" || isEnc(v)) continue;
-      const t = await enc(v, use);
+      const t = use != null ? await enc(v, use, k) : null;
       if (t) out[k] = t;
-      else if (v2 === "ok" || key) { delete out[k]; toast("The phone number for " + (use ?? "this person") + " was not saved: you don't have access to that person's contact details.", true); }
+      else if (v3 === "ok") { delete out[k]; blocked.push(k); }
+      /* without private-details.sql the value is kept as it was before 3.65.0 */
     }
+    if (blocked.length) toast("Not saved: " + blocked.join(", ") + ". Private details can be filled in by an admin, or after your request for them is approved.", true);
     return out;
   }
   async function inbound(method, path, body) {
     if (!online() || !body || method === "GET") return body;
     const kc = state.schema && state.schema.key_column;
     const m = /^\/api\/rows\/([^/?]+)/.exec(path || ""), pid = m ? decodeURIComponent(m[1]) : null;
-    if (body.values) { const nid = kc && body.values[kc] != null && body.values[kc] !== "" ? String(body.values[kc]).trim() : null; return { ...body, values: await fixIn(body.values, nid ?? pid, pid) }; }
-    if (Array.isArray(body.updates)) return { ...body, updates: await Promise.all(body.updates.map(async u => { const nid = kc && u.values && u.values[kc] != null && u.values[kc] !== "" ? String(u.values[kc]).trim() : null; return { ...u, values: await fixIn(u.values, nid ?? (u.id != null ? String(u.id) : null), u.id != null ? String(u.id) : null) }; })) };
+    const nidOf = v => kc && v && v[kc] != null && v[kc] !== "" ? String(v[kc]).trim() : null;
+    if (body.values) return { ...body, values: await fixIn(body.values, nidOf(body.values) ?? pid, pid) };
+    if (Array.isArray(body.updates)) return { ...body, updates: await Promise.all(body.updates.map(async u => ({ ...u, values: await fixIn(u.values, nidOf(u.values) ?? (u.id != null ? String(u.id) : null), u.id != null ? String(u.id) : null) }))) };
     return body;
   }
-  /* after loading: the super admin's dashboard encrypts numbers still in plain text and moves older cells to the new form */
   async function afterLoad(d) {
     const ph = d && d._phone; if (!ph || !online()) return;
-    if (ph.plain && !ph.todo.length && !warned && CLOUD.user().role === "superadmin") { warned = true; toast(keyState === "nosql" && v2 === "nosql" ? "Phone numbers are not encrypted yet: run encryption.sql and teams.sql once in Supabase → SQL Editor, then reload." : "Phone numbers could not be encrypted right now. They stay as they are; reload to try again.", true); }
+    if (ph.plain && !ph.todo.length && !warned && CLOUD.user().role === "superadmin") { warned = true; toast(v3 === "nosql" ? "Private details are not locked yet: run private-details.sql once in Supabase → SQL Editor, then reload." : "Private details could not be encrypted right now. They stay as they are; reload to try again.", true); }
     const todo = ph.todo.filter(u => !tried.has(String(u.id)));
     if (!todo.length || migrating || !(window.PERM && PERM.can("emp.bulk"))) return;
     migrating = true; for (const u of todo) tried.add(String(u.id));
-    try { await api("POST", "/api/bulk", { updates: todo, note: "Encrypted phone and WhatsApp numbers" }); toast("Encrypted " + todo.length + " " + (todo.length === 1 ? "person's" : "people's") + " phone and WhatsApp numbers in the database."); await loadData(true); }
-    catch (e) { toast("Could not encrypt the phone numbers yet: " + e.message, true); }
+    try { await api("POST", "/api/bulk", { updates: todo, note: "Encrypted private details" }); toast("Locked the private details of " + todo.length + " " + (todo.length === 1 ? "person" : "people") + " in the database."); await loadData(true); }
+    catch (e) { toast("Could not encrypt the private details yet: " + e.message, true); }
     finally { migrating = false; }
   }
-  /* the downloaded workbook: readable numbers for people who may see every number */
+  /* the downloaded workbook: readable private details for admins */
   async function plainCopy(u8) {
     if (!online() || !canSee()) return u8;
-    try { await empKeys((state.rows || []).map(r => String(r.id))); } catch { }
-    await getKey();
-    const ids = [];
-    await BE.rewriteCells(u8, async (h, v) => { const e = envId(v); if (e != null && !ek.has(e)) ids.push(e); return undefined; });
-    if (ids.length) await empKeys(ids);
-    return BE.rewriteCells(u8, async (h, v) => RE.test(String(h || "")) && isEnc(v) ? ((await dec(v)) ?? undefined) : undefined);
+    const pairs = [], ids = []; let old = false;
+    await BE.rewriteCells(u8, async (h, v) => { const p = parse3(v); if (p) pairs.push(p); else if (typeof v === "string" && v.startsWith(P2)) ids.push(envId2(v)); else if (typeof v === "string" && v.startsWith(P1)) old = true; return undefined; });
+    await fieldKeys(pairs); if (ids.length) await empKeys(ids); if (old) await getKey();
+    return BE.rewriteCells(u8, async (h, v) => isEnc(v) ? ((await dec(v)) ?? undefined) : undefined);
   }
-  /* access changed: drop every key and every decrypted number held in memory */
-  function forget() { gen++; ek.clear(); denied.clear(); plain.clear(); if (!canSee()) { key = null; keyState = "none"; } }
-  return { inbound, outbound, afterLoad, canSee, canSeeRow, isCol, plainCopy, forget, locked: (n, id) => online() && isCol(n) && !canSeeRow(id), state: () => keyState, v2: () => v2 };
+  /* access changed: drop every key and every decrypted value held in memory */
+  function forget() { gen++; fk.clear(); denied.clear(); plain.clear(); if (!canSee()) { key = null; keyState = "none"; ek.clear(); } }
+  const envOf = (id, col) => ((env.get(String(id)) || {})[col]) || { e: String(id), f: F(col) };
+  return { inbound, outbound, afterLoad, canSee, canSeeCell, isCol, plainCopy, forget, envOf, F, isEnc,
+    locked: (n, id) => online() && isCol(n) && !canSeeCell(id == null ? null : envOf(id, n).e, id == null ? n : envOf(id, n).f),
+    state: () => keyState, v3: () => v3 };
 })();
 async function api(method, path, body) {
   try { body = await PHONE.inbound(method, path, body); return await PHONE.outbound(await BE.call(method, path, body)); }
@@ -9949,6 +10071,7 @@ function prep(r) {
 async function loadData(silent) {
   if (silent) document.body.classList.add("refreshing");
   try {
+    await Promise.all([DETAILS.ensure(), window.__tdSettingsReady || !window.loadTeamSettings ? null : loadTeamSettings().then(() => { window.__tdSettingsReady = true; }).catch(() => { })]);   /* v3.65.0 */
     await TEAMS.ensure();   /* v3.64.0: know the team first, so a team lead never sees other teams for a moment */
     const d = await api("GET", "/api/data");
     ingest(d);
@@ -9982,7 +10105,7 @@ async function poll() {
 }
 
 /* ============================== filtering ============================== */
-const APP = { title: "Team Dashboard", version: "3.64.0", released: "20 Oct 2026" };
+const APP = { title: "Team Dashboard", version: "3.65.0", released: "20 Oct 2026" };
 const BASE_DIMS = { status: "status_column", desig: "designation_column", client: "client_column", mode: "mode_column" };
 const STANDARD_STATUSES = ["Active", "Manager", "OJT", "Bench", "New", "Projected", "Left", "Moved"];
 const TILE_ORDER = ["Active", "Manager", "OJT", "Bench", "New", "Projected"];
@@ -12045,7 +12168,7 @@ function renderTable() {
         h("button", { class: "thf" + (fa ? " on" : ""), "data-pop": "1", "aria-label": "Filter " + tc.label, title: "Filter " + tc.label, onclick: ev => openColFilter(ev.currentTarget, tc.key) }, "▾")));
   })));
   tbody.replaceChildren(...slice.map(row => h("tr", { tabindex: 0, class: row.id === state.flashId ? "flash" : "", "aria-label": "Edit " + gs(row, "name_column"),
-      onclick: () => openDrawer(row), onkeydown: ev => { if (ev.key === "Enter") openDrawer(row); } }, cols.map(tc => withCellCopy(cellNode(row, tc), tc)))));
+      onclick: () => openDrawer(row), onkeydown: ev => { if (ev.key === "Enter") openDrawer(row); } }, cols.map(tc => (PHONE.locked(tc.key, row.id) && PHONE.envOf(row.id, tc.key).has !== false ? h("td", { class: "priv-cell", title: "Private detail · ask for it in the notifications" }, "🔒") : null) || withCellCopy(cellNode(row, tc), tc)))));
   if (window.ATT) { try { ATT.decorateTable(thead, tbody, slice); } catch (e) { console.error(e); } }
   if (!slice.length) tbody.append(h("tr", {}, h("td", { colspan: Math.max(1, cols.length), style: "text-align:center;color:var(--ink-2);padding:28px;cursor:default" }, "No employees match the current filters.")));
   state.flashId = null;
@@ -12554,6 +12677,7 @@ function openDrawer(row) {
 
   function build() {
     fields.length = 0; body.replaceChildren(errBox);
+    if (!isNew && window.privBanner) { const pb = privBanner(row, () => { closeDrawer(); setTimeout(() => { const r2 = state.rows.find(x => x.id === row.id); if (r2) openDrawer(r2); }, 600); }); if (pb) body.append(pb); }   /* v3.65.0 */
     /* v3.27: details first, in clear categories with a jump bar; attendance and the route come after */
     const ICON = { "Personal": "👤", "Contact & address": "📞", "Job": "💼", "Key dates": "📅", "Commute & equipment": "🚗", "Notes": "📝", "Additional details": "➕", "Other": "…" };
     const cols = state.cols.filter(c => !c.auto), secs = [];
@@ -12569,7 +12693,8 @@ function openDrawer(row) {
           if (c.name === sch.doj_column) val = todaySerial();
         }
         const f = buildField(c, val, isNew);
-        if (PHONE.locked(c.name, base && base.id)) { f.get = () => (base ? base.v[state.idx[c.name]] : null); f.wrap.querySelectorAll("input,select,textarea").forEach(el => { el.disabled = true; el.dataset.locked = "1"; el.value = ""; el.placeholder = "🔒 Hidden"; el.title = "Only the super admin and people they allow can see phone and WhatsApp numbers"; }); }
+        if (PHONE.locked(c.name, base && base.id)) { f.get = () => (base ? base.v[state.idx[c.name]] : null); f.wrap.querySelectorAll("input,select,textarea").forEach(el => { el.disabled = true; el.dataset.locked = "1"; el.value = ""; el.placeholder = isNew ? "🔒 Filled in by an admin" : "🔒 Private"; el.title = "Private detail: only admins see it. Ask for it in the notification center; once approved it shows for 15 minutes."; });
+          if (!isNew && window.openDetailRequest) { const lab = f.wrap.querySelector("label, .flabel, span"); const ask = h("button", { type: "button", class: "dt-ask-f", onclick: e => { e.preventDefault(); e.stopPropagation(); openDetailRequest(state.rows.find(x => x.id === base.id) || row, c.name); } }, "Ask to see"); (lab || f.wrap).append(ask); } }
         fields.push(f); mine.push(f); grid.append(f.wrap);
       }
       const cnt = h("small", { class: "emp-cnt" }), navCnt = h("small", { class: "emp-jn" });
@@ -13297,7 +13422,7 @@ window.applyAccess = () => {
   show('#cardHolidays', PERM.can('ov.holidays')); if (typeof renderHolidays === 'function' && typeof state !== 'undefined' && state.view === 'summary') { renderHolidays(); window.organizeOverview?.(); }
   show('#cardWatch', PERM.can('ov.watch'));
   show('#btnAddField', PERM.can('emp.fields'));
-  show('#btnBell', PERM.can('notifications.view') || PERM.can('activity.view'));
+  show('#btnBell', PERM.can('notifications.view') || PERM.can('activity.view') || PERM.online());   /* v3.65.0: requests for private details live here */
   window.refreshNotifications?.();
   document.body.classList.toggle('no-report-export', !PERM.can('rep.export'));
   /* v3.14: each report group has its own right */
@@ -13371,7 +13496,7 @@ const activityNotification = it => ({id:'activity:'+(it.eventId || JSON.stringif
 let notificationItems = [], notificationOwner = '', notificationBody = null, bellBusy = false, activityError = '';
 function bellShow(n) {
   const b=el('bellN'), btn=el('btnBell'); if (!b || !btn) return;
-  b.hidden=!n; b.textContent=''; b.style.cssText='width:9px;min-width:9px;height:9px;padding:0;top:1px;right:1px;border-radius:50%;background:#e34948';
+  const extra=window.accessBadge?window.accessBadge():0; n=n+extra; b.hidden=!n; b.textContent=''; b.style.cssText='width:9px;min-width:9px;height:9px;padding:0;top:1px;right:1px;border-radius:50%;background:#e34948';
   btn.title=n ? `${n} unread notifications` : 'Notifications';
   btn.setAttribute('aria-label', n ? `Notifications: ${n} unread` : 'Notifications');
 }
@@ -13386,7 +13511,8 @@ function drawNotifications() {
   if (!notificationBody?.isConnected) return;
   const read=notificationReads(), unread=unreadCount();
   const allRead=h('button',{class:'btn mini',disabled:!unread,onclick:()=>markNotificationsRead(notificationItems.map(it=>it.id))},'Mark all read');
-  notificationBody.replaceChildren(
+  const inbox=h('div',{class:'ib-box'}); if (window.drawAccessInbox) drawAccessInbox(inbox);   /* v3.65.0 */
+  notificationBody.replaceChildren(inbox,
     h('div',{class:'activity-controls'},h('b',{},`${unread} unread`),h('span',{class:'spacer'}),allRead,h('button',{class:'btn mini',onclick:()=>bellCheck()},'Refresh')),
     h('p',{class:'set-hint'},'Read status is saved for your account on this browser. Opening this panel does not mark notifications as read.'),
     ...(activityError ? [h('p',{class:'err',role:'status'},activityError)] : []),
@@ -13399,7 +13525,7 @@ async function bellCheck() {
   if (bellBusy || el('app').hidden || document.hidden) return;
   const owner=notificationKey();
   if (notificationOwner !== owner) { notificationOwner=owner; notificationItems=[]; activityError=''; }
-  if (!notificationPermission() && !PERM.can('activity.view')) { notificationItems=[];bellShow(0);drawNotifications();return; }
+  if (!notificationPermission() && !PERM.can('activity.view')) { notificationItems=[];bellShow(0);drawNotifications();try{DETAILS.load();}catch{}return; }
   bellBusy=true;
   try {
     await loadTeamSettings(true);
@@ -13421,8 +13547,9 @@ window.refreshNotifications=()=>{
   notificationItems=notificationItems.filter(it=>it.type==='request'?allowedIds.has(it.id):PERM.can('activity.view'));
   bellShow(unreadCount());drawNotifications();bellCheck();
 };
+window.bellRecount=()=>bellShow(unreadCount());
 window.openBell=()=>{
-  if (!notificationPermission() && !PERM.can('activity.view')) { toast('Notification access is disabled for your account.',true);return; }
+  if (!notificationPermission() && !PERM.can('activity.view') && !PERM.online()) { toast('Notification access is disabled for your account.',true);return; }
   notificationBody=h('div',{class:'body'},h('div',{class:'empty'},'Loading notifications…'));
   mountDrawer(h('aside',{class:'drawer activity-drawer',role:'dialog','aria-modal':'true','aria-label':'Notifications'},h('header',{},h('h2',{},'Notifications'),h('button',{class:'btn ghost',onclick:closeDrawer,'aria-label':'Close'},'✕')),notificationBody));
   bellCheck();
@@ -13477,7 +13604,7 @@ const REQ_HEAD = ['Employee', 'Leave type', 'Dates', 'Days', 'Status', 'Sent by'
 async function fullCopy(u8, opts = {}) {
   /* readable phone numbers only for people who may see them and chose to include them; plus the leave requests (they live in the database) */
   const keepPhones = opts.phones !== false && PHONE.canSee();
-  u8 = keepPhones ? await PHONE.plainCopy(u8) : await BE.rewriteCells(u8, (hd, v) => /phone|mobile|whats\s*app|contact\s*(no\.?|number)|^contact$/i.test(String(hd || '')) && v != null && v !== '' ? '' : undefined);
+  u8 = keepPhones ? await PHONE.plainCopy(u8) : await BE.rewriteCells(u8, (hd, v) => (tdPrivate(hd) || PHONE.isEnc(v)) && v != null && v !== '' ? '' : undefined);
   const reqs = ((window.TD_SETTINGS || {}).leave_requests || []).filter(r => r && r.name);
   if (reqs.length) {
     const fmtD = x => { const d = new Date(x); return isNaN(d) ? String(x || '') : d.toISOString().slice(0, 16).replace('T', ' '); };
@@ -13506,7 +13633,7 @@ function downloadWorkbook(name, getBytes, what) {
   const meter = h('span', { class: 'dlw-meter' }, ...[1, 2, 3, 4, 5].map(() => h('i', {}))), mtxt = h('small', { class: 'dlw-mtxt' });
   const pwBox = h('div', { class: 'dlw-pwbox' }, h('label', { class: 'dlw-l' }, 'Password for the file'), h('div', { class: 'dlw-pwrow' }, pw, eye, gen, cp), h('div', { class: 'dlw-strength' }, meter, mtxt),
     h('p', { class: 'dlw-note' }, 'Share the password separately from the file (for example by phone or chat, not in the same email). It can’t be recovered if it is lost.'));
-  const phones = canPh ? checkLine('Include phone & WhatsApp numbers', true) : null;
+  const phones = canPh ? checkLine('Include private details (phone, WhatsApp, date of birth…)', true) : null;
   const phHint = h('small', { class: 'dlw-hint' });
   const inside = h('div', { class: 'dlw-in' }, h('b', {}, 'In the file'), h('div', { class: 'pc-chips' }, ...['Employees', 'Attendance & backups', 'Activity log', 'Admin log', 'Pseudo name history', 'Leave requests'].map(t => h('span', { class: 'pc-chip' }, t))),
     phones ? h('div', { class: 'dlw-ph' }, phones.el, phHint) : h('small', { class: 'dlw-hint' }, 'Phone and WhatsApp numbers are left out: your access doesn’t include them.'));
@@ -13517,7 +13644,7 @@ function downloadWorkbook(name, getBytes, what) {
     for (const [o, v] of [[optLocked, 'locked'], [optPlain, 'plain']]) { o.setAttribute('aria-checked', String(mode === v)); o.classList.toggle('on', mode === v); }
     pwBox.hidden = mode !== 'locked';
     const sc = pwScore(pw.value); meter.querySelectorAll('i').forEach((x, i) => { x.className = i < sc ? 'on s' + sc : ''; }); mtxt.textContent = !pw.value ? '' : ['', 'Too weak', 'Weak', 'Fair', 'Strong', 'Very strong'][sc];
-    if (phones) { if (mode === 'plain' && !phones.box.dataset.touched) phones.box.checked = false; if (mode === 'locked' && !phones.box.dataset.touched) phones.box.checked = true; phHint.textContent = phones.box.checked ? (mode === 'plain' ? 'Careful: the numbers will be readable by anyone who gets the file.' : 'Kept inside the protected file.') : 'Phone and WhatsApp cells will be empty in the file.'; }
+    if (phones) { if (mode === 'plain' && !phones.box.dataset.touched) phones.box.checked = false; if (mode === 'locked' && !phones.box.dataset.touched) phones.box.checked = true; phHint.textContent = phones.box.checked ? (mode === 'plain' ? 'Careful: they will be readable by anyone who gets the file.' : 'Kept inside the protected file.') : 'Private details will be empty in the file.'; }
     fname.textContent = base + ' ' + stamp + (mode === 'locked' ? ' (protected)' : '') + '.xlsx';
     const ok = mode === 'plain' || pw.value.length >= 8; go.disabled = !ok; go.textContent = mode === 'locked' ? '🔒 Download protected file' : 'Download readable file';
   };
@@ -13888,7 +14015,7 @@ function buildAccessForm(src, users = [], opts = {}) {
   const bkSync = () => { bkRev.box.disabled = !bkRep.box.checked; if (!bkRep.box.checked) bkRev.box.checked = false; }; bkRep.box.addEventListener('change', bkSync); bkSync();
   const bkBox = h('div', { class: 'rmod-extra bk-access' }, h('p', { class: 'rmod-subt' }, 'Backups'), bkEdit.el, h('p', { class: 'set-hint' }, 'Untick to keep people in this role from setting or changing backups; they still see them, and leave they record or approve is saved without the backup question.'), bkRep.el, bkRev.el, h('p', { class: 'set-hint' }, 'Backup report: off unless ticked. Super admins always have everything.'));
   const phSee = checkLine('Can see and edit phone & WhatsApp numbers', !!(accessSource && accessSource.permissions && accessSource.permissions._phones));
-  const phBox = h('div', { class: 'rmod-extra bk-access' }, h('p', { class: 'rmod-subt' }, 'Phone & WhatsApp numbers'), phSee.el, h('p', { class: 'set-hint' }, 'Stored encrypted in the database. Off unless ticked: everyone else sees these fields blank. Super admins always see them.'));
+  const phBox = h('div', { class: 'rmod-extra bk-access', hidden: true }, h('p', { class: 'rmod-subt' }, 'Phone & WhatsApp numbers'), phSee.el, h('p', { class: 'set-hint' }, 'Stored encrypted in the database. Off unless ticked: everyone else sees these fields blank. Super admins always see them.'));
   const bkPerms = () => ({ _bkReport: bkRep.box.checked, _bkRevenue: bkRep.box.checked && bkRev.box.checked, _phones: phSee.box.checked, _backupEdit: bkEdit.box.checked });
   const rights = h('div', { class: 'rights' }, roleNote, bkBox, phBox, presets, h('div', { class: 'rrows' }, h('div', { class: 'rgrid-head', 'aria-hidden': 'true' }, h('span', {}, 'Area'), h('span', {}, 'Hide'), h('span', {}, 'View'), h('span', {}, 'Edit'), h('span', {}, '')), ...modules));
   rights.addEventListener('change', () => setTimeout(paintPresets)); rights.addEventListener('click', e => { if (e.target.closest('.rseg-b, .rchk')) setTimeout(paintPresets); });
@@ -14261,7 +14388,7 @@ async function openTeamEditor(t, users, done) {
   const save = h('button', { class: 'btn primary', type: 'button' }, isNew ? 'Create team' : 'Save team');
   const d = pdlg(isNew ? 'New team' : 'Edit ' + t.name, h('div', { class: 'tm-ed' },
     h('label', { class: 'dlw-l' }, 'Team name'), name,
-    h('div', { class: 'tm-sec' }, h('span', { class: 'dlw-l' }, 'Team leads'), h('p', { class: 'set-hint' }, 'They see this team’s employees, attendance and contact numbers. Anything else needs an approved request.')), leadList,
+    h('div', { class: 'tm-sec' }, h('span', { class: 'dlw-l' }, 'Team leads'), h('p', { class: 'set-hint' }, 'They see this team’s employees and attendance. Other teams need an approved request; private details (phone, date of birth…) are asked for in the notifications.')), leadList,
     h('div', { class: 'tm-sec' }, h('span', { class: 'dlw-l' }, 'Employees · ', count), h('span', { class: 'grow' }), shownN),
     h('div', { class: 'tm-tools' }, q, cl, show), h('div', { class: 'tm-tools2' }, leftBox.el, h('span', { class: 'grow' }), allBtn, noneBtn), list,
     h('p', { class: 'set-hint' }, 'An employee is in one team. Adding someone who is in another team moves them here.'), err),
@@ -14302,7 +14429,7 @@ async function drawTeamsTab(body, users) {
       open.length ? h('p', { class: 'tm-open' }, '🔓 Also open to ' + open.map(a => a.user_name + ' (' + tmLeft(a.expires_at) + ')').join(', ')) : null);
   };
   fill(body,
-    h('div', { class: 'tm-head' }, h('div', {}, h('h3', {}, 'Teams'), h('p', { class: 'set-hint' }, 'Put each employee in a team and pick its team leads. A team lead who isn’t an admin sees only their own team’s employees, attendance and contact numbers. Other teams open only after you or an admin approve a request, for a few hours, and close on their own.')),
+    h('div', { class: 'tm-head' }, h('div', {}, h('h3', {}, 'Teams'), h('p', { class: 'set-hint' }, 'Put each employee in a team and pick its team leads. A team lead who isn’t an admin sees only their own team’s employees and attendance. Other teams open only after you or an admin approve a request, for a few hours, and close on their own.')),
       h('span', { class: 'grow' }), h('button', { class: 'btn', type: 'button', onclick: () => openTeamAccess() }, 'Requests' + (pend.length ? ' · ' + pend.length : '')), h('button', { class: 'btn primary', type: 'button', onclick: () => openTeamEditor(null, users, redraw) }, '+ New team')),
     h('div', { class: 'tm-stats' }, h('div', {}, h('b', {}, String(ts.length)), h('span', {}, ts.length === 1 ? 'team' : 'teams')), h('div', {}, h('b', {}, String(people.length - free.length)), h('span', {}, 'in a team')),
       h('div', { class: free.length ? 'warn' : '' }, h('b', {}, String(free.length)), h('span', {}, 'not in a team')), h('div', { class: pend.length ? 'hot' : '' }, h('b', {}, String(pend.length)), h('span', {}, pend.length === 1 ? 'request waiting' : 'requests waiting'))),
@@ -14347,7 +14474,7 @@ function openTeamAccess() {
     /* --- team leads: my team, my open access, ask for more --- */
     if (!admin || mineT.length) {
       parts.push(h('section', { class: 'tm-s' }, h('h4', {}, mineT.length === 1 ? 'Your team' : 'Your teams'),
-        mineT.length ? h('div', { class: 'tm-mine' }, mineT.map((t, n) => h('div', { class: 'tm-minec' }, tmName(t, n), h('div', {}, h('b', {}, t.name), h('small', {}, (t.emps || []).length + ' employees · attendance and contact numbers'))))) :
+        mineT.length ? h('div', { class: 'tm-mine' }, mineT.map((t, n) => h('div', { class: 'tm-minec' }, tmName(t, n), h('div', {}, h('b', {}, t.name), h('small', {}, (t.emps || []).length + ' employees · attendance'))))) :
           h('p', { class: 'set-hint' }, admin ? 'You are not the lead of a team.' : 'You are not the lead of a team yet. Ask the super admin to add you to one.')));
       if (live.length) parts.push(h('section', { class: 'tm-s' }, h('h4', {}, 'Extra access open now'),
         live.map(a => h('div', { class: 'tm-live' }, h('span', { class: 'tm-pulse' }), h('span', {}, h('b', {}, a.team), h('small', {}, ' · approved by ' + (a.decided_by || '?'))), h('span', { class: 'grow' }), tmLeftEl(a.expires_at),
@@ -14366,7 +14493,7 @@ function openTeamAccess() {
         team.addEventListener('change', ok); why.addEventListener('input', ok); ok();
         send.addEventListener('click', async () => { send.disabled = true; send.textContent = 'Sending…'; try { const t0 = team.value, w0 = why.value.trim(); form.team = ''; form.why = ''; await TEAMS.call(() => CLOUD.teams.request(t0, form.hours, w0)); toast('Request sent. You’ll see the team here as soon as an admin approves it.'); } catch (e) { form.team = team.value; form.why = why.value; toast(e.message, true); send.disabled = false; send.textContent = 'Send request'; } });
         parts.push(h('section', { class: 'tm-s tm-ask' }, h('h4', {}, 'Ask to see another team'),
-          h('p', { class: 'set-hint' }, 'An admin or the super admin approves it. You then see that team’s employees, attendance and contact numbers until the time runs out.'),
+          h('p', { class: 'set-hint' }, 'An admin or the super admin approves it. You then see that team’s employees and attendance until the time runs out.'),
           h('div', { class: 'tm-askrow' }, team, hb), why, h('div', { class: 'tm-req-b' }, h('span', { class: 'grow' }), send)));
       }
       if (myPend.length) parts.push(h('section', { class: 'tm-s' }, h('h4', {}, 'Your requests waiting'),
@@ -14385,6 +14512,191 @@ function openTeamAccess() {
   tick = setInterval(() => { let ended = false; for (const el of body.querySelectorAll('.tm-left')) { const t = tmLeft(el.dataset.exp); el.textContent = t; if (t === 'ended') ended = true; } if (ended) draw(); }, 20000);
 }
 window.openTeamAccess = openTeamAccess;
+/* ============================== v3.65.0: private details: ask, approve, see for 15 minutes ============================== */
+const dtLeft = iso => { const s = Math.round((Date.parse(iso) - DETAILS.now()) / 1000); if (!(s > 0)) return 'ended'; const m = Math.floor(s / 60); return m >= 1 ? m + ' min ' + String(s % 60).padStart(2, '0') + ' s left' : s + ' s left'; };
+const dtLeftEl = iso => h('span', { class: 'tm-left', 'data-dexp': iso }, dtLeft(iso));
+const dtAgo = iso => { const m = Math.max(0, Math.round((DETAILS.now() - Date.parse(iso)) / 60000)); return m < 1 ? 'just now' : m < 60 ? m + ' min ago' : m < 1440 ? Math.round(m / 60) + ' h ago' : Math.round(m / 1440) + ' d ago'; };
+const dtMissing = () => h('p', { class: 'set-hint' }, 'Private details need one step in Supabase: open SQL Editor, paste private-details.sql (it came with this version), press Run, then reload.');
+/* the private fields of one person, as stored (so the request names exactly what is locked) */
+function dtFieldsOf(row) {
+  const out = [];
+  for (const c of state.cols || []) {
+    if (!PHONE.isCol(c.name)) continue;
+    const env = PHONE.envOf(row.id, c.name), stored = env.has !== false;
+    out.push({ col: c.name, label: c.label || c.name, f: env.f, e: env.e, stored, open: PHONE.canSeeCell(env.e, env.f) });
+  }
+  return out;
+}
+const dtName = row => gs(row, 'name_column').trim() || String(row.id);
+/* ---------- ask for someone's private details ---------- */
+function openDetailRequest(row, only) {
+  if (DETAILS.state() === 'nosql') { pdlg('Ask for private details', dtMissing()); return; }
+  const body = h('div', { class: 'dt-ask' }), err = h('p', { class: 'err', role: 'alert' });
+  let pick = row || null; const ticked = new Set(only ? [only] : []);
+  const why = h('textarea', { class: 'input', rows: 2, maxlength: 500, placeholder: 'Why do you need them? e.g. to call about tomorrow’s shift', 'aria-label': 'Reason' });
+  const send = h('button', { class: 'btn primary', type: 'button', disabled: true }, 'Send request');
+  const ok = () => { send.disabled = !pick || !ticked.size || !why.value.trim(); };
+  why.addEventListener('input', ok);
+  const search = h('input', { class: 'input', type: 'search', placeholder: 'Search the person by name or number', 'aria-label': 'Person' });
+  const res = h('div', { class: 'tm-list dt-res' });
+  const drawRes = () => {
+    const s = search.value.trim().toLowerCase();
+    const list = s ? state.rows.filter(r => (dtName(r) + ' ' + r.id).toLowerCase().includes(s)).slice(0, 30) : [];
+    fill(res, s && !list.length ? h('p', { class: 'set-hint', style: 'padding:10px 12px' }, 'Nobody matches.') : list.map(r => h('button', { type: 'button', class: 'tm-row dt-pick', onclick: () => { pick = r; ticked.clear(); draw(); } }, h('span', { class: 'tm-pn' }, dtName(r), h('small', {}, r.id + (gs(r, 'client_column') ? ' · ' + gs(r, 'client_column') : ''))))));
+    res.hidden = !s;
+  };
+  search.addEventListener('input', drawRes);
+  function draw() {
+    const parts = [];
+    if (!pick) { parts.push(h('label', { class: 'dlw-l' }, 'Whose details'), search, res); }
+    else {
+      const fs = dtFieldsOf(pick), have = fs.filter(x => x.stored);
+      parts.push(h('div', { class: 'dt-who' }, h('span', { class: 'tm-dot', style: '--h:210' }, dtName(pick).slice(0, 1)), h('div', {}, h('b', {}, dtName(pick)), h('small', {}, pick.id + (gs(pick, 'client_column') ? ' · ' + gs(pick, 'client_column') : ''))), h('span', { class: 'grow' }),
+        row ? null : h('button', { class: 'dlw-mini', type: 'button', onclick: () => { pick = null; ticked.clear(); draw(); setTimeout(() => search.focus(), 0); } }, 'Change')));
+      parts.push(h('label', { class: 'dlw-l' }, 'Which details'));
+      if (!have.length) parts.push(h('p', { class: 'set-hint' }, 'No private details are stored for this person.'));
+      else parts.push(h('div', { class: 'dt-fields' }, fs.map(x => {
+        if (x.open) return h('span', { class: 'tm-chip sm dt-open' }, '🔓 ' + x.label);
+        if (!x.stored) return h('span', { class: 'tm-chip sm dt-empty', title: 'Nothing stored' }, x.label + ' · empty');
+        const on = ticked.has(x.col);
+        return h('button', { type: 'button', class: 'tm-chip' + (on ? ' on' : ''), 'aria-pressed': String(on), onclick: () => { on ? ticked.delete(x.col) : ticked.add(x.col); draw(); } }, (on ? '✓ ' : '🔒 ') + x.label);
+      }), have.filter(x => !x.open).length > 1 ? h('button', { class: 'linkbtn', type: 'button', onclick: () => { have.filter(x => !x.open).forEach(x => ticked.add(x.col)); draw(); } }, 'All') : null));
+      parts.push(h('label', { class: 'dlw-l' }, 'Reason'), why);
+      parts.push(h('p', { class: 'dlw-note' }, '⏱ After an admin approves, the ticked details show for 15 minutes, then lock again. Every request is kept with your name.'));
+    }
+    parts.push(err); fill(body, parts); ok();
+  }
+  const d = pdlg('Ask for private details', body, [h('span', { class: 'grow' }), h('button', { class: 'btn', type: 'button', onclick: () => d.close() }, 'Cancel'), send], 'dt-dlg');
+  draw(); setTimeout(() => (pick ? why : search).focus(), 0);
+  send.addEventListener('click', async () => {
+    err.textContent = ''; send.disabled = true; send.textContent = 'Sending…';
+    const fs = dtFieldsOf(pick).filter(x => ticked.has(x.col));
+    try {
+      await DETAILS.call(() => CLOUD.details.request(String(fs[0].e), dtName(pick), fs.map(x => x.f), fs.map(x => x.label), why.value.trim()));
+      d.close(); toast('Request sent. You’ll get a notification when an admin answers.'); window.refreshNotifications?.();
+    } catch (e) { err.textContent = e.message; send.disabled = false; send.textContent = 'Send request'; }
+  });
+}
+window.openDetailRequest = openDetailRequest;
+
+/* ---------- the strip at the top of an employee's card ---------- */
+window.privBanner = (row, close) => {
+  if (!PERM.online() || PHONE.canSee() || !row) return null;
+  const fs = dtFieldsOf(row), locked = fs.filter(x => x.stored && !x.open), open = fs.filter(x => x.open);
+  const mine = DETAILS.live().filter(a => fs.some(x => x.open && String(a.emp_id) === String(x.e)));
+  const wait = DETAILS.items().filter(a => a.status === 'pending' && String(a.user_id) === DETAILS.myId() && String(a.emp_id) === String(row.id));
+  if (!locked.length && !open.length) return null;
+  const box = h('div', { class: 'dt-banner' + (open.length ? ' open' : '') });
+  const exp = mine.length ? mine.map(a => a.expires_at).sort()[0] : null;
+  fill(box, h('span', { class: 'dt-bi' }, open.length ? '🔓' : '🔒'),
+    h('div', {}, open.length ? h('b', {}, open.map(x => x.label).join(', ') + ' visible') : h('b', {}, locked.length + ' private ' + (locked.length === 1 ? 'detail' : 'details') + ' locked'),
+      h('small', {}, open.length ? 'Locks again on its own' + (locked.length ? ' · still locked: ' + locked.map(x => x.label).join(', ') : '') : wait.length ? 'Your request is waiting for an admin' : locked.map(x => x.label).join(', '))),
+    h('span', { class: 'grow' }), exp ? dtLeftEl(exp) : null,
+    locked.length && !wait.length ? h('button', { class: 'btn mini', type: 'button', onclick: () => openDetailRequest(row) }, 'Ask to see') : null);
+  if (exp) {
+    const t = setInterval(() => {
+      if (!box.isConnected) { clearInterval(t); return; }
+      const el = box.querySelector('[data-dexp]'); const left = dtLeft(exp); if (el) el.textContent = left;
+      if (left === 'ended') { clearInterval(t); toast('Time is up: the private details are locked again.'); try { PHONE.forget(); } catch { } close && close(); }
+    }, 1000);
+  }
+  return box;
+};
+
+/* ---------- the notification center: requests ---------- */
+function drawAccessInbox(box) {
+  if (!box) return;
+  if (!PERM.online()) { fill(box); return; }
+  const admin = DETAILS.isAdmin(), parts = [];
+  const act = async (fn, okMsg) => { try { await fn(); if (okMsg) toast(okMsg); } catch (e) { toast(e.message, true); } drawAccessInbox(box); window.bellRecount?.(); };
+  if (DETAILS.state() === 'nosql') { if (admin) parts.push(h('section', { class: 'ib-s' }, h('h4', {}, 'Private details'), dtMissing())); fill(box, parts); return; }
+  const items = DETAILS.items();
+  if (admin) {
+    const pend = DETAILS.pending(), open = items.filter(a => a.status === 'approved' && Date.parse(a.expires_at) > DETAILS.now());
+    const tpend = TEAMS.state() === 'ok' ? TEAMS.pending() : [];
+    parts.push(h('section', { class: 'ib-s' }, h('h4', {}, 'Requests to approve', pend.length + tpend.length ? h('span', { class: 'ppl-tab-n hot' }, String(pend.length + tpend.length)) : null),
+      !pend.length && !tpend.length ? h('p', { class: 'set-hint' }, 'Nothing waiting.') : null,
+      pend.map(a => h('div', { class: 'tm-req' }, h('div', { class: 'tm-req-t' }, h('b', {}, a.user_name || 'Someone'), ' wants to see ', h('b', {}, a.emp_name || a.emp_id), '’s ', (a.labels || a.fields || []).join(', '), h('small', {}, ' · ' + dtAgo(a.requested_at))),
+        a.reason ? h('p', { class: 'tm-why' }, '“' + a.reason + '”') : null,
+        h('div', { class: 'tm-req-b' }, h('span', { class: 'set-hint' }, '🔐 Private details · opens for ' + (a.minutes || 15) + ' min'), h('span', { class: 'grow' }),
+          h('button', { class: 'btn', type: 'button', onclick: e => { e.target.disabled = true; act(() => DETAILS.call(() => CLOUD.details.decide(a.id, 'reject')), 'Declined.'); } }, 'Decline'),
+          h('button', { class: 'btn primary', type: 'button', onclick: e => { e.target.disabled = true; act(() => DETAILS.call(() => CLOUD.details.decide(a.id, 'approve')), 'Approved: ' + (a.user_name || '') + ' sees it for ' + (a.minutes || 15) + ' minutes.'); } }, 'Approve')))),
+      tpend.map(a => h('div', { class: 'tm-req' }, h('div', { class: 'tm-req-t' }, h('b', {}, a.user_name || 'Someone'), ' wants to see the team ', h('b', {}, a.team), h('small', {}, ' · ' + dtAgo(a.requested_at) + ' · for ' + a.hours + ' h')),
+        a.reason ? h('p', { class: 'tm-why' }, '“' + a.reason + '”') : null,
+        h('div', { class: 'tm-req-b' }, h('span', { class: 'set-hint' }, '👥 Team access'), h('span', { class: 'grow' }),
+          h('button', { class: 'btn', type: 'button', onclick: e => { e.target.disabled = true; act(() => TEAMS.call(() => CLOUD.teams.decide(a.id, 'reject')), 'Declined.'); } }, 'Decline'),
+          h('button', { class: 'btn primary', type: 'button', onclick: e => { e.target.disabled = true; act(() => TEAMS.call(() => CLOUD.teams.decide(a.id, 'approve', a.hours)), 'Approved for ' + a.hours + ' h.'); } }, 'Approve'))))));
+    if (open.length) parts.push(h('section', { class: 'ib-s' }, h('h4', {}, 'Open right now'),
+      open.map(a => h('div', { class: 'tm-live' }, h('span', { class: 'tm-pulse' }), h('span', {}, h('b', {}, a.user_name), ' → ', a.emp_name || a.emp_id, h('small', {}, ' · ' + (a.labels || []).join(', '))), h('span', { class: 'grow' }), dtLeftEl(a.expires_at),
+        h('button', { class: 'pt-act danger', type: 'button', onclick: e => { e.target.disabled = true; act(() => DETAILS.call(() => CLOUD.details.decide(a.id, 'revoke')), 'Locked again.'); } }, 'Lock now')))));
+  } else {
+    const mine = items.filter(a => String(a.user_id) === DETAILS.myId());
+    const open = mine.filter(a => a.status === 'approved' && Date.parse(a.expires_at) > DETAILS.now()), wait = mine.filter(a => a.status === 'pending');
+    const ended = mine.filter(a => !open.includes(a) && !wait.includes(a)).slice(0, 6);
+    const lbl = { rejected: ['Declined', 'no'], expired: ['Ended', 'x'], revoked: ['Locked', 'x'], cancelled: ['Cancelled', 'x'], approved: ['Ended', 'x'] };
+    const openEmp = a => { const r = state.rows.find(x => String(x.id) === String(a.emp_id)); if (r) { closeDrawer(); setTimeout(() => openDrawer(r), 0); } else toast('That person is not in your list.', true); };
+    parts.push(h('section', { class: 'ib-s' }, h('div', { class: 'ib-head' }, h('h4', {}, 'Private details'), h('span', { class: 'grow' }), h('button', { class: 'btn mini primary', type: 'button', onclick: () => openDetailRequest(null) }, '+ Ask for details')),
+      h('p', { class: 'set-hint' }, 'Phone, WhatsApp, date of birth and other private details are locked. Ask for what you need; an admin approves it and you see it for 15 minutes.'),
+      open.map(a => h('div', { class: 'tm-live' }, h('span', { class: 'tm-pulse' }), h('span', {}, h('b', {}, a.emp_name || a.emp_id), h('small', {}, ' · ' + (a.labels || []).join(', '))), h('span', { class: 'grow' }), dtLeftEl(a.expires_at),
+        h('button', { class: 'btn mini primary', type: 'button', onclick: () => openEmp(a) }, 'Show'),
+        h('button', { class: 'pt-act', type: 'button', onclick: e => { e.target.disabled = true; act(() => DETAILS.call(() => CLOUD.details.decide(a.id, 'revoke')), 'Locked again.'); } }, 'Done'))),
+      wait.map(a => h('div', { class: 'tm-live' }, h('span', { class: 'tm-st w' }, 'Waiting'), h('span', {}, h('b', {}, a.emp_name || a.emp_id), h('small', {}, ' · ' + (a.labels || []).join(', ') + ' · ' + dtAgo(a.requested_at))), h('span', { class: 'grow' }),
+        h('button', { class: 'pt-act', type: 'button', onclick: e => { e.target.disabled = true; act(() => DETAILS.call(() => CLOUD.details.decide(a.id, 'cancel')), 'Request cancelled.'); } }, 'Cancel'))),
+      ended.map(a => { const [l, c] = lbl[a.status] || [a.status, 'x']; return h('div', { class: 'tm-live' }, h('span', { class: 'tm-st ' + c }, l), h('span', {}, a.emp_name || a.emp_id, h('small', {}, ' · ' + (a.labels || []).join(', ') + (a.decided_by ? ' · ' + a.decided_by : '')))); })));
+    if (TEAMS.state() === 'ok' && TEAMS.leadTeams().length) parts.push(h('section', { class: 'ib-s' }, h('div', { class: 'ib-head' }, h('h4', {}, 'Other teams'), h('span', { class: 'grow' }), h('button', { class: 'btn mini', type: 'button', onclick: () => openTeamAccess() }, 'Team access')),
+      TEAMS.grants().map(a => h('div', { class: 'tm-live' }, h('span', { class: 'tm-pulse' }), h('b', {}, a.team), h('span', { class: 'grow' }), tmLeftEl(a.expires_at)))));
+  }
+  fill(box, parts);
+  clearInterval(box._t); box._t = setInterval(() => { if (!box.isConnected) { clearInterval(box._t); return; } let ended = false; for (const el of box.querySelectorAll('[data-dexp]')) { const t = dtLeft(el.dataset.dexp); el.textContent = t; if (t === 'ended') ended = true; } if (ended) drawAccessInbox(box); }, 1000);
+}
+window.drawAccessInbox = drawAccessInbox;
+/* what the bell's dot counts besides the usual notifications: requests to answer (admins), answers to read (everyone else) */
+window.accessBadge = () => {
+  if (!PERM.online()) return 0;
+  if (DETAILS.isAdmin()) return DETAILS.pending().length + (TEAMS.state() === 'ok' ? TEAMS.pending().length : 0);
+  return DETAILS.live().length;
+};
+/* tell people straight away: admins about new requests, others about answers */
+addEventListener('details:changed', () => {
+  const ids = DETAILS.items().map(a => a.id + ':' + a.status).join(','), was = DETAILS.seenPending();
+  if (was != null && ids !== was) {
+    const old = new Set(was.split(','));
+    for (const a of DETAILS.items()) {
+      const k = a.id + ':' + a.status; if (old.has(k)) continue;
+      if (DETAILS.isAdmin() && a.status === 'pending') toast('🔐 ' + a.user_name + ' asks for ' + (a.emp_name || a.emp_id) + '’s ' + (a.labels || []).join(', ') + '. Open the notifications to answer.');
+      else if (!DETAILS.isAdmin() && String(a.user_id) === DETAILS.myId() && a.status === 'approved') toast('🔓 Approved: ' + (a.emp_name || a.emp_id) + '’s ' + (a.labels || []).join(', ') + ' visible for ' + (a.minutes || 15) + ' minutes.');
+      else if (!DETAILS.isAdmin() && String(a.user_id) === DETAILS.myId() && a.status === 'rejected') toast('Your request for ' + (a.emp_name || a.emp_id) + '’s details was declined.', true);
+    }
+  }
+  DETAILS.seenPending(ids);
+  window.bellRecount?.();
+  for (const b of document.querySelectorAll('.ib-box')) drawAccessInbox(b);
+});
+addEventListener('teams:changed', () => { window.bellRecount?.(); for (const b of document.querySelectorAll('.ib-box')) drawAccessInbox(b); });
+
+/* ---------- Settings › Fields & drop-downs › Private details ---------- */
+function drawPrivateFields(pane, tabs) {
+  const cols = state.cols.filter(c => !c.auto && c.name !== state.schema.key_column && c.name !== state.schema.name_column);
+  const cur = new Set(cols.filter(c => tdPrivate(c.name)).map(c => c.name)), draft = new Set(cur);
+  const save = h('button', { class: 'btn primary', type: 'button', disabled: true }, 'Save');
+  const dirty = h('span', { class: 'sm muted' });
+  const list = h('div', { class: 'dt-cols' });
+  const upd = () => { const n = [...draft].filter(x => !cur.has(x)).length + [...cur].filter(x => !draft.has(x)).length; dirty.textContent = n ? n + ' unsaved change' + (n === 1 ? '' : 's') : ''; save.disabled = !n; };
+  const draw = () => fill(list, cols.map(c => { const on = draft.has(c.name); return h('button', { type: 'button', class: 'tm-chip' + (on ? ' on' : ''), 'aria-pressed': String(on), onclick: () => { on ? draft.delete(c.name) : draft.add(c.name); draw(); upd(); } }, (on ? '🔒 ' : '') + c.label); }));
+  draw();
+  save.addEventListener('click', async () => {
+    save.disabled = true; save.textContent = 'Saving…';
+    try {
+      const added = [...draft].filter(x => !cur.has(x)), removed = [...cur].filter(x => !draft.has(x));
+      await saveTeamSetting('private_fields', [...draft], { name: 'Private details', text: (added.length ? 'Locked: ' + added.join(', ') : '') + (added.length && removed.length ? ' · ' : '') + (removed.length ? 'Unlocked: ' + removed.join(', ') : '') });
+      PHONE.forget(); await loadData(true); toast('Saved. The database is being updated with the new private fields.'); drawPrivateFields(pane, tabs);
+    } catch (e) { toast(e.message, true); save.disabled = false; save.textContent = 'Save'; }
+  });
+  fill(pane, tabs, h('div', { class: 'set-card' }, h('h4', {}, '🔒 Private details'),
+    h('p', { class: 'set-hint' }, 'Ticked fields are stored encrypted in the database. Only admins and the super admin see them. Anyone else sees “🔒 Private” and can ask for a person’s details in the notification center; after an admin approves, they show for 15 minutes and lock again.'),
+    list, h('div', { class: 'dd-foot', style: 'display:flex;gap:10px;align-items:center;justify-content:flex-end;margin-top:12px' }, dirty, save),
+    h('p', { class: 'set-hint' }, 'Birthdays on the Overview come from the date of birth, so people who are not admins don’t see them while the date of birth is private.')));
+}
 
 /* ---------- the button at the top: my team / requests waiting ---------- */
 function teamPill() {
@@ -14737,7 +15049,7 @@ function drawEditor(box, u, reload, users = [], template = null, groups = []) {
         h('label', {}, 'Passcode', h('div', { class: 'pc-wrap' }, code, eye, fresh)),
         h('label', {}, 'Linked employee (optional)', emp, empList)),
       active.el),
-    sec('2', 'Role', roles.length ? 'What they can open and change comes from their role' : 'Create roles in the Roles tab above, then pick one here', pickBox, h('div', { class: 'ped-phones' }, phonesOn.el)),
+    sec('2', 'Role', roles.length ? 'What they can open and change comes from their role' : 'Create roles in the Roles tab above, then pick one here', pickBox, h('div', { class: 'ped-phones', hidden: true }, phonesOn.el)),
     groups.length ? sec('3', 'Groups', 'People in the same group see each other’s requests and request notifications', groupBox) : null,
     h('div', { class: 'set-actions ped-save' }, save, err, h('span', { class: 'spacer' }), del));
   if (isNew) name.focus();
@@ -14761,8 +15073,9 @@ async function drawChoices(pane) {
   const sup = PERM.isSuper();
   const tab = drawChoices.tab || 'emp';
   const tabs = h('div', { class: 'ppl-tabs', role: 'tablist' },
-    ...[['emp', 'Employee fields'], ['att', 'Attendance fields']].map(([k, l]) => h('button', { type: 'button', class: 'ppl-tab', role: 'tab', 'aria-selected': String(tab === k), onclick: () => { drawChoices.tab = k; drawChoices(pane); } }, l)));
+    ...[['emp', 'Employee fields'], ['att', 'Attendance fields'], ...(sup && PERM.online() ? [['priv', '🔒 Private details']] : [])].map(([k, l]) => h('button', { type: 'button', class: 'ppl-tab', role: 'tab', 'aria-selected': String(tab === k), onclick: () => { drawChoices.tab = k; drawChoices(pane); } }, l)));
   if (tab === 'att') { drawAttFieldNames(pane, tabs, sup); return; }
+  if (tab === 'priv' && sup) { drawPrivateFields(pane, tabs); return; }   /* v3.65.0 */
   const core = new Set(CORE_ROLES.map(k => state.schema[k]).filter(Boolean));
   const saved = JSON.parse(JSON.stringify((window.TD_SETTINGS || {}).field_choices || {}));
   const labels = { ...((window.TD_SETTINGS || {}).field_labels || {}) };
