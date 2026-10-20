@@ -5,7 +5,7 @@
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <link rel="preconnect" href="https://iiogwevtyzgedhoaqlrn.supabase.co" crossorigin><link rel="dns-prefetch" href="https://iiogwevtyzgedhoaqlrn.supabase.co">
 <link rel="icon" href="data:,">
-<title>Team Dashboard · 3.61.0</title>
+<title>Team Dashboard · 3.61.1</title>
 <link rel="preconnect" href="https://fonts.googleapis.com"><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin><link href="https://fonts.googleapis.com/css2?family=Public+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet">
 <style>
 :root {
@@ -2104,6 +2104,12 @@ html body .sidebar nav.tabs .tab[data-view="backups"], html body .tab[data-view=
 /* v3.61.0: password dialog */
 .td-pw { display:flex; flex-direction:column; gap:4px; margin:8px 0 0; font-size:12.5px; font-weight:600; color:var(--ink-2); text-align:left; }
 .td-pw-err { min-height:1em; margin:6px 0 0; color:var(--danger, #c62828); font-size:12.5px; font-weight:600; }
+/* v3.61.1: moving old groups into roles */
+.grp-move { border:1px solid color-mix(in srgb, #d97706 35%, var(--border, #e3e6ec)); background:color-mix(in srgb, #d97706 7%, var(--surface)); border-radius:12px; padding:12px 14px; margin:0 0 12px; }
+.grp-move > b { display:block; margin-bottom:2px; } .grp-move .set-hint { margin:0 0 8px; }
+.grp-move-row { display:flex; flex-wrap:wrap; align-items:center; gap:8px; padding:6px 0; border-top:1px solid var(--border, #e3e6ec); }
+.grp-move-row > span { flex:1 1 260px; font-size:13px; } .grp-move-row .input { width:auto; min-width:160px; }
+.role-hint { margin:0 0 10px; }
 </style></head>
 
 
@@ -4191,8 +4197,13 @@ window.PERM = {
   userGroups() { const g = (window.TD_SETTINGS || {}).user_groups; return Array.isArray(g) ? g.filter(x => x && Array.isArray(x.members)) : []; },
   groupsOf(userId) { const id = String(userId ?? ''); return id ? this.userGroups().filter(g => g.members.some(m => String(m && m.id != null ? m.id : m) === id)) : []; },
   myUserGroups() { return this.online() ? this.groupsOf(CLOUD.user()?.id) : []; },
+  /* v3.61.1: groups are merged into roles: people with the same role see each other's requests and request notifications.
+     Each role keeps its member list (role.members), so everyone can tell who shares their role. Old groups still count
+     until their people have been given a role and the groups are cleared. */
   groupMates() {
-    const me = this.online() ? String(CLOUD.user()?.id ?? '') : '', out = new Set(); if (!me) return out;
+    const u = this.online() ? CLOUD.user() : null, me = u ? String(u.id ?? '') : '', out = new Set(); if (!me) return out;
+    const rid = u.rawPermissions && u.rawPermissions._role, roles = (window.TD_SETTINGS || {}).user_roles;
+    if (rid && Array.isArray(roles)) { const r = roles.find(x => x && x.id === rid); for (const m of (r && Array.isArray(r.members) ? r.members : [])) { const id = String(m && m.id != null ? m.id : m); if (id && id !== me) out.add(id); } }
     for (const g of this.groupsOf(me)) for (const m of g.members) { const id = String(m && m.id != null ? m.id : m); if (id && id !== me) out.add(id); }
     return out;
   },
@@ -9533,7 +9544,7 @@ async function poll() {
 }
 
 /* ============================== filtering ============================== */
-const APP = { title: "Team Dashboard", version: "3.61.0", released: "19 Oct 2026" };
+const APP = { title: "Team Dashboard", version: "3.61.1", released: "20 Oct 2026" };
 const BASE_DIMS = { status: "status_column", desig: "designation_column", client: "client_column", mode: "mode_column" };
 const STANDARD_STATUSES = ["Active", "Manager", "OJT", "Bench", "New", "Projected", "Left", "Moved"];
 const TILE_ORDER = ["Active", "Manager", "OJT", "Bench", "New", "Projected"];
@@ -13109,17 +13120,22 @@ async function drawPeople(pane, selectId) {
   const [users, requests, settings] = await Promise.all([CLOUD.admin.users(), CLOUD.admin.resetRequests().catch(() => []), CLOUD.getSettings().catch(() => ({}))]);
   const groups = groupsFrom(settings);
   window.TD_SETTINGS = { ...(window.TD_SETTINGS || {}), user_groups: settings.user_groups || [], user_roles: settings.user_roles || [] };
+  /* v3.61.1: each role remembers who has it (that is what lets people in the same role see each other's requests) */
+  { const roles0 = tdRoles(); if (roles0.length) { let ch = false;
+      const next = (settings.user_roles || []).map(r => { if (!r || !r.id) return r; const mem = users.filter(u => u.role !== 'superadmin' && u.permissions && u.permissions._role === r.id).map(u => ({ id: String(u.id), name: u.name })).sort((a, b) => a.id.localeCompare(b.id));
+        const old = JSON.stringify((r.members || []).map(m => ({ id: String(m.id), name: m.name })).sort((a, b) => a.id.localeCompare(b.id))); if (old !== JSON.stringify(mem)) { ch = true; return { ...r, members: mem }; } return r; });
+      if (ch) { try { await saveRoles(next); window.TD_SETTINGS.user_roles = next; settings.user_roles = next; } catch (e) { console.warn('Role members:', e); } } } }
   const me = CLOUD.user();
   const pending = (requests || []).filter(r => r.status === 'pending');
   const reload = id => drawPeople(pane, id);
   const body = h('div', { class: 'ppl-body' });
   const tabBtn = (id, label, n, hot) => h('button', { type: 'button', class: 'ppl-tab', role: 'tab', 'aria-selected': String(PPL.tab === id), onclick: () => { PPL.tab = id; drawPeople(pane, selectId); } }, label, n != null ? h('span', { class: 'ppl-tab-n' + (hot ? ' hot' : '') }, String(n)) : null);
   const tabs = h('div', { class: 'ppl-tabs', role: 'tablist', 'aria-label': 'People & access' },
-    tabBtn('people', 'People', users.length), tabBtn('roles', 'Roles', tdRoles().length), tabBtn('groups', 'Groups', groups.length), tabBtn('passcodes', 'Passcodes', pending.length || null, pending.length > 0));
+    tabBtn('people', 'People', users.length), tabBtn('roles', 'Roles', tdRoles().length), tabBtn('passcodes', 'Passcodes', pending.length || null, pending.length > 0));
   fill(pane, tabs, body);
 
-  if (PPL.tab === 'groups') { drawGroups(body, users, groups, () => reload(selectId)); return; }
-  if (PPL.tab === 'roles') { drawRoles(body, users, () => reload(selectId)); return; }
+  if (PPL.tab === 'groups') PPL.tab = 'roles';
+  if (PPL.tab === 'roles') { drawRoles(body, users, () => reload(selectId), groups); return; }
 
   if (PPL.tab === 'passcodes') {
     const selfOn = settings.self_passcode !== false;
@@ -13152,7 +13168,7 @@ async function drawPeople(pane, selectId) {
   const select = u => {
     selId = u ? u.id : 'new';
     list.querySelectorAll('.ppl-item').forEach(b => b.setAttribute('aria-current', b.dataset.id === String(selId) ? 'true' : 'false'));
-    drawEditor(editor, u, reload, users, null, groups);
+    drawEditor(editor, u, reload, users, null, []);   /* v3.61.1: no separate groups any more */
   };
   const drawList = () => {
     const q = PPL.q.trim().toLowerCase();
@@ -13367,13 +13383,13 @@ function buildAccessForm(src, users = []) {
   const presets = h('div', { class: 'rights-presets' }, h('span', {}, 'Quick start:'), ...presetBtns, presetNow);
   const roleNote = h('p', { class: 'set-hint' }, 'Pick a quick start, then tick Hide, View or Edit for each area. Open “Fine-tune” on a line only if you need something in between; the line then shows “Custom”.');
   /* v3.53.0: the Backup report page is given on purpose, also to admins */
+  const bkEditOn = accessSource.permissions && '_backupEdit' in accessSource.permissions ? !!accessSource.permissions._backupEdit : !!(src && src.admin);
+  const bkEdit = checkLine('Can set backups (Backup Provided, Not Provided, Seat Shown Live)', bkEditOn);
   const bkRep = checkLine('Can open the Backup report page', !!(accessSource && accessSource.permissions && accessSource.permissions._bkReport));
   const bkRev = checkLine('…including Revenue (seat rates and estimated revenue)', !!(accessSource && accessSource.permissions && accessSource.permissions._bkRevenue));
   const bkSync = () => { bkRev.box.disabled = !bkRep.box.checked; if (!bkRep.box.checked) bkRev.box.checked = false; }; bkRep.box.addEventListener('change', bkSync); bkSync();
   const bkBox = h('div', { class: 'rmod-extra bk-access' }, h('p', { class: 'rmod-subt' }, 'Backups'), bkEdit.el, h('p', { class: 'set-hint' }, 'Untick to keep people in this role from setting or changing backups; they still see them, and leave they record or approve is saved without the backup question.'), bkRep.el, bkRev.el, h('p', { class: 'set-hint' }, 'Backup report: off unless ticked. Super admins always have everything.'));
   const phSee = checkLine('Can see and edit phone & WhatsApp numbers', !!(accessSource && accessSource.permissions && accessSource.permissions._phones));
-  const bkEditOn = accessSource.permissions && '_backupEdit' in accessSource.permissions ? !!accessSource.permissions._backupEdit : !!(src && src.admin);
-  const bkEdit = checkLine('Can set backups (Backup Provided, Not Provided, Seat Shown Live)', bkEditOn);
   const phBox = h('div', { class: 'rmod-extra bk-access' }, h('p', { class: 'rmod-subt' }, 'Phone & WhatsApp numbers'), phSee.el, h('p', { class: 'set-hint' }, 'Stored encrypted in the database. Off unless ticked: everyone else sees these fields blank. Super admins always see them.'));
   const bkPerms = () => ({ _bkReport: bkRep.box.checked, _bkRevenue: bkRep.box.checked && bkRev.box.checked, _phones: phSee.box.checked, _backupEdit: bkEdit.box.checked });
   const rights = h('div', { class: 'rights' }, roleNote, bkBox, phBox, presets, h('div', { class: 'rrows' }, h('div', { class: 'rgrid-head', 'aria-hidden': 'true' }, h('span', {}, 'Area'), h('span', {}, 'Hide'), h('span', {}, 'View'), h('span', {}, 'Edit'), h('span', {}, '')), ...modules));
@@ -13412,8 +13428,24 @@ const SUGGESTED_ROLES = () => [
   { name: 'View only', admin: false, preset: 'View only' },
 ].filter(x => PERM.presets[x.preset]).map(x => ({ id: roleId() + x.name.length, name: x.name, admin: x.admin, rights: { _v: PERM.version, ...PERM.presets[x.preset] }, extras: { _notificationAudience: { mode: 'all', users: [] } } }));
 
-function drawRoles(box, users, reload) {
+function drawRoles(box, users, reload, oldGroups = []) {
   const roles = tdRoles();
+  /* v3.61.1: groups were merged into roles. Old groups show here until their people have a role. */
+  const legacy = oldGroups.length ? h('div', { class: 'grp-move' }, h('b', {}, 'Groups are now part of roles'),
+    h('p', { class: 'set-hint' }, 'People with the same role see each other’s requests and request notifications, which is what groups did. Your old groups still work until you move their people into a role. Moving gives them that role’s access.'),
+    ...oldGroups.map(g => { const sel = h('select', { class: 'input', 'aria-label': 'Role for the people in ' + g.name }, h('option', { value: '' }, 'Choose a role…'), ...roles.map(r => h('option', { value: r.id, selected: r.name.trim().toLowerCase() === g.name.trim().toLowerCase() }, r.name)));
+      const go = h('button', { class: 'btn mini primary', type: 'button', onclick: async () => {
+        const r = roles.find(x => x.id === sel.value); if (!r) { toast('Choose a role first.', true); return; }
+        go.disabled = true; go.textContent = 'Moving…';
+        const people = users.filter(u => u.role !== 'superadmin' && g.members.some(m => m.id === String(u.id)));
+        const failed = await syncRoleMembers(r, [...users.filter(u => u.role !== 'superadmin' && u.permissions && u.permissions._role === r.id), ...people.filter(p => !(p.permissions && p.permissions._role === r.id))], () => { });
+        if (failed.length) { toast('Not moved: ' + failed.join('; '), true); go.disabled = false; go.textContent = 'Move'; return; }
+        await loadTeamSettings(); await saveGroups(groupsFrom(window.TD_SETTINGS).filter(x => x.id !== g.id), 'Moved group ' + g.name + ' into role ' + r.name);
+        toast(people.length + ' ' + (people.length === 1 ? 'person' : 'people') + ' from ' + g.name + ' now have the role ' + r.name + '.'); reload();
+      } }, 'Move');
+      return h('div', { class: 'grp-move-row' }, h('span', {}, h('b', {}, g.name), ' · ' + g.members.length + (g.members.length === 1 ? ' person: ' : ' people: ') + g.members.map(m => m.name).slice(0, 6).join(', ') + (g.members.length > 6 ? '…' : '')), sel, go,
+        confirmButton('Remove group', 'Click again to remove the group', async () => { await saveGroups(groupsFrom(window.TD_SETTINGS).filter(x => x.id !== g.id), 'Removed group ' + g.name); reload(); }));
+    })) : null;
   const list = h('div', { class: 'ppl-list role-list', role: 'list' }), editor = h('div', { class: 'ppl-editor role-editor' });
   let selId = null;
   const membersOf = r => users.filter(u => u.role !== 'superadmin' && u.permissions && u.permissions._role === r.id);
@@ -13425,7 +13457,7 @@ function drawRoles(box, users, reload) {
     roles.length ? null : h('div', { class: 'grp-empty', style: 'margin:0' }, h('b', {}, 'No roles yet'), h('p', {}, 'A role is a named set of access, like “Team Leader”. Give it to people instead of ticking boxes for each one.'),
       h('button', { class: 'btn', type: 'button', onclick: async e => { e.currentTarget.disabled = true; try { await saveRoles(SUGGESTED_ROLES(), 'Added suggested roles'); toast('Suggested roles added. Change them as you like.'); reload(); } catch (er) { toast(er.message, true); e.currentTarget.disabled = false; } } }, 'Start with suggested roles')));
   drawList();
-  fill(box, h('div', { class: 'ppl' }, h('div', { class: 'ppl-side' }, h('button', { class: 'btn primary', type: 'button', onclick: () => select(null) }, '+ New role'), list), editor));
+  fill(box, legacy, h('p', { class: 'set-hint role-hint' }, 'A role sets what people can open and change. People with the same role also see each other’s requests and request notifications.'), h('div', { class: 'ppl' }, h('div', { class: 'ppl-side' }, h('button', { class: 'btn primary', type: 'button', onclick: () => select(null) }, '+ New role'), list), editor));
   const first = roles.find(r => r.id === drawRoles.sel) || roles[0] || null;
   selId = first ? first.id : 'new'; drawList(); select(first);
 }
@@ -13574,7 +13606,7 @@ function drawEditor(box, u, reload, users = [], template = null, groups = []) {
         h('label', {}, 'Linked employee (optional)', emp, empList)),
       active.el),
     sec('2', 'Role', roles.length ? 'What they can open and change comes from their role' : 'Create roles in the Roles tab above, then pick one here', pickBox, h('div', { class: 'ped-phones' }, phonesOn.el)),
-    sec('3', 'Groups', 'People in the same group see each other’s requests and request notifications', groupBox),
+    groups.length ? sec('3', 'Groups', 'People in the same group see each other’s requests and request notifications', groupBox) : null,
     h('div', { class: 'set-actions ped-save' }, save, err, h('span', { class: 'spacer' }), del));
   if (isNew) name.focus();
 }
