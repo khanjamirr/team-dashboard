@@ -5,7 +5,7 @@
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <link rel="preconnect" href="https://iiogwevtyzgedhoaqlrn.supabase.co" crossorigin><link rel="dns-prefetch" href="https://iiogwevtyzgedhoaqlrn.supabase.co">
 <link rel="icon" href="data:,">
-<title>Team Dashboard · 3.61.1</title>
+<title>Team Dashboard · 3.62.1</title>
 <link rel="preconnect" href="https://fonts.googleapis.com"><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin><link href="https://fonts.googleapis.com/css2?family=Public+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet">
 <style>
 :root {
@@ -2110,6 +2110,106 @@ html body .sidebar nav.tabs .tab[data-view="backups"], html body .tab[data-view=
 .grp-move-row { display:flex; flex-wrap:wrap; align-items:center; gap:8px; padding:6px 0; border-top:1px solid var(--border, #e3e6ec); }
 .grp-move-row > span { flex:1 1 260px; font-size:13px; } .grp-move-row .input { width:auto; min-width:160px; }
 .role-hint { margin:0 0 10px; }
+/* ===== v3.62.0: People & access, redesigned ===== */
+.ua-head { display:flex; align-items:center; gap:12px; flex-wrap:wrap; margin:-4px 0 14px; } .ua-head .set-hint { margin:0; } .ua-head .grow { flex:1; }
+.ua-head .ppl-tabs { margin:0 !important; }
+.pt-card { background:var(--surface); border:1px solid var(--border, var(--line)); border-radius:16px; overflow:hidden; }
+.pt-tools { display:flex; align-items:center; gap:12px; flex-wrap:wrap; padding:14px 16px; }
+.pt-search { flex:0 1 300px; background:var(--surface-2) !important; border-color:transparent !important; border-radius:10px !important; }
+.pt-n { margin-left:6px; color:var(--ink-2); font-weight:600; font-size:12px; }
+.pt-wrap { overflow:auto; }
+.pt { width:100%; border-collapse:collapse; font-size:13px; }
+.pt th { text-align:left; font-size:12px; font-weight:600; color:var(--ink-2); padding:9px 14px; border-top:1px solid var(--border, var(--line)); border-bottom:1px solid var(--border, var(--line)); background:var(--surface); position:sticky; top:0; z-index:1; }
+.pt td { padding:12px 14px; border-bottom:1px solid var(--border, var(--line)); vertical-align:middle; }
+.pt tr:last-child td { border-bottom:0; } .pt tr:hover td { background:color-mix(in srgb, var(--accent) 3%, transparent); }
+.pt tr.off td { opacity:.62; }
+.pt-who { display:flex; align-items:center; gap:10px; } .pt-who b { display:block; font-size:13.5px; } .pt-who small { color:var(--ink-2); font-size:11.5px; }
+.pt-role { min-width:190px; font-weight:650 !important; background:var(--surface-2) !important; border-color:transparent !important; border-radius:10px !important; height:38px; }
+.pt-super { display:inline-block; padding:5px 12px; border-radius:999px; background:#fff3c4; color:#7a5a00; font-weight:700; font-size:12px; }
+.pt-open { max-width:420px; }
+.pc-chips { display:flex; flex-wrap:wrap; gap:5px; } .pc-chip { padding:2px 8px; border-radius:6px; background:var(--surface-2); color:var(--ink); font-size:11.5px; font-weight:600; white-space:nowrap; }
+.pc-more { font-size:11.5px; color:var(--accent); align-self:center; cursor:default; } .pc-none { color:var(--ink-2); font-size:12px; }
+.pt-st { display:inline-flex; align-items:center; gap:6px; font-weight:650; font-size:12.5px; } .pt-st::before { content:""; width:7px; height:7px; border-radius:50%; background:#22a05a; } .pt-st.on { color:#16794a; } .pt-st.off { color:var(--ink-2); } .pt-st.off::before { background:#a0a6b1; }
+.pt-when { color:var(--ink-2); white-space:nowrap; }
+.pt-acts { white-space:nowrap; text-align:right; } .pt-acts > * { margin-left:6px; }
+.pt-act { border:0; background:color-mix(in srgb, var(--accent) 10%, var(--surface)); color:var(--accent); font:inherit; font-size:12px; font-weight:650; padding:5px 11px; border-radius:999px; cursor:pointer; }
+.pt-act:hover { background:color-mix(in srgb, var(--accent) 18%, var(--surface)); }
+.pt-act.danger, .btn.pt-act.danger { background:transparent !important; color:var(--danger, #c62828) !important; border:0 !important; box-shadow:none !important; }
+.pt-empty { text-align:center; color:var(--ink-2); padding:24px !important; }
+/* dialogs */
+.pdlg-veil { position:fixed; inset:0; z-index:1200; background:rgba(15,23,42,.42); display:flex; align-items:flex-start; justify-content:center; padding:4vh 16px; overflow:auto; }
+.pdlg { background:var(--surface); color:var(--ink); border-radius:18px; box-shadow:0 30px 80px -20px rgba(0,0,0,.45); width:min(560px, 100%); display:flex; flex-direction:column; max-height:92vh; }
+.pdlg.wide { width:min(980px, 100%); }
+.pdlg > header { display:flex; align-items:center; justify-content:space-between; padding:18px 22px 12px; border-bottom:1px solid var(--border, var(--line)); } .pdlg > header h3 { margin:0; font-size:18px; }
+.pdlg-x { border:0; background:transparent; font-size:24px; line-height:1; color:var(--ink-2); cursor:pointer; padding:4px 8px; border-radius:8px; } .pdlg-x:hover { background:var(--surface-2); }
+.pdlg-body { padding:16px 22px; overflow:auto; }
+.pdlg > footer { display:flex; align-items:center; gap:8px; padding:12px 22px 16px; border-top:1px solid var(--border, var(--line)); } .pdlg > footer .grow { flex:1; }
+.pt-edit .ped-save { position:sticky; bottom:-16px; background:var(--surface); padding-bottom:6px; }
+/* role cards */
+.rc-head { display:flex; align-items:flex-start; justify-content:space-between; gap:12px; margin:0 0 12px; } .rc-head h4 { margin:0 0 2px; font-size:16px; } .rc-head .set-hint { margin:0; }
+.rc-grid { display:grid; grid-template-columns:repeat(auto-fill, minmax(260px, 1fr)); gap:14px; }
+.rcard { display:flex; flex-direction:column; gap:9px; padding:16px; border:1px solid var(--border, var(--line)); border-radius:16px; background:var(--surface); box-shadow:0 1px 2px rgba(16,24,40,.04); }
+.rcard-top { display:flex; align-items:flex-start; justify-content:space-between; gap:8px; } .rcard-top b { font-size:14.5px; line-height:1.25; }
+.rcard-n { flex:none; padding:2px 9px; border-radius:999px; background:color-mix(in srgb, var(--accent) 12%, var(--surface)); color:var(--accent); font-size:11.5px; font-weight:700; white-space:nowrap; }
+.rcard-desc { margin:-4px 0 0; color:var(--ink-2); font-size:12px; }
+.rcard-counts { display:flex; flex-wrap:wrap; gap:5px; } .rcard-counts span { padding:2px 8px; border-radius:6px; font-size:11.5px; font-weight:700; }
+.rcard-counts .cv { background:#e6efff; color:#1f4fbf; } .rcard-counts .ce { background:#e3f6ea; color:#16794a; } .rcard-counts .cm { background:#fde8e8; color:#b42318; }
+.rcard-sec { display:flex; gap:6px; flex-wrap:wrap; } .rcard-sec span { padding:2px 8px; border-radius:6px; background:var(--surface-2); font-size:11.5px; font-weight:600; } .rcard-sec .rcard-adm { background:#fff3c4; color:#7a5a00; }
+.rcard-foot { margin-top:auto; padding-top:10px; border-top:1px solid var(--border, var(--line)); display:flex; flex-wrap:wrap; gap:6px; align-items:center; }
+@media (prefers-color-scheme: dark) { :root:not([data-theme="light"]) .rcard-counts .cv { background:rgba(77,141,255,.18); color:#9cc0ff; } :root:not([data-theme="light"]) .rcard-counts .ce { background:rgba(34,160,90,.18); color:#7fd6a4; } :root:not([data-theme="light"]) .rcard-counts .cm { background:rgba(227,73,72,.18); color:#ff9b9a; } :root:not([data-theme="light"]) .pt-super, :root:not([data-theme="light"]) .rcard-sec .rcard-adm { background:rgba(255,204,0,.16); color:#ffd75e; } }
+/* assign people */
+.as-list { display:flex; flex-direction:column; max-height:52vh; overflow:auto; margin-top:10px; border:1px solid var(--border, var(--line)); border-radius:12px; }
+.as-row { display:flex; align-items:center; gap:10px; padding:9px 12px; border-bottom:1px solid var(--border, var(--line)); cursor:pointer; } .as-row:last-child { border-bottom:0; } .as-row:hover { background:var(--surface-2); }
+.as-who { display:flex; flex-direction:column; } .as-who small { color:var(--ink-2); font-size:11.5px; } .as-cnt { color:var(--ink-2); font-size:12.5px; font-weight:600; }
+/* role dialog: name / description / fill in from, then the switch table */
+.rd-top { display:grid; grid-template-columns:1fr 1.2fr 1fr; gap:12px; margin-bottom:10px; } .rd-top label { display:flex; flex-direction:column; gap:5px; font-size:12.5px; font-weight:650; color:var(--ink-2); }
+.rd-top .input { background:var(--surface-2) !important; border-color:transparent !important; border-radius:10px !important; height:40px; }
+@media (max-width:760px) { .rd-top { grid-template-columns:1fr; } }
+.rights-t { margin-top:12px; }
+.rt { border-top:1px solid var(--border, var(--line)); }
+.rt-h, .rt-r { display:grid; grid-template-columns:minmax(150px, 1.15fr) repeat(3, minmax(0, 1fr)); gap:14px; align-items:center; }
+.rt-h { padding:10px 4px; border-bottom:2px solid var(--border, var(--line)); font-size:12.5px; font-weight:700; } .rt-h span:not(:first-child) { color:var(--accent); } .rt-h span:first-child { color:var(--ink-2); }
+.rt-g { border-bottom:1px solid var(--border, var(--line)); }
+.rt-r { padding:12px 4px; } .rt-p b { display:block; font-size:13.5px; } .rt-p small { color:var(--ink-2); font-size:11.5px; line-height:1.3; display:block; }
+.rt-c { display:flex; align-items:flex-start; gap:10px; } .rt-d { font-size:12px; color:var(--ink-2); line-height:1.3; padding-top:2px; } .rt-na { color:var(--ink-3, #a0a6b1); padding-left:18px; }
+.rt-sw { flex:none; position:relative; width:42px; height:24px; border-radius:999px; border:0; padding:0; cursor:pointer; background:#c9ced8; transition:background-color .2s ease; }
+.rt-sw::after { content:""; position:absolute; top:3px; left:3px; width:18px; height:18px; border-radius:50%; background:#fff; box-shadow:0 1px 3px rgba(0,0,0,.3); transition:transform .2s ease; }
+.rt-sw[aria-checked="true"] { background:#1f5fd6; } .rt-sw[aria-checked="true"]::after { transform:translateX(18px); }
+.rt-sw[aria-checked="mixed"] { background:#8fb0ec; } .rt-sw[aria-checked="mixed"]::after { transform:translateX(9px); }
+.rt-sw:focus-visible { outline:2px solid var(--accent); outline-offset:2px; }
+.rt-sec { margin:0 0 4px; } .rt-sec > summary { list-style:none; cursor:pointer; display:flex; align-items:center; gap:10px; flex-wrap:wrap; padding:8px 12px; margin:0 0 6px; border-radius:8px; background:color-mix(in srgb, var(--accent) 6%, var(--surface)); color:var(--accent); font-size:12.5px; font-weight:650; }
+.rt-sec > summary::-webkit-details-marker { display:none; } .rt-sec > summary::before { content:"▸"; } .rt-sec[open] > summary::before { content:"▾"; }
+.rt-cnt { color:var(--ink-2); font-weight:500; } .rt-sec > summary .linkbtn { font-size:12px; }
+.rt-sec-body { padding:4px 12px 12px; } .rt-sec-body .rmod-items, .rt-sec-body .rmod-sub { display:flex; flex-direction:column; gap:4px; }
+.rt-more { margin-top:16px; } .rt-more h5 { margin:0 0 8px; font-size:13.5px; }
+@media (max-width:760px) { .rt-h { display:none; } .rt-r { grid-template-columns:1fr; gap:8px; } }
+/* v3.62.0: People table fits the Settings pane */
+.pt { table-layout:fixed; min-width:880px; }
+.pt th:nth-child(1) { width:20%; } .pt th:nth-child(2) { width:17%; } .pt th:nth-child(3) { width:23%; } .pt th:nth-child(4) { width:9%; } .pt th:nth-child(5) { width:9%; } .pt th:nth-child(6) { width:22%; }
+.pt td.pt-acts { white-space:nowrap; padding-left:4px; padding-right:10px; } .pt td.pt-acts > * { margin:0 0 0 3px; } .pt { min-width:780px; }
+.pt .pc-chip { white-space:normal; } .pt td { padding-left:10px; padding-right:10px; } .pt th { padding-left:10px; padding-right:10px; }
+.pt-acts .pt-act { padding:4px 8px; font-size:11.5px; }
+.pt-who > span:last-child { min-width:0; } .pt-who b { white-space:nowrap; overflow:hidden; text-overflow:ellipsis; } .pt-who small { white-space:nowrap; overflow:hidden; text-overflow:ellipsis; display:block; }
+.pt-role { min-width:0; width:100%; }
+.pt-acts { white-space:normal; } .pt-acts { text-align:right; } .pt td.pt-acts > * { margin:2px 0 2px 4px; }
+.pt-acts .pt-act { padding:4px 10px; }
+/* v3.62.0: Admin log */
+.c-alog { padding:18px 20px 22px; }
+.al-head { display:flex; align-items:flex-start; gap:10px; flex-wrap:wrap; margin-bottom:10px; } .al-head h2 { margin:0 0 2px; } .al-head .set-hint { margin:0; } .al-head .grow { flex:1; }
+.al-due { margin:0 0 10px; padding:9px 12px; border-radius:10px; background:color-mix(in srgb, #d97706 10%, var(--surface)); color:var(--ink); font-size:13px; font-weight:600; }
+.al-tools { display:flex; flex-wrap:wrap; align-items:center; gap:10px; margin:0 0 14px; } .al-q { flex:1 1 220px; } .al-tools select.input { width:auto; }
+.al-day { margin:0 0 14px; } .al-day h3 { font-size:13px; margin:0 0 8px; color:var(--ink-2); display:flex; align-items:center; gap:6px; } .al-day h3 em { font-style:normal; font-size:11px; padding:1px 7px; border-radius:999px; background:var(--accent); color:#fff; }
+.al-e { border:1px solid var(--border, var(--line)); border-left:4px solid var(--alc, #8a94a6); border-radius:12px; padding:11px 14px; margin:0 0 8px; background:var(--surface); }
+.al-e.done { opacity:.75; }
+.al-e-top { display:flex; align-items:center; gap:8px; flex-wrap:wrap; } .al-e-top b { font-size:14px; } .al-e-top .grow { flex:1; }
+.al-t { font-size:11px; font-weight:700; padding:2px 8px; border-radius:999px; background:color-mix(in srgb, var(--alc) 14%, var(--surface)); color:var(--alc); white-space:nowrap; }
+.al-u { --alc:#1f5fd6; } .al-a { --alc:#0f8a6a; } .al-d2, .al-d { } .al-p { --alc:#7a4fd6; } .al-c { --alc:#c2610c; }
+article.al-d { --alc:#c62828; }
+.al-e p.al-d { margin:6px 0 0; white-space:pre-wrap; font-size:13px; line-height:1.45; color:var(--ink); border:0; padding:0; }
+.al-meta { display:flex; flex-wrap:wrap; align-items:center; gap:6px; margin-top:8px; } .al-meta span { font-size:11.5px; font-weight:600; padding:2px 8px; border-radius:6px; background:var(--surface-2); } .al-meta small { color:var(--ink-2); font-size:11.5px; margin-left:auto; }
+.al-fu { background:#e6efff !important; color:#1f4fbf; } .al-fu.late { background:#fde8e8 !important; color:#b42318; } .al-fu.ok { background:#e3f6ea !important; color:#16794a; }
+.al-form { display:grid; grid-template-columns:repeat(4, minmax(0, 1fr)); gap:12px; } .al-f { display:flex; flex-direction:column; gap:5px; font-size:12.5px; font-weight:650; color:var(--ink-2); } .al-f.full { grid-column:1 / -1; }
+.al-form .err { grid-column:1 / -1; margin:0; } @media (max-width:760px) { .al-form { grid-template-columns:1fr 1fr; } }
 </style></head>
 
 
@@ -2220,10 +2320,12 @@ html body .sidebar nav.tabs .tab[data-view="backups"], html body .tab[data-view=
         <button class="atab" role="tab" data-atab="review" aria-selected="false"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="9" cy="8" r="4"/><path d="M2 21c0-3.9 3.1-7 7-7"/><path d="M16 14l2 2 4-4"/></svg>Designation reviews <b id="cntReview" hidden></b></button>
         <button class="atab" role="tab" data-atab="health" aria-selected="false"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M3 12h4l3-8 4 16 3-8h4"/></svg>Attendance data health <b id="cntHealth" hidden></b></button>
         <button class="atab" role="tab" data-atab="fill" aria-selected="false"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="3" y="3" width="18" height="18" rx="2"/><path d="M3 9h18M9 21V9"/></svg>Fill in bulk <b id="cntFill" hidden></b></button>
+        <button class="atab" role="tab" data-atab="log" aria-selected="false" hidden><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M4 4h11a3 3 0 0 1 3 3v13H7a3 3 0 0 1-3-3z"/><path d="M8 8h6M8 12h6M8 16h3"/></svg>Admin log <b id="cntLog" hidden></b></button>
       </div>
       <div class="card c-actions" id="cardActions" aria-label="Action items"></div>
       <div class="card c-review" id="cardReview" aria-label="Designation review" hidden></div>
       <div class="card c-fill" id="cardFill" aria-label="Fill in bulk" hidden></div>
+      <div class="card c-alog" id="cardAdminLog" aria-label="Admin log" hidden></div>
       <div id="slotHealth" hidden></div>
     </div>
     <div id="pageSettings" hidden></div>
@@ -3159,7 +3261,7 @@ async function sheetLocate(zip, name) {
   if (rid) for (const m of rels.matchAll(/<Relationship\b[^>]*>/g)) if (xattr(m[0], "Id") === rid) target = xattr(m[0], "Target");
   return { wbx, rels, path: target ? resolvePath("xl/workbook.xml", target) : null };
 }
-async function sheetReadRows(zip, loc) {
+async function sheetReadRows(zip, loc, width = PSH_HEAD.length) {
   const e = loc.path && zip.find(loc.path); if (!e) return null;
   const doc = parseXml(await zip.get(loc.path)), sd = doc.getElementsByTagNameNS(NS_MAIN, "sheetData")[0], out = [];
   let shared = null;
@@ -3173,7 +3275,7 @@ async function sheetReadRows(zip, loc) {
       if (t === "inlineStr") { const is = firstKid(c, "is"); v[ref.col - 1] = is ? siText(is) : ""; }
       else { const ve = firstKid(c, "v"); if (ve) v[ref.col - 1] = t === "s" ? await sharedStr(+ve.textContent) : ve.textContent; }
     }
-    if (v.some(x => x != null && x !== "")) out.push(Array.from({ length: PSH_HEAD.length }, (_, i) => v[i] == null ? "" : String(v[i])));
+    if (v.some(x => x != null && x !== "")) out.push(Array.from({ length: width }, (_, i) => v[i] == null ? "" : String(v[i])));
   }
   return out;
 }
@@ -3235,6 +3337,44 @@ async function addSheetToCopy(u8, name, head, rows, widths) {
   const zip = await Zip.open(u8), loc = await sheetLocate(zip, name);
   await sheetWriteRows(zip, loc, name, head, rows, widths || head.map(() => 18));
   return new Uint8Array(await (await zip.build()).arrayBuffer());
+}
+/* ------------------------------ v3.62.0: Admin log ------------------------------
+   Daily updates, activities and decisions for the team, a process or a client. Admins only. Kept as an "Admin Log" sheet
+   in the same workbook (so it is encrypted with everything else and part of every download). */
+const ALOG_SHEET = "Admin Log";
+const ALOG_HEAD = ["ID", "Date", "Type", "Client", "Process", "Title", "Details", "Follow-up", "Status", "Written by", "Written at", "Edited by", "Edited at"];
+const alogObj = r => ({ id: r[0], date: r[1], type: r[2], client: r[3], process: r[4], title: r[5], details: r[6], follow: r[7], status: r[8], by: r[9], at: r[10], editedBy: r[11], editedAt: r[12] });
+const alogRow = o => [o.id, o.date, o.type, o.client, o.process, o.title, o.details, o.follow, o.status, o.by, o.at, o.editedBy, o.editedAt].map(x => x == null ? "" : String(x));
+const alogOk = () => !(window.PERM && PERM.online()) || PERM.isSuper();
+async function adminLogRead() {
+  if (!alogOk()) throw new ApiErr(403, "The admin log is for admins only.");
+  const { u8 } = await readFile(), zip = await Zip.open(u8), loc = await sheetLocate(zip, ALOG_SHEET);
+  return ((await sheetReadRows(zip, loc, ALOG_HEAD.length)) || []).map(alogObj);
+}
+async function adminLogWrite(op, item) {
+  if (!alogOk()) throw new ApiErr(403, "The admin log is for admins only.");
+  return serial(async () => {
+    for (let attempt = 0; ; attempt++) {
+      try {
+        const { fh, u8 } = await readFile(), zip = await Zip.open(u8), loc = await sheetLocate(zip, ALOG_SHEET);
+        const rows = ((await sheetReadRows(zip, loc, ALOG_HEAD.length)) || []).map(alogObj), now = nowText();
+        let note = "";
+        if (op === "add") { const o = { ...item, id: crypto.randomUUID().slice(0, 8), by: ME, at: now, editedBy: "", editedAt: "" }; rows.push(o); note = "Added “" + o.title + "”"; }
+        else {
+          const i = rows.findIndex(r => r.id === item.id); if (i < 0) throw new ApiErr(404, "That entry is no longer in the log. Refresh to see the latest.");
+          const mine = rows[i].by === ME || (window.PERM && PERM.isOwner());
+          if (!mine) throw new ApiErr(403, "Only " + rows[i].by + " or the super admin can change this entry.");
+          if (op === "delete") { note = "Deleted “" + rows[i].title + "”"; rows.splice(i, 1); }
+          else { rows[i] = { ...rows[i], ...item, id: rows[i].id, by: rows[i].by, at: rows[i].at, editedBy: ME, editedAt: now }; note = "Edited “" + rows[i].title + "”"; }
+        }
+        rows.sort((a, b) => String(a.date).localeCompare(String(b.date)) || String(a.at).localeCompare(String(b.at)));
+        await sheetWriteRows(zip, loc, ALOG_SHEET, ALOG_HEAD, rows.map(alogRow), [10, 12, 15, 18, 18, 34, 70, 12, 9, 18, 18, 18, 18]);
+        await writeBlob(fh, await zip.build(), [{ action: "settings", key: "", name: "Admin log", details: { note } }]);
+        Conn.cache = null;
+        return rows;
+      } catch (e) { if (!isRace(e) || attempt >= 2) throw e; Conn.cache = null; await sleep(250 + attempt * 600); }
+    }
+  });
 }
 async function readPseudoHistory() {
   const { u8 } = await readFile(), zip = await Zip.open(u8), loc = await sheetLocate(zip, PSEUDO_SHEET);
@@ -3726,7 +3866,7 @@ return {
   supported: () => typeof window.showOpenFilePicker === "function" && !!window.indexedDB,
   folderName: () => (Conn.dir ? Conn.dir.name : ""),
   /* used by the Attendance page (same folder, same backups folder, same activity log) */
-  dir: () => Conn.dir, kvGet, kvSet, backup, purgeLocalCopies, rewriteCells, readPseudoHistory, addSheetToCopy, writeBlob, appendActivity, nowText, readActivity, readData, writeData, isCloud, flushActivity, ACT_VERBS, actDetails,
+  dir: () => Conn.dir, kvGet, kvSet, backup, purgeLocalCopies, rewriteCells, readPseudoHistory, addSheetToCopy, adminLogRead, adminLogWrite, writeBlob, appendActivity, nowText, readActivity, readData, writeData, isCloud, flushActivity, ACT_VERBS, actDetails,
   userName, setUser: n => { ME = String(n || "").trim() || "You"; },
   async isLocked(name) { for (const cand of ["~$" + name, "~$" + name.slice(2)]) { try { await Conn.dir.getFileHandle(cand); return true; } catch (e) { /* not there */ } } return false; },
   fileName: () => Conn.fileName,
@@ -9544,7 +9684,7 @@ async function poll() {
 }
 
 /* ============================== filtering ============================== */
-const APP = { title: "Team Dashboard", version: "3.61.1", released: "20 Oct 2026" };
+const APP = { title: "Team Dashboard", version: "3.62.1", released: "20 Oct 2026" };
 const BASE_DIMS = { status: "status_column", desig: "designation_column", client: "client_column", mode: "mode_column" };
 const STANDARD_STATUSES = ["Active", "Manager", "OJT", "Bench", "New", "Projected", "Left", "Moved"];
 const TILE_ORDER = ["Active", "Manager", "OJT", "Bench", "New", "Projected"];
@@ -10776,7 +10916,7 @@ function organizeUpcoming() {
 function renderGlance() {
   /* v3.56.0: greeting, period switch and four headline tiles (Present · Out · Backup cover · Needs you) */
   const box = $("#ovGlance"); if (!box) return;
-  const can = k => !window.PERM || PERM.can(k), attOk = can("ov.attendance") && window.ATT && (!window.PERM || PERM.canView("attendance"));
+  const can = k => !window.PERM || PERM.can(k), attOk = !!(window.ATT && ATT.overviewStats);   /* v3.62.1: everyone sees the same headline tiles, whatever their attendance rights */
   const st = attOk && ATT.overviewStats ? ATT.overviewStats() : null;
   const now = new Date(), hr = now.getHours(), who = (() => { try { return (typeof CLOUD !== "undefined" && CLOUD.user && CLOUD.user() || {}).name || (typeof BE !== "undefined" && BE.userName ? BE.userName() : "") || ""; } catch { return ""; } })();
   const first = String(who).trim().split(/\s+/)[0] || "";
@@ -10806,7 +10946,7 @@ function renderGlance() {
     spark.title = one ? "Present on the last 10 working days" : "Present on each working day of the " + (st.per === "week" ? "week" : "month");
     tiles.push(h("div", { class: "ovx-t ovx-green" }, h("small", {}, "Present" + pl), h("b", {}, String(st.present), h("span", {}, " of " + st.tracked + (one ? "" : " a day"))), h("em", { title: one ? "" : "Over " + st.days + " working day" + (st.days === 1 ? "" : "s") }, st.rate + "% attendance"), spark));
     tiles.push(h("button", { type: "button", class: "ovx-t ovx-peach", onclick: () => { $("#cardAttendance")?.scrollIntoView({ behavior: "smooth", block: "center" }); } }, h("small", {}, (one ? "Out" : "Leave days") + pl), h("b", {}, String(st.full + st.half)), h("em", {}, st.full + " leave · " + st.half + " half day · " + st.late + " late")));
-    if (window.ATT.canBackup && ATT.canBackup()) tiles.push(h("div", { class: "ovx-t" }, h("small", {}, "Backup cover" + pl), h("b", {}, st.cov == null ? "–" : st.cov + "%"), h("div", { class: "ovx-bar" }, h("i", { style: "width:" + (st.cov == null ? 0 : st.cov) + "%" })), h("em", {}, st.leaveN ? st.covered + " of " + st.leaveN + (one ? " covered" : " leave days covered") : "nobody on leave")));
+    tiles.push(h("div", { class: "ovx-t" }, h("small", {}, "Backup cover" + pl), h("b", {}, st.cov == null ? "–" : st.cov + "%"), h("div", { class: "ovx-bar" }, h("i", { style: "width:" + (st.cov == null ? 0 : st.cov) + "%" })), h("em", {}, st.leaveN ? st.covered + " of " + st.leaveN + (one ? " covered" : " leave days covered") : "nobody on leave")));
   } else if (can("ov.coming") && state.schema) {
     let b = 0, a = 0; const toSat = 6 - new Date().getDay(); try { b = upcoming("dob_column", "bday", toSat).length; a = upcoming("doj_column", "anniv", toSat).length; } catch { }
     tiles.push(h("div", { class: "ovx-t ovx-peach" }, h("small", {}, "Celebrations this week"), h("b", {}, String(b + a)), h("em", {}, b + " birthday" + (b === 1 ? "" : "s") + " · " + a + " anniversar" + (a === 1 ? "y" : "ies"))));
@@ -11052,7 +11192,7 @@ function setView(v) {
 
 /* ============================== v3.3: Action center (action items · designation reviews · attendance data health) ============================== */
 let actionTab = "actions";
-const ACT_TABS = ["actions", "review", "health", "fill"];
+const ACT_TABS = ["actions", "review", "health", "fill", "log"];
 function actionCounts() {
   const c = { actions: 0, review: 0, health: null };
   try { c.actions = actionItems().out.length; } catch (e) { /* not ready */ }
@@ -11071,6 +11211,7 @@ function syncActionTabs() {
   set("#cntActions", c.actions); set("#cntReview", c.review); set("#cntHealth", c.health);
   $("#cardActions").hidden = actionTab !== "actions"; $("#cardReview").hidden = actionTab !== "review"; $("#slotHealth").hidden = actionTab !== "health";
   $("#cardFill").hidden = actionTab !== "fill"; syncFillBadge(); if (actionTab === "fill") renderFill();
+  { const lg = $("#cardAdminLog"); if (lg) { const was = lg.hidden; lg.hidden = actionTab !== "log"; if (actionTab === "log" && (was || !lg.firstChild)) window.renderAdminLog?.(); } }   /* v3.62.0 */
   set("#tabActionsN", (visTab("actions") ? c.actions || 0 : 0) + (visTab("review") ? c.review || 0 : 0) + (visTab("health") ? c.health || 0 : 0));
 }
 function openActionCenter(tab) { if (ACT_TABS.includes(tab)) actionTab = tab; if (state.view === "actions") renderAll(); else setView("actions"); }
@@ -12829,6 +12970,7 @@ window.applyAccess = () => {
   show('.atab[data-atab="health"]', PERM.canView('attendance') && PERM.can('act.health'));
   show('.atab[data-atab="actions"]', PERM.can('act.items'));
   show('.atab[data-atab="review"]', PERM.can('act.review'));
+  show('.atab[data-atab="log"]', PERM.isSuper());   /* v3.62.0: the admin log is for admins */
   show('#cardAttendance', PERM.canView('attendance') && PERM.can('ov.attendance'));
   window.ATT?.renderApprovalRequests();
   show('#cardComing', PERM.can('ov.coming'));
@@ -13041,7 +13183,7 @@ async function fullCopy(u8) {
   return u8;
 }
 async function downloadWorkbook(name, getBytes) {
-  const pick = await tdChoice({ title: 'Download the workbook', text: 'You get one Excel file with all the data: employees, attendance and backups, the activity log, the pseudo name history and the leave requests. Choose how it should be protected.',
+  const pick = await tdChoice({ title: 'Download the workbook', text: 'You get one Excel file with all the data: employees, attendance and backups, the activity log, the admin log, the pseudo name history and the leave requests. Choose how it should be protected.',
     buttons: [{ label: 'Cancel', value: null }, { label: 'Readable Excel', value: 'plain' }, { label: 'Password-protected Excel', value: 'locked', kind: 'primary' }] });
   if (!pick) return;
   let pw = null; if (pick === 'locked') { pw = await askPassword(); if (!pw) return; }
@@ -13132,10 +13274,12 @@ async function drawPeople(pane, selectId) {
   const tabBtn = (id, label, n, hot) => h('button', { type: 'button', class: 'ppl-tab', role: 'tab', 'aria-selected': String(PPL.tab === id), onclick: () => { PPL.tab = id; drawPeople(pane, selectId); } }, label, n != null ? h('span', { class: 'ppl-tab-n' + (hot ? ' hot' : '') }, String(n)) : null);
   const tabs = h('div', { class: 'ppl-tabs', role: 'tablist', 'aria-label': 'People & access' },
     tabBtn('people', 'People', users.length), tabBtn('roles', 'Roles', tdRoles().length), tabBtn('passcodes', 'Passcodes', pending.length || null, pending.length > 0));
-  fill(pane, tabs, body);
+  /* v3.62.0: header like the reference: what this is, People | Roles | Passcodes, + Add user */
+  const addBtn = h('button', { class: 'btn primary', type: 'button', onclick: () => { if (PPL.tab !== 'people') { PPL.tab = 'people'; drawPeople(pane).then(() => drawPeopleTable.add && drawPeopleTable.add()); } else drawPeopleTable.add && drawPeopleTable.add(); } }, '+ Add user');
+  fill(pane, h('div', { class: 'ua-head' }, h('p', { class: 'set-hint' }, 'Add people, set their passcodes and choose what they can open.'), h('span', { class: 'grow' }), tabs, addBtn), body);
 
   if (PPL.tab === 'groups') PPL.tab = 'roles';
-  if (PPL.tab === 'roles') { drawRoles(body, users, () => reload(selectId), groups); return; }
+  if (PPL.tab === 'roles') { drawRoleCards(body, users, () => reload(selectId), groups); return; }
 
   if (PPL.tab === 'passcodes') {
     const selfOn = settings.self_passcode !== false;
@@ -13160,6 +13304,8 @@ async function drawPeople(pane, selectId) {
     return;
   }
 
+  /* v3.62.0: People is one table */
+  if (PPL.tab === 'people' || !PPL.tab) { drawPeopleTable(body, users, me, reload); return; }
   /* People: searchable list on the left, one editor on the right */
   const list = h('div', { class: 'ppl-list', role: 'list' }), editor = h('div', { class: 'ppl-editor' });
   const search = h('input', { class: 'input', type: 'search', placeholder: 'Find a person or ID…', 'aria-label': 'Find a person', value: PPL.q });
@@ -13246,7 +13392,7 @@ function filterText(f) {
 }
 window.filterText = filterText;
 /* v3.55.0: the access form of a role (rights grid, presets, Backup report, fixed filters, notifications, field buttons) */
-function buildAccessForm(src, users = []) {
+function buildAccessForm(src, users = [], opts = {}) {
   const accessSource = { permissions: { ...((src && src.rights) || {}), ...((src && src.extras) || {}) } };
   const start = accessSource.permissions._v ? PERM.upgrade(accessSource.permissions) : PERM.presets['View only'];
   const audience = accessSource?.permissions?._notificationAudience || { mode: 'all', users: [] };
@@ -13320,7 +13466,7 @@ function buildAccessForm(src, users = []) {
     editor,
     h('p', { class: 'rmod-note' }, 'They start with these filters every time they sign in. Without “Change the filters” they can’t change or clear them.'));
   /* rights, one card per module: the module's page on top, what they can do in it underneath */
-  const boxes = {}, syncs = [];
+  const boxes = {}, syncs = [], PARTS = [];
   const isSuper = () => false;
   const modules = PERM.groups.map(g => {
     const items = g.items.map(([k, label]) => { const c = checkLine(label, !!start[k], { 'data-k': k }); boxes[k] = c.box; return c; });
@@ -13371,6 +13517,7 @@ function buildAccessForm(src, users = []) {
     const card = h('details', { class: 'rrow' },
       h('summary', {}, h('span', { class: 'rrow-name' }, h('b', {}, g.name), h('span', { class: 'rrow-meta' }, countEl, segHint)), seg, h('span', { class: 'rrow-more', 'aria-hidden': 'true' }, 'Fine-tune')),
       h('div', { class: 'rrow-body' }, head, itemsBox, subBox, extra));
+    PARTS.push({ g, itemsBox, subBox, extra, allIt });
     const sync = () => { const off = g.page && !boxes[g.page].checked; card.classList.toggle('off', !!off); for (const c of items) c.box.disabled = isSuper() || !!off; for (const c of subItems) c.box.disabled = isSuper() || !!off; if (g.page) boxes[g.page].disabled = isSuper(); };
     if (g.page) boxes[g.page].addEventListener('change', sync);
     card.addEventListener('change', () => setTimeout(paintSeg));
@@ -13398,8 +13545,314 @@ function buildAccessForm(src, users = []) {
   syncRole(); paintPresets();
   const rightsNow = () => Object.fromEntries([['_v', PERM.version], ...PERM.keys.map(k => [k, boxes[k].checked])]);
   /* v3.16: copy rights between people, duplicate a person, or hand these rights to several people at once */
-  return { el: rights, read: () => ({ rights: rightsNow(), extras: { ...bkPerms(), _attendanceFields: fieldChecks.filter(c => c.box.checked).map(c => c.field), _notificationAudience: { mode: audienceMode.value, users: audienceChecks.filter(c => c.box.checked).map(c => c.id) }, ...(fixed ? { _filters: fixed } : {}) } }), summary: () => PERM.keys.filter(k => boxes[k].checked).length };
+  /* v3.62.0: the table layout: one row per page, a View / Edit / Delete & manage switch each, the details underneath */
+  let outEl = rights;
+  if (opts.table) {
+    const HINT = { 'Overview': 'Home page: attendance, Request Center, coming up', 'Employees': 'Employee list and details', 'Attendance': 'Tracker, People, History & upcoming', 'Action center': 'Action items, reviews, data health', 'Reports': 'Charts and custom dashboards', 'Save & sync': 'The saving status page', 'ⓘ Leave card': 'Past and upcoming leave next to names', 'Notifications': 'The bell and the activity log', 'Filters': 'Search and filters at the top', 'Settings': 'Settings pages and tools' };
+    const labelOf = (g, k) => k === g.page ? 'Open the ' + g.name + ' page' : (([...g.items, ...((g.sub && g.sub.items) || [])].find(i => i[0] === k) || [k, k])[1]);
+    const short = t => t.length > 60 ? t.slice(0, 58).replace(/\s+\S*$/, '') + '…' : t;
+    const paintAll = [], repaint = () => { syncs.forEach(f => f()); paintAll.forEach(f => f()); };
+    const rowsT = PARTS.map(P => {
+      const g = P.g, keys = [...(g.page ? [g.page] : []), ...P.allIt.map(([k]) => k)];
+      const B = { view: keys.filter(k => k === g.page || !PERM.isEditKey(k)), edit: keys.filter(k => k !== g.page && PERM.isEditKey(k) && !MANAGE_KEYS.has(k)), manage: keys.filter(k => MANAGE_KEYS.has(k)) };
+      const stOf = b => { const on = B[b].filter(k => boxes[k].checked).length; return !B[b].length ? null : on === 0 ? 'off' : on === B[b].length ? 'on' : 'some'; };
+      const set = (b, val) => { for (const k of B[b]) boxes[k].checked = val; if (val && b !== 'view' && g.page) boxes[g.page].checked = true; if (!val && b === 'view') for (const k of [...B.edit, ...B.manage]) boxes[k].checked = false; repaint(); };
+      const more = ks => ks.length > 1 ? ' + ' + (ks.length - 1) + ' more' : '';
+      const desc = b => b === 'view' && g.page ? 'See the page' + (B.view.length > 1 ? ' and its ' + (B.view.length - 1) + ' sections' : '') : short(labelOf(g, B[b][0])) + more(B[b]);
+      const cell = b => {
+        if (!B[b].length) return h('div', { class: 'rt-c rt-na' }, '—');
+        const sw = h('button', { type: 'button', class: 'rt-sw', role: 'switch', 'aria-label': ({ view: 'View', edit: 'Edit', manage: 'Delete & manage' })[b] + ' · ' + g.name });
+        const paint = () => { const st = stOf(b); sw.setAttribute('aria-checked', st === 'on' ? 'true' : st === 'some' ? 'mixed' : 'false'); sw.title = st === 'some' ? 'Some of these are on. Open the details below to see which.' : ''; };
+        paintAll.push(paint); paint(); sw.addEventListener('click', () => set(b, stOf(b) !== 'on'));
+        return h('div', { class: 'rt-c' }, sw, h('span', { class: 'rt-d' }, desc(b)));
+      };
+      const cnt = h('small', { class: 'rt-cnt' }), pc = () => { const on = keys.filter(k => boxes[k].checked).length; cnt.textContent = on === keys.length ? '· all on' : on === 0 ? '· all off' : '· ' + on + ' of ' + keys.length + ' on'; };
+      paintAll.push(pc); pc();
+      const parts = [P.itemsBox, P.subBox, P.extra].filter(Boolean);
+      const allOn = e => { e.preventDefault(); keys.forEach(k => { boxes[k].checked = true; }); repaint(); }, allOff = e => { e.preventDefault(); keys.filter(k => k !== g.page).forEach(k => { boxes[k].checked = false; }); repaint(); };
+      const sec = parts.length ? h('details', { class: 'rt-sec' }, h('summary', {}, h('span', {}, 'Sections and details on the ' + g.name + ' line'), cnt, h('button', { type: 'button', class: 'linkbtn', onclick: allOn }, 'Show all'), h('button', { type: 'button', class: 'linkbtn', onclick: allOff }, 'Hide all')), h('div', { class: 'rt-sec-body' }, ...parts)) : null;
+      return h('div', { class: 'rt-g' }, h('div', { class: 'rt-r' }, h('div', { class: 'rt-p' }, h('b', {}, g.name), h('small', {}, HINT[g.name] || '')), cell('view'), cell('edit'), cell('manage')), sec);
+    });
+    const tableT = h('div', { class: 'rt' }, h('div', { class: 'rt-h' }, ...['Page', 'View', 'Edit', 'Delete & manage'].map(t => h('span', {}, t))), ...rowsT);
+    tableT.addEventListener('change', () => setTimeout(() => paintAll.forEach(f => f())));
+    outEl = h('div', { class: 'rights rights-t' }, tableT, h('div', { class: 'rt-more' }, h('h5', {}, 'More rights'), bkBox, phBox));
+  }
+  return { el: outEl, read: () => ({ rights: rightsNow(), extras: { ...bkPerms(), _attendanceFields: fieldChecks.filter(c => c.box.checked).map(c => c.field), _notificationAudience: { mode: audienceMode.value, users: audienceChecks.filter(c => c.box.checked).map(c => c.id) }, ...(fixed ? { _filters: fixed } : {}) } }), summary: () => PERM.keys.filter(k => boxes[k].checked).length };
 }
+/* ============================== v3.62.0: People & access, redesigned ==============================
+   People: one table (role picker on each row, what they can open, status, last sign-in, Edit / Duplicate / Delete).
+   Roles: one card per role, rights edited in a dialog with View / Edit / Delete & manage switches per page. */
+function pdlg(title, body, foot, cls) {
+  const v = h('div', { class: 'pdlg-veil', role: 'presentation' });
+  const close = () => { v.remove(); document.removeEventListener('keydown', esc, true); };
+  const esc = e => { if (e.key === 'Escape' && !e.defaultPrevented) { e.stopPropagation(); close(); } };
+  const box = h('div', { class: 'pdlg ' + (cls || ''), role: 'dialog', 'aria-modal': 'true', 'aria-label': title },
+    h('header', {}, h('h3', {}, title), h('button', { class: 'pdlg-x', type: 'button', 'aria-label': 'Close', onclick: close }, '×')),
+    h('div', { class: 'pdlg-body' }, body), foot ? h('footer', {}, ...[].concat(foot)) : null);
+  v.append(box); v.addEventListener('mousedown', e => { if (e.target === v) close(); });
+  document.addEventListener('keydown', esc, true); document.body.append(v);
+  return { close, box };
+}
+const agoText = t => { const d = Date.parse(t); if (!d) return 'Never'; const m = Math.max(0, (Date.now() - d) / 60000); return m < 1 ? 'Just now' : m < 60 ? Math.round(m) + ' min ago' : m < 1440 ? Math.round(m / 60) + ' h ago' : m < 1440 * 60 ? Math.round(m / 1440) + ' d ago' : new Date(d).toLocaleDateString(undefined, { day: 'numeric', month: 'short', year: 'numeric' }); };
+const kindOf = u => u.role === 'superadmin' ? 'Super admin' : u.role === 'admin' ? 'Admin' : 'User';
+/* the page chips for a role or a person */
+function pageChips(p, admin) {
+  const out = PERM.groups.filter(g => g.page && p && p[g.page]).map(g => g.name);
+  if (p && p._bkReport) out.push('Backup report'); if (p && p._phones) out.push('Phone numbers'); if (admin) out.push('Settings');
+  return out;
+}
+function chipsEl(list, max = 5) {
+  if (!list.length) return h('span', { class: 'pc-none' }, 'Nothing yet');
+  return h('span', { class: 'pc-chips' }, ...list.slice(0, max).map(t => h('span', { class: 'pc-chip' }, t)), list.length > max ? h('span', { class: 'pc-more', title: list.slice(max).join(', ') }, '+' + (list.length - max) + ' more') : null);
+}
+/* count switches for a role card: how many View / Edit / Delete & manage rights it has, and hidden sections */
+const MANAGE_KEYS = new Set(['emp.delete', 'emp.fields', 'emp.bulk', 'att.rows', 'att.fields', 'att.addemp', 'att.holidays', 'set.workbook', 'set.fields']);
+function rightCounts(p) {
+  let v = 0, e = 0, m = 0, hidden = 0;
+  for (const g of PERM.groups) {
+    const keys = [...g.items, ...((g.sub && g.sub.items) || [])].map(i => i[0]); const pageOn = !g.page || !!p[g.page];
+    if (g.page && p[g.page]) v++;
+    for (const k of keys) { if (!p[k]) { if (g.page && pageOn && !PERM.isEditKey(k)) hidden++; continue; } if (MANAGE_KEYS.has(k)) m++; else if (PERM.isEditKey(k)) e++; else if (!g.page) v++; }
+  }
+  return { v, e, m, hidden };
+}
+
+/* ---------- People table ---------- */
+function drawPeopleTable(body, users, me, reload) {
+  const roles = tdRoles();
+  const search = h('input', { class: 'input pt-search', type: 'search', placeholder: 'Search people', 'aria-label': 'Search people', value: PPL.q || '' });
+  const counts = { all: users.length, admin: users.filter(u => u.role === 'admin' || u.role === 'superadmin').length, user: users.filter(u => u.role === 'user').length, off: users.filter(u => !u.active).length };
+  if (!['all', 'admin', 'user', 'off'].includes(PPL.kind)) PPL.kind = 'all';
+  const seg = h('div', { class: 'seg pt-seg', role: 'group', 'aria-label': 'Show' }, ...[['all', 'Everyone'], ['admin', 'Admins'], ['user', 'Users'], ['off', 'Disabled']].map(([k, l]) =>
+    h('button', { type: 'button', 'aria-pressed': String(PPL.kind === k), onclick: () => { PPL.kind = k; drawPeopleTable(body, users, me, reload); } }, l, h('span', { class: 'pt-n' }, String(counts[k])))));
+  const tbody = h('tbody', {});
+  const table = h('table', { class: 'pt' }, h('thead', {}, h('tr', {}, ...['Person', 'Role', 'Can open', 'Status', 'Last sign-in', ''].map(t => h('th', {}, t)))), tbody);
+  const editPerson = (u, template) => {
+    const box = h('div', { class: 'pt-edit' });
+    const d = pdlg(u ? 'Edit ' + u.name : template ? 'Duplicate ' + template.name : 'Add user', box, null, 'wide');
+    drawEditor(box, u, id => { d.close(); reload(id); }, users, template || null, []);
+  };
+  const drawRows = () => {
+    const q = (PPL.q || '').trim().toLowerCase();
+    const shown = users.filter(u => (PPL.kind === 'all' || (PPL.kind === 'off' ? !u.active : PPL.kind === 'admin' ? (u.role === 'admin' || u.role === 'superadmin') : u.role === 'user'))
+      && (!q || (u.name + ' ' + (u.login_id || '') + ' ' + roleLabel(u)).toLowerCase().includes(q))).sort((a, b) => (a.role === 'superadmin' ? -1 : 0) - (b.role === 'superadmin' ? -1 : 0) || a.name.localeCompare(b.name));
+    tbody.replaceChildren(...shown.map(u => {
+      const r = roleOfUser(u), sup = u.role === 'superadmin';
+      const perms = sup ? null : r ? { ...(r.rights || {}), ...(r.extras || {}) } : PERM.upgrade(u.permissions || {});
+      const chips = sup ? ['Everything'] : (u.role === 'admin' && !r) ? ['Everything except People & access'] : pageChips(perms || {}, u.role === 'admin');
+      let roleCell;
+      if (sup) roleCell = h('span', { class: 'pt-super' }, 'Super admin');
+      else {
+        const sel = h('select', { class: 'input pt-role', 'aria-label': 'Role for ' + u.name }, ...roles.map(x => h('option', { value: x.id, selected: !!r && r.id === x.id }, x.name)), h('option', { value: '', selected: !r }, 'No role'));
+        sel.addEventListener('change', async () => {
+          sel.disabled = true;
+          try {
+            const nr = roles.find(x => x.id === sel.value);
+            if (nr) await CLOUD.admin.save(u.id, u.name, u.passcode, nr.admin ? 'admin' : 'user', u.active, { ...tdRolePerms(nr), ...keepLink(u.permissions) }, u.login_id);
+            else { const p = { ...(u.permissions || {}) }; delete p._role; await CLOUD.admin.save(u.id, u.name, u.passcode, u.role, u.active, p, u.login_id); }
+            toast(u.name + (nr ? ' now has the role ' + nr.name + '.' : ' has no role now (keeps the access they had).')); reload(u.id);
+          } catch (e) { toast(e.message, true); sel.disabled = false; }
+        });
+        roleCell = sel;
+      }
+      const del = sup || u.id === me.id ? null : confirmButton('Delete', 'Sure?', async () => { try { await CLOUD.admin.remove(u.id); toast(u.name + ' was deleted.'); reload(); } catch (e) { toast(e.message, true); } }, 'pt-act danger');
+      return h('tr', { class: u.active ? '' : 'off' },
+        h('td', {}, h('div', { class: 'pt-who' }, h('span', { class: 'ppl-av r-' + u.role }, pplInitials(u.name)), h('span', {}, h('b', {}, u.name + (u.id === me.id ? ' (you)' : '')), h('small', {}, kindOf(u) + (u.login_id ? ' · ' + u.login_id : ''))))),
+        h('td', {}, roleCell),
+        h('td', { class: 'pt-open' }, chipsEl(chips)),
+        h('td', {}, h('span', { class: 'pt-st ' + (u.active ? 'on' : 'off') }, u.active ? 'Active' : 'Disabled')),
+        h('td', { class: 'pt-when' }, agoText(u.last_login)),
+        h('td', { class: 'pt-acts' }, h('button', { class: 'pt-act', type: 'button', onclick: () => editPerson(u) }, 'Edit'), sup ? null : h('button', { class: 'pt-act', type: 'button', onclick: () => editPerson(null, u) }, 'Duplicate'), del));
+    }));
+    if (!shown.length) tbody.append(h('tr', {}, h('td', { colspan: 6, class: 'pt-empty' }, 'No one matches.')));
+  };
+  search.addEventListener('input', () => { PPL.q = search.value; drawRows(); });
+  drawRows();
+  fill(body, h('div', { class: 'pt-card' }, h('div', { class: 'pt-tools' }, search, seg), h('div', { class: 'pt-wrap' }, table)));
+  drawPeopleTable.add = () => editPerson(null);
+}
+
+/* ---------- Roles: cards ---------- */
+function drawRoleCards(box, users, reload, oldGroups = []) {
+  const roles = tdRoles();
+  const membersOf = r => users.filter(u => u.role !== 'superadmin' && u.permissions && u.permissions._role === r.id);
+  const legacy = legacyGroupsBox(users, roles, reload, oldGroups);
+  const grid = h('div', { class: 'rc-grid' });
+  for (const r of roles) {
+    const p = { ...(r.rights || {}), ...(r.extras || {}) }, c = rightCounts(p), n = membersOf(r).length;
+    grid.append(h('article', { class: 'rcard' },
+      h('div', { class: 'rcard-top' }, h('b', {}, r.name), h('span', { class: 'rcard-n' }, n + (n === 1 ? ' person' : ' people'))),
+      r.desc ? h('p', { class: 'rcard-desc' }, r.desc) : null,
+      chipsEl(pageChips(p, r.admin), 8),
+      h('div', { class: 'rcard-counts' }, h('span', { class: 'cv' }, 'View ' + c.v), h('span', { class: 'ce' }, 'Edit ' + c.e), h('span', { class: 'cm' }, 'Delete & manage ' + c.m)),
+      h('div', { class: 'rcard-sec' }, h('span', {}, c.hidden ? c.hidden + (c.hidden === 1 ? ' section hidden' : ' sections hidden') : 'All sections shown'), r.admin ? h('span', { class: 'rcard-adm' }, 'Admin') : null),
+      h('div', { class: 'rcard-foot' },
+        h('button', { class: 'btn primary mini', type: 'button', onclick: () => openAssign(r, users, reload) }, 'Assign people'),
+        h('button', { class: 'pt-act', type: 'button', onclick: () => openRoleDialog(r, users, roles, reload) }, 'Edit rights'),
+        h('button', { class: 'pt-act', type: 'button', onclick: async () => { const copy = { ...r, id: roleId(), name: uniqueRoleName(r.name + ' (copy)', roles), members: [] }; try { await saveRoles([...roles, copy], 'Duplicated role ' + r.name); toast('Made a copy: ' + copy.name + '.'); reload(); } catch (e) { toast(e.message, true); } } }, 'Duplicate'),
+        confirmButton('Delete', n ? n + ' keep its access, no role · sure?' : 'Sure?', async () => {
+          try { await saveRoles(roles.filter(x => x.id !== r.id), 'Deleted role ' + r.name);
+            for (const x of membersOf(r)) { const pp = { ...tdRolePerms(r), ...keepLink(x.permissions) }; delete pp._role; try { await CLOUD.admin.save(x.id, x.name, x.passcode, x.role, x.active, pp, x.login_id); } catch { } }
+            toast('Role deleted. Its people keep the same access, with no role.'); reload(); } catch (e) { toast(e.message, true); }
+        }, 'pt-act danger'))));
+  }
+  if (!roles.length) grid.append(h('div', { class: 'grp-empty' }, h('b', {}, 'No roles yet'), h('p', {}, 'A role is a named set of access, like “Team Leader”. Give it to people instead of ticking boxes for each one.'),
+    h('button', { class: 'btn', type: 'button', onclick: async e => { e.currentTarget.disabled = true; try { await saveRoles(SUGGESTED_ROLES(), 'Added suggested roles'); reload(); } catch (er) { toast(er.message, true); } } }, 'Add suggested roles')));
+  fill(box, legacy, h('div', { class: 'rc-head' }, h('div', {}, h('h4', {}, 'Roles'), h('p', { class: 'set-hint' }, 'Set what each role can view, edit and delete once, then give people a role. Changing a role updates everyone who has it. People with the same role also see each other’s requests.')),
+    h('button', { class: 'btn primary', type: 'button', onclick: () => openRoleDialog(null, users, roles, reload) }, '+ New role')), grid);
+}
+const uniqueRoleName = (base, roles) => { let n = base, i = 2; while (roles.some(r => r.name.toLowerCase() === n.toLowerCase())) n = base + ' ' + i++; return n; };
+
+/* ---------- Assign people ---------- */
+function openAssign(r, users, reload) {
+  const people = users.filter(u => u.role !== 'superadmin').sort((a, b) => a.name.localeCompare(b.name));
+  const had = new Set(people.filter(u => u.permissions && u.permissions._role === r.id).map(u => u.id)), on = new Set(had);
+  const q = h('input', { class: 'input', type: 'search', placeholder: 'Find a person', 'aria-label': 'Find a person' });
+  const list = h('div', { class: 'as-list' });
+  const draw = () => { const t = q.value.trim().toLowerCase(); list.replaceChildren(...people.filter(u => !t || (u.name + ' ' + (u.login_id || '')).toLowerCase().includes(t)).map(u => {
+    const cb = h('input', { type: 'checkbox', checked: on.has(u.id) }); cb.addEventListener('change', () => { cb.checked ? on.add(u.id) : on.delete(u.id); cnt.textContent = on.size + ' selected'; });
+    const cur = roleOfUser(u);
+    return h('label', { class: 'as-row' }, cb, h('span', { class: 'ppl-av sm r-' + u.role }, pplInitials(u.name)), h('span', { class: 'as-who' }, h('b', {}, u.name), h('small', {}, (cur ? (cur.id === r.id ? 'has this role' : 'now: ' + cur.name) : 'no role') + (u.active ? '' : ' · disabled'))));
+  })); };
+  const cnt = h('span', { class: 'as-cnt' }, on.size + ' selected');
+  q.addEventListener('input', draw); draw();
+  const save = h('button', { class: 'btn primary', type: 'button' }, 'Save');
+  const d = pdlg('Assign people · ' + r.name, h('div', {}, h('p', { class: 'set-hint' }, 'Ticked people get this role and its access. Someone in another role moves to this one.'), q, list), [cnt, h('span', { class: 'grow' }), h('button', { class: 'btn', type: 'button', onclick: () => d.close() }, 'Cancel'), save]);
+  save.addEventListener('click', async () => {
+    save.disabled = true; save.textContent = 'Saving…';
+    const add = people.filter(u => on.has(u.id) && !had.has(u.id)), drop = people.filter(u => had.has(u.id) && !on.has(u.id)), failed = await syncRoleMembers(r, add, () => { });
+    for (const x of drop) { try { const p = { ...(x.permissions || {}) }; delete p._role; await CLOUD.admin.save(x.id, x.name, x.passcode, x.role, x.active, p, x.login_id); } catch (e) { failed.push(x.name + ' (' + e.message + ')'); } }
+    if (failed.length) toast('Not updated: ' + failed.join('; '), true); else toast(r.name + ': ' + on.size + (on.size === 1 ? ' person' : ' people') + '.');
+    d.close(); reload();
+  });
+}
+
+/* ---------- Edit role dialog ---------- */
+function openRoleDialog(r, users, roles, reload) {
+  const isNew = !r, err = h('p', { class: 'err', role: 'alert' });
+  const nm = h('input', { class: 'input', value: r ? r.name : '', placeholder: 'e.g. Team Leader', maxlength: 40, 'aria-label': 'Role name' });
+  const desc = h('input', { class: 'input', value: (r && r.desc) || '', placeholder: 'Who it is for', maxlength: 120, 'aria-label': 'Description' });
+  const from = h('select', { class: 'input', 'aria-label': 'Fill in from' }, h('option', { value: '' }, 'Start from…'),
+    h('optgroup', { label: 'Ready-made' }, ...Object.keys(PERM.presets).filter(n => n !== 'Admin').map(n => h('option', { value: 'p:' + n }, n))),
+    roles.filter(x => !r || x.id !== r.id).length ? h('optgroup', { label: 'Copy another role' }, ...roles.filter(x => !r || x.id !== r.id).map(x => h('option', { value: 'r:' + x.id }, x.name))) : null);
+  const adm = checkLine('Admin role: can also change dashboard settings (every Settings page except People & access)', !!(r && r.admin));
+  const holder = h('div', {});
+  let form = buildAccessForm(r, users, { table: true }); holder.append(form.el);
+  from.addEventListener('change', () => {
+    const v = from.value; if (!v) return;
+    const src = v.startsWith('p:') ? { rights: PERM.presets[v.slice(2)], extras: r ? r.extras : {} } : roles.find(x => x.id === v.slice(2));
+    if (!src) return; form = buildAccessForm({ ...src, admin: adm.box.checked }, users, { table: true }); holder.replaceChildren(form.el);
+    toast('Filled in from ' + from.options[from.selectedIndex].text + '. Change anything, then Save.');
+  });
+  const save = h('button', { class: 'btn primary', type: 'button' }, isNew ? 'Create role' : 'Save role');
+  const d = pdlg(isNew ? 'New role' : 'Edit role', h('div', { class: 'rd' }, h('div', { class: 'rd-top' }, h('label', {}, 'Role name', nm), h('label', {}, 'Description', desc), h('label', {}, 'Fill in from', from)), adm.el, holder, err),
+    [h('span', { class: 'grow' }), h('button', { class: 'btn', type: 'button', onclick: () => d.close() }, 'Cancel'), save], 'wide');
+  setTimeout(() => nm.focus(), 0);
+  save.addEventListener('click', async () => {
+    err.textContent = '';
+    const name = nm.value.replace(/\s+/g, ' ').trim();
+    if (!name) { err.textContent = 'Give the role a name.'; nm.focus(); return; }
+    if (roles.some(x => x.name.toLowerCase() === name.toLowerCase() && (!r || x.id !== r.id))) { err.textContent = 'There is already a role with that name.'; return; }
+    save.disabled = true; save.textContent = 'Saving…';
+    try {
+      const v = form.read(), role = { ...(r || {}), id: r ? r.id : roleId(), name, desc: desc.value.trim(), admin: adm.box.checked, rights: v.rights, extras: v.extras };
+      await saveRoles(r ? roles.map(x => x.id === r.id ? role : x) : [...roles, role], (isNew ? 'Created role ' : 'Updated role ') + name);
+      const members = r ? users.filter(u => u.role !== 'superadmin' && u.permissions && u.permissions._role === r.id) : [];
+      const failed = await syncRoleMembers(role, members, () => { save.textContent = 'Updating people…'; });
+      BE.appendActivity([{ time: BE.nowText(), user: BE.userName(), action: 'settings', key: '', name: 'Role ' + name, details: { note: (isNew ? 'Created role ' : 'Updated role ') + name + ' · ' + roleSummary(role) + ' · ' + members.length + ' people' } }]);
+      toast(failed.length ? 'Role saved, but not updated for: ' + failed.join('; ') : 'Role saved.' + (members.length ? ' ' + members.length + (members.length === 1 ? ' person gets' : ' people get') + ' it within a minute.' : ''), !!failed.length);
+      d.close(); reload();
+    } catch (e) { err.textContent = e.message; save.disabled = false; save.textContent = isNew ? 'Create role' : 'Save role'; }
+  });
+}
+
+/* ============================== v3.62.0: Admin log (Action center) ============================== */
+const ALOG_TYPES = [['Update', 'u'], ['Activity', 'a'], ['Decision', 'd'], ['Process change', 'p'], ['Client update', 'c']];
+const ALOG = { items: null, q: '', type: 'all', client: 'all', days: '30', busy: false, err: '' };
+const alogToday = () => { const d = new Date(); return d.getFullYear() + '-' + String(d.getMonth() + 1).padStart(2, '0') + '-' + String(d.getDate()).padStart(2, '0'); };
+const alogDay = iso => { const d = new Date(iso + 'T00:00:00'); return isNaN(d) ? iso : d.toLocaleDateString(undefined, { weekday: 'short', day: 'numeric', month: 'short', year: 'numeric' }); };
+const alogCls = t => 'al-' + ((ALOG_TYPES.find(x => x[0] === t) || [, 'u'])[1]);
+async function loadAdminLog(force) {
+  if (ALOG.busy || (ALOG.items && !force)) return;
+  ALOG.busy = true; ALOG.err = '';
+  try { ALOG.items = await BE.adminLogRead(); } catch (e) { ALOG.err = e.message; ALOG.items = ALOG.items || []; }
+  finally { ALOG.busy = false; renderAdminLog(); }
+}
+function alogClients() {
+  const out = new Set(); try { for (const r of state.rows) { const c = gs(r, 'client_column'); if (c) out.add(c); } } catch { }
+  for (const x of ALOG.items || []) if (x.client) out.add(x.client);
+  return [...out].sort((a, b) => a.localeCompare(b));
+}
+function openAdminLogEntry(x) {
+  const isNew = !x, err = h('p', { class: 'err', role: 'alert' });
+  const date = h('input', { class: 'input', type: 'date', value: (x && x.date) || alogToday(), 'aria-label': 'Date' });
+  const type = h('select', { class: 'input', 'aria-label': 'Type' }, ...ALOG_TYPES.map(([t]) => h('option', { value: t, selected: x ? x.type === t : t === 'Update' }, t)));
+  const client = h('input', { class: 'input', list: 'alogClients', value: (x && x.client) || '', placeholder: 'Team (all) or a client', 'aria-label': 'Client' });
+  const procs = [...new Set((ALOG.items || []).map(i => i.process).filter(Boolean))].sort();
+  const process = h('input', { class: 'input', list: 'alogProcs', value: (x && x.process) || '', placeholder: 'e.g. Hiring, Payroll, Shift change', 'aria-label': 'Process' });
+  const title = h('input', { class: 'input', value: (x && x.title) || '', maxlength: 140, placeholder: 'One line: what happened or what was decided', 'aria-label': 'Title' });
+  const details = h('textarea', { class: 'input', rows: 6, maxlength: 4000, placeholder: 'Details, reasons, who was involved, next steps…', 'aria-label': 'Details' }); details.value = (x && x.details) || '';
+  const follow = h('input', { class: 'input', type: 'date', value: (x && x.follow) || '', 'aria-label': 'Follow-up date' });
+  const status = h('select', { class: 'input', 'aria-label': 'Status' }, ...['Open', 'Done'].map(t => h('option', { value: t, selected: x ? (x.status || 'Open') === t : t === 'Open' }, t)));
+  const save = h('button', { class: 'btn primary', type: 'button' }, isNew ? 'Add to the log' : 'Save');
+  const lab = (t, el, cls) => h('label', { class: 'al-f ' + (cls || '') }, t, el);
+  const d = pdlg(isNew ? 'New log entry' : 'Edit log entry', h('div', { class: 'al-form' },
+    lab('Date', date), lab('Type', type), lab('Client', client), lab('Process', process), lab('Title', title, 'full'), lab('Details', details, 'full'), lab('Follow up on (optional)', follow), lab('Status', status),
+    h('datalist', { id: 'alogClients' }, h('option', { value: 'Team (all)' }), ...alogClients().map(c => h('option', { value: c }))), h('datalist', { id: 'alogProcs' }, ...procs.map(c => h('option', { value: c }))), err),
+    [h('span', { class: 'grow' }), h('button', { class: 'btn', type: 'button', onclick: () => d.close() }, 'Cancel'), save], 'wide');
+  setTimeout(() => title.focus(), 0);
+  save.addEventListener('click', async () => {
+    err.textContent = '';
+    if (!title.value.trim()) { err.textContent = 'Write a title.'; title.focus(); return; }
+    if (!date.value) { err.textContent = 'Pick a date.'; return; }
+    save.disabled = true; save.textContent = 'Saving…';
+    const item = { id: x && x.id, date: date.value, type: type.value, client: client.value.trim(), process: process.value.trim(), title: title.value.trim(), details: details.value.trim(), follow: follow.value, status: status.value };
+    try { ALOG.items = (await BE.adminLogWrite(isNew ? 'add' : 'edit', item)).map(o => ({ ...o })); d.close(); toast(isNew ? 'Added to the admin log.' : 'Saved.'); renderAdminLog(); }
+    catch (e) { err.textContent = e.message; save.disabled = false; save.textContent = isNew ? 'Add to the log' : 'Save'; }
+  });
+}
+function renderAdminLog() {
+  const box = document.getElementById('cardAdminLog'); if (!box) return;
+  if (!ALOG.items) { fill(box, h('p', { class: 'set-hint', style: 'padding:16px' }, 'Loading the admin log…')); loadAdminLog(); return; }
+  const me = BE.userName(), owner = !(window.PERM && PERM.online()) || PERM.isOwner();
+  const since = ALOG.days === 'all' ? '' : (() => { const d = new Date(); d.setDate(d.getDate() - +ALOG.days); return d.toISOString().slice(0, 10); })();
+  const q = ALOG.q.trim().toLowerCase();
+  const list = ALOG.items.filter(x => (ALOG.type === 'all' || x.type === ALOG.type) && (ALOG.client === 'all' || (x.client || 'Team (all)') === ALOG.client) && (!since || x.date >= since)
+    && (!q || [x.title, x.details, x.client, x.process, x.by, x.type].join(' ').toLowerCase().includes(q))).sort((a, b) => b.date.localeCompare(a.date) || String(b.at).localeCompare(String(a.at)));
+  const today = alogToday(), due = ALOG.items.filter(x => x.follow && x.status !== 'Done' && x.follow <= today);
+  const search = h('input', { class: 'input al-q', type: 'search', placeholder: 'Search the log', value: ALOG.q, 'aria-label': 'Search the log' });
+  search.addEventListener('input', () => { ALOG.q = search.value; const pos = search.selectionStart; renderAdminLog(); const s2 = document.querySelector('#cardAdminLog .al-q'); if (s2) { s2.focus(); try { s2.setSelectionRange(pos, pos); } catch { } } });
+  const seg = h('div', { class: 'seg al-seg', role: 'group', 'aria-label': 'Type' }, ...[['all', 'All'], ...ALOG_TYPES.map(([t]) => [t, t])].map(([v, l]) => h('button', { type: 'button', 'aria-pressed': String(ALOG.type === v), onclick: () => { ALOG.type = v; renderAdminLog(); } }, l)));
+  const cl = h('select', { class: 'input', 'aria-label': 'Client' }, h('option', { value: 'all' }, 'All clients & team'), h('option', { value: 'Team (all)', selected: ALOG.client === 'Team (all)' }, 'Team (all)'), ...alogClients().map(c => h('option', { value: c, selected: ALOG.client === c }, c)));
+  cl.addEventListener('change', () => { ALOG.client = cl.value; renderAdminLog(); });
+  const per = h('select', { class: 'input', 'aria-label': 'Period' }, ...[['7', 'Last 7 days'], ['30', 'Last 30 days'], ['90', 'Last 90 days'], ['all', 'Everything']].map(([v, l]) => h('option', { value: v, selected: ALOG.days === v }, l)));
+  per.addEventListener('change', () => { ALOG.days = per.value; renderAdminLog(); });
+  const copy = h('button', { class: 'btn', type: 'button', title: 'Copy what is shown as text, for an email or chat' }, 'Copy');
+  copy.addEventListener('click', async () => { const txt = list.map(x => alogDay(x.date) + ' · ' + x.type + (x.client ? ' · ' + x.client : '') + (x.process ? ' · ' + x.process : '') + '\n' + x.title + (x.details ? '\n' + x.details : '') + (x.follow ? '\nFollow up: ' + alogDay(x.follow) + ' (' + (x.status || 'Open') + ')' : '') + '\n— ' + x.by).join('\n\n'); try { await navigator.clipboard.writeText(txt); toast('Copied ' + list.length + ' entries.'); } catch { toast('The browser blocked copying.', true); } });
+  const groups = new Map(); for (const x of list) { if (!groups.has(x.date)) groups.set(x.date, []); groups.get(x.date).push(x); }
+  const entry = x => {
+    const canEdit = owner || x.by === me, late = x.follow && x.status !== 'Done' && x.follow <= today;
+    const toggle = canEdit && x.follow ? h('button', { class: 'pt-act', type: 'button', onclick: async e => { e.target.disabled = true; try { ALOG.items = await BE.adminLogWrite('edit', { id: x.id, status: x.status === 'Done' ? 'Open' : 'Done' }); renderAdminLog(); } catch (er) { toast(er.message, true); e.target.disabled = false; } } }, x.status === 'Done' ? 'Reopen' : 'Mark done') : null;
+    return h('article', { class: 'al-e ' + alogCls(x.type) + (x.status === 'Done' ? ' done' : '') },
+      h('div', { class: 'al-e-top' }, h('span', { class: 'al-t' }, x.type), h('b', {}, x.title), h('span', { class: 'grow' }),
+        canEdit ? h('button', { class: 'pt-act', type: 'button', onclick: () => openAdminLogEntry(x) }, 'Edit') : null,
+        canEdit ? confirmButton('Delete', 'Sure?', async () => { try { ALOG.items = await BE.adminLogWrite('delete', { id: x.id }); toast('Deleted from the log.'); renderAdminLog(); } catch (e) { toast(e.message, true); } }, 'pt-act danger') : null),
+      x.details ? h('p', { class: 'al-d' }, x.details) : null,
+      h('div', { class: 'al-meta' }, h('span', {}, x.client || 'Team (all)'), x.process ? h('span', {}, x.process) : null,
+        x.follow ? h('span', { class: 'al-fu' + (late ? ' late' : '') + (x.status === 'Done' ? ' ok' : '') }, (x.status === 'Done' ? 'Done · ' : late ? 'Follow-up due · ' : 'Follow up ') + alogDay(x.follow)) : null, toggle,
+        h('small', {}, 'by ' + (x.by === me ? 'you' : x.by) + ' · ' + String(x.at).slice(11, 16) + (x.editedAt ? ' · edited by ' + (x.editedBy === me ? 'you' : x.editedBy) : ''))));
+  };
+  fill(box,
+    h('div', { class: 'al-head' }, h('div', {}, h('h2', {}, 'Admin log'), h('p', { class: 'set-hint' }, 'Daily updates, activities and decisions for the team, a process or a client. Only admins see it; it is kept in the workbook.')),
+      h('span', { class: 'grow' }), copy, h('button', { class: 'btn primary', type: 'button', onclick: () => openAdminLogEntry(null) }, '+ New entry')),
+    due.length ? h('p', { class: 'al-due' }, due.length + (due.length === 1 ? ' follow-up is' : ' follow-ups are') + ' due: ' + due.slice(0, 4).map(x => x.title).join(' · ') + (due.length > 4 ? '…' : '')) : null,
+    h('div', { class: 'al-tools' }, search, seg, cl, per),
+    ALOG.err ? h('p', { class: 'err' }, ALOG.err) : null,
+    list.length ? h('div', { class: 'al-list' }, ...[...groups.entries()].map(([dt, xs]) => h('section', { class: 'al-day' }, h('h3', {}, alogDay(dt), h('small', {}, ' · ' + xs.length + (xs.length === 1 ? ' entry' : ' entries')), dt === today ? h('em', {}, 'Today') : null), ...xs.map(entry))))
+      : h('div', { class: 'allclear', style: 'padding:24px' }, ALOG.items.length ? 'Nothing matches these filters.' : 'No entries yet. Press “+ New entry” to write the first update, activity or decision.'));
+}
+window.renderAdminLog = renderAdminLog;
+
 /* ----- v3.55.0: roles ----- */
 const roleId = () => 'r' + Date.now().toString(36) + Math.random().toString(36).slice(2, 5);
 const roleOfUser = u => (u && u.role !== 'superadmin' && u.permissions && u.permissions._role ? tdRoles().find(r => r.id === u.permissions._role) || null : null);
@@ -13428,10 +13881,8 @@ const SUGGESTED_ROLES = () => [
   { name: 'View only', admin: false, preset: 'View only' },
 ].filter(x => PERM.presets[x.preset]).map(x => ({ id: roleId() + x.name.length, name: x.name, admin: x.admin, rights: { _v: PERM.version, ...PERM.presets[x.preset] }, extras: { _notificationAudience: { mode: 'all', users: [] } } }));
 
-function drawRoles(box, users, reload, oldGroups = []) {
-  const roles = tdRoles();
-  /* v3.61.1: groups were merged into roles. Old groups show here until their people have a role. */
-  const legacy = oldGroups.length ? h('div', { class: 'grp-move' }, h('b', {}, 'Groups are now part of roles'),
+function legacyGroupsBox(users, roles, reload, oldGroups) {
+  return oldGroups.length ? h('div', { class: 'grp-move' }, h('b', {}, 'Groups are now part of roles'),
     h('p', { class: 'set-hint' }, 'People with the same role see each other’s requests and request notifications, which is what groups did. Your old groups still work until you move their people into a role. Moving gives them that role’s access.'),
     ...oldGroups.map(g => { const sel = h('select', { class: 'input', 'aria-label': 'Role for the people in ' + g.name }, h('option', { value: '' }, 'Choose a role…'), ...roles.map(r => h('option', { value: r.id, selected: r.name.trim().toLowerCase() === g.name.trim().toLowerCase() }, r.name)));
       const go = h('button', { class: 'btn mini primary', type: 'button', onclick: async () => {
@@ -13446,6 +13897,11 @@ function drawRoles(box, users, reload, oldGroups = []) {
       return h('div', { class: 'grp-move-row' }, h('span', {}, h('b', {}, g.name), ' · ' + g.members.length + (g.members.length === 1 ? ' person: ' : ' people: ') + g.members.map(m => m.name).slice(0, 6).join(', ') + (g.members.length > 6 ? '…' : '')), sel, go,
         confirmButton('Remove group', 'Click again to remove the group', async () => { await saveGroups(groupsFrom(window.TD_SETTINGS).filter(x => x.id !== g.id), 'Removed group ' + g.name); reload(); }));
     })) : null;
+}
+function drawRoles(box, users, reload, oldGroups = []) {
+  const roles = tdRoles();
+  /* v3.61.1: groups were merged into roles. Old groups show here until their people have a role. */
+  const legacy = legacyGroupsBox(users, roles, reload, oldGroups);
   const list = h('div', { class: 'ppl-list role-list', role: 'list' }), editor = h('div', { class: 'ppl-editor role-editor' });
   let selId = null;
   const membersOf = r => users.filter(u => u.role !== 'superadmin' && u.permissions && u.permissions._role === r.id);
