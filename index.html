@@ -5,7 +5,7 @@
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <link rel="preconnect" href="https://iiogwevtyzgedhoaqlrn.supabase.co" crossorigin><link rel="dns-prefetch" href="https://iiogwevtyzgedhoaqlrn.supabase.co">
 <link rel="icon" href="data:,">
-<title>Team Dashboard · 3.68.0</title>
+<title>Team Dashboard · 3.68.1</title>
 <link rel="preconnect" href="https://fonts.googleapis.com"><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin><link href="https://fonts.googleapis.com/css2?family=Public+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet">
 <style>
 :root {
@@ -10064,6 +10064,18 @@ function prep(r) {
   return r;
 }
 
+/* v3.68.1: an admin's dashboard publishes everyone's birthday (day and month only, never the year) so birthdays show for
+   everybody while the date of birth itself stays private. Moved and Left people are left out. */
+async function publishBirthdays() {
+  try {
+    if (!BE.isCloud() || !window.PERM || !PERM.isSuper() || !state.schema || !state.schema.dob_column) return;
+    const map = {};
+    for (const r of state.rows) { if (/^(moved|left)$/i.test(gs(r, "status_column").trim())) continue; const d = g(r, state.schema.dob_column); if (!isNum(d)) continue; const x = serialToDate(d); map[r.id] = String(x.getUTCMonth() + 1).padStart(2, "0") + "-" + String(x.getUTCDate()).padStart(2, "0"); }
+    if (!Object.keys(map).length) return;
+    const old = (window.TD_SETTINGS || {}).birthdays || {}, same = Object.keys(map).length === Object.keys(old).length && Object.keys(map).every(k => old[k] === map[k]);
+    if (!same && window.saveTeamSetting) await window.saveTeamSetting("birthdays", map);
+  } catch (e) { console.warn("Birthdays:", e.message); }
+}
 async function loadData(silent) {
   if (silent) document.body.classList.add("refreshing");
   try {
@@ -10073,6 +10085,7 @@ async function loadData(silent) {
     setSync(true);
     renderAll();
     setTimeout(() => PHONE.afterLoad(d), 0);
+    setTimeout(publishBirthdays, 1500);
     if (d.external) toast("The Excel file was changed outside the dashboard (" + d.external + (d.external === 1 ? " change" : " changes") + "). See Activity for who and what.");
   } finally {
     document.body.classList.remove("refreshing");
@@ -10100,7 +10113,7 @@ async function poll() {
 }
 
 /* ============================== filtering ============================== */
-const APP = { title: "Team Dashboard", version: "3.68.0", released: "20 Oct 2026" };
+const APP = { title: "Team Dashboard", version: "3.68.1", released: "20 Oct 2026" };
 const BASE_DIMS = { status: "status_column", desig: "designation_column", client: "client_column", mode: "mode_column" };
 const STANDARD_STATUSES = ["Active", "Manager", "OJT", "Bench", "New", "Projected", "Left", "Moved"];
 const TILE_ORDER = ["Active", "Manager", "OJT", "Bench", "New", "Projected"];
@@ -11274,18 +11287,22 @@ function lineChart(months, series, W) {
 function upcoming(colKey, kind, days) {
   const t = new Date(); const today = Date.UTC(t.getFullYear(), t.getMonth(), t.getDate());
   const out = [];
+  const bmap = kind === "bday" ? ((window.TD_SETTINGS || {}).birthdays || {}) : null;
   for (const r of state.rows) {
-    if (!isCurrent(r)) continue;
-    const s = g(r, colName(colKey));
-    if (!isNum(s)) continue;
-    const d0 = serialToDate(s);
+    /* v3.68.1: birthdays for every status except Moved and Left */
+    if (kind === "bday" ? /^(moved|left)$/i.test(gs(r, "status_column").trim()) : !isCurrent(r)) continue;
+    let s = g(r, colName(colKey)), md = null;
+    /* the date of birth is private: everyone else gets the day and month the admin's dashboard publishes */
+    if (!isNum(s) && bmap && typeof bmap[r.id] === "string" && /^\d{2}-\d{2}$/.test(bmap[r.id])) { md = bmap[r.id]; s = null; }
+    if (!isNum(s) && !md) continue;
+    const d0 = md ? new Date(Date.UTC(2000, +md.slice(0, 2) - 1, +md.slice(3, 5))) : serialToDate(s);
     let cand = Date.UTC(t.getFullYear(), d0.getUTCMonth(), d0.getUTCDate());
     if (cand < today) cand = Date.UTC(t.getFullYear() + 1, d0.getUTCMonth(), d0.getUTCDate());
     const diff = Math.round((cand - today) / 86400000);
     if (diff > days) continue;
     const years = new Date(cand).getUTCFullYear() - d0.getUTCFullYear();
     if (kind === "anniv" && years < 1) continue;
-    out.push({ name: gs(r, "name_column"), date: new Date(cand), diff, years, r, src: s });
+    out.push({ name: gs(r, "name_column"), date: new Date(cand), diff, years, r, src: s, md: md ? String(d0.getUTCDate()).padStart(2, "0") + " " + MON[d0.getUTCMonth()] : null });
   }
   return out.sort((a, b) => a.diff - b.diff || a.name.localeCompare(b.name));
 }
@@ -11447,7 +11464,7 @@ async function copyCelebrations(days, only) {
   const rows = [];
   for (const [col, kind, label] of [["dob_column", "bday", "Birthday"], ["doj_column", "anniv", "Work anniversary"]]) {
     if (only && only !== kind) continue;
-    for (const x of upcoming(col, kind, days)) rows.push([x.name, keyCol ? S0(g(x.r, keyCol)) : "", clCol ? S0(g(x.r, clCol)) : "", dsCol ? S0(g(x.r, dsCol)) : "", label, long(x.date), long(serialToDate(x.src)), kind === "anniv" ? String(x.years) : "", x.diff === 0 ? "Today" : x.diff === 1 ? "Tomorrow" : "In " + x.diff + " days"]);
+    for (const x of upcoming(col, kind, days)) rows.push([x.name, keyCol ? S0(g(x.r, keyCol)) : "", clCol ? S0(g(x.r, clCol)) : "", dsCol ? S0(g(x.r, dsCol)) : "", label, long(x.date), (x.md || long(serialToDate(x.src))), kind === "anniv" ? String(x.years) : "", x.diff === 0 ? "Today" : x.diff === 1 ? "Tomorrow" : "In " + x.diff + " days"]);
   }
   rows.sort((a, b) => new Date(a[5]) - new Date(b[5]) || a[0].localeCompare(b[0]));
   if (!rows.length) { toast("Nothing to copy in this period."); return; }
@@ -12988,7 +13005,7 @@ function openDrawer(row) {
   const phone = hv("phone_column"), wa = sch.whatsapp_column && row ? S(g(row, sch.whatsapp_column)) : "", digits = x => String(x || "").replace(/[^\d+]/g, "");
   const st = hv("status_column"), stCls = !st ? "" : isInactiveStatus(st) ? "off" : /^active$/i.test(st) ? "on" : "mid";
   const fact = (lbl, v) => v ? h("div", { class: "emp2-fact" }, h("small", {}, lbl), h("b", {}, v)) : null;
-  const facts = row ? [fact("Emp ID", String(row.id)), fact("Tenure", tenure), fact("Joined", isNum(doj) ? fmtDate(doj) : ""), fact("Birthday", isNum(dob) ? new Date((dob - 25569) * 86400000).toLocaleDateString(undefined, { day: "numeric", month: "short", timeZone: "UTC" }) : ""), (pv ? h("div", { class: "emp2-fact" }, h("small", {}, "Pseudo name"), h("b", {}, pv, " ", h("button", { class: "psn-i", type: "button", title: "History of " + pv, "aria-label": "History of " + pv, onclick: e => { e.stopPropagation(); psnHistory(pv); } }, "i"))) : null)].filter(Boolean) : [];
+  const facts = row ? [fact("Emp ID", String(row.id)), fact("Tenure", tenure), fact("Joined", isNum(doj) ? fmtDate(doj) : ""), fact("Birthday", isNum(dob) ? new Date((dob - 25569) * 86400000).toLocaleDateString(undefined, { day: "numeric", month: "short", timeZone: "UTC" }) : (() => { const md = ((window.TD_SETTINGS || {}).birthdays || {})[row.id]; return typeof md === "string" && /^\d{2}-\d{2}$/.test(md) ? new Date(Date.UTC(2000, +md.slice(0, 2) - 1, +md.slice(3))).toLocaleDateString(undefined, { day: "numeric", month: "short", timeZone: "UTC" }) : ""; })()), (pv ? h("div", { class: "emp2-fact" }, h("small", {}, "Pseudo name"), h("b", {}, pv, " ", h("button", { class: "psn-i", type: "button", title: "History of " + pv, "aria-label": "History of " + pv, onclick: e => { e.stopPropagation(); psnHistory(pv); } }, "i"))) : null)].filter(Boolean) : [];
   const acts = row ? [phone && digits(phone) ? h("a", { class: "emp2-act", href: "tel:" + digits(phone), title: "Call " + phone }, "📞 Call") : null, (wa || phone) && digits(wa || phone) ? h("a", { class: "emp2-act", href: "https://wa.me/" + digits(wa || phone).replace(/^\+/, ""), target: "_blank", rel: "noopener noreferrer", title: "WhatsApp" }, "💬 WhatsApp") : null].filter(Boolean) : [];
   const emp2Status = h("span", { class: "emp2-status" }, isNew ? "Fill in the details, then add." : "No unsaved changes");
   title.className = "emp2-name";
@@ -14689,7 +14706,7 @@ function drawPrivateFields(pane, tabs) {
   fill(pane, tabs, h('div', { class: 'set-card' }, h('h4', {}, '🔒 Private details'),
     h('p', { class: 'set-hint' }, 'Ticked fields are stored encrypted in the database. Only admins and the super admin see them; everyone else sees “🔒”. Phone and WhatsApp numbers of people who are Active, Active + Resign, OJT, New or Bench can be asked for in the notification center; after an admin approves, they show for 15 minutes and lock again. The other ticked fields stay with admins.'),
     list, h('div', { class: 'dd-foot', style: 'display:flex;gap:10px;align-items:center;justify-content:flex-end;margin-top:12px' }, dirty, save),
-    h('p', { class: 'set-hint' }, 'Birthdays on the Overview come from the date of birth, so people who are not admins don’t see them while the date of birth is private.')));
+    h('p', { class: 'set-hint' }, 'Birthdays on the Overview still show for everyone (all statuses except Moved and Left): only the day and month are shared, never the year.')));
 }
 
 
