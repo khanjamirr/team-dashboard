@@ -5,7 +5,7 @@
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <link rel="preconnect" href="https://iiogwevtyzgedhoaqlrn.supabase.co" crossorigin><link rel="dns-prefetch" href="https://iiogwevtyzgedhoaqlrn.supabase.co">
 <link rel="icon" href="data:,">
-<title>Team Dashboard · 3.67.0</title>
+<title>Team Dashboard · 3.68.0</title>
 <link rel="preconnect" href="https://fonts.googleapis.com"><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin><link href="https://fonts.googleapis.com/css2?family=Public+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet">
 <style>
 :root {
@@ -2092,6 +2092,23 @@ html body .sidebar nav.tabs .tab[data-view="backups"], html body .tab[data-view=
 .psn-people { display:flex; flex-direction:column; }
 .psn-row { display:flex; align-items:center; gap:12px; padding:9px 4px; border-bottom:1px solid var(--border, var(--line)); }
 /* v3.67.0: pseudo names as a fixed list, each tagged to a recruiter */
+.psn-i { display:inline-grid; place-items:center; width:17px; height:17px; border-radius:50%; border:1px solid var(--border, #cfd5df); background:var(--surface); color:var(--ink-2); font:italic 700 11px/1 Georgia, serif; cursor:pointer; padding:0; margin-left:4px; vertical-align:middle; }
+.psn-i:hover { border-color:var(--accent); color:var(--accent); }
+.psn-name { display:inline-flex; align-items:center; gap:2px; } .psn-seat.off { opacity:.6; }
+.psn-top { display:flex; gap:8px; align-items:flex-start; flex-wrap:wrap; margin-bottom:10px; } .psn-top .psn-chips { margin:0; } .psn-client { max-width:220px; height:34px; }
+.psn-group { display:flex; align-items:baseline; gap:8px; padding:14px 4px 6px; border-bottom:2px solid var(--border, var(--line)); } .psn-group b { font-size:14px; } .psn-group small { color:var(--ink-2); }
+.psn-add select { max-width:180px; } .psn-warn { font-size:12.5px; color:#9a5b00; background:#fff7e8; border:1px solid #f3dcae; padding:8px 12px; border-radius:10px; }
+.psn-pk-dates { display:flex; gap:10px; align-items:flex-end; flex-wrap:wrap; } .psn-dl { display:flex; flex-direction:column; gap:3px; } .psn-dl small { font-size:11.5px; color:var(--ink-2); font-weight:600; }
+.psn-date { height:32px; width:auto; } .psn-vacbox { display:inline-flex; gap:6px; align-items:flex-end; padding-left:10px; border-left:1px solid var(--border, var(--line)); }
+.psn-meta { gap:12px; } .psn-same { font-size:11px; font-weight:700; color:var(--accent); background:color-mix(in srgb, var(--accent) 10%, var(--surface)); padding:1px 8px; border-radius:999px; }
+.psn-empty { text-align:center; padding:30px 10px; } .psn-empty-b { display:flex; gap:8px; justify-content:center; margin-top:12px; }
+.psn-veil { z-index:3000; } .psn-dlg { width:min(560px, calc(100vw - 32px)); } .psn-conf p { margin:0 0 10px; }
+.psn-hlist { display:flex; flex-direction:column; } .psn-h { display:flex; align-items:center; gap:10px; padding:10px 2px; border-bottom:1px solid var(--border, var(--line)); }
+.psn-h-dot { width:9px; height:9px; border-radius:50%; background:var(--border, #cfd5df); flex:none; } .psn-h.cur .psn-h-dot { background:#22a05a; box-shadow:0 0 0 4px color-mix(in srgb, #22a05a 18%, transparent); }
+.psn-h-who { flex:1; min-width:0; } .psn-h-who b { display:block; font-size:13.5px; } .psn-h-who small { color:var(--ink-2); font-size:11.5px; }
+.psn-h-dates { display:flex; align-items:center; gap:6px; font-size:12.5px; } .psn-h-dates .input { height:30px; width:auto; } .psn-h-to { color:var(--ink-2); }
+.psn-h-foot { display:flex; align-items:center; gap:10px; margin-top:12px; }
+
 .psn-chips { display:flex; flex-wrap:wrap; gap:6px; margin:0 0 10px; }
 .psn-chip { display:inline-flex; align-items:center; gap:7px; border:1px solid var(--border, var(--line)); background:var(--surface); color:var(--ink); border-radius:999px; padding:5px 12px; font:inherit; font-size:12.5px; font-weight:600; cursor:pointer; }
 .psn-chip b { font-size:11.5px; padding:0 7px; border-radius:999px; background:var(--surface-2); }
@@ -2102,7 +2119,7 @@ html body .sidebar nav.tabs .tab[data-view="backups"], html body .tab[data-view=
 .psn-seat.vacant .psn-val { background:var(--surface-2); color:var(--ink-2); border:1px dashed var(--border, #d6dae2); }
 .psn-seat.psn-flagrow { background:color-mix(in srgb, #e34948 6%, var(--surface)); border-radius:10px; }
 .psn-flag { font-size:11.5px; font-weight:700; color:#b42323; background:#fde7e7; padding:3px 9px; border-radius:999px; white-space:nowrap; } .psn-flag.sm { font-size:10.5px; padding:1px 7px; }
-.psn-picker { flex-direction:column; align-items:stretch !important; gap:8px; } .psn-pk-top { display:flex; gap:6px; align-items:center; } .psn-pk-top .input { flex:1; }
+.psn-picker { display:flex; flex-direction:column; flex-wrap:nowrap !important; align-items:stretch !important; gap:8px; } .psn-picker > * { flex:none; } .psn-picker .input, .psn-pk-dates .input { height:34px; } .psn-pk-dates .btn { height:32px; } .psn-pk-top { display:flex; gap:6px; align-items:center; } .psn-pk-top .input { flex:1; }
 .psn-res { display:flex; flex-direction:column; max-height:260px; overflow:auto; border:1px solid var(--border, var(--line)); border-radius:10px; }
 .psn-opt { display:flex; align-items:center; gap:8px; text-align:left; border:0; border-bottom:1px solid var(--border, var(--line)); background:var(--surface); padding:8px 12px; font:inherit; cursor:pointer; color:var(--ink); }
 .psn-opt:hover, .psn-opt:focus { background:var(--surface-2); } .psn-on { flex:1; min-width:0; display:flex; flex-direction:column; } .psn-on b { font-size:13.5px; } .psn-on span { font-size:12px; color:var(--ink-2); } .psn-has, .psn-free { font-size:12px; white-space:nowrap; flex:none; } .psn-opt small { color:var(--ink-2); }
@@ -2114,6 +2131,7 @@ html body .sidebar nav.tabs .tab[data-view="backups"], html body .tab[data-view=
 .psn-val.none { font-weight:500; color:var(--ink-2); background:var(--surface-2); }
 .psn-edit { display:flex; flex-wrap:wrap; align-items:center; gap:8px; padding:8px 4px 12px; border-bottom:1px solid var(--border, var(--line)); }
 .psn-edit .input { flex:1 1 200px; } .psn-edit small { flex-basis:100%; }
+.psn-edit.psn-picker > .input, .psn-dl .input, .psn-meta .input { flex:none !important; } .psn-dl small { flex-basis:auto !important; }
 .psn-err { color:var(--danger, #c62828); font-size:12.5px; font-weight:600; }
 .psn-tbl { width:100%; border-collapse:collapse; font-size:13px; } .psn-tbl th, .psn-tbl td { text-align:left; padding:7px 6px; border-bottom:1px solid var(--border, var(--line)); vertical-align:top; }
 .psn-tbl th { font-size:11.5px; color:var(--ink-2); font-weight:650; } .psn-tbl small { color:var(--ink-2); } .psn-n { display:block; }
@@ -3463,10 +3481,12 @@ async function pseudoHistoryUpdate(zip, u8, entries) {
         if (!PSEUDO_RE.test(k) || !ch || typeof ch !== "object" || !("to" in ch)) continue;
         const from = keystr(ch.from).trim(), to = keystr(ch.to).trim(), key = keystr(e.key), t = e.time || now, by = e.user || who;
         if (from === to) continue;
-        if (from) for (const r of rows) if (r[0].toLowerCase() === from.toLowerCase() && r[1] === key && !r[4]) { r[4] = t; r[6] = by; changed = true; }
+        /* v3.68.0: dates chosen in the pseudo names panel (assigned from / removed on) */
+        const D = PSEUDO_DATES || {}, tOpen = D.from || t, tClose = to ? (D.from || t) : (D.to || t), tPass = D.to || t;
+        if (from) for (const r of rows) if (r[0].toLowerCase() === from.toLowerCase() && r[1] === key && !r[4]) { r[4] = tClose; r[6] = by; changed = true; }
         if (to) {
-          for (const r of rows) if (r[0].toLowerCase() === to.toLowerCase() && r[1] !== key && !r[4]) { r[4] = t; r[6] = by; r[7] = (r[7] ? r[7] + " · " : "") + "Seat passed to " + (e.name || key); changed = true; }
-          rows.push([to, key, e.name || "", t, "", by, "", /^external/.test(e.action || "") ? "Changed in Excel" : e.action === "add" ? "New employee" : ""]); changed = true;
+          for (const r of rows) if (r[0].toLowerCase() === to.toLowerCase() && r[1] !== key && !r[4]) { r[4] = tPass; r[6] = by; r[7] = (r[7] ? r[7] + " · " : "") + "Seat passed to " + (e.name || key); changed = true; }
+          rows.push([to, key, e.name || "", tOpen, "", by, "", /^external/.test(e.action || "") ? "Changed in Excel" : e.action === "add" ? "New employee" : ""]); changed = true;
         }
       }
     }
@@ -3517,6 +3537,31 @@ async function adminLogWrite(op, item) {
         await writeBlob(fh, await zip.build(), [{ action: "settings", key: "", name: "Admin log", details: { note } }]);
         Conn.cache = null;
         return rows;
+      } catch (e) { if (!isRace(e) || attempt >= 2) throw e; Conn.cache = null; await sleep(250 + attempt * 600); }
+    }
+  });
+}
+let PSEUDO_DATES = null;
+const setPseudoDates = d => { PSEUDO_DATES = d || null; };
+/* v3.68.0: admins correct the dates of a pseudo name's assignments */
+async function pseudoHistoryEdit(edits) {
+  if (window.PERM && PERM.online() && !PERM.isSuper()) throw new ApiErr(403, "Only admins can change these dates.");
+  return serial(async () => {
+    for (let attempt = 0; ; attempt++) {
+      try {
+        const { fh, u8 } = await readFile(), zip = await Zip.open(u8), loc = await sheetLocate(zip, PSEUDO_SHEET);
+        const rows = (await sheetReadRows(zip, loc)) || []; let n = 0;
+        for (const e of edits) {
+          const r = rows.find(x => x[0].toLowerCase() === String(e.pseudo).toLowerCase() && x[1] === String(e.key) && x[3] === String(e.from || "") && x[4] === String(e.to || ""));
+          if (!r) continue;
+          if (e.newFrom) { r[3] = e.newFrom; n++; }
+          if (e.newTo && r[4]) { r[4] = e.newTo; n++; }
+          if (r[4] && r[3] && /^\d{4}-/.test(r[3]) && /^\d{4}-/.test(r[4]) && r[4].slice(0, 10) < r[3].slice(0, 10)) throw new ApiErr(400, "The end date can’t be before the start date (" + r[2] + ").");
+        }
+        if (!n) return rows;
+        await sheetWriteRows(zip, loc, PSEUDO_SHEET, PSH_HEAD, rows, [18, 12, 26, 18, 18, 18, 18, 46]);
+        await writeBlob(fh, await zip.build(), [{ action: "settings", key: "", name: "Pseudo name history", details: { note: "Changed " + n + " date" + (n === 1 ? "" : "s") + " of " + [...new Set(edits.map(e => e.pseudo))].join(", ") } }]);
+        Conn.cache = null; return rows;
       } catch (e) { if (!isRace(e) || attempt >= 2) throw e; Conn.cache = null; await sleep(250 + attempt * 600); }
     }
   });
@@ -4012,7 +4057,7 @@ return {
   supported: () => typeof window.showOpenFilePicker === "function" && !!window.indexedDB,
   folderName: () => (Conn.dir ? Conn.dir.name : ""),
   /* used by the Attendance page (same folder, same backups folder, same activity log) */
-  dir: () => Conn.dir, kvGet, kvSet, backup, purgeLocalCopies, rewriteCells, readPseudoHistory, addSheetToCopy, readUpload, adminLogRead, adminLogWrite, writeBlob, appendActivity, nowText, readActivity, readData, writeData, isCloud, flushActivity, ACT_VERBS, actDetails,
+  dir: () => Conn.dir, kvGet, kvSet, backup, purgeLocalCopies, rewriteCells, readPseudoHistory, pseudoHistoryEdit, setPseudoDates, addSheetToCopy, readUpload, adminLogRead, adminLogWrite, writeBlob, appendActivity, nowText, readActivity, readData, writeData, isCloud, flushActivity, ACT_VERBS, actDetails,
   userName, setUser: n => { ME = String(n || "").trim() || "You"; },
   async isLocked(name) { for (const cand of ["~$" + name, "~$" + name.slice(2)]) { try { await Conn.dir.getFileHandle(cand); return true; } catch (e) { /* not there */ } } return false; },
   fileName: () => Conn.fileName,
@@ -10055,7 +10100,7 @@ async function poll() {
 }
 
 /* ============================== filtering ============================== */
-const APP = { title: "Team Dashboard", version: "3.67.0", released: "20 Oct 2026" };
+const APP = { title: "Team Dashboard", version: "3.68.0", released: "20 Oct 2026" };
 const BASE_DIMS = { status: "status_column", desig: "designation_column", client: "client_column", mode: "mode_column" };
 const STANDARD_STATUSES = ["Active", "Manager", "OJT", "Bench", "New", "Projected", "Left", "Moved"];
 const TILE_ORDER = ["Active", "Manager", "OJT", "Bench", "New", "Projected"];
@@ -12534,11 +12579,68 @@ function buildField(c, value, isNew) {
   return { wrap, get, name, control };
 }
 
-/* ============================== v3.61.0: Pseudo names ==============================
-   Set a pseudo name for each person (a name can belong to only one current person) and search who held a pseudo name
-   before. The history lives in the "Pseudo Name History" sheet of the same workbook. */
-const saveTeamSettingP = (...a) => window.saveTeamSetting(...a);
+/* ============================== v3.61.0 / v3.68.0: Pseudo names ==============================
+   v3.68.0: the admin keeps the list of pseudo names, each for a client, active or inactive (Settings: pseudo_names).
+   Each active name is tagged to one real recruiter (Active, Active + Resign or OJT), from a chosen date; when the
+   recruiter is replaced or the name made vacant, the end date is chosen too. Every assignment stays in the
+   "Pseudo Name History" sheet of the same workbook; the small "i" shows a name's history. */
 const pseudoCol = () => ((state.cols || []).find(c => /pseudo/i.test(c.name)) || {}).name || null;
+const psnIsAdmin = () => !window.PERM || !PERM.online() || PERM.isSuper();
+const psnStatus = r => { const s = gs(r, "status_column").toLowerCase().replace(/\s+/g, "").replace(/&/g, "+"); return /^active\+resign(ed|ation)?$/.test(s) ? "resign" : s === "active" ? "active" : s === "ojt" ? "ojt" : s; };
+const psnEligible = r => ["active", "resign", "ojt"].includes(psnStatus(r));
+const psnMaster = () => { const L = (window.TD_SETTINGS || {}).pseudo_names; if (!Array.isArray(L)) return null;
+  const seen = new Set(); return L.map(x => typeof x === "string" ? { name: x.trim(), client: "", active: true } : { name: String((x && x.name) || "").trim(), client: String((x && x.client) || "").trim(), active: !(x && x.active === false) })
+    .filter(x => x.name && !seen.has(x.name.toLowerCase()) && seen.add(x.name.toLowerCase())); };
+const psnSaveMaster = (list, text) => window.saveTeamSetting("pseudo_names", list.slice().sort((a, b) => (a.client || "").localeCompare(b.client || "") || a.name.localeCompare(b.name)), { name: "Pseudo names", text });
+const psnToday = () => { const d = new Date(); return d.getFullYear() + "-" + String(d.getMonth() + 1).padStart(2, "0") + "-" + String(d.getDate()).padStart(2, "0"); };
+const psnDay = t => { const s = String(t || ""); return /^\d{4}-\d{2}-\d{2}/.test(s) ? s.slice(0, 10) : ""; };
+const psnNice = t => { const d = psnDay(t); if (!d) return String(t || "").replace(/^\(|\)$/g, "") || "—"; return new Date(d + "T00:00:00").toLocaleDateString(undefined, { day: "numeric", month: "short", year: "numeric" }); };
+/* a small window above whatever is open (the employee card or the pseudo names panel) */
+function psnModal(title, body, foot) {
+  const v = h("div", { class: "pdlg-veil psn-veil", role: "presentation" });
+  const close = () => { v.remove(); document.removeEventListener("keydown", esc, true); };
+  const esc = e => { if (e.key === "Escape") { e.stopPropagation(); e.preventDefault(); close(); } };
+  v.append(h("div", { class: "pdlg psn-dlg", role: "dialog", "aria-modal": "true", "aria-label": title },
+    h("header", {}, h("h3", {}, title), h("button", { class: "pdlg-x", type: "button", "aria-label": "Close", onclick: close }, "×")),
+    h("div", { class: "pdlg-body" }, body), foot ? h("footer", {}, ...[].concat(foot)) : null));
+  v.addEventListener("mousedown", e => { if (e.target === v) close(); });
+  document.addEventListener("keydown", esc, true); document.body.append(v);
+  return { close };
+}
+/* the "i": who held this pseudo name and when (admins can correct the dates) */
+async function psnHistory(name, after) {
+  const body = h("div", { class: "psn-hist" }, h("p", { class: "hint" }, "Loading…"));
+  const m = psnModal("History · " + name, body);
+  let rows;
+  try { rows = (await BE.readPseudoHistory()).filter(x => x.pseudo && x.pseudo.toLowerCase() === name.toLowerCase()); } catch (e) { body.replaceChildren(h("p", { class: "err" }, e.message)); return; }
+  const meta = (psnMaster() || []).find(x => x.name.toLowerCase() === name.toLowerCase());
+  rows.sort((a, b) => (!b.to - !a.to) || String(psnDay(b.from) || b.from).localeCompare(String(psnDay(a.from) || a.from)));
+  const admin = psnIsAdmin(), edits = new Map();
+  const save = h("button", { class: "btn primary", type: "button", disabled: true }, "Save dates");
+  const list = rows.map(x => {
+    const cur = !x.to;
+    const dIn = (v, k) => { const i = h("input", { class: "input", type: "date", value: psnDay(v), max: psnToday(), "aria-label": k === "from" ? "Assigned from" : "Removed on" });
+      i.addEventListener("change", () => { const e = edits.get(x) || {}; e[k] = i.value; edits.set(x, e); save.disabled = false; }); return i; };
+    return h("div", { class: "psn-h" + (cur ? " cur" : "") },
+      h("span", { class: "psn-h-dot", "aria-hidden": "true" }),
+      h("div", { class: "psn-h-who" }, h("b", {}, x.name || x.key || "—"), h("small", {}, [x.key, x.by ? "set by " + x.by : "", x.note].filter(Boolean).join(" · "))),
+      h("div", { class: "psn-h-dates" },
+        admin && psnDay(x.from) !== "" || (admin && !x.from) ? dIn(x.from, "from") : h("span", {}, x.from ? psnNice(x.from) : "before the history"),
+        h("span", { class: "psn-h-to" }, "→"),
+        cur ? h("span", { class: "psn-now" }, "Current") : admin && psnDay(x.to) ? dIn(x.to, "to") : h("span", {}, psnNice(x.to))));
+  });
+  save.addEventListener("click", async () => {
+    save.disabled = true; save.textContent = "Saving…";
+    try { await BE.pseudoHistoryEdit([...edits.entries()].map(([x, e]) => ({ pseudo: x.pseudo, key: x.key, from: x.from, to: x.to, newFrom: e.from, newTo: e.to }))); toast("Dates saved."); m.close(); after && after(); }
+    catch (e) { toast(e.message, true); save.disabled = false; save.textContent = "Save dates"; }
+  });
+  body.replaceChildren(
+    h("p", { class: "hint" }, [meta && meta.client ? "Client: " + meta.client : "", meta ? (meta.active ? "Active" : "Inactive") : "Not in the admin’s list", rows.length + (rows.length === 1 ? " assignment" : " assignments")].filter(Boolean).join(" · ")),
+    rows.length ? h("div", { class: "psn-hlist" }, list) : h("p", { class: "hint" }, "Nobody has used this pseudo name yet."),
+    admin && rows.length ? h("div", { class: "psn-h-foot" }, h("small", { class: "hint" }, "You can correct the dates. The current recruiter has no end date."), h("span", { class: "grow" }), save) : null);
+}
+window.psnHistory = psnHistory;
+
 async function openPseudoNames(focusId) {
   if (employeePending) { toast("Finish saving the current employee first.", true); return; }
   const canEdit = !window.PERM || PERM.can("emp.edit");
@@ -12550,126 +12652,184 @@ async function openPseudoNames(focusId) {
   if (!pc) {
     const can = !window.PERM || PERM.can("emp.fields");
     body.append(h("p", {}, "The workforce sheet has no Pseudo Name column yet."),
-      can ? h("button", { class: "btn primary", type: "button", onclick: async e => { e.target.disabled = true; try { await api("POST", "/api/columns", { name: "Pseudo Name" }); await loadData(true); closeDrawer(); openPseudoNames(); } catch (err) { e.target.disabled = false; toast(err.message, true); } } }, "Add a Pseudo Name column") : h("p", { class: "hint" }, "Ask the super admin to add one."));
+      can ? h("button", { class: "btn primary", type: "button", onclick: async e => { e.target.disabled = true; try { await api("POST", "/api/columns", { name: "Pseudo Name" }); await loadData(true); closeDrawer(); openPseudoNames(); } catch (err) { e.target.disabled = false; toast(err.message, true); } } }, "Add a Pseudo Name column") : null);
     return;
   }
-  let hist = null, q = "", tab = "current", editing = focusId || null, busy = false, seatFilter = "all";
-  const isAdminP = !window.PERM || !PERM.online() || PERM.isSuper();
-  /* v3.67.0: Active / Active + Resign / OJT recruiters can be tagged; Active + Resign ones need a replacement */
-  const psnStatus = r => { const s = gs(r, "status_column").toLowerCase().replace(/\s+/g, "").replace(/&/g, "+"); return /^active\+resign(ed|ation)?$/.test(s) ? "resign" : s === "active" ? "active" : s === "ojt" ? "ojt" : s; };
-  const psnEligible = r => ["active", "resign", "ojt"].includes(psnStatus(r));
-  /* the fixed list: what the admin saved, plus every name someone holds today (so nothing can go missing) */
-  const seatList = cur => {
-    const saved = (window.TD_SETTINGS || {}).pseudo_names, out = new Map();
-    const add = v => { const t = String(v || "").trim(); if (t && !out.has(t.toLowerCase())) out.set(t.toLowerCase(), t); };
-    if (Array.isArray(saved)) saved.forEach(add); else freeNames().forEach(add);
-    for (const r of (cur || holders()).values()) add(pv(r));
-    return [...out.values()].sort((a, b) => a.localeCompare(b, undefined, { sensitivity: "base" }));
-  };
-  const saveSeats = arr => saveTeamSettingP("pseudo_names", [...new Set(arr.map(x => String(x).trim()).filter(Boolean))].sort((a, b) => a.localeCompare(b)), { name: "Pseudo names", text: "Pseudo name list updated (" + arr.length + " names)" });
-  const pv = r => S(g(r, pc)).trim(), nm = r => gs(r, "name_column") || String(r.id);
+  const admin = psnIsAdmin();
+  let hist = null, q = "", tab = "current", editing = null, editMeta = null, busy = false, filter = "all", client = "all";
+  const pv = r => S(g(r, pc)).trim(), nm = r => gs(r, "name_column") || String(r.id), cl = r => gs(r, "client_column");
   const holders = () => { const m = new Map(); for (const r of state.rows) { const v = pv(r); if (!v || isInactive(r)) continue; m.set(v.toLowerCase(), r); } return m; };
-  const freeNames = () => { const cur = holders(), out = new Set(); for (const r of state.rows) { const v = pv(r); if (v && isInactive(r) && !cur.has(v.toLowerCase())) out.add(v); } for (const x of hist || []) if (x.pseudo && !cur.has(x.pseudo.toLowerCase())) out.add(x.pseudo); return [...out].sort((a, b) => a.localeCompare(b, undefined, { numeric: true })); };
-  const search = h("input", { class: "input", type: "search", placeholder: "Search a pseudo name, person or Emp ID", "aria-label": "Search pseudo names", value: q });
+  const search = h("input", { class: "input", type: "search", placeholder: "Search a pseudo name, recruiter or Emp ID", "aria-label": "Search pseudo names" });
   const tabs = h("div", { class: "seg psn-tabs", role: "group", "aria-label": "Show" });
   const listBox = h("div", { class: "psn-list" });
-  const note = h("p", { class: "hint psn-note" }, "The pseudo names are a fixed list. Tag each one to a real recruiter (Active, Active + Resign or OJT). One pseudo name belongs to one recruiter; when someone leaves or is replaced, it stays in the history.");
-  body.append(h("div", { class: "psn-bar" }, search, tabs), note, listBox);
+  body.append(h("div", { class: "psn-bar" }, search, tabs), listBox);
   search.addEventListener("input", () => { q = search.value.trim().toLowerCase(); drawList(); });
   const hit = (...xs) => !q || xs.some(x => String(x || "").toLowerCase().includes(q));
   function drawTabs() {
     tabs.replaceChildren(...[["current", "Pseudo names"], ["history", "History" + (hist ? " · " + hist.length : "")]].map(([k, l]) => h("button", { type: "button", "aria-pressed": String(tab === k), onclick: () => { tab = k; drawTabs(); drawList(); } }, l)));
   }
+  const reloadHist = async () => { hist = null; drawTabs(); try { hist = await BE.readPseudoHistory(); } catch { hist = []; } drawTabs(); drawList(); };
+  const since = (p, id) => { const x = (hist || []).find(y => y.pseudo && y.pseudo.toLowerCase() === p.toLowerCase() && y.key === String(id) && !y.to); return x ? psnDay(x.from) : ""; };
+  const iBtn = name => h("button", { class: "psn-i", type: "button", title: "History of " + name, "aria-label": "History of " + name, onclick: e => { e.stopPropagation(); psnHistory(name, reloadHist); } }, "i");
+  const dateIn = (lbl, v) => { const i = h("input", { class: "input psn-date", type: "date", value: v || psnToday(), max: psnToday(), "aria-label": lbl }); return { i, el: h("label", { class: "psn-dl" }, h("small", {}, lbl), i) }; };
+
   function drawList() {
     if (tab === "history") {
       if (!hist) { listBox.replaceChildren(h("p", { class: "hint" }, "Loading the history…")); return; }
-      const rows = hist.filter(x => hit(x.pseudo, x.name, x.key)).sort((a, b) => String(b.from || "").localeCompare(String(a.from || "")));
-      listBox.replaceChildren(rows.length ? h("table", { class: "psn-tbl" }, h("thead", {}, h("tr", {}, ...["Pseudo name", "Person", "From", "To", "Set by"].map(t => h("th", {}, t)))),
-        h("tbody", {}, ...rows.slice(0, 500).map(x => h("tr", {}, h("td", {}, h("b", {}, x.pseudo)), h("td", {}, x.name || "—", x.key ? h("small", {}, " · " + x.key) : null),
-          h("td", {}, x.from || h("span", { class: "hint" }, "before history")), h("td", {}, x.to ? x.to : h("span", { class: "psn-now" }, "Current")), h("td", {}, x.by || "—", x.note ? h("small", { class: "psn-n" }, x.note) : null))))) : h("p", { class: "hint" }, q ? "Nobody has used a pseudo name matching “" + q + "”." : "No history yet. It starts with the next save."));
+      const rows = hist.filter(x => hit(x.pseudo, x.name, x.key)).sort((a, b) => String(psnDay(b.from) || b.from || "").localeCompare(String(psnDay(a.from) || a.from || "")));
+      listBox.replaceChildren(rows.length ? h("table", { class: "psn-tbl" }, h("thead", {}, h("tr", {}, ...["Pseudo name", "Recruiter", "From", "To", "Set by"].map(t => h("th", {}, t)))),
+        h("tbody", {}, ...rows.slice(0, 500).map(x => h("tr", {}, h("td", {}, h("b", {}, x.pseudo), " ", iBtn(x.pseudo)), h("td", {}, x.name || "—", x.key ? h("small", {}, " · " + x.key) : null),
+          h("td", {}, x.from ? psnNice(x.from) : h("span", { class: "hint" }, "before history")), h("td", {}, x.to ? psnNice(x.to) : h("span", { class: "psn-now" }, "Current")), h("td", {}, x.by || "—", x.note ? h("small", { class: "psn-n" }, x.note) : null))))) : h("p", { class: "hint" }, q ? "Nobody has used a pseudo name matching “" + q + "”." : "No history yet."));
       return;
     }
-    /* v3.67.0: the pseudo names are a fixed list (seats); each one is tagged to a real recruiter */
-    const cur = holders(), list0 = seatList(cur);
-    const since = (p, id) => { const x = (hist || []).find(y => y.pseudo && y.pseudo.toLowerCase() === p.toLowerCase() && y.key === String(id) && !y.to); return x && x.from ? String(x.from).slice(0, 10) : ""; };
-    const seats = list0.map(p => { const r = cur.get(p.toLowerCase()) || null; const st = r ? psnStatus(r) : ""; return { p, r, st, flag: st === "resign" }; });
-    const counts = { all: seats.length, filled: seats.filter(s => s.r).length, vacant: seats.filter(s => !s.r).length, flag: seats.filter(s => s.flag).length };
-    const withoutOne = state.rows.filter(r => psnEligible(r) && !pv(r)).sort((a, b) => nm(a).localeCompare(nm(b)));
-    const chip = (k, l, n, cls) => h("button", { type: "button", class: "psn-chip " + (cls || "") + (seatFilter === k ? " on" : ""), onclick: () => { seatFilter = k; editing = null; drawList(); } }, l, h("b", {}, String(n)));
-    const head = h("div", { class: "psn-chips" }, chip("all", "All", counts.all), chip("filled", "Tagged", counts.filled), chip("vacant", "Vacant", counts.vacant, counts.vacant ? "warn" : ""),
-      chip("flag", "Needs replacement", counts.flag, counts.flag ? "hot" : ""), chip("nobody", "Recruiters without one", withoutOne.length));
+    const master = psnMaster(), cur = holders();
+    /* nothing set yet */
+    if (!master) {
+      const inUse = [...cur.entries()].map(([, r]) => ({ name: pv(r), client: cl(r), active: true }));
+      listBox.replaceChildren(h("div", { class: "psn-empty" }, h("h3", {}, "No pseudo names set yet"),
+        h("p", { class: "hint" }, admin ? "Set the pseudo names for each client. Only the names you set here can be given to recruiters." : "The admin hasn’t set the pseudo names yet."),
+        admin ? h("div", { class: "psn-empty-b" }, inUse.length ? h("button", { class: "btn primary", type: "button", onclick: async e => { e.target.disabled = true; try { await psnSaveMaster(inUse, "Started the list with the " + inUse.length + " pseudo names in use"); toast("Added " + inUse.length + " pseudo names, each under its recruiter’s client."); drawList(); } catch (er) { toast(er.message, true); e.target.disabled = false; } } }, "Start with the " + inUse.length + " names in use") : null,
+          h("button", { class: "btn", type: "button", onclick: async () => { try { await psnSaveMaster([], "Started an empty list"); drawList(); } catch (er) { toast(er.message, true); } } }, "Start empty")) : null));
+      return;
+    }
+    const clients = [...new Set([...master.map(x => x.client || ""), ...state.rows.filter(psnEligible).map(cl)].filter(Boolean))].sort((a, b) => a.localeCompare(b));
+    const seats = master.map(x => { const r = cur.get(x.name.toLowerCase()) || null; return { ...x, r, flag: !!r && psnStatus(r) === "resign" }; });
+    const inClient = s => client === "all" || (s.client || "") === client;
+    const pool = seats.filter(inClient);
+    const act = pool.filter(s => s.active);
+    const counts = { all: act.length, filled: act.filter(s => s.r).length, vacant: act.filter(s => !s.r).length, flag: act.filter(s => s.flag).length, inactive: pool.filter(s => !s.active).length };
+    const withoutOne = state.rows.filter(r => psnEligible(r) && !pv(r) && (client === "all" || cl(r) === client)).sort((a, b) => nm(a).localeCompare(nm(b)));
+    const notListed = [...cur.values()].filter(r => !master.some(x => x.name.toLowerCase() === pv(r).toLowerCase()));
+    const chip = (k, l, n, cls) => h("button", { type: "button", class: "psn-chip " + (cls || "") + (filter === k ? " on" : ""), onclick: () => { filter = k; editing = editMeta = null; drawList(); } }, l, h("b", {}, String(n)));
+    const csel = h("select", { class: "input psn-client", "aria-label": "Client" }, h("option", { value: "all" }, "All clients · " + seats.filter(s => s.active).length), ...clients.map(c => h("option", { value: c, selected: client === c }, c + " · " + seats.filter(s => s.active && s.client === c).length)), seats.some(s => !s.client) ? h("option", { value: "", selected: client === "" }, "No client") : null);
+    csel.addEventListener("change", () => { client = csel.value; editing = editMeta = null; drawList(); });
+    const head = h("div", { class: "psn-top" }, csel, h("div", { class: "psn-chips" }, chip("all", "All", counts.all), chip("filled", "Tagged", counts.filled), chip("vacant", "Vacant", counts.vacant, counts.vacant ? "warn" : ""),
+      chip("flag", "Needs replacement", counts.flag, counts.flag ? "hot" : ""), chip("nobody", "Recruiters without one", withoutOne.length), admin ? chip("inactive", "Inactive", counts.inactive) : null));
+    const parts = [head];
+    if (admin) parts.push(addForm(master, clients));
+    if (admin && notListed.length) parts.push(h("p", { class: "psn-warn" }, "⚠ " + notListed.length + " pseudo " + (notListed.length === 1 ? "name is" : "names are") + " in use but not in your list: " + notListed.slice(0, 6).map(pv).join(", ") + (notListed.length > 6 ? "…" : "") + " ",
+      h("button", { class: "linkbtn", type: "button", onclick: async () => { try { await psnSaveMaster([...master, ...notListed.map(r => ({ name: pv(r), client: cl(r), active: true }))], "Added " + notListed.length + " names in use"); drawList(); } catch (e) { toast(e.message, true); } } }, "Add them")));
     const box = h("div", { class: "psn-people" });
-    if (seatFilter === "nobody") {
-      const vac = seats.filter(s => !s.r).map(s => s.p);
+    if (filter === "nobody") {
+      const vac = seats.filter(s => s.active && !s.r);
       for (const r of withoutOne.filter(r => hit(nm(r), r.id))) {
-        const sel = h("select", { class: "input psn-pick", "aria-label": "Pseudo name for " + nm(r), disabled: !canEdit || !vac.length }, h("option", { value: "" }, vac.length ? "Give a vacant pseudo name…" : "No vacant pseudo names"), ...vac.map(v => h("option", { value: v }, v)));
-        sel.addEventListener("change", () => sel.value && tag(sel.value, r));
-        box.append(h("div", { class: "psn-row" }, h("div", { class: "psn-who" }, h("b", {}, nm(r)), h("small", {}, [r.id, gs(r, "status_column")].join(" · "))), psnStatus(r) === "resign" ? h("span", { class: "psn-flag" }, "Resigning") : null, sel));
+        const mine = vac.filter(s => s.client === cl(r)), other = vac.filter(s => s.client !== cl(r));
+        const sel = h("select", { class: "input psn-pick", "aria-label": "Pseudo name for " + nm(r), disabled: !canEdit || !vac.length }, h("option", { value: "" }, vac.length ? "Give a vacant pseudo name…" : "No vacant pseudo names"),
+          mine.length ? h("optgroup", { label: cl(r) || "Same client" }, ...mine.map(s => h("option", { value: s.name }, s.name))) : null, other.length ? h("optgroup", { label: "Other clients" }, ...other.map(s => h("option", { value: s.name }, s.name + (s.client ? " · " + s.client : "")))) : null);
+        box.append(h("div", { class: "psn-row" }, h("div", { class: "psn-who" }, h("b", {}, nm(r)), h("small", {}, [r.id, gs(r, "status_column"), cl(r)].filter(Boolean).join(" · "))), psnStatus(r) === "resign" ? h("span", { class: "psn-flag" }, "Resigning") : null, sel));
+        sel.addEventListener("change", () => { if (!sel.value) return; const s = seats.find(x => x.name === sel.value); confirmTag(s, r, () => { sel.value = ""; }); });
       }
-      if (!box.firstChild) box.append(h("p", { class: "hint" }, "Every Active, Active + Resign and OJT recruiter has a pseudo name."));
-      listBox.replaceChildren(head, box); return;
+      if (!box.firstChild) box.append(h("p", { class: "hint" }, "Every Active, Active + Resign and OJT recruiter" + (client !== "all" ? " of " + (client || "no client") : "") + " has a pseudo name."));
+      listBox.replaceChildren(...parts, box); return;
     }
-    const shown = seats.filter(s => (seatFilter === "all" || (seatFilter === "filled" && s.r) || (seatFilter === "vacant" && !s.r) || (seatFilter === "flag" && s.flag)) && hit(s.p, s.r && nm(s.r), s.r && s.r.id))
-      .sort((a, b) => (b.flag - a.flag) || (!a.r - !b.r) * (seatFilter === "all" ? 0 : 1) || a.p.localeCompare(b.p, undefined, { sensitivity: "base" }));
-    for (const s of shown) {
-      const was = !s.r ? (hist || []).filter(x => x.pseudo && x.pseudo.toLowerCase() === s.p.toLowerCase() && x.to).sort((a, b) => String(b.to).localeCompare(String(a.to)))[0] : null;
-      const line = h("div", { class: "psn-row psn-seat" + (s.flag ? " psn-flagrow" : "") + (!s.r ? " vacant" : "") + (editing === s.p ? " on" : "") },
-        h("span", { class: "psn-val" }, s.p),
-        h("span", { class: "psn-arrow", "aria-hidden": "true" }, "→"),
-        s.r ? h("div", { class: "psn-who" }, h("b", {}, nm(s.r)), h("small", {}, [s.r.id, gs(s.r, "status_column"), since(s.p, s.r.id) ? "since " + since(s.p, s.r.id) : ""].filter(Boolean).join(" · ")))
-          : h("div", { class: "psn-who" }, h("b", { class: "psn-vac" }, "Vacant"), h("small", {}, was ? "last: " + was.name + (/^\d{4}-/.test(String(was.to)) ? " (until " + String(was.to).slice(0, 10) + ")" : " (left)") : "not tagged yet")),
-        s.flag ? h("span", { class: "psn-flag", title: "This recruiter is resigning: tag a replacement" }, "⚠ Needs replacement") : null,
-        canEdit && editing !== s.p ? h("button", { class: "btn mini" + (s.flag || !s.r ? " primary" : ""), type: "button", onclick: () => { editing = s.p; drawList(); } }, s.flag ? "Replace" : s.r ? "Change" : "Tag") : null);
-      box.append(line);
-      if (editing === s.p) box.append(picker(s, cur));
+    const shown = pool.filter(s => (filter === "inactive" ? !s.active : s.active) && (filter === "all" || filter === "inactive" || (filter === "filled" && s.r) || (filter === "vacant" && !s.r) || (filter === "flag" && s.flag)) && hit(s.name, s.client, s.r && nm(s.r), s.r && s.r.id));
+    const groups = new Map(); for (const s of shown) { const k = s.client || ""; if (!groups.has(k)) groups.set(k, []); groups.get(k).push(s); }
+    for (const [c, list] of [...groups.entries()].sort((a, b) => (a[0] ? 0 : 1) - (b[0] ? 0 : 1) || a[0].localeCompare(b[0]))) {
+      list.sort((a, b) => (b.flag - a.flag) || a.name.localeCompare(b.name, undefined, { sensitivity: "base" }));
+      const vac = list.filter(s => !s.r).length, fl = list.filter(s => s.flag).length;
+      box.append(h("div", { class: "psn-group" }, h("b", {}, c || "No client"), h("small", {}, list.length + (list.length === 1 ? " name" : " names") + (filter === "inactive" ? " (inactive)" : (vac ? " · " + vac + " vacant" : "") + (fl ? " · " + fl + " need a replacement" : "")))));
+      for (const s of list) {
+        const was = !s.r ? (hist || []).filter(x => x.pseudo && x.pseudo.toLowerCase() === s.name.toLowerCase() && x.to).sort((a, b) => String(psnDay(b.to)).localeCompare(String(psnDay(a.to))))[0] : null;
+        const key = s.name;
+        box.append(h("div", { class: "psn-row psn-seat" + (s.flag ? " psn-flagrow" : "") + (!s.r ? " vacant" : "") + (!s.active ? " off" : "") + (editing === key ? " on" : "") },
+          h("span", { class: "psn-name" }, h("span", { class: "psn-val" }, s.name), iBtn(s.name)),
+          h("span", { class: "psn-arrow", "aria-hidden": "true" }, "→"),
+          s.r ? h("div", { class: "psn-who" }, h("b", {}, nm(s.r)), h("small", {}, [s.r.id, gs(s.r, "status_column"), since(s.name, s.r.id) ? "since " + psnNice(since(s.name, s.r.id)) : ""].filter(Boolean).join(" · ")))
+            : h("div", { class: "psn-who" }, h("b", { class: "psn-vac" }, s.active ? "Vacant" : "Inactive"), h("small", {}, was ? "last: " + was.name + (psnDay(was.to) ? " (until " + psnNice(was.to) + ")" : " (left)") : "not tagged yet")),
+          s.flag ? h("span", { class: "psn-flag", title: "This recruiter is resigning: tag a replacement" }, "⚠ Needs replacement") : null,
+          admin && editMeta !== key ? h("button", { class: "btn mini ghost", type: "button", title: "Client, active / inactive", onclick: () => { editMeta = key; editing = null; drawList(); } }, "Edit") : null,
+          canEdit && s.active && editing !== key ? h("button", { class: "btn mini" + (s.flag || !s.r ? " primary" : ""), type: "button", onclick: () => { editing = key; editMeta = null; drawList(); } }, s.flag ? "Replace" : s.r ? "Change" : "Tag") : null));
+        if (editMeta === key) box.append(metaEditor(s, master, clients));
+        if (editing === key) box.append(picker(s));
+      }
     }
-    if (!shown.length) box.append(h("p", { class: "hint" }, q ? "No pseudo name or recruiter matches “" + q + "”." : seatFilter === "flag" ? "Nobody needs replacing right now." : seatFilter === "vacant" ? "Every pseudo name is tagged." : "No pseudo names yet."));
-    const add = isAdminP ? (() => {
-      const inp = h("input", { class: "input", placeholder: "New pseudo name", maxlength: "60", "aria-label": "New pseudo name" });
-      const b = h("button", { class: "btn mini", type: "button" }, "+ Add");
-      const go = async () => { const t = inp.value.trim(); if (!t) return; if (list0.some(x => x.toLowerCase() === t.toLowerCase())) { toast("“" + t + "” is already in the list.", true); return; } b.disabled = true; try { await saveSeats([...list0, t]); toast("Added “" + t + "”."); drawList(); } catch (e) { toast(e.message, true); } finally { b.disabled = false; } };
-      b.addEventListener("click", go); inp.addEventListener("keydown", e => { if (e.key === "Enter") go(); });
-      return h("div", { class: "psn-add" }, inp, b);
-    })() : null;
-    listBox.replaceChildren(head, add, h("p", { class: "hint" }, counts.all + " pseudo names · " + counts.filled + " tagged · " + counts.vacant + " vacant" + (counts.flag ? " · " + counts.flag + " need a replacement" : "") + (q ? " (matching your search)" : "")), box);
+    if (!shown.length) box.append(h("p", { class: "hint" }, q ? "No pseudo name or recruiter matches “" + q + "”." : filter === "flag" ? "Nobody needs replacing right now." : filter === "vacant" ? "Every pseudo name is tagged." : filter === "inactive" ? "No inactive pseudo names." : admin ? "No pseudo names here yet. Add one above." : "No pseudo names here yet."));
+    parts.push(h("p", { class: "hint psn-sum" }, counts.all + " active pseudo names · " + counts.filled + " tagged · " + counts.vacant + " vacant" + (counts.flag ? " · " + counts.flag + " need a replacement" : "") + (counts.inactive ? " · " + counts.inactive + " inactive" : "")));
+    listBox.replaceChildren(...parts, box);
+    if (focusId) { const r = state.rows.find(x => x.id === focusId); focusId = null; if (r && pv(r)) { const el = [...box.querySelectorAll(".psn-val")].find(x => x.textContent === pv(r)); if (el) el.scrollIntoView({ block: "center" }); } }
   }
-  /* the picker under a pseudo name: Active, Active + Resign and OJT recruiters only */
-  function picker(s, cur) {
-    const inp = h("input", { class: "input", type: "search", placeholder: "Search the recruiter by name or Emp ID", "aria-label": "Recruiter for " + s.p });
+  /* admins: add a name for a client */
+  function addForm(master, clients) {
+    const inp = h("input", { class: "input", placeholder: "New pseudo name", maxlength: "60", "aria-label": "New pseudo name" });
+    const csel = h("select", { class: "input", "aria-label": "Client for the new name" }, h("option", { value: "" }, "Client…"), ...clients.map(c => h("option", { value: c, selected: client === c }, c)));
+    const b = h("button", { class: "btn mini primary", type: "button" }, "+ Add");
+    const go = async () => {
+      const t = inp.value.trim(); if (!t) { inp.focus(); return; }
+      if (!csel.value) { toast("Pick the client for “" + t + "”.", true); csel.focus(); return; }
+      if (master.some(x => x.name.toLowerCase() === t.toLowerCase())) { toast("“" + t + "” is already in the list.", true); return; }
+      b.disabled = true;
+      try { await psnSaveMaster([...master, { name: t, client: csel.value, active: true }], "Added “" + t + "” for " + csel.value); toast("Added “" + t + "” for " + csel.value + "."); drawList(); setTimeout(() => listBox.querySelector(".psn-add input")?.focus(), 0); }
+      catch (e) { toast(e.message, true); b.disabled = false; }
+    };
+    b.addEventListener("click", go); inp.addEventListener("keydown", e => { if (e.key === "Enter") go(); });
+    return h("div", { class: "psn-add" }, inp, csel, b);
+  }
+  /* admins: client, active / inactive, remove */
+  function metaEditor(s, master, clients) {
+    const csel = h("select", { class: "input", "aria-label": "Client" }, h("option", { value: "" }, "No client"), ...clients.map(c => h("option", { value: c, selected: s.client === c }, c)));
+    const act = h("input", { type: "checkbox", checked: s.active, disabled: !!s.r && s.active });
+    const save = h("button", { class: "btn mini primary", type: "button" }, "Save");
+    save.addEventListener("click", async () => {
+      save.disabled = true;
+      try { await psnSaveMaster(master.map(x => x.name === s.name ? { ...x, client: csel.value, active: act.checked } : x), "“" + s.name + "”: " + (csel.value || "no client") + ", " + (act.checked ? "active" : "inactive")); editMeta = null; toast("Saved “" + s.name + "”."); drawList(); }
+      catch (e) { toast(e.message, true); save.disabled = false; }
+    });
+    return h("div", { class: "psn-edit psn-meta" }, h("label", { class: "psn-dl" }, h("small", {}, "Client"), csel),
+      h("label", { class: "chk-line", title: s.r && s.active ? "Make it vacant first" : "" }, act, h("span", {}, "Active" + (s.r && s.active ? " (make it vacant before turning it off)" : ""))),
+      h("span", { class: "grow" }),
+      !s.r ? h("button", { class: "btn mini danger", type: "button", onclick: async () => { if (!confirm("Remove “" + s.name + "” from the list? Its history is kept.")) return; try { await psnSaveMaster(master.filter(x => x.name !== s.name), "Removed “" + s.name + "”"); editMeta = null; drawList(); } catch (e) { toast(e.message, true); } } }, "Remove") : null,
+      h("button", { class: "btn mini", type: "button", onclick: () => { editMeta = null; drawList(); } }, "Cancel"), save);
+  }
+  /* the picker under a pseudo name: Active, Active + Resign and OJT recruiters, the same client first */
+  function picker(s) {
+    const inp = h("input", { class: "input", type: "search", placeholder: "Search the recruiter by name or Emp ID", "aria-label": "Recruiter for " + s.name });
     const res = h("div", { class: "psn-res" });
+    const from = dateIn(s.r ? "New recruiter from" : "Assigned from"), to = s.r ? dateIn(nm(s.r) + " removed on") : null;
     const draw = () => {
       const t = inp.value.trim().toLowerCase();
-      const ppl = state.rows.filter(r => psnEligible(r) && (!s.r || r.id !== s.r.id) && (!t || (nm(r) + " " + r.id).toLowerCase().includes(t)))
-        .sort((a, b) => (!!pv(a) - !!pv(b)) || (psnStatus(a) === "resign") - (psnStatus(b) === "resign") || nm(a).localeCompare(nm(b))).slice(0, 40);
+      const ppl = state.rows.filter(r => psnEligible(r) && (!s.r || r.id !== s.r.id) && (!t || (nm(r) + " " + r.id + " " + cl(r)).toLowerCase().includes(t)))
+        .sort((a, b) => ((cl(b) === s.client) - (cl(a) === s.client)) || (!!pv(a) - !!pv(b)) || ((psnStatus(a) === "resign") - (psnStatus(b) === "resign")) || nm(a).localeCompare(nm(b))).slice(0, 40);
       res.replaceChildren(...ppl.map(r => { const has = pv(r), rs = psnStatus(r) === "resign";
-        return h("div", { class: "psn-opt", role: "button", tabindex: "0", onclick: () => tag(s.p, r), onkeydown: e => { if (e.key === "Enter") tag(s.p, r); } }, h("div", { class: "psn-on" }, h("b", {}, nm(r)), h("span", {}, r.id + " · " + gs(r, "status_column"))),
+        return h("div", { class: "psn-opt", role: "button", tabindex: "0", onclick: () => tag(s, r, from.i.value, to && to.i.value), onkeydown: e => { if (e.key === "Enter") tag(s, r, from.i.value, to && to.i.value); } },
+          h("div", { class: "psn-on" }, h("b", {}, nm(r)), h("span", {}, [r.id, gs(r, "status_column"), cl(r)].filter(Boolean).join(" · "))),
+          cl(r) === s.client && s.client ? h("span", { class: "psn-same" }, s.client) : null,
           rs ? h("span", { class: "psn-flag sm" }, "Resigning") : null, has ? h("span", { class: "psn-has" }, "has " + has + " → it becomes vacant") : h("span", { class: "psn-free" }, "no pseudo name")); }),
         ppl.length ? null : h("p", { class: "hint" }, "No Active, Active + Resign or OJT recruiter matches."));
     };
     inp.addEventListener("input", draw); inp.addEventListener("keydown", e => { if (e.key === "Escape") { editing = null; drawList(); } if (e.key === "Enter") { const b = res.querySelector(".psn-opt"); if (b) b.click(); } });
     draw(); setTimeout(() => inp.focus(), 0);
-    return h("div", { class: "psn-edit psn-picker" }, h("div", { class: "psn-pk-top" }, inp,
-      s.r && canEdit ? h("button", { class: "btn mini", type: "button", onclick: () => untag(s) }, "Make vacant") : null,
-      !s.r && isAdminP ? h("button", { class: "btn mini danger", type: "button", onclick: async () => { try { await saveSeats(seatList(cur).filter(x => x.toLowerCase() !== s.p.toLowerCase())); editing = null; toast("Removed “" + s.p + "” from the list."); drawList(); } catch (e) { toast(e.message, true); } } }, "Remove from list") : null,
-      h("button", { class: "btn mini", type: "button", onclick: () => { editing = null; drawList(); } }, "Cancel")), res);
+    const vac = s.r ? dateIn("Removed on") : null;
+    return h("div", { class: "psn-edit psn-picker" },
+      h("div", { class: "psn-pk-dates" }, from.el, to ? to.el : null, h("span", { class: "grow" }),
+        s.r ? h("span", { class: "psn-vacbox" }, vac.el, h("button", { class: "btn mini", type: "button", onclick: () => untag(s, vac.i.value) }, "Make vacant")) : null,
+        h("button", { class: "btn mini", type: "button", onclick: () => { editing = null; drawList(); } }, "Cancel")),
+      inp, res);
   }
-  /* tag: the new recruiter gets the pseudo name; whoever had it (and whatever the new one had) is freed in the same save */
-  async function tag(p, r) {
-    if (busy) return; busy = true;
-    const old = holders().get(p.toLowerCase()), ups = [];
+  function confirmTag(s, r, reset) {
+    const from = dateIn("Assigned from");
+    const m = psnModal("Give “" + s.name + "” to " + nm(r), h("div", { class: "psn-conf" }, h("p", {}, nm(r) + " · " + r.id + (cl(r) ? " · " + cl(r) : "")), from.el),
+      [h("span", { class: "grow" }), h("button", { class: "btn", type: "button", onclick: () => { m.close(); reset(); } }, "Cancel"), h("button", { class: "btn primary", type: "button", onclick: () => { m.close(); tag(s, r, from.i.value, null); } }, "Save")]);
+  }
+  /* tag: the new recruiter gets the pseudo name from the chosen date; whoever had it ends on the chosen date */
+  async function tag(s, r, fromDay, toDay) {
+    if (busy) return;
+    if (!fromDay) { toast("Pick the date the recruiter starts with this pseudo name.", true); return; }
+    busy = true;
+    const old = holders().get(s.name.toLowerCase()), ups = [];
     if (old && old.id !== r.id) ups.push({ id: old.id, values: { [pc]: null } });
-    ups.push({ id: r.id, values: { [pc]: p } });
+    ups.push({ id: r.id, values: { [pc]: s.name } });
     try {
-      await api("POST", "/api/bulk", { updates: ups, note: "Pseudo name " + p + " → " + nm(r) + (old && old.id !== r.id ? " (was " + nm(old) + ")" : "") });
+      BE.setPseudoDates({ from: fromDay, to: toDay || fromDay, prevOf: pv(r) ? fromDay : null });
+      await api("POST", "/api/bulk", { updates: ups, note: "Pseudo name " + s.name + " → " + nm(r) + " from " + fromDay + (old && old.id !== r.id ? " (was " + nm(old) + " until " + (toDay || fromDay) + ")" : "") });
       await loadData(true); editing = null;
-      toast("“" + p + "” is now tagged to " + nm(r) + "." + (pv(r) && pv(r) !== p ? "" : ""));
-      hist = null; drawTabs(); drawList(); try { hist = await BE.readPseudoHistory(); } catch { hist = []; } drawTabs(); drawList();
-    } catch (e) { toast(e.message, true); } finally { busy = false; }
+      toast("“" + s.name + "” is now " + nm(r) + "’s, from " + psnNice(fromDay) + ".");
+      await reloadHist();
+    } catch (e) { toast(e.message, true); } finally { BE.setPseudoDates(null); busy = false; }
   }
-  async function untag(s) {
+  async function untag(s, day) {
     if (busy || !s.r) return; busy = true;
-    try { await api("POST", "/api/bulk", { updates: [{ id: s.r.id, values: { [pc]: null } }], note: "Pseudo name " + s.p + " made vacant" }); await loadData(true); editing = null; toast("“" + s.p + "” is vacant now."); hist = null; drawList(); try { hist = await BE.readPseudoHistory(); } catch { hist = []; } drawTabs(); drawList(); }
-    catch (e) { toast(e.message, true); } finally { busy = false; }
+    try { BE.setPseudoDates({ to: day || psnToday() }); await api("POST", "/api/bulk", { updates: [{ id: s.r.id, values: { [pc]: null } }], note: "Pseudo name " + s.name + " made vacant on " + (day || psnToday()) }); await loadData(true); editing = null; toast("“" + s.name + "” is vacant from " + psnNice(day || psnToday()) + "."); await reloadHist(); }
+    catch (e) { toast(e.message, true); } finally { BE.setPseudoDates(null); busy = false; }
   }
   drawTabs(); drawList();
   try { hist = await BE.readPseudoHistory(); } catch (e) { hist = []; console.warn(e); }
@@ -12706,6 +12866,11 @@ function openDrawer(row) {
           if (c.name === sch.doj_column) val = todaySerial();
         }
         const f = buildField(c, val, isNew);
+        if (c.name === pseudoCol() && psnMaster()) {   /* v3.68.0: pseudo names are given in the Pseudo names panel (dates and history kept there) */
+          f.get = () => (base ? base.v[state.idx[c.name]] : null);
+          f.wrap.querySelectorAll("input,select,textarea").forEach(el => { el.disabled = true; el.title = "Pseudo names are given in the Pseudo names panel"; });
+          if (!isNew) { const lab = f.wrap.querySelector("label"); if (lab) { const cur = base && S(base.v[state.idx[c.name]]).trim(); if (cur) lab.append(h("button", { type: "button", class: "psn-i", title: "History of " + cur, onclick: e => { e.preventDefault(); e.stopPropagation(); psnHistory(cur); } }, "i")); lab.append(h("button", { type: "button", class: "dt-ask-f", onclick: e => { e.preventDefault(); e.stopPropagation(); const id = base.id; closeDrawer(); setTimeout(() => openPseudoNames(id), 0); } }, cur ? "Change" : "Give one")); } }
+        }
         if (PHONE.locked(c.name, base && base.id)) { f.get = () => (base ? base.v[state.idx[c.name]] : null); f.wrap.querySelectorAll("input,select,textarea").forEach(el => { el.disabled = true; el.dataset.locked = "1"; el.value = ""; el.placeholder = isNew ? "🔒 Filled in by an admin" : "🔒 Private"; el.title = "Private detail: only admins see it. Ask for it in the notification center; once approved it shows for 15 minutes."; });
           if (!isNew && window.openDetailRequest && window.dtCanAsk && dtCanAsk(base.id, c.name)) { const lab = f.wrap.querySelector("label, .flabel, span"); const ask = h("button", { type: "button", class: "dt-ask-f", onclick: e => { e.preventDefault(); e.stopPropagation(); openDetailRequest(state.rows.find(x => x.id === base.id) || row, c.name); } }, "Ask to see"); (lab || f.wrap).append(ask); } }
         fields.push(f); mine.push(f); grid.append(f.wrap);
@@ -12823,7 +12988,7 @@ function openDrawer(row) {
   const phone = hv("phone_column"), wa = sch.whatsapp_column && row ? S(g(row, sch.whatsapp_column)) : "", digits = x => String(x || "").replace(/[^\d+]/g, "");
   const st = hv("status_column"), stCls = !st ? "" : isInactiveStatus(st) ? "off" : /^active$/i.test(st) ? "on" : "mid";
   const fact = (lbl, v) => v ? h("div", { class: "emp2-fact" }, h("small", {}, lbl), h("b", {}, v)) : null;
-  const facts = row ? [fact("Emp ID", String(row.id)), fact("Tenure", tenure), fact("Joined", isNum(doj) ? fmtDate(doj) : ""), fact("Birthday", isNum(dob) ? new Date((dob - 25569) * 86400000).toLocaleDateString(undefined, { day: "numeric", month: "short", timeZone: "UTC" }) : ""), fact("Pseudo name", pv)].filter(Boolean) : [];
+  const facts = row ? [fact("Emp ID", String(row.id)), fact("Tenure", tenure), fact("Joined", isNum(doj) ? fmtDate(doj) : ""), fact("Birthday", isNum(dob) ? new Date((dob - 25569) * 86400000).toLocaleDateString(undefined, { day: "numeric", month: "short", timeZone: "UTC" }) : ""), (pv ? h("div", { class: "emp2-fact" }, h("small", {}, "Pseudo name"), h("b", {}, pv, " ", h("button", { class: "psn-i", type: "button", title: "History of " + pv, "aria-label": "History of " + pv, onclick: e => { e.stopPropagation(); psnHistory(pv); } }, "i"))) : null)].filter(Boolean) : [];
   const acts = row ? [phone && digits(phone) ? h("a", { class: "emp2-act", href: "tel:" + digits(phone), title: "Call " + phone }, "📞 Call") : null, (wa || phone) && digits(wa || phone) ? h("a", { class: "emp2-act", href: "https://wa.me/" + digits(wa || phone).replace(/^\+/, ""), target: "_blank", rel: "noopener noreferrer", title: "WhatsApp" }, "💬 WhatsApp") : null].filter(Boolean) : [];
   const emp2Status = h("span", { class: "emp2-status" }, isNew ? "Fill in the details, then add." : "No unsaved changes");
   title.className = "emp2-name";
