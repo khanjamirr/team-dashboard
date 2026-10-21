@@ -5,7 +5,7 @@
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <link rel="preconnect" href="https://iiogwevtyzgedhoaqlrn.supabase.co" crossorigin><link rel="dns-prefetch" href="https://iiogwevtyzgedhoaqlrn.supabase.co">
 <link rel="icon" href="data:,">
-<title>Team Dashboard · 3.65.0</title>
+<title>Team Dashboard · 3.66.0</title>
 <link rel="preconnect" href="https://fonts.googleapis.com"><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin><link href="https://fonts.googleapis.com/css2?family=Public+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet">
 <style>
 :root {
@@ -2367,7 +2367,6 @@ article.al-d { --alc:#c62828; }
       <button class="btn ghost" id="btnLogout" title="Connect your two workbooks">Linked files</button>
       <button class="btn ghost autosync" id="btnAutoSync" hidden></button>
       <button class="btn ghost" id="btnSaveNow" hidden></button>
-      <button class="btn ghost teampill" id="btnTeams" type="button" hidden></button>
       <button class="btn ghost bell" id="btnBell" type="button" aria-label="Activity" title="Activity: every change, newest first" hidden><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M6 8a6 6 0 0 1 12 0c0 7 3 9 3 9H3s3-2 3-9"/><path d="M10.3 21a1.94 1.94 0 0 0 3.4 0"/></svg><span class="bell-n" id="bellN" hidden></span></button>
     </header>
   <div class="workspace-heading overview-heading"><div><p class="eyebrow">TEAM WORKSPACE</p><h2 id="cleanPageTitle">Overview</h2><p>Your people and priorities, at a glance.</p></div></div>
@@ -5022,7 +5021,7 @@ const isLeaveCode = v => LEAVE_CATS.has(catOf(v));
 const nameTokens = n => String(n || '').toLowerCase().replace(/[^a-z0-9\s]/g, ' ').split(/\s+/).filter(Boolean).sort().join(' ');
 const idKey = v => (v == null ? '' : String(v).trim().toLowerCase());
 function rosterRows() { try { return (state.schema && state.rows) || []; } catch { return []; } }
-function rosterVer() { try { return state.version + '|' + TEAMS.sig(); } catch { return null; } }
+function rosterVer() { try { return state.version; } catch { return null; } }
 function rosterIndex() {
   const rows = rosterRows();
   if (rosterIndex.c && rosterIndex.c.rows === rows && rosterIndex.c.n === rows.length && rosterIndex.c.v === rosterVer()) return rosterIndex.c;
@@ -5084,10 +5083,9 @@ function inScope(r) {
 
 /* derived indexes (cached per data version, roster version and scope). D() follows the Team scope, D(true) is everything. */
 function D(all = false) {
-  const key = S.ver + '|' + (all ? 'all' : curSig()) + '|' + rosterRows().length + '|' + TEAMS.sig();
+  const key = S.ver + '|' + (all ? 'all' : curSig()) + '|' + rosterRows().length;
   const slot = all ? 'ca' : 'cs'; if (D[slot] && D[slot].key === key) return D[slot];
-  const tv = r => TEAMS.restricted() ? !!rosterMatch(r.empId, r.name) : true;   /* v3.64.0: a team lead's attendance is their team's */
-  const rows = all ? (TEAMS.restricted() ? S.rows.filter(tv) : S.rows) : S.rows.filter(r => tv(r) && inScope(r));
+  const rows = all ? S.rows : S.rows.filter(inScope);
   const byMonth = new Map(), people = new Map(), clients = new Set();
   for (const r of rows) {
     if (!byMonth.has(r.month)) byMonth.set(r.month, []); byMonth.get(r.month).push(r);
@@ -9676,73 +9674,6 @@ const state = {
   visible: null, chartView: {}, flashId: null, online: true,
 };
 
-/* ============================== v3.64.0: teams, team leads and time-limited access ==============================
-   Teams live in the database (teams.sql): a name, its team leads (dashboard users) and its employees. A team lead who is
-   not an admin sees only the employees of their own team(s), plus any team an admin has opened for them for a few hours.
-   The server decides who gets which employee's contact key, so phone and WhatsApp numbers stay locked even if someone
-   tampers with the page; when the hours run out the server stops handing out the keys and the page hides the team again. */
-const TEAMS = (() => {
-  let data = null, st = "none", loadP = null, skew = 0, lastSig = null, cache = null, lastPending = null;
-  const online = () => { try { return !!(BE.isCloud() && typeof CLOUD !== "undefined" && CLOUD.user()); } catch { return false; } };
-  const me = () => CLOUD.user();
-  const myId = () => String((me() || {}).id ?? "");
-  const isAdmin = () => { const u = me(); return !!u && (u.role === "admin" || u.role === "superadmin"); };
-  const now = () => Date.now() + skew;
-  const teams = () => (data && data.teams) || [];
-  const access = () => (data && data.access) || [];
-  const leadTeams = () => teams().filter(t => (t.leads || []).some(l => String(l.id) === myId()));
-  const grants = () => access().filter(a => String(a.user_id) === myId() && a.status === "approved" && Date.parse(a.expires_at) > now());
-  const restricted = () => online() && st === "ok" && !!data && data.owner === myId() && !isAdmin() && leadTeams().length > 0;
-  function allowed() {
-    const k = data ? (data.now + "|" + myId() + "|" + grants().map(a => a.id).join(",")) : "";
-    if (cache && cache.k === k) return cache.set;
-    const ids = new Set([...leadTeams().map(t => t.id), ...grants().map(a => a.team_id)]), set = new Set();
-    for (const t of teams()) if (ids.has(t.id)) for (const e of t.emps || []) set.add(String(e));
-    cache = { k, set }; return set;
-  }
-  const sig = () => restricted() ? "t:" + [...allowed()].sort().join(",") : "all";
-  const contactSig = () => online() && st === "ok" ? [...allowed()].sort().join(",") : "";
-  const okEmp = id => !restricted() || allowed().has(String(id));
-  const contactOk = id => online() && st === "ok" && id != null && allowed().has(String(id));
-  const teamOf = id => teams().find(t => (t.emps || []).includes(String(id))) || null;
-  function set(d) {
-    data = { teams: (d && d.teams) || [], access: (d && d.access) || [], now: d && d.now, owner: myId() };
-    if (d && d.now) skew = Date.parse(d.now) - Date.now();
-    st = "ok"; cache = null; check();
-    try { dispatchEvent(new CustomEvent("teams:changed")); } catch { }
-    return data;
-  }
-  async function load() {
-    if (!online()) { data = null; st = "none"; return null; }
-    if (loadP) return loadP;
-    loadP = (async () => {
-      try { return set(await CLOUD.teams.get()); }
-      catch (e) { if (/not set up|function|schema cache|does not exist/i.test(e.message || "")) st = "nosql"; else if (st !== "ok") st = "err"; console.warn("Teams:", e.message); return null; }
-      finally { loadP = null; }
-    })();
-    return loadP;
-  }
-  const ensure = () => { if (data && data.owner !== myId()) { data = null; st = "none"; cache = null; lastSig = null; } return (st === "none" && online()) ? load() : Promise.resolve(data); };   /* a different person signed in: start over */
-  /* what someone can see changed (access approved, ran out, team edited): forget the keys and redraw */
-  function check() {
-    const s = sig() + "#" + contactSig();
-    if (lastSig === null) { lastSig = s; return; }
-    if (s === lastSig) return;
-    lastSig = s;
-    try { PHONE.forget(); } catch { }
-    if (state.schema) loadData(true).catch(() => { });
-  }
-  const pending = () => access().filter(a => a.status === "pending");
-  async function call(fn) { const d = await fn(); return set(d); }
-  setInterval(() => { if (!online() || document.hidden) return; check(); }, 15000);
-  setInterval(() => { if (online() && !document.hidden && st !== "nosql") load(); }, 45000);
-  addEventListener("focus", () => { if (online() && st !== "nosql") load(); });
-  return {
-    load, ensure, set, call, restricted, okEmp, contactOk, sig, teams, access, leadTeams, grants, pending, teamOf, isAdmin, now, myId,
-    allowed, state: () => st, lastPending: v => (v === undefined ? lastPending : (lastPending = v))
-  };
-})();
-window.TEAMS = TEAMS;
 /* ============================== v3.65.0: requests for private details ==============================
    Someone who is not an admin asks for a person's private fields (one or more). An admin approves it in the notification
    center; those fields then open for that person for 15 minutes and lock again on their own (the server stops handing
@@ -10052,7 +9983,7 @@ function ingest(d) {
   state.schema = d.schema; state.version = d.version; state.file = d.file; state.user = d.user;
   state.cols = d.schema.columns;
   state.idx = {}; state.cols.forEach((c, i) => { state.idx[c.name] = i; });
-  state.rows = (TEAMS.restricted() ? d.rows.filter(r => TEAMS.okEmp(r.id)) : d.rows).map(r => prep(r));   /* v3.64.0: team leads see their own team */
+  state.rows = d.rows.map(r => prep(r));
   if (!state.visible) {
     let saved = null;
     try { saved = JSON.parse(lsGet("td_cols") || "null"); } catch (e) { /* ignore */ }
@@ -10072,7 +10003,6 @@ async function loadData(silent) {
   if (silent) document.body.classList.add("refreshing");
   try {
     await Promise.all([DETAILS.ensure(), window.__tdSettingsReady || !window.loadTeamSettings ? null : loadTeamSettings().then(() => { window.__tdSettingsReady = true; }).catch(() => { })]);   /* v3.65.0 */
-    await TEAMS.ensure();   /* v3.64.0: know the team first, so a team lead never sees other teams for a moment */
     const d = await api("GET", "/api/data");
     ingest(d);
     setSync(true);
@@ -10105,7 +10035,7 @@ async function poll() {
 }
 
 /* ============================== filtering ============================== */
-const APP = { title: "Team Dashboard", version: "3.65.0", released: "20 Oct 2026" };
+const APP = { title: "Team Dashboard", version: "3.66.0", released: "20 Oct 2026" };
 const BASE_DIMS = { status: "status_column", desig: "designation_column", client: "client_column", mode: "mode_column" };
 const STANDARD_STATUSES = ["Active", "Manager", "OJT", "Bench", "New", "Projected", "Left", "Moved"];
 const TILE_ORDER = ["Active", "Manager", "OJT", "Bench", "New", "Projected"];
@@ -12694,7 +12624,7 @@ function openDrawer(row) {
         }
         const f = buildField(c, val, isNew);
         if (PHONE.locked(c.name, base && base.id)) { f.get = () => (base ? base.v[state.idx[c.name]] : null); f.wrap.querySelectorAll("input,select,textarea").forEach(el => { el.disabled = true; el.dataset.locked = "1"; el.value = ""; el.placeholder = isNew ? "🔒 Filled in by an admin" : "🔒 Private"; el.title = "Private detail: only admins see it. Ask for it in the notification center; once approved it shows for 15 minutes."; });
-          if (!isNew && window.openDetailRequest) { const lab = f.wrap.querySelector("label, .flabel, span"); const ask = h("button", { type: "button", class: "dt-ask-f", onclick: e => { e.preventDefault(); e.stopPropagation(); openDetailRequest(state.rows.find(x => x.id === base.id) || row, c.name); } }, "Ask to see"); (lab || f.wrap).append(ask); } }
+          if (!isNew && window.openDetailRequest && window.dtCanAsk && dtCanAsk(base.id, c.name)) { const lab = f.wrap.querySelector("label, .flabel, span"); const ask = h("button", { type: "button", class: "dt-ask-f", onclick: e => { e.preventDefault(); e.stopPropagation(); openDetailRequest(state.rows.find(x => x.id === base.id) || row, c.name); } }, "Ask to see"); (lab || f.wrap).append(ask); } }
         fields.push(f); mine.push(f); grid.append(f.wrap);
       }
       const cnt = h("small", { class: "emp-cnt" }), navCnt = h("small", { class: "emp-jn" });
@@ -13618,7 +13548,6 @@ const PW_ABC = 'ABCDEFGHJKLMNPQRSTUVWXYZabcdefghijkmnpqrstuvwxyz23456789';
 const genPassword = () => { const a = crypto.getRandomValues(new Uint32Array(15)); let out = ''; for (let i = 0; i < 15; i++) { if (i && i % 5 === 0) out += '-'; out += PW_ABC[a[i] % PW_ABC.length]; } return out; };
 const pwScore = p => { if (!p) return 0; let sc = Math.min(4, Math.floor(p.length / 4)); const kinds = [/[a-z]/, /[A-Z]/, /\d/, /[^A-Za-z0-9]/].filter(r => r.test(p)).length; sc += kinds - 1; if (/^(.)\1+$/.test(p) || /^(password|12345|qwerty)/i.test(p)) sc = 1; return Math.max(1, Math.min(5, sc)); };
 function downloadWorkbook(name, getBytes, what) {
-  if (TEAMS.restricted()) { toast('Team leads can’t download the whole workbook: it holds every team. Ask an admin.', true); return; }   /* v3.64.0 */
   const canPh = PHONE.canSee(), stamp = new Date().toISOString().slice(0, 10);
   const base = String(name || 'Team Dashboard.xlsx').replace(/\.xlsx$/i, '');
   let mode = 'locked';
@@ -13750,14 +13679,14 @@ async function drawPeople(pane, selectId) {
   const body = h('div', { class: 'ppl-body' });
   const tabBtn = (id, label, n, hot) => h('button', { type: 'button', class: 'ppl-tab', role: 'tab', 'aria-selected': String(PPL.tab === id), onclick: () => { PPL.tab = id; drawPeople(pane, selectId); } }, label, n != null ? h('span', { class: 'ppl-tab-n' + (hot ? ' hot' : '') }, String(n)) : null);
   const tabs = h('div', { class: 'ppl-tabs', role: 'tablist', 'aria-label': 'People & access' },
-    tabBtn('people', 'People', users.length), tabBtn('roles', 'Roles', tdRoles().length), tabBtn('teams', 'Teams', TEAMS.state() === 'ok' ? TEAMS.teams().length : null, TEAMS.pending().length > 0), tabBtn('passcodes', 'Passcodes', pending.length || null, pending.length > 0));
+    tabBtn('people', 'People', users.length), tabBtn('roles', 'Roles', tdRoles().length), tabBtn('passcodes', 'Passcodes', pending.length || null, pending.length > 0));
   /* v3.62.0: header like the reference: what this is, People | Roles | Passcodes, + Add user */
   const addBtn = h('button', { class: 'btn primary', type: 'button', onclick: () => { if (PPL.tab !== 'people') { PPL.tab = 'people'; drawPeople(pane).then(() => drawPeopleTable.add && drawPeopleTable.add()); } else drawPeopleTable.add && drawPeopleTable.add(); } }, '+ Add user');
   fill(pane, h('div', { class: 'ua-head' }, h('p', { class: 'set-hint' }, 'Add people, set their passcodes and choose what they can open.'), h('span', { class: 'grow' }), tabs, addBtn), body);
 
   if (PPL.tab === 'groups') PPL.tab = 'roles';
   if (PPL.tab === 'roles') { drawRoleCards(body, users, () => reload(selectId), groups); return; }
-  if (PPL.tab === 'teams') { drawTeamsTab(body, users); return; }   /* v3.64.0 */
+  if (PPL.tab === 'teams') PPL.tab = 'people';   /* v3.66.0: teams were removed */
 
   if (PPL.tab === 'passcodes') {
     const selfOn = settings.self_passcode !== false;
@@ -14330,206 +14259,32 @@ function renderAdminLog() {
       : h('div', { class: 'allclear', style: 'padding:24px' }, ALOG.items.length ? 'Nothing matches these filters.' : 'No entries yet. Press “+ New entry” to write the first update, activity or decision.'));
 }
 window.renderAdminLog = renderAdminLog;
-/* ============================== v3.64.0: Teams (People & access) and Team access (everyone) ============================== */
-const tmLeftEl = iso => h('span', { class: 'tm-left', 'data-exp': iso }, tmLeft(iso));
-const tmLeft = iso => { const ms = Date.parse(iso) - TEAMS.now(); if (!(ms > 0)) return 'ended'; const m = Math.ceil(ms / 60000); return m < 60 ? m + ' min left' : Math.floor(m / 60) + ' h ' + String(m % 60).padStart(2, '0') + ' min left'; };
-const tmAgo = iso => { const m = Math.max(0, Math.round((TEAMS.now() - Date.parse(iso)) / 60000)); return m < 1 ? 'just now' : m < 60 ? m + ' min ago' : m < 1440 ? Math.round(m / 60) + ' h ago' : Math.round(m / 1440) + ' d ago'; };
-const tmPeople = () => (state.rows || []).map(r => ({ id: String(r.id), name: gs(r, 'name_column').trim() || String(r.id), client: gs(r, 'client_column'), left: isInactive(r) }));
-const tmName = (t, n) => h('span', { class: 'tm-dot', style: '--h:' + ((n * 67) % 360) }, (t.name || '?').slice(0, 1).toUpperCase());
-const tmStatus = a => ({ pending: ['Waiting', 'w'], approved: ['Open', 'ok'], expired: ['Ended', 'x'], rejected: ['Declined', 'no'], revoked: ['Closed early', 'x'], cancelled: ['Cancelled', 'x'] })[a.status] || [a.status, 'x'];
-const tmMissing = () => h('div', { class: 'set-card tm-missing' }, h('h4', {}, 'One step in Supabase first'),
-  h('p', { class: 'set-hint' }, 'Teams are kept in the database, so nobody can change them from the browser. Open Supabase → SQL Editor, paste teams.sql (it came with this version), press Run, then reload this page.'));
-
-/* ---------- the editor for one team ---------- */
-async function openTeamEditor(t, users, done) {
-  const isNew = !t, people = tmPeople(), byId = new Map(people.map(p => [p.id, p]));
-  const sel = new Set((t && t.emps) || []), leads = new Set(((t && t.leads) || []).map(l => String(l.id)));
-  const otherTeam = id => TEAMS.teams().find(x => (!t || x.id !== t.id) && (x.emps || []).includes(id));
-  const err = h('p', { class: 'err', role: 'alert' });
-  const name = h('input', { class: 'input', value: (t && t.name) || '', maxlength: 60, placeholder: 'e.g. Team Asha, Night shift, Acme support', 'aria-label': 'Team name' });
-  /* team leads */
-  const pickable = users.filter(u => u.role !== 'superadmin' && u.active !== false).sort((a, b) => String(a.name).localeCompare(String(b.name)));
-  const leadList = h('div', { class: 'tm-leads' });
-  const drawLeads = () => fill(leadList, pickable.length ? pickable.map(u => {
-    const on = leads.has(String(u.id));
-    return h('button', { type: 'button', class: 'tm-chip' + (on ? ' on' : ''), 'aria-pressed': String(on), title: u.role === 'admin' ? 'Admins already see everyone; they can still lead a team' : '', onclick: () => { on ? leads.delete(String(u.id)) : leads.add(String(u.id)); drawLeads(); } },
-      on ? '✓ ' : '+ ', u.name, u.role === 'admin' ? h('small', {}, ' admin') : null);
-  }) : h('p', { class: 'set-hint' }, 'Add your team leads as users first (People tab).'));
-  drawLeads();
-  /* employees */
-  const q = h('input', { class: 'input', type: 'search', placeholder: 'Search name, number or client', 'aria-label': 'Search employees' });
-  const clients = [...new Set(people.map(p => p.client).filter(Boolean))].sort((a, b) => a.localeCompare(b));
-  const cl = h('select', { class: 'input', 'aria-label': 'Client' }, h('option', { value: '' }, 'All clients'), ...clients.map(c => h('option', { value: c }, c)));
-  const show = h('select', { class: 'input', 'aria-label': 'Show' }, ...[['all', 'Everyone'], ['in', 'In this team'], ['free', 'Not in a team'], ['other', 'In another team']].map(([v, l]) => h('option', { value: v }, l)));
-  const leftBox = checkLine('Show people who left', false);
-  const list = h('div', { class: 'tm-list', role: 'list' }), count = h('b', {}), shownN = h('span', { class: 'set-hint' });
-  let shown = [];
-  const draw = () => {
-    const s = q.value.trim().toLowerCase();
-    shown = people.filter(p => (leftBox.box.checked || !p.left || sel.has(p.id)) && (!cl.value || p.client === cl.value)
-      && (!s || (p.name + ' ' + p.id + ' ' + p.client).toLowerCase().includes(s))
-      && (show.value === 'all' || (show.value === 'in' ? sel.has(p.id) : show.value === 'free' ? !sel.has(p.id) && !otherTeam(p.id) : !!otherTeam(p.id))))
-      .sort((a, b) => (sel.has(b.id) - sel.has(a.id)) || a.name.localeCompare(b.name));
-    count.textContent = sel.size + (sel.size === 1 ? ' employee' : ' employees');
-    shownN.textContent = shown.length + ' shown';
-    fill(list, shown.slice(0, 400).map(p => {
-      const o = otherTeam(p.id), box = h('input', { type: 'checkbox', checked: sel.has(p.id), 'aria-label': p.name });
-      box.addEventListener('change', () => { box.checked ? sel.add(p.id) : sel.delete(p.id); draw(); });
-      return h('label', { class: 'tm-row' + (sel.has(p.id) ? ' on' : ''), role: 'listitem' }, box, h('span', { class: 'tm-pn' }, p.name, h('small', {}, p.id + (p.client ? ' · ' + p.client : '') + (p.left ? ' · left' : ''))),
-        o ? h('span', { class: 'tm-in' + (sel.has(p.id) ? ' move' : '') }, sel.has(p.id) ? 'moves from ' + o.name : 'in ' + o.name) : null);
-    }), shown.length > 400 ? h('p', { class: 'set-hint', style: 'padding:8px 12px' }, 'Showing the first 400. Search or pick a client to narrow it down.') : null,
-      !shown.length ? h('p', { class: 'set-hint', style: 'padding:14px' }, 'Nobody matches.') : null);
-  };
-  for (const x of [q]) x.addEventListener('input', draw);
-  for (const x of [cl, show, leftBox.box]) x.addEventListener('change', draw);
-  const allBtn = h('button', { class: 'dlw-mini', type: 'button', onclick: () => { shown.forEach(p => sel.add(p.id)); draw(); } }, 'Add all shown');
-  const noneBtn = h('button', { class: 'dlw-mini', type: 'button', onclick: () => { shown.forEach(p => sel.delete(p.id)); draw(); } }, 'Remove all shown');
-  draw();
-  const save = h('button', { class: 'btn primary', type: 'button' }, isNew ? 'Create team' : 'Save team');
-  const d = pdlg(isNew ? 'New team' : 'Edit ' + t.name, h('div', { class: 'tm-ed' },
-    h('label', { class: 'dlw-l' }, 'Team name'), name,
-    h('div', { class: 'tm-sec' }, h('span', { class: 'dlw-l' }, 'Team leads'), h('p', { class: 'set-hint' }, 'They see this team’s employees and attendance. Other teams need an approved request; private details (phone, date of birth…) are asked for in the notifications.')), leadList,
-    h('div', { class: 'tm-sec' }, h('span', { class: 'dlw-l' }, 'Employees · ', count), h('span', { class: 'grow' }), shownN),
-    h('div', { class: 'tm-tools' }, q, cl, show), h('div', { class: 'tm-tools2' }, leftBox.el, h('span', { class: 'grow' }), allBtn, noneBtn), list,
-    h('p', { class: 'set-hint' }, 'An employee is in one team. Adding someone who is in another team moves them here.'), err),
-    [h('span', { class: 'grow' }), h('button', { class: 'btn', type: 'button', onclick: () => d.close() }, 'Cancel'), save], 'wide tm-dlg');
-  setTimeout(() => (isNew ? name : q).focus(), 0);
-  save.addEventListener('click', async () => {
-    err.textContent = '';
-    if (!name.value.trim()) { err.textContent = 'Give the team a name.'; name.focus(); return; }
-    save.disabled = true; save.textContent = 'Saving…';
-    try {
-      const L = pickable.filter(u => leads.has(String(u.id))).map(u => ({ id: String(u.id), name: u.name }));
-      await TEAMS.call(() => CLOUD.teams.save({ id: t ? t.id : null, name: name.value.trim(), leads: L, emps: [...sel] }));
-      d.close(); toast((isNew ? 'Created ' : 'Saved ') + name.value.trim() + ' · ' + sel.size + (sel.size === 1 ? ' employee' : ' employees') + '.'); done && done();
-    } catch (e) { err.textContent = e.message; save.disabled = false; save.textContent = isNew ? 'Create team' : 'Save team'; }
-  });
-  void byId;
-}
-
-/* ---------- People & access › Teams ---------- */
-async function drawTeamsTab(body, users) {
-  fill(body, h('p', { class: 'set-hint' }, 'Loading teams…'));
-  await TEAMS.load();
-  if (TEAMS.state() === 'nosql') { fill(body, tmMissing()); return; }
-  if (TEAMS.state() !== 'ok') { fill(body, h('p', { class: 'err' }, 'Could not load the teams. Check the connection and reload.')); return; }
-  const redraw = () => drawTeamsTab(body, users);
-  const people = tmPeople().filter(p => !p.left), ts = TEAMS.teams(), inAny = new Set(ts.flatMap(t => t.emps || []));
-  const free = people.filter(p => !inAny.has(p.id)), pend = TEAMS.pending();
-  const card = (t, n) => {
-    const emps = (t.emps || []), live = emps.filter(id => people.some(p => p.id === id)).length, cls = new Map();
-    for (const id of emps) { const p = tmPeople().find(x => x.id === id); if (p && p.client) cls.set(p.client, (cls.get(p.client) || 0) + 1); }
-    const open = TEAMS.access().filter(a => a.team_id === t.id && a.status === 'approved' && Date.parse(a.expires_at) > TEAMS.now());
-    return h('article', { class: 'tm-card' },
-      h('div', { class: 'tm-card-top' }, tmName(t, n), h('div', {}, h('b', {}, t.name), h('small', {}, live + (live === 1 ? ' employee' : ' employees') + (emps.length > live ? ' · ' + (emps.length - live) + ' left or not found' : ''))), h('span', { class: 'grow' }),
-        h('button', { class: 'pt-act', type: 'button', onclick: () => openTeamEditor(t, users, redraw) }, 'Edit'),
-        confirmButton('Delete', 'Sure?', async () => { try { await TEAMS.call(() => CLOUD.teams.remove(t.id)); toast('Deleted ' + t.name + '.'); redraw(); } catch (e) { toast(e.message, true); } }, 'pt-act danger')),
-      h('div', { class: 'tm-meta' }, h('span', { class: 'dlw-l' }, 'Leads'), (t.leads || []).length ? (t.leads || []).map(l => h('span', { class: 'tm-chip on sm' }, l.name || l.id)) : h('span', { class: 'tm-warn' }, 'No team lead yet')),
-      cls.size ? h('div', { class: 'tm-meta' }, h('span', { class: 'dlw-l' }, 'Clients'), [...cls.entries()].sort((a, b) => b[1] - a[1]).slice(0, 5).map(([c, k]) => h('span', { class: 'tm-tag' }, c + ' ' + k))) : null,
-      open.length ? h('p', { class: 'tm-open' }, '🔓 Also open to ' + open.map(a => a.user_name + ' (' + tmLeft(a.expires_at) + ')').join(', ')) : null);
-  };
-  fill(body,
-    h('div', { class: 'tm-head' }, h('div', {}, h('h3', {}, 'Teams'), h('p', { class: 'set-hint' }, 'Put each employee in a team and pick its team leads. A team lead who isn’t an admin sees only their own team’s employees and attendance. Other teams open only after you or an admin approve a request, for a few hours, and close on their own.')),
-      h('span', { class: 'grow' }), h('button', { class: 'btn', type: 'button', onclick: () => openTeamAccess() }, 'Requests' + (pend.length ? ' · ' + pend.length : '')), h('button', { class: 'btn primary', type: 'button', onclick: () => openTeamEditor(null, users, redraw) }, '+ New team')),
-    h('div', { class: 'tm-stats' }, h('div', {}, h('b', {}, String(ts.length)), h('span', {}, ts.length === 1 ? 'team' : 'teams')), h('div', {}, h('b', {}, String(people.length - free.length)), h('span', {}, 'in a team')),
-      h('div', { class: free.length ? 'warn' : '' }, h('b', {}, String(free.length)), h('span', {}, 'not in a team')), h('div', { class: pend.length ? 'hot' : '' }, h('b', {}, String(pend.length)), h('span', {}, pend.length === 1 ? 'request waiting' : 'requests waiting'))),
-    ts.length ? h('div', { class: 'tm-grid' }, ts.map(card)) : h('div', { class: 'allclear', style: 'padding:24px' }, 'No teams yet. Press “+ New team”, give it a name, pick the team lead and tick the employees.'),
-    free.length && ts.length ? h('p', { class: 'set-hint', style: 'margin-top:12px' }, 'Not in a team: ' + free.slice(0, 8).map(p => p.name).join(', ') + (free.length > 8 ? ' and ' + (free.length - 8) + ' more' : '') + '. Team leads don’t see them; admins do.') : null);
-}
-
-/* ---------- Team access: your team, your access to other teams, and (admins) the requests ---------- */
-function openTeamAccess() {
-  if (TEAMS.state() === 'nosql') { pdlg('Team access', tmMissing()); return; }
-  const body = h('div', { class: 'tm-acc' });
-  const d = pdlg('Team access', body, null, 'wide tm-dlg');
-  let tick = null, later = false;
-  const form = { team: '', hours: 2, why: '' };
-  const close0 = d.close; d.close = () => { clearInterval(tick); removeEventListener('teams:changed', draw); close0(); };
-  d.box.querySelector('.pdlg-x').onclick = d.close;
-  const act = async (fn, ok) => { try { await TEAMS.call(fn); if (ok) toast(ok); } catch (e) { toast(e.message, true); } };
-  function draw() {
-    if (!document.body.contains(body)) { clearInterval(tick); removeEventListener('teams:changed', draw); return; }
-    /* never redraw under someone's fingers: wait until they leave the field */
-    const ae = document.activeElement; if (ae && body.contains(ae) && /^(TEXTAREA|SELECT|INPUT)$/.test(ae.tagName)) { if (!later) { later = true; ae.addEventListener('blur', () => { later = false; setTimeout(draw, 0); }, { once: true }); } return; }
-    const admin = TEAMS.isAdmin(), mineT = TEAMS.leadTeams(), mineIds = new Set(mineT.map(t => t.id)), uid = TEAMS.myId();
-    const myAcc = TEAMS.access().filter(a => String(a.user_id) === uid), live = TEAMS.grants(), myPend = myAcc.filter(a => a.status === 'pending');
-    const parts = [];
-    /* --- admins: what is waiting --- */
-    if (admin) {
-      const pend = TEAMS.pending(), open = TEAMS.access().filter(a => a.status === 'approved' && Date.parse(a.expires_at) > TEAMS.now());
-      parts.push(h('section', { class: 'tm-s' }, h('h4', {}, 'Requests waiting', pend.length ? h('span', { class: 'ppl-tab-n hot' }, String(pend.length)) : null),
-        pend.length ? pend.map(a => {
-          const hrs = h('select', { class: 'input tm-hrs', 'aria-label': 'Hours' }, ...[1, 2, 4, 8, 12, 24].map(n => h('option', { value: n, selected: n === a.hours }, n + (n === 1 ? ' hour' : ' hours'))));
-          if (![1, 2, 4, 8, 12, 24].includes(a.hours)) hrs.prepend(h('option', { value: a.hours, selected: true }, a.hours + ' hours'));
-          return h('div', { class: 'tm-req' }, h('div', { class: 'tm-req-t' }, h('b', {}, a.user_name || 'Someone'), ' wants to see ', h('b', {}, a.team), h('small', {}, ' · asked ' + tmAgo(a.requested_at) + ' for ' + a.hours + (a.hours === 1 ? ' hour' : ' hours'))),
-            a.reason ? h('p', { class: 'tm-why' }, '“' + a.reason + '”') : null,
-            h('div', { class: 'tm-req-b' }, h('span', { class: 'set-hint' }, 'Open for'), hrs, h('span', { class: 'grow' }),
-              h('button', { class: 'btn', type: 'button', onclick: e => { e.target.disabled = true; act(() => CLOUD.teams.decide(a.id, 'reject'), 'Declined.'); } }, 'Decline'),
-              h('button', { class: 'btn primary', type: 'button', onclick: e => { e.target.disabled = true; act(() => CLOUD.teams.decide(a.id, 'approve', +hrs.value), 'Approved: ' + a.user_name + ' can see ' + a.team + ' for ' + hrs.value + ' h.'); } }, 'Approve')));
-        }) : h('p', { class: 'set-hint' }, 'Nothing waiting.')));
-      if (open.length) parts.push(h('section', { class: 'tm-s' }, h('h4', {}, 'Open right now'),
-        open.map(a => h('div', { class: 'tm-live' }, h('span', { class: 'tm-pulse' }), h('span', {}, h('b', {}, a.user_name), ' → ', a.team, h('small', {}, ' · approved by ' + (a.decided_by || '?'))), h('span', { class: 'grow' }), tmLeftEl(a.expires_at),
-          h('button', { class: 'pt-act danger', type: 'button', onclick: e => { e.target.disabled = true; act(() => CLOUD.teams.decide(a.id, 'revoke'), 'Closed. ' + a.user_name + ' no longer sees ' + a.team + '.'); } }, 'Close now')))));
-    }
-    /* --- team leads: my team, my open access, ask for more --- */
-    if (!admin || mineT.length) {
-      parts.push(h('section', { class: 'tm-s' }, h('h4', {}, mineT.length === 1 ? 'Your team' : 'Your teams'),
-        mineT.length ? h('div', { class: 'tm-mine' }, mineT.map((t, n) => h('div', { class: 'tm-minec' }, tmName(t, n), h('div', {}, h('b', {}, t.name), h('small', {}, (t.emps || []).length + ' employees · attendance'))))) :
-          h('p', { class: 'set-hint' }, admin ? 'You are not the lead of a team.' : 'You are not the lead of a team yet. Ask the super admin to add you to one.')));
-      if (live.length) parts.push(h('section', { class: 'tm-s' }, h('h4', {}, 'Extra access open now'),
-        live.map(a => h('div', { class: 'tm-live' }, h('span', { class: 'tm-pulse' }), h('span', {}, h('b', {}, a.team), h('small', {}, ' · approved by ' + (a.decided_by || '?'))), h('span', { class: 'grow' }), tmLeftEl(a.expires_at),
-          h('button', { class: 'pt-act', type: 'button', onclick: e => { e.target.disabled = true; act(() => CLOUD.teams.decide(a.id, 'revoke'), 'Closed. ' + a.team + ' is hidden again.'); } }, 'I’m done')))));
-      const can = TEAMS.teams().filter(t => !mineIds.has(t.id) && !live.some(a => a.team_id === t.id) && !myPend.some(a => a.team_id === t.id));
-      if (!admin && mineT.length && !can.length) parts.push(h('p', { class: 'set-hint' }, TEAMS.teams().length > mineT.length ? 'Every other team is already open to you or waiting for an answer.' : 'There are no other teams.'));
-      if (!admin && mineT.length && can.length) {
-        const team = h('select', { class: 'input', 'aria-label': 'Team' }, h('option', { value: '' }, can.length ? 'Choose a team…' : 'No other teams'), ...can.map(t => h('option', { value: t.id }, t.name + ' · ' + (t.emps || []).length)));
-        team.value = can.some(t => t.id === form.team) ? form.team : '';
-        const hb = h('div', { class: 'seg tm-hseg', role: 'group', 'aria-label': 'For how long' });
-        const drawH = () => fill(hb, [1, 2, 4, 8].map(n => h('button', { type: 'button', 'aria-pressed': String(form.hours === n), onclick: () => { form.hours = n; drawH(); } }, n + ' h')));
-        drawH();
-        const why = h('textarea', { class: 'input', rows: 2, maxlength: 500, placeholder: 'Why do you need it? e.g. covering Beta’s shift today', 'aria-label': 'Reason' }); why.value = form.why;
-        const send = h('button', { class: 'btn primary', type: 'button', disabled: true }, 'Send request');
-        const ok = () => { form.team = team.value; form.why = why.value; send.disabled = !team.value || !why.value.trim(); };
-        team.addEventListener('change', ok); why.addEventListener('input', ok); ok();
-        send.addEventListener('click', async () => { send.disabled = true; send.textContent = 'Sending…'; try { const t0 = team.value, w0 = why.value.trim(); form.team = ''; form.why = ''; await TEAMS.call(() => CLOUD.teams.request(t0, form.hours, w0)); toast('Request sent. You’ll see the team here as soon as an admin approves it.'); } catch (e) { form.team = team.value; form.why = why.value; toast(e.message, true); send.disabled = false; send.textContent = 'Send request'; } });
-        parts.push(h('section', { class: 'tm-s tm-ask' }, h('h4', {}, 'Ask to see another team'),
-          h('p', { class: 'set-hint' }, 'An admin or the super admin approves it. You then see that team’s employees and attendance until the time runs out.'),
-          h('div', { class: 'tm-askrow' }, team, hb), why, h('div', { class: 'tm-req-b' }, h('span', { class: 'grow' }), send)));
-      }
-      if (myPend.length) parts.push(h('section', { class: 'tm-s' }, h('h4', {}, 'Your requests waiting'),
-        myPend.map(a => h('div', { class: 'tm-live' }, h('span', { class: 'tm-st w' }, 'Waiting'), h('span', {}, h('b', {}, a.team), h('small', {}, ' · ' + a.hours + ' h · asked ' + tmAgo(a.requested_at))), h('span', { class: 'grow' }),
-          h('button', { class: 'pt-act', type: 'button', onclick: e => { e.target.disabled = true; act(() => CLOUD.teams.decide(a.id, 'cancel'), 'Request cancelled.'); } }, 'Cancel')))));
-    }
-    /* --- history --- */
-    const hist = (admin ? TEAMS.access() : myAcc).filter(a => a.status !== 'pending' && !(a.status === 'approved' && Date.parse(a.expires_at) > TEAMS.now())).slice(0, 12);
-    if (hist.length) parts.push(h('details', { class: 'tm-s tm-hist' }, h('summary', {}, 'Last 30 days · ' + hist.length),
-      hist.map(a => { const [l, c] = tmStatus(a); return h('div', { class: 'tm-live' }, h('span', { class: 'tm-st ' + c }, l), h('span', {}, admin ? h('b', {}, a.user_name + ' → ') : null, a.team, h('small', {}, ' · ' + new Date(a.requested_at).toLocaleString(undefined, { day: 'numeric', month: 'short', hour: '2-digit', minute: '2-digit' }) + (a.decided_by ? ' · ' + a.decided_by : '')))); })));
-    if (PERM.isOwner && PERM.isOwner()) parts.push(h('p', { class: 'set-hint tm-foot' }, h('button', { class: 'dlw-mini', type: 'button', onclick: () => { d.close(); PPL.tab = 'teams'; window.openSettings && window.openSettings('people'); } }, 'Manage teams'), ' Add teams, team leads and employees in Settings › People & access › Teams.'));
-    fill(body, parts);
-  }
-  addEventListener('teams:changed', draw);
-  draw(); TEAMS.load();
-  tick = setInterval(() => { let ended = false; for (const el of body.querySelectorAll('.tm-left')) { const t = tmLeft(el.dataset.exp); el.textContent = t; if (t === 'ended') ended = true; } if (ended) draw(); }, 20000);
-}
-window.openTeamAccess = openTeamAccess;
 /* ============================== v3.65.0: private details: ask, approve, see for 15 minutes ============================== */
 const dtLeft = iso => { const s = Math.round((Date.parse(iso) - DETAILS.now()) / 1000); if (!(s > 0)) return 'ended'; const m = Math.floor(s / 60); return m >= 1 ? m + ' min ' + String(s % 60).padStart(2, '0') + ' s left' : s + ' s left'; };
 const dtLeftEl = iso => h('span', { class: 'tm-left', 'data-dexp': iso }, dtLeft(iso));
 const dtAgo = iso => { const m = Math.max(0, Math.round((DETAILS.now() - Date.parse(iso)) / 60000)); return m < 1 ? 'just now' : m < 60 ? m + ' min ago' : m < 1440 ? Math.round(m / 60) + ' h ago' : Math.round(m / 1440) + ' d ago'; };
 const dtMissing = () => h('p', { class: 'set-hint' }, 'Private details need one step in Supabase: open SQL Editor, paste private-details.sql (it came with this version), press Run, then reload.');
+/* v3.66.0: people can be asked about only while they work here (Active, Active + Resign, OJT, New, Bench),
+   and only their phone and WhatsApp numbers can be asked for; other private details stay with admins */
+const DT_ASK_RE = /phone|mobile|whats\s*app|contact\s*(no\.?|number)|^contact$/i;
+const DT_STATUSES = ['active', 'active+resign', 'active+resigned', 'active+resignation', 'ojt', 'new', 'bench'];
+const dtEligible = row => !!row && DT_STATUSES.includes(gs(row, 'status_column').toLowerCase().replace(/\s+/g, '').replace(/&/g, '+'));
+const dtAskable = col => DT_ASK_RE.test(String(col || ''));
+window.dtCanAsk = (id, col) => { const r = state.rows.find(x => String(x.id) === String(id)); return dtEligible(r) && dtAskable(col); };
 /* the private fields of one person, as stored (so the request names exactly what is locked) */
 function dtFieldsOf(row) {
   const out = [];
   for (const c of state.cols || []) {
     if (!PHONE.isCol(c.name)) continue;
     const env = PHONE.envOf(row.id, c.name), stored = env.has !== false;
-    out.push({ col: c.name, label: c.label || c.name, f: env.f, e: env.e, stored, open: PHONE.canSeeCell(env.e, env.f) });
+    out.push({ col: c.name, label: c.label || c.name, f: env.f, e: env.e, stored, open: PHONE.canSeeCell(env.e, env.f), ask: dtAskable(c.name) });
   }
   return out;
 }
 const dtName = row => gs(row, 'name_column').trim() || String(row.id);
 /* ---------- ask for someone's private details ---------- */
 function openDetailRequest(row, only) {
+  if (row && !dtEligible(row)) { toast('Numbers can be asked for only for people who are Active, Active + Resign, OJT, New or Bench.', true); return; }
   if (DETAILS.state() === 'nosql') { pdlg('Ask for private details', dtMissing()); return; }
   const body = h('div', { class: 'dt-ask' }), err = h('p', { class: 'err', role: 'alert' });
   let pick = row || null; const ticked = new Set(only ? [only] : []);
@@ -14541,8 +14296,8 @@ function openDetailRequest(row, only) {
   const res = h('div', { class: 'tm-list dt-res' });
   const drawRes = () => {
     const s = search.value.trim().toLowerCase();
-    const list = s ? state.rows.filter(r => (dtName(r) + ' ' + r.id).toLowerCase().includes(s)).slice(0, 30) : [];
-    fill(res, s && !list.length ? h('p', { class: 'set-hint', style: 'padding:10px 12px' }, 'Nobody matches.') : list.map(r => h('button', { type: 'button', class: 'tm-row dt-pick', onclick: () => { pick = r; ticked.clear(); draw(); } }, h('span', { class: 'tm-pn' }, dtName(r), h('small', {}, r.id + (gs(r, 'client_column') ? ' · ' + gs(r, 'client_column') : ''))))));
+    const list = s ? state.rows.filter(r => dtEligible(r) && (dtName(r) + ' ' + r.id).toLowerCase().includes(s)).slice(0, 30) : [];
+    fill(res, s && !list.length ? h('p', { class: 'set-hint', style: 'padding:10px 12px' }, 'Nobody matches. Only people who are Active, Active + Resign, OJT, New or Bench can be asked about.') : list.map(r => h('button', { type: 'button', class: 'tm-row dt-pick', onclick: () => { pick = r; ticked.clear(); draw(); } }, h('span', { class: 'tm-pn' }, dtName(r), h('small', {}, r.id + (gs(r, 'client_column') ? ' · ' + gs(r, 'client_column') : ''))))));
     res.hidden = !s;
   };
   search.addEventListener('input', drawRes);
@@ -14550,11 +14305,11 @@ function openDetailRequest(row, only) {
     const parts = [];
     if (!pick) { parts.push(h('label', { class: 'dlw-l' }, 'Whose details'), search, res); }
     else {
-      const fs = dtFieldsOf(pick), have = fs.filter(x => x.stored);
+      const fs = dtFieldsOf(pick).filter(x => x.ask), have = fs.filter(x => x.stored);
       parts.push(h('div', { class: 'dt-who' }, h('span', { class: 'tm-dot', style: '--h:210' }, dtName(pick).slice(0, 1)), h('div', {}, h('b', {}, dtName(pick)), h('small', {}, pick.id + (gs(pick, 'client_column') ? ' · ' + gs(pick, 'client_column') : ''))), h('span', { class: 'grow' }),
         row ? null : h('button', { class: 'dlw-mini', type: 'button', onclick: () => { pick = null; ticked.clear(); draw(); setTimeout(() => search.focus(), 0); } }, 'Change')));
-      parts.push(h('label', { class: 'dlw-l' }, 'Which details'));
-      if (!have.length) parts.push(h('p', { class: 'set-hint' }, 'No private details are stored for this person.'));
+      parts.push(h('label', { class: 'dlw-l' }, 'Which numbers'));
+      if (!have.length) parts.push(h('p', { class: 'set-hint' }, 'No phone or WhatsApp number is stored for this person.'));
       else parts.push(h('div', { class: 'dt-fields' }, fs.map(x => {
         if (x.open) return h('span', { class: 'tm-chip sm dt-open' }, '🔓 ' + x.label);
         if (!x.stored) return h('span', { class: 'tm-chip sm dt-empty', title: 'Nothing stored' }, x.label + ' · empty');
@@ -14562,15 +14317,15 @@ function openDetailRequest(row, only) {
         return h('button', { type: 'button', class: 'tm-chip' + (on ? ' on' : ''), 'aria-pressed': String(on), onclick: () => { on ? ticked.delete(x.col) : ticked.add(x.col); draw(); } }, (on ? '✓ ' : '🔒 ') + x.label);
       }), have.filter(x => !x.open).length > 1 ? h('button', { class: 'linkbtn', type: 'button', onclick: () => { have.filter(x => !x.open).forEach(x => ticked.add(x.col)); draw(); } }, 'All') : null));
       parts.push(h('label', { class: 'dlw-l' }, 'Reason'), why);
-      parts.push(h('p', { class: 'dlw-note' }, '⏱ After an admin approves, the ticked details show for 15 minutes, then lock again. Every request is kept with your name.'));
+      parts.push(h('p', { class: 'dlw-note' }, '⏱ After an admin approves, the ticked numbers show for 15 minutes, then lock again. Every request is kept with your name.'));
     }
     parts.push(err); fill(body, parts); ok();
   }
-  const d = pdlg('Ask for private details', body, [h('span', { class: 'grow' }), h('button', { class: 'btn', type: 'button', onclick: () => d.close() }, 'Cancel'), send], 'dt-dlg');
+  const d = pdlg('Ask for a phone or WhatsApp number', body, [h('span', { class: 'grow' }), h('button', { class: 'btn', type: 'button', onclick: () => d.close() }, 'Cancel'), send], 'dt-dlg');
   draw(); setTimeout(() => (pick ? why : search).focus(), 0);
   send.addEventListener('click', async () => {
     err.textContent = ''; send.disabled = true; send.textContent = 'Sending…';
-    const fs = dtFieldsOf(pick).filter(x => ticked.has(x.col));
+    const fs = dtFieldsOf(pick).filter(x => x.ask && ticked.has(x.col));
     try {
       await DETAILS.call(() => CLOUD.details.request(String(fs[0].e), dtName(pick), fs.map(x => x.f), fs.map(x => x.label), why.value.trim()));
       d.close(); toast('Request sent. You’ll get a notification when an admin answers.'); window.refreshNotifications?.();
@@ -14582,7 +14337,7 @@ window.openDetailRequest = openDetailRequest;
 /* ---------- the strip at the top of an employee's card ---------- */
 window.privBanner = (row, close) => {
   if (!PERM.online() || PHONE.canSee() || !row) return null;
-  const fs = dtFieldsOf(row), locked = fs.filter(x => x.stored && !x.open), open = fs.filter(x => x.open);
+  const fs = dtFieldsOf(row), locked = fs.filter(x => x.stored && !x.open), open = fs.filter(x => x.open), askable = dtEligible(row) && locked.some(x => x.ask);
   const mine = DETAILS.live().filter(a => fs.some(x => x.open && String(a.emp_id) === String(x.e)));
   const wait = DETAILS.items().filter(a => a.status === 'pending' && String(a.user_id) === DETAILS.myId() && String(a.emp_id) === String(row.id));
   if (!locked.length && !open.length) return null;
@@ -14590,9 +14345,9 @@ window.privBanner = (row, close) => {
   const exp = mine.length ? mine.map(a => a.expires_at).sort()[0] : null;
   fill(box, h('span', { class: 'dt-bi' }, open.length ? '🔓' : '🔒'),
     h('div', {}, open.length ? h('b', {}, open.map(x => x.label).join(', ') + ' visible') : h('b', {}, locked.length + ' private ' + (locked.length === 1 ? 'detail' : 'details') + ' locked'),
-      h('small', {}, open.length ? 'Locks again on its own' + (locked.length ? ' · still locked: ' + locked.map(x => x.label).join(', ') : '') : wait.length ? 'Your request is waiting for an admin' : locked.map(x => x.label).join(', '))),
+      h('small', {}, open.length ? 'Locks again on its own' + (locked.length ? ' · still locked: ' + locked.map(x => x.label).join(', ') : '') : wait.length ? 'Your request is waiting for an admin' : locked.map(x => x.label).join(', ') + (!dtEligible(row) && locked.some(x => x.ask) ? ' · numbers can’t be asked for: ' + (gs(row, 'status_column') || 'no status') : ''))),
     h('span', { class: 'grow' }), exp ? dtLeftEl(exp) : null,
-    locked.length && !wait.length ? h('button', { class: 'btn mini', type: 'button', onclick: () => openDetailRequest(row) }, 'Ask to see') : null);
+    askable && !wait.length ? h('button', { class: 'btn mini', type: 'button', onclick: () => openDetailRequest(row) }, 'Ask to see') : null);
   if (exp) {
     const t = setInterval(() => {
       if (!box.isConnected) { clearInterval(t); return; }
@@ -14613,19 +14368,13 @@ function drawAccessInbox(box) {
   const items = DETAILS.items();
   if (admin) {
     const pend = DETAILS.pending(), open = items.filter(a => a.status === 'approved' && Date.parse(a.expires_at) > DETAILS.now());
-    const tpend = TEAMS.state() === 'ok' ? TEAMS.pending() : [];
-    parts.push(h('section', { class: 'ib-s' }, h('h4', {}, 'Requests to approve', pend.length + tpend.length ? h('span', { class: 'ppl-tab-n hot' }, String(pend.length + tpend.length)) : null),
-      !pend.length && !tpend.length ? h('p', { class: 'set-hint' }, 'Nothing waiting.') : null,
+    parts.push(h('section', { class: 'ib-s' }, h('h4', {}, 'Requests to approve', pend.length ? h('span', { class: 'ppl-tab-n hot' }, String(pend.length)) : null),
+      !pend.length ? h('p', { class: 'set-hint' }, 'Nothing waiting.') : null,
       pend.map(a => h('div', { class: 'tm-req' }, h('div', { class: 'tm-req-t' }, h('b', {}, a.user_name || 'Someone'), ' wants to see ', h('b', {}, a.emp_name || a.emp_id), '’s ', (a.labels || a.fields || []).join(', '), h('small', {}, ' · ' + dtAgo(a.requested_at))),
         a.reason ? h('p', { class: 'tm-why' }, '“' + a.reason + '”') : null,
         h('div', { class: 'tm-req-b' }, h('span', { class: 'set-hint' }, '🔐 Private details · opens for ' + (a.minutes || 15) + ' min'), h('span', { class: 'grow' }),
           h('button', { class: 'btn', type: 'button', onclick: e => { e.target.disabled = true; act(() => DETAILS.call(() => CLOUD.details.decide(a.id, 'reject')), 'Declined.'); } }, 'Decline'),
-          h('button', { class: 'btn primary', type: 'button', onclick: e => { e.target.disabled = true; act(() => DETAILS.call(() => CLOUD.details.decide(a.id, 'approve')), 'Approved: ' + (a.user_name || '') + ' sees it for ' + (a.minutes || 15) + ' minutes.'); } }, 'Approve')))),
-      tpend.map(a => h('div', { class: 'tm-req' }, h('div', { class: 'tm-req-t' }, h('b', {}, a.user_name || 'Someone'), ' wants to see the team ', h('b', {}, a.team), h('small', {}, ' · ' + dtAgo(a.requested_at) + ' · for ' + a.hours + ' h')),
-        a.reason ? h('p', { class: 'tm-why' }, '“' + a.reason + '”') : null,
-        h('div', { class: 'tm-req-b' }, h('span', { class: 'set-hint' }, '👥 Team access'), h('span', { class: 'grow' }),
-          h('button', { class: 'btn', type: 'button', onclick: e => { e.target.disabled = true; act(() => TEAMS.call(() => CLOUD.teams.decide(a.id, 'reject')), 'Declined.'); } }, 'Decline'),
-          h('button', { class: 'btn primary', type: 'button', onclick: e => { e.target.disabled = true; act(() => TEAMS.call(() => CLOUD.teams.decide(a.id, 'approve', a.hours)), 'Approved for ' + a.hours + ' h.'); } }, 'Approve'))))));
+          h('button', { class: 'btn primary', type: 'button', onclick: e => { e.target.disabled = true; act(() => DETAILS.call(() => CLOUD.details.decide(a.id, 'approve')), 'Approved: ' + (a.user_name || '') + ' sees it for ' + (a.minutes || 15) + ' minutes.'); } }, 'Approve'))))));
     if (open.length) parts.push(h('section', { class: 'ib-s' }, h('h4', {}, 'Open right now'),
       open.map(a => h('div', { class: 'tm-live' }, h('span', { class: 'tm-pulse' }), h('span', {}, h('b', {}, a.user_name), ' → ', a.emp_name || a.emp_id, h('small', {}, ' · ' + (a.labels || []).join(', '))), h('span', { class: 'grow' }), dtLeftEl(a.expires_at),
         h('button', { class: 'pt-act danger', type: 'button', onclick: e => { e.target.disabled = true; act(() => DETAILS.call(() => CLOUD.details.decide(a.id, 'revoke')), 'Locked again.'); } }, 'Lock now')))));
@@ -14635,16 +14384,14 @@ function drawAccessInbox(box) {
     const ended = mine.filter(a => !open.includes(a) && !wait.includes(a)).slice(0, 6);
     const lbl = { rejected: ['Declined', 'no'], expired: ['Ended', 'x'], revoked: ['Locked', 'x'], cancelled: ['Cancelled', 'x'], approved: ['Ended', 'x'] };
     const openEmp = a => { const r = state.rows.find(x => String(x.id) === String(a.emp_id)); if (r) { closeDrawer(); setTimeout(() => openDrawer(r), 0); } else toast('That person is not in your list.', true); };
-    parts.push(h('section', { class: 'ib-s' }, h('div', { class: 'ib-head' }, h('h4', {}, 'Private details'), h('span', { class: 'grow' }), h('button', { class: 'btn mini primary', type: 'button', onclick: () => openDetailRequest(null) }, '+ Ask for details')),
-      h('p', { class: 'set-hint' }, 'Phone, WhatsApp, date of birth and other private details are locked. Ask for what you need; an admin approves it and you see it for 15 minutes.'),
+    parts.push(h('section', { class: 'ib-s' }, h('div', { class: 'ib-head' }, h('h4', {}, 'Private details'), h('span', { class: 'grow' }), h('button', { class: 'btn mini primary', type: 'button', onclick: () => openDetailRequest(null) }, '+ Ask for a number')),
+      h('p', { class: 'set-hint' }, 'Phone and WhatsApp numbers are locked. Ask for the person’s number you need (Active, Active + Resign, OJT, New or Bench); an admin approves it and you see it for 15 minutes. Other private details stay with admins.'),
       open.map(a => h('div', { class: 'tm-live' }, h('span', { class: 'tm-pulse' }), h('span', {}, h('b', {}, a.emp_name || a.emp_id), h('small', {}, ' · ' + (a.labels || []).join(', '))), h('span', { class: 'grow' }), dtLeftEl(a.expires_at),
         h('button', { class: 'btn mini primary', type: 'button', onclick: () => openEmp(a) }, 'Show'),
         h('button', { class: 'pt-act', type: 'button', onclick: e => { e.target.disabled = true; act(() => DETAILS.call(() => CLOUD.details.decide(a.id, 'revoke')), 'Locked again.'); } }, 'Done'))),
       wait.map(a => h('div', { class: 'tm-live' }, h('span', { class: 'tm-st w' }, 'Waiting'), h('span', {}, h('b', {}, a.emp_name || a.emp_id), h('small', {}, ' · ' + (a.labels || []).join(', ') + ' · ' + dtAgo(a.requested_at))), h('span', { class: 'grow' }),
         h('button', { class: 'pt-act', type: 'button', onclick: e => { e.target.disabled = true; act(() => DETAILS.call(() => CLOUD.details.decide(a.id, 'cancel')), 'Request cancelled.'); } }, 'Cancel'))),
       ended.map(a => { const [l, c] = lbl[a.status] || [a.status, 'x']; return h('div', { class: 'tm-live' }, h('span', { class: 'tm-st ' + c }, l), h('span', {}, a.emp_name || a.emp_id, h('small', {}, ' · ' + (a.labels || []).join(', ') + (a.decided_by ? ' · ' + a.decided_by : '')))); })));
-    if (TEAMS.state() === 'ok' && TEAMS.leadTeams().length) parts.push(h('section', { class: 'ib-s' }, h('div', { class: 'ib-head' }, h('h4', {}, 'Other teams'), h('span', { class: 'grow' }), h('button', { class: 'btn mini', type: 'button', onclick: () => openTeamAccess() }, 'Team access')),
-      TEAMS.grants().map(a => h('div', { class: 'tm-live' }, h('span', { class: 'tm-pulse' }), h('b', {}, a.team), h('span', { class: 'grow' }), tmLeftEl(a.expires_at)))));
   }
   fill(box, parts);
   clearInterval(box._t); box._t = setInterval(() => { if (!box.isConnected) { clearInterval(box._t); return; } let ended = false; for (const el of box.querySelectorAll('[data-dexp]')) { const t = dtLeft(el.dataset.dexp); el.textContent = t; if (t === 'ended') ended = true; } if (ended) drawAccessInbox(box); }, 1000);
@@ -14653,7 +14400,7 @@ window.drawAccessInbox = drawAccessInbox;
 /* what the bell's dot counts besides the usual notifications: requests to answer (admins), answers to read (everyone else) */
 window.accessBadge = () => {
   if (!PERM.online()) return 0;
-  if (DETAILS.isAdmin()) return DETAILS.pending().length + (TEAMS.state() === 'ok' ? TEAMS.pending().length : 0);
+  if (DETAILS.isAdmin()) return DETAILS.pending().length;
   return DETAILS.live().length;
 };
 /* tell people straight away: admins about new requests, others about answers */
@@ -14672,7 +14419,6 @@ addEventListener('details:changed', () => {
   window.bellRecount?.();
   for (const b of document.querySelectorAll('.ib-box')) drawAccessInbox(b);
 });
-addEventListener('teams:changed', () => { window.bellRecount?.(); for (const b of document.querySelectorAll('.ib-box')) drawAccessInbox(b); });
 
 /* ---------- Settings › Fields & drop-downs › Private details ---------- */
 function drawPrivateFields(pane, tabs) {
@@ -14693,28 +14439,11 @@ function drawPrivateFields(pane, tabs) {
     } catch (e) { toast(e.message, true); save.disabled = false; save.textContent = 'Save'; }
   });
   fill(pane, tabs, h('div', { class: 'set-card' }, h('h4', {}, '🔒 Private details'),
-    h('p', { class: 'set-hint' }, 'Ticked fields are stored encrypted in the database. Only admins and the super admin see them. Anyone else sees “🔒 Private” and can ask for a person’s details in the notification center; after an admin approves, they show for 15 minutes and lock again.'),
+    h('p', { class: 'set-hint' }, 'Ticked fields are stored encrypted in the database. Only admins and the super admin see them; everyone else sees “🔒”. Phone and WhatsApp numbers of people who are Active, Active + Resign, OJT, New or Bench can be asked for in the notification center; after an admin approves, they show for 15 minutes and lock again. The other ticked fields stay with admins.'),
     list, h('div', { class: 'dd-foot', style: 'display:flex;gap:10px;align-items:center;justify-content:flex-end;margin-top:12px' }, dirty, save),
     h('p', { class: 'set-hint' }, 'Birthdays on the Overview come from the date of birth, so people who are not admins don’t see them while the date of birth is private.')));
 }
 
-/* ---------- the button at the top: my team / requests waiting ---------- */
-function teamPill() {
-  const b = document.getElementById('btnTeams'); if (!b) return;
-  const on = PERM.online() && TEAMS.state() === 'ok', admin = TEAMS.isAdmin(), mine = on ? TEAMS.leadTeams() : [], pend = on && admin ? TEAMS.pending() : [];
-  const showIt = on && (mine.length > 0 || (admin && (TEAMS.teams().length > 0 || pend.length > 0)));
-  b.hidden = !showIt; if (!showIt) return;
-  const live = TEAMS.grants();
-  const label = mine.length && !admin ? (mine.length === 1 ? mine[0].name : mine.length + ' teams') + ' · ' + TEAMS.allowed().size : 'Team access';
-  fill(b, h('span', { 'aria-hidden': 'true' }, '👥 '), label, live.length ? h('span', { class: 'tm-plus', title: 'Extra access open' }, '+' + live.length) : null, pend.length ? h('span', { class: 'bell-n tm-n' }, String(pend.length)) : null);
-  b.title = mine.length && !admin ? 'You see your team' + (live.length ? ' and ' + live.length + ' more for a while' : '') + '. Open to ask for another team.' : pend.length ? pend.length + ' access request' + (pend.length === 1 ? '' : 's') + ' waiting' : 'Teams and access to other teams';
-  /* a new request: tell the admins straight away */
-  if (admin) { const ids = pend.map(a => a.id).join(','), was = TEAMS.lastPending(); if (was != null && ids !== was) { const fresh = pend.filter(a => !was.split(',').includes(String(a.id))); if (fresh.length) toast(fresh[0].user_name + ' asks to see ' + fresh[0].team + ' for ' + fresh[0].hours + ' h. Open “Team access” to approve.'); } TEAMS.lastPending(ids); }
-}
-addEventListener('teams:changed', teamPill);
-setInterval(teamPill, 30000);
-document.getElementById('btnTeams')?.addEventListener('click', () => openTeamAccess());
-window.teamPill = teamPill;
 
 /* ============================== v3.63.0: Update employees from an Excel file ==============================
    Upload a sheet with the Emp number and the fields to change. Columns are matched to the workforce fields, every change is
