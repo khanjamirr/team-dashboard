@@ -5,7 +5,7 @@
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <link rel="preconnect" href="https://iiogwevtyzgedhoaqlrn.supabase.co" crossorigin><link rel="dns-prefetch" href="https://iiogwevtyzgedhoaqlrn.supabase.co">
 <link rel="icon" href="data:,">
-<title>Team Dashboard · 3.71.0</title>
+<title>Team Dashboard · 3.71.2</title>
 <link rel="preconnect" href="https://fonts.googleapis.com"><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin><link href="https://fonts.googleapis.com/css2?family=Public+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet">
 <style>
 :root {
@@ -2272,7 +2272,7 @@ article.al-d { --alc:#c62828; }
 .emp2-facts { display:flex; flex-wrap:wrap; gap:8px; margin-top:12px; }
 .emp2-fact { padding:6px 12px; border-radius:10px; background:var(--surface); border:1px solid var(--border, var(--line)); } .emp2-fact small { display:block; font-size:10.5px; color:var(--ink-2); text-transform:uppercase; letter-spacing:.04em; font-weight:650; } .emp2-fact b { font-size:13px; }
 .emp2-acts { display:flex; gap:6px; flex-wrap:wrap; justify-content:flex-end; padding-top:4px; }
-.emp2-act { text-decoration:none; padding:7px 12px; border-radius:10px; border:1px solid var(--border, var(--line)); background:var(--surface); color:var(--ink); font-size:12.5px; font-weight:650; white-space:nowrap; } .emp2-act:hover { background:var(--surface-2); }
+.emp2-act { cursor:pointer; font-family:inherit; text-decoration:none; padding:7px 12px; border-radius:10px; border:1px solid var(--border, var(--line)); background:var(--surface); color:var(--ink); font-size:12.5px; font-weight:650; white-space:nowrap; } .emp2-act:hover { background:var(--surface-2); }
 .emp2-x { border:0; background:transparent; font-size:26px; line-height:1; color:var(--ink-2); cursor:pointer; padding:2px 8px; border-radius:10px; } .emp2-x:hover { background:var(--surface-2); }
 .drawer.emp2 > .body { display:grid; grid-template-columns:200px minmax(0,1fr); column-gap:20px; align-content:start; padding:16px 22px 22px; background:var(--surface-2); }
 .drawer.emp2 > .body > * { grid-column:2; }
@@ -2375,16 +2375,21 @@ article.al-d { --alc:#c62828; }
   #pinnedHeader > .workspace-heading h2, #pinnedHeader #cleanPageTitle { font-size:21px !important; margin:0 !important; letter-spacing:-.4px !important; white-space:nowrap; }
   #pinnedHeader > .workspace-filters { order:1; flex:1 1 auto; min-width:0; margin:0 !important; padding:0 !important; }
   #pinnedHeader > header.top { order:2; flex:none; margin:0 !important; padding:0 !important; min-height:0 !important; }
-  #pinnedHeader #cleanFilters { display:flex !important; flex-wrap:wrap; align-items:center; gap:5px 6px; padding:0 !important; }
-  #pinnedHeader #cleanFilters > .bar, #pinnedHeader .filters, #pinnedHeader #customFieldControls { display:contents !important; }
+  #pinnedHeader #cleanFilters { display:block !important; width:100%; padding:0 !important; }
+  #pinnedHeader #cleanFilters > .bar { display:flex !important; flex:1 1 100% !important; flex-wrap:wrap; align-items:center; gap:5px 6px; width:100%; margin:0 !important; padding:0 !important; }
+  #pinnedHeader .filters, #pinnedHeader #customFieldControls { display:contents !important; }
   #pinnedHeader #fClear, #pinnedHeader #fMoreOpts { font-size:0 !important; } #pinnedHeader #fClear::after { content:'Clear'; font-size:12px; } #pinnedHeader #fMoreOpts::after { content:'More ▾'; font-size:12px; } #pinnedHeader #fMoreOpts[aria-expanded="true"]::after { content:'Less ▴'; }
   #pinnedHeader #fClear, #pinnedHeader #fMoreOpts { height:30px; padding:0 4px !important; white-space:nowrap; }
-  #pinnedHeader .filters .search { flex:0 1 190px !important; width:190px !important; min-width:110px !important; grid-column:auto !important; }
+  #pinnedHeader .filters .search { flex:1.6 1 200px !important; width:auto !important; min-width:140px !important; max-width:380px !important; grid-column:auto !important; }
   #pinnedHeader .filters .input, #pinnedHeader .msel { height:30px !important; }
-  #pinnedHeader .filters .msel, #pinnedHeader #customFieldControls .msel { flex:0 1 128px !important; width:128px !important; min-width:84px !important; max-width:170px !important; padding:1px 7px !important; }
+  #pinnedHeader .filters .msel, #pinnedHeader #customFieldControls .msel { flex:1 1 130px !important; width:auto !important; min-width:110px !important; max-width:230px !important; padding:1px 8px !important; }
+  /* v3.71.1: the filters spread over the whole width; Clear and More sit at the right end */
+  #pinnedHeader #fClear { margin-left:auto !important; }
+  #pinnedHeader > .workspace-filters { flex:1 1 auto !important; }
   #pinnedHeader .msel .lab small { font-size:8px !important; line-height:1 !important; }
   #pinnedHeader .msel .lab { line-height:1.15 !important; font-size:12px !important; }
-  #pinnedHeader .saved-filter-row { order:4; flex:1 0 100%; margin:2px 0 0 !important; padding:4px 0 0 !important; gap:6px !important; border-top:1px dashed var(--border) !important; }
+  body:not(.sf-open) #pinnedHeader .saved-filter-row { display:none !important; }
+  #pinnedHeader .saved-filter-row { align-items:center; order:4; flex:1 0 100%; margin:4px 0 0 !important; padding:4px 0 0 !important; gap:6px !important; border-top:1px dashed var(--border) !important; }
   #pinnedHeader .saved-filter-row { flex-wrap:nowrap !important; } #pinnedHeader .saved-filter-row > * { flex:none; }
   #pinnedHeader .saved-filter-row .input { height:28px !important; width:130px !important; font-size:12px !important; }
   #pinnedHeader .saved-filter-row .hint { margin-left:auto; }
@@ -7083,10 +7088,13 @@ function identityOf(p) {
   if (rr) return { name: gs(rr, 'name_column').trim() || p.name, empId: parseId(gs(rr, 'key_column')), client: gs(rr, 'client_column') || (p.latest && p.latest.client) || '' };
   return { name: p.name, empId: [...p.ids][0] != null ? parseId([...p.ids][0]) : null, client: (p.latest && p.latest.client) || '' };
 }
-function employeeNames() {
-  const out = new Map();
-  if (hasRoster()) for (const r of rosterRows()) { if (isGone(r)) continue; const nm = gs(r, 'name_column').trim(); if (nm) out.set(personKey(nm), { name: nm, hint: `Emp ID ${gs(r, 'key_column') || '—'} · ${rosterStatus(r) || 'no status'}` }); }
-  for (const p of D(true).people.values()) if (!out.has(p.key)) out.set(p.key, { name: p.name, hint: ([...p.ids][0] ? 'Emp ID ' + [...p.ids][0] : 'no Emp ID') + (hasRoster() ? ' · tracker only' : '') });
+/* v3.71.2: people whose status in the workforce file is Left or Moved (or another leaver status) */
+const isLeaver = r => !!r && (isGone(r) || /^(left|moved)$/i.test(rosterStatus(r)));
+const personGone = p => { try { const x = p && (p.roster || (rosterOfPerson(p) || {}).row); return !!x && isLeaver(x); } catch { return false; } };
+function employeeNames(opts = {}) {
+  const out = new Map(), gone = new Set();
+  if (hasRoster()) for (const r of rosterRows()) { if (isGone(r)) { const nm0 = gs(r, 'name_column').trim(); if (nm0) gone.add(personKey(nm0)); continue; } const nm = gs(r, 'name_column').trim(); if (nm) out.set(personKey(nm), { name: nm, hint: `Emp ID ${gs(r, 'key_column') || '—'} · ${rosterStatus(r) || 'no status'}` }); }
+  for (const p of D(true).people.values()) if (!out.has(p.key) && !(opts.current && (gone.has(p.key) || personGone(p)))) out.set(p.key, { name: p.name, hint: ([...p.ids][0] ? 'Emp ID ' + [...p.ids][0] : 'no Emp ID') + (hasRoster() ? ' · tracker only' : '') });
   return [...out.values()].sort((a, b) => a.name.localeCompare(b.name));
 }
 
@@ -7510,7 +7518,7 @@ const PAST_CSS = `.ph{border:1px solid var(--line);border-radius:10px;padding:10
 /* ---------- log leave ---------- */
 function openLogLeave(preKey) {
   if (S.status !== 'ready' || !S.ctx) { toast('The attendance tracker isn’t connected yet. Open the Attendance page once, or ask the admin to connect it in Settings › Save & sync.'); return; }
-  const d = D(true); const names = employeeNames();
+  const d = D(true); const names = employeeNames({ current: true });   /* v3.71.2: no Left / Moved people when recording attendance */
   if (!canLog()) { toast('Your passcode can’t record attendance. Ask the admin for the right in Settings.'); return; }
   const linked = window.PERM && PERM.linkedEmp && PERM.linkedEmp();
   const linkedName = linked ? ((rosterRows().find(r => idKey(gs(r, 'key_column')) === idKey(linked.code)) && gs(rosterRows().find(r => idKey(gs(r, 'key_column')) === idKey(linked.code)), 'name_column').trim()) || linked.name) : '';
@@ -7534,6 +7542,7 @@ function openLogLeave(preKey) {
   const plan = () => {
     const name = $('#l-name', m).value, p = resolvePerson(name), from = new Date($('#l-from', m).value + 'T00:00:00Z'), to = new Date($('#l-to', m).value + 'T00:00:00Z');
     if (!p) return { err: name.trim() ? 'No employee with that name in the workforce file or the tracker.' : 'Pick an employee.' };
+    if (personGone(p)) return { err: p.name.trim() + ' has left or moved, so attendance can’t be recorded for them.' };
     if (isNaN(from) || isNaN(to)) return { err: 'Choose both dates.' }; if (to < from) return { err: '“To” is before “From”.' }; if ((to - from) / 86400000 > 92) return { err: 'That range is longer than 3 months. Split it up.' }; if (needsApproval() && ((($('#l-note', m) || {}).value || '').trim().length < 3)) return { err: 'Write a note for your manager: it is required (e.g. family function, doctor’s appointment).' };
     const code = $('#l-code', m).value, skip = true; /* v3.22: week offs and holidays are always kept; only a direct edit in the tracker changes them */ const set = [], skipped = [], blocked = [], create = new Set(); let overwrite = 0;
     for (let t = from; t <= to; t = new Date(t.getTime() + 86400000)) {
@@ -10260,7 +10269,7 @@ async function poll() {
 }
 
 /* ============================== filtering ============================== */
-const APP = { title: "Team Dashboard", version: "3.71.0", released: "20 Oct 2026" };
+const APP = { title: "Team Dashboard", version: "3.71.2", released: "20 Oct 2026" };
 const BASE_DIMS = { status: "status_column", desig: "designation_column", client: "client_column", mode: "mode_column" };
 const STANDARD_STATUSES = ["Active", "Manager", "OJT", "Bench", "New", "Projected", "Left", "Moved"];
 const TILE_ORDER = ["Active", "Manager", "OJT", "Bench", "New", "Projected"];
@@ -13154,7 +13163,9 @@ function openDrawer(row) {
   const st = hv("status_column"), stCls = !st ? "" : isInactiveStatus(st) ? "off" : /^active$/i.test(st) ? "on" : "mid";
   const fact = (lbl, v) => v ? h("div", { class: "emp2-fact" }, h("small", {}, lbl), h("b", {}, v)) : null;
   const facts = row ? [fact("Emp ID", String(row.id)), fact("Tenure", tenure), fact("Joined", isNum(doj) ? fmtDate(doj) : ""), fact("Birthday", isNum(dob) ? new Date((dob - 25569) * 86400000).toLocaleDateString(undefined, { day: "numeric", month: "short", timeZone: "UTC" }) : (() => { const md = ((window.TD_SETTINGS || {}).birthdays || {})[row.id]; return typeof md === "string" && /^\d{2}-\d{2}$/.test(md) ? new Date(Date.UTC(2000, +md.slice(0, 2) - 1, +md.slice(3))).toLocaleDateString(undefined, { day: "numeric", month: "short", timeZone: "UTC" }) : ""; })()), (pv ? h("div", { class: "emp2-fact" }, h("small", {}, "Pseudo name"), h("b", {}, pv, " ", h("button", { class: "psn-i", type: "button", title: "History of " + pv, "aria-label": "History of " + pv, onclick: e => { e.stopPropagation(); psnHistory(pv); } }, "i"))) : null)].filter(Boolean) : [];
-  const acts = row ? [phone && digits(phone) ? h("a", { class: "emp2-act", href: "tel:" + digits(phone), title: "Call " + phone }, "📞 Call") : null, (wa || phone) && digits(wa || phone) ? h("a", { class: "emp2-act", href: "https://wa.me/" + digits(wa || phone).replace(/^\+/, ""), target: "_blank", rel: "noopener noreferrer", title: "WhatsApp" }, "💬 WhatsApp") : null].filter(Boolean) : [];
+  /* v3.71.2: the two buttons copy the number (no call / WhatsApp links) */
+  const copyNum = (num, what) => async e => { e.preventDefault(); const t = String(num).trim(); try { await navigator.clipboard.writeText(t); } catch { const ta = document.createElement("textarea"); ta.value = t; ta.style.position = "fixed"; ta.style.opacity = "0"; document.body.append(ta); ta.select(); try { document.execCommand("copy"); } catch { } ta.remove(); } toast(what + " number copied: " + t); };
+  const acts = row ? [phone && digits(phone) ? h("button", { type: "button", class: "emp2-act", title: "Copy the phone number", onclick: copyNum(phone, "Phone") }, "📞 Call") : null, (wa || phone) && digits(wa || phone) ? h("button", { type: "button", class: "emp2-act", title: "Copy the WhatsApp number", onclick: copyNum(wa || phone, "WhatsApp") }, "💬 WhatsApp") : null].filter(Boolean) : [];
   const emp2Status = h("span", { class: "emp2-status" }, isNew ? "Fill in the details, then add." : "No unsaved changes");
   title.className = "emp2-name";
   const head = h("header", { class: "emp2-head" },
