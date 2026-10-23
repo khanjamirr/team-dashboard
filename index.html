@@ -5,7 +5,7 @@
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <link rel="preconnect" href="https://iiogwevtyzgedhoaqlrn.supabase.co" crossorigin><link rel="dns-prefetch" href="https://iiogwevtyzgedhoaqlrn.supabase.co">
 <link rel="icon" href="data:,">
-<title>Team Dashboard · 3.68.1</title>
+<title>Team Dashboard · 3.69.0</title>
 <link rel="preconnect" href="https://fonts.googleapis.com"><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin><link href="https://fonts.googleapis.com/css2?family=Public+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet">
 <style>
 :root {
@@ -642,8 +642,8 @@ header.top .spacer { display:block; }
 /* ================= v3.0: attendance ================= */
 .tab[data-view=attendance]::before { content:'▦'; }
 .tab.dirty::after { content:'●'; margin-left:auto; color:#ffb020; font-size:12px; }
-/* the status boxes + filters work on every page (attendance included); only the Action center is independent of them */
-.v-actions .status-section, .v-actions .bar, .v-actions #scopeLine, .v-actions #xchips, .v-attendance #scopeLine { display:none; }
+/* v3.69.0: the status boxes + filters work on every page, the Action center included */
+.v-attendance #scopeLine { display:none; }   /* v3.69.0: the filters at the top work on every page, the Action center included */
 #pageAttendance { min-width:0; }
 #cardAttendance { margin-bottom:20px; padding:16px 20px; border-left:3px solid var(--c-aqua); background:var(--surface); }
 #cardAttendance .card-head { margin-bottom:12px; gap:6px; flex-wrap:wrap; }
@@ -2470,7 +2470,7 @@ article.al-d { --alc:#c62828; }
       </section><div id="customDash" class="cd-page" hidden></div><div id="bkReportsWrap" class="card" hidden><div class="section-heading"><div><h2>Leave backups</h2><p>Backup Provided / Not Provided for each leave day, by 26th–25th cycle. Edit and copy from here.</p></div></div><div id="bkReportsHost" class="bkr"></div></div><div id="attReportsWrap" hidden><div class="section-heading"><div><h2>Attendance</h2><p>Leave, unplanned absences and who is out · from the attendance workbook · linked to your report selection</p></div></div><div id="slotReports"></div></div></div>
     <div id="pageAttendance" hidden><div id="slotAttendance"><div id="attHost"></div></div></div>
     <div id="pageActions" hidden>
-      <div class="section-heading"><div><h2>Action center</h2><p>Everything that needs a decision or a fix, in one place · independent of search and report filters</p></div><span id="todayLabel"></span></div>
+      <div class="section-heading"><div><h2>Action center</h2><p>Everything that needs a decision or a fix, in one place · follows the filters at the top</p></div><span id="todayLabel"></span></div>
       <div class="atabs" role="tablist" aria-label="Action center sections">
         <button class="atab on" role="tab" data-atab="actions" aria-selected="true"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M9 11l3 3 8-8"/><path d="M20 12v7a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11"/></svg>Action items <b id="cntActions" hidden></b></button>
         <button class="atab" role="tab" data-atab="review" aria-selected="false"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="9" cy="8" r="4"/><path d="M2 21c0-3.9 3.1-7 7-7"/><path d="M16 14l2 2 4-4"/></svg>Designation reviews <b id="cntReview" hidden></b></button>
@@ -5137,7 +5137,7 @@ const hostSig = () => { try { if(state.view === 'reports'){const f0=state.filter
 const curSig = () => hostSig() + '|' + rosterVer() + (S.ui.showUnmatched ? 'u' : '');
 const hostSummary = () => { try { return filterSummary() || 'All statuses'; } catch { return ''; } };
 function inScope(r) {
-  try { if(state.view === "actions")return true;if(state.view === "reports"){const match=rowRoster(r),f0=state.filters,filtered=!!f0.q||Object.values(f0.sel).some(v=>v.size);return match?(passes(match)&&reportPass(match)):!filtered&&!reportScope.cohort&&!Object.values(reportScope.sel).some(v=>v.size);} } catch {}
+  try { if(state.view === "reports"){const match=rowRoster(r),f0=state.filters,filtered=!!f0.q||Object.values(f0.sel).some(v=>v.size);return match?(passes(match)&&reportPass(match)):!filtered&&!reportScope.cohort&&!Object.values(reportScope.sel).some(v=>v.size);} } catch {}
   if (!hasRoster()) return true;
   const x = rosterMatch(r.empId, r.name); if (!x) return !!S.ui.showUnmatched;
   try { return passes(x.row); } catch { return true; }
@@ -8673,7 +8673,7 @@ function bkDueCheck(force) {
 function bkDueStart() { if (BKDUE.timer) return; BKDUE.timer = setInterval(() => { try { bkDueCheck(); } catch (e) { console.error(e); } }, 15000); setTimeout(() => { try { bkDueCheck(); } catch { } }, 4000); }
 
 /* ---------- v3.29.0: backup report by pay cycle: "Oct 2026" = 26 Sep – 25 Oct 2026 (the month the cycle ends in) ---------- */
-const BKR = { month: null, client: 'all', sub: 'all', status: null, desig: 'all', q: '', view: 'cal', late: 'off', names: 'real', yn: 'all', span: 'cycle', week: 0, day: '' };
+const BKR = { month: null, client: 'all', sub: 'all', status: 'all', desig: 'all', ms: { client: [], sub: [], status: [], desig: [] }, q: '', view: 'cal', late: 'off', names: 'real', yn: 'all', span: 'cycle', week: 0, day: '' };
 /* v3.30.2: look at the whole cycle, one week (Mon–Sun, cut to the cycle) or one day */
 function bkWeeks(cycle) {
   const { start, end } = cycParts(cycle), out = []; let a = new Date(start);
@@ -8708,9 +8708,15 @@ const bkSubOf = r => { const c = bkSubCol(), w = c ? rowRoster(r) : null; return
 /* v3.39.0: more filters: employee status (Active by default), designation and a name / ID search */
 const bkStatusOf = r => { const w = rowRoster(r); return (w ? gs(w, 'status_column') : '') || 'Not in workforce file'; };
 const bkDesigOf = r => { const w = rowRoster(r); return (w ? gs(w, 'designation_column') : '') || 'No designation'; };
-const bkPassBase = (r, client, sub) => (client === 'all' || bkClientOf(r) === client) && (!sub || sub === 'all' || bkSubOf(r) === sub);
-const bkPass = (r, client, sub) => bkPassBase(r, client, sub)
-  && (!BKR.status || BKR.status === 'all' || bkStatusOf(r) === BKR.status) && (BKR.desig === 'all' || bkDesigOf(r) === BKR.desig)
+/* v3.69.0: Client, Sub-client, Status and Designation take several values (BKR.ms; empty = all); BKR.client / BKR.sub
+   stay the single chosen value (or 'all') for the views that show one client */
+const bkSync = () => { BKR.client = BKR.ms.client.length === 1 ? BKR.ms.client[0] : 'all'; BKR.sub = BKR.ms.sub.length === 1 ? BKR.ms.sub[0] : 'all'; BKR.status = BKR.ms.status.length ? BKR.ms.status.join(', ') : 'all'; BKR.desig = BKR.ms.desig.length ? BKR.ms.desig.join(', ') : 'all'; };
+const bkIn = (list, v) => !list.length || list.includes(v);
+const bkPassBase = (r, client, sub) => (client === 'all' ? bkIn(BKR.ms.client, bkClientOf(r)) : bkClientOf(r) === client) && (!sub || sub === 'all' ? bkIn(BKR.ms.sub, bkSubOf(r)) : bkSubOf(r) === sub);
+/* v3.69.0: the filters at the top of the page (status, designation, client, search…) apply here too */
+const bkHost = r => { try { return inScope(r); } catch { return true; } };
+const bkPass = (r, client, sub) => bkPassBase(r, client, sub) && bkHost(r)
+  && bkIn(BKR.ms.status, bkStatusOf(r)) && bkIn(BKR.ms.desig, bkDesigOf(r))
   && (!BKR.q || (r.name + ' ' + (r.id || '') + ' ' + (rowRoster(r) ? gs(rowRoster(r), 'key_column') : '')).toLowerCase().includes(BKR.q.toLowerCase()));
 function backupReportData(cycle, client, yn = 'all', range = null, sub = BKR.sub) {
   const d = D(true), items = [], { start, end } = cycParts(cycle);
@@ -8778,23 +8784,28 @@ function mountBackupReport(body) {
   const draw = () => {
     const RG = bkRange(BKR.month), WK = bkWeeks(BKR.month), R = backupReportData(BKR.month, BKR.client, BKR.yn, RG), T = R.total, clientView = BKR.client !== 'all', pc = bkPseudoCol(), nmOf = x => BKR.names === 'pseudo' ? x.pseudo : x.name, edit = canBackup();
     const subs = bkSubCol() ? [...new Set(D(true).rows.filter(r => BKR.client === 'all' || bkClientOf(r) === BKR.client).map(bkSubOf))].sort() : [];
-    if (BKR.sub !== 'all' && !subs.includes(BKR.sub)) BKR.sub = 'all';
     const allRows = D(true).rows, statuses = [...new Set(allRows.map(bkStatusOf))].sort(), desigs = [...new Set(allRows.map(bkDesigOf))].sort();
-    if (BKR.status == null) BKR.status = statuses.find(x => /^active$/i.test(x)) || 'all';
-    if (BKR.status !== 'all' && !statuses.includes(BKR.status)) BKR.status = 'all';
-    if (BKR.desig !== 'all' && !desigs.includes(BKR.desig)) BKR.desig = 'all';
+    BKR.ms.client = BKR.ms.client.filter(x => allClients.includes(x)); BKR.ms.sub = BKR.ms.sub.filter(x => subs.includes(x));
+    BKR.ms.status = BKR.ms.status.filter(x => statuses.includes(x)); BKR.ms.desig = BKR.ms.desig.filter(x => desigs.includes(x)); bkSync();
+    /* a drop-down where several values can be ticked: opens a small list with search, All and Clear */
+    const msel = (key, label, allLabel, opts) => { const sel = BKR.ms[key], txt = !sel.length ? allLabel : sel.length === 1 ? sel[0] : sel.length + ' selected';
+      return `<div class="bkms" data-bkms="${key}"><button type="button" class="bkms-btn${sel.length ? ' on' : ''}" aria-haspopup="listbox" aria-expanded="false" title="${esc(sel.join(', ') || allLabel)}"><small>${esc(label)}</small><b>${esc(txt)}</b><i aria-hidden="true">▾</i></button>
+        <div class="bkms-pop" hidden role="listbox" aria-multiselectable="true" aria-label="${esc(label)}">${opts.length > 7 ? '<input type="search" class="input mini bkms-q" placeholder="Search…" aria-label="Search ' + esc(label) + '">' : ''}
+          <div class="bkms-acts"><button type="button" class="linkbtn" data-bkms-all>Select all</button><button type="button" class="linkbtn" data-bkms-none>Clear</button></div>
+          <div class="bkms-list">${opts.map(o => `<label class="bkms-o"><input type="checkbox" value="${esc(o)}"${sel.includes(o) ? ' checked' : ''}><span>${esc(o)}</span></label>`).join('')}</div>
+          <div class="bkms-foot"><span class="sm muted" data-bkms-n></span><button type="button" class="btn mini" data-bkms-cancel>Cancel</button><button type="button" class="btn mini primary" data-bkms-ok>Apply</button></div></div></div>`; };
     const tg = (key, opts) => `<div class="att-toggle" role="group">${opts.map(([v, l]) => `<button type="button" data-bkr-t="${key}" data-v="${v}" aria-pressed="${BKR[key] === v}">${l}</button>`).join('')}</div>`;
     const tile = (cls, n, l, sub) => `<div class="bkr-t ${cls}"><b>${n}</b><span>${l}</span><em>${sub}</em></div>`;
     const pl = n => n + ' ' + (n === 1 ? 'person' : 'people'), dl = n => fmt(n) + ' day' + (n === 1 ? '' : 's');
     /* v3.51.1: the views as tabs on their own row, so switching between Calendar and the Billing grid is one obvious click */
     body.innerHTML = `<div class="bkr-views" role="tablist" aria-label="Report view">${[['cal', 'Calendar', 'Absenteeism and backups, week by week'], ['grid', 'Billing grid', 'One row per person, one cell per day'], ['report', 'Summary', 'Totals, charts and the day-by-day list'], ...(isRevAdmin() ? [['rev', 'Revenue', 'Seat rates and the estimated revenue for the month (admins only)']] : [])].map(([v, l, t]) => `<button type="button" role="tab" data-bkr-t="view" data-v="${v}" aria-selected="${BKR.view === v}" title="${t}">${l}</button>`).join('')}</div>
       <div class="bkr-bar"><label>Cycle <select data-bkr="month">${cycles.map(m => `<option value="${m}"${m === BKR.month ? ' selected' : ''}>${esc(cycLabel(m))}</option>`).join('')}</select></label>
-        <label>Client <select data-bkr="client"><option value="all">All clients</option>${allClients.map(c => `<option${c === BKR.client ? ' selected' : ''}>${esc(c)}</option>`).join('')}</select></label>
-        ${subs.length ? `<label>Sub-client <select data-bkr="sub"><option value="all">All sub-clients</option>${subs.map(c => `<option${c === BKR.sub ? ' selected' : ''}>${esc(c)}</option>`).join('')}</select></label>` : ''}
-        <label>Status <select data-bkr="status"><option value="all">All statuses</option>${statuses.map(c => `<option${c === BKR.status ? ' selected' : ''}>${esc(c)}</option>`).join('')}</select></label>
-        <label>Designation <select data-bkr="desig"><option value="all">All designations</option>${desigs.map(c => `<option${c === BKR.desig ? ' selected' : ''}>${esc(c)}</option>`).join('')}</select></label>
+        ${msel('client', 'Client', 'All clients', allClients)}
+        ${subs.length ? msel('sub', 'Sub-client', 'All sub-clients', subs) : ''}
+        ${msel('status', 'Status', 'All statuses', statuses)}
+        ${msel('desig', 'Designation', 'All designations', desigs)}
         <input type="search" class="input mini" data-bkr-q placeholder="Search name or ID" value="${esc(BKR.q)}" aria-label="Search employee" style="width:160px">
-        ${BKR.status !== 'all' || BKR.desig !== 'all' || BKR.q || BKR.client !== 'all' || BKR.sub !== 'all' ? '<button type="button" class="linkbtn" data-bkr-reset>Clear filters</button>' : ''}
+        ${Object.values(BKR.ms).some(x => x.length) || BKR.q ? '<button type="button" class="linkbtn" data-bkr-reset>Clear filters</button>' : ''}
         ${BKR.view === 'rev' ? '' : `<label>Show ${tg('span', [['cycle', 'Whole cycle'], ['week', 'Week'], ['day', 'Day']])}</label>`}
         ${BKR.span === 'week' && BKR.view !== 'rev' ? `<select data-bkr-week aria-label="Week">${WK.map((w, k) => `<option value="${k}"${k === Math.min(BKR.week, WK.length - 1) ? ' selected' : ''}>Week ${k + 1} · ${bkShortD(w.from)}${w.to !== w.from ? ' – ' + bkShortD(w.to) : ''}</option>`).join('')}</select>` : ''}
         ${BKR.span === 'day' && BKR.view !== 'rev' ? `<span class="bkr-day"><button type="button" class="btn mini" data-bkr-step="-1" aria-label="Previous day">‹</button><input type="date" data-bkr-day value="${RG.from}" min="${isoDate(cycParts(BKR.month).start)}" max="${isoDate(cycParts(BKR.month).end)}" aria-label="Day"><button type="button" class="btn mini" data-bkr-step="1" aria-label="Next day">›</button></span>` : ''}
@@ -8811,9 +8822,25 @@ function mountBackupReport(body) {
       <h4>Day by day</h4>${R.items.length ? `<table class="bkr-tbl"><thead><tr><th>Date</th><th>Employee</th>${clientView ? '' : '<th>Client</th>'}<th>Leave</th><th>Backup</th><th>Cover</th></tr></thead><tbody>${R.items.map(x => `<tr><td>${bkFmtD(x.iso)}</td><td>${esc(nmOf(x))}</td>${clientView ? '' : `<td>${esc(x.client)}</td>`}<td>${esc(x.code)}${x.days === .5 ? ' (½)' : ''}</td><td><span class="bkr-st ${x.st}">${x.ynL}</span></td><td>${x.backup ? esc(x.backup) : ''}${edit ? `<button type="button" class="btn mini bkr-ed" data-bkr-ed="${esc(x.key)}" data-iso="${x.iso}" title="Change the backup for this day">${x.set ? 'Edit' : '+ Add'}</button>` : ''}</td></tr>`).join('')}</tbody></table>` : '<p class="sm muted">No leave in this ' + (BKR.span === 'cycle' ? 'cycle' : BKR.span) + (clientView ? ' for this client' : '') + (BKR.yn !== 'all' ? ' with backup provided: ' + BKR.yn : '') + '.</p>'}
       </div>`;
     body.querySelectorAll('[data-bkr]').forEach(el => el.addEventListener('change', () => { BKR[el.dataset.bkr] = el.dataset.bkr === 'month' ? +el.value : el.value; draw(); }));
-    body.querySelectorAll('[data-bkr-client]').forEach(el => el.addEventListener('click', () => { BKR.client = el.dataset.bkrClient; draw(); }));
+    body.querySelectorAll('[data-bkr-client]').forEach(el => el.addEventListener('click', () => { BKR.ms.client = [el.dataset.bkrClient]; bkSync(); draw(); }));
+    /* v3.69.0: the multi-select drop-downs */
+    body.querySelectorAll('[data-bkms]').forEach(box => {
+      const key = box.dataset.bkms, btn = box.querySelector('.bkms-btn'), pop = box.querySelector('.bkms-pop'), q = pop.querySelector('.bkms-q'), boxes = [...pop.querySelectorAll('input[type=checkbox]')], n = pop.querySelector('[data-bkms-n]');
+      const count = () => { const k = boxes.filter(b => b.checked).length; n.textContent = k ? k + ' ticked' : 'None ticked = all'; };
+      const close = () => { pop.hidden = true; btn.setAttribute('aria-expanded', 'false'); document.removeEventListener('mousedown', outside, true); };
+      const apply = () => { const v = boxes.filter(b => b.checked).map(b => b.value); close(); if (JSON.stringify(v) !== JSON.stringify(BKR.ms[key])) { BKR.ms[key] = v; if (key === 'client') BKR.ms.sub = []; bkSync(); draw(); } };
+      const outside = e => { if (!e.composedPath().includes(box)) apply(); };
+      btn.addEventListener('click', () => { if (!pop.hidden) { apply(); return; } body.querySelectorAll('.bkms-pop').forEach(p => { if (p !== pop) p.hidden = true; }); pop.hidden = false; btn.setAttribute('aria-expanded', 'true'); count(); document.addEventListener('mousedown', outside, true); (q || boxes[0])?.focus(); });
+      boxes.forEach(b => b.addEventListener('change', count));
+      q?.addEventListener('input', () => { const t = q.value.trim().toLowerCase(); pop.querySelectorAll('.bkms-o').forEach(l => { l.hidden = !!t && !l.textContent.toLowerCase().includes(t); }); });
+      pop.querySelector('[data-bkms-all]').addEventListener('click', () => { boxes.forEach(b => { if (!b.closest('.bkms-o').hidden) b.checked = true; }); count(); });
+      pop.querySelector('[data-bkms-none]').addEventListener('click', () => { boxes.forEach(b => { b.checked = false; }); count(); });
+      pop.querySelector('[data-bkms-ok]').addEventListener('click', apply);
+      pop.querySelector('[data-bkms-cancel]').addEventListener('click', () => { boxes.forEach(b => { b.checked = BKR.ms[key].includes(b.value); }); close(); });
+      pop.addEventListener('keydown', e => { if (e.key === 'Escape') { e.stopPropagation(); pop.querySelector('[data-bkms-cancel]').click(); btn.focus(); } if (e.key === 'Enter' && e.target.type !== 'checkbox') { e.preventDefault(); apply(); } });
+    });
     /* v3.37.0: billing grid view */
-    let G = null; const gTitle = [BKR.client === 'all' ? 'All clients' : BKR.client, BKR.sub !== 'all' ? BKR.sub : ''].filter(Boolean).join(' ') + (BKR.status && BKR.status !== 'all' ? ' (' + BKR.status + ')' : '') + ' | ' + MONTHS[Engine.serialToDate(BKR.month).getUTCMonth()] + '-' + Engine.serialToDate(BKR.month).getUTCFullYear() + (BKR.span !== 'cycle' ? ' · ' + bkRangeLabel(RG) : '');
+    let G = null; const gTitle = [BKR.ms.client.length ? BKR.ms.client.join(', ') : 'All clients', BKR.ms.sub.length ? BKR.ms.sub.join(', ') : ''].filter(Boolean).join(' ') + (BKR.ms.status.length ? ' (' + BKR.ms.status.join(', ') + ')' : '') + (BKR.ms.desig.length ? ' · ' + BKR.ms.desig.join(', ') : '') + ' | ' + MONTHS[Engine.serialToDate(BKR.month).getUTCMonth()] + '-' + Engine.serialToDate(BKR.month).getUTCFullYear() + (BKR.span !== 'cycle' ? ' · ' + bkRangeLabel(RG) : '');
     if (BKR.view === 'grid') {
       G = bkGridData(BKR.month, BKR.client, BKR.sub, RG, BKR.names === 'pseudo');
       body.querySelector('#bkrSheet').innerHTML = `<div class="bkg-title">${esc(gTitle)}</div><p class="sm muted" style="text-align:center;margin:-6px 0 10px">${esc(cycRange(BKR.month))} · ${G.people.length} people · billed days = P + H + BR (HD and BR½ count half)</p>${bkGridLegend()}<div class="bkg-wrap">${bkGridHTML(G, gTitle, BKR.names)}</div>`;
@@ -8835,7 +8862,7 @@ function mountBackupReport(body) {
       body.querySelectorAll('[data-bkcal-k]').forEach(el => { const go = () => openBackupBox(el.dataset.bkcalK, el.dataset.iso, draw); el.addEventListener('click', go); el.addEventListener('keydown', e => { if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); go(); } }); });
     }
     { const qi = body.querySelector('[data-bkr-q]'); let tmr; qi.addEventListener('input', () => { clearTimeout(tmr); tmr = setTimeout(() => { BKR.q = qi.value.trim(); draw(); const n = body.querySelector('[data-bkr-q]'); if (n) { n.focus(); n.setSelectionRange(n.value.length, n.value.length); } }, 300); }); }
-    body.querySelector('[data-bkr-reset]')?.addEventListener('click', () => { BKR.client = 'all'; BKR.sub = 'all'; BKR.status = 'all'; BKR.desig = 'all'; BKR.q = ''; draw(); });
+    body.querySelector('[data-bkr-reset]')?.addEventListener('click', () => { BKR.ms = { client: [], sub: [], status: [], desig: [] }; bkSync(); BKR.q = ''; draw(); });
     body.querySelectorAll('[data-bkr-t]').forEach(b => b.addEventListener('click', () => { BKR[b.dataset.bkrT] = b.dataset.v; if (b.dataset.bkrT === 'span' && b.dataset.v === 'week') { const t = isoDate(TODAY), k = WK.findIndex(w => t >= w.from && t <= w.to); BKR.week = k < 0 ? 0 : k; } draw(); }));
     body.querySelector('[data-bkr-week]')?.addEventListener('change', e => { BKR.week = +e.target.value; draw(); });
     body.querySelector('[data-bkr-day]')?.addEventListener('change', e => { if (e.target.value) { BKR.day = e.target.value; draw(); } });
@@ -9017,6 +9044,8 @@ function bkCalData(cycle, client, sub, range, withLate) {
 const monthName = ms => ['January', 'February', 'March', 'April', 'May', 'June', 'July', 'August', 'September', 'October', 'November', 'December'][Engine.serialToDate(ms).getUTCMonth()];
 function bkCalHTML(C, names, forCopy) {
   const nm = e => names === 'pseudo' ? e.pseudo : e.name, ed = !forCopy && canBackup();
+  /* v3.69.0: each day lists names A–Z, by the name shown (real or pseudo) */
+  for (const wk of C.weeks) for (const x of wk) x.entries.sort((a, b) => nm(a).localeCompare(nm(b), undefined, { sensitivity: 'base' }));
   const B = 'border:2px solid #000;', thin = 'border-left:1px solid #000;border-right:1px solid #000;border-bottom:1px solid #d0d4da;';
   const stCol = { backup: '#1b7f3b', none: '#c62828', unset: '#6b7280', late: '#a15c00' };
   const dayLbl = (x, first) => x.dt.getUTCDate() + (first || x.dt.getUTCDate() === 1 ? ' ' + MONTHS[x.dt.getUTCMonth()] : '');
@@ -9046,6 +9075,7 @@ function bkCalHTML(C, names, forCopy) {
 }
 async function bkCalCopy(C, title, names) {
   const nm = e => names === 'pseudo' ? e.pseudo : e.name, lines = [title, ''];
+  for (const wk of C.weeks) for (const x of wk) x.entries.sort((a, b) => nm(a).localeCompare(nm(b), undefined, { sensitivity: 'base' }));
   let firstShown = true;
   C.weeks.forEach((wk, wi) => {
     const n = Math.max(3, ...wk.map(x => x.entries.length));
@@ -9065,7 +9095,7 @@ function bkCharts(R, clientView) {
   return `<div class="bkc ${clientView ? 'one' : ''}">${cl}<div class="bkc-panel"><h5>Day by day <em><i class="p"></i>Provided <i class="n"></i>Not provided</em></h5><div class="bkc-cols">${cols}</div></div></div>`;
 }
 const BKG_CSS = `.bkg-title{text-align:center;font-weight:700;font-size:15px;margin:4px 0 10px}.bkg-legend{display:flex;flex-wrap:wrap;justify-content:flex-end;gap:6px 14px;font-size:12.5px;margin:0 0 10px}.bkg-legend>span{display:inline-flex;align-items:center;gap:5px}.bkg-wrap{overflow:auto;border:1px solid #e3e6ec;border-radius:10px}.bkg{border-collapse:collapse;font-size:12.5px;min-width:100%}.bkg th,.bkg td{padding:4px 3px;text-align:center;border-bottom:1px solid #eef0f4}.bkg thead th{font-size:11.5px;vertical-align:bottom;background:#f7f8fa;position:sticky;top:0}.bkg thead th .wd{display:block;writing-mode:vertical-rl;transform:rotate(180deg);margin:0 auto 4px;font-weight:700}.bkg thead th b{display:block}.bkg .nm{text-align:left;white-space:nowrap;padding:4px 10px;position:sticky;left:0;background:#fff}.bkg thead .nm{background:#f7f8fa;z-index:2}.bkg-c{display:inline-flex;align-items:center;justify-content:center;min-width:24px;height:22px;padding:0 3px;font-size:11px;font-weight:700;border:1px solid transparent;border-radius:2px;box-sizing:border-box}.bkg-c.p{background:#c6f7c6;border-color:#4caf50;color:#1d3d1d}.bkg-c.hd{background:#ffff66;border-color:#c9b600;color:#333}.bkg-c.h{background:#1ee3ef;border-color:#0aa;color:#023}.bkg-c.br{background:#8bc34a;border-color:#5b8f22;color:#fff}.bkg-c.sr{background:#111;border-color:#111;color:#fff}.bkg-c.l{background:#ff8a8a;border-color:#e06666}.bkg-c.x{background:#eee;border-color:#bbb;color:#333}.bkg-c.ed{cursor:pointer}.bkg-m{font-size:10.5px;color:#667;border:1px solid #d9dde5;border-radius:8px;padding:0 5px;margin-left:4px;cursor:help}.bkg-c.ed:hover{outline:2px solid #334;outline-offset:1px}`;
-const BKR_CSS = BKG_CSS + BKCAL_CSS + `.bkc{display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1.6fr);gap:12px;margin:0 0 14px}.bkc.one{grid-template-columns:1fr}.bkc-panel{border:1px solid #e3e6ec;border-radius:12px;padding:10px 12px}.bkc-panel h5{margin:0 0 8px;font-size:12px;display:flex;gap:10px;align-items:center}.bkc-panel h5 em{font-style:normal;font-weight:500;color:#667;font-size:11px;display:inline-flex;gap:4px;align-items:center;margin-left:auto}.bkc-panel h5 em i{display:inline-block;width:9px;height:9px;border-radius:2px;margin-left:6px}.bkc .p{background:#22a05a}.bkc .n{background:#e34948}.bkc-row{display:grid;grid-template-columns:minmax(0,90px) 1fr 38px;gap:8px;align-items:center;font-size:12px;padding:3px 0}.bkc-row span{overflow:hidden;text-overflow:ellipsis;white-space:nowrap}.bkc-row b{text-align:right}.bkc-bar{display:flex;height:12px;border-radius:6px;overflow:hidden;background:#eef0f4}.bkc-cols{display:flex;align-items:flex-end;gap:4px;height:130px;padding-top:4px;overflow-x:auto}.bkc-col{flex:1 0 22px;max-width:40px;height:100%;display:flex;flex-direction:column;justify-content:flex-end;align-items:center}.bkc-stack{width:70%;display:flex;flex-direction:column;border-radius:4px 4px 0 0;overflow:hidden;min-height:3px}.bkc-stack i{display:block;min-height:0}.bkc-col span{font-size:10.5px;line-height:1.1;margin-top:3px;text-align:center;color:#556}.bkc-col small{display:block;font-size:9px;color:#889}@media (max-width:800px){.bkc{grid-template-columns:1fr}}.bkr-title h3{margin:0 0 2px;font-size:17px}.bkr-title p{margin:0 0 12px;color:#556;font-size:12.5px}.bkr-tiles{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:10px;margin-bottom:10px}.bkr-tiles.two{grid-template-columns:repeat(2,minmax(0,1fr))}.bkr-t{border:1px solid #e3e6ec;border-radius:12px;padding:10px 14px;display:flex;flex-direction:column;border-top:3px solid var(--tc)}.bkr-t b{font-size:22px}.bkr-t span{font-weight:650;font-size:12.5px}.bkr-t em{font-style:normal;font-size:12px;color:#667}.bkr-t.b{--tc:#22a05a}.bkr-t.l{--tc:#3b6cf6}.bkr-t.n{--tc:#e34948}.bkr-bar2{display:flex;height:10px;border-radius:6px;overflow:hidden;background:#eef0f4;margin:0 0 16px}.bkr-bar2 .b{background:#22a05a}.bkr-bar2 .l{background:#3b6cf6}.bkr-bar2 .n{background:#e34948}h4{margin:16px 0 6px;font-size:13px}.bkr-tbl{width:100%;border-collapse:collapse;font-size:12.5px}.bkr-tbl th{text-align:left;font-size:11px;text-transform:uppercase;letter-spacing:.04em;color:#667;border-bottom:1px solid #e3e6ec;padding:6px 8px}.bkr-tbl td{padding:6px 8px;border-bottom:1px solid #eef0f4}.bkr-tbl td.bad{color:#c63b3a;font-weight:650}.bkr-st{display:inline-block;padding:1px 8px;border-radius:999px;font-size:11.5px;font-weight:600}.bkr-st.backup{background:#e3f4ea;color:#1c7a45}.bkr-st.live{background:#e6edfe;color:#3558c8}.bkr-st.none{background:#fde8e8;color:#c63b3a}.bk-yn{font-style:normal;font-size:10.5px;font-weight:700;padding:1px 7px;border-radius:6px}.bk-yn.y{background:#e3f4ea;color:#1c7a45}.bk-yn.n{background:#fde8e8;color:#c63b3a}.bk-yn.l{background:#e6edfe;color:#3558c8}`;
+const BKR_CSS = BKG_CSS + BKCAL_CSS + `.bkms{position:relative;display:inline-block}.bkms-btn{display:inline-flex;align-items:center;gap:6px;height:34px;padding:0 10px;border:1px solid var(--border,#dfe3ea);border-radius:10px;background:var(--surface,#fff);color:var(--ink,#1a2233);font:inherit;font-size:13px;cursor:pointer;max-width:240px}.bkms-btn small{color:var(--ink-2,#5b6478);font-size:11.5px;font-weight:600}.bkms-btn b{font-weight:650;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}.bkms-btn i{font-style:normal;color:var(--ink-2,#5b6478);font-size:11px}.bkms-btn.on{border-color:var(--accent,#2563eb);background:color-mix(in srgb,var(--accent,#2563eb) 7%,var(--surface,#fff))}.bkms-pop{position:absolute;z-index:60;top:calc(100% + 6px);left:0;width:260px;background:var(--surface,#fff);border:1px solid var(--border,#dfe3ea);border-radius:12px;box-shadow:0 12px 32px rgba(20,30,50,.16);padding:10px;display:flex;flex-direction:column;gap:8px}.bkms-pop[hidden]{display:none}.bkms-q{width:100%}.bkms-acts{display:flex;justify-content:space-between}.bkms-list{max-height:260px;overflow:auto;display:flex;flex-direction:column}.bkms-o{display:flex;align-items:center;gap:8px;padding:6px 6px;border-radius:8px;cursor:pointer;font-size:13px}.bkms-o:hover{background:var(--surface-2,#f3f5f9)}.bkms-o[hidden]{display:none}.bkms-foot{display:flex;align-items:center;gap:6px;border-top:1px solid var(--border,#e6e9ef);padding-top:8px}.bkms-foot span{flex:1}`+`.bkc{display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1.6fr);gap:12px;margin:0 0 14px}.bkc.one{grid-template-columns:1fr}.bkc-panel{border:1px solid #e3e6ec;border-radius:12px;padding:10px 12px}.bkc-panel h5{margin:0 0 8px;font-size:12px;display:flex;gap:10px;align-items:center}.bkc-panel h5 em{font-style:normal;font-weight:500;color:#667;font-size:11px;display:inline-flex;gap:4px;align-items:center;margin-left:auto}.bkc-panel h5 em i{display:inline-block;width:9px;height:9px;border-radius:2px;margin-left:6px}.bkc .p{background:#22a05a}.bkc .n{background:#e34948}.bkc-row{display:grid;grid-template-columns:minmax(0,90px) 1fr 38px;gap:8px;align-items:center;font-size:12px;padding:3px 0}.bkc-row span{overflow:hidden;text-overflow:ellipsis;white-space:nowrap}.bkc-row b{text-align:right}.bkc-bar{display:flex;height:12px;border-radius:6px;overflow:hidden;background:#eef0f4}.bkc-cols{display:flex;align-items:flex-end;gap:4px;height:130px;padding-top:4px;overflow-x:auto}.bkc-col{flex:1 0 22px;max-width:40px;height:100%;display:flex;flex-direction:column;justify-content:flex-end;align-items:center}.bkc-stack{width:70%;display:flex;flex-direction:column;border-radius:4px 4px 0 0;overflow:hidden;min-height:3px}.bkc-stack i{display:block;min-height:0}.bkc-col span{font-size:10.5px;line-height:1.1;margin-top:3px;text-align:center;color:#556}.bkc-col small{display:block;font-size:9px;color:#889}@media (max-width:800px){.bkc{grid-template-columns:1fr}}.bkr-title h3{margin:0 0 2px;font-size:17px}.bkr-title p{margin:0 0 12px;color:#556;font-size:12.5px}.bkr-tiles{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:10px;margin-bottom:10px}.bkr-tiles.two{grid-template-columns:repeat(2,minmax(0,1fr))}.bkr-t{border:1px solid #e3e6ec;border-radius:12px;padding:10px 14px;display:flex;flex-direction:column;border-top:3px solid var(--tc)}.bkr-t b{font-size:22px}.bkr-t span{font-weight:650;font-size:12.5px}.bkr-t em{font-style:normal;font-size:12px;color:#667}.bkr-t.b{--tc:#22a05a}.bkr-t.l{--tc:#3b6cf6}.bkr-t.n{--tc:#e34948}.bkr-bar2{display:flex;height:10px;border-radius:6px;overflow:hidden;background:#eef0f4;margin:0 0 16px}.bkr-bar2 .b{background:#22a05a}.bkr-bar2 .l{background:#3b6cf6}.bkr-bar2 .n{background:#e34948}h4{margin:16px 0 6px;font-size:13px}.bkr-tbl{width:100%;border-collapse:collapse;font-size:12.5px}.bkr-tbl th{text-align:left;font-size:11px;text-transform:uppercase;letter-spacing:.04em;color:#667;border-bottom:1px solid #e3e6ec;padding:6px 8px}.bkr-tbl td{padding:6px 8px;border-bottom:1px solid #eef0f4}.bkr-tbl td.bad{color:#c63b3a;font-weight:650}.bkr-st{display:inline-block;padding:1px 8px;border-radius:999px;font-size:11.5px;font-weight:600}.bkr-st.backup{background:#e3f4ea;color:#1c7a45}.bkr-st.live{background:#e6edfe;color:#3558c8}.bkr-st.none{background:#fde8e8;color:#c63b3a}.bk-yn{font-style:normal;font-size:10.5px;font-weight:700;padding:1px 7px;border-radius:6px}.bk-yn.y{background:#e3f4ea;color:#1c7a45}.bk-yn.n{background:#fde8e8;color:#c63b3a}.bk-yn.l{background:#e6edfe;color:#3558c8}`;
 /* ---------- v3.56.0: new Overview (Concept A layout, Concept F look). One "Who is out" card for Today / This week /
    This month (the 26th–25th cycle), each person with their leave code and backup status, plus a Mon–Fri week bar chart.
    The headline tiles on top read ATT.overviewStats(). ---------- */
@@ -10113,7 +10143,7 @@ async function poll() {
 }
 
 /* ============================== filtering ============================== */
-const APP = { title: "Team Dashboard", version: "3.68.1", released: "20 Oct 2026" };
+const APP = { title: "Team Dashboard", version: "3.69.0", released: "20 Oct 2026" };
 const BASE_DIMS = { status: "status_column", desig: "designation_column", client: "client_column", mode: "mode_column" };
 const STANDARD_STATUSES = ["Active", "Manager", "OJT", "Bench", "New", "Projected", "Left", "Moved"];
 const TILE_ORDER = ["Active", "Manager", "OJT", "Bench", "New", "Projected"];
@@ -11526,7 +11556,7 @@ function actionItems() {
   const fields = requiredCols();
   const out = [];
   for (const r of state.rows) {
-    if (!ACTION_STATUS.test(gs(r, "status_column"))) continue;
+    if (!ACTION_STATUS.test(gs(r, "status_column")) || !passes(r)) continue;
     const miss = fields.filter(([c]) => isBlankVal(g(r, c))).map(f => f[1]);
     if (miss.length) out.push({ row: r, miss });
   }
@@ -11564,7 +11594,7 @@ function addMonthsSerial(serial, m) {
 function reviewItems(days) {
   const today = todaySerial(), out = [];
   for (const r of state.rows) {
-    if (!isCurrent(r)) continue;
+    if (!isCurrent(r) || !passes(r)) continue;
     const doj = g(r, colName("doj_column")); if (!isNum(doj) || doj > today + days) continue;
     let best = null;
     for (const m of REVIEW_MILESTONES) { const due = addMonthsSerial(doj, m), diff = due - today; if (Math.abs(diff) <= days && (!best || Math.abs(diff) < Math.abs(best.diff))) best = { m, due, diff }; }
@@ -11659,7 +11689,7 @@ function renderStrip() {
   const item = (tab, label, sub, n, cls) => h("button", { class: "strip-item " + cls + (n ? " has" : " clear"), onclick: () => openActionCenter(tab), title: "Open the Action center: " + label },
     h("b", {}, n == null ? "–" : String(n)), h("span", {}, h("strong", {}, label), h("small", {}, sub)));
   el.replaceChildren(
-    h("div", { class: "section-heading" }, h("div", {}, h("h2", {}, "Action center"), h("p", {}, "What needs a decision or a fix · independent of search and report filters")), h("button", { class: "btn ghost", onclick: () => openActionCenter(actionTab) }, "Open Action center →")),
+    h("div", { class: "section-heading" }, h("div", {}, h("h2", {}, "Action center"), h("p", {}, "What needs a decision or a fix · follows the filters at the top")), h("button", { class: "btn ghost", onclick: () => openActionCenter(actionTab) }, "Open Action center →")),
     h("div", { class: "strip" },
       item("actions", "Action items", "people with missing details", c.actions, "act"),
       item("review", "Designation reviews", "near a 6, 12, 18 or 24 month milestone", c.review, "rev"),
