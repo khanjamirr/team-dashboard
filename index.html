@@ -5,7 +5,7 @@
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <link rel="preconnect" href="https://iiogwevtyzgedhoaqlrn.supabase.co" crossorigin><link rel="dns-prefetch" href="https://iiogwevtyzgedhoaqlrn.supabase.co">
 <link rel="icon" href="data:,">
-<title>Team Dashboard · 3.69.1</title>
+<title>Team Dashboard · 3.69.2</title>
 <link rel="preconnect" href="https://fonts.googleapis.com"><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin><link href="https://fonts.googleapis.com/css2?family=Public+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet">
 <style>
 :root {
@@ -2366,6 +2366,29 @@ article.al-d { --alc:#c62828; }
 .dlw-fnl { margin:14px 0 0; font-size:12px; color:var(--ink-2); } .dlw-fn { font-size:12px; padding:2px 7px; border-radius:6px; background:var(--surface-2); color:var(--ink); }
 .dlw-log { color:var(--ink-2); font-size:11.5px; }
 @media (max-width:640px) { .dlw-opts { grid-template-columns:1fr; } }
+
+/* v3.69.2: a compact page header: title, search and filters on one line; saved filters on a slim line under them */
+@media (min-width:1200px) {
+  .sticky-top.pinned-top#pinnedHeader { display:flex !important; flex-wrap:nowrap !important; align-items:center !important; gap:14px !important; padding-top:10px !important; padding-bottom:10px !important; min-height:0 !important; }
+  #pinnedHeader > .workspace-heading { order:0; flex:none; margin:0 !important; }
+  #pinnedHeader > .workspace-heading h2, #pinnedHeader #cleanPageTitle { font-size:22px !important; margin:0 !important; letter-spacing:-.4px !important; white-space:nowrap; }
+  #pinnedHeader > .workspace-filters { order:1; flex:1 1 auto; min-width:0; margin:0 !important; padding:0 !important; }
+  #pinnedHeader > header.top { order:2; flex:none; margin:0 !important; padding:0 !important; min-height:0 !important; }
+  #pinnedHeader #cleanFilters { display:flex !important; flex-wrap:wrap; align-items:center; gap:6px 8px; }
+  #pinnedHeader #cleanFilters > .bar { flex:0 1 auto; min-width:0; margin:0 !important; padding:0 !important; }
+  #pinnedHeader .filters { display:flex !important; flex-wrap:wrap !important; align-items:center !important; gap:6px !important; }
+  #pinnedHeader .filters .search { flex:0 1 230px !important; width:230px !important; min-width:150px !important; grid-column:auto !important; }
+  #pinnedHeader .filters .input, #pinnedHeader .msel { height:32px !important; }
+  #pinnedHeader .filters .msel, #pinnedHeader #customFieldControls .msel { flex:0 1 150px !important; width:150px !important; min-width:110px !important; padding:2px 8px !important; }
+  #pinnedHeader .msel .lab small { font-size:8.5px !important; }
+  #pinnedHeader #fClear, #pinnedHeader #fMoreOpts { height:32px; padding:0 6px !important; font-size:12px !important; }
+  #pinnedHeader #customFieldControls { display:flex !important; flex-wrap:wrap; gap:6px; margin:0 !important; }
+  #pinnedHeader #customFieldControls:empty { display:none !important; }
+  #pinnedHeader .saved-filter-row { flex:1 0 100%; margin:2px 0 0 !important; padding:4px 0 0 !important; gap:6px !important; border-top:1px dashed var(--border) !important; }
+  #pinnedHeader .saved-filter-row .input { height:28px !important; width:150px !important; font-size:12px !important; }
+  #pinnedHeader .saved-filter-row .btn, #pinnedHeader .saved-filter-row summary { height:28px !important; padding:0 8px !important; font-size:12px !important; }
+  #pinnedHeader .scope-line { margin:0 !important; }
+}
 </style></head>
 
 
@@ -10140,7 +10163,7 @@ async function poll() {
 }
 
 /* ============================== filtering ============================== */
-const APP = { title: "Team Dashboard", version: "3.69.1", released: "20 Oct 2026" };
+const APP = { title: "Team Dashboard", version: "3.69.2", released: "20 Oct 2026" };
 const BASE_DIMS = { status: "status_column", desig: "designation_column", client: "client_column", mode: "mode_column" };
 const STANDARD_STATUSES = ["Active", "Manager", "OJT", "Bench", "New", "Projected", "Left", "Moved"];
 const TILE_ORDER = ["Active", "Manager", "OJT", "Bench", "New", "Projected"];
