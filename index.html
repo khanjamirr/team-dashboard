@@ -5,7 +5,7 @@
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <link rel="preconnect" href="https://iiogwevtyzgedhoaqlrn.supabase.co" crossorigin><link rel="dns-prefetch" href="https://iiogwevtyzgedhoaqlrn.supabase.co">
 <link rel="icon" href="data:,">
-<title>Team Dashboard · 3.69.2</title>
+<title>Team Dashboard · 3.71.0</title>
 <link rel="preconnect" href="https://fonts.googleapis.com"><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin><link href="https://fonts.googleapis.com/css2?family=Public+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet">
 <style>
 :root {
@@ -2367,28 +2367,51 @@ article.al-d { --alc:#c62828; }
 .dlw-log { color:var(--ink-2); font-size:11.5px; }
 @media (max-width:640px) { .dlw-opts { grid-template-columns:1fr; } }
 
-/* v3.69.2: a compact page header: title, search and filters on one line; saved filters on a slim line under them */
-@media (min-width:1200px) {
-  .sticky-top.pinned-top#pinnedHeader { display:flex !important; flex-wrap:nowrap !important; align-items:center !important; gap:14px !important; padding-top:10px !important; padding-bottom:10px !important; min-height:0 !important; }
+/* v3.69.2 / v3.70.0: a compact page header: title, search and every filter (extra ones like Sub client too) on one line;
+   saved filters on a slim line under them only when "More options" is open */
+@media (min-width:900px) {
+  .sticky-top.pinned-top#pinnedHeader { display:flex !important; flex-wrap:nowrap !important; align-items:center !important; gap:12px !important; padding-top:8px !important; padding-bottom:8px !important; min-height:0 !important; margin-bottom:12px !important; }
   #pinnedHeader > .workspace-heading { order:0; flex:none; margin:0 !important; }
-  #pinnedHeader > .workspace-heading h2, #pinnedHeader #cleanPageTitle { font-size:22px !important; margin:0 !important; letter-spacing:-.4px !important; white-space:nowrap; }
+  #pinnedHeader > .workspace-heading h2, #pinnedHeader #cleanPageTitle { font-size:21px !important; margin:0 !important; letter-spacing:-.4px !important; white-space:nowrap; }
   #pinnedHeader > .workspace-filters { order:1; flex:1 1 auto; min-width:0; margin:0 !important; padding:0 !important; }
   #pinnedHeader > header.top { order:2; flex:none; margin:0 !important; padding:0 !important; min-height:0 !important; }
-  #pinnedHeader #cleanFilters { display:flex !important; flex-wrap:wrap; align-items:center; gap:6px 8px; }
-  #pinnedHeader #cleanFilters > .bar { flex:0 1 auto; min-width:0; margin:0 !important; padding:0 !important; }
-  #pinnedHeader .filters { display:flex !important; flex-wrap:wrap !important; align-items:center !important; gap:6px !important; }
-  #pinnedHeader .filters .search { flex:0 1 230px !important; width:230px !important; min-width:150px !important; grid-column:auto !important; }
-  #pinnedHeader .filters .input, #pinnedHeader .msel { height:32px !important; }
-  #pinnedHeader .filters .msel, #pinnedHeader #customFieldControls .msel { flex:0 1 150px !important; width:150px !important; min-width:110px !important; padding:2px 8px !important; }
-  #pinnedHeader .msel .lab small { font-size:8.5px !important; }
-  #pinnedHeader #fClear, #pinnedHeader #fMoreOpts { height:32px; padding:0 6px !important; font-size:12px !important; }
-  #pinnedHeader #customFieldControls { display:flex !important; flex-wrap:wrap; gap:6px; margin:0 !important; }
-  #pinnedHeader #customFieldControls:empty { display:none !important; }
-  #pinnedHeader .saved-filter-row { flex:1 0 100%; margin:2px 0 0 !important; padding:4px 0 0 !important; gap:6px !important; border-top:1px dashed var(--border) !important; }
-  #pinnedHeader .saved-filter-row .input { height:28px !important; width:150px !important; font-size:12px !important; }
+  #pinnedHeader #cleanFilters { display:flex !important; flex-wrap:wrap; align-items:center; gap:5px 6px; padding:0 !important; }
+  #pinnedHeader #cleanFilters > .bar, #pinnedHeader .filters, #pinnedHeader #customFieldControls { display:contents !important; }
+  #pinnedHeader #fClear, #pinnedHeader #fMoreOpts { font-size:0 !important; } #pinnedHeader #fClear::after { content:'Clear'; font-size:12px; } #pinnedHeader #fMoreOpts::after { content:'More ▾'; font-size:12px; } #pinnedHeader #fMoreOpts[aria-expanded="true"]::after { content:'Less ▴'; }
+  #pinnedHeader #fClear, #pinnedHeader #fMoreOpts { height:30px; padding:0 4px !important; white-space:nowrap; }
+  #pinnedHeader .filters .search { flex:0 1 190px !important; width:190px !important; min-width:110px !important; grid-column:auto !important; }
+  #pinnedHeader .filters .input, #pinnedHeader .msel { height:30px !important; }
+  #pinnedHeader .filters .msel, #pinnedHeader #customFieldControls .msel { flex:0 1 128px !important; width:128px !important; min-width:84px !important; max-width:170px !important; padding:1px 7px !important; }
+  #pinnedHeader .msel .lab small { font-size:8px !important; line-height:1 !important; }
+  #pinnedHeader .msel .lab { line-height:1.15 !important; font-size:12px !important; }
+  #pinnedHeader .saved-filter-row { order:4; flex:1 0 100%; margin:2px 0 0 !important; padding:4px 0 0 !important; gap:6px !important; border-top:1px dashed var(--border) !important; }
+  #pinnedHeader .saved-filter-row { flex-wrap:nowrap !important; } #pinnedHeader .saved-filter-row > * { flex:none; }
+  #pinnedHeader .saved-filter-row .input { height:28px !important; width:130px !important; font-size:12px !important; }
+  #pinnedHeader .saved-filter-row .hint { margin-left:auto; }
   #pinnedHeader .saved-filter-row .btn, #pinnedHeader .saved-filter-row summary { height:28px !important; padding:0 8px !important; font-size:12px !important; }
-  #pinnedHeader .scope-line { margin:0 !important; }
+  /* the chosen values already show on the drop-downs: no second row of chips, and the "220 of 220" line sits under the search only when there is room */
+  #pinnedHeader #xchips { display:none !important; }
+  #pinnedHeader .scope-line { margin:2px 0 0 !important; font-size:11px !important; }
 }
+@media (min-width:900px) and (max-width:1399px) { #pinnedHeader .saved-filter-row .hint { display:none !important; } #pinnedHeader .saved-filter-row .field-customizer { margin-left:auto !important; } #pinnedHeader > .workspace-heading h2, #pinnedHeader #cleanPageTitle { font-size:19px !important; } }
+
+/* v3.70.0: the menu bar folds into a slim strip of icons (button on its edge, or Ctrl + \) */
+#navToggle { position:absolute; top:26px; right:-13px; width:26px; height:26px; border-radius:50%; border:1px solid var(--border, #d9dee7); background:var(--surface, #fff); color:var(--ink-2, #5b6478); display:grid; place-items:center; cursor:pointer; z-index:40; font:700 15px/1 system-ui, sans-serif; box-shadow:0 2px 8px rgba(15,25,45,.12); padding:0; }
+#navToggle:hover { color:var(--accent); border-color:var(--accent); }
+.sidebar { transition:width .18s ease, padding .18s ease; }
+#app { transition:padding-left .18s ease; }
+@media (min-width:651px) {
+  body.nav-mini .sidebar { width:64px !important; padding-left:8px !important; padding-right:8px !important; overflow:visible; }
+  body.nav-mini #app { padding-left:96px !important; }
+  body.nav-mini .sidebar .brand h1 { font-size:0 !important; justify-content:center; }
+  body.nav-mini .sidebar .brand h1 > * { display:none; }
+  body.nav-mini .sidebar .brand h1::before { margin:0 !important; }
+  body.nav-mini .sidebar .brand-tag, body.nav-mini .sidebar .sync, body.nav-mini .sidebar .nav-label, body.nav-mini .sidebar .sidebar-bottom, body.nav-mini .sidebar #userchip { display:none !important; }
+  body.nav-mini .sidebar .tab { font-size:0 !important; justify-content:center !important; padding-left:0 !important; padding-right:0 !important; position:relative; min-height:42px; }
+  body.nav-mini .sidebar .tab::before { font-size:17px !important; margin:0 !important; }
+  body.nav-mini .sidebar .tab .tabn { position:absolute; top:3px; right:3px; font-size:10px !important; min-width:16px; height:16px; line-height:16px; padding:0 4px; margin:0 !important; }
+}
+@media (max-width:650px) { #navToggle { display:none; } }
 </style></head>
 
 
@@ -2404,7 +2427,7 @@ article.al-d { --alc:#c62828; }
   </div>
 </section>
 
-<div id="app" hidden><aside class="sidebar" aria-label="Workspace navigation"><div class="brand dashboard-identity">      <h1><span id="title">Team Dashboard</span></h1><p class="brand-tag">One place for your people, priorities and team insights.</p>      <span class="sync" id="sync" role="status"><i></i><span id="syncText">Loading…</span></span></div><div class="nav-label">WORKSPACE</div>      <nav class="tabs" role="tablist" aria-label="Pages" aria-orientation="vertical">
+<div id="app" hidden><aside class="sidebar" aria-label="Workspace navigation"><button type="button" id="navToggle" aria-label="Hide the menu" title="Hide the menu (Ctrl + \\)">‹</button><div class="brand dashboard-identity">      <h1><span id="title">Team Dashboard</span></h1><p class="brand-tag">One place for your people, priorities and team insights.</p>      <span class="sync" id="sync" role="status"><i></i><span id="syncText">Loading…</span></span></div><div class="nav-label">WORKSPACE</div>      <nav class="tabs" role="tablist" aria-label="Pages" aria-orientation="vertical">
         <button class="tab on" role="tab" aria-controls="pageSummary" data-view="summary" aria-selected="true" data-icon="🏠" data-short="Home">Overview</button>
         <button class="tab" role="tab" aria-controls="pageEmployees" data-view="employees" aria-selected="false" data-icon="👥" data-short="People">Employees</button>
       <button class="tab" role="tab" aria-controls="pageAttendance" data-view="attendance" aria-selected="false" data-icon="🗓️" data-short="Attend.">Attendance</button>
@@ -8415,7 +8438,16 @@ const bkRow = (key, iso) => { const p = D(true).people.get(key); if (!p) return 
 const bkExtraKey = r => Object.keys(r.extra || {}).find(k => k.toLowerCase() === BK_FIELD.toLowerCase());
 /* v3.33.0: a backup can cover a half day: stored as "Chen Li (half)" or "Yes (half)" */
 const BK_HALF = /\s*\((half|half day|½)\)\s*$/i;
-const bkRead = v0 => { let v = String(v0).trim(); const half = BK_HALF.test(v); if (half) v = v.replace(BK_HALF, '').trim();
+/* v3.71.0: a day can be split: "Seat shown live (1st half) + Chen Li (2nd half)", or "No (2nd half) + Worked (1st half)" */
+const BK_PART = /\s*\((1st|2nd|first|second)\s*half\)\s*$/i;
+const bkRead = v0 => {
+  const s0 = String(v0).trim();
+  if (s0.includes(' + ')) { const [a, ...rest] = s0.split(' + '), o = bkRead(a), t = rest.join(' + ').trim(); o.half = true; o.other = /^worked\b/i.test(t.replace(BK_PART, '').trim()) ? { worked: true } : bkRead(t); if (o.other) { delete o.other.half; delete o.other.other; } return o; }
+  let v = s0, part = null; const pm = BK_PART.exec(v); if (pm) { part = /^(1|f)/i.test(pm[1]) ? 1 : 2; v = v.replace(BK_PART, '').trim(); }
+  const half = !!part || BK_HALF.test(v); if (BK_HALF.test(v)) v = v.replace(BK_HALF, '').trim();
+  if (/^worked$/i.test(v)) return { worked: true };
+  const o0 = bkRead0(v); if (half) o0.half = true; if (part) o0.part = part; return o0; };
+const bkRead0 = v0 => { let v = String(v0).trim(); const half = BK_HALF.test(v); if (half) v = v.replace(BK_HALF, '').trim();
   /* v3.35.0: two answers only: Backup Provided / Backup Not Provided, each with an optional person and full / half day.
      "No/Chen Li" = not provided officially, but Chen Li covered. Old "Kept live" / "Unofficial backup" read as Not Provided. */
   const mn = /^(no|not provided|backup not provided)(\s*\/\s*(.+))?$/i.exec(v);
@@ -8423,7 +8455,21 @@ const bkRead = v0 => { let v = String(v0).trim(); const half = BK_HALF.test(v); 
   const ml = /^(seat\s*(shown\s*)?live|kept live|live)(\s*\/\s*(.+))?$/i.exec(v);
   const o = ml ? { live: true, b: (ml[4] || '').trim() } : bkIsLive(v) ? { no: true, b: '' } : mn ? { no: true, b: (mn[3] || '').trim() } : /^(yes|backup provided)$/i.test(v) ? { b: '', yes: true } : { b: v };
   if (half) o.half = true; return o; };
-const bkText = val => !val ? '' : (val.live ? 'Seat shown live' + (val.b ? '/' + val.b : '') : val.no ? 'No' + (val.b ? '/' + val.b : '') : (val.b || 'Yes')) + (val.half ? ' (half)' : '');
+const bkText1 = val => val.worked ? 'Worked' : (val.live ? 'Seat shown live' + (val.b ? '/' + val.b : '') : val.no ? 'No' + (val.b ? '/' + val.b : '') : (val.b || 'Yes'));
+const bkPartTxt = p => p === 1 ? ' (1st half)' : p === 2 ? ' (2nd half)' : ' (half)';
+const bkText = val => !val ? '' : bkText1(val) + (val.half ? bkPartTxt(val.part) : '') + (val.half && val.other ? ' + ' + bkText1(val.other) + bkPartTxt(val.part === 1 ? 2 : val.part === 2 ? 1 : null) : '');
+/* v3.71.0: how much of the day is billed: each half counts when it was worked, covered by a backup or shown live */
+const bkSplit = (b, c) => { if (!b || !b.half) return null;
+  const oth = b.other || (b.no ? (c === 'half' ? { worked: true } : { worked: true }) : (c === 'half' ? { worked: true } : { no: true }));
+  const kindOf = x => x.worked ? 'worked' : x.live ? 'live' : x.no ? 'none' : 'backup';
+  const p1 = b.part || 1, halves = { [p1]: kindOf(b), [p1 === 1 ? 2 : 1]: kindOf(oth) };
+  const bill = [1, 2].reduce((a, k) => a + (halves[k] === 'none' ? 0 : .5), 0);
+  return { halves, bill, explicit: !!b.other }; };
+const BK_KW = { worked: 'worked', live: 'seat shown live', backup: 'backup provided', none: 'no backup' };
+const bkSplitText = (b, sp) => { const p1 = b.part || 1, at = k => (k === p1 ? b : b.other) || {}, nm = k => (sp.halves[k] === 'backup' || sp.halves[k] === 'live') && at(k).b ? ' (' + at(k).b + ')' : '';
+  const abs = [1, 2].filter(k => sp.halves[k] !== 'worked');
+  return (abs.length === 2 ? 'Absent full day' : abs.length ? 'Absent ' + (abs[0] === 1 ? '1st' : '2nd') + ' half' : 'Present') + ' · 1st half: ' + BK_KW[sp.halves[1]] + nm(1) + ' · 2nd half: ' + BK_KW[sp.halves[2]] + nm(2); };
+const BKkind = x => !x ? '' : x.worked ? 'worked' : x.live ? 'live' : x.no ? 'none' : 'backup';
 const bkRemark = (key, iso) => { const r = bkRow(key, iso); if (!r) return ''; const k = Object.keys(r.extra || {}).find(q => q.toLowerCase() === BKM_FIELD.toLowerCase()); return k ? (bkParse(r.extra[k]).get(+iso.slice(8, 10)) || '') : ''; };
 const bkGet = (key, iso) => {
   const r = bkRow(key, iso);
@@ -8433,7 +8479,8 @@ const bkGet = (key, iso) => {
 /* v3.33.0: backups are for admins and super admins only (users don't see or change them). Local mode (no sign-in) = the owner. */
 /* v3.61.0: a role can be allowed or kept from setting backups ("Can set backups"); without that setting, admins can and users can't */
 const canBackup = () => { try { if (!(window.PERM && PERM.online())) return true; const u = CLOUD.user(); if (!u) return false; if (u.role === 'superadmin') return true; const p = u.permissions || {}; if (p._backupEdit === false) return false; if (p._backupEdit === true) return true; return isAdminRole(); } catch { return false; } };
-const bkLabel = x => !x ? '' : (x.live ? 'Seat Shown Live' : x.no ? 'Backup Not Provided' : 'Backup Provided') + (x.b ? ' · ' + x.b : '') + (x.half ? ' (half day)' : '');
+const bkLabel1 = x => x.worked ? 'Worked' : (x.live ? 'Seat Shown Live' : x.no ? 'Backup Not Provided' : 'Backup Provided') + (x.b ? ' · ' + x.b : '');
+const bkLabel = x => !x ? '' : x.half && x.other ? bkLabel1(x) + ' (' + ((x.part || 1) === 1 ? '1st' : '2nd') + ' ½) + ' + bkLabel1(x.other) + ' (' + ((x.part || 1) === 1 ? '2nd' : '1st') + ' ½)' : bkLabel1(x) + (x.half ? (x.part ? ' (' + (x.part === 1 ? '1st' : '2nd') + ' half)' : ' (half day)') : '');
 /* v3.30.1: backup settings: is the backup person's name optional (default), required, or not asked at all */
 const bkNameMode = () => { const m = ((window.TD_SETTINGS || {}).backup_opts || {}).name; return ['optional', 'required', 'off'].includes(m) ? m : 'optional'; };
 /* v3.30.0: "Backup provided" as a plain Yes / No (kept live counts as No: nobody was put on the work) */
@@ -8507,6 +8554,8 @@ function openBackupBox(pKey, iso, onDone, opts = {}) {
   const d = D(true), p = d.people.get(pKey); const name = p ? p.name : pKey;
   const cur = bkGet(pKey, iso), team = bkTeam(pKey, iso), days = bkStretch(p, iso), nmMode = bkNameMode();
   const curK = !cur ? '' : cur.live ? 'live' : cur.no ? 'no' : 'yes', dt = new Date(iso + 'T00:00:00Z');
+  /* v3.71.0: the leave code of the day (HD1 = 1st half, HD2 = 2nd half) suggests which half */
+  const dayCode = (() => { const r0 = bkRow(pKey, iso); return r0 ? String(r0.days[+iso.slice(8, 10) - 1] ?? '').trim().toUpperCase() : ''; })(), dayHalf = /^HD/.test(dayCode) || catOf(dayCode) === 'half';
   const firstIso = (opts.days && opts.days.length ? [...opts.days].sort()[0] : iso), aheadDays = Math.round((new Date(firstIso + 'T00:00:00Z') - TODAY) / 86400000), skipOk = !!opts.collect && aheadDays >= 15;
   /* v3.33.0: a cleaner box: pick one of three cards; the "Yes" card opens the person and full / half day */
   const OPT = [['yes', 'Backup Provided', 'A backup covers the work', '#22a05a', '<path d="M5 12l5 5L20 7"/>'], ['no', 'Backup Not Provided', 'No official backup', '#e34948', '<path d="M6 6l12 12M18 6L6 18"/>'], ['live', 'Seat Shown Live', 'On leave here, shown present to the client', '#3b6cf6', '<circle cx="12" cy="12" r="3"/><path d="M5.6 5.6a9 9 0 0 0 0 12.8M18.4 5.6a9 9 0 0 1 0 12.8M8.5 8.5a5 5 0 0 0 0 7M15.5 8.5a5 5 0 0 1 0 7"/>']];
@@ -8541,6 +8590,9 @@ function openBackupBox(pKey, iso, onDone, opts = {}) {
       .bkx-yes.live{border-color:color-mix(in srgb,#3b6cf6 40%,transparent);background:color-mix(in srgb,#3b6cf6 4%,transparent)}
       .bkx-yes.live .bkx-seg button[aria-pressed="true"]{color:#3558c8}
       .bkx-row{display:flex;align-items:center;gap:12px;font-size:12px;font-weight:600;color:var(--ink-2,#445)}
+      .bkx-split{display:flex;flex-direction:column;gap:8px;margin-top:10px;padding-top:10px;border-top:1px dashed var(--border,#dde2ea)} .bkx-split[hidden],#bkx-n2wrap[hidden]{display:none}
+      .bkx-oth{flex-wrap:wrap} #bkx-n2wrap{display:flex;flex-direction:column;gap:4px;font-size:12px;font-weight:600;color:var(--ink-2,#445)} #bkx-n2wrap em{font-style:normal;font-weight:400;color:var(--muted,#667)}
+      .bkx-sum{margin:0;font-size:12px;color:#1c7a45;font-weight:600} .bkx-sum.part{color:#9a5b00}
       @media (max-width:560px){.bkx-opts{grid-template-columns:1fr}.bkx-o{flex-direction:row;align-items:center}.bkx-o small{display:none}}
     </style>
     <div class="bkx-when">${cur && !opts.collect ? '<span class="bkx-clr" id="bkx-clr"><button type="button" class="btn mini" id="bk-clear-ask" title="Remove the saved backup for this day">Clear</button></span>' : ''}<span class="bkx-cal"><i>${MONTHS[dt.getUTCMonth()]}</i><b>${dt.getUTCDate()}</b></span><div style="padding-right:90px"><b>${esc(name)}</b> is on leave<span>${esc(opts.days && opts.days.length > 1 ? longDate(new Date(opts.days[0] + 'T00:00:00Z')) + ' – ' + longDate(new Date(opts.days[opts.days.length - 1] + 'T00:00:00Z')) + ' · ' + opts.days.length + ' days' : longDate(dt))} · who covers the work?</span></div></div>
@@ -8548,6 +8600,12 @@ function openBackupBox(pKey, iso, onDone, opts = {}) {
     <div class="bkx-opts" role="radiogroup" aria-label="Backup">${OPT.map(([k, t, sub, c, ico]) => `<button type="button" class="bkx-o" role="radio" data-bkx="${k}" aria-checked="${curK === k}" style="--oc:${c}"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">${ico}</svg><b>${t}</b><small>${sub}</small></button>`).join('')}</div>
     <div class="bkx-yes${curK === 'no' ? ' no' : curK === 'live' ? ' live' : ''}" id="bkx-yes" ${curK ? '' : 'hidden'}>
       <div class="bkx-row">Cover for <em style="font-style:normal;font-weight:400;color:#c63b3a">required</em> <span class="bkx-seg" role="group" aria-label="Cover for"><button type="button" data-bkh="full" aria-pressed="false">Full day</button><button type="button" data-bkh="half" aria-pressed="false">Half day</button></span></div>
+      <div class="bkx-split" id="bkx-split" hidden>
+        <div class="bkx-row">This option is for the <span class="bkx-seg" role="group" aria-label="Which half"><button type="button" data-bkp="1" aria-pressed="false">1st half</button><button type="button" data-bkp="2" aria-pressed="false">2nd half</button></span></div>
+        <div class="bkx-row">The other half <span class="bkx-seg bkx-oth" role="group" aria-label="The other half"><button type="button" data-bko="worked" aria-pressed="false">Worked</button><button type="button" data-bko="yes" aria-pressed="false">Backup Provided</button><button type="button" data-bko="live" aria-pressed="false">Seat Shown Live</button><button type="button" data-bko="no" aria-pressed="false">Not Provided</button></span></div>
+        <label id="bkx-n2wrap" hidden><span>Other half covered by</span> <em>optional</em><input type="text" id="bk-name2" list="bk-list" placeholder="Type or pick a name, or leave blank" autocomplete="off"></label>
+        <p class="bkx-sum" id="bkx-sum"></p>
+      </div>
       ${nmMode === 'off' ? '' : `<label id="bkx-pwrap" ${curK === 'no' ? 'style="display:none"' : ''}><span id="bkx-plbl">${curK === 'live' ? 'Taken care of by' : 'Backup person'}</span> <em id="bkx-pem">${nmMode === 'optional' || curK !== 'yes' ? 'optional · anyone in the current team' : 'anyone in the current team'}</em><input type="text" id="bk-name" list="bk-list" value="${esc(cur && cur.b ? cur.b : '')}" placeholder="${nmMode === 'optional' ? 'Type or pick a name, or leave blank' : 'Type or pick a name'}" autocomplete="off"><datalist id="bk-list">${team.map(t => `<option value="${esc(t.name)}" label="${esc([t.id && 'ID ' + t.id, t.sub, t.out ? 'also off that day' : ''].filter(Boolean).join(' · '))}"></option>`).join('')}</datalist></label>`}
     </div>
     <label class="bkx-rm" id="bkx-rm" ${opts.collect || curK ? '' : 'hidden'}>${opts.collect ? 'Comments / remarks <em style="color:#c63b3a">required</em>' : 'Remarks <em>optional · copied as written</em>'}<textarea id="bk-rm" rows="2" maxlength="200" placeholder="${opts.collect ? 'Write a comment' : 'Optional note'}">${esc(bkRemark(pKey, iso))}</textarea></label>
@@ -8556,7 +8614,8 @@ function openBackupBox(pKey, iso, onDone, opts = {}) {
     footer: `${skipOk ? `<button class="btn" id="bk-skip" title="The leave starts in ${aheadDays} days: record it now and set the backup closer to the date">Skip backup for now</button>` : ''}<span class="grow"></span><button class="btn" data-close>Cancel</button><button class="btn primary" id="bk-go" ${curK ? '' : 'disabled'}>${esc(opts.confirm || 'Save')}</button>` });
   /* v3.60.1: leave 15 or more days ahead can be saved without deciding the backup yet */
   $('#bk-skip', m)?.addEventListener('click', async () => { closeModal(); try { await opts.collect(null); } catch (e) { toast('Could not finish: ' + e.message); } });
-  let pick = curK, half = null;   /* v3.44.0: Full day / Half day is always chosen on purpose (blank to start) */
+  let pick = curK, half = cur && typeof cur.half === 'boolean' ? cur.half : null;   /* v3.44.0: chosen on purpose; v3.70.2: an existing backup keeps its choice */
+  if (half !== null) setTimeout(() => m.querySelectorAll('[data-bkh]').forEach(x => x.setAttribute('aria-pressed', String((x.dataset.bkh === 'half') === half))), 0);
   const kind = () => pick, isHalf = () => half;
   m.querySelectorAll('[data-bkx]').forEach(b => b.addEventListener('click', () => {
     pick = b.dataset.bkx; m.querySelectorAll('[data-bkx]').forEach(x => x.setAttribute('aria-checked', String(x === b)));
@@ -8564,7 +8623,31 @@ function openBackupBox(pKey, iso, onDone, opts = {}) {
     $('#bkx-yes', m).hidden = !pick; $('#bkx-yes', m).classList.toggle('live', pick === 'live'); $('#bkx-yes', m).classList.toggle('no', pick === 'no'); if ($('#bkx-pwrap', m)) $('#bkx-pwrap', m).style.display = pick === 'no' ? 'none' : ''; if ($('#bkx-plbl', m)) { $('#bkx-plbl', m).textContent = pick === 'live' ? 'Taken care of by' : 'Backup person'; $('#bkx-pem', m).textContent = (nmMode === 'optional' || pick !== 'yes' ? 'optional · ' : '') + 'anyone in the current team'; } $('#bkx-rm', m).hidden = !pick && !opts.collect; $('#bkx-yes', m).classList.toggle('no', pick === 'no'); $('#bk-go', m).disabled = false; $('#bk-err', m).textContent = '';
     setTimeout(() => $('#bk-name', m)?.focus(), 0);
   }));
-  m.querySelectorAll('[data-bkh]').forEach(b => b.addEventListener('click', () => { half = b.dataset.bkh === 'half'; m.querySelectorAll('[data-bkh]').forEach(x => x.setAttribute('aria-pressed', String(x === b))); }));
+  /* v3.71.0: Half day: which half this option is for, and what happened in the other half */
+  let part = cur && cur.part ? cur.part : (/^HD2/.test(dayCode) ? 2 : /^HD1/.test(dayCode) ? 1 : null);
+  let oth = cur && cur.other ? (cur.other.worked ? 'worked' : cur.other.live ? 'live' : cur.other.no ? 'no' : 'yes') : null;
+  const KW = { worked: 'worked', yes: 'backup', live: 'shown live', no: 'no backup' };
+  const drawSplit = () => {
+    const box = $('#bkx-split', m); box.hidden = half !== true || !pick;
+    if (box.hidden) return;
+    if (!oth) oth = dayHalf || pick === 'no' ? 'worked' : 'no';
+    m.querySelectorAll('[data-bkp]').forEach(x => x.setAttribute('aria-pressed', String(+x.dataset.bkp === part)));
+    m.querySelectorAll('[data-bko]').forEach(x => x.setAttribute('aria-pressed', String(x.dataset.bko === oth)));
+    $('#bkx-n2wrap', m).hidden = !(oth === 'yes' || oth === 'live');
+    const cov = k => k === 'no' ? 0 : .5, bill = cov(pick) + cov(oth), sum = $('#bkx-sum', m);
+    const p1 = part || 1, h1 = p1 === 1 ? pick : oth, h2 = p1 === 1 ? oth : pick, abs = [h1, h2].filter(k => k !== 'worked').length;
+    sum.textContent = part ? (bill === 1 ? 'Billed as a full day (P)' : bill ? 'Billed as half a day' : 'Not billed') + ' · ' + (abs === 2 ? 'absent the full day' : abs ? 'absent the ' + (h1 !== 'worked' ? '1st' : '2nd') + ' half' : 'present') + ' · 1st half: ' + KW[h1] + ', 2nd half: ' + KW[h2] : 'Choose which half this option is for.';
+    sum.classList.toggle('part', bill !== 1);
+  };
+  if (cur && cur.other && cur.other.b) setTimeout(() => { const n2 = $('#bk-name2', m); if (n2) n2.value = cur.other.b; }, 0);
+  m.querySelectorAll('[data-bkh]').forEach(b => b.addEventListener('click', () => { half = b.dataset.bkh === 'half'; m.querySelectorAll('[data-bkh]').forEach(x => x.setAttribute('aria-pressed', String(x === b))); drawSplit(); }));
+  m.querySelectorAll('[data-bkp]').forEach(b => b.addEventListener('click', () => { part = +b.dataset.bkp; drawSplit(); }));
+  m.querySelectorAll('[data-bko]').forEach(b => b.addEventListener('click', () => { oth = b.dataset.bko; drawSplit(); if (!$('#bkx-n2wrap', m).hidden) $('#bk-name2', m)?.focus(); }));
+  m.querySelectorAll('[data-bkx]').forEach(b => b.addEventListener('click', () => setTimeout(drawSplit, 0)));
+  setTimeout(drawSplit, 0);
+  /* what the other half adds to the saved value */
+  const splitOf = () => { if (half !== true || !part) return {}; const n2 = ($('#bk-name2', m)?.value || '').trim(), o = oth === 'worked' ? { worked: true } : oth === 'live' ? { live: true, b: n2 } : oth === 'no' ? { no: true, b: '' } : { b: n2, yes: !n2 };
+    return { part, other: o }; };
   const write = async val => {
     const which = opts.days && opts.days.length ? opts.days : [iso];
     if (opts.collect) { closeModal(); try { await opts.collect(val); } catch (e) { toast('Could not finish: ' + e.message); } return; }
@@ -8584,21 +8667,22 @@ function openBackupBox(pKey, iso, onDone, opts = {}) {
     const write = v => write0(v ? { ...v, remark: rmv() } : v);
     /* v3.43.4: when approving or recording leave, a comment is required */
     if (kind() && half === null) { $('#bk-err', m).textContent = 'Choose Cover for: Full day or Half day.'; return; }
+    if (kind() && half === true && !part) { $('#bk-err', m).textContent = 'Choose which half this option is for: 1st half or 2nd half.'; return; }
     if (opts.collect && rmv().trim().length < 2) { $('#bk-err', m).textContent = 'Add a comment / remark first.'; $('#bk-rm', m)?.focus(); return; }
     try {
       if (kind() === 'live') { const vl = !$('#bk-name', m) ? '' : $('#bk-name', m).value.trim(), hl = vl ? team.find(t => t.name.toLowerCase() === vl.toLowerCase()) : null;
         if (vl && !hl) { $('#bk-err', m).textContent = 'Pick someone from the current team list, or leave the name blank.'; return; }
-        return await write({ live: true, b: hl ? hl.name : '', half: isHalf(), by: BE.userName(), at: new Date().toISOString() }); }
+        return await write({ live: true, b: hl ? hl.name : '', half: isHalf(), ...splitOf(), by: BE.userName(), at: new Date().toISOString() }); }
       if (kind() === 'no') { const vn = '',   /* v3.40.4: no name for Backup Not Provided */ hn = vn ? team.find(t => t.name.toLowerCase() === vn.toLowerCase()) : null;
         if (vn && !hn) { $('#bk-err', m).textContent = 'Pick someone from the current team list, or leave the name blank.'; return; }
-        return await write({ no: true, b: hn ? hn.name : '', half: isHalf(), by: BE.userName(), at: new Date().toISOString() }); }
+        return await write({ no: true, b: hn ? hn.name : '', half: isHalf(), ...splitOf(), by: BE.userName(), at: new Date().toISOString() }); }
       if (kind() === 'none') return await write({ none: true, by: BE.userName(), at: new Date().toISOString() });
       if (!kind()) { $('#bk-err', m).textContent = 'Pick one of the three options.'; return; }
       const v = nmMode === 'off' || !$('#bk-name', m) ? '' : $('#bk-name', m).value.trim(); const hit = team.find(t => t.name.toLowerCase() === v.toLowerCase());
       if (!v && nmMode === 'required') { $('#bk-err', m).textContent = 'Pick who is covering, or choose “Backup Not Provided”.'; return; }
-      if (!v) return await write({ b: '', yes: true, half: isHalf(), by: BE.userName(), at: new Date().toISOString() });
+      if (!v) return await write({ b: '', yes: true, half: isHalf(), ...splitOf(), by: BE.userName(), at: new Date().toISOString() });
       if (!hit) { $('#bk-err', m).textContent = 'Pick someone from the current team list.'; return; }
-      await write({ b: hit.name, id: hit.id, half: isHalf(), by: BE.userName(), at: new Date().toISOString() });
+      await write({ b: hit.name, id: hit.id, half: isHalf(), ...splitOf(), by: BE.userName(), at: new Date().toISOString() });
     } catch (e) { $('#bk-err', m).textContent = 'Could not save: ' + e.message; }
   };
   /* v3.36.0: Clear sits at the top and asks first */
@@ -8753,13 +8837,14 @@ function backupReportData(cycle, client, yn = 'all', range = null, sub = BKR.sub
       const cl = bkClientOf(r); if (!bkPass(r, client, sub)) continue;
       const c = catOf(r.days[i]); if (!c || !LEAVE_CATS.has(c)) continue;
       const key = personKey(r.name), b = bkGet(key, iso);
-      items.push({ iso, name: r.name.trim(), pseudo: bkPseudo(r), key, client: cl, code: String(r.days[i]).trim().toUpperCase(), days: c === 'half' ? 0.5 : 1, st: bkYes(b) ? 'backup' : bkLive(b) ? 'live' : 'none', backup: b && b.b ? b.b : '', half: !!(b && b.half), set: !!b });
+      const spx = b && b.half && b.other ? bkSplit(b, c) : null, split = spx ? Object.values(spx.halves).reduce((a, k) => (a[k] = (a[k] || 0) + .5, a), {}) : null;
+      items.push({ iso, name: r.name.trim(), pseudo: bkPseudo(r), key, client: cl, code: String(r.days[i]).trim().toUpperCase(), days: split ? 1 - (split.worked || 0) : c === 'half' ? 0.5 : 1, st: split ? (split.backup ? 'backup' : split.live ? 'live' : 'none') : bkYes(b) ? 'backup' : bkLive(b) ? 'live' : 'none', backup: b && b.b ? b.b : (b && b.other && b.other.b ? b.other.b : ''), half: !!(b && b.half), set: !!b, split, splitTxt: spx ? bkSplitText(b, spx) : '' });
     }
   }
   items.sort((a, b) => a.iso.localeCompare(b.iso) || a.name.localeCompare(b.name));
-  for (const x of items) x.yn = x.st !== 'none' ? 'Yes' : 'No', x.ynL = x.st === 'live' ? 'Seat Shown Live' : (x.st === 'backup' ? 'Backup Provided' : 'Backup Not Provided') + (x.half ? ' · half day' : '');
+  for (const x of items) x.yn = x.st !== 'none' ? 'Yes' : 'No', x.ynL = x.splitTxt ? x.splitTxt : x.st === 'live' ? 'Seat Shown Live' : (x.st === 'backup' ? 'Backup Provided' : 'Backup Not Provided') + (x.half ? ' · half day' : '');
   if (yn !== 'all') { const keep = items.filter(x => x.yn.toLowerCase() === yn); items.length = 0; items.push(...keep); }
-  const sum = list => { const o = { people: new Set(list.map(x => x.key)).size, days: 0, backup: 0, live: 0, none: 0, pBackup: new Set(), pLive: new Set(), pNone: new Set() }; for (const x of list) { o.days += x.days; if (x.st === 'backup' && x.half) { o.backup += x.days / 2; o.none += x.days / 2; } else o[x.st] += x.days; ({ backup: o.pBackup, live: o.pLive, none: o.pNone })[x.st].add(x.key); } o.pBackup = o.pBackup.size; o.pLive = o.pLive.size; o.pNone = o.pNone.size; o.cov = o.days ? Math.round((o.backup + o.live) / o.days * 100) : 100; return o; };
+  const sum = list => { const o = { people: new Set(list.map(x => x.key)).size, days: 0, backup: 0, live: 0, none: 0, pBackup: new Set(), pLive: new Set(), pNone: new Set() }; for (const x of list) { o.days += x.days; if (x.split) { for (const [kk, v] of Object.entries(x.split)) if (kk !== 'worked') o[kk] += v; } else if ((x.st === 'backup' || x.st === 'live') && x.half) { o[x.st] += x.days / 2; o.none += x.days / 2; } else o[x.st] += x.days; ({ backup: o.pBackup, live: o.pLive, none: o.pNone })[x.st].add(x.key); } o.pBackup = o.pBackup.size; o.pLive = o.pLive.size; o.pNone = o.pNone.size; o.cov = o.days ? Math.round((o.backup + o.live) / o.days * 100) : 100; return o; };
   const clients = [...new Set(items.map(x => x.client))].sort();
   return { items, total: sum(items), byClient: clients.map(c => ({ client: c, ...sum(items.filter(x => x.client === c)) })) };
 }
@@ -8863,7 +8948,7 @@ function mountBackupReport(body) {
     let G = null; const gTitle = (() => { let c = []; try { c = [...((state.filters.sel || {}).client || [])]; } catch { } return c.length ? c.join(', ') : 'All clients'; })() + ' | ' + MONTHS[Engine.serialToDate(BKR.month).getUTCMonth()] + '-' + Engine.serialToDate(BKR.month).getUTCFullYear() + (BKR.span !== 'cycle' ? ' · ' + bkRangeLabel(RG) : '');
     if (BKR.view === 'grid') {
       G = bkGridData(BKR.month, BKR.client, BKR.sub, RG, BKR.names === 'pseudo');
-      body.querySelector('#bkrSheet').innerHTML = `<div class="bkg-title">${esc(gTitle)}</div><p class="sm muted" style="text-align:center;margin:-6px 0 10px">${esc(cycRange(BKR.month))} · ${G.people.length} people · billed days = P + H + BR (HD and BR½ count half)</p>${bkGridLegend()}<div class="bkg-wrap">${bkGridHTML(G, gTitle, BKR.names)}</div>`;
+      body.querySelector('#bkrSheet').innerHTML = `<div class="bkg-title">${esc(gTitle)}</div><p class="sm muted" style="text-align:center;margin:-6px 0 10px">${esc(cycRange(BKR.month))} · ${G.people.length} people · billed days = P + H + BR (HD, BR½ and P½ count half)</p>${bkGridLegend()}<div class="bkg-wrap">${bkGridHTML(G, gTitle, BKR.names)}</div>`;
       body.querySelectorAll('[data-bkg-k]').forEach(el => { const go = () => openBackupBox(el.dataset.bkgK, el.dataset.iso, draw); el.addEventListener('click', go); el.addEventListener('keydown', e => { if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); go(); } }); });
     }
     /* v3.51.0: calendar view: one block per week (Mon–Fri), each day lists who was on backup, absent or late */
@@ -8909,11 +8994,16 @@ function bkGridData(cycle, client, sub, range, merge) {
       if (v == null) k = !trackedOn(r, i) ? 'SR' : (w === 0 || w === 6) ? 'L' : 'P';
       else if (c === 'off') k = code === 'H' ? 'H' : 'L';
       else if (c === 'moved' || c === 'na') k = 'SR';
-      else if (c === 'half' || LEAVE_CATS.has(c) || c === 'applied') { const b = bkGet(key, iso); k = bkLive(b) ? 'LIVE' : bkYes(b) ? 'BR' : (c === 'half' || (b && b.half)) ? 'HD' : 'L'; if (k === 'BR' && b.half && c !== 'half') k = 'BRH'; }   /* v3.58.2: "Cover for: Half day" bills the seat as a half day even when the tracker says full-day leave */
+      else if (c === 'half' || LEAVE_CATS.has(c) || c === 'applied') { const b = bkGet(key, iso); k = bkLive(b) ? 'LIVE' : bkYes(b) ? 'BR' : (c === 'half' || (b && b.half)) ? 'HD' : 'L'; if (k === 'BR' && b.half && c !== 'half') k = 'BRH'; if (k === 'LIVE' && b.half && c !== 'half') k = 'LIVEH'; }   /* v3.70.2: Seat shown live for half the day bills half */   /* v3.58.2: "Cover for: Half day" bills the seat as a half day even when the tracker says full-day leave */
       else if (c === 'present' || c === 'remote' || c === 'late') k = 'P';
       else k = 'X';
       const b = k === 'BR' || k === 'BRH' ? bkGet(key, iso) : null;
-      const def = k === 'LIVE' ? ['P', 'p', 1, 'Seat shown live (on leave, shown present to the client)'] : k === 'BRH' ? ['BR½', 'br', .5, 'Backup for half the day'] : k === 'X' ? [code, 'x', 0, 'Code ' + code] : BKG[k];
+      /* v3.71.0: a split day: each half billed on its own (worked, backup or shown live = ½ each); both halves covered = P */
+      const b2 = (c === 'half' || LEAVE_CATS.has(c) || c === 'applied') ? bkGet(key, iso) : null, sp2 = b2 && b2.half && b2.other ? bkSplit(b2, c) : null;
+      if (sp2) { const t = sp2.bill === 1 ? 'P' : sp2.bill === .5 ? (sp2.halves[1] === 'worked' || sp2.halves[2] === 'worked' ? 'HD' : sp2.halves[1] === 'live' || sp2.halves[2] === 'live' ? 'P½' : 'BR½') : '';
+        P.cells[j] = { key, iso, leave: true, t, cls: sp2.bill === 1 ? 'p' : sp2.bill ? 'hd' : 'l', x: 'split ' + (sp2.halves[1] !== 'worked' && sp2.halves[2] !== 'worked' ? 'absf' : sp2.halves[1] !== 'worked' ? 'abs1' : 'abs2'), bill: sp2.bill, title: bkFmtD(iso) + ' · ' + code + ' · ' + bkSplitText(b2, sp2) };
+        P.total += sp2.bill; continue; }
+      const def = k === 'LIVE' ? ['P', 'p', 1, 'Seat shown live (on leave, shown present to the client)'] : k === 'LIVEH' ? ['P½', 'hd', .5, 'Seat shown live for half the day'] : k === 'BRH' ? ['BR½', 'br', .5, 'Backup for half the day'] : k === 'X' ? [code, 'x', 0, 'Code ' + code] : BKG[k];
       P.cells[j] = { key, iso, leave: c === 'half' || LEAVE_CATS.has(c) || c === 'applied', t: def[0], cls: def[1], bill: def[2], title: bkFmtD(iso) + ' · ' + (code || (k === 'P' ? 'blank = present' : k === 'L' ? 'week end' : '')) + ' · ' + def[3] + (b && b.b ? ' · ' + b.b : '') };
       P.total += def[2];
     }
@@ -8943,13 +9033,13 @@ function bkGridData(cycle, client, sub, range, merge) {
 }
 function bkGridHTML(G, title, names, forCopy) {
   const inl = forCopy ? { p: 'background:#c6f7c6;border:1px solid #4caf50', hd: 'background:#ffff66;border:1px solid #c9b600', h: 'background:#1ee3ef;border:1px solid #0aa', br: 'background:#8bc34a;border:1px solid #5b8f22;color:#fff', sr: 'background:#111;color:#fff;border:1px solid #111', l: 'background:#ff8a8a;border:1px solid #e06666', x: 'background:#eee;border:1px solid #bbb' } : null;
-  const cellIn = c => !c ? '' : forCopy ? `<span style="display:inline-block;min-width:22px;padding:2px 3px;font-weight:700;font-size:11px;${inl[c.cls]}">${esc(c.t) || '&nbsp;'}</span>` : `<span class="bkg-c ${c.cls}${c.leave && canBackup() ? ' ed' : ''}" title="${esc(c.title)}${c.leave && canBackup() ? ' · click to set the backup' : ''}"${c.leave && canBackup() ? ` data-bkg-k="${esc(c.key)}" data-iso="${c.iso}" role="button" tabindex="0"` : ''}>${esc(c.t)}</span>`;
+  const cellIn = c => !c ? '' : forCopy ? `<span style="display:inline-block;min-width:22px;padding:2px 3px;font-weight:700;font-size:11px;${inl[c.cls]}">${esc(c.t) || '&nbsp;'}</span>` : `<span class="bkg-c ${c.cls}${c.x ? ' ' + c.x : ''}${c.leave && canBackup() ? ' ed' : ''}" title="${esc(c.title)}${c.leave && canBackup() ? ' · click to set the backup' : ''}"${c.leave && canBackup() ? ` data-bkg-k="${esc(c.key)}" data-iso="${c.iso}" role="button" tabindex="0"` : ''}>${esc(c.t)}</span>`;
   const td = forCopy ? ' style="border:1px solid #dce3ed;padding:4px;text-align:center"' : '', th = forCopy ? ' style="border:1px solid #dce3ed;padding:4px;background:#f1f3f7;text-align:center;font-size:11px"' : '';
   const head = `<tr><th${th}>Sr.<br>No.</th><th${forCopy ? ' style="border:1px solid #dce3ed;padding:4px 8px;background:#f1f3f7;text-align:left"' : ' class="nm"'}>Name</th>${G.days.map(dt => `<th${th} class="${dt.getUTCDay() % 6 === 0 ? 'we' : ''}"><span class="wd">${WEEKDAYS[dt.getUTCDay()]}</span>${forCopy ? '<br>' : ''}<b>${dt.getUTCDate()}</b></th>`).join('')}<th${th}>Total<br>Billed<br>Days</th></tr>`;
   const body = G.people.map((P, n) => `<tr><td${td}>${n + 1}</td><td${forCopy ? ' style="border:1px solid #dce3ed;padding:4px 8px;white-space:nowrap"' : ' class="nm"'}>${esc(names === 'pseudo' ? P.pseudo : P.name)}${!forCopy && P.members ? ` <span class="bkg-m" title="One seat, shared by: ${esc(P.members.join(', '))}">⇄ ${P.members.length}</span>` : ''}</td>${P.cells.map(c => `<td${td}>${cellIn(c)}</td>`).join('')}<td${td}><b>${fmt(P.total)}</b></td></tr>`).join('');
   return `${forCopy ? `<p style="font:bold 14px Segoe UI,Arial,sans-serif;text-align:center">${esc(title)}</p>` : ''}<table class="bkg" ${forCopy ? 'style="border-collapse:collapse;font:12px Segoe UI,Arial,sans-serif"' : ''}><thead>${head}</thead><tbody>${body || `<tr><td colspan="${G.days.length + 3}">No one in this selection.</td></tr>`}</tbody></table>`;
 }
-const bkGridLegend = () => `<div class="bkg-legend">${[['p', 'P', 'Present'], ['hd', 'HD', 'Half Day'], ['h', 'H', 'Holiday'], ['br', 'BR', 'Backup Recruiter'], ['sr', 'SR', 'Seat Remove'], ['l', '', 'Leave / Absent / Week End']].map(([c, t, l]) => `<span><span class="bkg-c ${c}">${t}</span>${l}</span>`).join('')}</div>`;
+const bkGridLegend = () => `<div class="bkg-legend">${[['p', 'P', 'Present'], ['hd', 'HD', 'Half Day'], ['h', 'H', 'Holiday'], ['br', 'BR', 'Backup Recruiter'], ['sr', 'SR', 'Seat Remove'], ['l', '', 'Leave / Absent / Week End'], ['p split abs2', 'P', 'Split day: halves covered by backup / seat shown live (A1 / A2 = absent 1st / 2nd half, A = absent all day)']].map(([c, t, l]) => `<span><span class="bkg-c ${c}">${t}</span>${l}</span>`).join('')}</div>`;
 async function bkGridCopy(G, title, names) {
   const txt = [title, '', ['Sr. No.', 'Name', ...G.days.map(dt => WEEKDAYS[dt.getUTCDay()] + ' ' + dt.getUTCDate()), 'Total Billed Days'].join('\t'), ...G.people.map((P, n) => [n + 1, names === 'pseudo' ? P.pseudo : P.name, ...P.cells.map(c => c ? (c.t || (c.cls === 'l' ? 'L' : '')) : ''), fmt(P.total)].join('\t'))].join('\n');
   const html = '<div>' + bkGridHTML(G, title, names, true) + '</div>';
@@ -9040,6 +9130,13 @@ function bkCalData(cycle, client, sub, range, withLate) {
           if (c === 'late') { if (!withLate) continue; st = 'late'; label = 'Few hours late'; pp.pL.add(key); }
           else if (LEAVE_CATS.has(c)) {
             const b = bkGet(key, iso);
+            const spc = b && b.half && b.other ? bkSplit(b, c) : null;
+            if (spc) {   /* v3.71.0: split day: each half counted on its own */
+              const hv = Object.values(spc.halves); if (!hv.some(k => k === 'backup' || k === 'none')) { count.live++; continue; }
+              pp.pOut.add(key); for (const k of hv) { if (k === 'backup') { count.bDays += .5; pp.pB.add(key); } else if (k === 'none') { count.nDays += .5; pp.pN.add(key); } }
+              st = hv.includes('none') ? 'none' : 'backup'; label = bkSplitText(b, spc).replace(/ · /, ' — ');
+              count[st]++; entries.push({ key, iso, name: r.name.trim(), pseudo: bkPseudo(r), st, label, leave: true, set: true, remark: bkRemark(key, iso) }); continue;
+            }
             if (bkLive(b)) { count.live++; continue; }
             const dd = c === 'half' ? 0.5 : 1; pp.pOut.add(key);
             /* v3.52.2: say plainly whether a backup was provided: Provided, Not Provided, or Not updated (nobody recorded it yet) */
@@ -9114,7 +9211,7 @@ function bkCharts(R, clientView) {
   const cl = clientView ? '' : `<div class="bkc-panel"><h5>By client</h5>${R.byClient.map(c => `<div class="bkc-row"><span title="${esc(c.client)}">${esc(c.client)}</span><div class="bkc-bar"><i class="p" style="width:${c.days ? (c.backup + c.live) / c.days * 100 : 0}%"></i><i class="n" style="width:${c.days ? c.none / c.days * 100 : 0}%"></i></div><b>${c.cov}%</b></div>`).join('')}</div>`;
   return `<div class="bkc ${clientView ? 'one' : ''}">${cl}<div class="bkc-panel"><h5>Day by day <em><i class="p"></i>Provided <i class="n"></i>Not provided</em></h5><div class="bkc-cols">${cols}</div></div></div>`;
 }
-const BKG_CSS = `.bkg-title{text-align:center;font-weight:700;font-size:15px;margin:4px 0 10px}.bkg-legend{display:flex;flex-wrap:wrap;justify-content:flex-end;gap:6px 14px;font-size:12.5px;margin:0 0 10px}.bkg-legend>span{display:inline-flex;align-items:center;gap:5px}.bkg-wrap{overflow:auto;border:1px solid #e3e6ec;border-radius:10px}.bkg{border-collapse:collapse;font-size:12.5px;min-width:100%}.bkg th,.bkg td{padding:4px 3px;text-align:center;border-bottom:1px solid #eef0f4}.bkg thead th{font-size:11.5px;vertical-align:bottom;background:#f7f8fa;position:sticky;top:0}.bkg thead th .wd{display:block;writing-mode:vertical-rl;transform:rotate(180deg);margin:0 auto 4px;font-weight:700}.bkg thead th b{display:block}.bkg .nm{text-align:left;white-space:nowrap;padding:4px 10px;position:sticky;left:0;background:#fff}.bkg thead .nm{background:#f7f8fa;z-index:2}.bkg-c{display:inline-flex;align-items:center;justify-content:center;min-width:24px;height:22px;padding:0 3px;font-size:11px;font-weight:700;border:1px solid transparent;border-radius:2px;box-sizing:border-box}.bkg-c.p{background:#c6f7c6;border-color:#4caf50;color:#1d3d1d}.bkg-c.hd{background:#ffff66;border-color:#c9b600;color:#333}.bkg-c.h{background:#1ee3ef;border-color:#0aa;color:#023}.bkg-c.br{background:#8bc34a;border-color:#5b8f22;color:#fff}.bkg-c.sr{background:#111;border-color:#111;color:#fff}.bkg-c.l{background:#ff8a8a;border-color:#e06666}.bkg-c.x{background:#eee;border-color:#bbb;color:#333}.bkg-c.ed{cursor:pointer}.bkg-m{font-size:10.5px;color:#667;border:1px solid #d9dde5;border-radius:8px;padding:0 5px;margin-left:4px;cursor:help}.bkg-c.ed:hover{outline:2px solid #334;outline-offset:1px}`;
+const BKG_CSS = `.bkg-c.split{position:relative}.bkg-c.split::after{position:absolute;top:-5px;right:-6px;font-size:8.5px;font-weight:800;line-height:1;padding:1px 3px;border-radius:5px;background:#fff3dc;color:#9a5b00;border:1px solid #f3dcae}.bkg-c.absf::after{content:'A'}.bkg-c.abs1::after{content:'A1'}.bkg-c.abs2::after{content:'A2'}.bkg-title{text-align:center;font-weight:700;font-size:15px;margin:4px 0 10px}.bkg-legend{display:flex;flex-wrap:wrap;justify-content:flex-end;gap:6px 14px;font-size:12.5px;margin:0 0 10px}.bkg-legend>span{display:inline-flex;align-items:center;gap:5px}.bkg-wrap{overflow:auto;border:1px solid #e3e6ec;border-radius:10px}.bkg{border-collapse:collapse;font-size:12.5px;min-width:100%}.bkg th,.bkg td{padding:4px 3px;text-align:center;border-bottom:1px solid #eef0f4}.bkg thead th{font-size:11.5px;vertical-align:bottom;background:#f7f8fa;position:sticky;top:0}.bkg thead th .wd{display:block;writing-mode:vertical-rl;transform:rotate(180deg);margin:0 auto 4px;font-weight:700}.bkg thead th b{display:block}.bkg .nm{text-align:left;white-space:nowrap;padding:4px 10px;position:sticky;left:0;background:#fff}.bkg thead .nm{background:#f7f8fa;z-index:2}.bkg-c{display:inline-flex;align-items:center;justify-content:center;min-width:24px;height:22px;padding:0 3px;font-size:11px;font-weight:700;border:1px solid transparent;border-radius:2px;box-sizing:border-box}.bkg-c.p{background:#c6f7c6;border-color:#4caf50;color:#1d3d1d}.bkg-c.hd{background:#ffff66;border-color:#c9b600;color:#333}.bkg-c.h{background:#1ee3ef;border-color:#0aa;color:#023}.bkg-c.br{background:#8bc34a;border-color:#5b8f22;color:#fff}.bkg-c.sr{background:#111;border-color:#111;color:#fff}.bkg-c.l{background:#ff8a8a;border-color:#e06666}.bkg-c.x{background:#eee;border-color:#bbb;color:#333}.bkg-c.ed{cursor:pointer}.bkg-m{font-size:10.5px;color:#667;border:1px solid #d9dde5;border-radius:8px;padding:0 5px;margin-left:4px;cursor:help}.bkg-c.ed:hover{outline:2px solid #334;outline-offset:1px}`;
 const BKR_CSS = BKG_CSS + BKCAL_CSS + `.bkr-scope{align-self:center;max-width:420px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}.bkms{position:relative;display:inline-block}.bkms-btn{display:inline-flex;align-items:center;gap:6px;height:34px;padding:0 10px;border:1px solid var(--border,#dfe3ea);border-radius:10px;background:var(--surface,#fff);color:var(--ink,#1a2233);font:inherit;font-size:13px;cursor:pointer;max-width:240px}.bkms-btn small{color:var(--ink-2,#5b6478);font-size:11.5px;font-weight:600}.bkms-btn b{font-weight:650;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}.bkms-btn i{font-style:normal;color:var(--ink-2,#5b6478);font-size:11px}.bkms-btn.on{border-color:var(--accent,#2563eb);background:color-mix(in srgb,var(--accent,#2563eb) 7%,var(--surface,#fff))}.bkms-pop{position:absolute;z-index:60;top:calc(100% + 6px);left:0;width:260px;background:var(--surface,#fff);border:1px solid var(--border,#dfe3ea);border-radius:12px;box-shadow:0 12px 32px rgba(20,30,50,.16);padding:10px;display:flex;flex-direction:column;gap:8px}.bkms-pop[hidden]{display:none}.bkms-q{width:100%}.bkms-acts{display:flex;justify-content:space-between}.bkms-list{max-height:260px;overflow:auto;display:flex;flex-direction:column}.bkms-o{display:flex;align-items:center;gap:8px;padding:6px 6px;border-radius:8px;cursor:pointer;font-size:13px}.bkms-o:hover{background:var(--surface-2,#f3f5f9)}.bkms-o[hidden]{display:none}.bkms-foot{display:flex;align-items:center;gap:6px;border-top:1px solid var(--border,#e6e9ef);padding-top:8px}.bkms-foot span{flex:1}`+`.bkc{display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1.6fr);gap:12px;margin:0 0 14px}.bkc.one{grid-template-columns:1fr}.bkc-panel{border:1px solid #e3e6ec;border-radius:12px;padding:10px 12px}.bkc-panel h5{margin:0 0 8px;font-size:12px;display:flex;gap:10px;align-items:center}.bkc-panel h5 em{font-style:normal;font-weight:500;color:#667;font-size:11px;display:inline-flex;gap:4px;align-items:center;margin-left:auto}.bkc-panel h5 em i{display:inline-block;width:9px;height:9px;border-radius:2px;margin-left:6px}.bkc .p{background:#22a05a}.bkc .n{background:#e34948}.bkc-row{display:grid;grid-template-columns:minmax(0,90px) 1fr 38px;gap:8px;align-items:center;font-size:12px;padding:3px 0}.bkc-row span{overflow:hidden;text-overflow:ellipsis;white-space:nowrap}.bkc-row b{text-align:right}.bkc-bar{display:flex;height:12px;border-radius:6px;overflow:hidden;background:#eef0f4}.bkc-cols{display:flex;align-items:flex-end;gap:4px;height:130px;padding-top:4px;overflow-x:auto}.bkc-col{flex:1 0 22px;max-width:40px;height:100%;display:flex;flex-direction:column;justify-content:flex-end;align-items:center}.bkc-stack{width:70%;display:flex;flex-direction:column;border-radius:4px 4px 0 0;overflow:hidden;min-height:3px}.bkc-stack i{display:block;min-height:0}.bkc-col span{font-size:10.5px;line-height:1.1;margin-top:3px;text-align:center;color:#556}.bkc-col small{display:block;font-size:9px;color:#889}@media (max-width:800px){.bkc{grid-template-columns:1fr}}.bkr-title h3{margin:0 0 2px;font-size:17px}.bkr-title p{margin:0 0 12px;color:#556;font-size:12.5px}.bkr-tiles{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:10px;margin-bottom:10px}.bkr-tiles.two{grid-template-columns:repeat(2,minmax(0,1fr))}.bkr-t{border:1px solid #e3e6ec;border-radius:12px;padding:10px 14px;display:flex;flex-direction:column;border-top:3px solid var(--tc)}.bkr-t b{font-size:22px}.bkr-t span{font-weight:650;font-size:12.5px}.bkr-t em{font-style:normal;font-size:12px;color:#667}.bkr-t.b{--tc:#22a05a}.bkr-t.l{--tc:#3b6cf6}.bkr-t.n{--tc:#e34948}.bkr-bar2{display:flex;height:10px;border-radius:6px;overflow:hidden;background:#eef0f4;margin:0 0 16px}.bkr-bar2 .b{background:#22a05a}.bkr-bar2 .l{background:#3b6cf6}.bkr-bar2 .n{background:#e34948}h4{margin:16px 0 6px;font-size:13px}.bkr-tbl{width:100%;border-collapse:collapse;font-size:12.5px}.bkr-tbl th{text-align:left;font-size:11px;text-transform:uppercase;letter-spacing:.04em;color:#667;border-bottom:1px solid #e3e6ec;padding:6px 8px}.bkr-tbl td{padding:6px 8px;border-bottom:1px solid #eef0f4}.bkr-tbl td.bad{color:#c63b3a;font-weight:650}.bkr-st{display:inline-block;padding:1px 8px;border-radius:999px;font-size:11.5px;font-weight:600}.bkr-st.backup{background:#e3f4ea;color:#1c7a45}.bkr-st.live{background:#e6edfe;color:#3558c8}.bkr-st.none{background:#fde8e8;color:#c63b3a}.bk-yn{font-style:normal;font-size:10.5px;font-weight:700;padding:1px 7px;border-radius:6px}.bk-yn.y{background:#e3f4ea;color:#1c7a45}.bk-yn.n{background:#fde8e8;color:#c63b3a}.bk-yn.l{background:#e6edfe;color:#3558c8}`;
 /* ---------- v3.56.0: new Overview (Concept A layout, Concept F look). One "Who is out" card for Today / This week /
    This month (the 26th–25th cycle), each person with their leave code and backup status, plus a Mon–Fri week bar chart.
@@ -10163,7 +10260,7 @@ async function poll() {
 }
 
 /* ============================== filtering ============================== */
-const APP = { title: "Team Dashboard", version: "3.69.2", released: "20 Oct 2026" };
+const APP = { title: "Team Dashboard", version: "3.71.0", released: "20 Oct 2026" };
 const BASE_DIMS = { status: "status_column", desig: "designation_column", client: "client_column", mode: "mode_column" };
 const STANDARD_STATUSES = ["Active", "Manager", "OJT", "Bench", "New", "Projected", "Left", "Moved"];
 const TILE_ORDER = ["Active", "Manager", "OJT", "Bench", "New", "Projected"];
@@ -12387,6 +12484,7 @@ function availableFilterFields() {
 }
 function renderCustomFieldFilters() {
  const area=document.getElementById('customFieldControls');if(!area||!state.schema)return;
+ { const f=document.querySelector('#cleanFilters .filters'),c=document.getElementById('fClear'); if(f&&c&&area.parentElement!==f) f.insertBefore(area,c); }   /* v3.70.1: extra filters sit in the same line, before Clear filters */
  const chosen=new Set(chosenFilterFields());
  // Keep an applied filter visible, including filters restored from older presets.
  for(const [k,v] of Object.entries(state.filters.sel))if(v.size)chosen.add(k);
@@ -15497,5 +15595,18 @@ function drawPrefs(pane) {
  document.addEventListener('click',e=>{if(customize.open&&!customize.contains(e.target))customize.open=false;});
  renderCustomFieldFilters();
 })();</script>
+<script>
+/* v3.70.0: fold / unfold the menu bar; the choice is remembered on this computer (a display setting, no data) */
+(() => {
+  const btn = document.getElementById('navToggle'); if (!btn) return;
+  const set = on => { document.body.classList.toggle('nav-mini', on); btn.textContent = on ? '›' : '‹'; const t = on ? 'Show the menu (Ctrl + \\)' : 'Hide the menu (Ctrl + \\)'; btn.title = t; btn.setAttribute('aria-label', on ? 'Show the menu' : 'Hide the menu'); btn.setAttribute('aria-expanded', String(!on));
+    document.querySelectorAll('.sidebar .tab').forEach(b => { const n = b.cloneNode(true); n.querySelectorAll('.tabn').forEach(x => x.remove()); const label = n.textContent.trim(); if (on) b.title = label; else if (b.title === label) b.removeAttribute('title'); });
+    try { localStorage.setItem('td_nav_mini', on ? '1' : '0'); } catch { } };
+  let start = false; try { start = localStorage.getItem('td_nav_mini') === '1'; } catch { }
+  set(start);
+  btn.addEventListener('click', () => set(!document.body.classList.contains('nav-mini')));
+  document.addEventListener('keydown', e => { if ((e.ctrlKey || e.metaKey) && e.key === '\\') { e.preventDefault(); set(!document.body.classList.contains('nav-mini')); } });
+})();
+</script>
 </body>
 </html>
