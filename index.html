@@ -5,7 +5,7 @@
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <link rel="preconnect" href="https://iiogwevtyzgedhoaqlrn.supabase.co" crossorigin><link rel="dns-prefetch" href="https://iiogwevtyzgedhoaqlrn.supabase.co">
 <link rel="icon" href="data:,">
-<title>Team Dashboard · 3.71.2</title>
+<title>Team Dashboard · 3.72.0</title>
 <link rel="preconnect" href="https://fonts.googleapis.com"><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin><link href="https://fonts.googleapis.com/css2?family=Public+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet">
 <style>
 :root {
@@ -8506,7 +8506,8 @@ function bkTeam(exceptKey, iso) {
   const outToday = new Set((D(true).byMonth.get(ms) || []).filter(r => { const c = catOf(r.days[i]); return c && (LEAVE_CATS.has(c) || c === 'applied'); }).map(r => personKey(r.name)));
   const list = []; const seen = new Set();
   for (const r of rosterRows()) {
-    let cur = true; try { cur = isCurrent(r) && !goneKind(r); } catch { }
+    /* v3.72.0: anyone not Left / Moved can be a backup (Active + Resign, OJT, New, Bench … included) */
+    let cur = true; try { cur = !isLeaver(r); } catch { }
     const name = gs(r, 'name_column').trim(); if (!cur || !name) continue; const k = personKey(name); if (k === exceptKey || seen.has(k)) continue; seen.add(k);
     list.push({ name, id: String(gs(r, 'key_column') || ''), out: outToday.has(k), sub: [gs(r, 'designation_column'), gs(r, 'client_column')].filter(Boolean).join(' · ') });
   }
@@ -8615,7 +8616,7 @@ function openBackupBox(pKey, iso, onDone, opts = {}) {
         <label id="bkx-n2wrap" hidden><span>Other half covered by</span> <em>optional</em><input type="text" id="bk-name2" list="bk-list" placeholder="Type or pick a name, or leave blank" autocomplete="off"></label>
         <p class="bkx-sum" id="bkx-sum"></p>
       </div>
-      ${nmMode === 'off' ? '' : `<label id="bkx-pwrap" ${curK === 'no' ? 'style="display:none"' : ''}><span id="bkx-plbl">${curK === 'live' ? 'Taken care of by' : 'Backup person'}</span> <em id="bkx-pem">${nmMode === 'optional' || curK !== 'yes' ? 'optional · anyone in the current team' : 'anyone in the current team'}</em><input type="text" id="bk-name" list="bk-list" value="${esc(cur && cur.b ? cur.b : '')}" placeholder="${nmMode === 'optional' ? 'Type or pick a name, or leave blank' : 'Type or pick a name'}" autocomplete="off"><datalist id="bk-list">${team.map(t => `<option value="${esc(t.name)}" label="${esc([t.id && 'ID ' + t.id, t.sub, t.out ? 'also off that day' : ''].filter(Boolean).join(' · '))}"></option>`).join('')}</datalist></label>`}
+      ${nmMode === 'off' ? '' : `<label id="bkx-pwrap" ${curK === 'no' ? 'style="display:none"' : ''}><span id="bkx-plbl">${curK === 'live' ? 'Taken care of by' : 'Backup person'}</span> <em id="bkx-pem">${nmMode === 'optional' || curK !== 'yes' ? 'optional · pick from the list or type any name (a new person too)' : 'pick from the list or type any name (a new person too)'}</em><input type="text" id="bk-name" list="bk-list" value="${esc(cur && cur.b ? cur.b : '')}" placeholder="${nmMode === 'optional' ? 'Type or pick a name, or leave blank' : 'Type or pick a name'}" autocomplete="off"><datalist id="bk-list">${team.map(t => `<option value="${esc(t.name)}" label="${esc([t.id && 'ID ' + t.id, t.sub, t.out ? 'also off that day' : ''].filter(Boolean).join(' · '))}"></option>`).join('')}</datalist></label>`}
     </div>
     <label class="bkx-rm" id="bkx-rm" ${opts.collect || curK ? '' : 'hidden'}>${opts.collect ? 'Comments / remarks <em style="color:#c63b3a">required</em>' : 'Remarks <em>optional · copied as written</em>'}<textarea id="bk-rm" rows="2" maxlength="200" placeholder="${opts.collect ? 'Write a comment' : 'Optional note'}">${esc(bkRemark(pKey, iso))}</textarea></label>
     ${bkPrevHtml(pKey, opts.days && opts.days.length ? opts.days : [iso], opts.collect || curK)}
@@ -8629,7 +8630,7 @@ function openBackupBox(pKey, iso, onDone, opts = {}) {
   m.querySelectorAll('[data-bkx]').forEach(b => b.addEventListener('click', () => {
     pick = b.dataset.bkx; m.querySelectorAll('[data-bkx]').forEach(x => x.setAttribute('aria-checked', String(x === b)));
     if ($('#bkx-prev', m)) $('#bkx-prev', m).hidden = !pick;
-    $('#bkx-yes', m).hidden = !pick; $('#bkx-yes', m).classList.toggle('live', pick === 'live'); $('#bkx-yes', m).classList.toggle('no', pick === 'no'); if ($('#bkx-pwrap', m)) $('#bkx-pwrap', m).style.display = pick === 'no' ? 'none' : ''; if ($('#bkx-plbl', m)) { $('#bkx-plbl', m).textContent = pick === 'live' ? 'Taken care of by' : 'Backup person'; $('#bkx-pem', m).textContent = (nmMode === 'optional' || pick !== 'yes' ? 'optional · ' : '') + 'anyone in the current team'; } $('#bkx-rm', m).hidden = !pick && !opts.collect; $('#bkx-yes', m).classList.toggle('no', pick === 'no'); $('#bk-go', m).disabled = false; $('#bk-err', m).textContent = '';
+    $('#bkx-yes', m).hidden = !pick; $('#bkx-yes', m).classList.toggle('live', pick === 'live'); $('#bkx-yes', m).classList.toggle('no', pick === 'no'); if ($('#bkx-pwrap', m)) $('#bkx-pwrap', m).style.display = pick === 'no' ? 'none' : ''; if ($('#bkx-plbl', m)) { $('#bkx-plbl', m).textContent = pick === 'live' ? 'Taken care of by' : 'Backup person'; $('#bkx-pem', m).textContent = (nmMode === 'optional' || pick !== 'yes' ? 'optional · ' : '') + 'pick from the list or type any name (a new person too)'; } $('#bkx-rm', m).hidden = !pick && !opts.collect; $('#bkx-yes', m).classList.toggle('no', pick === 'no'); $('#bk-go', m).disabled = false; $('#bk-err', m).textContent = '';
     setTimeout(() => $('#bk-name', m)?.focus(), 0);
   }));
   /* v3.71.0: Half day: which half this option is for, and what happened in the other half */
@@ -8655,7 +8656,7 @@ function openBackupBox(pKey, iso, onDone, opts = {}) {
   m.querySelectorAll('[data-bkx]').forEach(b => b.addEventListener('click', () => setTimeout(drawSplit, 0)));
   setTimeout(drawSplit, 0);
   /* what the other half adds to the saved value */
-  const splitOf = () => { if (half !== true || !part) return {}; const n2 = ($('#bk-name2', m)?.value || '').trim(), o = oth === 'worked' ? { worked: true } : oth === 'live' ? { live: true, b: n2 } : oth === 'no' ? { no: true, b: '' } : { b: n2, yes: !n2 };
+  const splitOf = () => { if (half !== true || !part) return {}; const n2 = String($('#bk-name2', m)?.value || '').replace(/[;:+]/g, ' ').replace(/\s+/g, ' ').trim().slice(0, 60), o = oth === 'worked' ? { worked: true } : oth === 'live' ? { live: true, b: n2 } : oth === 'no' ? { no: true, b: '' } : { b: n2, yes: !n2 };
     return { part, other: o }; };
   const write = async val => {
     const which = opts.days && opts.days.length ? opts.days : [iso];
@@ -8679,18 +8680,18 @@ function openBackupBox(pKey, iso, onDone, opts = {}) {
     if (kind() && half === true && !part) { $('#bk-err', m).textContent = 'Choose which half this option is for: 1st half or 2nd half.'; return; }
     if (opts.collect && rmv().trim().length < 2) { $('#bk-err', m).textContent = 'Add a comment / remark first.'; $('#bk-rm', m)?.focus(); return; }
     try {
-      if (kind() === 'live') { const vl = !$('#bk-name', m) ? '' : $('#bk-name', m).value.trim(), hl = vl ? team.find(t => t.name.toLowerCase() === vl.toLowerCase()) : null;
-        if (vl && !hl) { $('#bk-err', m).textContent = 'Pick someone from the current team list, or leave the name blank.'; return; }
-        return await write({ live: true, b: hl ? hl.name : '', half: isHalf(), ...splitOf(), by: BE.userName(), at: new Date().toISOString() }); }
+      /* v3.72.0: the backup can be anyone: pick from the list or type a new name (someone not in the employee list yet) */
+      const cleanNm = s => String(s || '').replace(/[;:+]/g, ' ').replace(/\((half|1st half|2nd half|half day|½)\)/gi, '').replace(/\s+/g, ' ').trim().slice(0, 60);
+      if (kind() === 'live') { const vl = cleanNm(!$('#bk-name', m) ? '' : $('#bk-name', m).value), hl = vl ? team.find(t => t.name.toLowerCase() === vl.toLowerCase()) : null;
+        return await write({ live: true, b: hl ? hl.name : vl, half: isHalf(), ...splitOf(), by: BE.userName(), at: new Date().toISOString() }); }
       if (kind() === 'no') { const vn = '',   /* v3.40.4: no name for Backup Not Provided */ hn = vn ? team.find(t => t.name.toLowerCase() === vn.toLowerCase()) : null;
-        if (vn && !hn) { $('#bk-err', m).textContent = 'Pick someone from the current team list, or leave the name blank.'; return; }
         return await write({ no: true, b: hn ? hn.name : '', half: isHalf(), ...splitOf(), by: BE.userName(), at: new Date().toISOString() }); }
       if (kind() === 'none') return await write({ none: true, by: BE.userName(), at: new Date().toISOString() });
       if (!kind()) { $('#bk-err', m).textContent = 'Pick one of the three options.'; return; }
-      const v = nmMode === 'off' || !$('#bk-name', m) ? '' : $('#bk-name', m).value.trim(); const hit = team.find(t => t.name.toLowerCase() === v.toLowerCase());
+      const v = nmMode === 'off' || !$('#bk-name', m) ? '' : cleanNm($('#bk-name', m).value); const hit = team.find(t => t.name.toLowerCase() === v.toLowerCase());
       if (!v && nmMode === 'required') { $('#bk-err', m).textContent = 'Pick who is covering, or choose “Backup Not Provided”.'; return; }
       if (!v) return await write({ b: '', yes: true, half: isHalf(), ...splitOf(), by: BE.userName(), at: new Date().toISOString() });
-      if (!hit) { $('#bk-err', m).textContent = 'Pick someone from the current team list.'; return; }
+      if (!hit) { await write({ b: v, half: isHalf(), ...splitOf(), by: BE.userName(), at: new Date().toISOString() }); return; }
       await write({ b: hit.name, id: hit.id, half: isHalf(), ...splitOf(), by: BE.userName(), at: new Date().toISOString() });
     } catch (e) { $('#bk-err', m).textContent = 'Could not save: ' + e.message; }
   };
@@ -10269,7 +10270,7 @@ async function poll() {
 }
 
 /* ============================== filtering ============================== */
-const APP = { title: "Team Dashboard", version: "3.71.2", released: "20 Oct 2026" };
+const APP = { title: "Team Dashboard", version: "3.72.0", released: "20 Oct 2026" };
 const BASE_DIMS = { status: "status_column", desig: "designation_column", client: "client_column", mode: "mode_column" };
 const STANDARD_STATUSES = ["Active", "Manager", "OJT", "Bench", "New", "Projected", "Left", "Moved"];
 const TILE_ORDER = ["Active", "Manager", "OJT", "Bench", "New", "Projected"];
