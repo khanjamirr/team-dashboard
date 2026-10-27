@@ -5,7 +5,7 @@
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <link rel="preconnect" href="https://iiogwevtyzgedhoaqlrn.supabase.co" crossorigin><link rel="dns-prefetch" href="https://iiogwevtyzgedhoaqlrn.supabase.co">
 <link rel="icon" href="data:,">
-<title>Team Dashboard · 3.72.0</title>
+<title>Team Dashboard · 3.72.1</title>
 <link rel="preconnect" href="https://fonts.googleapis.com"><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin><link href="https://fonts.googleapis.com/css2?family=Public+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet">
 <style>
 :root {
@@ -2095,7 +2095,7 @@ html body .sidebar nav.tabs .tab[data-view="backups"], html body .tab[data-view=
 .psn-i { display:inline-grid; place-items:center; width:17px; height:17px; border-radius:50%; border:1px solid var(--border, #cfd5df); background:var(--surface); color:var(--ink-2); font:italic 700 11px/1 Georgia, serif; cursor:pointer; padding:0; margin-left:4px; vertical-align:middle; }
 .psn-i:hover { border-color:var(--accent); color:var(--accent); }
 .psn-name { display:inline-flex; align-items:center; gap:2px; } .psn-seat.off { opacity:.6; }
-.psn-top { display:flex; gap:8px; align-items:flex-start; flex-wrap:wrap; margin-bottom:10px; } .psn-top .psn-chips { margin:0; } .psn-client { max-width:220px; height:34px; }
+.psn-copy { height:34px; white-space:nowrap; } .psn-top { display:flex; gap:8px; align-items:flex-start; flex-wrap:wrap; margin-bottom:10px; } .psn-top .psn-chips { margin:0; } .psn-client { max-width:220px; height:34px; }
 .psn-group { display:flex; align-items:baseline; gap:8px; padding:14px 4px 6px; border-bottom:2px solid var(--border, var(--line)); } .psn-group b { font-size:14px; } .psn-group small { color:var(--ink-2); }
 .psn-add select { max-width:180px; } .psn-warn { font-size:12.5px; color:#9a5b00; background:#fff7e8; border:1px solid #f3dcae; padding:8px 12px; border-radius:10px; }
 .psn-pk-dates { display:flex; gap:10px; align-items:flex-end; flex-wrap:wrap; } .psn-dl { display:flex; flex-direction:column; gap:3px; } .psn-dl small { font-size:11.5px; color:var(--ink-2); font-weight:600; }
@@ -10270,7 +10270,7 @@ async function poll() {
 }
 
 /* ============================== filtering ============================== */
-const APP = { title: "Team Dashboard", version: "3.72.0", released: "20 Oct 2026" };
+const APP = { title: "Team Dashboard", version: "3.72.1", released: "20 Oct 2026" };
 const BASE_DIMS = { status: "status_column", desig: "designation_column", client: "client_column", mode: "mode_column" };
 const STANDARD_STATUSES = ["Active", "Manager", "OJT", "Bench", "New", "Projected", "Left", "Moved"];
 const TILE_ORDER = ["Active", "Manager", "OJT", "Bench", "New", "Projected"];
@@ -12878,7 +12878,17 @@ async function openPseudoNames(focusId) {
     const chip = (k, l, n, cls) => h("button", { type: "button", class: "psn-chip " + (cls || "") + (filter === k ? " on" : ""), onclick: () => { filter = k; editing = editMeta = null; drawList(); } }, l, h("b", {}, String(n)));
     const csel = h("select", { class: "input psn-client", "aria-label": "Client" }, h("option", { value: "all" }, "All clients · " + seats.filter(s => s.active).length), ...clients.map(c => h("option", { value: c, selected: client === c }, c + " · " + seats.filter(s => s.active && s.client === c).length)), seats.some(s => !s.client) ? h("option", { value: "", selected: client === "" }, "No client") : null);
     csel.addEventListener("change", () => { client = csel.value; editing = editMeta = null; drawList(); });
-    const head = h("div", { class: "psn-top" }, csel, h("div", { class: "psn-chips" }, chip("all", "All", counts.all), chip("filled", "Tagged", counts.filled), chip("vacant", "Vacant", counts.vacant, counts.vacant ? "warn" : ""),
+    /* v3.72.1: one click copies what is shown: pseudo name, recruiter, Emp ID (pastes as columns in Excel / Sheets, as a table in Outlook / Teams) */
+    let copyRows = () => [];
+    const copyBtn = h("button", { class: "btn mini psn-copy", type: "button", title: "Copy the pseudo names shown (pseudo name, recruiter, Emp ID)", onclick: async () => {
+      const rows = copyRows(); if (!rows.length) { toast("Nothing to copy."); return; }
+      const hd = ["Pseudo name", "Recruiter", "Emp ID"], e = v => String(v ?? "").replace(/[&<>"]/g, c => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;" }[c]));
+      const txt = [hd.join("\t"), ...rows.map(r => r.join("\t"))].join("\n");
+      const html = '<table border="1" cellpadding="4" cellspacing="0" style="border-collapse:collapse;font:12px Segoe UI,Arial,sans-serif"><thead><tr>' + hd.map(x => '<th style="background:#f1f3f7;text-align:left">' + x + '</th>').join("") + '</tr></thead><tbody>' + rows.map(r => '<tr>' + r.map(x => '<td>' + e(x) + '</td>').join("") + '</tr>').join("") + '</tbody></table>';
+      try { if (window.ClipboardItem && navigator.clipboard?.write) await navigator.clipboard.write([new ClipboardItem({ "text/plain": new Blob([txt], { type: "text/plain" }), "text/html": new Blob([html], { type: "text/html" }) })]); else await navigator.clipboard.writeText(txt); toast("Copied " + rows.length + (rows.length === 1 ? " row" : " rows") + ": pseudo name, recruiter, Emp ID."); }
+      catch { try { const ta = document.createElement("textarea"); ta.value = txt; ta.style.position = "fixed"; ta.style.opacity = "0"; document.body.append(ta); ta.select(); document.execCommand("copy"); ta.remove(); toast("Copied " + rows.length + " rows."); } catch { toast("The browser blocked copying.", true); } }
+    } }, "⧉ Copy");
+    const head = h("div", { class: "psn-top" }, csel, copyBtn, h("div", { class: "psn-chips" }, chip("all", "All", counts.all), chip("filled", "Tagged", counts.filled), chip("vacant", "Vacant", counts.vacant, counts.vacant ? "warn" : ""),
       chip("flag", "Needs replacement", counts.flag, counts.flag ? "hot" : ""), chip("nobody", "Recruiters without one", withoutOne.length), admin ? chip("inactive", "Inactive", counts.inactive) : null));
     const parts = [head];
     if (admin) parts.push(addForm(master, clients));
@@ -12894,10 +12904,12 @@ async function openPseudoNames(focusId) {
         box.append(h("div", { class: "psn-row" }, h("div", { class: "psn-who" }, h("b", {}, nm(r)), h("small", {}, [r.id, gs(r, "status_column"), cl(r)].filter(Boolean).join(" · "))), psnStatus(r) === "resign" ? h("span", { class: "psn-flag" }, "Resigning") : null, sel));
         sel.addEventListener("change", () => { if (!sel.value) return; const s = seats.find(x => x.name === sel.value); confirmTag(s, r, () => { sel.value = ""; }); });
       }
+      copyRows = () => withoutOne.filter(r => hit(nm(r), r.id)).map(r => ["", nm(r), String(r.id)]);
       if (!box.firstChild) box.append(h("p", { class: "hint" }, "Every Active, Active + Resign and OJT recruiter" + (client !== "all" ? " of " + (client || "no client") : "") + " has a pseudo name."));
       listBox.replaceChildren(...parts, box); return;
     }
     const shown = pool.filter(s => (filter === "inactive" ? !s.active : s.active) && (filter === "all" || filter === "inactive" || (filter === "filled" && s.r) || (filter === "vacant" && !s.r) || (filter === "flag" && s.flag)) && hit(s.name, s.client, s.r && nm(s.r), s.r && s.r.id));
+    copyRows = () => [...shown].sort((a, b) => (a.client || "").localeCompare(b.client || "") || a.name.localeCompare(b.name, undefined, { sensitivity: "base" })).map(s => [s.name, s.r ? nm(s.r) : "", s.r ? String(s.r.id) : ""]);
     const groups = new Map(); for (const s of shown) { const k = s.client || ""; if (!groups.has(k)) groups.set(k, []); groups.get(k).push(s); }
     for (const [c, list] of [...groups.entries()].sort((a, b) => (a[0] ? 0 : 1) - (b[0] ? 0 : 1) || a[0].localeCompare(b[0]))) {
       list.sort((a, b) => (b.flag - a.flag) || a.name.localeCompare(b.name, undefined, { sensitivity: "base" }));
