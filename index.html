@@ -10,7 +10,7 @@
 <meta name="format-detection" content="telephone=no">
 <link rel="preconnect" href="https://iiogwevtyzgedhoaqlrn.supabase.co" crossorigin><link rel="dns-prefetch" href="https://iiogwevtyzgedhoaqlrn.supabase.co">
 <link rel="icon" href="data:,">
-<title>Team Dashboard · 3.74.0</title>
+<title>Team Dashboard · 3.74.1</title>
 <link rel="preconnect" href="https://fonts.googleapis.com"><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin><link href="https://fonts.googleapis.com/css2?family=Public+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet">
 <style>
 :root {
@@ -1098,6 +1098,7 @@ table.data td { padding:9px 10px; font-size:12px; }
 .watch-empty { padding:18px 12px; color:var(--ink-2); font-size:12.5px; border:1px dashed var(--border); border-radius:10px; }
 /* v3.14: activity bell in the header, on every page */
 .bell { position:relative; width:34px; padding:0 !important; justify-content:center; }
+#btnRefresh.spin svg { animation:tdspin .9s linear; } @keyframes tdspin { to { transform:rotate(360deg); } }
 .bell svg { width:18px; height:18px; }
 .bell-n { position:absolute; top:-4px; right:-5px; min-width:17px; height:17px; padding:0 4px; border-radius:9px; background:var(--danger); color:#fff; font-size:10px; font-weight:700; line-height:17px; text-align:center; }
 .drawer.activity-drawer .body { padding-top:4px; }
@@ -2550,6 +2551,7 @@ article.al-d { --alc:#c62828; }
       <button class="btn ghost" id="btnLogout" title="Connect your two workbooks">Linked files</button>
       <button class="btn ghost autosync" id="btnAutoSync" hidden></button>
       <button class="btn ghost" id="btnSaveNow" hidden></button>
+      <button class="btn ghost bell" id="btnRefresh" type="button" aria-label="Refresh" title="Get the latest changes, requests and notifications now" hidden><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M21 12a9 9 0 1 1-2.64-6.36"/><path d="M21 3v6h-6"/></svg></button>
       <button class="btn ghost bell" id="btnBell" type="button" aria-label="Activity" title="Activity: every change, newest first" hidden><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M6 8a6 6 0 0 1 12 0c0 7 3 9 3 9H3s3-2 3-9"/><path d="M10.3 21a1.94 1.94 0 0 0 3.4 0"/></svg><span class="bell-n" id="bellN" hidden></span></button>
     </header>
   <div class="workspace-heading overview-heading"><div><p class="eyebrow">TEAM WORKSPACE</p><h2 id="cleanPageTitle">Overview</h2><p>Your people and priorities, at a glance.</p></div></div>
@@ -2671,6 +2673,24 @@ article.al-d { --alc:#c62828; }
 <div id="tip" hidden role="tooltip"></div>
 <div id="toast" aria-live="polite"></div>
 
+<script>
+/* v3.74.1: stay inside the Supabase free plan. Every background check goes through TDNET: checks run less often,
+   stop while the tab is hidden or nobody has touched the page for 10 minutes, and all run at once on the next click
+   (or when the Refresh button is pressed). */
+window.TDNET = (() => {
+  const IDLE_MS = 10 * 60 * 1000, last = {}, list = [];
+  let touched = Date.now();
+  const idle = () => document.hidden || Date.now() - touched > IDLE_MS;
+  const due = (key, ms) => { if (idle()) return false; const n = Date.now(); if (last[key] && n - last[key] < ms) return false; last[key] = n; return true; };
+  const runAll = () => { for (const k in last) delete last[k]; for (const p of list) { try { if (!p.cond || p.cond()) { last[p.key] = Date.now(); p.fn(); } } catch (e) { console.warn(e); } } };
+  const wake = () => { const was = Date.now() - touched > IDLE_MS; touched = Date.now(); if (was && !document.hidden) setTimeout(runAll, 50); };
+  for (const ev of ['pointerdown', 'keydown', 'wheel', 'touchstart']) addEventListener(ev, wake, { passive: true, capture: true });
+  document.addEventListener('visibilitychange', () => { if (!document.hidden) { touched = Date.now(); setTimeout(runAll, 50); } });
+  /* poller(key, every ms, fn, cond): checks every few seconds whether fn is due */
+  const poller = (key, ms, fn, cond) => { list.push({ key, fn, cond }); setInterval(() => { if ((!cond || cond()) && due(key, ms)) { try { fn(); } catch (e) { console.warn(e); } } }, Math.min(5000, ms)); };
+  return { idle, due, poller, refresh: runAll, IDLE_MS };
+})();
+</script>
 <script>
 /* cfb.js 1.2.2 (C) 2013-present SheetJS, Apache License 2.0 (http://www.apache.org/licenses/LICENSE-2.0): reads and writes the compound file that holds a password-protected Excel file. Kept in its own scope. */
 window.CFB = (function () { var module, exports, define, require;
@@ -8533,7 +8553,7 @@ table.att td { padding-top:5px; padding-bottom:5px; }
   document.getElementById('btnWho')?.addEventListener('click', askName); updateWho();
   window.addEventListener('focus', () => { if (S.status === 'ready') checkDisk(); });
   document.addEventListener('visibilitychange', () => { if (!document.hidden && S.status === 'ready') checkDisk(); });
-  setInterval(() => { if (S.status === 'ready' && !document.hidden) checkDisk(); }, 2000);
+  TDNET.poller('att-disk', 20000, () => checkDisk(), () => S.status === 'ready');   /* v3.74.1: was every 2 s */
   setInterval(autoTick, 200);
 }
 
@@ -10080,7 +10100,7 @@ const DETAILS = (() => {
   const ensure = () => { if (data && data.owner !== myId()) { data = null; st = "none"; lastSig = null; } return (st === "none" && online()) ? load() : Promise.resolve(data); };
   async function call(fn) { return set(await fn()); }
   setInterval(() => { if (online()) check(); }, 3000);
-  setInterval(() => { if (online() && !document.hidden && st !== "nosql") load(); }, 12000);
+  TDNET.poller("details", 60000, () => load(), () => online() && st !== "nosql");   /* v3.74.1: was every 12 s */
   addEventListener("focus", () => { if (online() && st !== "nosql") load(); });
   return { load, ensure, call, has, live, items, pending, now, isAdmin, myId, state: () => st, seenPending: v => (v === undefined ? seenPending : (seenPending = v)) };
 })();
@@ -10413,7 +10433,7 @@ async function poll() {
 }
 
 /* ============================== filtering ============================== */
-const APP = { title: "Team Dashboard", version: "3.74.0", released: "2 Nov 2026" };
+const APP = { title: "Team Dashboard", version: "3.74.1", released: "2 Nov 2026" };
 const BASE_DIMS = { status: "status_column", desig: "designation_column", client: "client_column", mode: "mode_column" };
 const STANDARD_STATUSES = ["Active", "Manager", "OJT", "Bench", "New", "Projected", "Left", "Moved"];
 const TILE_ORDER = ["Active", "Manager", "OJT", "Bench", "New", "Projected"];
@@ -13667,7 +13687,8 @@ new ResizeObserver(() => {
   lastW = w; clearTimeout(rT); rT = setTimeout(() => { if (state.schema) renderCharts(); }, 120);
 }).observe($("#charts"));
 
-setInterval(poll, 2000);
+TDNET.poller('version', 20000, poll);
+document.getElementById('btnRefresh')?.addEventListener('click', ev => { const b = ev.currentTarget; b.classList.add('spin'); setTimeout(() => b.classList.remove('spin'), 900); TDNET.refresh(); toast('Getting the latest…'); });   /* v3.74.1: was every 2 s */
 document.addEventListener("visibilitychange", () => { if (!document.hidden) poll(); });
 
 (async function boot() {
@@ -13883,8 +13904,10 @@ document.addEventListener('keydown', e => { if (e.key === '/' && !/INPUT|TEXTARE
 /* ---------- team settings (mandatory fields, ...) ---------- */
 const LOCAL_KEY = 'td_settings_v1';
 window.loadTeamSettings = async (strict = false) => {
-  try { window.TD_SETTINGS = PERM.online() ? ((await CLOUD.getSettings()) || {}) : JSON.parse(localStorage.getItem(LOCAL_KEY) || '{}'); }
+  let done; window.__tdSetP = new Promise(r => { done = r; });
+  try { window.TD_SETTINGS = PERM.online() ? ((await CLOUD.getSettings()) || {}) : JSON.parse(localStorage.getItem(LOCAL_KEY) || '{}'); window.__tdSetAt = Date.now(); }
   catch (e) { if (strict) throw e; window.TD_SETTINGS = window.TD_SETTINGS || {}; }
+  finally { done(); window.__tdSetP = null; }
 };
 /* lists that anyone with an editing right may change (needs setup.sql from 3.12; the admin can still save without it) */
 async function saveSharedSetting(key, value) {
@@ -13936,7 +13959,8 @@ window.applyAccess = () => {
   show('#cardHolidays', PERM.can('ov.holidays')); if (typeof renderHolidays === 'function' && typeof state !== 'undefined' && state.view === 'summary') { renderHolidays(); window.organizeOverview?.(); }
   show('#cardWatch', PERM.can('ov.watch'));
   show('#btnAddField', PERM.can('emp.fields'));
-  show('#btnBell', PERM.can('notifications.view') || PERM.can('activity.view') || PERM.online());   /* v3.65.0: requests for private details live here */
+  show('#btnBell', PERM.can('notifications.view') || PERM.can('activity.view') || PERM.online());
+  show('#btnRefresh', PERM.online());   /* v3.65.0: requests for private details live here */
   window.refreshNotifications?.();
   document.body.classList.toggle('no-report-export', !PERM.can('rep.export'));
   /* v3.14: each report group has its own right */
@@ -13950,7 +13974,7 @@ window.applyAccess = () => {
   if (typeof state !== 'undefined' && state.schema && !PERM.canView(state.view)) setView(PERM.firstView());
   renderSyncButtons();
 };
-setInterval(async () => { if (PERM.online() && !el('app').hidden && !document.hidden) { await CLOUD.refreshMe(); applyAccess(); } }, 60000);
+TDNET.poller('me', 300000, async () => { await CLOUD.refreshMe(); applyAccess(); }, () => PERM.online() && !el('app').hidden);   /* v3.74.1: was every minute */
 
 /* v3.49.0: team chat was removed */
 
@@ -13976,7 +14000,7 @@ async function pollRequests() {
     if (JSON.stringify((window.TD_SETTINGS || {}).leave_requests || []) !== before && window.ATT && ATT.redraw) ATT.redraw();
   } catch { } finally { reqPolling = false; updateReqBadge(); }
 }
-setInterval(pollRequests, 10000);   /* v3.60.0: requests and approvals show up within seconds */
+TDNET.poller('settings', 60000, pollRequests);   /* v3.74.1: was every 10 s; requests and approvals show up within a minute (or at once with Refresh) */
 addEventListener('att:requests', updateReqBadge);
 addEventListener('att:data', updateReqBadge);
 addEventListener('att:sync', updateReqBadge);
@@ -14042,7 +14066,7 @@ async function bellCheck() {
   if (!notificationPermission() && !PERM.can('activity.view')) { notificationItems=[];bellShow(0);drawNotifications();try{DETAILS.load();}catch{}return; }
   bellBusy=true;
   try {
-    await loadTeamSettings(true);
+    if (window.__tdSetP) await window.__tdSetP; else if (!window.__tdSetAt || Date.now() - window.__tdSetAt > 30000) await loadTeamSettings(true);   /* v3.74.1: settings fetched in the last 30 s are reused */
     let activity=[];activityError='';
     if (PERM.can('activity.view')) {
       try { const d=await api('GET','/api/activity'); activity=(d.items || []).filter(it=>!String(it.action || '').startsWith('request-')).map(activityNotification); }
@@ -14070,7 +14094,7 @@ window.openBell=()=>{
 };
 el('btnBell').addEventListener('click',()=>window.openBell());
 setTimeout(bellCheck,4000);
-setInterval(bellCheck,15000);
+TDNET.poller('bell', 60000, bellCheck);   /* v3.74.1: was every 15 s */
 addEventListener('att:requests',bellCheck);
 addEventListener('att:sync',bellCheck);
 addEventListener('activity:changed',bellCheck);
@@ -15541,7 +15565,7 @@ function drawSync(pane) {
   ticker = setInterval(() => { if (!pane.isConnected || !onSettings()) { clearInterval(ticker); return; } if (current === 'sync' && !pane.contains(document.activeElement)) draw(); }, 1500);
 }
 
-/* ----- v3.74.0: Storage & clean-up: keep the database under 1 GB ----- */
+/* ----- v3.74.0: Storage & clean-up (v3.74.1: sized for the Supabase free plan, 500 MB) ----- */
 const mb = n => n == null ? '—' : n >= 1048576 ? (n / 1048576).toFixed(n >= 104857600 ? 0 : 1) + ' MB' : Math.max(1, Math.round(n / 1024)) + ' KB';
 const KEEP_OPTS = [[0, 'Don’t keep (recommended)'], [7, '7 days'], [30, '30 days'], [60, '60 days'], [90, '90 days'], [180, '180 days'], [365, '1 year'], ['forever', 'Forever']];
 const AGE_OPTS = [[30, 'older than 30 days'], [60, 'older than 60 days'], [90, 'older than 90 days'], [180, 'older than 180 days'], [365, 'older than 1 year'], [0, 'everything']];
@@ -15559,11 +15583,11 @@ async function drawStorage(pane) {
   /* the meter */
   let meter = null;
   if (srv) {
-    const used = (+srv.db_bytes || 0) + (+srv.files_bytes || 0), lim = +srv.limit_bytes || 1073741824, pct = Math.min(100, used / lim * 100);
+    const used = (+srv.db_bytes || 0) + (+srv.files_bytes || 0), lim = 524288000,   /* v3.74.1: Supabase free plan */ pct = Math.min(100, used / lim * 100);
     const col = pct >= 85 ? '#d92d20' : pct >= 60 ? '#dc8a00' : '#17824a';
     meter = h('div', { class: 'set-card stg-meter' },
       h('h4', {}, 'Database'),
-      h('div', { class: 'stg-big' }, h('b', {}, mb(used)), h('span', {}, ' of ' + (lim % 1073741824 ? mb(lim) : lim / 1073741824 + ' GB') + ' used · ' + pct.toFixed(pct < 10 ? 1 : 0) + '%')),
+      h('div', { class: 'stg-big' }, h('b', {}, mb(used)), h('span', {}, ' of 500 MB (free plan) used · ' + pct.toFixed(pct < 10 ? 1 : 0) + '%')),
       h('div', { class: 'stg-bar', role: 'progressbar', 'aria-valuemin': 0, 'aria-valuemax': 100, 'aria-valuenow': Math.round(pct) }, h('i', { style: 'width:' + Math.max(1, pct) + '%;background:' + col })),
       pct >= 85 ? h('p', { class: 'err' }, 'Almost full: clean up old backups and logs below.') : null);
   } else if (online) meter = h('div', { class: 'set-card' }, h('h4', {}, 'Database'), srvErr === 'nosql'
@@ -15621,7 +15645,7 @@ async function drawStorage(pane) {
   const wbCard = info ? h('div', { class: 'set-card' }, h('h4', {}, 'Workbook'), h('div', { class: 'stg-big' }, h('b', {}, mb(info.bytes))),
     h('p', { class: 'set-hint' }, (info.sheets || []).map(x => x.name + ' ' + mb(x.packed)).join(' · ') || 'Employees and attendance only.'),
     h('p', { class: 'set-hint' }, online ? 'Every daily backup is a full copy of the workbook, so a smaller Activity Log also makes every backup smaller.' : 'This is the Excel file on this computer.')) : null;
-  fill(pane, h('p', { class: 'set-hint' }, online ? 'Keep the database under 1 GB: stop or shorten the Activity Log and delete old logs and backups you no longer need.' : 'Keep the workbook small: stop or shorten the Activity Log and delete old entries.'),
+  fill(pane, h('p', { class: 'set-hint' }, online ? 'Stay inside the Supabase free plan (500 MB database, 5 GB a month sent out): stop or shorten the Activity Log and delete old logs and backups you no longer need.' : 'Keep the workbook small: stop or shorten the Activity Log and delete old entries.'),
     err, h('div', { class: 'set-grid', style: 'margin-bottom:14px' }, meter, wbCard), act, server, detail);
 }
 
@@ -15719,7 +15743,7 @@ window.refreshResetBadge = async () => {
   document.querySelectorAll('[data-view="settings"]').forEach(t => { let b = t.querySelector('.nav-badge'); if (!n) { b?.remove(); return; } if (!b) { b = h('span', { class: 'nav-badge', title: 'Passcode reset requests waiting' }); t.append(b); } b.textContent = String(n); });
   if (n && Date.now() - resetToldAt > 36e5) { resetToldAt = Date.now(); toast(n + ' passcode reset request' + (n === 1 ? ' is' : 's are') + ' waiting in Settings › People & access.'); }
 };
-setInterval(() => window.refreshResetBadge && window.refreshResetBadge(), 120000);
+TDNET.poller('resets', 300000, () => window.refreshResetBadge && window.refreshResetBadge());   /* v3.74.1: was every 2 min */
 
 /* ----- Tools ----- */
 function drawTools(pane) {
