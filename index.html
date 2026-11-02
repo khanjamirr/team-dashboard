@@ -10,7 +10,7 @@
 <meta name="format-detection" content="telephone=no">
 <link rel="preconnect" href="https://iiogwevtyzgedhoaqlrn.supabase.co" crossorigin><link rel="dns-prefetch" href="https://iiogwevtyzgedhoaqlrn.supabase.co">
 <link rel="icon" href="data:,">
-<title>Team Dashboard · 3.73.0</title>
+<title>Team Dashboard · 3.74.0</title>
 <link rel="preconnect" href="https://fonts.googleapis.com"><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin><link href="https://fonts.googleapis.com/css2?family=Public+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet">
 <style>
 :root {
@@ -2423,6 +2423,10 @@ article.al-d { --alc:#c62828; }
 }
 @media (max-width:650px) { #navToggle { display:none; } }
 #tbl td.td-mob { display:none; }
+.stg-big { display:flex; align-items:baseline; gap:6px; flex-wrap:wrap; margin:2px 0 10px; } .stg-big b { font-size:26px; font-weight:750; letter-spacing:-.01em; } .stg-big span { color:var(--ink-2); font-size:13px; }
+.stg-bar { height:10px; border-radius:999px; background:var(--surface-2); overflow:hidden; border:1px solid var(--border); } .stg-bar i { display:block; height:100%; border-radius:999px; }
+.stg-row { display:flex; align-items:center; gap:10px; flex-wrap:wrap; margin:10px 0 6px; } .stg-row > span { min-width:130px; font-weight:600; font-size:13px; }
+.stg-detail > summary { cursor:pointer; font-weight:650; } .stg-detail[open] > summary { margin-bottom:10px; }
 /* ================= v3.73.0: phone browsers (iPhone Safari, Android Chrome) ================= */
 @media (max-width:700px) {
   html { -webkit-text-size-adjust:100%; text-size-adjust:100%; }
@@ -3442,7 +3446,15 @@ function backup(u8, fileName) {
    Everything the dashboard logs goes to an "Activity Log" sheet in the same workbook, newest first, and only the
    past 30 days are kept. Entries wait in LOGQ until the next save of the workbook; if nothing else is saved within a
    few seconds, the log is written on its own. */
-const ACT_SHEET = "Activity Log", ACT_DAYS = Infinity, ACT_MAX = Infinity;
+const ACT_SHEET = "Activity Log", ACT_MAX = Infinity;
+/* v3.74.0: how long the Activity Log keeps entries (Settings > Storage & clean-up). 0 = nothing new is recorded
+   (the default, to keep the database small); entries already in the sheet stay until they are cleaned up. */
+const ACT_KEEP_DEFAULT = 0;
+function actKeepDays() {
+  const v = (typeof window !== "undefined" && window.TD_SETTINGS || {}).activity_keep_days;
+  if (v === "forever") return Infinity;
+  const n = Number(v); return v == null || v === "" || !Number.isFinite(n) ? ACT_KEEP_DEFAULT : Math.max(0, Math.floor(n));
+}
 const ACT_HEAD = ["Date & time", "User", "Area", "Action", "Emp Code", "Name", "Details", "Data (used by the dashboard)"];
 const LOGQ = [];
 let logTimer = null;
@@ -3717,7 +3729,12 @@ async function readPseudoHistory() {
 }
 async function withActivity(blob, entries) {
   const zip = await Zip.open(new Uint8Array(await blob.arrayBuffer())), loc = await actLocate(zip);
-  const since = Date.now() - ACT_DAYS * 86400000, seen = new Set();
+  const keep = actKeepDays();
+  if (keep === 0) {   /* v3.74.0: activity is not kept: the sheet is left as it is, only the pseudo name history is updated */
+    try { await pseudoHistoryUpdate(zip, new Uint8Array(await blob.arrayBuffer()), entries); } catch (e) { console.warn("Pseudo name history:", e); }
+    return zip.build();
+  }
+  const since = Date.now() - keep * 86400000, seen = new Set();
   let items = [...await actRead(zip, loc), ...entries].map(scrubActivity).filter(e => { const t = activityTime(e); return !Number.isFinite(t) || t >= since; });
   items = items.filter(e => { const k = actJson(e); if (seen.has(k)) return false; seen.add(k); return true; });
   items.sort((a, b) => (activityTime(b) || 0) - (activityTime(a) || 0));
@@ -3737,8 +3754,37 @@ function appendActivity(entries) {
   return Promise.resolve();
 }
 function scheduleLogFlush(ms = 4000) { clearTimeout(logTimer); logTimer = setTimeout(() => { flushActivity().catch(() => {}); }, ms); }
+const actWorkforce = e => !!e && !e.att && e.action !== "settings" && !/^(att-|external-att-|request-)/.test(e.action || "");
+/* v3.74.0: delete Activity Log entries older than `days` (0 = all of them) */
+async function purgeActivity(days) {
+  return serial(async () => {
+    for (let attempt = 0; ; attempt++) {
+      try {
+        const { fh, u8 } = await readFile(), zip = await Zip.open(u8), loc = await actLocate(zip);
+        if (!loc.path) return { before: 0, removed: 0, left: 0 };
+        const items = await actRead(zip, loc), cut = days > 0 ? Date.now() - days * 86400000 : Infinity;
+        const keepIt = items.filter(e => { const t = activityTime(e); return days > 0 && (!Number.isFinite(t) || t >= cut); });
+        const removed = items.length - keepIt.length;
+        if (!removed) return { before: items.length, removed: 0, left: items.length };
+        await actWrite(zip, loc, keepIt);
+        await writeBlob(fh, await zip.build(), []);
+        Conn.cache = null; return { before: items.length, removed, left: keepIt.length };
+      } catch (e) { if (!isRace(e) || attempt >= 2) throw e; Conn.cache = null; await sleep(250 + attempt * 600); }
+    }
+  });
+}
+/* v3.74.0: how much room the workbook and its Activity Log take */
+async function storageInfo() {
+  const { u8 } = await readFile(), zip = await Zip.open(u8), loc = await actLocate(zip);
+  const e = loc.path && zip.find(loc.path), items = loc.path ? await actRead(zip, loc) : [];
+  const times = items.map(activityTime).filter(Number.isFinite);
+  const sheets = [];
+  for (const nm of [ACT_SHEET, PSEUDO_SHEET, ALOG_SHEET]) { const l = nm === ACT_SHEET ? loc : await sheetLocate(zip, nm); const z = l.path && zip.find(l.path); if (z) sheets.push({ name: nm, raw: z.usize, packed: z.csize }); }
+  return { bytes: u8.length, actEntries: items.length, actOldest: times.length ? Math.min(...times) : null, actRaw: e ? e.usize : 0, actPacked: e ? e.csize : 0, sheets, keepDays: actKeepDays() };
+}
 async function flushActivity() {
   if (!LOGQ.length || !Conn.dir || !Conn.fileName) return;
+  if (actKeepDays() === 0 && !LOGQ.some(actWorkforce)) { LOGQ.length = 0; return; }   /* v3.74.0: nothing to keep, so no extra save */
   if (window.ATT && ATT.state && ATT.state().saving) { scheduleLogFlush(3000); return; }
   if (window.PERM && !PERM.canWrite()) return;
   try { await serial(async () => { if (!LOGQ.length) return; const { fh, u8 } = await readFile(); await writeBlob(fh, new Blob([u8]), []); Conn.cache = null; }); }
@@ -4201,7 +4247,7 @@ return {
   supported: () => typeof window.showOpenFilePicker === "function" && !!window.indexedDB,
   folderName: () => (Conn.dir ? Conn.dir.name : ""),
   /* used by the Attendance page (same folder, same backups folder, same activity log) */
-  dir: () => Conn.dir, kvGet, kvSet, backup, purgeLocalCopies, rewriteCells, readPseudoHistory, pseudoHistoryEdit, setPseudoDates, addSheetToCopy, readUpload, adminLogRead, adminLogWrite, writeBlob, appendActivity, nowText, readActivity, readData, writeData, isCloud, flushActivity, ACT_VERBS, actDetails,
+  dir: () => Conn.dir, kvGet, kvSet, backup, purgeLocalCopies, rewriteCells, readPseudoHistory, pseudoHistoryEdit, setPseudoDates, addSheetToCopy, readUpload, adminLogRead, adminLogWrite, writeBlob, appendActivity, purgeActivity, storageInfo, actKeepDays, nowText, readActivity, readData, writeData, isCloud, flushActivity, ACT_VERBS, actDetails,
   userName, setUser: n => { ME = String(n || "").trim() || "You"; },
   async isLocked(name) { for (const cand of ["~$" + name, "~$" + name.slice(2)]) { try { await Conn.dir.getFileHandle(cand); return true; } catch (e) { /* not there */ } } return false; },
   fileName: () => Conn.fileName,
@@ -4457,6 +4503,9 @@ const CLOUD = (() => {
     closeReset: (id, status) => rpc('td_admin_close_reset', { p_token: tok(), p_id: id, p_status: status }),
     remove: id => rpc('td_admin_delete_user', { p_token: tok(), p_id: id }),
     history: () => rpc('td_admin_history', { p_token: tok() }),
+    /* v3.74.0: storage meter and clean-up (storage.sql) */
+    storage: () => rpc('td_admin_storage', { p_token: tok() }),
+    cleanup: (days, kinds) => rpc('td_admin_cleanup', { p_token: tok(), p_days: days, p_kinds: kinds }),
     backup: async (name, day) => unseal(unb64((await rpc('td_admin_get_backup', { p_token: tok(), p_name: name, p_day: day })).data)),
     async download() { const f = await wb().getFile(); return new Uint8Array(await f.arrayBuffer()); },
     async replace(file) {
@@ -10364,7 +10413,7 @@ async function poll() {
 }
 
 /* ============================== filtering ============================== */
-const APP = { title: "Team Dashboard", version: "3.73.0", released: "31 Oct 2026" };
+const APP = { title: "Team Dashboard", version: "3.74.0", released: "2 Nov 2026" };
 const BASE_DIMS = { status: "status_column", desig: "designation_column", client: "client_column", mode: "mode_column" };
 const STANDARD_STATUSES = ["Active", "Manager", "OJT", "Bench", "New", "Projected", "Left", "Moved"];
 const TILE_ORDER = ["Active", "Manager", "OJT", "Bench", "New", "Projected"];
@@ -13348,7 +13397,7 @@ async function openActivity(container) {
     const refresh = h("button", { class: "btn mini", onclick: () => openActivity(body) }, "Refresh");
     body.replaceChildren(
       h("div", { class: "activity-controls" }, search, h("span", { class: "spacer" }), refresh),
-      h("p", { class: "set-hint" }, "Every change is written to the “Activity Log” sheet of " + (state.file || "the workbook") + ", newest first. History is retained for all users; notification audience settings do not filter this audit log."),
+      h("p", { class: "set-hint" }, BE.actKeepDays() === 0 ? "New activity is not being recorded (Settings → Storage & clean-up). Entries below were recorded before." : "Changes are written to the “Activity Log” sheet of " + (state.file || "the workbook") + ", newest first, and kept for " + (BE.actKeepDays() === Infinity ? "ever" : BE.actKeepDays() + " days") + " (Settings → Storage & clean-up)."),
       ...(d.warning ? [h("div", { class: "banner", role: "status" }, d.warning)] : []), list);
     return d.items;
   } catch (e) { body.replaceChildren(h("div", { class: "banner" }, e.message)); return null; }
@@ -14154,6 +14203,7 @@ const MODULES = [
   { id: 'choices', name: 'Fields & drop-downs', show: () => PERM.isSuper() || PERM.can('set.fields'), draw: drawChoices },
   { id: 'sync', name: 'Save & sync', show: () => PERM.can('sync.view'), draw: drawSync },
   { id: 'signins', name: 'Sign-in log', show: () => PERM.online() && PERM.can('set.workbook'), draw: drawSignins },
+  { id: 'storage', name: 'Storage & clean-up', show: () => PERM.isSuper(), draw: drawStorage },
   { id: 'workbook', name: 'Workbook & backups', show: () => PERM.can('set.workbook') || PERM.can('workbook.download'), draw: drawWorkbook },
   { id: 'backups', name: 'Leave backups', show: () => PERM.isSuper() || PERM.can('set.fields'), draw: drawBackupSettings },
   { id: 'tools', name: 'Tools', show: () => PERM.can('tools.distance'), draw: drawTools },
@@ -15489,6 +15539,90 @@ function drawSync(pane) {
   };
   draw();
   ticker = setInterval(() => { if (!pane.isConnected || !onSettings()) { clearInterval(ticker); return; } if (current === 'sync' && !pane.contains(document.activeElement)) draw(); }, 1500);
+}
+
+/* ----- v3.74.0: Storage & clean-up: keep the database under 1 GB ----- */
+const mb = n => n == null ? '—' : n >= 1048576 ? (n / 1048576).toFixed(n >= 104857600 ? 0 : 1) + ' MB' : Math.max(1, Math.round(n / 1024)) + ' KB';
+const KEEP_OPTS = [[0, 'Don’t keep (recommended)'], [7, '7 days'], [30, '30 days'], [60, '60 days'], [90, '90 days'], [180, '180 days'], [365, '1 year'], ['forever', 'Forever']];
+const AGE_OPTS = [[30, 'older than 30 days'], [60, 'older than 60 days'], [90, 'older than 90 days'], [180, 'older than 180 days'], [365, 'older than 1 year'], [0, 'everything']];
+const KIND_NAMES = { logs: 'Sign-in & save logs', backups: 'Daily backups', requests: 'Answered requests' };
+async function drawStorage(pane) {
+  const err = h('p', { class: 'err', role: 'alert' });
+  const run = async fn => { err.textContent = ''; try { await fn(); } catch (e) { err.textContent = e.message; } };
+  const online = PERM.online();
+  fill(pane, h('p', { class: 'set-hint' }, 'Checking the storage…'));
+  let info = null, srv = null, srvErr = '';
+  try { info = await BE.storageInfo(); } catch (e) { err.textContent = e.message; }
+  if (online) { try { srv = await CLOUD.admin.storage(); } catch (e) { srvErr = /function|schema cache|not set up/i.test(e.message || '') ? 'nosql' : e.message; } }
+  const sel = (opts, val, label) => h('select', { class: 'input', 'aria-label': label, style: 'max-width:240px' }, ...opts.map(([v, t]) => h('option', { value: String(v), selected: String(v) === String(val) }, t)));
+
+  /* the meter */
+  let meter = null;
+  if (srv) {
+    const used = (+srv.db_bytes || 0) + (+srv.files_bytes || 0), lim = +srv.limit_bytes || 1073741824, pct = Math.min(100, used / lim * 100);
+    const col = pct >= 85 ? '#d92d20' : pct >= 60 ? '#dc8a00' : '#17824a';
+    meter = h('div', { class: 'set-card stg-meter' },
+      h('h4', {}, 'Database'),
+      h('div', { class: 'stg-big' }, h('b', {}, mb(used)), h('span', {}, ' of ' + (lim % 1073741824 ? mb(lim) : lim / 1073741824 + ' GB') + ' used · ' + pct.toFixed(pct < 10 ? 1 : 0) + '%')),
+      h('div', { class: 'stg-bar', role: 'progressbar', 'aria-valuemin': 0, 'aria-valuemax': 100, 'aria-valuenow': Math.round(pct) }, h('i', { style: 'width:' + Math.max(1, pct) + '%;background:' + col })),
+      pct >= 85 ? h('p', { class: 'err' }, 'Almost full: clean up old backups and logs below.') : null);
+  } else if (online) meter = h('div', { class: 'set-card' }, h('h4', {}, 'Database'), srvErr === 'nosql'
+    ? h('p', { class: 'set-hint' }, 'To see the database size and clean up the server logs and backups, open Supabase → SQL Editor, paste storage.sql (it came with this version), press Run, then reload.')
+    : h('p', { class: 'err' }, srvErr));
+
+  /* the Activity Log */
+  const keepSel = sel(KEEP_OPTS, (TD_SETTINGS || {}).activity_keep_days ?? 0, 'Keep activity for');
+  const saveKeep = h('button', { class: 'btn primary', type: 'button', onclick: () => run(async () => {
+    const v = keepSel.value === 'forever' ? 'forever' : +keepSel.value;
+    await window.saveTeamSetting('activity_keep_days', v); toast(v === 0 ? 'Activity is no longer recorded.' : 'Activity is kept for ' + KEEP_OPTS.find(o => String(o[0]) === String(v))[1].toLowerCase() + '.'); drawStorage(pane);
+  }) }, 'Save');
+  const ageA = sel(AGE_OPTS, 30, 'Which activity to delete');
+  const delA = confirmButton('Delete activity', 'Click again to delete', () => run(async () => {
+    if (window.ATT && ATT.dirty()) throw new Error('Save your attendance changes first.');
+    const d = +ageA.value, r = await BE.purgeActivity(d);
+    toast(r.removed ? 'Deleted ' + r.removed + ' activity entr' + (r.removed === 1 ? 'y' : 'ies') + (r.left ? ' · ' + r.left + ' kept' : '') + '.' : 'Nothing to delete.');
+    drawStorage(pane);
+  }));
+  const act = h('div', { class: 'set-card' },
+    h('h4', {}, 'Activity log'),
+    info ? h('p', { class: 'set-hint' }, info.actEntries ? info.actEntries.toLocaleString() + (info.actEntries === 1 ? ' entry' : ' entries') + ' · about ' + mb(info.actPacked) + ' of the ' + mb(info.bytes) + ' workbook' + (info.actOldest ? ' · oldest ' + new Date(info.actOldest).toLocaleDateString(undefined, { day: 'numeric', month: 'short', year: 'numeric' }) : '') : 'The Activity Log is empty.') : null,
+    h('div', { class: 'stg-row' }, h('span', {}, 'Keep activity for'), keepSel, saveKeep),
+    h('p', { class: 'set-hint' }, '“Don’t keep” records nothing new. Leave requests, approvals, pseudo name history and the admin log are kept apart and are not affected. With a number of days, older entries are removed on every save.'),
+    h('div', { class: 'stg-row' }, h('span', {}, 'Delete activity'), ageA, delA));
+
+  /* the server */
+  let server = null;
+  if (srv) {
+    const kinds = ['logs', 'backups', 'requests'].filter(k => (srv.tables || []).some(t => t.kind === k));
+    const checks = kinds.map(k => { const t = (srv.tables || []).filter(x => x.kind === k), bytes = t.reduce((a, x) => a + (+x.bytes || 0), 0), rows = t.reduce((a, x) => a + (+x.rows || 0), 0); return { k, ...checkLine(KIND_NAMES[k] + ' · ' + rows.toLocaleString() + ' rows · ' + mb(bytes), true) }; });
+    const ageS = sel(AGE_OPTS, 30, 'Which server records to delete');
+    const delS = confirmButton('Delete from the server', 'Click again to delete', () => run(async () => {
+      const ks = checks.filter(c => c.box.checked).map(c => c.k); if (!ks.length) throw new Error('Tick at least one kind of record.');
+      const r = await CLOUD.admin.cleanup(+ageS.value, ks), n = (r.tables || []).reduce((a, x) => a + (+x.deleted || 0), 0);
+      toast(n ? 'Deleted ' + n.toLocaleString() + ' old record' + (n === 1 ? '' : 's') + ' from the server.' : 'Nothing that old to delete.');
+      drawStorage(pane);
+    }));
+    server = h('div', { class: 'set-card' },
+      h('h4', {}, 'Server logs & backups'),
+      kinds.length ? h('div', {}, ...checks.map(c => c.el)) : h('p', { class: 'set-hint' }, 'No logs or backups found on the server.'),
+      kinds.length ? h('div', { class: 'stg-row' }, h('span', {}, 'Delete'), ageS, delS) : null,
+      h('p', { class: 'set-hint' }, 'The newest row of every log is always kept, backups from the last 7 days always stay, and pending requests are never deleted. The workbook, users, settings and keys are never touched. Deleted space is reused at once; to make the size shown in Supabase drop too, run “vacuum full;” once in the SQL Editor.'));
+  }
+
+  /* what takes the room */
+  let detail = null;
+  if (srv && (srv.tables || []).length) {
+    const rows = srv.tables.slice().sort((a, b) => b.bytes - a.bytes);
+    detail = h('details', { class: 'set-card stg-detail' }, h('summary', {}, 'What takes the room (' + rows.length + ' tables)'),
+      h('div', { class: 'login-wrap' }, h('table', { class: 'login-table' },
+        h('thead', {}, h('tr', {}, ...['Table', 'Size', 'Rows', 'Oldest', 'Clean-up'].map(t => h('th', {}, t)))),
+        h('tbody', {}, ...rows.map(t => h('tr', {}, h('td', {}, t.name), h('td', {}, mb(+t.bytes)), h('td', {}, (+t.rows || 0).toLocaleString()), h('td', {}, t.oldest ? new Date(t.oldest).toLocaleDateString(undefined, { day: 'numeric', month: 'short', year: 'numeric' }) : '—'), h('td', {}, t.kind ? KIND_NAMES[t.kind] : 'Kept'))))))) ;
+  }
+  const wbCard = info ? h('div', { class: 'set-card' }, h('h4', {}, 'Workbook'), h('div', { class: 'stg-big' }, h('b', {}, mb(info.bytes))),
+    h('p', { class: 'set-hint' }, (info.sheets || []).map(x => x.name + ' ' + mb(x.packed)).join(' · ') || 'Employees and attendance only.'),
+    h('p', { class: 'set-hint' }, online ? 'Every daily backup is a full copy of the workbook, so a smaller Activity Log also makes every backup smaller.' : 'This is the Excel file on this computer.')) : null;
+  fill(pane, h('p', { class: 'set-hint' }, online ? 'Keep the database under 1 GB: stop or shorten the Activity Log and delete old logs and backups you no longer need.' : 'Keep the workbook small: stop or shorten the Activity Log and delete old entries.'),
+    err, h('div', { class: 'set-grid', style: 'margin-bottom:14px' }, meter, wbCard), act, server, detail);
 }
 
 /* ----- Workbook & backups ----- */
