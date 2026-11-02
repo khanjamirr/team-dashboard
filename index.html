@@ -10,7 +10,7 @@
 <meta name="format-detection" content="telephone=no">
 <link rel="preconnect" href="https://iiogwevtyzgedhoaqlrn.supabase.co" crossorigin><link rel="dns-prefetch" href="https://iiogwevtyzgedhoaqlrn.supabase.co">
 <link rel="icon" href="data:,">
-<title>Team Dashboard · 3.74.1</title>
+<title>Team Dashboard · 3.74.2</title>
 <link rel="preconnect" href="https://fonts.googleapis.com"><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin><link href="https://fonts.googleapis.com/css2?family=Public+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet">
 <style>
 :root {
@@ -2428,6 +2428,11 @@ article.al-d { --alc:#c62828; }
 .stg-bar { height:10px; border-radius:999px; background:var(--surface-2); overflow:hidden; border:1px solid var(--border); } .stg-bar i { display:block; height:100%; border-radius:999px; }
 .stg-row { display:flex; align-items:center; gap:10px; flex-wrap:wrap; margin:10px 0 6px; } .stg-row > span { min-width:130px; font-weight:600; font-size:13px; }
 .stg-detail > summary { cursor:pointer; font-weight:650; } .stg-detail[open] > summary { margin-bottom:10px; }
+.ovx-code.can { cursor:pointer; border-radius:7px; padding:3px 6px; margin:-3px -6px -3px 0; text-decoration:underline dotted; text-underline-offset:3px; } .ovx-code.can:hover, .ovx-code.can:focus-visible { background:var(--surface-2); color:var(--accent); outline:none; }
+.ovx-cmenu { position:fixed; z-index:1200; width:250px; max-height:min(380px, 70vh); display:flex; flex-direction:column; background:var(--surface); color:var(--ink); border:1px solid var(--border); border-radius:12px; box-shadow:0 14px 40px rgba(15,23,42,.22); overflow:hidden; }
+.ovx-cm-h { padding:10px 12px; border-bottom:1px solid var(--border); } .ovx-cm-h b { display:block; font-size:13px; } .ovx-cm-h small { color:var(--ink-2); font-size:11.5px; }
+.ovx-cm-l { overflow:auto; padding:4px; } .ovx-cmenu button { display:flex; gap:10px; align-items:center; width:100%; border:0; background:transparent; text-align:left; padding:7px 9px; border-radius:8px; font:inherit; font-size:13px; color:inherit; cursor:pointer; }
+.ovx-cmenu button b { min-width:36px; font-size:12px; } .ovx-cmenu button span { color:var(--ink-2); } .ovx-cmenu button:hover, .ovx-cmenu button:focus-visible { background:var(--accent-soft, var(--surface-2)); outline:none; }
 /* ================= v3.73.0: phone browsers (iPhone Safari, Android Chrome) ================= */
 @media (max-width:700px) {
   html { -webkit-text-size-adjust:100%; text-size-adjust:100%; }
@@ -7695,7 +7700,7 @@ function openLogLeave(preKey) {
     title: 'Record attendance',
     body: `<style>${PAST_CSS}.cbx{position:relative}.cbx-list{position:absolute;left:0;right:0;top:calc(100% + 4px);z-index:5;max-height:260px;overflow:auto;background:var(--surface);border:1px solid var(--line-2);border-radius:10px;box-shadow:0 10px 30px rgba(0,0,0,.18);padding:4px}.cbx-opt{display:flex;justify-content:space-between;gap:12px;width:100%;border:0;background:transparent;text-align:left;padding:7px 10px;border-radius:7px;font-size:13px;color:var(--ink);font-weight:500}.cbx-opt small{color:var(--ink-3);font-weight:400}.cbx-opt.on,.cbx-opt:hover{background:var(--accent-soft)}.cbx-empty{padding:10px;color:var(--ink-3);font-size:12px}.cbx-caret{position:absolute;right:8px;top:50%;transform:translateY(-50%);border:0;background:transparent;color:var(--ink-3);padding:4px 6px}</style>
       <div class="form"><div class="full" style="display:flex;flex-direction:column;gap:4px"><span style="font-size:12px;font-weight:600;color:var(--ink-2)">Employee</span><div class="cbx"><input type="text" id="l-name" value="${esc(pre || '')}" placeholder="Pick or type a name" autocomplete="off" role="combobox" aria-expanded="false" aria-controls="l-list" aria-label="Employee" style="width:100%;padding-right:32px"><button type="button" class="cbx-caret" id="l-caret" tabindex="-1" aria-label="Show all employees">▾</button><div class="cbx-list" id="l-list" role="listbox" hidden></div></div></div>
-      <div style="display:flex;flex-direction:column;gap:4px"><span style="font-size:12px;font-weight:600;color:var(--ink-2)">Type <small style="font-weight:400;color:var(--ink-3)">· type a code or a word, ↑↓ Enter · Alt+T</small></span><div class="cbx"><input type="text" id="l-type" autocomplete="off" role="combobox" aria-expanded="false" aria-controls="l-tlist" aria-label="Type" style="width:100%" placeholder="e.g. SL or sick"><button type="button" class="cbx-caret" tabindex="-1" aria-hidden="true" id="l-tcaret">▾</button><div class="cbx-list" id="l-tlist" role="listbox" hidden></div></div><select id="l-code" hidden aria-hidden="true" tabindex="-1">${codesAllowed.map(c => `<option value="${c}" ${c === 'LA' && (!can('att.approve') || !codesAllowed.includes('AL')) ? 'selected' : ''}>${c} · ${CODES[c].label}</option>`).join('')}</select></div><span></span>
+      <div style="display:flex;flex-direction:column;gap:4px"><span style="font-size:12px;font-weight:600;color:var(--ink-2)">Type <small style="font-weight:400;color:var(--ink-3)">· type a code or a word, ↑↓ Enter · Alt+T</small></span><div class="cbx"><input type="text" id="l-type" autocomplete="off" role="combobox" aria-expanded="false" aria-controls="l-tlist" aria-label="Type" style="width:100%" placeholder="Choose a type, e.g. SL or sick"><button type="button" class="cbx-caret" tabindex="-1" aria-hidden="true" id="l-tcaret">▾</button><div class="cbx-list" id="l-tlist" role="listbox" hidden></div></div><select id="l-code" hidden aria-hidden="true" tabindex="-1"><option value="" selected></option>${codesAllowed.map(c => `<option value="${c}">${c} · ${CODES[c].label}</option>`).join('')}</select></div><span></span>
       <label>From<input type="date" id="l-from" value="${today}"></label><label>To<input type="date" id="l-to" value="${today}"></label>
       ${needsApproval() ? `<label class="full">Note for your manager <span style="color:var(--bad,#c0392b)">*</span> (required)<input type="text" id="l-note" maxlength="200" required aria-required="true" placeholder="e.g. family function, doctor’s appointment" autocomplete="off"></label><div class="full sm" style="padding:8px 10px;border-radius:8px;background:var(--accent-soft)">This leave goes to a manager for approval first. It is added to attendance only after they approve it.</div>` : ''}</div>
       <div id="l-prev" class="sm" style="margin-top:12px;padding:10px 12px;border:1px solid var(--line);border-radius:8px;background:var(--surface-2)"></div><div class="err" id="l-err"></div>
@@ -7707,7 +7712,7 @@ function openLogLeave(preKey) {
     if (!p) return { err: name.trim() ? 'No employee with that name in the workforce file or the tracker.' : 'Pick an employee.' };
     if (personGone(p)) return { err: p.name.trim() + ' has left or moved, so attendance can’t be recorded for them.' };
     if (isNaN(from) || isNaN(to)) return { err: 'Choose both dates.' }; if (to < from) return { err: '“To” is before “From”.' }; if ((to - from) / 86400000 > 92) return { err: 'That range is longer than 3 months. Split it up.' }; if (needsApproval() && ((($('#l-note', m) || {}).value || '').trim().length < 3)) return { err: 'Write a note for your manager: it is required (e.g. family function, doctor’s appointment).' };
-    const code = $('#l-code', m).value, skip = true; /* v3.22: week offs and holidays are always kept; only a direct edit in the tracker changes them */ const set = [], skipped = [], blocked = [], create = new Set(); let overwrite = 0;
+    const code = $('#l-code', m).value, skip = true; if (!code) return { err: 'Choose a leave type.' };   /* v3.74.2: no type is chosen for you */ /* v3.22: week offs and holidays are always kept; only a direct edit in the tracker changes them */ const set = [], skipped = [], blocked = [], create = new Set(); let overwrite = 0;
     for (let t = from; t <= to; t = new Date(t.getTime() + 86400000)) {
       const ms = Engine.monthSerial(t.getUTCFullYear(), t.getUTCMonth()), i = t.getUTCDate() - 1; const row = p.rows.find(r => r.month === ms);
       const cur = row ? row.days[i] : (t.getUTCDay() % 6 === 0 ? 'WO' : null);
@@ -7752,7 +7757,7 @@ function openLogLeave(preKey) {
   { const sel = $('#l-code', m), inp = $('#l-type', m), list = $('#l-tlist', m);
     const opts = codesAllowed.map(c => ({ c, t: c + ' · ' + CODES[c].label, k: (c + ' ' + CODES[c].label).toLowerCase() }));
     let act = 0, shown = opts;
-    const label = () => (opts.find(o => o.c === sel.value) || opts[0]).t;
+    const label = () => (opts.find(o => o.c === sel.value) || { t: '' }).t;   /* v3.74.2: blank until a type is picked */
     const draw = () => { list.innerHTML = shown.length ? shown.map((o, i) => `<button type="button" class="cbx-opt${i === act ? ' on' : ''}" role="option" aria-selected="${i === act}" data-c="${o.c}"><span><b>${esc(o.c)}</b></span><small>${esc(CODES[o.c].label)}</small></button>`).join('') : '<div class="cbx-empty">No type matches. Try a code like SL or a word like sick.</div>'; list.hidden = false; inp.setAttribute('aria-expanded', 'true'); list.querySelector('.cbx-opt.on')?.scrollIntoView({ block: 'nearest' }); };
     const close = () => { list.hidden = true; inp.setAttribute('aria-expanded', 'false'); };
     const filter = q => { q = q.trim().toLowerCase(); if (!q || q === label().toLowerCase()) return opts; const ex = opts.filter(o => o.c.toLowerCase() === q), pre = opts.filter(o => !ex.includes(o) && o.c.toLowerCase().startsWith(q)), word = opts.filter(o => !ex.includes(o) && !pre.includes(o) && o.k.includes(q)); return [...ex, ...pre, ...word]; };
@@ -9443,6 +9448,33 @@ function ovClientRecords(list) {
   const pOf = r => { try { const w = rowRoster(r), v = w && pc ? String(g(w, pc) ?? '').trim() : ''; return v || r.name.trim(); } catch { return r.name.trim(); } };
   return list.filter(e => e.st === 'backup' || e.st === 'none').map(e => [...(OVP.p === 'today' ? [] : [bkFmtD(e.iso)]), pOf(e.r), (e.st === 'backup' ? 'Backup Provided' : 'Backup Not Provided') + (e.half ? ' (Half day)' : ''), bkRemark(e.key, e.iso)]);
 }
+/* v3.74.2: change the leave type of one day straight from the Who is out card */
+const ovCodeOpts = e => { const cur = e.v; return [...PICK, ''].filter(c => c !== cur && codeAllowed(cur, c)); };
+const ovCanCode = e => (can('att.edit') || can('att.approve')) && !!e.r && e.r.uid != null && ovCodeOpts(e).length > 0;
+function ovCodeMenu(anchor, e, done) {
+  document.getElementById('ovxCodeMenu')?.remove();
+  if (!e) return;
+  const row = S.rows.find(r => r.uid === e.r.uid) || e.r, i = e.dt.getUTCDate() - 1, cur = e.v;
+  const leaveFirst = ['AL', 'CL', 'SL', 'UL', 'AB', 'HD1', 'HD2', 'LA', 'L', 'RJ'];
+  const opts = ovCodeOpts(e).sort((a, b) => (leaveFirst.indexOf(a) < 0 ? 99 : leaveFirst.indexOf(a)) - (leaveFirst.indexOf(b) < 0 ? 99 : leaveFirst.indexOf(b)));
+  const m = document.createElement('div'); m.id = 'ovxCodeMenu'; m.className = 'ovx-cmenu'; m.setAttribute('role', 'menu');
+  m.innerHTML = `<div class="ovx-cm-h"><b>${esc(row.name.trim())}</b><small>${esc(longDate(e.dt))} · now ${esc(cur)} · ${esc(labelOf(cur))}</small></div><div class="ovx-cm-l">` +
+    opts.map(c => `<button type="button" role="menuitem" data-c="${c}"><b>${c || '—'}</b><span>${c ? esc((CODES[c] || {}).label || c) : 'Blank (present)'}</span></button>`).join('') + '</div>';
+  document.body.append(m);
+  const r = anchor.getBoundingClientRect(), w = m.offsetWidth, hh = m.offsetHeight;
+  let x = Math.min(Math.max(8, r.right - w), innerWidth - w - 8), y = r.bottom + 6; if (y + hh > innerHeight - 8) y = Math.max(8, r.top - hh - 6);
+  m.style.left = x + 'px'; m.style.top = y + 'px';
+  const close = () => { m.remove(); removeEventListener('mousedown', out, true); removeEventListener('keydown', key, true); removeEventListener('scroll', close, true); };
+  const out = ev => { if (!m.contains(ev.target)) close(); };
+  const key = ev => { if (ev.key === 'Escape') { ev.stopPropagation(); close(); anchor.focus(); } else if (ev.key === 'ArrowDown' || ev.key === 'ArrowUp') { ev.preventDefault(); const bs = [...m.querySelectorAll('button')], k = bs.indexOf(document.activeElement); bs[(k + (ev.key === 'ArrowDown' ? 1 : -1) + bs.length) % bs.length]?.focus(); } };
+  setTimeout(() => { addEventListener('mousedown', out, true); addEventListener('keydown', key, true); addEventListener('scroll', close, true); }, 0);
+  m.addEventListener('click', async ev => {
+    const b = ev.target.closest('[data-c]'); if (!b) return; const code = b.dataset.c; close();
+    if (!(await confirmOverwrite(row.name.trim(), [{ t: e.dt, from: cur, to: code }]))) return;
+    if (mutate(`${row.name.trim()} · ${longDate(e.dt)}: ${cur} → ${code || 'blank'}`, () => setDay(row, i, code), { cells: true }) !== false) { toast(`${row.name.trim()}: ${cur} → ${code || 'blank'} on ${longDate(e.dt)}.`); done && done(); }
+  });
+  m.querySelector('button')?.focus();
+}
 function renderOutCard(el) {
   if (S.status !== 'ready' || !S.ctx) { el.innerHTML = `<div class="ovx-head"><h2>Who is out</h2></div><div class="ovx-empty">${S.status === 'loading' || S.status === 'idle' ? 'Loading attendance…' : 'The attendance workbook isn’t connected yet. <button class="linkbtn" data-att-go="grid">Set it up</button>'}</div>`; el.querySelector('[data-att-go]')?.addEventListener('click', () => go('grid')); return; }
   const R = ovRange(OVP.p), all = ovEntries(R.from, R.to).sort((a, b) => a.iso.localeCompare(b.iso) || a.r.name.localeCompare(b.r.name));
@@ -9467,8 +9499,8 @@ function renderOutCard(el) {
   if (OVP.names == null) { try { OVP.names = localStorage.getItem('td_ov_names') || 'real'; } catch { OVP.names = 'real'; } }
   const pz = OVP.names === 'pseudo', nmOf = r => pz ? (bkPseudo(r) || r.name.trim()) : r.name.trim();
   const more = window.tdMore([`<button type="button" class="btn" data-ov-mail>Email the update</button>`, can('ov.openatt') && can('page.attendance') ? `<button type="button" class="btn" data-att-go="grid">Open attendance</button>` : '', `<button type="button" class="btn" data-att-hist>History &amp; upcoming</button>`, `<hr>`, `<label class="ovx-nsw" title="Show pseudo names instead of real names in this list"><span>Pseudo names</span><input type="checkbox" role="switch" data-ov-names${pz ? ' checked' : ''}><i aria-hidden="true"></i></label>`], "More", "left");
-  const rows = shown.map(e => { const [t, c] = OV_ST[e.st], act = ed && ['backup', 'none', 'unset', 'live'].includes(e.st);
-    return `<li><span class="ovx-av">${esc(ini(nmOf(e.r)))}</span><span class="ovx-nm"><b>${esc(nmOf(e.r))}</b><small>${esc([OVP.p === 'today' ? '' : bkFmtD(e.iso), cl(e.r), dg(e.r)].filter(Boolean).join(' · '))}</small></span>${e.half ? (pz ? `<span class="ovx-code" title="${esc(labelOf(e.v))} in attendance · billed as a half day">HD</span>` : `<span class="ovx-code" title="${esc(labelOf(e.v))} · cover set for half a day, billed as a half day">${esc(e.v)}<em class="ovx-half">½ day</em></span>`) : `<span class="ovx-code" title="${esc(labelOf(e.v))}">${esc(e.v)}</span>`}${act ? `<button type="button" class="ovx-chip ${c}" data-ovbk="${esc(e.key)}" data-iso="${e.iso}" title="Set or change the backup">${t}</button>` : `<span class="ovx-chip ${c}">${t}</span>`}</li>`; }).join('');
+  const rows = shown.map((e, ix) => { const [t, c] = OV_ST[e.st], act = ed && ['backup', 'none', 'unset', 'live'].includes(e.st);
+    return `<li><span class="ovx-av">${esc(ini(nmOf(e.r)))}</span><span class="ovx-nm"><b>${esc(nmOf(e.r))}</b><small>${esc([OVP.p === 'today' ? '' : bkFmtD(e.iso), cl(e.r), dg(e.r)].filter(Boolean).join(' · '))}</small></span>${e.half ? (pz ? `<span class="ovx-code${ovCanCode(e) ? ' can' : ''}"${ovCanCode(e) ? ` data-ovc="${ix}" role="button" tabindex="0" aria-label="Change the leave type for ${esc(nmOf(e.r))}"` : ''} title="${esc(labelOf(e.v))} in attendance · billed as a half day">HD</span>` : `<span class="ovx-code${ovCanCode(e) ? ' can' : ''}"${ovCanCode(e) ? ` data-ovc="${ix}" role="button" tabindex="0" aria-label="Change the leave type for ${esc(nmOf(e.r))}"` : ''} title="${esc(labelOf(e.v))} · cover set for half a day, billed as a half day">${esc(e.v)}<em class="ovx-half">½ day</em></span>`) : `<span class="ovx-code${ovCanCode(e) ? ' can' : ''}"${ovCanCode(e) ? ` data-ovc="${ix}" role="button" tabindex="0" aria-label="Change the leave type for ${esc(nmOf(e.r))}"` : ''} title="${esc(labelOf(e.v))}">${esc(e.v)}</span>`}${act ? `<button type="button" class="ovx-chip ${c}" data-ovbk="${esc(e.key)}" data-iso="${e.iso}" title="Set or change the backup">${t}</button>` : `<span class="ovx-chip ${c}">${t}</span>`}</li>`; }).join('');
   /* this week, Monday to Friday: covered (green) and not covered (red) */
   const T0 = ovDay(), ws = addDays(T0, -T0.getUTCDay()), days = [1, 2, 3, 4, 5].map(k => addDays(ws, k)), wk = days.map(dt => { const es = ovEntries(dt, dt).filter(e => ['backup', 'none', 'unset'].includes(e.st)); return { dt, cov: es.filter(e => e.st === 'backup').length, not: es.length - es.filter(e => e.st === 'backup').length, fut: dt > TODAY }; });
   const mx = Math.max(1, ...wk.map(x => x.cov + x.not));
@@ -9479,6 +9511,9 @@ function renderOutCard(el) {
   el.querySelectorAll('[data-ovf]').forEach(b => b.addEventListener('click', () => { OVP.f = b.dataset.ovf; OVP.all = false; renderOutCard(el); }));
   el.querySelector('[data-ov-all]')?.addEventListener('click', () => { OVP.all = !OVP.all; renderOutCard(el); });
   el.querySelectorAll('[data-ovbk]').forEach(b => b.addEventListener('click', () => openBackupBox(b.dataset.ovbk, b.dataset.iso, () => { renderOutCard(el); window.organizeOverview?.(); })));
+  /* v3.74.2: click the leave code to change the leave type for that day */
+  el.querySelectorAll('[data-ovc]').forEach(b => { const go = ev => { ev.preventDefault(); ev.stopPropagation(); ovCodeMenu(b, shown[+b.dataset.ovc], () => { renderOutCard(el); window.organizeOverview?.(); }); };
+    b.addEventListener('click', go); b.addEventListener('keydown', ev => { if (ev.key === 'Enter' || ev.key === ' ') go(ev); }); });
   el.querySelectorAll('[data-att-go]').forEach(b => b.addEventListener('click', () => go(b.dataset.attGo)));
   el.querySelector('[data-att-hist]')?.addEventListener('click', openAttHistory);
   /* v3.58.3: the More menu floats above the page (position fixed) so the card edge never cuts it off, and it flips to stay on screen */
@@ -10433,7 +10468,7 @@ async function poll() {
 }
 
 /* ============================== filtering ============================== */
-const APP = { title: "Team Dashboard", version: "3.74.1", released: "2 Nov 2026" };
+const APP = { title: "Team Dashboard", version: "3.74.2", released: "2 Nov 2026" };
 const BASE_DIMS = { status: "status_column", desig: "designation_column", client: "client_column", mode: "mode_column" };
 const STANDARD_STATUSES = ["Active", "Manager", "OJT", "Bench", "New", "Projected", "Left", "Moved"];
 const TILE_ORDER = ["Active", "Manager", "OJT", "Bench", "New", "Projected"];
