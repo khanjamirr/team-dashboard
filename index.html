@@ -10,7 +10,7 @@
 <meta name="format-detection" content="telephone=no">
 <link rel="preconnect" href="https://iiogwevtyzgedhoaqlrn.supabase.co" crossorigin><link rel="dns-prefetch" href="https://iiogwevtyzgedhoaqlrn.supabase.co">
 <link rel="icon" href="data:,">
-<title>Team Dashboard · 3.74.5</title>
+<title>Team Dashboard · 3.74.6</title>
 <link rel="preconnect" href="https://fonts.googleapis.com"><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin><link href="https://fonts.googleapis.com/css2?family=Public+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet">
 <style>
 :root {
@@ -4341,7 +4341,7 @@ const SUPABASE_CONFIG = {
   /* v3.74.4: new Supabase project. Left like this, the sign-in screen asks once per computer for the Project URL and the
      API key (Supabase → Project Settings → API Keys: the publishable key, or the legacy anon key). To skip that, put your
      Project URL and key between the quotes. */
-  url: 'https://YOUR-PROJECT.supabase.co',
+  url: 'https://upvntuvloapwcazjzaen.supabase.co',
   anonKey: '',
   workbookFile: 'Team Dashboard.xlsx',
 };
@@ -4350,18 +4350,25 @@ const CLOUD = (() => {
   const XLSX_TYPE = 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet';
   const ls = { get(k) { try { return JSON.parse(localStorage.getItem(k) || 'null'); } catch { return null; } }, set(k, v) { try { v == null ? localStorage.removeItem(k) : localStorage.setItem(k, JSON.stringify(v)); } catch { } } };
   const PH = u => /YOUR-PROJECT/i.test(String(u || ''));   /* v3.74.4: the placeholder URL counts as no URL */
-  const cfg = () => { const saved = ls.get(LS_CFG) || {}, c = { ...SUPABASE_CONFIG }; if (PH(c.url)) c.url = ''; for (const k of ['url', 'anonKey']) if (!c[k] && saved[k] && !(k === 'url' && PH(saved[k]))) c[k] = saved[k];   /* v3.74.5: a saved placeholder URL is ignored */ c.anonKey = String(c.anonKey || '').trim(); c.url = fixUrl(c.url, c.anonKey).url; return c; };
+  const cfg = () => { const saved = ls.get(LS_CFG) || {}, c = { ...SUPABASE_CONFIG }; if (PH(c.url)) c.url = ''; for (const k of ['url', 'anonKey']) if (!c[k] && saved[k] && !(k === 'url' && (PH(saved[k]) || /^https?:\/\/(eyJ|sb_)/.test(saved[k]))) && !(k === 'anonKey' && !/^(eyJ|sb_)/.test(String(saved[k]).trim()))) c[k] = saved[k];   /* v3.74.6: a wrong saved URL or key is ignored */   /* v3.74.5: a saved placeholder URL is ignored */ c.anonKey = String(c.anonKey || '').trim(); c.url = fixUrl(c.url, c.anonKey).url; return c; };
   const configured = () => { const c = cfg(); return !!(c.url && c.anonKey); };
   const fromFile = () => !!(SUPABASE_CONFIG.url && !PH(SUPABASE_CONFIG.url) && SUPABASE_CONFIG.anonKey);
   /* The anon key carries the project id ("ref"). Use it to fill in or correct the Project URL, so a typo can't break sign-in. */
   function keyRef(key) { try { const p = String(key).split('.')[1].replace(/-/g, '+').replace(/_/g, '/'); return JSON.parse(atob(p + '==='.slice((p.length + 3) % 4))).ref || ''; } catch { return ''; } }
+  /* v3.74.6: accepts the Project URL, the dashboard link (supabase.com/dashboard/project/<id>), or just the project id.
+     When the key carries the project id (the anon key does), the URL is always made from it. */
   function fixUrl(url, key) {
     url = String(url || '').trim().replace(/\/+$/, ''); const ref = keyRef(key);
-    if (url && !/^https?:\/\//i.test(url)) url = 'https://' + url;
+    if (/^(eyJ|sb_)/.test(url)) url = '';                                          // a key pasted into the URL box
+    const dash = /supabase\.com\/dashboard\/project\/([a-z0-9]{10,40})/i.exec(url);
+    if (dash) url = `https://${dash[1].toLowerCase()}.supabase.co`;
+    else if (/^[a-z0-9]{15,40}$/i.test(url)) url = `https://${url.toLowerCase()}.supabase.co`;
+    else if (url && !/^https?:\/\//i.test(url)) url = 'https://' + url;
+    url = url.replace(/^(https?:\/\/[^/]+).*$/i, '$1');                            // drop any path after the address
     if (!ref) return { url, note: '' };
     const m = /^https?:\/\/([a-z0-9]+)\.supabase\.co$/i.exec(url);
     if (!url) return { url: `https://${ref}.supabase.co`, note: '' };
-    if (m && m[1].toLowerCase() !== ref.toLowerCase()) return { url: `https://${ref}.supabase.co`, note: `The Project URL didn’t match your key, so it was corrected to https://${ref}.supabase.co.` };
+    if (!m || m[1].toLowerCase() !== ref.toLowerCase()) return { url: `https://${ref}.supabase.co`, note: `The Project URL was set to https://${ref}.supabase.co to match your key.` };
     return { url, note: '' };
   }
   let session = ls.get(LS_SESSION);
@@ -4586,14 +4593,15 @@ const CLOUD = (() => {
     const lid = inp('text', 'e.g. 1024', ls.get(LS_LOGIN) || '', { id: 'signinLogin', autocomplete: 'username', class: 'input signin-login', spellcheck: 'false', autocapitalize: 'off' });
     const pass = inp('password', '', '', { id: 'signinPass', autocomplete: 'current-password', class: 'input signin-pass', spellcheck: 'false' });
     const eye = h('button', { class: 'signin-eye', type: 'button', 'aria-label': 'Show passcode', onclick: () => { const show = pass.type === 'password'; pass.type = show ? 'text' : 'password'; eye.textContent = show ? 'Hide' : 'Show'; eye.setAttribute('aria-label', show ? 'Hide passcode' : 'Show passcode'); pass.focus(); } }, 'Show');
-    const needKey = !SUPABASE_CONFIG.anonKey, needUrl = !SUPABASE_CONFIG.url || PH(SUPABASE_CONFIG.url), needProject = needKey || needUrl;
+    const needKey = !SUPABASE_CONFIG.anonKey, needUrl = !SUPABASE_CONFIG.url || PH(SUPABASE_CONFIG.url), needProject = needKey || needUrl, showProject = needProject && !configured();
     const go = h('button', { class: 'btn primary signin-go', type: 'submit' }, 'Sign in');
     const form = h('form', { class: 'signin-form', novalidate: true });
     form.addEventListener('submit', async ev => {
       ev.preventDefault();
       go.disabled = true; go.textContent = 'Signing in…'; err.textContent = '';
       try {
-        if (needProject && !configured()) { const f = fixUrl(needUrl ? url.value : SUPABASE_CONFIG.url, needKey ? key.value.trim() : SUPABASE_CONFIG.anonKey); url.value = f.url; ls.set(LS_CFG, { url: f.url, anonKey: needKey ? key.value.trim() : SUPABASE_CONFIG.anonKey }); if (f.note) toast(f.note); }
+        if (needProject && (showProject || !configured())) { let uv = url.value.trim(), kv = key.value.trim(); if (/^(eyJ|sb_)/.test(uv) && /^https?:|supabase/i.test(kv)) [uv, kv] = [kv, uv];   /* v3.74.6: boxes swapped */
+          key.value = kv; const f = fixUrl(needUrl ? uv : SUPABASE_CONFIG.url, needKey ? kv : SUPABASE_CONFIG.anonKey); url.value = f.url; ls.set(LS_CFG, { url: f.url, anonKey: needKey ? kv : SUPABASE_CONFIG.anonKey }); if (f.note) toast(f.note); }
         if (!configured()) throw new Error('Enter the Project URL and the API key first (Supabase → Project Settings → API Keys).');
         if (!pass.value.trim()) throw new Error('Enter your passcode.');
         if (!lid.value.trim()) throw new Error('Enter your login ID (your Emp ID).');
@@ -4606,7 +4614,7 @@ const CLOUD = (() => {
     });
     setTimeout(() => { if (configured() && pass.isConnected) (lid.value ? pass : lid).focus(); }, 50);
     form.append(
-      ...(needProject && !configured() ? [h('p', { class: 'signin-note' }, 'First time on this computer: paste the Supabase details once.'), ...(needUrl ? [url] : []), ...(needKey ? [key] : [])] : []),
+      ...(showProject ? [h('p', { class: 'signin-note' }, 'First time on this computer: paste the Supabase details once.'), ...(needUrl ? [url] : []), ...(needKey ? [key] : [])] : []),
       h('label', { class: 'signin-label', for: 'signinLogin' }, 'Login ID (your Emp ID)'), lid,
       h('label', { class: 'signin-label', for: 'signinPass' }, 'Passcode'),
       h('div', { class: 'signin-field' }, pass, eye), go, err);
@@ -10474,7 +10482,7 @@ async function poll() {
 }
 
 /* ============================== filtering ============================== */
-const APP = { title: "Team Dashboard", version: "3.74.5", released: "11 Nov 2026" };
+const APP = { title: "Team Dashboard", version: "3.74.6", released: "11 Nov 2026" };
 const BASE_DIMS = { status: "status_column", desig: "designation_column", client: "client_column", mode: "mode_column" };
 const STANDARD_STATUSES = ["Active", "Manager", "OJT", "Bench", "New", "Projected", "Left", "Moved"];
 const TILE_ORDER = ["Active", "Manager", "OJT", "Bench", "New", "Projected"];
