@@ -10,7 +10,7 @@
 <meta name="format-detection" content="telephone=no">
 <link rel="preconnect" href="https://iiogwevtyzgedhoaqlrn.supabase.co" crossorigin><link rel="dns-prefetch" href="https://iiogwevtyzgedhoaqlrn.supabase.co">
 <link rel="icon" href="data:,">
-<title>Team Dashboard · 3.74.3</title>
+<title>Team Dashboard · 3.74.5</title>
 <link rel="preconnect" href="https://fonts.googleapis.com"><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin><link href="https://fonts.googleapis.com/css2?family=Public+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet">
 <style>
 :root {
@@ -4338,8 +4338,9 @@ return {
    All checks happen in the database functions from supabase/setup.sql.
    ===================================================================== */
 const SUPABASE_CONFIG = {
-  /* v3.74.3: new Supabase project. Paste the "anon public" key from Supabase → Project Settings → API between the quotes
-     below (the Project URL is worked out from the key). Left empty, the sign-in screen asks for the key once per computer. */
+  /* v3.74.4: new Supabase project. Left like this, the sign-in screen asks once per computer for the Project URL and the
+     API key (Supabase → Project Settings → API Keys: the publishable key, or the legacy anon key). To skip that, put your
+     Project URL and key between the quotes. */
   url: 'https://YOUR-PROJECT.supabase.co',
   anonKey: '',
   workbookFile: 'Team Dashboard.xlsx',
@@ -4348,9 +4349,10 @@ const CLOUD = (() => {
   const LS_CFG = 'td-supabase-config', LS_SESSION = 'td-pass-session', LS_MODE = 'td-mode', LS_LOGIN = 'td-login-id';
   const XLSX_TYPE = 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet';
   const ls = { get(k) { try { return JSON.parse(localStorage.getItem(k) || 'null'); } catch { return null; } }, set(k, v) { try { v == null ? localStorage.removeItem(k) : localStorage.setItem(k, JSON.stringify(v)); } catch { } } };
-  const cfg = () => { const saved = ls.get(LS_CFG) || {}, c = { ...SUPABASE_CONFIG }; for (const k of ['url', 'anonKey']) if (!c[k] && saved[k]) c[k] = saved[k]; c.anonKey = String(c.anonKey || '').trim(); c.url = fixUrl(c.url, c.anonKey).url; return c; };
+  const PH = u => /YOUR-PROJECT/i.test(String(u || ''));   /* v3.74.4: the placeholder URL counts as no URL */
+  const cfg = () => { const saved = ls.get(LS_CFG) || {}, c = { ...SUPABASE_CONFIG }; if (PH(c.url)) c.url = ''; for (const k of ['url', 'anonKey']) if (!c[k] && saved[k] && !(k === 'url' && PH(saved[k]))) c[k] = saved[k];   /* v3.74.5: a saved placeholder URL is ignored */ c.anonKey = String(c.anonKey || '').trim(); c.url = fixUrl(c.url, c.anonKey).url; return c; };
   const configured = () => { const c = cfg(); return !!(c.url && c.anonKey); };
-  const fromFile = () => !!(SUPABASE_CONFIG.url && SUPABASE_CONFIG.anonKey);
+  const fromFile = () => !!(SUPABASE_CONFIG.url && !PH(SUPABASE_CONFIG.url) && SUPABASE_CONFIG.anonKey);
   /* The anon key carries the project id ("ref"). Use it to fill in or correct the Project URL, so a typo can't break sign-in. */
   function keyRef(key) { try { const p = String(key).split('.')[1].replace(/-/g, '+').replace(/_/g, '/'); return JSON.parse(atob(p + '==='.slice((p.length + 3) % 4))).ref || ''; } catch { return ''; } }
   function fixUrl(url, key) {
@@ -4397,14 +4399,14 @@ const CLOUD = (() => {
     const c = cfg(); let res, timer = null;
     /* v3.11: a request that hangs no longer leaves the dashboard stuck on "Saving…" */
     if (!signal) { const ac = new AbortController(); signal = ac.signal; timer = setTimeout(() => ac.abort(), fn === 'td_put_file' || fn === 'td_get_file' ? 90000 : 30000); }
-    try { res = await fetch(`${c.url}/rest/v1/rpc/${fn}`, { method: 'POST', cache: 'no-store', signal, headers: { apikey: c.anonKey, Authorization: 'Bearer ' + c.anonKey, 'Content-Type': 'application/json' }, body: JSON.stringify(args || {}) }); }
-    catch (e) { throw cloudErr(503, e && e.name === 'AbortError' ? 'Supabase did not answer in time, so nothing was changed. Check your connection and try again.' : `Could not reach Supabase at ${c.url}. Check that the Project URL is exactly as shown in Supabase (Project Settings → API) and that you are online. Nothing was changed.`); }
+    try { res = await fetch(`${c.url}/rest/v1/rpc/${fn}`, { method: 'POST', cache: 'no-store', signal, headers: { apikey: c.anonKey, ...(/^eyJ/.test(c.anonKey) ? { Authorization: 'Bearer ' + c.anonKey } : {}), 'Content-Type': 'application/json' }   /* v3.74.4: new sb_publishable_ keys go in apikey only */, body: JSON.stringify(args || {}) }); }
+    catch (e) { throw cloudErr(503, e && e.name === 'AbortError' ? 'Supabase did not answer in time, so nothing was changed. Check your connection and try again.' : `Could not reach Supabase at ${c.url}. Check that the Project URL is exactly as shown in Supabase (the Connect box, or Project Settings → Data API) and that you are online. To type it again, use “Change the Supabase project URL or key” below. Nothing was changed.`); }
     finally { if (timer) clearTimeout(timer); }
     const text = await res.text(); let j = null; try { j = text ? JSON.parse(text) : null; } catch { }
     if (!res.ok) {
       const code = (j && j.message) || res.statusText;
       if (res.status === 404 && /function|schema cache/i.test(code)) throw cloudErr(500, 'The Supabase database is not set up yet. Run setup.sql in Supabase → SQL Editor.');
-      if (res.status === 401) { if (!SUPABASE_CONFIG.anonKey) ls.set(LS_CFG, null); throw cloudErr(401, 'Supabase rejected the anon key. Paste the “anon public” key again from Supabase → Project Settings → API.', { badKey: true }); }
+      if (res.status === 401) { if (!SUPABASE_CONFIG.anonKey) ls.set(LS_CFG, null); throw cloudErr(401, 'Supabase rejected the API key. Paste the publishable key (or the legacy anon key) again from Supabase → Project Settings → API Keys.', { badKey: true }); }
       if (code === 'SESSION_EXPIRED') { dropSession(); throw cloudErr(401, code); }
       /* v3.46: an admin saving a setting before the database was updated gets told what to do */
       if (code === 'ADMIN_ONLY' && session && session.role === 'admin' && fn === 'td_admin_set_setting') throw cloudErr(403, 'The database still only lets the super admin save settings. Ask the super admin to run supabase/admin-settings.sql once in Supabase → SQL Editor, then try again.');
@@ -4580,11 +4582,11 @@ const CLOUD = (() => {
       return wrap;
     }
     const inp = (type, ph, val, extra) => h('input', { class: 'input', type, placeholder: ph, value: val || '', autocomplete: 'off', ...(extra || {}) });
-    const url = inp('url', 'Supabase project URL', c.url), key = inp('text', 'Supabase anon key', c.anonKey);
+    const url = inp('url', 'Project URL, e.g. https://abcdxyz.supabase.co', c.url, { 'aria-label': 'Supabase project URL' }), key = inp('text', 'API key: publishable (sb_publishable_…) or anon (eyJ…)', c.anonKey, { 'aria-label': 'Supabase API key' });
     const lid = inp('text', 'e.g. 1024', ls.get(LS_LOGIN) || '', { id: 'signinLogin', autocomplete: 'username', class: 'input signin-login', spellcheck: 'false', autocapitalize: 'off' });
     const pass = inp('password', '', '', { id: 'signinPass', autocomplete: 'current-password', class: 'input signin-pass', spellcheck: 'false' });
     const eye = h('button', { class: 'signin-eye', type: 'button', 'aria-label': 'Show passcode', onclick: () => { const show = pass.type === 'password'; pass.type = show ? 'text' : 'password'; eye.textContent = show ? 'Hide' : 'Show'; eye.setAttribute('aria-label', show ? 'Hide passcode' : 'Show passcode'); pass.focus(); } }, 'Show');
-    const needKey = !SUPABASE_CONFIG.anonKey, needUrl = !SUPABASE_CONFIG.url, needProject = needKey || needUrl;
+    const needKey = !SUPABASE_CONFIG.anonKey, needUrl = !SUPABASE_CONFIG.url || PH(SUPABASE_CONFIG.url), needProject = needKey || needUrl;
     const go = h('button', { class: 'btn primary signin-go', type: 'submit' }, 'Sign in');
     const form = h('form', { class: 'signin-form', novalidate: true });
     form.addEventListener('submit', async ev => {
@@ -4592,7 +4594,7 @@ const CLOUD = (() => {
       go.disabled = true; go.textContent = 'Signing in…'; err.textContent = '';
       try {
         if (needProject && !configured()) { const f = fixUrl(needUrl ? url.value : SUPABASE_CONFIG.url, needKey ? key.value.trim() : SUPABASE_CONFIG.anonKey); url.value = f.url; ls.set(LS_CFG, { url: f.url, anonKey: needKey ? key.value.trim() : SUPABASE_CONFIG.anonKey }); if (f.note) toast(f.note); }
-        if (!configured()) throw new Error('Enter the Supabase project URL and anon key first.');
+        if (!configured()) throw new Error('Enter the Project URL and the API key first (Supabase → Project Settings → API Keys).');
         if (!pass.value.trim()) throw new Error('Enter your passcode.');
         if (!lid.value.trim()) throw new Error('Enter your login ID (your Emp ID).');
         const r = await rpc('td_login', { p_login_id: lid.value.trim(), p_passcode: pass.value });
@@ -4625,7 +4627,9 @@ const CLOUD = (() => {
       h('p', { class: 'signin-note', style: 'margin:4px 0 8px' }, 'Only the super admin can give you a new one. Send them a request:'),
       rid, rnote, rgo, rmsg);
     const forgot = h('button', { class: 'linkbtn signin-alt', type: 'button', onclick: () => { help.hidden = !help.hidden; forgot.textContent = help.hidden ? 'Forgot passcode?' : 'Hide'; if (!help.hidden) { rid.value = rid.value || lid.value; (rid.value ? rnote : rid).focus(); } } }, 'Forgot passcode?');
-    form.append(forgot, help);
+    /* v3.74.5: put in different Supabase details (wrong URL or key saved on this computer) */
+    const change = !fromFile() && configured() ? h('button', { class: 'linkbtn signin-alt', type: 'button', onclick: () => { ls.set(LS_CFG, null); location.reload(); } }, 'Change the Supabase project URL or key') : null;
+    form.append(...[forgot, help, change].filter(Boolean));
     wrap.append(form);
     return wrap;
   }
@@ -10470,7 +10474,7 @@ async function poll() {
 }
 
 /* ============================== filtering ============================== */
-const APP = { title: "Team Dashboard", version: "3.74.3", released: "11 Nov 2026" };
+const APP = { title: "Team Dashboard", version: "3.74.5", released: "11 Nov 2026" };
 const BASE_DIMS = { status: "status_column", desig: "designation_column", client: "client_column", mode: "mode_column" };
 const STANDARD_STATUSES = ["Active", "Manager", "OJT", "Bench", "New", "Projected", "Left", "Moved"];
 const TILE_ORDER = ["Active", "Manager", "OJT", "Bench", "New", "Projected"];
