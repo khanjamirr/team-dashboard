@@ -10,7 +10,7 @@
 <meta name="format-detection" content="telephone=no">
 <link rel="preconnect" href="https://iiogwevtyzgedhoaqlrn.supabase.co" crossorigin><link rel="dns-prefetch" href="https://iiogwevtyzgedhoaqlrn.supabase.co">
 <link rel="icon" href="data:,">
-<title>Team Dashboard · 3.74.6</title>
+<title>Team Dashboard · 3.76.0</title>
 <link rel="preconnect" href="https://fonts.googleapis.com"><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin><link href="https://fonts.googleapis.com/css2?family=Public+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet">
 <style>
 :root {
@@ -1247,6 +1247,7 @@ div.rmod-head { cursor:default; }
 .rmod.off .rmod-items { opacity:.45; }
 .rmod-extra { border-top:1px solid var(--border); margin-top:6px; padding-top:8px; }
 .copy-access { margin:12px 0; }
+.pc-first { margin:6px 0 10px; padding:9px 12px; border-radius:10px; font-size:13px; background:color-mix(in srgb, var(--accent) 10%, var(--surface)); border:1px solid color-mix(in srgb, var(--accent) 30%, var(--border)); }
 .pc-overlay { position:fixed; inset:0; z-index:1000; display:flex; align-items:center; justify-content:center; padding:16px; background:rgba(0,0,0,.35); }
 .pc-card { width:100%; max-width:400px; padding:22px; border-radius:14px; background:var(--surface, #fff); color:var(--ink); box-shadow:0 20px 50px rgba(0,0,0,.25); }
 .reset-queue { margin:0 0 14px; padding:12px 14px; border:1px solid var(--c-yellow, #d9a400); border-radius:10px; background:var(--wash); }
@@ -2433,6 +2434,12 @@ article.al-d { --alc:#c62828; }
 .ovx-cm-h { padding:10px 12px; border-bottom:1px solid var(--border); } .ovx-cm-h b { display:block; font-size:13px; } .ovx-cm-h small { color:var(--ink-2); font-size:11.5px; }
 .ovx-cm-l { overflow:auto; padding:4px; } .ovx-cmenu button { display:flex; gap:10px; align-items:center; width:100%; border:0; background:transparent; text-align:left; padding:7px 9px; border-radius:8px; font:inherit; font-size:13px; color:inherit; cursor:pointer; }
 .ovx-cmenu button b { min-width:36px; font-size:12px; } .ovx-cmenu button span { color:var(--ink-2); } .ovx-cmenu button:hover, .ovx-cmenu button:focus-visible { background:var(--accent-soft, var(--surface-2)); outline:none; }
+#cardFill .fill-xl { display:flex; gap:14px; align-items:center; flex-wrap:wrap; margin:0 0 14px; padding:12px 14px; border-radius:12px; border:1px solid color-mix(in srgb, var(--c-violet) 35%, var(--border)); background:color-mix(in srgb, var(--c-violet) 8%, var(--surface)); }
+#cardFill .fill-xl b { display:block; font-size:14px; margin-bottom:2px; } #cardFill .fill-xl span { font-size:12.5px; color:var(--ink-2); } #cardFill .fill-xl .grow { flex:1 1 320px; }
+.xl-paste { margin-top:10px; } .xl-paste > summary { cursor:pointer; font-weight:600; font-size:13px; color:var(--accent); } .xl-paste textarea { width:100%; margin:8px 0; font-family:ui-monospace, Menlo, Consolas, monospace; font-size:12px; }
+.xl-new-box { margin-top:14px; padding:10px 12px; border:1px dashed var(--border); border-radius:10px; } .xl-new-box h5 { margin:0 0 8px; }
+.xl-newp { display:grid; grid-template-columns:20px minmax(140px,1.2fr) 110px minmax(0,2fr); gap:10px; align-items:center; padding:6px 4px; font-size:13px; cursor:pointer; } .xl-newp.off { opacity:.55; } .xl-nid { color:var(--ink-2); font-variant-numeric:tabular-nums; } .xl-nf { color:var(--ink-2); font-size:12px; }
+@media (max-width:700px) { .xl-newp { grid-template-columns:20px 1fr; } .xl-nid, .xl-nf { grid-column:2; } }
 /* ================= v3.73.0: phone browsers (iPhone Safari, Android Chrome) ================= */
 @media (max-width:700px) {
   html { -webkit-text-size-adjust:100%; text-size-adjust:100%; }
@@ -4002,34 +4009,41 @@ const findRow = (book, schema, rid) => {
 };
 const nameOf = (book, schema, vals) => { const ni = book.headers.indexOf(schema.name_column); return ni >= 0 && vals[ni] != null ? String(vals[ni]) : ""; };
 
+/* v3.75.0: write one new person into the open book (used by + Add employee and by Update from Excel) */
+async function insertRow(book, schema, sets, values) {
+  const H = book.headers, kcol = schema.key_column, ncol = schema.name_column, ki = H.indexOf(kcol);
+  const key = keystr(values[kcol]), name = keystr(values[ncol]);
+  const lab = c => (schema.columns.find(x => x.name === c) || {}).label || c;
+  if (!key) throw new ApiErr(400, lab(kcol) + " is required.");
+  if (ncol && H.includes(ncol) && !name) throw new ApiErr(400, lab(ncol) + " is required" + " (" + lab(kcol) + " " + key + ").");
+  if (book.rows.some(r => keystr(r.vals[ki]).toLowerCase() === key.toLowerCase())) throw new ApiErr(409, lab(kcol) + " '" + key + "' already exists.");
+  const prof = profile(book), nv = {};
+  { const pc = pseudoColOf(H); if (pc && !isBlank(values[pc])) { const who = pseudoClash(book, schema, values[pc], null); if (who) throw pseudoErr(values[pc], who); } }
+  H.forEach((h, i) => {
+    if (h in values && !sets.autoCols.has(h)) nv[h] = coerce(schema, sets, h, values[h], prof[i]);
+    else if (h in schema.add_defaults && isBlank(values[h])) nv[h] = schema.add_defaults[h];
+  });
+  const dojV = schema.doj_column ? nv[schema.doj_column] : null;
+  if (schema.tenure_column && H.includes(schema.tenure_column) && dojV != null) nv[schema.tenure_column] = tenureValue(schema, dojV);
+  const last = book.rows.length ? book.rows[book.rows.length - 1] : { r: book.hr, st: [] }, R = last.r + 1;
+  const rowEl = getOrCreateRow(book, R), lastEl = book.rowEls.get(last.r);
+  if (lastEl && lastEl !== rowEl) for (const a of ["s", "customFormat", "ht", "customHeight"]) if (lastEl.hasAttribute(a) && !rowEl.hasAttribute(a)) rowEl.setAttribute(a, lastEl.getAttribute(a));
+  H.forEach((h, i) => {
+    if (nv[h] == null && last.st[i] == null) return;
+    const c = getOrCreateCell(book, rowEl, i + 1);
+    if (last.st[i] != null && !c.hasAttribute("s")) c.setAttribute("s", last.st[i]);
+    if (nv[h] != null) { writeCell(book, c, nv[h]); if (last.st[i] == null) ensureDateStyle(book, c, sets, h, i); }
+  });
+  await extendRanges(book, last.r, R);
+  const vals = rowVals(book, R);
+  book.rows.push({ r: R, st: last.st || [], vals, fl: [] });   /* so the next new person goes below this one */
+  const pc = pseudoColOf(H);
+  return { id: keystr(vals[ki]), vals, name, log: { action: "add", key: keystr(vals[ki]), name, details: pc && !isBlank(nv[pc]) ? { [pc]: { from: null, to: nv[pc] } } : {} } };
+}
 async function addRow(values) {
   return mutate(async (book, schema, sets) => {
-    const H = book.headers, kcol = schema.key_column, ncol = schema.name_column, ki = H.indexOf(kcol);
-    const key = keystr(values[kcol]), name = keystr(values[ncol]);
-    const lab = c => (schema.columns.find(x => x.name === c) || {}).label || c;
-    if (!key) throw new ApiErr(400, lab(kcol) + " is required.");
-    if (ncol && H.includes(ncol) && !name) throw new ApiErr(400, lab(ncol) + " is required.");
-    if (book.rows.some(r => keystr(r.vals[ki]).toLowerCase() === key.toLowerCase())) throw new ApiErr(409, lab(kcol) + " '" + key + "' already exists.");
-    const prof = profile(book), nv = {};
-    { const pc = pseudoColOf(H); if (pc && !isBlank(values[pc])) { const who = pseudoClash(book, schema, values[pc], null); if (who) throw pseudoErr(values[pc], who); } }
-    H.forEach((h, i) => {
-      if (h in values && !sets.autoCols.has(h)) nv[h] = coerce(schema, sets, h, values[h], prof[i]);
-      else if (h in schema.add_defaults && isBlank(values[h])) nv[h] = schema.add_defaults[h];
-    });
-    const dojV = schema.doj_column ? nv[schema.doj_column] : null;
-    if (schema.tenure_column && H.includes(schema.tenure_column) && dojV != null) nv[schema.tenure_column] = tenureValue(schema, dojV);
-    const last = book.rows.length ? book.rows[book.rows.length - 1] : { r: book.hr, st: [] }, R = last.r + 1;
-    const rowEl = getOrCreateRow(book, R), lastEl = book.rowEls.get(last.r);
-    if (lastEl && lastEl !== rowEl) for (const a of ["s", "customFormat", "ht", "customHeight"]) if (lastEl.hasAttribute(a) && !rowEl.hasAttribute(a)) rowEl.setAttribute(a, lastEl.getAttribute(a));
-    H.forEach((h, i) => {
-      if (nv[h] == null && last.st[i] == null) return;
-      const c = getOrCreateCell(book, rowEl, i + 1);
-      if (last.st[i] != null && !c.hasAttribute("s")) c.setAttribute("s", last.st[i]);
-      if (nv[h] != null) { writeCell(book, c, nv[h]); if (last.st[i] == null) ensureDateStyle(book, c, sets, h, i); }
-    });
-    await extendRanges(book, last.r, R);
-    const vals = rowVals(book, R);
-    return { res: { id: keystr(vals[ki]), etag: etagOf(vals), v: vals, name }, log: [{ action: "add", key: keystr(vals[ki]), name, details: (() => { const pc = pseudoColOf(H); return pc && !isBlank(nv[pc]) ? { [pc]: { from: null, to: nv[pc] } } : {}; })() }], verify: chk => chk.rows.length === book.rows.length + 1 && chk.rows[chk.rows.length - 1].vals.every((v, i) => v === vals[i]), };
+    const n0 = book.rows.length, a = await insertRow(book, schema, sets, values), vals = a.vals;
+    return { res: { id: a.id, etag: etagOf(vals), v: vals, name: a.name }, log: [a.log], verify: chk => chk.rows.length === n0 + 1 && chk.rows[chk.rows.length - 1].vals.every((v, i) => v === vals[i]) };
   });
 }
 
@@ -4198,11 +4212,12 @@ async function deleteColumn(rawName) {
   return res;
 }
 
-async function bulkUpdate(updates, note) {
-  if (!Array.isArray(updates) || !updates.length) throw new ApiErr(400, "Nothing to update.");
+async function bulkUpdate(updates, note, adds) {
+  updates = Array.isArray(updates) ? updates : []; adds = Array.isArray(adds) ? adds : [];   /* v3.75.0: new people can be added in the same save */
+  if (!updates.length && !adds.length) throw new ApiErr(400, "Nothing to update.");
   let logs = [];
   const res = await mutate(async (book, schema, sets) => {
-    const H = book.headers, prof = profile(book), expect = []; logs = [];
+    const H = book.headers, prof = profile(book), expect = [], n0 = book.rows.length; logs = [];
     /* v3.61.0: pseudo names stay unique, also within one bulk save */
     { const pc = pseudoColOf(H); if (pc) { const moving = new Set(updates.filter(u => u.values && pc in u.values).map(u => String(u.id))), seenP = new Map();
       for (const u of updates) { if (!u.values || !(pc in u.values) || isBlank(u.values[pc])) continue; const v = keystr(u.values[pc]).trim(), lk = v.toLowerCase(), row = findRow(book, schema, String(u.id));
@@ -4226,11 +4241,13 @@ async function bulkUpdate(updates, note) {
       logs.push({ id: String(u.id), name: nameOf(book, schema, row.vals) || String(u.id), changes });
       expect.push({ id: String(u.id), vals: rowVals(book, row.r) });
     }
-    if (!expect.length) return { noWrite: true, res: { ok: true, count: 0 } };
-    const ki = H.indexOf(schema.key_column);
-    const bulkLog = [{ action: "bulk", key: "", name: logs.length + (logs.length === 1 ? " employee" : " employees"), details: { note: note || "Bulk update" } },
-      ...logs.map(l => ({ action: "edit", key: l.id, name: l.name, details: { ...l.changes, note: "Filled in bulk" } }))];
-    return { res: { ok: true, count: expect.length }, log: bulkLog, verify: chk => chk.rows.length === book.rows.length && expect.every(e => { const r = chk.rows.find(x => keystr(x.vals[ki]) === e.id); return !!r && r.vals.every((v, i) => v === e.vals[i]); }) };
+    const added = [];
+    for (const v of adds) { const a = await insertRow(book, schema, sets, v || {}); added.push(a); expect.push({ id: a.id, vals: a.vals }); }
+    if (!expect.length) return { noWrite: true, res: { ok: true, count: 0, added: 0 } };
+    const ki = H.indexOf(schema.key_column), nUpd = expect.length - added.length;
+    const bulkLog = [{ action: "bulk", key: "", name: (nUpd ? nUpd + (nUpd === 1 ? " employee" : " employees") : "") + (nUpd && added.length ? " + " : "") + (added.length ? added.length + " new" : ""), details: { note: note || "Bulk update" } },
+      ...logs.map(l => ({ action: "edit", key: l.id, name: l.name, details: { ...l.changes, note: "Filled in bulk" } })), ...added.map(a => a.log)];
+    return { res: { ok: true, count: nUpd, added: added.length }, log: bulkLog, verify: chk => chk.rows.length === n0 + added.length && expect.every(e => { const r = chk.rows.find(x => keystr(x.vals[ki]) === e.id); return !!r && r.vals.every((v, i) => v === e.vals[i]); }) };
   });
   return res;
 }
@@ -4255,7 +4272,10 @@ const routes = {
       if (path === "/api/columns" && method === "POST") return await addColumn(body && body.name);
       if (path === "/api/columns/delete" && method === "POST") return await deleteColumn(body && body.name);
       if (path === "/api/columns/rename" && method === "POST") { if (window.PERM && !PERM.isSuper()) throw new ApiErr(403, "Only the super admin can rename fields."); return await renameColumn(body && body.from, body && body.to); }
-      if (path === "/api/bulk" && method === "POST") return await bulkUpdate(body && body.updates, body && body.note);
+      if (path === "/api/bulk" && method === "POST") {
+        if (body && Array.isArray(body.adds) && body.adds.length && window.PERM && !PERM.can("emp.add")) throw new ApiErr(403, "Adding new employees needs the Add employees right.");
+        return await bulkUpdate(body && body.updates, body && body.note, body && body.adds);
+      }
       const m = /^\/api\/rows\/([^?]+)(?:\?(.*))?$/.exec(path);
       if (m) {
         const rid = decodeURIComponent(m[1]);
@@ -4371,7 +4391,7 @@ const CLOUD = (() => {
     if (!m || m[1].toLowerCase() !== ref.toLowerCase()) return { url: `https://${ref}.supabase.co`, note: `The Project URL was set to https://${ref}.supabase.co to match your key.` };
     return { url, note: '' };
   }
-  let session = ls.get(LS_SESSION);
+  let session = ls.get(LS_SESSION), justTyped = '';
   const MESSAGES = {
     WRONG_PASSCODE: 'That passcode is not correct.',
     TOO_MANY_ATTEMPTS: 'Too many wrong passcodes from this network. Wait 10 minutes and try again.',
@@ -4525,6 +4545,7 @@ const CLOUD = (() => {
     if (!session || mode() !== 'cloud') return null;
     try { const me = await rpc('td_me', { p_token: session.token }); session = { ...session, ...me }; ls.set(LS_SESSION, session); return session; } catch (e) { return null; }
   }
+  const passChanged = () => { if (session) { session = { ...session, must_change: false }; ls.set(LS_SESSION, session); } };
   const user = () => session ? { name: session.name, role: session.role, id: session.user_id, loginId: session.login_id || '', selfPasscode: session.role === 'superadmin' || session.self_passcode !== false, permissions: window.tdResolvePerms ? window.tdResolvePerms(session.permissions || {}) : (session.permissions || {}), rawPermissions: session.permissions || {} } : null;   /* v3.55.0: rights come from the person's role when they have one */
   /* v3.18: change your own passcode (after typing the current one) */
   const changeMyPasscode = (oldCode, newCode) => rpc('td_change_my_passcode', { p_token: tok(), p_old: oldCode, p_new: newCode });
@@ -4608,7 +4629,7 @@ const CLOUD = (() => {
         const r = await rpc('td_login', { p_login_id: lid.value.trim(), p_passcode: pass.value });
         if (r && r.error) throw cloudErr(401, r.error);
         ls.set(LS_LOGIN, lid.value.trim());
-        session = { token: r.token, name: r.name, role: r.role, user_id: r.user_id, login_id: r.login_id, permissions: r.permissions || {} }; ls.set(LS_SESSION, session);
+        session = { token: r.token, name: r.name, role: r.role, user_id: r.user_id, login_id: r.login_id, permissions: r.permissions || {}, must_change: !!r.must_change }; ls.set(LS_SESSION, session); justTyped = pass.value;   /* v3.76.0: kept in memory only, to fill the first passcode change */
         await afterSignIn();
       } catch (e) { if (e.badKey) { renderConnect({ error: e.message }); return; } err.textContent = e.message; go.disabled = false; go.textContent = 'Sign in'; pass.select(); }
     });
@@ -4650,6 +4671,8 @@ const CLOUD = (() => {
       user().selfPasscode ? h('button', { class: 'linkbtn', type: 'button', onclick: () => window.openChangePasscode && window.openChangePasscode() }, 'Change passcode') : null,
       h('button', { class: 'linkbtn', type: 'button', onclick: signOut }, 'Sign out'));
     if (session.role === 'superadmin') setTimeout(() => window.refreshResetBadge && window.refreshResetBadge(), 500);
+    /* v3.76.0: a passcode given by the admin: ask the person to choose their own, once per sign-in */
+    if (session.must_change && user().selfPasscode && !window.__pcAsked) { window.__pcAsked = true; const t = justTyped; justTyped = ''; setTimeout(() => window.openChangePasscode && window.openChangePasscode({ first: true, current: t }), 900); }
     lab.after(links);
     document.querySelectorAll('.cloud-links').forEach((el, i, all) => { if (i < all.length - 1) el.remove(); });
   }
@@ -4674,7 +4697,7 @@ const CLOUD = (() => {
     request: (team, hours, reason) => rpc('td_access_request', { p_token: tok(), p_team: team, p_hours: hours, p_reason: reason }),
     decide: (id, action, hours) => rpc('td_access_decide', { p_token: tok(), p_id: id, p_action: action, p_hours: hours ?? null })
   };
-  return { phoneKey, contactKeys, fieldKeys, details, teams, atRest: () => dataKeyState, SUPABASE_CONFIG, saveDashboard, changeMyPasscode, card, resume, mode, decorate, signOut, useLocalFiles, openAdmin, configured, isAdmin, refreshMe, user, getSettings, setSetting, setShared, saveLeaveRequest, admin, _rpc: rpc };
+  return { phoneKey, contactKeys, fieldKeys, details, teams, atRest: () => dataKeyState, SUPABASE_CONFIG, saveDashboard, changeMyPasscode, passChanged, card, resume, mode, decorate, signOut, useLocalFiles, openAdmin, configured, isAdmin, refreshMe, user, getSettings, setSetting, setShared, saveLeaveRequest, admin, _rpc: rpc };
 })();
 
 /* =====================================================================
@@ -10482,7 +10505,7 @@ async function poll() {
 }
 
 /* ============================== filtering ============================== */
-const APP = { title: "Team Dashboard", version: "3.74.6", released: "11 Nov 2026" };
+const APP = { title: "Team Dashboard", version: "3.76.0", released: "11 Nov 2026" };
 const BASE_DIMS = { status: "status_column", desig: "designation_column", client: "client_column", mode: "mode_column" };
 const STANDARD_STATUSES = ["Active", "Manager", "OJT", "Bench", "New", "Projected", "Left", "Moved"];
 const TILE_ORDER = ["Active", "Manager", "OJT", "Bench", "New", "Projected"];
@@ -12234,6 +12257,9 @@ function renderFill() {
   card.replaceChildren(...[
     h("div", { class: "card-head" }, h("div", { class: "grow" }, h("h2", {}, "Fill in bulk"), h("div", { class: "sub" }, "Type or paste values for many people in one table, then save them all to Excel in one go. Works for any field.")),
       h("button", { class: "btn ghost", title: "How this works", onclick: () => toast("Pick a field, fill the table (you can paste a column copied from Excel), then press Save. Nothing is written until you save.") }, "?")),
+    (!window.PERM || PERM.can("emp.bulk") || PERM.can("emp.edit")) ? h("div", { class: "fill-xl" },   /* v3.75.0: fill from an Excel sheet, matched by Emp ID */
+      h("div", { class: "grow" }, h("b", {}, "Fill from an Excel sheet"), h("span", {}, "Upload a file or paste cells with an Emp ID column: each person's details are matched by Emp ID and filled in. You review every change, and Emp IDs not in the dashboard can be added as new employees.")),
+      h("button", { class: "btn primary", type: "button", onclick: () => openExcelUpdate() }, "Upload or paste Excel…")) : null,
     h("div", { class: "fill-sec" }, h("div", { class: "fill-lbl" }, "Quick starts"), h("div", { class: "fchips" }, presetChips.length ? presetChips : h("span", { class: "hint" }, "Nothing is missing from the usual fields. Pick any field below.")), ),
     h("div", { class: "fill-sec" }, h("div", { class: "fill-lbl" }, "Fields to fill"), h("div", { class: "fchips" }, fieldChips, addSel)),
     FILL.ids ? h("div", { class: "fill-note" }, "Showing only the " + fmtN(FILL.ids.size) + " people from " + (FILL.idsLabel || (P ? "the check" : "your list")) + ". ",
@@ -15107,7 +15133,8 @@ function drawPrivateFields(pane, tabs) {
    Upload a sheet with the Emp number and the fields to change. Columns are matched to the workforce fields, every change is
    shown as current → new for review (untick any), and only then saved in one go. */
 function xlCsv(text) {
-  const rows = [], d = (text.split(/\r?\n/, 1)[0].match(/;/g) || []).length > (text.split(/\r?\n/, 1)[0].match(/,/g) || []).length ? ';' : ',';
+  const first = text.split(/\r?\n/, 1)[0], cnt = c => (first.split(c).length - 1);
+  const rows = [], d = cnt('\t') > 0 && cnt('\t') >= cnt(',') && cnt('\t') >= cnt(';') ? '\t' : cnt(';') > cnt(',') ? ';' : ',';   /* v3.75.0: cells pasted from Excel are tab separated */
   let row = [], cur = '', q = false;
   for (let i = 0; i < text.length; i++) { const ch = text[i];
     if (q) { if (ch === '"') { if (text[i + 1] === '"') { cur += '"'; i++; } else q = false; } else cur += ch; continue; }
@@ -15133,12 +15160,15 @@ function openExcelUpdate() {
   if (window.PERM && !(PERM.can('emp.bulk') || PERM.can('emp.edit'))) { toast('Updating from Excel needs the right to edit employees.', true); return; }
   const sch = state.schema, cols = state.cols.filter(c => !c.auto && c.name !== sch.key_column);
   const file = h('input', { type: 'file', accept: '.xlsx,.xlsm,.csv', 'aria-label': 'Excel or CSV file' });
+  const pasteBox = h('textarea', { class: 'input', rows: 5, placeholder: 'Copy the cells in Excel (heading row first) and paste here', 'aria-label': 'Pasted cells' });   /* v3.75.0 */
   const stepBox = h('div', { class: 'xl-step' });
   const go = h('button', { class: 'btn primary', type: 'button', disabled: true }, 'Review changes');
   const back = h('button', { class: 'btn', type: 'button', hidden: true }, '← Back');
   const info = h('span', { class: 'as-cnt' });
   const d = pdlg('Update employees from Excel', h('div', { class: 'xl' },
-    h('div', { class: 'xl-drop' }, h('b', {}, 'Choose an Excel or CSV file'), h('p', { class: 'set-hint' }, 'One row per person: the Emp number in one column, then a column for each field to change, named like the field here (for example Designation, Phone, Current Area). Empty cells change nothing unless you say so below. Nothing is saved until you review and confirm.'), file),
+    h('div', { class: 'xl-drop' }, h('b', {}, 'Choose an Excel or CSV file'), h('p', { class: 'set-hint' }, 'One row per person: the Emp number in one column, then a column for each field to change, named like the field here (for example Designation, Phone, Current Area). Each row is matched to the person by Emp number; Emp numbers that are not in the dashboard yet can be added as new employees. Empty cells change nothing unless you say so below. Nothing is saved until you review and confirm.'), file,
+      h('details', { class: 'xl-paste' }, h('summary', {}, 'Or paste cells copied from Excel'),
+        pasteBox, h('div', { class: 'xl-row' }, h('button', { class: 'btn', type: 'button', onclick: () => { const t = pasteBox.value; if (!t.trim()) { toast('Paste the cells first, with the heading row.', true); return; } up = xlCsv(t); isCsv = true; sheetName = null; if (!up.rows.length) { stepBox.replaceChildren(h('p', { class: 'err' }, 'Paste the heading row and at least one row of data.')); return; } info.textContent = 'Pasted · ' + up.rows.length + ' rows'; mapStep([]); } }, 'Use the pasted cells')))),
     stepBox), [info, h('span', { class: 'grow' }), back, h('button', { class: 'btn', type: 'button', onclick: () => d.close() }, 'Cancel'), go], 'wide');
   let up = null, sheetName = null, u8 = null, isCsv = false, review = null, lastSheets = [];
   const keyGuess = hs => { const k = [sch.key_column, (state.cols.find(c => c.name === sch.key_column) || {}).label].filter(Boolean).map(xlNorm); return hs.findIndex(x => k.includes(xlNorm(x))) >= 0 ? hs.findIndex(x => k.includes(xlNorm(x))) : hs.findIndex(x => /^(emp|employee)?(code|id|no|number|empcode|empid|empno)$/.test(xlNorm(x)) || /emp.*(code|id|no|num)/i.test(x)); };
@@ -15175,10 +15205,21 @@ function openExcelUpdate() {
   function buildReview() {
     const k = +keySel.value, use = maps.filter(m => m.i !== k && m.sel.value), clear = blankMode.value === 'clear';
     const byId = new Map(state.rows.map(r => [String(r.id).trim().toLowerCase(), r]));
-    const people = [], missing = [], locked = new Set(), bad = [];
+    const people = [], missing = [], locked = new Set(), bad = [], fresh = [], seenNew = new Set();
+    const nameMap = use.find(m => m.sel.value === sch.name_column);
     for (const row of up.rows) {
       const id = String(row[k] ?? '').trim(); if (!id) continue;
-      const r = byId.get(id.toLowerCase()) || byId.get(String(Number(id)).toLowerCase()); if (!r) { missing.push(id); continue; }
+      const r = byId.get(id.toLowerCase()) || byId.get(String(Number(id)).toLowerCase());
+      if (!r) {   /* v3.75.0: not in the dashboard yet: can be added as a new employee */
+        missing.push(id); if (seenNew.has(id.toLowerCase())) continue; seenNew.add(id.toLowerCase());
+        const values = { [sch.key_column]: id }, shown = [];
+        for (const m of use) { const col = state.cols.find(c => c.name === m.sel.value); let nv = row[m.i]; if (!col || nv == null || String(nv).trim() === '') continue;
+          if (col.type === 'date') { const dv = xlDate(nv); if (dv === undefined) { bad.push(id + ' · ' + col.label + ': “' + nv + '” is not a date'); continue; } nv = dv; } else if (typeof nv === 'string') nv = nv.trim();
+          values[col.name] = nv; shown.push(col.label); }
+        const nm = nameMap ? String(row[nameMap.i] ?? '').trim() : '';
+        fresh.push({ id, name: nm, values, shown, on: !!nm, why: nm ? '' : (nameMap ? 'no name in this row' : 'match a column to ' + ((state.cols.find(c => c.name === sch.name_column) || {}).label || 'the name') + ' to add new people') });
+        continue;
+      }
       const ch = [];
       for (const m of use) {
         const col = state.cols.find(c => c.name === m.sel.value); let nv = row[m.i];
@@ -15192,13 +15233,19 @@ function openExcelUpdate() {
       }
       if (ch.length) people.push({ r, ch, on: true });
     }
-    return { people, missing, locked: [...locked], bad, fields: use.length };
+    return { people, missing, locked: [...locked], bad, fields: use.length, fresh };
   }
   const show = v => v == null || v === '' ? '—' : typeof v === 'number' && v > 20000 && v < 80000 && Number.isInteger(Math.round(v)) && String(v).length >= 5 ? fmtDate(v) : String(v);
   function reviewStep() {
     review = buildReview();
-    const { people, missing, locked, bad } = review, nCh = () => people.reduce((a, p) => a + (p.on ? p.ch.filter(c => c.on).length : 0), 0), nP = () => people.filter(p => p.on && p.ch.some(c => c.on)).length;
-    const count = h('b', {}); const paint = () => { count.textContent = nP() + ' people · ' + nCh() + ' changes selected'; go.disabled = !nCh(); go.textContent = nCh() ? 'Update ' + nP() + (nP() === 1 ? ' person' : ' people') : 'Nothing to update'; };
+    const { people, missing, locked, bad, fresh } = review, nCh = () => people.reduce((a, p) => a + (p.on ? p.ch.filter(c => c.on).length : 0), 0), nP = () => people.filter(p => p.on && p.ch.some(c => c.on)).length;
+    const canAdd = !window.PERM || PERM.can('emp.add'), nA = () => canAdd ? fresh.filter(f => f.on).length : 0;
+    const count = h('b', {}); const paint = () => { count.textContent = nP() + ' people · ' + nCh() + ' changes selected' + (nA() ? ' · ' + nA() + ' new' : ''); go.disabled = !nCh() && !nA();
+      go.textContent = nCh() || nA() ? [nP() ? 'Update ' + nP() + (nP() === 1 ? ' person' : ' people') : '', nA() ? 'add ' + nA() + ' new' : ''].filter(Boolean).join(' and ').replace(/^a/, 'A') : 'Nothing to update'; };
+    const freshBox = fresh.length ? h('div', { class: 'xl-new-box' }, h('h5', {}, fresh.length + ' Emp number' + (fresh.length === 1 ? ' is' : 's are') + ' not in the dashboard yet' + (canAdd ? ': tick the ones to add as new employees' : '')),
+      canAdd ? null : h('p', { class: 'set-hint' }, 'Adding new employees needs the “Add employees” right, so these are skipped.'),
+      ...fresh.map(f => { const cb = h('input', { type: 'checkbox', checked: f.on && canAdd, disabled: !canAdd || !f.name }); cb.addEventListener('change', () => { f.on = cb.checked; paint(); });
+        return h('label', { class: 'xl-newp' + (f.name && canAdd ? '' : ' off') }, cb, h('b', {}, f.name || '(no name)'), h('span', { class: 'xl-nid' }, f.id), h('span', { class: 'xl-nf' }, f.why || (f.shown.length ? 'Fills: ' + f.shown.join(', ') : 'Emp number and name only'))); })) : null;
     const list = h('div', { class: 'xl-review' }, ...people.map(p => {
       const pc = h('input', { type: 'checkbox', checked: true, 'aria-label': 'Include ' + gs(p.r, 'name_column') });
       const lines = p.ch.map(c => { const cb = h('input', { type: 'checkbox', checked: true }); cb.addEventListener('change', () => { c.on = cb.checked; paint(); });
@@ -15207,22 +15254,23 @@ function openExcelUpdate() {
       return h('div', { class: 'xl-p' }, h('label', { class: 'xl-ph' }, pc, h('b', {}, gs(p.r, 'name_column') || p.r.id), h('small', {}, p.r.id + ' · ' + p.ch.length + (p.ch.length === 1 ? ' change' : ' changes'))), ...lines);
     }));
     stepBox.replaceChildren(
-      h('div', { class: 'xl-sum' }, count, missing.length ? h('span', { class: 'xl-warn', title: missing.join(', ') }, missing.length + ' Emp numbers not found: ' + missing.slice(0, 6).join(', ') + (missing.length > 6 ? '…' : '')) : null,
+      h('div', { class: 'xl-sum' }, count, missing.length && !canAdd ? h('span', { class: 'xl-warn', title: missing.join(', ') }, missing.length + ' Emp numbers not found: ' + missing.slice(0, 6).join(', ') + (missing.length > 6 ? '…' : '')) : null,
         locked.length ? h('span', { class: 'xl-warn' }, 'Skipped (locked for you): ' + locked.join(', ')) : null, bad.length ? h('span', { class: 'xl-warn', title: bad.join('\n') }, bad.length + ' values skipped (not a date)') : null),
       people.length ? h('div', { class: 'xl-tools' }, h('button', { class: 'linkbtn', type: 'button', onclick: () => { people.forEach(p => { p.on = true; p.ch.forEach(c => { c.on = true; }); }); reviewStep(); } }, 'Select all'), ' · ', h('button', { class: 'linkbtn', type: 'button', onclick: () => { people.forEach(p => { p.on = false; }); stepBox.querySelectorAll('.xl-ph input').forEach(b => { b.checked = false; }); stepBox.querySelectorAll('.xl-ch').forEach(l => l.classList.add('off')); paint(); } }, 'Select none')) : null,
-      people.length ? list : h('div', { class: 'allclear' }, 'Everything in this file already matches the dashboard. Nothing to update.'));
+      people.length ? list : h('div', { class: 'allclear' }, fresh.length ? 'Everyone already in the dashboard matches this file.' : 'Everything in this file already matches the dashboard. Nothing to update.'), freshBox);
     back.hidden = false; paint();
   }
   back.addEventListener('click', () => { mapStep(isCsv ? [] : null); });
   go.addEventListener('click', async () => {
     if (!review) { if (+keySel.value < 0 || keySel.value === '') { toast('Choose the column with the Emp number.', true); return; } if (!maps.some(m => m.i !== +keySel.value && m.sel.value)) { toast('Match at least one column to a field.', true); return; } reviewStep(); return; }
     const updates = review.people.filter(p => p.on).map(p => ({ id: p.r.id, values: Object.fromEntries(p.ch.filter(c => c.on).map(c => [c.col.name, c.nv])) })).filter(u => Object.keys(u.values).length);
-    if (!updates.length) return;
+    const adds = (!window.PERM || PERM.can('emp.add')) ? review.fresh.filter(f => f.on && f.name).map(f => f.values) : [];
+    if (!updates.length && !adds.length) return;
     go.disabled = true; go.textContent = 'Saving…';
     try {
-      await api('POST', '/api/bulk', { updates, note: 'Updated from Excel' + (file.files[0] ? ': ' + file.files[0].name : '') });
+      await api('POST', '/api/bulk', { updates, adds, note: 'Updated from Excel' + (file.files[0] ? ': ' + file.files[0].name : ' (pasted cells)') });
       await loadData(true); d.close();
-      toast('Updated ' + updates.length + (updates.length === 1 ? ' person' : ' people') + ' from the Excel file.');
+      toast([updates.length ? 'Updated ' + updates.length + (updates.length === 1 ? ' person' : ' people') : '', adds.length ? 'added ' + adds.length + ' new employee' + (adds.length === 1 ? '' : 's') : ''].filter(Boolean).join(' and ').replace(/^a/, 'A') + ' from Excel.');
     } catch (e) { go.disabled = false; go.textContent = 'Try again'; stepBox.prepend(h('p', { class: 'err' }, e.message)); }
   });
 }
@@ -15760,29 +15808,33 @@ async function drawSignins(pane) {
 }
 
 /* ----- v3.18: change my own passcode (sidebar link) ----- */
-window.openChangePasscode = () => {
+window.openChangePasscode = (opt = {}) => {   /* v3.76.0: opt.first = asked after the first sign-in */
   document.getElementById('pcDialog')?.remove();
   const err = h('p', { class: 'err', role: 'alert' });
   const field = (label, id, ac) => { const i = h('input', { class: 'input', type: 'password', id, autocomplete: ac, spellcheck: 'false', style: 'width:100%' }); return [h('label', { class: 'signin-label', for: id, style: 'display:block;margin-top:10px' }, label), i]; };
   const [l1, oldI] = field('Current passcode', 'pcOld', 'current-password'), [l2, newI] = field('New passcode (at least 6 characters)', 'pcNew', 'new-password'), [l3, again] = field('New passcode again', 'pcAgain', 'new-password');
   const close = () => wrap.remove();
-  const go = h('button', { class: 'btn primary', type: 'submit' }, 'Change passcode');
+  if (opt.current) { oldI.value = opt.current; }
+  const go = h('button', { class: 'btn primary', type: 'submit' }, opt.first ? 'Save my passcode' : 'Change passcode');
   const form = h('form', { class: 'pc-card', role: 'dialog', 'aria-modal': 'true', 'aria-labelledby': 'pcTitle' },
-    h('h3', { id: 'pcTitle', style: 'margin:0 0 4px' }, 'Change your passcode'),
+    h('h3', { id: 'pcTitle', style: 'margin:0 0 4px' }, opt.first ? 'Welcome! Choose your own passcode' : 'Change your passcode'),
+    opt.first ? h('p', { class: 'pc-first' }, 'Your passcode was set by the admin. Choose a new one that only you know: at least 6 characters, and not the same as before.') : null,
     h('p', { class: 'set-hint', style: 'margin:0' }, 'Signed in as ' + CLOUD.user().name + ' · login ID ' + (CLOUD.user().loginId || '—') + '. Your login ID stays the same. You will be signed out on other computers.'),
-    l1, oldI, l2, newI, l3, again, err,
-    h('div', { class: 'set-actions flat', style: 'margin-top:14px;justify-content:flex-end' }, h('button', { class: 'btn', type: 'button', onclick: close }, 'Cancel'), go));
+    ...(opt.current ? [] : [l1, oldI]), l2, newI, l3, again, err,
+    h('div', { class: 'set-actions flat', style: 'margin-top:14px;justify-content:flex-end' }, h('button', { class: 'btn', type: 'button', onclick: close }, opt.first ? 'Later' : 'Cancel'), go),
+    opt.first ? h('p', { class: 'set-hint', style: 'margin:8px 0 0;text-align:right' }, '“Later” asks again at your next sign-in. You can also use Change passcode at the bottom left.') : null);
   form.addEventListener('submit', async ev => {
     ev.preventDefault(); err.textContent = '';
     if (!oldI.value) { err.textContent = 'Enter your current passcode.'; return; }
     if (newI.value.trim().length < 6) { err.textContent = 'The new passcode needs at least 6 characters.'; return; }
     if (newI.value !== again.value) { err.textContent = 'The two new passcodes don’t match.'; return; }
     go.disabled = true; go.textContent = 'Changing…';
-    try { await CLOUD.changeMyPasscode(oldI.value, newI.value.trim()); close(); toast('Passcode changed. Use the new one next time you sign in.'); BE.appendActivity([{ time: BE.nowText(), user: BE.userName(), action: 'settings', key: '', name: CLOUD.user().name, details: { note: CLOUD.user().name + ' changed their own passcode' } }]); }
+    if (newI.value.trim() === oldI.value) { err.textContent = 'Choose a passcode different from the current one.'; go.disabled = false; go.textContent = opt.first ? 'Save my passcode' : 'Change passcode'; return; }
+    try { await CLOUD.changeMyPasscode(oldI.value, newI.value.trim()); CLOUD.passChanged && CLOUD.passChanged(); close(); toast('Passcode changed. Use the new one next time you sign in.'); BE.appendActivity([{ time: BE.nowText(), user: BE.userName(), action: 'settings', key: '', name: CLOUD.user().name, details: { note: CLOUD.user().name + ' changed their own passcode' } }]); }
     catch (e) { err.textContent = e.message; go.disabled = false; go.textContent = 'Change passcode'; }
   });
-  const wrap = h('div', { id: 'pcDialog', class: 'pc-overlay', onclick: e => { if (e.target === wrap) close(); }, onkeydown: e => { if (e.key === 'Escape') close(); } }, form);
-  document.body.append(wrap); oldI.focus();
+  const wrap = h('div', { id: 'pcDialog', class: 'pc-overlay', onclick: e => { if (e.target === wrap && !opt.first) close(); }, onkeydown: e => { if (e.key === 'Escape') close(); } }, form);
+  document.body.append(wrap); (opt.current ? newI : oldI).focus();
 };
 /* ----- v3.18: red number on Settings when passcode reset requests are waiting (super admin) ----- */
 let resetToldAt = 0;
