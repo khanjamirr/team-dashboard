@@ -10,7 +10,7 @@
 <meta name="format-detection" content="telephone=no">
 <link rel="preconnect" href="https://iiogwevtyzgedhoaqlrn.supabase.co" crossorigin><link rel="dns-prefetch" href="https://iiogwevtyzgedhoaqlrn.supabase.co">
 <link rel="icon" href="data:,">
-<title>Team Dashboard · 3.74.2</title>
+<title>Team Dashboard · 3.74.3</title>
 <link rel="preconnect" href="https://fonts.googleapis.com"><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin><link href="https://fonts.googleapis.com/css2?family=Public+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet">
 <style>
 :root {
@@ -4338,8 +4338,10 @@ return {
    All checks happen in the database functions from supabase/setup.sql.
    ===================================================================== */
 const SUPABASE_CONFIG = {
-  url: 'https://iiogwevtyzgedhoaqlrn.supabase.co',
-  anonKey: 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Imlpb2d3ZXZ0eXpnZWRob2FxbHJuIiwicm9sZSI6ImFub24iLCJpYXQiOjE3OTAxMzMwODIsImV4cCI6MjEwNTcwOTA4Mn0.jO3fZe8X8a9ZaxrZ8UVXQsUfNAz2fe4WqU07SWQPlqc',   // anon public key: safe to include; every action still needs a valid passcode
+  /* v3.74.3: new Supabase project. Paste the "anon public" key from Supabase → Project Settings → API between the quotes
+     below (the Project URL is worked out from the key). Left empty, the sign-in screen asks for the key once per computer. */
+  url: 'https://YOUR-PROJECT.supabase.co',
+  anonKey: '',
   workbookFile: 'Team Dashboard.xlsx',
 };
 const CLOUD = (() => {
@@ -4401,7 +4403,7 @@ const CLOUD = (() => {
     const text = await res.text(); let j = null; try { j = text ? JSON.parse(text) : null; } catch { }
     if (!res.ok) {
       const code = (j && j.message) || res.statusText;
-      if (res.status === 404 && /function|schema cache/i.test(code)) throw cloudErr(500, 'The Supabase database is not set up yet. Run supabase/setup.sql in the SQL Editor.');
+      if (res.status === 404 && /function|schema cache/i.test(code)) throw cloudErr(500, 'The Supabase database is not set up yet. Run setup.sql in Supabase → SQL Editor.');
       if (res.status === 401) { if (!SUPABASE_CONFIG.anonKey) ls.set(LS_CFG, null); throw cloudErr(401, 'Supabase rejected the anon key. Paste the “anon public” key again from Supabase → Project Settings → API.', { badKey: true }); }
       if (code === 'SESSION_EXPIRED') { dropSession(); throw cloudErr(401, code); }
       /* v3.46: an admin saving a setting before the database was updated gets told what to do */
@@ -10468,7 +10470,7 @@ async function poll() {
 }
 
 /* ============================== filtering ============================== */
-const APP = { title: "Team Dashboard", version: "3.74.2", released: "2 Nov 2026" };
+const APP = { title: "Team Dashboard", version: "3.74.3", released: "11 Nov 2026" };
 const BASE_DIMS = { status: "status_column", desig: "designation_column", client: "client_column", mode: "mode_column" };
 const STANDARD_STATUSES = ["Active", "Manager", "OJT", "Bench", "New", "Projected", "Left", "Moved"];
 const TILE_ORDER = ["Active", "Manager", "OJT", "Bench", "New", "Projected"];
