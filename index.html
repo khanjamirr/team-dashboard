@@ -10,7 +10,7 @@
 <meta name="format-detection" content="telephone=no">
 <link rel="preconnect" href="https://iiogwevtyzgedhoaqlrn.supabase.co" crossorigin><link rel="dns-prefetch" href="https://iiogwevtyzgedhoaqlrn.supabase.co">
 <link rel="icon" href="data:,">
-<title>Team Dashboard · 3.82.0</title>
+<title>Team Dashboard · 3.82.1</title>
 <link rel="preconnect" href="https://fonts.googleapis.com"><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin><link href="https://fonts.googleapis.com/css2?family=Public+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet">
 <style>
 :root {
@@ -2980,6 +2980,31 @@ html body.tt-filt-open #pinnedHeader.pinned-top .workspace-filters .filters.filt
 html body .drawer, html body .pdlg, html body .tp-pop, html body dialog { background:var(--surface) !important; }
 #pageActions > .section-heading h2 { display:none; }   /* v3.82.0: the page name is already in the top bar */
 #pageActions > .section-heading { margin-bottom:12px; }
+/* v3.82.1: grouped top tabs, Options and Tables buttons, quieter Reports and Settings */
+.top-tabs { background:transparent !important; border:0 !important; padding:0 !important; gap:8px !important; }
+.top-tabs .tt-grp { display:flex; align-items:center; gap:2px; padding:3px; border-radius:999px; background:var(--ios-fill); border:1px solid var(--glass-line); flex:none; }
+.btn.tt-opt-btn, .btn.tt-tables { display:inline-flex; align-items:center; gap:6px; height:36px; padding:0 14px !important; }
+.btn.tt-opt-btn[hidden], .btn.tt-tables[hidden] { display:none !important; }
+.btn.tt-opt-btn[aria-expanded="true"], .btn.tt-tables[aria-pressed="true"] { box-shadow:var(--glass-hi), 0 0 0 2px var(--accent) !important; }
+.tt-opt-ic { font-size:14px; line-height:1; }
+#reportSticky .report-controls { display:none !important; }
+#reportSticky:not(:has(#reportSelection button)) { display:none !important; }
+#reportSticky { background:transparent !important; border:0 !important; box-shadow:none !important; padding:0 !important; margin:0 0 12px !important; position:static !important; }
+#reportSticky .report-selection { display:flex; flex-wrap:wrap; gap:8px; align-items:center; padding:0 !important; }
+#attReportsWrap > .section-heading p { display:none; }
+.set-page .set-grp { display:none !important; } .set-gap { height:6px; margin:0; }
+@media (max-width:700px) { .btn.tt-opt-btn .tt-filt-l, .btn.tt-tables .tt-filt-l { display:none; } .top-tabs { flex-wrap:nowrap; } }
+/* v3.82.1: tab with a drop-down of its views */
+.top-tabs button.tt-has-kids small { font-size:12px; font-weight:500; color:var(--muted); margin-left:-2px; }
+.top-tabs button.tt-has-kids small::before { content:"· "; }
+.top-tabs .tt-chev { font-style:normal; font-size:11px; color:var(--muted); margin-left:-2px; }
+.top-tabs button[aria-selected="false"] .tt-chev { display:none; }
+.tt-menu { position:fixed; z-index:1200; min-width:210px; padding:6px; border-radius:16px; background:var(--surface); border:1px solid var(--glass-edge, var(--border)); box-shadow:0 1px 0 rgba(255,255,255,.6) inset, 0 24px 60px -16px rgba(0,0,0,.35); display:flex; flex-direction:column; animation:ttPop .16s ease-out; }
+@keyframes ttPop { from { opacity:0; transform:translateY(-4px) scale(.98); } }
+.tt-menu button { all:unset; box-sizing:border-box; display:flex; align-items:center; gap:8px; padding:9px 12px; border-radius:10px; font-size:14px; font-weight:500; color:var(--ink); cursor:pointer; }
+.tt-menu button:hover, .tt-menu button:focus-visible { background:var(--ios-fill); }
+.tt-menu button[aria-checked="true"] { color:var(--accent); font-weight:600; }
+.tt-menu .tt-ck { width:16px; text-align:center; }
 </style></head>
 
 
@@ -10969,7 +10994,7 @@ async function poll() {
 }
 
 /* ============================== filtering ============================== */
-const APP = { title: "Team Dashboard", version: "3.82.0", released: "2026-11-12" };
+const APP = { title: "Team Dashboard", version: "3.82.1", released: "2026-11-12" };
 const BASE_DIMS = { status: "status_column", desig: "designation_column", client: "client_column", mode: "mode_column" };
 const STANDARD_STATUSES = ["Active", "Manager", "OJT", "Bench", "New", "Projected", "Left", "Moved"];
 const TILE_ORDER = ["Active", "Manager", "OJT", "Bench", "New", "Projected"];
@@ -14812,13 +14837,12 @@ const drawPrefsTools = pane => { const a = h('div'), b = h('div'); fill(pane, a,
 const MODULES = [
   { id: 'people', group: 'Team', name: 'People & access', show: () => PERM.online() && PERM.isOwner(), draw: drawPeople },
   { id: 'signins', group: 'Team', name: 'Sign-in log', show: () => PERM.online() && PERM.can('set.workbook') && !PERM.isOwner(), draw: drawSignins },   /* the super admin finds it in People & access */
-  { id: 'fields', group: 'Data', name: 'Fields', show: () => PERM.isSuper() || PERM.can('set.fields'), draw: tabbed('fields', [...[['emp', 'Employee fields'], ['att', 'Attendance fields'], ['priv', '🔒 Private details']].map(([k, n]) => ({ id: k === 'emp' ? 'choices' : k, name: n, show: () => k !== 'priv' || (PERM.isSuper() && PERM.online()), draw: pane => { drawChoices.tab = k; drawChoices.flat = true; return drawChoices(pane); } })), { id: 'mandatory', name: 'Mandatory fields', draw: drawFields }]) },
-  { id: 'backups', group: 'Data', name: 'Leave backups', show: () => PERM.isSuper() || PERM.can('set.fields'), draw: drawBackupSettings },
+  { id: 'fields', group: 'Data', name: 'Fields', show: () => PERM.isSuper() || PERM.can('set.fields'), draw: tabbed('fields', [...[['emp', 'Employee fields'], ['att', 'Attendance fields'], ['priv', '🔒 Private details']].map(([k, n]) => ({ id: k === 'emp' ? 'choices' : k, name: n, show: () => k !== 'priv' || (PERM.isSuper() && PERM.online()), draw: pane => { drawChoices.tab = k; drawChoices.flat = true; return drawChoices(pane); } })), { id: 'mandatory', name: 'Mandatory fields', draw: drawFields }, { id: 'backups', name: 'Leave backups', draw: drawBackupSettings }]) },   /* v3.82.1: Leave backups moved here */
   { id: 'data', group: 'Data', name: 'Workbook & storage', show: () => PERM.can('set.workbook') || PERM.can('workbook.download') || PERM.isSuper(), draw: tabbed('data', [{ id: 'workbook', name: 'Workbook & backups', show: () => PERM.can('set.workbook') || PERM.can('workbook.download'), draw: drawWorkbook }, { id: 'storage', name: 'Storage & clean-up', show: () => PERM.isSuper(), draw: drawStorage }]) },
   { id: 'prefs', group: 'You', name: 'Preferences', show: () => true, draw: drawPrefsTools },
 ];
 /* old page names still work (links inside the dashboard) */
-const SET_ALIAS = { att: ['fields', 'att'], priv: ['fields', 'priv'], workbook: ['data', 'workbook'], storage: ['data', 'storage'], choices: ['fields', 'choices'], mandatory: ['fields', 'mandatory'], tools: ['prefs'], sync: ['prefs'] };
+const SET_ALIAS = { backups: ['fields', 'backups'], att: ['fields', 'att'], priv: ['fields', 'priv'], workbook: ['data', 'workbook'], storage: ['data', 'storage'], choices: ['fields', 'choices'], mandatory: ['fields', 'mandatory'], tools: ['prefs'], sync: ['prefs'] };
 let current = null, ticker = null;
 /* v3.12: Settings is a page in the left menu (no longer a dialog) */
 window.openSettings = id => {
@@ -14838,7 +14862,7 @@ window.drawSettingsPage = () => {
       /* v3.82.0: Preferences (theme, sign out, distances) lives in this profile card, so there is no separate "General" group */
       h('button', { type: 'button', class: 'set-me', 'aria-current': mod.id === 'prefs' ? 'page' : null, onclick: () => { current = 'prefs'; drawSettingsPage(); } },
         h('span', { class: 'set-me-av' }, PERM.online() ? pplInitials(u.name) : '⚙'), h('span', { class: 'set-me-t' }, h('b', {}, PERM.online() ? u.name : 'This computer'), h('small', {}, (PERM.online() ? (PERM.roleNames[u.role] || 'User') + ' · ' : '') + 'Preferences')), h('span', { class: 'set-me-go', 'aria-hidden': 'true' }, '›')),
-      ...mods.filter(m => m.id !== 'prefs').flatMap((m, i, arr) => [i === 0 || arr[i - 1].group !== m.group ? h('p', { class: 'set-grp' }, m.group) : null, h('button', { class: 'set-nav-item', type: 'button', 'aria-current': m === mod ? 'page' : null, onclick: () => { current = m.id; drawSettingsPage(); } }, m.name)])),
+      ...mods.filter(m => m.id !== 'prefs').flatMap((m, i, arr) => [i === 0 ? h('p', { class: 'set-gap', 'aria-hidden': 'true' }) : null,   /* v3.82.1: no group headings */ h('button', { class: 'set-nav-item', type: 'button', 'aria-current': m === mod ? 'page' : null, onclick: () => { current = m.id; drawSettingsPage(); } }, m.name)])),
     h('section', { class: 'set-main', 'aria-labelledby': 'setModTitle' }, h('h3', { class: 'set-title', id: 'setModTitle' }, mod.name), pane)));
   Promise.resolve().then(() => mod.draw(pane)).catch(e => fill(pane, h('p', { class: 'err' }, e.message || String(e))));
 };
@@ -17007,9 +17031,15 @@ document.addEventListener('visibilitychange', () => { if (!document.hidden && on
       bs[0].parentElement.classList.add('tt-moved');
       return bs.map(b => { const c = b.cloneNode(true); c.querySelectorAll('svg').forEach(x => x.remove()); const n = c.querySelector('b, .n, .atab-n, .badge'); const badge = n && /^\d+$/.test(n.textContent.trim()) ? n.textContent.trim() : ''; if (badge) n.remove();
         return { label: c.textContent.trim(), on: b.classList.contains('on') || b.getAttribute('aria-selected') === 'true', badge, go: () => b.click() }; }); },
-    backups: () => { const t = document.getElementById('bkModTabs'); const bs = t ? [...t.querySelectorAll('button')] : []; if (bs.length < 2) return null;
-      t.closest('.bk-mod-head')?.classList.add('tt-moved');
-      return bs.map(b => ({ label: b.textContent, on: b.getAttribute('aria-pressed') === 'true', go: () => b.click() })); },
+    backups: () => { const t = document.getElementById('bkModTabs'); const bs = t ? [...t.querySelectorAll('button')] : [];
+      t?.closest('.bk-mod-head')?.classList.add('tt-moved');
+      const g1 = bs.length >= 2 ? bs.map(b => ({ label: b.textContent, on: b.getAttribute('aria-pressed') === 'true', go: () => b.click() })) : null;
+      const host = document.getElementById('bkPageHost'); const vs = host && !host.hidden ? [...host.querySelectorAll('.bkr-views > button')] : [];
+      if (vs.length) vs[0].parentElement.classList.add('tt-moved');
+      const g2 = vs.length >= 2 ? vs.map(b => ({ label: b.textContent, on: b.getAttribute('aria-selected') === 'true', go: () => b.click() })) : null;
+      /* v3.82.1: the report's own views open as a drop-down from the "Backup report" tab */
+      if (g1 && g2) { const rp = g1.find(i => /backup report/i.test(i.label)); if (rp) { rp.kids = g2; return g1; } }
+      const gs = [g1, g2].filter(Boolean); return gs.length ? gs : null; },
     reports: () => { const sel = document.getElementById('reportGroup'); if (!sel) return null;
       sel.closest('.report-controls')?.classList.add('tt-sel-moved');
       return [...sel.options].filter(o => !o.hidden && !o.disabled && o.style.display !== 'none').map(o => ({ label: o.textContent.replace(/^📊\s*/, ''), on: o.value === sel.value, go: () => { sel.value = o.value; sel.dispatchEvent(new Event('change', { bubbles: true })); } })); },
@@ -17018,16 +17048,65 @@ document.addEventListener('visibilitychange', () => { if (!document.hidden && on
   const draw = () => {
     const v = typeof state !== 'undefined' ? state.view : ''; let items = null;
     try { items = SRC[v] ? SRC[v]() : null; } catch { items = null; }
-    const next = v + '|' + (items ? items.map(i => i.label + (i.on ? '*' : '') + i.badge).join('|') : '');
+    const groups = !items ? [] : Array.isArray(items[0]) ? items : [items];
+    const next = v + '|' + groups.map(g => g.map(i => i.label + (i.on ? '*' : '') + (i.badge || '') + (i.kids ? '[' + i.kids.map(k => k.label + (k.on ? '*' : '')).join(',') + ']' : '')).join('|')).join('||');
+    optSync(v);
     if (next === sig) return; sig = next;
-    bar.hidden = !items || items.length < 2;
+    const ok = groups.filter(g => g.length >= 2);
+    bar.hidden = !ok.length;
     document.body.classList.toggle('has-top-tabs', !bar.hidden);
     if (bar.hidden) { bar.replaceChildren(); return; }
-    bar.replaceChildren(...items.map(i => h('button', { type: 'button', role: 'tab', 'aria-selected': String(!!i.on), onclick: () => { i.go(); setTimeout(draw, 30); setTimeout(draw, 300); } }, h('span', {}, i.label.trim()), i.badge ? h('em', {}, i.badge) : null)));
-    bar.querySelector('[aria-selected="true"]')?.scrollIntoView?.({ block: 'nearest', inline: 'nearest' });
+    closeMenu();
+    bar.replaceChildren(...ok.map(g => h('div', { class: 'tt-grp', role: 'tablist' }, ...g.map(i => { const cur = i.kids && i.kids.find(k => k.on);
+      return h('button', { type: 'button', role: 'tab', 'aria-selected': String(!!i.on), 'aria-haspopup': i.kids ? 'menu' : null, class: i.kids ? 'tt-has-kids' : null,
+        onclick: e => { if (i.kids && i.on) { openMenu(e.currentTarget, i.kids); return; } i.go(); setTimeout(draw, 30); setTimeout(draw, 300); } },
+        h('span', {}, i.label.trim()), cur ? h('small', {}, cur.label.trim()) : null, i.badge ? h('em', {}, i.badge) : null, i.kids ? h('i', { class: 'tt-chev', 'aria-hidden': 'true' }, '▾') : null); }))));
   };
+  /* ---- page options (cycle, period, show…) live in a panel behind an "Options" button; "Tables" is a toggle in the top bar ---- */
+  const OPT_CSS = `.tt-opt:not(.tt-opt-open){display:none!important}
+.tt-opt.tt-opt-open{display:flex!important;flex-wrap:wrap;align-items:center;gap:12px 14px;position:fixed!important;z-index:85;top:68px;right:20px;width:min(760px,calc(100vw - 40px));max-height:calc(100vh - 100px);overflow:auto;margin:0!important;padding:16px 18px!important;border-radius:22px!important;background:var(--surface)!important;border:1px solid var(--glass-edge,var(--border))!important;box-shadow:inset 0 1px 0 rgba(255,255,255,.6),0 30px 70px -20px rgba(0,0,0,.35)!important}
+.tt-opt.tt-opt-open .grow{display:none!important}
+.tt-opt.tt-opt-open > label, .tt-opt.tt-opt-open > .bkr-scope{display:flex;align-items:center;gap:8px;font-size:13px;font-weight:600;color:var(--ink-2)}
+.tt-opt.tt-opt-open select{height:36px;border-radius:12px}
+.tt-opt.tt-opt-open > .bkr-scope, .tt-opt.tt-opt-open > .sm{flex-basis:100%;font-weight:400}
+@media (max-width:700px){.tt-opt.tt-opt-open{top:auto;bottom:calc(84px + env(safe-area-inset-bottom));left:10px;right:10px;width:auto;max-height:70vh}}`;
+  const ensureCss = root => { const r = root && root.querySelector ? root : document; const holder = r === document ? document.head : r; if (holder.querySelector?.('#ttOptCss')) return; const st = document.createElement('style'); st.id = 'ttOptCss'; st.textContent = OPT_CSS; holder.append(st); };
+  const OPTS = {
+    backups: () => { const host = document.getElementById('bkPageHost'); if (!host || host.hidden) return null; host.querySelector('.bkr-cyc')?.classList.add('tt-moved'); const el = host.querySelector('.bkr-bar'); return el ? { el, root: document, title: 'Cycle, week or day, late comings, names, copy and print · each cycle runs from the 26th to the 25th' } : null; },
+    reports: () => { const r = document.querySelector('#slotReports')?.querySelector('*')?.shadowRoot || [...(window.__tdShadows || [])].find(x => x.host && x.host.closest && x.host.closest('#slotReports'));
+      const wrap = document.getElementById('attReportsWrap'); if (!r || !wrap || wrap.hidden) return null; const el = r.querySelector('.toolbar'); return el ? { el, root: r, title: 'Period and client group' } : null; },
+  };
+  const ob = h('button', { type: 'button', class: 'btn tt-opt-btn', hidden: true, 'aria-expanded': 'false', onclick: e => { e.stopPropagation(); optToggle(); } }, h('span', { 'aria-hidden': 'true', class: 'tt-opt-ic' }, '☰'), h('span', { class: 'tt-filt-l' }, 'Options'));
+  const tb = h('button', { type: 'button', class: 'btn tt-tables', hidden: true, 'aria-pressed': 'false', title: 'Show every chart on this page as a table, or back', onclick: () => { document.getElementById('repTables')?.click(); setTimeout(() => optSync(state.view), 50); } }, h('span', { 'aria-hidden': 'true' }, '▦'), h('span', { class: 'tt-filt-l' }, 'Tables'));
+  header.insertBefore(ob, spacer ? spacer.nextSibling : null); header.insertBefore(tb, ob);
+  let curOpt = null, optWanted = false;
+  const optToggle = open => { if (!curOpt) return; open = open == null ? !curOpt.el.classList.contains('tt-opt-open') : open; optWanted = open; curOpt.el.classList.toggle('tt-opt-open', open); ob.setAttribute('aria-expanded', String(open)); };
+  function optSync(v) {
+    let o = null; try { o = OPTS[v] ? OPTS[v]() : null; } catch { o = null; }
+    if (curOpt && (!o || o.el !== curOpt.el)) curOpt.el.classList.remove('tt-opt-open');
+    if (!o) optWanted = false;
+    if (o) { ensureCss(o.root); o.el.classList.add('tt-opt'); ob.title = o.title; if (optWanted) o.el.classList.add('tt-opt-open'); }
+    curOpt = o; ob.hidden = !o; if (!o) ob.setAttribute('aria-expanded', 'false');
+    const rt = document.getElementById('repTables'); tb.hidden = !(v === 'reports' && rt && !rt.hidden); if (rt) tb.setAttribute('aria-pressed', rt.getAttribute('aria-pressed') || 'false');
+  }
+  document.addEventListener('pointerdown', e => { if (!curOpt || !curOpt.el.classList.contains('tt-opt-open')) return; const path = e.composedPath ? e.composedPath() : []; if (path.includes(curOpt.el) || path.includes(ob) || path.some(x => x && x.classList && (x.classList.contains('bkms-pop') || x.classList.contains('colf')))) return; optToggle(false); }, true);
+  document.addEventListener('keydown', e => { if (e.key === 'Escape' && curOpt && curOpt.el.classList.contains('tt-opt-open')) optToggle(false); });
+  /* drop-down for tabs that have their own views */
+  let menu = null;
+  function closeMenu() { if (menu) { menu.remove(); menu = null; } }
+  function openMenu(btn, kids) {
+    if (menu) { closeMenu(); return; }
+    const r = btn.getBoundingClientRect();
+    menu = h('div', { class: 'tt-menu', role: 'menu', style: `top:${Math.round(r.bottom + 8)}px;left:${Math.round(Math.min(r.left, innerWidth - 230))}px` },
+      ...kids.map(k => h('button', { type: 'button', role: 'menuitemradio', 'aria-checked': String(!!k.on), onclick: () => { closeMenu(); k.go(); setTimeout(draw, 30); setTimeout(draw, 300); } }, h('span', { class: 'tt-ck', 'aria-hidden': 'true' }, k.on ? '✓' : ''), k.label.trim())));
+    document.body.append(menu); menu.querySelector('[aria-checked="true"]')?.focus();
+  }
+  document.addEventListener('pointerdown', e => { if (menu && !menu.contains(e.target) && !e.target.closest?.('.tt-has-kids')) closeMenu(); }, true);
+  document.addEventListener('keydown', e => { if (e.key === 'Escape') closeMenu(); });
   setInterval(() => { if (!document.hidden) draw(); }, 400);
-  addEventListener('click', () => setTimeout(draw, 60), true);
+  addEventListener('click', () => { setTimeout(draw, 0); setTimeout(draw, 60); }, true);
+  addEventListener('change', () => { setTimeout(draw, 0); setTimeout(draw, 80); }, true);
+  addEventListener('input', () => setTimeout(draw, 0), true);
 
   /* ---- Filters: one button in the top bar opens the search & filters panel ---- */
   const box = document.querySelector('.workspace-filters');
