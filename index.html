@@ -10,7 +10,7 @@
 <meta name="format-detection" content="telephone=no">
 <link rel="preconnect" href="https://iiogwevtyzgedhoaqlrn.supabase.co" crossorigin><link rel="dns-prefetch" href="https://iiogwevtyzgedhoaqlrn.supabase.co">
 <link rel="icon" href="data:,">
-<title>Team Dashboard · 3.81.0</title>
+<title>Team Dashboard · 3.82.0</title>
 <link rel="preconnect" href="https://fonts.googleapis.com"><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin><link href="https://fonts.googleapis.com/css2?family=Public+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet">
 <style>
 :root {
@@ -2785,6 +2785,201 @@ table td { border-color:var(--ios-sep) !important; }
   .sidebar nav.tabs .tab.on, .sidebar nav.tabs .tab[aria-selected="true"] { color:#0a84ff !important; background:transparent !important; box-shadow:none !important; }
   .card, #cardAttendance, #cardComing { border-radius:14px !important; }
 }
+</style><style id="v382-glass">
+/* ===== v3.82.0: iOS "liquid glass": frosted see-through surfaces over a soft colour wash; the left menu stays dark ===== */
+:root {
+  --glass:rgba(255,255,255,.58); --glass-strong:rgba(255,255,255,.74); --glass-edge:rgba(255,255,255,.75); --glass-line:rgba(255,255,255,.55);
+  --glass-shadow:0 10px 34px -12px rgba(31,45,90,.22), 0 2px 6px -2px rgba(31,45,90,.08);
+  --glass-hi:inset 0 1px 0 rgba(255,255,255,.9), inset 0 -1px 0 rgba(255,255,255,.25);
+  --glass-blur:blur(26px) saturate(185%);
+  --ios-fill:rgba(118,118,128,.13);
+}
+:root[data-theme="dark"] {
+  --glass:rgba(30,30,36,.55); --glass-strong:rgba(36,36,42,.74); --glass-edge:rgba(255,255,255,.14); --glass-line:rgba(255,255,255,.08);
+  --glass-shadow:0 12px 40px -12px rgba(0,0,0,.6); --glass-hi:inset 0 1px 0 rgba(255,255,255,.12), inset 0 -1px 0 rgba(255,255,255,.03);
+  --ios-fill:rgba(118,118,128,.26);
+}
+@media (prefers-color-scheme: dark) { :root:not([data-theme="light"]) {
+  --glass:rgba(30,30,36,.55); --glass-strong:rgba(36,36,42,.74); --glass-edge:rgba(255,255,255,.14); --glass-line:rgba(255,255,255,.08);
+  --glass-shadow:0 12px 40px -12px rgba(0,0,0,.6); --glass-hi:inset 0 1px 0 rgba(255,255,255,.12), inset 0 -1px 0 rgba(255,255,255,.03); --ios-fill:rgba(118,118,128,.26);
+} }
+/* the colour wash the glass floats on */
+html body, :root:not([data-theme="dark"]) body {
+  background:
+    radial-gradient(900px 620px at 8% -10%, rgba(120,170,255,.55), transparent 62%),
+    radial-gradient(760px 560px at 102% 4%, rgba(255,160,205,.42), transparent 60%),
+    radial-gradient(900px 700px at 70% 110%, rgba(110,230,200,.40), transparent 62%),
+    radial-gradient(700px 520px at -6% 92%, rgba(190,160,255,.38), transparent 60%),
+    #eef1f8 !important;
+  background-attachment:fixed !important;
+}
+:root[data-theme="dark"] body {
+  background:
+    radial-gradient(900px 620px at 8% -10%, rgba(40,90,220,.45), transparent 62%),
+    radial-gradient(760px 560px at 102% 4%, rgba(170,50,140,.30), transparent 60%),
+    radial-gradient(900px 700px at 70% 110%, rgba(20,150,130,.30), transparent 62%),
+    #05060a !important; background-attachment:fixed !important; }
+@media (prefers-color-scheme: dark) { :root:not([data-theme="light"]) body {
+  background: radial-gradient(900px 620px at 8% -10%, rgba(40,90,220,.45), transparent 62%), radial-gradient(760px 560px at 102% 4%, rgba(170,50,140,.30), transparent 60%), radial-gradient(900px 700px at 70% 110%, rgba(20,150,130,.30), transparent 62%), #05060a !important; background-attachment:fixed !important; } }
+/* glass cards and panels */
+.card, #cardAttendance, #cardComing, #ovRequests, #ovUpcoming, #cardWatch, .metric, .set-page, .tablewrap,
+#pageSummary.ov .ov-tile:not(.t-present):not(.t-out):not(.t-needs) {
+  background:var(--glass) !important; -webkit-backdrop-filter:var(--glass-blur); backdrop-filter:var(--glass-blur);
+  border:1px solid var(--glass-edge) !important; border-radius:22px !important; box-shadow:var(--glass-hi), var(--glass-shadow) !important; }
+.card .card, .card .tablewrap, .set-page .card { -webkit-backdrop-filter:none; backdrop-filter:none; background:var(--glass-strong) !important; border-radius:16px !important; box-shadow:var(--glass-hi) !important; }
+.set-page .set-nav { background:transparent !important; border-right:1px solid var(--glass-line) !important; }
+.set-page .set-main { background:transparent !important; }
+/* dialogs and side panels: thicker glass */
+.drawer, .pdlg, .tp-pop, dialog, .ppl-pop, .nf-panel, #bellPanel {
+  background:var(--glass-strong) !important; -webkit-backdrop-filter:blur(34px) saturate(190%); backdrop-filter:blur(34px) saturate(190%);
+  border:1px solid var(--glass-edge) !important; border-radius:24px !important; box-shadow:var(--glass-hi), 0 30px 80px -20px rgba(0,0,0,.35) !important; }
+#overlay, .pdlg-veil, .tp-veil { background:rgba(10,14,30,.22) !important; -webkit-backdrop-filter:blur(6px); backdrop-filter:blur(6px); }
+/* top bar: floating glass */
+.sticky-top.pinned-top, .pinned-top { background:var(--glass) !important; -webkit-backdrop-filter:var(--glass-blur); backdrop-filter:var(--glass-blur); border-bottom:1px solid var(--glass-line) !important; box-shadow:0 1px 0 rgba(255,255,255,.5) inset !important; }
+/* buttons: glass capsules; the main one is glossy blue */
+.btn { border-radius:999px !important; background:var(--glass-strong) !important; color:var(--accent) !important; border:1px solid var(--glass-edge) !important; box-shadow:var(--glass-hi), 0 2px 8px -3px rgba(31,45,90,.18) !important; -webkit-backdrop-filter:blur(12px); backdrop-filter:blur(12px); }
+.btn:hover { filter:brightness(1.03); transform:translateY(-.5px); }
+.btn.primary:not(.danger), .btn.primary {
+  background:linear-gradient(180deg, rgba(255,255,255,.28), rgba(255,255,255,0) 55%), var(--accent) !important; color:#fff !important;
+  border:1px solid rgba(255,255,255,.35) !important; box-shadow:inset 0 1px 0 rgba(255,255,255,.55), 0 6px 18px -6px color-mix(in srgb, var(--accent) 70%, transparent) !important; }
+.btn.danger { background:rgba(255,59,48,.14) !important; color:#ff3b30 !important; }
+.btn.primary.danger { background:linear-gradient(180deg, rgba(255,255,255,.28), rgba(255,255,255,0) 55%), #ff3b30 !important; color:#fff !important; }
+.btn.ghost { background:transparent !important; border-color:transparent !important; box-shadow:none !important; }
+.btn[disabled] { opacity:.55; transform:none; }
+/* inputs: frosted wells */
+.input, input[type="text"], input[type="search"], input[type="date"], input[type="number"], input[type="password"], input[type="email"], input[type="tel"], select, textarea {
+  background-color:color-mix(in srgb, var(--surface) 62%, transparent) !important; border:1px solid var(--glass-edge) !important; border-radius:12px !important;
+  box-shadow:inset 0 1px 2px rgba(0,0,0,.05) !important; }
+/* segmented controls: a glass track with a floating glossy thumb */
+.att-seg, .pl-seg, .seg, .fm-tabs, .atabs, .set-subtabs { background:var(--ios-fill) !important; border:1px solid var(--glass-line) !important; border-radius:999px !important; padding:3px !important; }
+.pl-seg button, .seg button, .fm-tabs button, .atabs .atab { border-radius:999px !important; }
+.pl-seg button[aria-pressed="true"], .seg button[aria-pressed="true"], .fm-tabs button[aria-selected="true"], .atabs .atab.on, .atabs .atab[aria-selected="true"] {
+  background:var(--glass-strong) !important; border-radius:999px !important; box-shadow:var(--glass-hi), 0 4px 12px -4px rgba(31,45,90,.28) !important; }
+/* tables sit on glass, headers frosted */
+#tbl thead th, :root:not([data-theme="dark"]) #tbl thead th, table thead th { background:color-mix(in srgb, var(--surface) 82%, transparent) !important; -webkit-backdrop-filter:blur(14px); backdrop-filter:blur(14px); }
+/* Settings: profile card at the top of the menu (Preferences lives here) */
+.set-me { all:unset; box-sizing:border-box; display:flex; align-items:center; gap:10px; margin:4px 8px 6px; padding:10px 12px; border-radius:16px; cursor:pointer;
+  background:var(--glass-strong); border:1px solid var(--glass-edge); box-shadow:var(--glass-hi); }
+.set-me:hover { filter:brightness(1.02); } .set-me:focus-visible { outline:2px solid var(--accent); outline-offset:2px; }
+.set-me[aria-current="page"] { box-shadow:var(--glass-hi), 0 0 0 2px var(--accent); }
+.set-me-av { flex:none; width:36px; height:36px; border-radius:50%; display:grid; place-items:center; font-size:13px; font-weight:700; color:#fff; background:linear-gradient(135deg, #5ac8fa, #007aff); box-shadow:inset 0 1px 0 rgba(255,255,255,.5); }
+.set-me-t { flex:1; min-width:0; display:flex; flex-direction:column; line-height:1.25; } .set-me-t b { font-size:13.5px; color:var(--ink); white-space:nowrap; overflow:hidden; text-overflow:ellipsis; } .set-me-t small { font-size:11.5px; color:var(--muted); }
+.set-me-go { font-size:20px; color:var(--muted); line-height:1; }
+.set-page .set-who { display:none !important; }
+.set-page .set-nav-item { border-radius:12px !important; }
+.set-page .set-nav-item[aria-current="page"] { background:var(--glass-strong) !important; box-shadow:var(--glass-hi), 0 2px 8px -4px rgba(31,45,90,.25) !important; }
+/* Backups: one title, tabs on the left */
+.bk-mod-head { justify-content:flex-start; }
+/* ---- left menu: dark smoked glass ---- */
+@media (min-width:701px) {
+  .sidebar { background:linear-gradient(180deg, rgba(28,28,34,.86), rgba(16,16,20,.9)) !important; -webkit-backdrop-filter:blur(30px) saturate(160%); backdrop-filter:blur(30px) saturate(160%);
+    border-right:1px solid rgba(255,255,255,.08) !important; box-shadow:inset -1px 0 0 rgba(255,255,255,.04), 8px 0 30px -12px rgba(0,0,0,.35) !important; }
+  .sidebar .tab { border-radius:14px !important; }
+  .sidebar .tab:hover { background:rgba(255,255,255,.08) !important; }
+  .sidebar .tab.on, .sidebar .tab[aria-selected="true"] {
+    background:linear-gradient(180deg, rgba(255,255,255,.26), rgba(255,255,255,0) 60%), #0a84ff !important;
+    border:1px solid rgba(255,255,255,.22) !important; box-shadow:inset 0 1px 0 rgba(255,255,255,.45), 0 8px 20px -8px rgba(10,132,255,.8) !important; }
+  .sidebar .brand h1::before { background-color:#0a84ff !important; box-shadow:inset 0 1px 0 rgba(255,255,255,.45), 0 4px 12px -4px rgba(10,132,255,.8); border-radius:11px !important; }
+}
+/* phones: a floating dark glass tab bar */
+@media (max-width:700px) {
+  .sidebar nav.tabs { left:10px !important; right:10px !important; bottom:calc(8px + env(safe-area-inset-bottom)) !important; border-radius:26px !important;
+    background:rgba(24,24,28,.72) !important; -webkit-backdrop-filter:blur(26px) saturate(180%); backdrop-filter:blur(26px) saturate(180%);
+    border:1px solid rgba(255,255,255,.12) !important; box-shadow:inset 0 1px 0 rgba(255,255,255,.12), 0 14px 34px -10px rgba(0,0,0,.5) !important; padding-bottom:4px !important; }
+  .sidebar nav.tabs .tab.on, .sidebar nav.tabs .tab[aria-selected="true"] { background:rgba(255,255,255,.12) !important; border-radius:18px !important; color:#4da3ff !important; }
+  .card, #cardAttendance, #cardComing, .set-page { border-radius:20px !important; }
+  #app { padding-bottom:96px !important; }
+  .set-page .set-me { width:100%; margin:4px 0 8px; }
+}
+@media (prefers-reduced-transparency: reduce) { .card, .set-page, .drawer, .pdlg, .sidebar, .pinned-top { -webkit-backdrop-filter:none !important; backdrop-filter:none !important; } }
+/* v3.82.0: stronger selectors where older layers used ids */
+html:root body.clean-overview, html:root body { background-color:#eef1f8 !important; }
+html:root body.clean-overview, html:root:not([data-theme="dark"]) body {
+  background-image:
+    radial-gradient(900px 620px at 8% -10%, rgba(120,170,255,.55), transparent 62%),
+    radial-gradient(760px 560px at 102% 4%, rgba(255,160,205,.42), transparent 60%),
+    radial-gradient(900px 700px at 70% 110%, rgba(110,230,200,.40), transparent 62%),
+    radial-gradient(700px 520px at -6% 92%, rgba(190,160,255,.38), transparent 60%) !important; background-attachment:fixed !important; }
+html:root[data-theme="dark"] body, html:root[data-theme="dark"] body.clean-overview { background-color:#05060a !important;
+  background-image: radial-gradient(900px 620px at 8% -10%, rgba(40,90,220,.45), transparent 62%), radial-gradient(760px 560px at 102% 4%, rgba(170,50,140,.30), transparent 60%), radial-gradient(900px 700px at 70% 110%, rgba(20,150,130,.30), transparent 62%) !important; }
+.sticky-top.pinned-top#pinnedHeader { background:var(--glass) !important; -webkit-backdrop-filter:var(--glass-blur); backdrop-filter:var(--glass-blur); border-bottom:1px solid var(--glass-line) !important; box-shadow:inset 0 -1px 0 rgba(255,255,255,.35) !important; }
+#pinnedHeader .filters .input, #pinnedHeader .msel { background:var(--glass-strong) !important; border:1px solid var(--glass-edge) !important; border-radius:12px !important; }
+:root { --ov-card:rgba(255,255,255,.6); --ov-bg:transparent; }
+:root[data-theme="dark"] { --ov-card:rgba(30,30,36,.58); --ov-bg:transparent; }
+#pageSummary.ov #cardAttendance, #pageSummary.ov #ovRequests, #pageSummary.ov #ovUpcoming, #pageSummary.ov #cardWatch, .ovx-t {
+  -webkit-backdrop-filter:var(--glass-blur); backdrop-filter:var(--glass-blur); border:1px solid var(--glass-edge) !important; box-shadow:var(--glass-hi), var(--glass-shadow) !important; }
+#pageSummary.ov #ovRequests .ov-up-head, #pageSummary.ov #ovUpcoming .ov-up-head { background:transparent !important; }
+/* v3.82.0: section tabs in the top bar */
+#pinnedHeader header.top { flex-wrap:wrap; }
+.top-tabs { display:flex; align-items:center; gap:2px; padding:3px; margin-left:14px; border-radius:999px; background:var(--ios-fill); border:1px solid var(--glass-line); max-width:100%; overflow-x:auto; scrollbar-width:none; }
+.top-tabs::-webkit-scrollbar { display:none; }
+.top-tabs[hidden] { display:none !important; }
+.top-tabs button { all:unset; box-sizing:border-box; display:inline-flex; align-items:center; gap:6px; white-space:nowrap; padding:6px 14px; border-radius:999px; font-size:13.5px; font-weight:600; color:var(--ink-2); cursor:pointer; transition:background .18s, box-shadow .18s, color .18s; }
+.top-tabs button:hover { color:var(--ink); }
+.top-tabs button:focus-visible { outline:2px solid var(--accent); outline-offset:1px; }
+.top-tabs button[aria-selected="true"] { background:var(--glass-strong); color:var(--ink); box-shadow:var(--glass-hi), 0 4px 12px -4px rgba(31,45,90,.3); }
+.top-tabs em { font-style:normal; font-size:11px; font-weight:700; min-width:18px; height:18px; padding:0 5px; border-radius:999px; display:inline-grid; place-items:center; background:#ff3b30; color:#fff; }
+html body .tt-moved.tt-moved, html body .atabs.tt-moved.tt-moved { display:none !important; }
+.report-controls.tt-sel-moved > label[for="reportGroup"], .report-controls.tt-sel-moved > #reportGroup { display:none !important; }
+/* the Filters button and its panel */
+.btn.tt-filt { display:inline-flex; align-items:center; gap:6px; height:36px; padding:0 14px !important; }
+.btn.tt-filt[hidden] { display:none !important; }
+.tt-filt-ic { font-size:16px; line-height:1; transform:scaleX(-1); }
+.tt-filt-n { font-style:normal; font-size:11px; font-weight:700; min-width:18px; height:18px; padding:0 5px; border-radius:999px; display:inline-grid; place-items:center; background:var(--accent); color:#fff; }
+.tt-filt-n[hidden] { display:none; }
+body.tt-filt-open .btn.tt-filt { box-shadow:var(--glass-hi), 0 0 0 2px var(--accent) !important; }
+html body:not(.tt-filt-open) #pinnedHeader .workspace-filters.pinned-filters { display:none !important; }
+html body.tt-filt-open #pinnedHeader .workspace-filters.pinned-filters {
+  display:block !important; position:fixed !important; z-index:80; top:68px; right:20px; width:min(820px, calc(100vw - 40px)); max-height:calc(100vh - 100px); overflow:auto;
+  padding:16px !important; border-radius:22px !important; background:var(--glass-strong) !important; -webkit-backdrop-filter:blur(34px) saturate(190%); backdrop-filter:blur(34px) saturate(190%);
+  border:1px solid var(--glass-edge) !important; box-shadow:var(--glass-hi), 0 30px 70px -20px rgba(0,0,0,.35) !important; }
+html body.tt-filt-open #pinnedHeader .workspace-filters #cleanFilters > summary { display:none !important; }
+html body.tt-filt-open #pinnedHeader .workspace-filters .filters { display:grid !important; grid-template-columns:repeat(2, minmax(0,1fr)) !important; gap:10px !important; }
+html body.tt-filt-open #pinnedHeader .workspace-filters .filters .search { grid-column:1 / -1 !important; }
+html body.tt-filt-open #pinnedHeader .workspace-filters .filters .msel { width:100% !important; height:44px !important; }
+html body.tt-filt-open #pinnedHeader .workspace-filters .scope-line { margin-top:10px; font-size:12px; color:var(--muted); }
+html body.tt-filt-open #pinnedHeader .workspace-filters #fClear, html body.tt-filt-open #pinnedHeader .workspace-filters #fMoreOpts { justify-self:start; }
+@media (max-width:700px) {
+  .top-tabs { order:5; margin:8px 0 2px; width:100%; }
+  html body.tt-filt-open #pinnedHeader .workspace-filters.pinned-filters { top:auto; bottom:calc(84px + env(safe-area-inset-bottom)); left:10px; right:10px; width:auto; max-height:70vh; }
+  html body.tt-filt-open #pinnedHeader .workspace-filters .filters { grid-template-columns:1fr !important; }
+  .btn.tt-filt .tt-filt-l { display:none; }
+}
+/* v3.82.0: auto-hiding menu bar */
+@media (min-width:701px) {
+  body.nav-auto .sidebar { z-index:95 !important; width:232px !important; transform:translateX(calc(-100% + 0px)); transition:transform .32s cubic-bezier(.2,.8,.2,1) .25s, box-shadow .3s !important; box-shadow:none !important; }
+  body.nav-auto .sidebar::after { content:""; position:absolute; top:0; bottom:0; right:-14px; width:14px; }   /* the hot edge */
+  body.nav-auto .sidebar::before { content:""; position:absolute; top:50%; right:-9px; width:5px; height:64px; margin-top:-32px; border-radius:3px; background:rgba(28,28,34,.55); box-shadow:inset 0 1px 0 rgba(255,255,255,.2); transition:opacity .2s; }
+  body.nav-auto .sidebar:hover, body.nav-auto .sidebar:focus-within, body.nav-auto .sidebar.nav-peek { transform:none; transition-delay:0s !important; box-shadow:20px 0 60px -10px rgba(0,0,0,.45) !important; }
+  body.nav-auto .sidebar.nav-away { transform:translateX(-100%) !important; transition-delay:0s !important; }
+  body.nav-auto .sidebar:hover::before, body.nav-auto .sidebar.nav-peek::before { opacity:0; }
+  /* names grow in as it opens */
+  body.nav-auto .sidebar .tab { transform:scale(.92); transform-origin:left center; transition:transform .25s cubic-bezier(.2,.8,.2,1), background .15s !important; }
+  body.nav-auto .sidebar:hover .tab, body.nav-auto .sidebar.nav-peek .tab { transform:scale(1); }
+  body.nav-auto .sidebar .tab:hover { transform:scale(1.04) !important; }
+  html body.nav-auto #app#app { padding-left:28px !important; }
+  body.nav-auto #navToggle { right:12px !important; top:30px !important; background:rgba(255,255,255,.12) !important; border:0 !important; color:#fff !important; font-size:12px; }
+}
+/* v3.82.0: blur only where it can't trap pop-ups (a blurred box becomes the frame for anything fixed inside it) */
+.card, #cardAttendance, #cardComing, #ovRequests, #ovUpcoming, #cardWatch, .metric, .set-page, .tablewrap, .ovx-t, #pageSummary.ov .ov-tile,
+.drawer, .pdlg, .tp-pop, dialog, #overlay, .btn, #tbl thead th, table thead th, #pinnedHeader, .sticky-top.pinned-top, .sidebar, .set-me, .workspace-filters { -webkit-backdrop-filter:none !important; backdrop-filter:none !important; }
+.drawer, .pdlg, .tp-pop, dialog { background:color-mix(in srgb, var(--surface) 93%, transparent) !important; }
+#overlay { background:transparent !important; }
+.sticky-top.pinned-top#pinnedHeader { isolation:isolate; background:transparent !important; }
+.sticky-top.pinned-top#pinnedHeader::before { content:""; position:absolute; inset:0; z-index:-1; background:var(--glass); -webkit-backdrop-filter:blur(26px) saturate(185%); backdrop-filter:blur(26px) saturate(185%); pointer-events:none; }
+html body.tt-filt-open #pinnedHeader .workspace-filters.pinned-filters { background:color-mix(in srgb, var(--surface) 94%, transparent) !important; }
+/* v3.82.0: solid surfaces where text sits over other text */
+@media (min-width:701px) { body.nav-auto .sidebar { background:#1c1c1e !important; } :root[data-theme="dark"] body.nav-auto .sidebar { background:#111113 !important; } }
+html body.tt-filt-open #pinnedHeader .workspace-filters.pinned-filters { background:var(--surface) !important; }
+html body.tt-filt-open #pinnedHeader.pinned-top .workspace-filters .filters.filters { display:flex !important; flex-wrap:wrap !important; gap:10px !important; grid-template-columns:none !important; }
+html body.tt-filt-open #pinnedHeader.pinned-top .workspace-filters .filters.filters > * { flex:1 1 220px !important; min-width:0 !important; max-width:none !important; }
+html body.tt-filt-open #pinnedHeader.pinned-top .workspace-filters .filters.filters > .search { flex-basis:100% !important; height:44px !important; }
+html body.tt-filt-open #pinnedHeader.pinned-top .workspace-filters .filters.filters > .msel:not([hidden]) { display:flex !important; border:1px solid var(--glass-edge) !important; background:var(--surface-2) !important; }
+html body.tt-filt-open #pinnedHeader.pinned-top .workspace-filters .filters.filters > #fClear, html body.tt-filt-open #pinnedHeader.pinned-top .workspace-filters .filters.filters > #fMoreOpts { flex:0 0 auto !important; }
+@media (max-width:700px) { html body #pinnedHeader.pinned-top { position:relative !important; } }
+html body .drawer, html body .pdlg, html body .tp-pop, html body dialog { background:var(--surface) !important; }
+#pageActions > .section-heading h2 { display:none; }   /* v3.82.0: the page name is already in the top bar */
+#pageActions > .section-heading { margin-bottom:12px; }
 </style></head>
 
 
@@ -2910,7 +3105,7 @@ table td { border-color:var(--ios-sep) !important; }
     <div id="pageSettings" hidden></div>
     <div id="pagePlaybook" hidden><section class="card pp-page"><div id="pbHost"></div></section></div>
     <div id="pagePlanner" hidden><section class="card pp-page"><div id="plHost"></div></section></div>
-    <div id="pageBackups" hidden><section class="card bkr-page"><div class="bk-mod-head"><h2>Backups</h2><div class="pl-seg bk-mod-tabs" id="bkModTabs" role="tablist"></div></div><div class="body bkr" id="bkPageHost"></div><div id="psnPageHost" hidden></div></section></div>
+    <div id="pageBackups" hidden><section class="card bkr-page"><div class="bk-mod-head"><div class="pl-seg bk-mod-tabs" id="bkModTabs" role="tablist"></div></div><div class="body bkr" id="bkPageHost"></div><div id="psnPageHost" hidden></div></section></div>
     <div id="pageEmployees" hidden>
       <section class="card c-emp" aria-label="Employee table">
         <div class="tools">
@@ -10774,7 +10969,7 @@ async function poll() {
 }
 
 /* ============================== filtering ============================== */
-const APP = { title: "Team Dashboard", version: "3.81.0", released: "2026-11-12" };
+const APP = { title: "Team Dashboard", version: "3.82.0", released: "2026-11-12" };
 const BASE_DIMS = { status: "status_column", desig: "designation_column", client: "client_column", mode: "mode_column" };
 const STANDARD_STATUSES = ["Active", "Manager", "OJT", "Bench", "New", "Projected", "Left", "Moved"];
 const TILE_ORDER = ["Active", "Manager", "OJT", "Bench", "New", "Projected"];
@@ -10972,7 +11167,7 @@ function openMultiSelect(ev, k) {
       k === "status" ? h("i", { class: "dot", style: "background:" + statusColor(v) }) : null, h("span", { class: "colf-v" }, v), h("small", {}, String(counts.get(v))))));
   };
   if (search) search.addEventListener("input", draw);
-  pop.append(h("div", { class: "colf-h" }, spec[2]), search, list,
+  pop.append(...[h("div", { class: "colf-h" }, spec[2]), search, list].filter(Boolean),
     h("div", { class: "colf-row", style: "margin-top:8px" },
       k === "status" ? h("button", { class: "btn mini", onclick: () => { state.filters.sel.status = new Set(defaultStatuses()); state.page = 1; renderAll(); draw(); } }, "Active + New")
                      : h("button", { class: "btn mini", onclick: () => { selOf(k).clear(); state.page = 1; renderAll(); draw(); } }, "Show all"),
@@ -14620,7 +14815,7 @@ const MODULES = [
   { id: 'fields', group: 'Data', name: 'Fields', show: () => PERM.isSuper() || PERM.can('set.fields'), draw: tabbed('fields', [...[['emp', 'Employee fields'], ['att', 'Attendance fields'], ['priv', '🔒 Private details']].map(([k, n]) => ({ id: k === 'emp' ? 'choices' : k, name: n, show: () => k !== 'priv' || (PERM.isSuper() && PERM.online()), draw: pane => { drawChoices.tab = k; drawChoices.flat = true; return drawChoices(pane); } })), { id: 'mandatory', name: 'Mandatory fields', draw: drawFields }]) },
   { id: 'backups', group: 'Data', name: 'Leave backups', show: () => PERM.isSuper() || PERM.can('set.fields'), draw: drawBackupSettings },
   { id: 'data', group: 'Data', name: 'Workbook & storage', show: () => PERM.can('set.workbook') || PERM.can('workbook.download') || PERM.isSuper(), draw: tabbed('data', [{ id: 'workbook', name: 'Workbook & backups', show: () => PERM.can('set.workbook') || PERM.can('workbook.download'), draw: drawWorkbook }, { id: 'storage', name: 'Storage & clean-up', show: () => PERM.isSuper(), draw: drawStorage }]) },
-  { id: 'prefs', group: 'General', name: 'Preferences', show: () => true, draw: drawPrefsTools },
+  { id: 'prefs', group: 'You', name: 'Preferences', show: () => true, draw: drawPrefsTools },
 ];
 /* old page names still work (links inside the dashboard) */
 const SET_ALIAS = { att: ['fields', 'att'], priv: ['fields', 'priv'], workbook: ['data', 'workbook'], storage: ['data', 'storage'], choices: ['fields', 'choices'], mandatory: ['fields', 'mandatory'], tools: ['prefs'], sync: ['prefs'] };
@@ -14639,7 +14834,11 @@ window.drawSettingsPage = () => {
   const u = CLOUD.user(), who = PERM.online() ? ('Signed in as ' + u.name + ' · ' + (PERM.roleNames[u.role] || 'User')) : 'Excel file on this computer';
   const pane = h('div', { class: 'set-pane' });
   fill(host, h('div', { class: 'set-page' },
-    h('nav', { class: 'set-nav', 'aria-label': 'Settings sections' }, h('p', { class: 'set-who' }, who), ...mods.flatMap((m, i) => [i === 0 || mods[i - 1].group !== m.group ? h('p', { class: 'set-grp' }, m.group) : null, h('button', { class: 'set-nav-item', type: 'button', 'aria-current': m === mod ? 'page' : null, onclick: () => { current = m.id; drawSettingsPage(); } }, m.name)])),
+    h('nav', { class: 'set-nav', 'aria-label': 'Settings sections' },
+      /* v3.82.0: Preferences (theme, sign out, distances) lives in this profile card, so there is no separate "General" group */
+      h('button', { type: 'button', class: 'set-me', 'aria-current': mod.id === 'prefs' ? 'page' : null, onclick: () => { current = 'prefs'; drawSettingsPage(); } },
+        h('span', { class: 'set-me-av' }, PERM.online() ? pplInitials(u.name) : '⚙'), h('span', { class: 'set-me-t' }, h('b', {}, PERM.online() ? u.name : 'This computer'), h('small', {}, (PERM.online() ? (PERM.roleNames[u.role] || 'User') + ' · ' : '') + 'Preferences')), h('span', { class: 'set-me-go', 'aria-hidden': 'true' }, '›')),
+      ...mods.filter(m => m.id !== 'prefs').flatMap((m, i, arr) => [i === 0 || arr[i - 1].group !== m.group ? h('p', { class: 'set-grp' }, m.group) : null, h('button', { class: 'set-nav-item', type: 'button', 'aria-current': m === mod ? 'page' : null, onclick: () => { current = m.id; drawSettingsPage(); } }, m.name)])),
     h('section', { class: 'set-main', 'aria-labelledby': 'setModTitle' }, h('h3', { class: 'set-title', id: 'setModTitle' }, mod.name), pane)));
   Promise.resolve().then(() => mod.draw(pane)).catch(e => fill(pane, h('p', { class: 'err' }, e.message || String(e))));
 };
@@ -16365,16 +16564,23 @@ function drawPrefs(pane) {
  renderCustomFieldFilters();
 })();</script>
 <script>
-/* v3.70.0: fold / unfold the menu bar; the choice is remembered on this computer (a display setting, no data) */
+/* v3.82.0: the menu bar hides itself; move the mouse to the left edge and it slides out with the page names. The pin keeps it open. */
 (() => {
   const btn = document.getElementById('navToggle'); if (!btn) return;
-  const set = on => { document.body.classList.toggle('nav-mini', on); btn.textContent = on ? '›' : '‹'; const t = on ? 'Show the menu (Ctrl + \\)' : 'Hide the menu (Ctrl + \\)'; btn.title = t; btn.setAttribute('aria-label', on ? 'Show the menu' : 'Hide the menu'); btn.setAttribute('aria-expanded', String(!on));
-    document.querySelectorAll('.sidebar .tab').forEach(b => { const n = b.cloneNode(true); n.querySelectorAll('.tabn').forEach(x => x.remove()); const label = n.textContent.trim(); if (on) b.title = label; else if (b.title === label) b.removeAttribute('title'); });
-    try { localStorage.setItem('td_nav_mini', on ? '1' : '0'); } catch { } };
-  let start = false; try { start = localStorage.getItem('td_nav_mini') === '1'; } catch { }
+  const side = document.querySelector('.sidebar');
+  const set = auto => { document.body.classList.remove('nav-mini'); document.body.classList.toggle('nav-auto', auto);
+    btn.textContent = auto ? '📌' : '‹'; const t = auto ? 'Keep the menu open (Ctrl + \\)' : 'Hide the menu until you point at it (Ctrl + \\)'; btn.title = t; btn.setAttribute('aria-label', t);
+    try { localStorage.setItem('td_nav_auto', auto ? '1' : '0'); } catch { } };
+  let start = true; try { start = localStorage.getItem('td_nav_auto') !== '0'; } catch { }
   set(start);
-  btn.addEventListener('click', () => set(!document.body.classList.contains('nav-mini')));
-  document.addEventListener('keydown', e => { if ((e.ctrlKey || e.metaKey) && e.key === '\\') { e.preventDefault(); set(!document.body.classList.contains('nav-mini')); } });
+  btn.addEventListener('click', () => set(!document.body.classList.contains('nav-auto')));
+  document.addEventListener('keydown', e => { if ((e.ctrlKey || e.metaKey) && e.key === '\\') { e.preventDefault(); set(!document.body.classList.contains('nav-auto')); } });
+  /* touch screens: tap the edge to open, tap a page to close */
+  side.addEventListener('click', e => { if (!document.body.classList.contains('nav-auto')) return; if (e.target.closest('.tab')) side.classList.remove('nav-peek'); });
+  side.addEventListener('pointerdown', e => { if (e.pointerType !== 'mouse' && document.body.classList.contains('nav-auto') && !side.classList.contains('nav-peek')) { side.classList.add('nav-peek'); if (!e.target.closest('.tab')) e.preventDefault(); } });
+  document.addEventListener('pointerdown', e => { if (!side.contains(e.target)) side.classList.remove('nav-peek'); });
+  /* after choosing a page, slide away */
+  side.addEventListener('click', e => { if (e.target.closest('.tab') && document.body.classList.contains('nav-auto')) { side.classList.add('nav-away'); setTimeout(() => side.classList.remove('nav-away'), 450); } });
 })();
 </script>
 <script>
@@ -16768,20 +16974,85 @@ document.addEventListener('visibilitychange', () => { if (!document.hidden && on
 <script>
 /* v3.81.0: the Backups page: Backup report and Pseudo names, each for the roles given it */
 (() => {
-  window.__bkTab = 'report'; let psnDrawn = false;
+  window.__bkTab = 'psn'; let psnDrawn = false;   /* v3.82.0: Pseudo names opens first */
   window.drawBackupsModule = () => {
     const tabsEl = document.getElementById('bkModTabs'); if (!tabsEl) return;
     const P = window.PERM, rep = !P || P.canBkReport(), psn = !P || P.canPsn();
-    const tabs = [rep && ['report', 'Backup report'], psn && ['psn', 'Pseudo names']].filter(Boolean);
-    if (!tabs.some(t => t[0] === window.__bkTab)) window.__bkTab = tabs[0] ? tabs[0][0] : 'report';
+    const tabs = [psn && ['psn', 'Pseudo names'], rep && ['report', 'Backup report']].filter(Boolean);
+    if (!tabs.some(t => t[0] === window.__bkTab)) window.__bkTab = tabs[0] ? tabs[0][0] : 'psn';
     tabsEl.replaceChildren(...tabs.map(([k, l]) => h('button', { type: 'button', role: 'tab', 'aria-pressed': String(k === window.__bkTab), onclick: () => { if (window.__bkTab === k) return; window.__bkTab = k; psnDrawn = false; renderAll(); } }, l)));
     tabsEl.hidden = tabs.length < 2;
     const bk = document.getElementById('bkPageHost'), ps = document.getElementById('psnPageHost');
     bk.hidden = window.__bkTab !== 'report'; ps.hidden = window.__bkTab !== 'psn';
     if (window.__bkTab === 'psn' && (!psnDrawn || !ps.firstChild)) { psnDrawn = true; try { openPseudoNames(null, ps); } catch (e) { ps.textContent = e.message; } }
   };
+  document.addEventListener('click', e => { const t = e.target.closest && e.target.closest('.tab[data-view="backups"]'); if (t && state.view !== 'backups') { window.__bkTab = 'psn'; psnDrawn = false; } }, true);
   /* the Attendance buttons that opened the Backup report now open this page */
-  document.addEventListener('click', e => { const b = e.composedPath && e.composedPath().find(x => x && x.matches && x.matches('[data-act="bk-report"], [data-bk-report]')); if (b) { e.stopPropagation(); e.preventDefault(); window.__bkTab = 'report'; setView('backups'); } }, true);
+  document.addEventListener('click', e => { const b = e.composedPath && e.composedPath().find(x => x && x.matches && x.matches('[data-act="bk-report"], [data-bk-report]')); if (b) { e.stopPropagation(); e.preventDefault(); window.__bkTab = 'report'; psnDrawn = false; setView('backups'); } }, true);
+})();
+</script>
+<script>
+/* v3.82.0: page sections as iOS tabs in the top bar, and the search & filters behind one "Filters" button */
+(() => {
+  const header = document.querySelector('#pinnedHeader header.top'); if (!header) return;
+  const bar = h('div', { class: 'top-tabs', role: 'tablist', 'aria-label': 'Sections of this page', hidden: true });
+  const spacer = header.querySelector('.spacer'); header.insertBefore(bar, spacer || null);
+  /* ---- where each page keeps its sections ---- */
+  const attRoot = () => document.getElementById('attHost')?.shadowRoot;
+  const SRC = {
+    attendance: () => { const r = attRoot(); if (!r) return null; const bs = [...r.querySelectorAll('.subnav .tab[data-v]')]; if (!bs.length) return null;
+      if (!r.getElementById('ttHide')) { const st = document.createElement('style'); st.id = 'ttHide'; st.textContent = '.topbar .subnav{display:none!important}'; r.append(st); }
+      return bs.map(b => ({ label: b.querySelector('span')?.textContent || b.textContent, on: b.getAttribute('aria-current') === 'page', badge: b.querySelector('.n, .badge, .cnt')?.textContent || '', go: () => b.click() })); },
+    actions: () => { const bs = [...document.querySelectorAll('#pageActions .atabs > .atab')].filter(b => !b.hidden && getComputedStyle(b).display !== 'none'); if (!bs.length) return null;
+      bs[0].parentElement.classList.add('tt-moved');
+      return bs.map(b => { const c = b.cloneNode(true); c.querySelectorAll('svg').forEach(x => x.remove()); const n = c.querySelector('b, .n, .atab-n, .badge'); const badge = n && /^\d+$/.test(n.textContent.trim()) ? n.textContent.trim() : ''; if (badge) n.remove();
+        return { label: c.textContent.trim(), on: b.classList.contains('on') || b.getAttribute('aria-selected') === 'true', badge, go: () => b.click() }; }); },
+    backups: () => { const t = document.getElementById('bkModTabs'); const bs = t ? [...t.querySelectorAll('button')] : []; if (bs.length < 2) return null;
+      t.closest('.bk-mod-head')?.classList.add('tt-moved');
+      return bs.map(b => ({ label: b.textContent, on: b.getAttribute('aria-pressed') === 'true', go: () => b.click() })); },
+    reports: () => { const sel = document.getElementById('reportGroup'); if (!sel) return null;
+      sel.closest('.report-controls')?.classList.add('tt-sel-moved');
+      return [...sel.options].filter(o => !o.hidden && !o.disabled && o.style.display !== 'none').map(o => ({ label: o.textContent.replace(/^📊\s*/, ''), on: o.value === sel.value, go: () => { sel.value = o.value; sel.dispatchEvent(new Event('change', { bubbles: true })); } })); },
+  };
+  let sig = '';
+  const draw = () => {
+    const v = typeof state !== 'undefined' ? state.view : ''; let items = null;
+    try { items = SRC[v] ? SRC[v]() : null; } catch { items = null; }
+    const next = v + '|' + (items ? items.map(i => i.label + (i.on ? '*' : '') + i.badge).join('|') : '');
+    if (next === sig) return; sig = next;
+    bar.hidden = !items || items.length < 2;
+    document.body.classList.toggle('has-top-tabs', !bar.hidden);
+    if (bar.hidden) { bar.replaceChildren(); return; }
+    bar.replaceChildren(...items.map(i => h('button', { type: 'button', role: 'tab', 'aria-selected': String(!!i.on), onclick: () => { i.go(); setTimeout(draw, 30); setTimeout(draw, 300); } }, h('span', {}, i.label.trim()), i.badge ? h('em', {}, i.badge) : null)));
+    bar.querySelector('[aria-selected="true"]')?.scrollIntoView?.({ block: 'nearest', inline: 'nearest' });
+  };
+  setInterval(() => { if (!document.hidden) draw(); }, 400);
+  addEventListener('click', () => setTimeout(draw, 60), true);
+
+  /* ---- Filters: one button in the top bar opens the search & filters panel ---- */
+  const box = document.querySelector('.workspace-filters');
+  const fb = h('button', { type: 'button', class: 'btn tt-filt', 'aria-expanded': 'false', 'aria-haspopup': 'true', title: 'Search & filters', onclick: e => { e.stopPropagation(); toggle(); } },
+    h('span', { class: 'tt-filt-ic', 'aria-hidden': 'true' }, '⌕'), h('span', { class: 'tt-filt-l' }, 'Filters'), h('em', { class: 'tt-filt-n', hidden: true }));
+  header.insertBefore(fb, spacer ? spacer.nextSibling : null);
+  const toggle = open => { open = open == null ? !document.body.classList.contains('tt-filt-open') : open; document.body.classList.toggle('tt-filt-open', open); fb.setAttribute('aria-expanded', String(open));
+    if (open) { const cf = document.getElementById('cleanFilters'); if (cf) cf.open = true; setTimeout(() => document.getElementById('fq')?.focus({ preventScroll: true }), 50); } };
+  const fstate = () => {
+    const shown = !!box && !box.hidden && box.classList.contains('pinned-filters');
+    fb.hidden = !shown; if (!shown && document.body.classList.contains('tt-filt-open')) toggle(false);
+    const n = (document.getElementById('fq')?.value ? 1 : 0) + [...document.querySelectorAll('#fStatus, #fDesig, #fClient, #fMode')].filter(b => b.classList.contains('on') && !b.hidden).length;
+    const em = fb.querySelector('.tt-filt-n'); em.hidden = !n; em.textContent = n;
+    const sl = document.getElementById('scopeLine'); fb.title = 'Search & filters' + (sl && sl.textContent ? ' · ' + sl.textContent : '');
+  };
+  setInterval(fstate, 500); fstate();
+  document.addEventListener('keydown', e => { if (e.key === 'Escape' && document.body.classList.contains('tt-filt-open')) toggle(false); });
+  document.addEventListener('pointerdown', e => {
+    if (!document.body.classList.contains('tt-filt-open')) return;
+    const path = e.composedPath ? e.composedPath() : [];
+    if (path.includes(box) || path.includes(fb) || path.some(x => x && x.style && String(x.style.zIndex) === '2147483000')) return;
+    toggle(false);
+  }, true);
+  /* "/" still jumps to the search box */
+  document.addEventListener('keydown', e => { if (e.key === '/' && !/INPUT|TEXTAREA|SELECT/.test(document.activeElement?.tagName || '') && !fb.hidden) { toggle(true); } }, true);
 })();
 </script>
 </body>
