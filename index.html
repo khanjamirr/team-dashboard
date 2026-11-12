@@ -10,7 +10,7 @@
 <meta name="format-detection" content="telephone=no">
 <link rel="preconnect" href="https://iiogwevtyzgedhoaqlrn.supabase.co" crossorigin><link rel="dns-prefetch" href="https://iiogwevtyzgedhoaqlrn.supabase.co">
 <link rel="icon" href="data:,">
-<title>Team Dashboard · 3.85.1</title>
+<title>Team Dashboard · 3.85.2</title>
 <link rel="preconnect" href="https://fonts.googleapis.com"><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin><link href="https://fonts.googleapis.com/css2?family=Public+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet">
 <style>
 :root {
@@ -3111,6 +3111,15 @@ tr.act-zero td { color:var(--muted); }
 .psn-ct-s td:first-child { padding-left:28px; color:var(--ink-2); }
 .psn-ct td.warn { color:#c77700; font-weight:700; } .psn-ct td.hot { color:#d70015; font-weight:700; }
 @media (max-width:700px) { .psn-ct td:not(:first-child), .psn-ct th:not(:first-child) { width:auto; padding:6px 8px; } .psn-ct th:nth-child(6), .psn-ct td:nth-child(6), .psn-ct th:nth-child(3), .psn-ct td:nth-child(3) { display:none; } .psn-ct { font-size:12px; } }
+/* v3.85.2: change a recruiter's pseudo name */
+.psn-mode { margin:0 0 12px; flex-wrap:wrap; } .psn-mode button { white-space:normal; text-align:left; }
+.psn-rn { display:flex; flex-direction:column; gap:10px; }
+.psn-rn-row, .psn-rn-new { display:flex; flex-wrap:wrap; gap:10px; align-items:flex-end; } .psn-rn-row .grow { flex:1 1 260px; } .psn-rn-new[hidden] { display:none; } .psn-rn-new .psn-dl { flex:1 1 200px; }
+.psn-rn-old { display:flex; flex-wrap:wrap; align-items:center; gap:10px; } .psn-rn-who[hidden] { display:none; } .psn-rn-who { display:flex; flex-direction:column; gap:8px; }
+.psn-opt.on { background:color-mix(in srgb, var(--accent) 8%, transparent); }
+.psn-rn-foot { display:flex; gap:8px; align-items:center; }
+.psn-rn-who > input { flex:none !important; height:40px !important; min-height:0 !important; } .psn-rn-who .psn-res { max-height:240px; overflow:auto; }
+.psn-rn-foot .grow, .psn-rn-row .grow { flex:1 1 auto; }
 </style></head>
 
 
@@ -11103,7 +11112,7 @@ async function poll() {
 }
 
 /* ============================== filtering ============================== */
-const APP = { title: "Team Dashboard", version: "3.85.1", released: "2026-11-12" };
+const APP = { title: "Team Dashboard", version: "3.85.2", released: "2026-11-12" };
 const BASE_DIMS = { status: "status_column", desig: "designation_column", client: "client_column", mode: "mode_column" };
 const STANDARD_STATUSES = ["Active", "Manager", "OJT", "Bench", "New", "Projected", "Left", "Moved"];
 const TILE_ORDER = ["Active", "Manager", "OJT", "Bench", "New", "Projected"];
@@ -13825,7 +13834,7 @@ async function openPseudoNames(focusId, host) {   /* v3.81.0: host = draw inside
             : h("div", { class: "psn-who" }, h("b", { class: "psn-vac" }, s.active ? "Vacant" : "Inactive"), h("small", {}, was ? "last: " + was.name + (psnDay(was.to) ? " (until " + psnNice(was.to) + ")" : " (left)") : "not tagged yet")),
           s.flag ? h("span", { class: "psn-flag", title: "This recruiter is resigning: tag a replacement" }, "⚠ Needs replacement") : null,
           admin && editMeta !== key ? h("button", { class: "btn mini ghost", type: "button", title: "Client, active / inactive", onclick: () => { editMeta = key; editing = null; drawList(); } }, "Edit") : null,
-          canEdit && s.active && editing !== key ? h("button", { class: "btn mini" + (s.flag || !s.r ? " primary" : ""), type: "button", onclick: () => { editing = key; editMeta = null; drawList(); } }, s.flag ? "Replace" : s.r ? "Change" : "Tag") : null));
+          canEdit && s.active && editing !== key ? h("button", { class: "btn mini" + (s.flag || !s.r ? " primary" : ""), type: "button", title: s.r ? "Give this name to someone else, or give " + nm(s.r) + " a different name" : "", onclick: () => { editing = key; editMeta = null; pickMode = "recruiter"; drawList(); } }, s.flag ? "Replace" : s.r ? "Change" : "Tag") : null));
         if (editMeta === key) box.append(metaEditor(s, master, clients));
         if (editing === key) box.append(picker(s));
       }
@@ -13872,7 +13881,81 @@ async function openPseudoNames(focusId, host) {   /* v3.81.0: host = draw inside
       h("button", { class: "btn mini", type: "button", onclick: () => { editMeta = null; drawList(); } }, "Cancel"), save);
   }
   /* the picker under a pseudo name: Active, Active + Resign and OJT recruiters, the same client first */
+  /* v3.85.2: "Change" offers both: give this name to someone else, or give this recruiter a different name */
+  let pickMode = "recruiter";
   function picker(s) {
+    if (s.r) {
+      const modes = h("div", { class: "seg psn-mode", role: "group", "aria-label": "What to change" }, ...[["recruiter", "Give “" + s.name + "” to someone else"], ["name", "Give " + nm(s.r) + " a different name"]].map(([k, l]) =>
+        h("button", { type: "button", "aria-pressed": String(pickMode === k), onclick: () => { pickMode = k; drawList(); } }, l)));
+      const inner = pickMode === "name" ? renamer(s) : recruiterPicker(s);
+      return h("div", { class: "psn-edit psn-picker" }, modes, inner);
+    }
+    return recruiterPicker(s);
+  }
+  /* give the recruiter another pseudo name (a vacant one, or a new one); the old name becomes vacant or goes to someone else */
+  function renamer(s) {
+    const r = s.r, master = psnMaster() || [], cur = holders();
+    const vac = master.filter(x => x.active && !cur.get(x.name.toLowerCase()) && x.name.toLowerCase() !== s.name.toLowerCase());
+    const same = vac.filter(x => x.client === cl(r)), other = vac.filter(x => x.client !== cl(r));
+    const NEW = "__new__";
+    const sel = h("select", { class: "input", "aria-label": "New pseudo name for " + nm(r) }, h("option", { value: "" }, "Choose the new pseudo name…"),
+      h("option", { value: NEW }, "➕ A new pseudo name (not in the list yet)"),
+      same.length ? h("optgroup", { label: (cl(r) || "Same client") + " · vacant" }, ...same.map(x => h("option", { value: x.name }, x.name + (x.sub ? " · " + x.sub : "")))) : null,
+      other.length ? h("optgroup", { label: "Other clients · vacant" }, ...other.map(x => h("option", { value: x.name }, x.name + " · " + (x.client || "no client")))) : null);
+    const nameIn = h("input", { class: "input", placeholder: "New pseudo name, e.g. Ellis Morgan", maxlength: "60" });
+    const clients = [...new Set([...master.map(x => x.client), ...state.rows.map(cl)].filter(Boolean))].sort();
+    const cSel = h("select", { class: "input", "aria-label": "Client of the new name" }, ...clients.map(c => h("option", { value: c, selected: c === (cl(r) || s.client) }, c)));
+    const newBox = h("div", { class: "psn-rn-new", hidden: true }, h("label", { class: "psn-dl" }, h("small", {}, "New name"), nameIn), h("label", { class: "psn-dl" }, h("small", {}, "Client"), cSel));
+    sel.addEventListener("change", () => { newBox.hidden = sel.value !== NEW; if (!newBox.hidden) nameIn.focus(); });
+    const from = dateIn("New name from");
+    /* the old name */
+    let giveTo = null;
+    const oldMode = h("div", { class: "seg", role: "group", "aria-label": "What happens to " + s.name });
+    const who = h("div", { class: "psn-rn-who", hidden: true });
+    const wIn = h("input", { class: "input", type: "search", placeholder: "Who gets “" + s.name + "”? Search by name or Emp ID" });
+    const wRes = h("div", { class: "psn-res" });
+    const drawWho = () => { const t = wIn.value.trim().toLowerCase();
+      if (giveTo) { wRes.replaceChildren(h("div", { class: "psn-opt on" }, h("div", { class: "psn-on" }, h("b", {}, nm(giveTo)), h("span", {}, [giveTo.id, gs(giveTo, "status_column"), cl(giveTo), pv(giveTo) ? "has " + pv(giveTo) + " → it becomes vacant" : ""].filter(Boolean).join(" · "))), h("button", { class: "btn mini", type: "button", onclick: () => { giveTo = null; drawWho(); } }, "Change"))); return; }
+      const ppl = state.rows.filter(x => psnEligible(x) && x.id !== r.id && (!t || (nm(x) + " " + x.id + " " + cl(x)).toLowerCase().includes(t)))
+        .sort((a, b) => ((cl(b) === s.client) - (cl(a) === s.client)) || (!!pv(a) - !!pv(b)) || nm(a).localeCompare(nm(b))).slice(0, 30);
+      wRes.replaceChildren(...ppl.map(x => h("div", { class: "psn-opt", role: "button", tabindex: "0", onclick: () => { giveTo = x; drawWho(); } },
+        h("div", { class: "psn-on" }, h("b", {}, nm(x)), h("span", {}, [x.id, gs(x, "status_column"), cl(x)].filter(Boolean).join(" · "))),
+        pv(x) ? h("span", { class: "psn-has" }, "has " + pv(x)) : h("span", { class: "psn-free" }, "no pseudo name")))); };
+    wIn.addEventListener("input", drawWho);
+    who.append(wIn, wRes);
+    let om = "vacant";
+    const paintOm = () => { oldMode.replaceChildren(...[["vacant", "“" + s.name + "” becomes vacant"], ["give", "Give “" + s.name + "” to someone else"]].map(([k, l]) => h("button", { type: "button", "aria-pressed": String(om === k), onclick: () => { om = k; paintOm(); who.hidden = om !== "give"; if (om === "give") { drawWho(); wIn.focus(); } } }, l))); };
+    paintOm();
+    const err = h("p", { class: "err" });
+    const save = h("button", { class: "btn primary", type: "button" }, "Save");
+    save.addEventListener("click", async () => {
+      if (busy) return; err.textContent = "";
+      let newName = sel.value === NEW ? nameIn.value.trim() : sel.value;
+      if (!newName) { err.textContent = "Choose the new pseudo name, or pick “A new pseudo name” and type it."; return; }
+      if (!from.i.value) { err.textContent = "Pick the date the new name starts."; return; }
+      if (om === "give" && !giveTo) { err.textContent = "Choose who gets “" + s.name + "”, or let it become vacant."; return; }
+      const exists = master.find(x => x.name.toLowerCase() === newName.toLowerCase());
+      if (sel.value === NEW && exists) { if (cur.get(exists.name.toLowerCase())) { err.textContent = "“" + exists.name + "” is already given to " + nm(cur.get(exists.name.toLowerCase())) + "."; return; } newName = exists.name; }
+      if (sel.value === NEW && !exists && !admin) { err.textContent = "Only an admin can add new pseudo names."; return; }
+      busy = true; save.disabled = true;
+      try {
+        if (sel.value === NEW && !exists) await psnSaveMaster([...master, { name: newName, client: cSel.value, sub: "", active: true }], "Added “" + newName + "” for " + cSel.value);
+        const day = from.i.value, ups = [{ id: r.id, values: { [pc]: newName } }];
+        if (om === "give" && giveTo) ups.push({ id: giveTo.id, values: { [pc]: s.name } });
+        BE.setPseudoDates({ from: day, to: day, prevOf: day });
+        await api("POST", "/api/bulk", { updates: ups, note: nm(r) + ": pseudo name " + s.name + " → " + newName + " from " + day + (om === "give" && giveTo ? "; " + s.name + " → " + nm(giveTo) : "; " + s.name + " vacant") });
+        await loadData(true); editing = null; pickMode = "recruiter";
+        toast(nm(r) + " is now “" + newName + "” from " + psnNice(day) + (om === "give" && giveTo ? "; “" + s.name + "” is " + nm(giveTo) + "’s." : "; “" + s.name + "” is vacant."));
+        await reloadHist();
+      } catch (e) { err.textContent = e.message; save.disabled = false; } finally { BE.setPseudoDates(null); busy = false; }
+    });
+    return h("div", { class: "psn-rn" },
+      h("div", { class: "psn-rn-row" }, h("label", { class: "psn-dl grow" }, h("small", {}, nm(r) + "’s new pseudo name"), sel), from.el), newBox,
+      vac.length ? null : h("p", { class: "hint" }, "No vacant pseudo names right now: add a new one."),
+      h("div", { class: "psn-rn-old" }, h("small", { class: "hint" }, "And “" + s.name + "”:"), oldMode), who, err,
+      h("div", { class: "psn-rn-foot" }, h("span", { class: "grow" }), h("button", { class: "btn mini", type: "button", onclick: () => { editing = null; pickMode = "recruiter"; drawList(); } }, "Cancel"), save));
+  }
+  function recruiterPicker(s) {
     const inp = h("input", { class: "input", type: "search", placeholder: "Search the recruiter by name or Emp ID", "aria-label": "Recruiter for " + s.name });
     const res = h("div", { class: "psn-res" });
     const from = dateIn(s.r ? "New recruiter from" : "Assigned from"), to = s.r ? dateIn(nm(s.r) + " removed on") : null;
@@ -13890,7 +13973,7 @@ async function openPseudoNames(focusId, host) {   /* v3.81.0: host = draw inside
     inp.addEventListener("input", draw); inp.addEventListener("keydown", e => { if (e.key === "Escape") { editing = null; drawList(); } if (e.key === "Enter") { const b = res.querySelector(".psn-opt"); if (b) b.click(); } });
     draw(); setTimeout(() => inp.focus(), 0);
     const vac = s.r ? dateIn("Removed on") : null;
-    return h("div", { class: "psn-edit psn-picker" },
+    return h("div", { class: s.r ? "psn-rp" : "psn-edit psn-picker" },
       h("div", { class: "psn-pk-dates" }, from.el, to ? to.el : null, h("span", { class: "grow" }),
         s.r ? h("span", { class: "psn-vacbox" }, vac.el, h("button", { class: "btn mini", type: "button", onclick: () => untag(s, vac.i.value) }, "Make vacant")) : null,
         h("button", { class: "btn mini", type: "button", onclick: () => { editing = null; drawList(); } }, "Cancel")),
