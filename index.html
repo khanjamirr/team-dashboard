@@ -10,7 +10,7 @@
 <meta name="format-detection" content="telephone=no">
 <link rel="preconnect" href="https://iiogwevtyzgedhoaqlrn.supabase.co" crossorigin><link rel="dns-prefetch" href="https://iiogwevtyzgedhoaqlrn.supabase.co">
 <link rel="icon" href="data:,">
-<title>Team Dashboard · 3.76.1</title>
+<title>Team Dashboard · 3.77.0</title>
 <link rel="preconnect" href="https://fonts.googleapis.com"><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin><link href="https://fonts.googleapis.com/css2?family=Public+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet">
 <style>
 :root {
@@ -464,6 +464,8 @@ body { font-size:14px; }
 .tab::before { content:'◫'; font-size:19px; width:22px; text-align:center; }
 .tab[data-view=employees]::before { content:'☷'; }
 .tab[data-view=reports]::before { content:'▥'; }
+.tab[data-view=planner]::before { content:'☑'; }
+.tab[data-view=playbook]::before { content:'❒'; }
 .tab[data-view=backups]::before { content:'⛨'; }
 .tab.on,:root[data-theme=dark] .tab.on { color:white; background:#5260db; box-shadow:none; }
 .tab:hover { background:#ffffff12; } .tab.on:hover { background:#626fea; }
@@ -1458,6 +1460,8 @@ body.filters-locked #cleanFilters, body.filters-locked #xchips, body.filters-loc
 #pageSummary.ov .ov-up .coming-list { max-height:300px !important; }
 #pageSummary.ov #coming[data-show="bday"] > .coming-group:nth-child(2), #pageSummary.ov #coming[data-show="anniv"] > .coming-group:nth-child(1) { display:none; }
 #pageSummary.ov #coming > .coming-group > h3 { display:none; }
+#pageSummary.ov #holidays[data-show="hol-us"] > .coming-group[data-ctry="IN"], #pageSummary.ov #holidays[data-show="hol-in"] > .coming-group[data-ctry="US"] { display:none; }
+#pageSummary.ov #holidays > .coming-group > h3 { display:none !important; } #pageSummary.ov #cardHolidays label:has(#holCountry) { display:none !important; }
 #pageSummary.ov #holidays > .coming-group > h3 { font-size:11px; font-weight:700; letter-spacing:.03em; text-transform:uppercase; color:var(--ink-2); margin:0 0 4px; }
 @media (max-width:1180px) {
   #pageSummary.ov { grid-template-columns:minmax(0,1fr) !important; grid-template-areas:"glance" "main" "side"; }
@@ -1549,6 +1553,8 @@ body.filters-locked #cleanFilters, body.filters-locked #xchips, body.filters-loc
   .sidebar nav.tabs .tab[data-view="actions"]::before { -webkit-mask-image:url("data:image/svg+xml,%3Csvg%20xmlns%3D%27http%3A//www.w3.org/2000/svg%27%20viewBox%3D%270%200%2024%2024%27%20fill%3D%27none%27%20stroke%3D%27black%27%20stroke-width%3D%272%27%20stroke-linecap%3D%27round%27%20stroke-linejoin%3D%27round%27%3E%3Cpath%20d%3D%27M9%2011l3%203%208-8%27/%3E%3Cpath%20d%3D%27M20%2012v7a2%202%200%200%201-2%202H6a2%202%200%200%201-2-2V6a2%202%200%200%201%202-2h9%27/%3E%3C/svg%3E"); mask-image:url("data:image/svg+xml,%3Csvg%20xmlns%3D%27http%3A//www.w3.org/2000/svg%27%20viewBox%3D%270%200%2024%2024%27%20fill%3D%27none%27%20stroke%3D%27black%27%20stroke-width%3D%272%27%20stroke-linecap%3D%27round%27%20stroke-linejoin%3D%27round%27%3E%3Cpath%20d%3D%27M9%2011l3%203%208-8%27/%3E%3Cpath%20d%3D%27M20%2012v7a2%202%200%200%201-2%202H6a2%202%200%200%201-2-2V6a2%202%200%200%201%202-2h9%27/%3E%3C/svg%3E"); }
   .sidebar nav.tabs .tab[data-view="reports"]::before { -webkit-mask-image:url("data:image/svg+xml,%3Csvg%20xmlns%3D%27http%3A//www.w3.org/2000/svg%27%20viewBox%3D%270%200%2024%2024%27%20fill%3D%27none%27%20stroke%3D%27black%27%20stroke-width%3D%272%27%20stroke-linecap%3D%27round%27%20stroke-linejoin%3D%27round%27%3E%3Cpath%20d%3D%27M4%2020V10M10%2020V4M16%2020v-7M22%2020H2%27/%3E%3C/svg%3E"); mask-image:url("data:image/svg+xml,%3Csvg%20xmlns%3D%27http%3A//www.w3.org/2000/svg%27%20viewBox%3D%270%200%2024%2024%27%20fill%3D%27none%27%20stroke%3D%27black%27%20stroke-width%3D%272%27%20stroke-linecap%3D%27round%27%20stroke-linejoin%3D%27round%27%3E%3Cpath%20d%3D%27M4%2020V10M10%2020V4M16%2020v-7M22%2020H2%27/%3E%3C/svg%3E"); }
   .sidebar nav.tabs .tab[data-view="backups"]::before { -webkit-mask-image:url("data:image/svg+xml,%3Csvg%20xmlns%3D%27http%3A//www.w3.org/2000/svg%27%20viewBox%3D%270%200%2024%2024%27%20fill%3D%27none%27%20stroke%3D%27black%27%20stroke-width%3D%272%27%20stroke-linecap%3D%27round%27%20stroke-linejoin%3D%27round%27%3E%3Cpath%20d%3D%27M12%203l7%203v5c0%204.5-3%208.3-7%2010-4-1.7-7-5.5-7-10V6z%27/%3E%3Cpath%20d%3D%27M9%2012l2%202%204-4%27/%3E%3C/svg%3E"); mask-image:url("data:image/svg+xml,%3Csvg%20xmlns%3D%27http%3A//www.w3.org/2000/svg%27%20viewBox%3D%270%200%2024%2024%27%20fill%3D%27none%27%20stroke%3D%27black%27%20stroke-width%3D%272%27%20stroke-linecap%3D%27round%27%20stroke-linejoin%3D%27round%27%3E%3Cpath%20d%3D%27M12%203l7%203v5c0%204.5-3%208.3-7%2010-4-1.7-7-5.5-7-10V6z%27/%3E%3Cpath%20d%3D%27M9%2012l2%202%204-4%27/%3E%3C/svg%3E"); }
+  .sidebar nav.tabs .tab[data-view="planner"]::before { -webkit-mask-image:url("data:image/svg+xml,%3Csvg%20xmlns='http://www.w3.org/2000/svg'%20viewBox='0%200%2024%2024'%20fill='none'%20stroke='black'%20stroke-width='2'%20stroke-linecap='round'%20stroke-linejoin='round'%3E%3Crect%20x='3'%20y='4'%20width='18'%20height='17'%20rx='2'/%3E%3Cpath%20d='M8%202v4M16%202v4M7%2013l3%203%206-6'/%3E%3C/svg%3E"); mask-image:url("data:image/svg+xml,%3Csvg%20xmlns='http://www.w3.org/2000/svg'%20viewBox='0%200%2024%2024'%20fill='none'%20stroke='black'%20stroke-width='2'%20stroke-linecap='round'%20stroke-linejoin='round'%3E%3Crect%20x='3'%20y='4'%20width='18'%20height='17'%20rx='2'/%3E%3Cpath%20d='M8%202v4M16%202v4M7%2013l3%203%206-6'/%3E%3C/svg%3E"); }
+  .sidebar nav.tabs .tab[data-view="playbook"]::before { -webkit-mask-image:url("data:image/svg+xml,%3Csvg%20xmlns='http://www.w3.org/2000/svg'%20viewBox='0%200%2024%2024'%20fill='none'%20stroke='black'%20stroke-width='2'%20stroke-linecap='round'%20stroke-linejoin='round'%3E%3Cpath%20d='M4%2019.5A2.5%202.5%200%200%201%206.5%2017H20V3H6.5A2.5%202.5%200%200%200%204%205.5z'/%3E%3Cpath%20d='M4%2019.5A2.5%202.5%200%200%200%206.5%2022H20v-5'/%3E%3C/svg%3E"); mask-image:url("data:image/svg+xml,%3Csvg%20xmlns='http://www.w3.org/2000/svg'%20viewBox='0%200%2024%2024'%20fill='none'%20stroke='black'%20stroke-width='2'%20stroke-linecap='round'%20stroke-linejoin='round'%3E%3Cpath%20d='M4%2019.5A2.5%202.5%200%200%201%206.5%2017H20V3H6.5A2.5%202.5%200%200%200%204%205.5z'/%3E%3Cpath%20d='M4%2019.5A2.5%202.5%200%200%200%206.5%2022H20v-5'/%3E%3C/svg%3E"); }
   .sidebar nav.tabs .tab[data-view="settings"]::before { -webkit-mask-image:url("data:image/svg+xml,%3Csvg%20xmlns%3D%27http%3A//www.w3.org/2000/svg%27%20viewBox%3D%270%200%2024%2024%27%20fill%3D%27none%27%20stroke%3D%27black%27%20stroke-width%3D%272%27%20stroke-linecap%3D%27round%27%20stroke-linejoin%3D%27round%27%3E%3Ccircle%20cx%3D%2712%27%20cy%3D%2712%27%20r%3D%273%27/%3E%3Cpath%20d%3D%27M19.4%2015a1.7%201.7%200%200%200%20.3%201.8l.1.1a2%202%200%201%201-2.8%202.8l-.1-.1a1.7%201.7%200%200%200-2.9%201.2V21a2%202%200%201%201-4%200v-.1a1.7%201.7%200%200%200-2.9-1.2l-.1.1a2%202%200%201%201-2.8-2.8l.1-.1A1.7%201.7%200%200%200%203%2015H3a2%202%200%201%201%200-4h.1a1.7%201.7%200%200%200%201.2-2.9l-.1-.1a2%202%200%201%201%202.8-2.8l.1.1A1.7%201.7%200%200%200%2010%204V3a2%202%200%201%201%204%200v.1a1.7%201.7%200%200%200%202.9%201.2l.1-.1a2%202%200%201%201%202.8%202.8l-.1.1a1.7%201.7%200%200%200%201.2%202.9H21a2%202%200%201%201%200%204h-.1a1.7%201.7%200%200%200-1.5%201z%27/%3E%3C/svg%3E"); mask-image:url("data:image/svg+xml,%3Csvg%20xmlns%3D%27http%3A//www.w3.org/2000/svg%27%20viewBox%3D%270%200%2024%2024%27%20fill%3D%27none%27%20stroke%3D%27black%27%20stroke-width%3D%272%27%20stroke-linecap%3D%27round%27%20stroke-linejoin%3D%27round%27%3E%3Ccircle%20cx%3D%2712%27%20cy%3D%2712%27%20r%3D%273%27/%3E%3Cpath%20d%3D%27M19.4%2015a1.7%201.7%200%200%200%20.3%201.8l.1.1a2%202%200%201%201-2.8%202.8l-.1-.1a1.7%201.7%200%200%200-2.9%201.2V21a2%202%200%201%201-4%200v-.1a1.7%201.7%200%200%200-2.9-1.2l-.1.1a2%202%200%201%201-2.8-2.8l.1-.1A1.7%201.7%200%200%200%203%2015H3a2%202%200%201%201%200-4h.1a1.7%201.7%200%200%200%201.2-2.9l-.1-.1a2%202%200%201%201%202.8-2.8l.1.1A1.7%201.7%200%200%200%2010%204V3a2%202%200%201%201%204%200v.1a1.7%201.7%200%200%200%202.9%201.2l.1-.1a2%202%200%201%201%202.8%202.8l-.1.1a1.7%201.7%200%200%200%201.2%202.9H21a2%202%200%201%201%200%204h-.1a1.7%201.7%200%200%200-1.5%201z%27/%3E%3C/svg%3E"); }
 
   .sidebar nav.tabs .tab::after { content:attr(data-short); font-size:10.5px; font-weight:600; letter-spacing:.01em; }
@@ -2440,6 +2446,91 @@ article.al-d { --alc:#c62828; }
 .xl-new-box { margin-top:14px; padding:10px 12px; border:1px dashed var(--border); border-radius:10px; } .xl-new-box h5 { margin:0 0 8px; }
 .xl-newp { display:grid; grid-template-columns:20px minmax(140px,1.2fr) 110px minmax(0,2fr); gap:10px; align-items:center; padding:6px 4px; font-size:13px; cursor:pointer; } .xl-newp.off { opacity:.55; } .xl-nid { color:var(--ink-2); font-variant-numeric:tabular-nums; } .xl-nf { color:var(--ink-2); font-size:12px; }
 @media (max-width:700px) { .xl-newp { grid-template-columns:20px 1fr; } .xl-nid, .xl-nf { grid-column:2; } }
+/* ================= v3.77.0: Playbook and Planner ================= */
+#ovUpTabs > button { padding-left:6px !important; padding-right:6px !important; gap:5px !important; font-size:12.5px !important; }
+body.v-plain #pinnedHeader .pinned-filters, body.v-plain #pinnedHeader #scopeLine { display:none !important; }
+.pp-page { padding:20px 22px 24px; }
+.pb-head { display:flex; align-items:center; gap:10px; flex-wrap:wrap; margin-bottom:14px; }
+.pb-head .grow { flex:1 1 260px; min-width:0; } .pb-head h2 { margin:0; font-size:20px; letter-spacing:-.01em; } .pb-head p { margin:2px 0 0; color:var(--ink-2); font-size:13px; }
+.pb-search { width:240px; max-width:100%; } .pb-client, .pl-whosel { width:auto; min-width:140px; }
+.pb-chips { display:flex; gap:6px; flex-wrap:wrap; margin:0 0 16px; }
+.pb-chip { display:inline-flex; align-items:center; gap:6px; padding:7px 12px; border-radius:999px; border:1px solid var(--border); background:var(--surface); color:var(--ink); font:inherit; font-size:13px; font-weight:600; cursor:pointer; }
+.pb-chip i { font-style:normal; font-size:12px; opacity:.8; } .pb-chip em { font-style:normal; font-size:11px; font-weight:700; padding:1px 7px; border-radius:999px; background:var(--surface-2); color:var(--ink-2); }
+.pb-chip.on { background:var(--accent); border-color:var(--accent); color:#fff; } .pb-chip.on em { background:rgba(255,255,255,.22); color:#fff; }
+.pb-sec { margin:0 0 22px; } .pb-sec > h3 { display:flex; align-items:center; gap:8px; margin:0 0 10px; font-size:13px; text-transform:uppercase; letter-spacing:.05em; color:var(--ink-2); }
+.pb-sec > h3 i { font-style:normal; display:inline-grid; place-items:center; width:24px; height:24px; border-radius:8px; background:var(--surface-2); color:var(--ink); font-size:12px; }
+.pb-sec > h3 em { font-style:normal; font-weight:700; font-size:11px; color:var(--ink-2); }
+.pb-s-dos > h3 i, .pb-k-dos .pb-ico { background:#e3f6ea; color:#167a3e; } .pb-s-donts > h3 i, .pb-k-donts .pb-ico { background:#fde8e7; color:#c0302a; }
+.pb-s-rules > h3 i, .pb-k-rules .pb-ico { background:#e8edff; color:#3247c4; } .pb-s-steps > h3 i, .pb-k-steps .pb-ico { background:#fff2dc; color:#a35b00; } .pb-s-tips > h3 i, .pb-k-tips .pb-ico { background:#f1e9ff; color:#6a3fc4; }
+.pb-grid { display:grid; grid-template-columns:repeat(auto-fill, minmax(330px, 1fr)); gap:12px; }
+.pb-card { border:1px solid var(--border); border-left:4px solid var(--border); border-radius:12px; background:var(--surface); padding:12px 14px 10px; display:flex; flex-direction:column; gap:6px; min-width:0; }
+.pb-card.pinned { box-shadow:0 0 0 1px color-mix(in srgb, var(--accent) 35%, transparent); }
+.pb-k-rules { border-left-color:#5b6cf0; } .pb-k-steps { border-left-color:#f0a020; } .pb-k-dos { border-left-color:#22a05a; } .pb-k-donts { border-left-color:#e0473f; } .pb-k-tips { border-left-color:#9a6af0; }
+.pb-card header { display:flex; align-items:center; gap:7px; flex-wrap:wrap; } .pb-card header .grow { flex:1; }
+.pb-ico { display:inline-grid; place-items:center; width:24px; height:24px; border-radius:8px; font-size:12px; font-weight:800; flex:none; }
+.pb-card h4 { margin:0; font-size:15px; line-height:1.3; }
+.pb-tag { font-size:10.5px; font-weight:700; padding:2px 8px; border-radius:999px; background:var(--surface-2); color:var(--ink-2); } .pb-tag.new { background:#e3f6ea; color:#167a3e; } .pb-tag.pin { background:#fff4d6; color:#8a5a00; }
+.pb-ib { border:1px solid transparent; background:transparent; color:var(--ink-2); border-radius:7px; min-width:28px; height:28px; padding:0 6px; cursor:pointer; font:inherit; font-size:13px; }
+.pb-ib:hover { background:var(--surface-2); color:var(--ink); border-color:var(--border); } .pb-del { color:#c0302a; font-size:12px; font-weight:600; }
+.pb-tools { display:inline-flex; gap:2px; }
+.pb-body { font-size:14px; line-height:1.55; color:var(--ink); overflow-wrap:anywhere; } .pb-body p { margin:0 0 6px; } .pb-body ul, .pb-body ol { margin:2px 0 6px; padding-left:20px; } .pb-body li { margin:2px 0; }
+.pb-k-dos .pb-body ul { list-style:none; padding-left:4px; } .pb-k-dos .pb-body ul li::before { content:'✓ '; color:#167a3e; font-weight:800; }
+.pb-k-donts .pb-body ul { list-style:none; padding-left:4px; } .pb-k-donts .pb-body ul li::before { content:'✕ '; color:#c0302a; font-weight:800; }
+.pb-card footer { font-size:11.5px; color:var(--ink-2); margin-top:auto; }
+.pb-empty, .pb-muted { color:var(--ink-2); font-size:13px; } .pb-empty { margin:4px 0; }
+.pb-start { padding:30px 20px; text-align:center; border:1px dashed var(--border); border-radius:14px; } .pb-start b { font-size:16px; } .pb-start p { color:var(--ink-2); max-width:560px; margin:6px auto 14px; } .pb-start-b { display:flex; gap:8px; justify-content:center; flex-wrap:wrap; }
+.pb-form, .pl-form { display:flex; flex-direction:column; gap:12px; } .pb-form label, .pl-form label { display:flex; flex-direction:column; gap:4px; } .pb-form label > span, .pl-form label > span, .pb-lbl, .pl-stwrap > span { font-size:12px; font-weight:700; color:var(--ink-2); display:block; margin-bottom:4px; }
+.pb-row2 { display:grid; grid-template-columns:1fr 1fr; gap:12px; } .pb-edit2 { align-items:start; } .pb-ta { min-height:220px; font-size:13.5px; }
+.pb-prev { border:1px solid var(--border); border-radius:10px; padding:10px 12px; min-height:220px; max-height:340px; overflow:auto; background:var(--surface-2); }
+.pb-form label.pb-pin { flex-direction:row; align-items:center; gap:8px; font-size:13px; }
+.pdlg.pb-dlg { width:min(920px, 96vw); } .pdlg.pl-dlg { width:min(720px, 96vw); }
+.pdlg.pb-dlg footer, .pdlg.pl-dlg footer { display:flex; gap:8px; align-items:center; } .pdlg.pl-dlg footer .grow { flex:1; }
+/* planner */
+.pl-stats { display:grid; grid-template-columns:repeat(4, minmax(0,1fr)); gap:10px; margin:0 0 14px; }
+.pl-sv { border:1px solid var(--border); border-radius:12px; padding:10px 14px; background:var(--surface); } .pl-sv b { font-size:24px; display:block; line-height:1.1; } .pl-sv span { font-size:12px; color:var(--ink-2); }
+.pl-sv.bad b { color:#c0302a; } .pl-sv.good b { color:#167a3e; }
+.pl-bar { display:flex; gap:8px; align-items:center; flex-wrap:wrap; margin:0 0 14px; } .pl-bar .grow { flex:1; }
+.pl-seg { display:inline-flex; padding:3px; gap:2px; border-radius:10px; background:var(--surface-2); border:1px solid var(--border); flex-wrap:wrap; }
+.pl-seg button { border:0; background:transparent; font:inherit; font-size:13px; font-weight:600; color:var(--ink-2); padding:6px 12px; border-radius:8px; cursor:pointer; }
+.pl-seg button[aria-pressed="true"] { background:var(--surface); color:var(--ink); box-shadow:0 1px 2px rgba(16,24,40,.12); } .pl-seg button:disabled { cursor:default; opacity:.7; }
+.pl-board { display:grid; grid-template-columns:repeat(4, minmax(220px, 1fr)); gap:12px; align-items:start; overflow-x:auto; padding-bottom:4px; }
+.pl-col { background:var(--surface-2); border:1px solid var(--border); border-radius:14px; padding:10px; min-height:160px; transition:box-shadow .12s; }
+.pl-col.over { box-shadow:0 0 0 2px var(--accent) inset; }
+.pl-col h4 { display:flex; align-items:center; gap:8px; margin:2px 4px 10px; font-size:13px; } .pl-col h4 i { width:9px; height:9px; border-radius:50%; background:#8a94a6; } .pl-col h4 em { font-style:normal; margin-left:auto; font-size:11px; font-weight:700; color:var(--ink-2); background:var(--surface); padding:1px 8px; border-radius:999px; }
+.pl-col-doing h4 i { background:#2f6fed; } .pl-col-blocked h4 i { background:#e0473f; } .pl-col-done h4 i { background:#22a05a; }
+.pl-cards { display:flex; flex-direction:column; gap:8px; }
+.pl-card { background:var(--surface); border:1px solid var(--border); border-radius:11px; padding:10px 11px; cursor:pointer; box-shadow:0 1px 2px rgba(16,24,40,.04); }
+.pl-card:hover, .pl-card:focus-visible { border-color:color-mix(in srgb, var(--accent) 45%, var(--border)); outline:none; } .pl-card.drag { opacity:.5; }
+.pl-card.pri-urgent { border-left:3px solid #e0473f; } .pl-card.pri-high { border-left:3px solid #f0a020; }
+.pl-ct { display:flex; gap:6px; align-items:flex-start; } .pl-ct b { font-size:14px; line-height:1.3; overflow-wrap:anywhere; }
+.pl-pri { flex:none; font-size:10px; font-weight:800; text-transform:uppercase; letter-spacing:.03em; padding:2px 6px; border-radius:6px; margin-top:1px; } .p-urgent { background:#fde8e7; color:#c0302a; } .p-high { background:#fff2dc; color:#a35b00; } .p-low { background:var(--surface-2); color:var(--ink-2); }
+.pl-cd { margin:5px 0 0; font-size:12.5px; color:var(--ink-2); line-height:1.4; overflow-wrap:anywhere; }
+.pl-cf { display:flex; align-items:center; gap:8px; margin-top:8px; font-size:12px; color:var(--ink-2); } .pl-cf .grow { flex:1; }
+.pl-due { font-weight:600; } .pl-due.over { color:#c0302a; } .pl-due.today { color:#a35b00; } .pl-due.soon { color:#2f6fed; }
+.pl-avs { display:inline-flex; } .pl-av { display:inline-grid; place-items:center; width:24px; height:24px; border-radius:50%; background:color-mix(in srgb, var(--accent) 16%, var(--surface)); color:var(--accent); font-size:10px; font-weight:800; border:2px solid var(--surface); flex:none; } .pl-avs .pl-av + .pl-av { margin-left:-7px; } .pl-av.more { background:var(--surface-2); color:var(--ink-2); }
+.pl-none { color:var(--ink-2); font-size:12.5px; margin:4px; } .pl-older { margin:8px 4px 0; font-size:12.5px; }
+.pl-tablewrap { overflow-x:auto; border:1px solid var(--border); border-radius:12px; }
+.pl-table { width:100%; border-collapse:collapse; font-size:13px; } .pl-table th { text-align:left; font-size:11.5px; color:var(--ink-2); padding:9px 12px; background:var(--surface-2); border-bottom:1px solid var(--border); white-space:nowrap; }
+.pl-table td { padding:9px 12px; border-bottom:1px solid var(--border); vertical-align:top; } .pl-table tr { cursor:pointer; } .pl-table tbody tr:hover { background:var(--surface-2); } .pl-table tr.done td { opacity:.6; }
+.pl-stp { font-size:11.5px; font-weight:700; padding:2px 8px; border-radius:999px; background:var(--surface-2); white-space:nowrap; } .st-doing { background:#e5eeff; color:#2f6fed; } .st-blocked { background:#fde8e7; color:#c0302a; } .st-done { background:#e3f6ea; color:#167a3e; }
+.pl-row3 { display:grid; grid-template-columns:160px 140px 1fr; gap:12px; align-items:end; }
+.pl-seg .pl-st-doing[aria-pressed="true"] { color:#2f6fed; } .pl-seg .pl-st-blocked[aria-pressed="true"] { color:#c0302a; } .pl-seg .pl-st-done[aria-pressed="true"] { color:#167a3e; }
+.pl-who { display:flex; flex-direction:column; gap:6px; } .pl-wlist { max-height:170px; overflow:auto; border:1px solid var(--border); border-radius:10px; padding:4px; display:grid; grid-template-columns:repeat(auto-fill, minmax(190px, 1fr)); }
+.pl-wi { display:flex !important; flex-direction:row !important; align-items:center; gap:8px; padding:5px 6px; border-radius:8px; font-size:13px; cursor:pointer; } .pl-wi:hover { background:var(--surface-2); }
+.pl-chip { display:inline-block; font-size:12.5px; font-weight:600; padding:3px 10px; border-radius:999px; background:var(--surface-2); margin:0 4px 4px 0; }
+.pl-nwrap { border-top:1px solid var(--border); padding-top:12px; } .pl-nadd { display:flex; gap:8px; align-items:flex-end; margin-bottom:10px; } .pl-nadd textarea { flex:1; }
+.pl-notes { display:flex; flex-direction:column; gap:10px; max-height:260px; overflow:auto; } .pl-note { display:flex; gap:9px; } .pl-note > div { min-width:0; flex:1; }
+.pl-nh { display:flex; gap:8px; align-items:baseline; } .pl-nh b { font-size:13px; } .pl-nh small { color:var(--ink-2); font-size:11.5px; }
+.pl-nt { font-size:13.5px; white-space:pre-wrap; overflow-wrap:anywhere; } .pl-note.sys .pl-nt { color:var(--ink-2); font-size:12.5px; font-style:italic; }
+.pl-meta { font-size:12px; color:var(--ink-2); margin:0; }
+.tab[data-view="planner"] .tabn.calm { background:var(--surface-2); color:var(--ink-2); }
+@media (max-width:700px) {
+  .pp-page { padding:14px 12px 18px; } .pb-search { width:100%; flex:1 1 100%; } .pb-grid { grid-template-columns:1fr; } .pb-row2, .pl-row3 { grid-template-columns:1fr; }
+  .pl-stats { grid-template-columns:repeat(2, minmax(0,1fr)); } .pl-board { grid-template-columns:repeat(4, 82vw); scroll-snap-type:x mandatory; } .pl-col { scroll-snap-align:start; }
+  .pb-ta, .pb-prev { min-height:160px; }
+  .sidebar nav.tabs .tab::after { font-size:9.5px !important; }
+}
+@media print { .pb-head .btn, .pb-chips, .pb-tools, .pb-ib { display:none !important; } }
 /* ================= v3.73.0: phone browsers (iPhone Safari, Android Chrome) ================= */
 @media (max-width:700px) {
   html { -webkit-text-size-adjust:100%; text-size-adjust:100%; }
@@ -2548,6 +2639,8 @@ article.al-d { --alc:#c62828; }
       <button class="tab" role="tab" aria-controls="pageAttendance" data-view="attendance" aria-selected="false" data-icon="🗓️" data-short="Attend.">Attendance</button>
       <button class="tab" role="tab" aria-controls="pageActions" data-view="actions" aria-selected="false" data-icon="✅" data-short="Actions">Action center<span class="tabn" id="tabActionsN" hidden></span></button>
       <button class="tab" role="tab" aria-controls="pageReports" data-view="reports" aria-selected="false" data-icon="📊" data-short="Reports">Reports</button>
+      <button class="tab" role="tab" aria-controls="pagePlanner" data-view="planner" aria-selected="false" data-icon="☑" data-short="Tasks">Planner</button>
+      <button class="tab" role="tab" aria-controls="pagePlaybook" data-view="playbook" aria-selected="false" data-icon="📘" data-short="Guide">Playbook</button>
       <button class="tab" role="tab" aria-controls="pageBackups" data-view="backups" hidden style="display:none" aria-selected="false" data-icon="⛨" data-short="Backups">Backup report</button>
       <button class="tab" role="tab" aria-controls="pageSettings" data-view="settings" aria-selected="false" data-icon="⚙️" data-short="Settings">Settings</button></nav><div class="sidebar-bottom"><div class="local-label"><i></i> Connected to your workbook</div></div></aside>
   <div class="sticky-top pinned-top" id="pinnedHeader">
@@ -2647,6 +2740,8 @@ article.al-d { --alc:#c62828; }
       <div id="slotHealth" hidden></div>
     </div>
     <div id="pageSettings" hidden></div>
+    <div id="pagePlaybook" hidden><section class="card pp-page"><div id="pbHost"></div></section></div>
+    <div id="pagePlanner" hidden><section class="card pp-page"><div id="plHost"></div></section></div>
     <div id="pageBackups" hidden><section class="card bkr-page"><div class="body bkr" id="bkPageHost"></div></section></div>
     <div id="pageEmployees" hidden>
       <section class="card c-emp" aria-label="Employee table">
@@ -4715,6 +4810,8 @@ const PERM_GROUPS = [
     sub: { title: 'Types in Record attendance', items: [['log.LA', 'LA · Leave application (pending)'], ['log.AL', 'AL · Approved leave'], ['log.CL', 'CL · Casual leave'], ['log.SL', 'SL · Sick leave'], ['log.UL', 'UL · Unplanned leave'], ['log.AB', 'AB · Absent'], ['log.HD1', 'HD1 · Half day, 1st half'], ['log.HD2', 'HD2 · Half day, 2nd half'], ['log.R', 'R · Remote'], ['log.L', 'L · Late coming'], ['log.C', 'C · Cab late']] } },
   { name: 'Action center', page: 'page.actions', items: [['act.items', 'See Action items'], ['act.review', 'See Designation reviews'], ['act.health', 'See Attendance data health']] },
   { name: 'Reports', page: 'page.reports', items: [['rep.team', 'Team composition'], ['rep.growth', 'Tenure & growth'], ['rep.location', 'Location & travel'], ['rep.attendance', 'Attendance reports'], ['rep.custom', 'See custom dashboards (their own and shared ones)'], ['rep.export', 'Copy report tables and charts'], ['rep.build', 'Create and edit custom dashboards']] },
+  { name: 'Planner', page: 'page.planner', items: [['plan.assign', 'Create tasks for other people'], ['plan.all', 'See everyone’s tasks']] },
+  { name: 'Playbook', page: 'page.playbook', items: [['pb.edit', 'Add, edit and delete playbook entries']] },
   { name: 'Save & sync', items: [['sync.view', 'Open the Save & sync settings'], ['sync.auto', 'Start or stop auto-sync'], ['sync.save', 'Save now and undo']] },
 
   { name: 'ⓘ Leave card', items: [['att.info', 'See the ⓘ button next to names (Request Center, Applications ahead, attendance card) with anyone’s past and upcoming leave and late comings']] },
@@ -4722,19 +4819,19 @@ const PERM_GROUPS = [
   { name: 'Filters', items: [['filters.custom', 'Change the filters (search, status, client…)']] },
   { name: 'Settings', items: [['set.fields', 'Choose the mandatory fields'], ['set.workbook', 'Backups, sign-in history and replacing the workbook'], ['workbook.download', 'Download a copy of the workbook'], ['tools.distance', 'Use the distance tool']] },
 ];
-const PERM_VERSION = 14;
+const PERM_VERSION = 15;
 const LOG_CODES = ['AL', 'CL', 'SL', 'UL', 'AB', 'HD1', 'HD2', 'LA', 'R', 'L', 'C'];
 /* the leave types a passcode could log before 3.14.2 (approval codes with Approve leave, LA always, the rest with Mark and edit) */
 const oldLogKeys = p => LOG_CODES.filter(c => ['AL', 'CL', 'SL'].includes(c) ? p['att.approve'] : c === 'LA' ? true : p['att.edit']).map(c => 'log.' + c);
 const PAGES = PERM_GROUPS.filter(g => g.page).map(g => g.page);
 const PERM_KEYS = [...PAGES, ...PERM_GROUPS.flatMap(g => [...g.items, ...((g.sub && g.sub.items) || [])].map(i => i[0]))];
-const PAGE_OF = { summary: 'page.overview', employees: 'page.employees', attendance: 'page.attendance', actions: 'page.actions', reports: 'page.reports' };
+const PAGE_OF = { summary: 'page.overview', employees: 'page.employees', attendance: 'page.attendance', actions: 'page.actions', reports: 'page.reports', planner: 'page.planner', playbook: 'page.playbook' };
 const pick = keys => Object.fromEntries([['_v', PERM_VERSION], ...PERM_KEYS.map(k => [k, ['notifications.view', 'requests.own', 'requests.rejected'].includes(k) || (k === 'requests.approvals' && keys.includes('att.approve')) || keys.includes(k)])]);
 const ROLE_NAMES = { superadmin: 'Super admin', admin: 'Admin', user: 'User' };
 /* v3.14: what a page shows by default once someone may open it (red flags and new fields stay off until ticked) */
 const VIEW_KEYS = ['ov.attendance', 'ov.coming', 'ov.holidays', 'act.items', 'act.review', 'act.health', 'rep.team', 'rep.growth', 'rep.location', 'rep.attendance', 'rep.custom', 'rep.export'];
 /* v3.17: rights that change data; everything else only lets someone see things. Used by the None / View / Edit switch per module. */
-const EDIT_KEYS = new Set(['att.approve', 'emp.edit', 'emp.add', 'emp.delete', 'emp.bulk', 'emp.fields', 'att.log', 'att.direct', 'att.edit', 'att.rows', 'att.holidays', 'att.fields', 'att.addemp', ...LOG_CODES.map(c => 'log.' + c), 'sync.auto', 'sync.save', 'filters.custom', 'set.fields', 'set.workbook', 'chat.all', 'rep.build']);
+const EDIT_KEYS = new Set(['pb.edit', 'plan.assign', 'att.approve', 'emp.edit', 'emp.add', 'emp.delete', 'emp.bulk', 'emp.fields', 'att.log', 'att.direct', 'att.edit', 'att.rows', 'att.holidays', 'att.fields', 'att.addemp', ...LOG_CODES.map(c => 'log.' + c), 'sync.auto', 'sync.save', 'filters.custom', 'set.fields', 'set.workbook', 'chat.all', 'rep.build']);
 const UPG = new WeakMap();
 window.PERM = {
   groups: PERM_GROUPS, keys: PERM_KEYS, roleNames: ROLE_NAMES, version: PERM_VERSION, isEditKey: k => EDIT_KEYS.has(k),
@@ -4743,7 +4840,7 @@ window.PERM = {
     'Admin': pick(PERM_KEYS),
     'Editor': pick([...PAGES, ...VIEW_KEYS, 'ov.openatt', 'rep.build', ...oldLogKeys({ 'att.edit': true }), 'emp.edit', 'emp.add', 'emp.bulk', 'att.who', 'att.grid', 'att.log', 'att.edit', 'att.rows', 'att.addemp', 'filters.custom', 'activity.view', 'tools.distance', 'sync.view', 'sync.auto', 'sync.save']),
     'Leave approver': pick([...PAGES, ...VIEW_KEYS, 'att.info', 'ov.openatt', ...LOG_CODES.map(c => 'log.' + c), 'att.direct', 'ov.watch', 'att.who', 'att.grid', 'att.log', 'att.edit', 'att.rows', 'att.approve', 'filters.custom', 'activity.view', 'sync.view', 'sync.auto', 'sync.save']),
-    'Leave logger': pick(['page.overview', 'page.attendance', 'ov.attendance', 'ov.coming', 'att.who', 'att.log', 'log.LA', 'sync.save']),
+    'Leave logger': pick(['page.overview', 'page.attendance', 'page.planner', 'page.playbook', 'ov.attendance', 'ov.coming', 'att.who', 'att.log', 'log.LA', 'sync.save']),
     'View only': pick([...PAGES, ...VIEW_KEYS, 'att.who', 'att.grid']),
   },
   online: () => CLOUD.mode() === 'cloud' && !!CLOUD.user(),
@@ -4757,6 +4854,7 @@ window.PERM = {
   upgrade(p) {
     if (!p || !p._v) return p;
     const q = { ...p };
+    if (q._v < 15) { q['page.planner'] = true; q['page.playbook'] = true; }   /* v3.77.0: everyone can open the new Planner and Playbook */
     if (q._v < 7) q['notifications.view'] = true;
     /* v3.16: editing rows and adding employees in the tracker became their own rights; keep what Mark and edit used to allow */
     if (q._v < 9) { q['att.rows'] = !!q['att.edit']; q['att.addemp'] = !!q['att.edit']; }
@@ -10505,7 +10603,7 @@ async function poll() {
 }
 
 /* ============================== filtering ============================== */
-const APP = { title: "Team Dashboard", version: "3.76.1", released: "11 Nov 2026" };
+const APP = { title: "Team Dashboard", version: "3.77.0", released: "12 Nov 2026" };
 const BASE_DIMS = { status: "status_column", desig: "designation_column", client: "client_column", mode: "mode_column" };
 const STANDARD_STATUSES = ["Active", "Manager", "OJT", "Bench", "New", "Projected", "Left", "Moved"];
 const TILE_ORDER = ["Active", "Manager", "OJT", "Bench", "New", "Projected"];
@@ -11730,12 +11828,17 @@ function organizeUpcoming() {
   const groups = [...$("#coming").querySelectorAll(":scope > .coming-group")];
   const num = g => { const m = g && /\((\d+)\)\s*$/.exec(g.querySelector("h3")?.textContent || ""); return m ? +m[1] : 0; };
   const tabs = [];
-  if (com && !com.hidden) tabs.push({ id: "bday", label: "Birthdays", n: num(groups[0]) }, { id: "anniv", label: "Anniversaries", n: num(groups[1]) });
-  if (hol && !hol.hidden) tabs.push({ id: "hol", label: "Holidays", n: [...$("#holidays").querySelectorAll(":scope > .coming-group")].reduce((a, g) => a + num(g), 0) });
+  if (com && !com.hidden) tabs.push({ id: "bday", label: "Birthdays", n: num(groups[0]) }, { id: "anniv", label: hol && !hol.hidden ? "Anniv." : "Anniversaries", n: num(groups[1]) });   /* v3.77.0: shorter so four tabs fit */
+  if (hol && !hol.hidden) {   /* v3.77.0: USA and India holidays in their own tabs */
+    const hg = c => $("#holidays").querySelector(':scope > .coming-group[data-ctry="' + c + '"]');
+    tabs.push({ id: "hol-us", label: "USA", n: num(hg("US")) }, { id: "hol-in", label: "India", n: num(hg("IN")) });
+  }
   wrap.hidden = !tabs.length; if (!tabs.length) return;
   if (!OV.up || !tabs.some(t => t.id === OV.up)) OV.up = tabs[0].id;
-  if (com) { com.classList.toggle("ov-off", OV.up === "hol"); $("#coming").dataset.show = OV.up; }
-  if (hol) hol.classList.toggle("ov-off", OV.up !== "hol");
+  if (OV.up === "hol") OV.up = "hol-us";
+  const isHol = /^hol/.test(OV.up);
+  if (com) { com.classList.toggle("ov-off", isHol); $("#coming").dataset.show = OV.up; }
+  if (hol) { hol.classList.toggle("ov-off", !isHol); $("#holidays").dataset.show = OV.up; }
   ovTabs(bar, tabs, OV.up, id => { OV.up = id; organizeUpcoming(); });
 }
 function renderGlance() {
@@ -11805,7 +11908,7 @@ function inHolidays(y) {
 }
 function renderHolidays() {
   const card = $("#cardHolidays"); if (!card || card.hidden) return;
-  const days = state.holDays || 90, ctry = state.holCountry || "both";
+  const days = state.holDays || 90, ctry = document.getElementById("ovUpcoming") ? "both" : (state.holCountry || "both");   /* v3.77.0: on the Overview the two countries are separate tabs */
   const t = new Date(), today = Date.UTC(t.getFullYear(), t.getMonth(), t.getDate()), end = today + days * 86400000;
   const years = [t.getFullYear(), t.getFullYear() + 1, t.getFullYear() + 2];
   const pickUp = list => list.filter(x => { const k = Math.max(x.date.getTime(), x.obs.getTime()); return k >= today && Math.min(x.date.getTime(), x.obs.getTime()) <= end; }).sort((a, b) => a.obs - b.obs);
@@ -11827,8 +11930,8 @@ function renderHolidays() {
   const lastIn = Math.max(...Object.keys(HOL_IN).map(Number));
   const inNote = years.some(y => y > lastIn && Date.UTC(y, 0, 1) <= end) ? "After " + lastIn + " only fixed-date holidays are listed until the official list is out." : "";
   const parts = [];
-  if (ctry !== "IN") parts.push(mk("🇺🇸", "USA", us, ""));
-  if (ctry !== "US") parts.push(mk("🇮🇳", "India", ind, inNote));
+  if (ctry !== "IN") { const g = mk("🇺🇸", "USA", us, ""); g.dataset.ctry = "US"; parts.push(g); }
+  if (ctry !== "US") { const g = mk("🇮🇳", "India", ind, inNote); g.dataset.ctry = "IN"; parts.push(g); }
   $("#holidays").replaceChildren(...parts);
 }
 function renderComing() {
@@ -11993,10 +12096,12 @@ function renderReview() {
 function syncView() {
   window.placeSavedFilters?.();
   document.body.classList.toggle("clean-overview",state.view === "summary");
-  document.getElementById("cleanPageTitle").textContent = ({summary:"Overview",employees:"Employees",attendance:"Attendance",actions:"Action center",reports:"Reports",backups:"Backup report",settings:"Settings"})[state.view] || "Overview";
+  document.getElementById("cleanPageTitle").textContent = ({summary:"Overview",employees:"Employees",attendance:"Attendance",actions:"Action center",reports:"Reports",playbook:"Playbook",planner:"Planner",backups:"Backup report",settings:"Settings"})[state.view] || "Overview";
   $("#pageSettings").hidden = state.view !== "settings";
   $("#pageReports").hidden = state.view !== "reports";
   $("#pageBackups").hidden = state.view !== "backups";
+  $("#pagePlaybook").hidden = state.view !== "playbook"; $("#pagePlanner").hidden = state.view !== "planner";   /* v3.77.0 */
+  document.body.classList.toggle("v-plain", state.view === "playbook" || state.view === "planner");
   document.querySelectorAll('.tab').forEach(t => t.tabIndex = t.dataset.view === state.view ? 0 : -1);
   for (const t of document.querySelectorAll(".tab")) { const on = t.dataset.view === state.view; t.setAttribute("aria-selected", on ? "true" : "false"); t.classList.toggle("on", on); }
   $("#quickAdd").hidden = true;
@@ -12017,7 +12122,7 @@ function setView(v) {
 
 /* ============================== v3.3: Action center (action items · designation reviews · attendance data health) ============================== */
 let actionTab = "actions";
-const ACT_TABS = ["actions", "review", "health", "fill", "log"];
+const ACT_TABS = ["actions", "review", "health", "fill"];
 function actionCounts() {
   const c = { actions: 0, review: 0, health: null };
   try { c.actions = actionItems().out.length; } catch (e) { /* not ready */ }
@@ -12766,6 +12871,8 @@ function renderAll() {
   setTimeout(celebratePopup, 400);
   if (state.view === "summary") { window.ATT?.renderApprovalRequests(); renderComing(); renderHolidays(); setTimeout(organizeOverview, 0); renderStrip(); if (window.ATT) { ATT.renderCard($("#cardAttendance")); if (window.PERM && PERM.can("ov.watch")) ATT.renderWatch($("#cardWatch")); } } else if (state.view === "reports") renderCharts(); else if (state.view === "actions") { renderActions(); renderReview(); } else if (state.view === "attendance" || state.view === "settings") { /* these pages draw themselves */ } else renderTable();
   if (state.view === "backups") { const host = $("#bkPageHost"); const busy = host && (host.contains(document.activeElement) && document.activeElement !== document.body || host.querySelector('[data-rev-save]:not([disabled])')); if (host && !busy) { try { ATT.mountBackupReport(host); } catch (e) { host.textContent = "The attendance workbook isn't ready yet."; } } }
+  if (state.view === "playbook") window.renderPlaybook?.();
+  if (state.view === "planner") window.renderPlanner?.();
   syncActionTabs(); attSync();
 }
 
@@ -14027,7 +14134,7 @@ window.applyAccess = () => {
   show('.atab[data-atab="health"]', PERM.canView('attendance') && PERM.can('act.health'));
   show('.atab[data-atab="actions"]', PERM.can('act.items'));
   show('.atab[data-atab="review"]', PERM.can('act.review'));
-  show('.atab[data-atab="log"]', PERM.isSuper());   /* v3.62.0: the admin log is for admins */
+  show('.atab[data-atab="log"]', false);   /* v3.77.0: the Admin log tab is removed from the Action center (its entries stay in the workbook) */
   show('#cardAttendance', PERM.canView('attendance') && PERM.can('ov.attendance'));
   window.ATT?.renderApprovalRequests();
   show('#cardComing', PERM.can('ov.coming'));
@@ -15989,5 +16096,318 @@ function drawPrefs(pane) {
   document.addEventListener('keydown', e => { if ((e.ctrlKey || e.metaKey) && e.key === '\\') { e.preventDefault(); set(!document.body.classList.contains('nav-mini')); } });
 })();
 </script>
+<script>
+/* =====================================================================
+   v3.77.0 PLAYBOOK (recruitment rules, steps, do's and don'ts) and PLANNER (tasks for people, with status and notes)
+   Playbook: a team setting ("playbook"), read by everyone, changed by admins and people with "pb.edit".
+   Planner: rows in the database (planner.sql); every rule is checked there again.
+   ===================================================================== */
+(() => {
+const $q = (s, r = document) => r.querySelector(s);
+const can = k => !window.PERM || PERM.can(k);
+const online = () => !!(window.PERM && PERM.online());
+const meU = () => { try { return (typeof CLOUD !== 'undefined' && CLOUD.user && CLOUD.user()) || {}; } catch { return {}; } };
+const tst = (m, bad) => { try { toast(m, bad); } catch { } };
+const DAY = 86400000;
+const todayIso = () => { const d = new Date(); return new Date(d.getTime() - d.getTimezoneOffset() * 60000).toISOString().slice(0, 10); };
+const MONS = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'];
+const fmtDay = iso => { if (!iso) return ''; const [y, m, d] = String(iso).slice(0, 10).split('-').map(Number); const t = new Date(); return d + ' ' + MONS[m - 1] + (y !== t.getFullYear() ? ' ' + y : ''); };
+const ago = t => { const d = Date.parse(t); if (!d) return ''; const m = Math.max(0, (Date.now() - d) / 60000); return m < 1 ? 'just now' : m < 60 ? Math.round(m) + ' min ago' : m < 1440 ? Math.round(m / 60) + ' h ago' : m < 1440 * 45 ? Math.round(m / 1440) + ' days ago' : new Date(d).toLocaleDateString(undefined, { day: 'numeric', month: 'short', year: 'numeric' }); };
+const initials = n => String(n || '?').trim().split(/\s+/).filter(Boolean).slice(0, 2).map(s => s[0]).join('').toUpperCase() || '?';
+const uid = () => Date.now().toString(36) + Math.random().toString(36).slice(2, 7);
+const escH = s => String(s ?? '').replace(/[&<>"']/g, c => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c]));
+/* simple formatting: "- " bullets, "1. " numbered steps, **bold**, links */
+function rich(text) {
+  const inline = s => escH(s).replace(/\*\*(.+?)\*\*/g, '<b>$1</b>').replace(/(https?:\/\/[^\s<]+)/g, '<a href="$1" target="_blank" rel="noopener noreferrer">$1</a>');
+  const out = []; let list = null;
+  const close = () => { if (list) { out.push('</' + list + '>'); list = null; } };
+  for (const raw of String(text || '').split(/\r?\n/)) {
+    const l = raw.trim(); let m;
+    if ((m = /^[-*•]\s+(.*)$/.exec(l))) { if (list !== 'ul') { close(); out.push('<ul>'); list = 'ul'; } out.push('<li>' + inline(m[1]) + '</li>'); }
+    else if ((m = /^\d+[.)]\s+(.*)$/.exec(l))) { if (list !== 'ol') { close(); out.push('<ol>'); list = 'ol'; } out.push('<li>' + inline(m[1]) + '</li>'); }
+    else { close(); if (l) out.push('<p>' + inline(l) + '</p>'); }
+  }
+  close(); return out.join('');
+}
+/* a dialog in the dashboard's usual style (also a bottom sheet on phones) */
+function dlg(title, body, foot, cls) {
+  const v = h('div', { class: 'pdlg-veil', role: 'presentation' });
+  const close = () => { v.remove(); document.removeEventListener('keydown', esc, true); };
+  const esc = e => { if (e.key === 'Escape' && !e.defaultPrevented) { e.stopPropagation(); close(); } };
+  const box = h('div', { class: 'pdlg ' + (cls || ''), role: 'dialog', 'aria-modal': 'true', 'aria-label': title },
+    h('header', {}, h('h3', {}, title), h('button', { class: 'pdlg-x', type: 'button', 'aria-label': 'Close', onclick: close }, '×')),
+    h('div', { class: 'pdlg-body' }, body), foot ? h('footer', {}, ...[].concat(foot)) : null);
+  v.append(box); v.addEventListener('mousedown', e => { if (e.target === v) close(); });
+  document.addEventListener('keydown', esc, true); document.body.append(v);
+  return { close, box };
+}
+const twice = (label, sure, fn, cls = 'btn danger') => { let armed = 0; const b = h('button', { class: cls, type: 'button' }, label);
+  b.addEventListener('click', () => { if (Date.now() - armed < 4000) { armed = 0; fn(); } else { armed = Date.now(); b.textContent = sure; setTimeout(() => { if (armed) { armed = 0; b.textContent = label; } }, 4000); } }); return b; };
+
+/* ================================================= PLAYBOOK ================================================= */
+const PB_CATS = [
+  { id: 'rules', label: 'Rules & regulations', short: 'Rules', icon: '§' },
+  { id: 'steps', label: 'Process & steps', short: 'Steps', icon: '➜' },
+  { id: 'dos', label: 'Do’s', short: 'Do’s', icon: '✓' },
+  { id: 'donts', label: 'Don’ts', short: 'Don’ts', icon: '✕' },
+  { id: 'tips', label: 'Tips & FAQs', short: 'Tips', icon: '?' },
+];
+const PB = { q: '', cat: 'all', client: '' };
+const pbList = () => { const v = (window.TD_SETTINGS || {}).playbook; return Array.isArray(v) ? v.filter(x => x && x.id && x.title) : []; };
+const pbCanEdit = () => can('pb.edit') || (window.PERM && PERM.isSuper());
+async function pbSave(change, msg) {
+  if (online()) { try { await window.loadTeamSettings(true); } catch { } }   // start from the latest list, so two editors don't undo each other
+  const next = change(pbList().slice());
+  await window.saveSharedSetting('playbook', next);
+  if (msg) tst(msg); renderPlaybook();
+}
+const PB_STARTER = [
+  ['rules', 'Candidate data is confidential', 'Never share a candidate’s phone number, email, CV or salary outside the team.\n- Use only the official tools to store candidate details\n- Do not forward CVs to personal email or WhatsApp'],
+  ['rules', 'Submit only screened candidates', 'Every profile sent to the client must be screened against the job description first.\n- Check must-have skills, experience and location\n- Confirm the candidate’s interest and availability before submitting'],
+  ['steps', 'From requirement to joining', '1. Read the requirement and note the must-have skills\n2. Source profiles (job boards, database, referrals)\n3. Screen on call and confirm interest, notice period and pay\n4. Submit to the client with a short summary\n5. Schedule interviews and send reminders\n6. Collect feedback and update the tracker the same day\n7. Share the offer and follow up until the joining date'],
+  ['dos', 'Do’s on every candidate call', '- Introduce yourself and the company clearly\n- Confirm the candidate’s current location and notice period\n- Explain the role and the next steps honestly\n- Update the tracker right after the call'],
+  ['donts', 'Don’ts', '- Don’t promise a salary or a joining date the client has not approved\n- Don’t submit the same candidate twice to one client\n- Don’t change a candidate’s details without telling them\n- Don’t skip the screening call'],
+  ['tips', 'What to do when a candidate does not pick up', 'Try again at a different time of day, then send a short message with your name, the company and the role. Mark the attempt in the tracker.'],
+];
+function pbEdit(entry) {
+  const isNew = !entry; const e = entry ? { ...entry } : { id: uid(), cat: PB.cat !== 'all' ? PB.cat : 'rules', title: '', body: '', client: '', pinned: false };
+  const cat = h('select', { class: 'input' }, ...PB_CATS.map(c => h('option', { value: c.id, selected: c.id === e.cat }, c.label)));
+  const title = h('input', { class: 'input', value: e.title, maxlength: 160, placeholder: 'e.g. Screen every profile before submitting' });
+  const clients = [...new Set(pbList().map(x => x.client).filter(Boolean).concat((() => { try { return [...new Set(state.rows.map(r => r.v[state.idx[state.schema.client_column]]).filter(Boolean).map(String))]; } catch { return []; } })()))].sort();
+  const dl = h('datalist', { id: 'pbClients' }, ...clients.map(c => h('option', { value: c })));
+  const client = h('input', { class: 'input', value: e.client || '', list: 'pbClients', placeholder: 'All clients' });
+  const body = h('textarea', { class: 'input pb-ta', rows: 10, placeholder: 'Write the rule, steps or points here.\n- a dash starts a bullet point\n1. a number starts a step\n**two stars** make text bold' }); body.value = e.body || '';
+  const pin = h('input', { type: 'checkbox', checked: !!e.pinned });
+  const prev = h('div', { class: 'pb-body pb-prev' }); const paint = () => { prev.innerHTML = rich(body.value) || '<p class="pb-muted">The preview shows here.</p>'; }; body.addEventListener('input', paint); paint();
+  const err = h('p', { class: 'err', role: 'alert' });
+  const save = h('button', { class: 'btn primary', type: 'button' }, isNew ? 'Add to playbook' : 'Save');
+  const d = dlg(isNew ? 'New playbook entry' : 'Edit playbook entry', h('div', { class: 'pb-form' },
+    h('div', { class: 'pb-row2' }, h('label', {}, h('span', {}, 'Section'), cat), h('label', {}, h('span', {}, 'Client (optional)'), client, dl)),
+    h('label', {}, h('span', {}, 'Title'), title),
+    h('div', { class: 'pb-row2 pb-edit2' }, h('label', {}, h('span', {}, 'Text'), body), h('div', {}, h('span', { class: 'pb-lbl' }, 'Preview'), prev)),
+    h('label', { class: 'pb-pin' }, pin, ' Pin to the top of its section'), err), [h('button', { class: 'btn', type: 'button', onclick: () => d.close() }, 'Cancel'), save], 'pb-dlg');
+  save.addEventListener('click', async () => {
+    err.textContent = ''; if (!title.value.trim()) { err.textContent = 'Give the entry a title.'; title.focus(); return; }
+    save.disabled = true; save.textContent = 'Saving…';
+    const who = meU().name || (typeof BE !== 'undefined' && BE.userName ? BE.userName() : ''), now = new Date().toISOString();
+    const rec = { ...e, cat: cat.value, title: title.value.trim(), body: body.value.replace(/\s+$/, ''), client: client.value.trim(), pinned: pin.checked, updatedAt: now, updatedBy: who, ...(isNew ? { createdAt: now, createdBy: who } : {}) };
+    try { await pbSave(list => { const i = list.findIndex(x => x.id === rec.id); if (i >= 0) list[i] = { ...list[i], ...rec }; else list.push(rec); return list; }, isNew ? 'Added to the playbook.' : 'Playbook entry saved.'); d.close(); }
+    catch (x) { err.textContent = x.message; save.disabled = false; save.textContent = isNew ? 'Add to playbook' : 'Save'; }
+  });
+  setTimeout(() => title.focus(), 30);
+}
+function renderPlaybook() {
+  const host = $q('#pbHost'); if (!host) return;
+  const all = pbList(), q = PB.q.trim().toLowerCase(), editor = pbCanEdit();
+  const clients = [...new Set(all.map(x => x.client).filter(Boolean))].sort();
+  if (PB.client && !clients.includes(PB.client)) PB.client = '';
+  const match = x => (!q || (x.title + ' ' + x.body + ' ' + (x.client || '')).toLowerCase().includes(q)) && (!PB.client || !x.client || x.client === PB.client);
+  const shown = all.filter(match);
+  const cnt = c => shown.filter(x => x.cat === c).length;
+  const search = h('input', { class: 'input pb-search', type: 'search', value: PB.q, placeholder: 'Search the playbook…', 'aria-label': 'Search the playbook' });
+  search.addEventListener('input', () => { PB.q = search.value; const p = search.selectionStart; renderPlaybook(); const s2 = $q('#pbHost .pb-search'); if (s2) { s2.focus(); try { s2.setSelectionRange(p, p); } catch { } } });
+  const chips = h('div', { class: 'pb-chips', role: 'tablist' }, ...[{ id: 'all', short: 'All', icon: '' }, ...PB_CATS].map(c => h('button', { type: 'button', role: 'tab', class: 'pb-chip pb-c-' + c.id + (PB.cat === c.id ? ' on' : ''), 'aria-selected': String(PB.cat === c.id), onclick: () => { PB.cat = c.id; renderPlaybook(); } },
+    c.icon ? h('i', {}, c.icon) : null, c.short || c.label, h('em', {}, String(c.id === 'all' ? shown.length : cnt(c.id))))));
+  const clientSel = clients.length ? h('select', { class: 'input pb-client', 'aria-label': 'Client', onchange: e => { PB.client = e.target.value; renderPlaybook(); } }, h('option', { value: '' }, 'All clients'), ...clients.map(c => h('option', { value: c, selected: c === PB.client }, c))) : null;
+  const head = h('div', { class: 'pb-head' },
+    h('div', { class: 'grow' }, h('h2', {}, 'Playbook'), h('p', {}, 'Recruitment rules, process steps, do’s and don’ts for the whole team' + (all.length ? ' · ' + all.length + ' entr' + (all.length === 1 ? 'y' : 'ies') : ''))),
+    search, clientSel, editor ? h('button', { class: 'btn primary', type: 'button', onclick: () => pbEdit(null) }, '+ Add entry') : null);
+  const move = (x, dir) => pbSave(list => { const same = list.filter(y => y.cat === x.cat); const i = same.findIndex(y => y.id === x.id), j = i + dir; if (j < 0 || j >= same.length) return list; const a = list.indexOf(same[i]), b = list.indexOf(same[j]); [list[a], list[b]] = [list[b], list[a]]; return list; });
+  const card = x => {
+    const fresh = Date.now() - Date.parse(x.updatedAt || 0) < 7 * DAY;
+    const copy = h('button', { class: 'pb-ib', type: 'button', title: 'Copy the text', 'aria-label': 'Copy ' + x.title, onclick: async () => { try { await navigator.clipboard.writeText(x.title + '\n\n' + (x.body || '')); tst('Copied.'); } catch { tst('Could not copy here.', true); } } }, '⧉');
+    return h('article', { class: 'pb-card pb-k-' + x.cat + (x.pinned ? ' pinned' : '') },
+      h('header', {}, h('span', { class: 'pb-ico', 'aria-hidden': 'true' }, (PB_CATS.find(c => c.id === x.cat) || PB_CATS[0]).icon),
+        h('h4', {}, x.title), x.pinned ? h('span', { class: 'pb-tag pin', title: 'Pinned' }, '★ Pinned') : null, x.client ? h('span', { class: 'pb-tag' }, x.client) : null, fresh ? h('span', { class: 'pb-tag new' }, x.createdAt && Date.now() - Date.parse(x.createdAt) < 7 * DAY ? 'New' : 'Updated') : null,
+        h('span', { class: 'grow' }), copy,
+        editor ? h('span', { class: 'pb-tools' },
+          h('button', { class: 'pb-ib', type: 'button', title: 'Move up', 'aria-label': 'Move up', onclick: () => move(x, -1) }, '↑'),
+          h('button', { class: 'pb-ib', type: 'button', title: 'Move down', 'aria-label': 'Move down', onclick: () => move(x, 1) }, '↓'),
+          h('button', { class: 'pb-ib', type: 'button', title: x.pinned ? 'Unpin' : 'Pin to the top', 'aria-label': x.pinned ? 'Unpin' : 'Pin', onclick: () => pbSave(list => list.map(y => y.id === x.id ? { ...y, pinned: !y.pinned } : y)) }, x.pinned ? '☆' : '★'),
+          h('button', { class: 'pb-ib', type: 'button', title: 'Edit', 'aria-label': 'Edit ' + x.title, onclick: () => pbEdit(x) }, '✎'),
+          twice('Delete', 'Sure?', () => pbSave(list => list.filter(y => y.id !== x.id), 'Deleted from the playbook.'), 'pb-ib pb-del')) : null),
+      (() => { const b = h('div', { class: 'pb-body' }); b.innerHTML = rich(x.body); return b; })(),
+      h('footer', {}, 'Updated ' + ago(x.updatedAt || x.createdAt) + (x.updatedBy ? ' by ' + x.updatedBy : '')));
+  };
+  const sec = c => { const items = shown.filter(x => x.cat === c.id).sort((a, b) => (b.pinned ? 1 : 0) - (a.pinned ? 1 : 0)); if (!items.length && PB.cat === 'all') return null;
+    return h('section', { class: 'pb-sec pb-s-' + c.id }, h('h3', {}, h('i', {}, c.icon), c.label, h('em', {}, String(items.length))),
+      items.length ? h('div', { class: 'pb-grid' }, ...items.map(card)) : h('p', { class: 'pb-empty' }, q ? 'Nothing matches the search here.' : 'Nothing in this section yet.' + (editor ? ' Use “+ Add entry”.' : ''))); };
+  let bodyEl;
+  if (!all.length) bodyEl = h('div', { class: 'pb-start' }, h('b', {}, 'The playbook is empty'),
+    h('p', {}, editor ? 'Write down the team’s recruitment rules, the steps to follow, and the do’s and don’ts, so everyone works the same way. Start from scratch, or add a few example entries you can edit.' : 'Your admin has not added anything yet.'),
+    editor ? h('div', { class: 'pb-start-b' }, h('button', { class: 'btn primary', type: 'button', onclick: () => pbEdit(null) }, '+ Add the first entry'),
+      h('button', { class: 'btn', type: 'button', onclick: async () => { const who = meU().name || '', now = new Date().toISOString(); try { await pbSave(list => list.concat(PB_STARTER.map(([cat, title, body]) => ({ id: uid(), cat, title, body, client: '', pinned: false, createdAt: now, createdBy: who, updatedAt: now, updatedBy: who }))), 'Example entries added: edit them to match your team.'); } catch (x) { tst(x.message, true); } } }, 'Add example entries')) : null);
+  else bodyEl = h('div', { class: 'pb-secs' }, ...(PB.cat === 'all' ? PB_CATS : PB_CATS.filter(c => c.id === PB.cat)).map(sec).filter(Boolean),
+    !shown.length ? h('p', { class: 'pb-empty' }, 'Nothing matches “' + PB.q + '”.') : null);
+  host.replaceChildren(head, chips, bodyEl);
+}
+
+/* ================================================= PLANNER ================================================= */
+const ST = [{ id: 'todo', label: 'To do' }, { id: 'doing', label: 'In progress' }, { id: 'blocked', label: 'Blocked' }, { id: 'done', label: 'Done' }];
+const PRI = [{ id: 'urgent', label: 'Urgent' }, { id: 'high', label: 'High' }, { id: 'normal', label: 'Normal' }, { id: 'low', label: 'Low' }];
+const stLabel = s => (ST.find(x => x.id === s) || ST[0]).label, priLabel = p => (PRI.find(x => x.id === p) || PRI[2]).label;
+const PL = { tasks: [], me: null, people: null, loaded: false, busy: false, err: '', scope: 'mine', view: 'board', q: '', who: '', oldDone: false, at: 0 };
+const ERR = { TASK_CONFLICT: 'Someone changed this task a moment ago. It has been reloaded: check it and try again.', TASK_EDIT_DENIED: 'Only the person who created this task (or an admin) can change that.', TASK_ASSIGN_DENIED: 'You can make tasks for yourself. Giving tasks to other people needs the “Create tasks for other people” right.', TASK_TITLE_REQUIRED: 'Give the task a title.', TASK_NOT_FOUND: 'This task was deleted.', TASK_NOTES_FULL: 'This task has too many notes. Start a new task.' };
+const rpc = (fn, args) => CLOUD._rpc(fn, args);
+const friendly = e => ERR[e && e.message] || (e && /not set up/i.test(e.message || '') ? 'The Planner is not set up in the database yet. The super admin needs to run planner.sql once in Supabase → SQL Editor.' : (e && e.message) || 'Something went wrong.');
+async function plLoad(quiet) {
+  if (!online()) return;
+  if (PL.busy) return; PL.busy = true;
+  try { const r = await rpc('td_tasks_list', { p_token: tok() }); PL.tasks = (r && r.tasks) || []; PL.me = (r && r.me) || null; PL.err = ''; PL.at = Date.now(); }
+  catch (e) { PL.err = /not set up/i.test(e.message || '') ? 'nosql' : friendly(e); if (!quiet) tst(PL.err === 'nosql' ? friendly(e) : PL.err, true); }
+  finally { PL.busy = false; PL.loaded = true; plBadge(); }
+}
+const tok = () => { try { return JSON.parse(localStorage.getItem('td-pass-session') || 'null').token; } catch { return null; } };
+const myId = () => String((PL.me && PL.me.id) || meU().id || '');
+const isMine = t => (t.assignees || []).some(a => String(a.id) === myId());
+const canEditT = t => !!PL.me && (PL.me.admin || String(t.createdBy) === myId());
+const canUpdT = t => !!PL.me && (PL.me.admin || isMine(t) || String(t.createdBy) === myId());
+const dueState = t => { if (!t.due || t.status === 'done') return ''; const d = t.due.slice(0, 10), td = todayIso(); return d < td ? 'over' : d === td ? 'today' : (Date.parse(d) - Date.parse(td)) / DAY <= 3 ? 'soon' : ''; };
+function plBadge() {
+  const tab = $q('.tab[data-view="planner"]'); if (!tab) return;
+  let b = tab.querySelector('.tabn'); if (!b) { b = h('span', { class: 'tabn' }); tab.append(b); }
+  const mine = PL.tasks.filter(t => isMine(t) && t.status !== 'done'), over = mine.filter(t => dueState(t) === 'over').length;
+  b.textContent = mine.length ? String(mine.length) : ''; b.hidden = !mine.length; b.title = mine.length + ' open task' + (mine.length === 1 ? '' : 's') + ' for you' + (over ? ' · ' + over + ' overdue' : '');
+  b.classList.toggle('calm', !over);
+}
+async function people() {
+  if (PL.people) return PL.people;
+  try { PL.people = await rpc('td_people_list', { p_token: tok() }); } catch { PL.people = [{ id: myId(), name: meU().name || 'Me' }]; }
+  return PL.people;
+}
+const avatars = list => h('span', { class: 'pl-avs' }, ...(list || []).slice(0, 4).map(a => h('span', { class: 'pl-av', title: a.name }, initials(a.name))), (list || []).length > 4 ? h('span', { class: 'pl-av more' }, '+' + (list.length - 4)) : null);
+async function setStatus(t, st) {
+  if (!canUpdT(t) || t.status === st) return;
+  const old = t.status; t.status = st; renderPlanner();
+  try { const r = await rpc('td_task_update', { p_token: tok(), p_id: t.id, p_status: st, p_note: null }); Object.assign(t, r); tst('“' + t.title + '” → ' + stLabel(st) + '.'); }
+  catch (e) { t.status = old; tst(friendly(e), true); }
+  renderPlanner(); plBadge();
+}
+async function openTask(t0) {
+  const isNew = !t0; let t = t0 ? { ...t0 } : { title: '', details: '', status: 'todo', priority: 'normal', due: '', assignees: [{ id: myId(), name: (PL.me && PL.me.name) || meU().name || 'Me' }], notes: [] };
+  const edit = isNew || canEditT(t), upd = isNew || canUpdT(t), assign = !!(PL.me && PL.me.assign);
+  const err = h('p', { class: 'err', role: 'alert' });
+  const title = h('input', { class: 'input', value: t.title, maxlength: 200, placeholder: 'What needs doing?', disabled: !edit });
+  const details = h('textarea', { class: 'input', rows: 4, placeholder: 'Details, links, the client or the role…', disabled: !edit }); details.value = t.details || '';
+  const due = h('input', { class: 'input', type: 'date', value: t.due ? String(t.due).slice(0, 10) : '', disabled: !edit });
+  const pri = h('select', { class: 'input', disabled: !edit }, ...PRI.map(p => h('option', { value: p.id, selected: p.id === t.priority }, p.label)));
+  let status = t.status;
+  const stBtns = h('div', { class: 'pl-seg', role: 'group', 'aria-label': 'Status' }, ...ST.map(s => h('button', { type: 'button', class: 'pl-st-' + s.id, 'aria-pressed': String(s.id === status), disabled: !upd, onclick: e => { status = s.id; for (const b of stBtns.children) b.setAttribute('aria-pressed', String(b === e.currentTarget)); } }, s.label)));
+  /* who it is for */
+  const chosen = new Map((t.assignees || []).map(a => [String(a.id), a.name]));
+  const whoBox = h('div', { class: 'pl-who' });
+  const paintWho = async () => {
+    if (!edit || !assign) { whoBox.replaceChildren(...[...[...chosen].map(([, n]) => h('span', { class: 'pl-chip' }, n)), edit && !assign ? h('small', { class: 'pb-muted' }, ' Only for you: giving tasks to others needs the “Create tasks for other people” right.') : null].filter(Boolean)); return; }
+    const list = await people(); const f = h('input', { class: 'input pl-wf', type: 'search', placeholder: 'Find a person…' });
+    const box = h('div', { class: 'pl-wlist' });
+    const draw = () => { const q = f.value.trim().toLowerCase(); box.replaceChildren(...list.filter(p => !q || p.name.toLowerCase().includes(q)).map(p => { const cb = h('input', { type: 'checkbox', checked: chosen.has(String(p.id)) }); cb.addEventListener('change', () => { if (cb.checked) chosen.set(String(p.id), p.name); else chosen.delete(String(p.id)); }); return h('label', { class: 'pl-wi' }, cb, h('span', { class: 'pl-av' }, initials(p.name)), p.name + (String(p.id) === myId() ? ' (me)' : '')); })); };
+    f.addEventListener('input', draw); draw(); whoBox.replaceChildren(f, box);
+  };
+  paintWho();
+  /* notes */
+  const noteIn = h('textarea', { class: 'input', rows: 2, placeholder: upd ? 'Add a note: progress, a question, a blocker…' : 'Only the people this task is for can add notes.', disabled: !upd });
+  const notesBox = h('div', { class: 'pl-notes' });
+  const paintNotes = () => notesBox.replaceChildren(...[...(t.notes || []).slice().reverse().map(n => h('div', { class: 'pl-note' + (n.kind === 'status' ? ' sys' : '') }, h('span', { class: 'pl-av' }, initials(n.by)), h('div', {}, h('div', { class: 'pl-nh' }, h('b', {}, n.by || ''), h('small', {}, ago(n.at))), h('div', { class: 'pl-nt' }, n.kind === 'status' ? String(n.text || '').replace(/\b(todo|doing|blocked|done)\b/g, m => stLabel(m)) : n.text)))), !(t.notes || []).length ? h('p', { class: 'pb-muted' }, 'No notes yet.') : null].filter(Boolean));
+  paintNotes();
+  const addNote = h('button', { class: 'btn', type: 'button', disabled: !upd || isNew }, 'Add note');
+  addNote.addEventListener('click', async () => { const txt = noteIn.value.trim(); if (!txt) return; addNote.disabled = true;
+    try { const r = await rpc('td_task_update', { p_token: tok(), p_id: t.id, p_status: null, p_note: txt }); t = { ...t, ...r }; noteIn.value = ''; paintNotes(); const i = PL.tasks.findIndex(x => x.id === t.id); if (i >= 0) PL.tasks[i] = t; renderPlanner(); }
+    catch (e) { err.textContent = friendly(e); } addNote.disabled = false; });
+  const save = h('button', { class: 'btn primary', type: 'button', disabled: !upd }, isNew ? 'Create task' : 'Save');
+  const del = !isNew && edit ? twice('Delete', 'Click again to delete', async () => { try { await rpc('td_task_delete', { p_token: tok(), p_id: t.id }); PL.tasks = PL.tasks.filter(x => x.id !== t.id); d.close(); renderPlanner(); plBadge(); tst('Task deleted.'); } catch (e) { err.textContent = friendly(e); } }) : null;
+  const meta = !isNew ? h('p', { class: 'pl-meta' }, 'Created by ' + (t.createdByName || '—') + ' · ' + ago(t.createdAt) + (t.updatedBy ? ' · last change by ' + t.updatedBy + ' ' + ago(t.updatedAt) : '')) : null;
+  const d = dlg(isNew ? 'New task' : 'Task', h('div', { class: 'pl-form' },
+    h('label', {}, h('span', {}, 'Title'), title), h('label', {}, h('span', {}, 'Details'), details),
+    h('div', { class: 'pl-row3' }, h('label', {}, h('span', {}, 'Due date'), due), h('label', {}, h('span', {}, 'Priority'), pri), h('div', { class: 'pl-stwrap' }, h('span', {}, 'Status'), stBtns)),
+    h('div', {}, h('span', { class: 'pb-lbl' }, 'For'), whoBox),
+    !isNew ? h('div', { class: 'pl-nwrap' }, h('span', { class: 'pb-lbl' }, 'Notes & updates'), h('div', { class: 'pl-nadd' }, noteIn, addNote), notesBox) : null,
+    meta, err), [del, h('span', { class: 'grow' }), h('button', { class: 'btn', type: 'button', onclick: () => d.close() }, 'Close'), save], 'pl-dlg');
+  save.addEventListener('click', async () => {
+    err.textContent = ''; save.disabled = true;
+    try {
+      if (edit) {
+        if (!title.value.trim()) throw new Error('TASK_TITLE_REQUIRED');
+        const task = { id: isNew ? null : t.id, title: title.value.trim(), details: details.value, due: due.value || null, priority: pri.value, status, assignees: [...chosen].map(([id, name]) => ({ id, name })) };
+        const r = await rpc('td_task_save', { p_token: tok(), p_task: task, p_ver: isNew ? null : t.ver });
+        if (noteIn.value.trim() && !isNew) { const r2 = await rpc('td_task_update', { p_token: tok(), p_id: r.id, p_status: null, p_note: noteIn.value.trim() }); Object.assign(r, r2); }
+        const i = PL.tasks.findIndex(x => x.id === r.id); if (i >= 0) PL.tasks[i] = r; else PL.tasks.push(r);
+      } else {
+        const r = await rpc('td_task_update', { p_token: tok(), p_id: t.id, p_status: status !== t.status ? status : null, p_note: noteIn.value.trim() || null });
+        const i = PL.tasks.findIndex(x => x.id === r.id); if (i >= 0) PL.tasks[i] = r;
+      }
+      d.close(); renderPlanner(); plBadge(); tst(isNew ? 'Task created.' : 'Task saved.');
+    } catch (e) { err.textContent = ERR[e.message] || friendly(e); save.disabled = false; if (e.message === 'TASK_CONFLICT') { await plLoad(true); renderPlanner(); } }
+  });
+  setTimeout(() => (isNew ? title : (upd ? noteIn : save)).focus(), 40);
+}
+function renderPlanner() {
+  const host = $q('#plHost'); if (!host) return;
+  if (!online()) PL.err = 'local'; else if (PL.err === 'local') { PL.err = ''; PL.loaded = false; }
+  if (!PL.loaded && online()) { host.replaceChildren(h('p', { class: 'pb-muted', style: 'padding:20px' }, 'Loading tasks…')); plLoad(true).then(renderPlanner); return; }
+  if (PL.err === 'local') { host.replaceChildren(h('div', { class: 'pb-start' }, h('b', {}, 'The Planner works online'), h('p', {}, 'Tasks are kept in the online database so the whole team sees them. Sign in to the online dashboard to use the Planner.'))); return; }
+  if (PL.err === 'nosql') { host.replaceChildren(h('div', { class: 'pb-start' }, h('b', {}, 'The Planner is not set up yet'), h('p', {}, (window.PERM && PERM.isOwner() ? 'Run planner.sql once in Supabase → SQL Editor, then press Refresh.' : 'Ask the super admin to run planner.sql once in Supabase.')), h('button', { class: 'btn', type: 'button', onclick: async () => { PL.loaded = false; renderPlanner(); } }, 'Refresh'))); return; }
+  const me = PL.me || {}, id = myId(), q = PL.q.trim().toLowerCase();
+  if (PL.scope === 'all' && !me.all) PL.scope = 'mine';
+  const inScope = t => PL.scope === 'mine' ? isMine(t) : PL.scope === 'created' ? String(t.createdBy) === id : true;
+  const hit = t => (!q || (t.title + ' ' + (t.details || '') + ' ' + (t.assignees || []).map(a => a.name).join(' ')).toLowerCase().includes(q)) && (!PL.who || (t.assignees || []).some(a => String(a.id) === PL.who));
+  const list = PL.tasks.filter(t => inScope(t) && hit(t));
+  const open = list.filter(t => t.status !== 'done'), over = open.filter(t => dueState(t) === 'over').length, wk = open.filter(t => t.due && (Date.parse(t.due) - Date.parse(todayIso())) / DAY <= 7 && dueState(t) !== 'over').length;
+  const doneWk = list.filter(t => t.status === 'done' && t.doneAt && Date.now() - Date.parse(t.doneAt) < 7 * DAY).length;
+  const scopes = [['mine', 'My tasks'], ['created', 'Created by me'], ...(me.all ? [['all', 'All tasks']] : [])];
+  const seg = (items, cur, set, label) => h('div', { class: 'pl-seg', role: 'group', 'aria-label': label }, ...items.map(([v, l]) => h('button', { type: 'button', 'aria-pressed': String(cur === v), onclick: () => { set(v); renderPlanner(); } }, l)));
+  const search = h('input', { class: 'input pb-search', type: 'search', value: PL.q, placeholder: 'Search tasks…', 'aria-label': 'Search tasks' });
+  search.addEventListener('input', () => { PL.q = search.value; const p = search.selectionStart; renderPlanner(); const s2 = $q('#plHost .pb-search'); if (s2) { s2.focus(); try { s2.setSelectionRange(p, p); } catch { } } });
+  const everyone = [...new Map(PL.tasks.flatMap(t => t.assignees || []).map(a => [String(a.id), a.name])).entries()].sort((a, b) => a[1].localeCompare(b[1]));
+  const whoSel = PL.scope !== 'mine' && everyone.length > 1 ? h('select', { class: 'input pl-whosel', 'aria-label': 'Person', onchange: e => { PL.who = e.target.value; renderPlanner(); } }, h('option', { value: '' }, 'Everyone'), ...everyone.map(([v, n]) => h('option', { value: v, selected: v === PL.who }, n))) : null;
+  if (!whoSel) PL.who = '';
+  const head = h('div', { class: 'pb-head' }, h('div', { class: 'grow' }, h('h2', {}, 'Planner'), h('p', {}, 'Tasks for the team: update the status and add notes as you go' + (PL.at ? ' · updated ' + ago(new Date(PL.at).toISOString()) : ''))),
+    h('button', { class: 'btn', type: 'button', title: 'Get the latest tasks', onclick: async () => { await plLoad(); renderPlanner(); } }, '↻'),
+    h('button', { class: 'btn primary', type: 'button', onclick: () => openTask(null) }, '+ New task'));
+  const stats = h('div', { class: 'pl-stats' },
+    h('div', { class: 'pl-sv' }, h('b', {}, String(open.length)), h('span', {}, 'open')),
+    h('div', { class: 'pl-sv' + (over ? ' bad' : '') }, h('b', {}, String(over)), h('span', {}, 'overdue')),
+    h('div', { class: 'pl-sv' }, h('b', {}, String(wk)), h('span', {}, 'due in 7 days')),
+    h('div', { class: 'pl-sv good' }, h('b', {}, String(doneWk)), h('span', {}, 'done this week')));
+  const bar = h('div', { class: 'pl-bar' }, seg(scopes, PL.scope, v => { PL.scope = v; }, 'Whose tasks'), search, whoSel, h('span', { class: 'grow' }), seg([['board', 'Board'], ['list', 'List']], PL.view, v => { PL.view = v; }, 'View'));
+  const cardOf = t => {
+    const ds = dueState(t), nn = (t.notes || []).filter(n => n.kind === 'note').length;
+    const c = h('div', { class: 'pl-card pri-' + t.priority + (ds ? ' due-' + ds : ''), draggable: canUpdT(t) ? 'true' : null, tabindex: '0', role: 'button', 'aria-label': t.title, onclick: () => openTask(t), onkeydown: e => { if (e.key === 'Enter') openTask(t); } },
+      h('div', { class: 'pl-ct' }, t.priority !== 'normal' ? h('span', { class: 'pl-pri p-' + t.priority }, priLabel(t.priority)) : null, h('b', {}, t.title)),
+      t.details ? h('p', { class: 'pl-cd' }, String(t.details).slice(0, 120)) : null,
+      h('div', { class: 'pl-cf' }, t.due ? h('span', { class: 'pl-due ' + ds }, (ds === 'over' ? 'Overdue · ' : ds === 'today' ? 'Today · ' : '') + fmtDay(t.due)) : null, nn ? h('span', { class: 'pl-nn', title: nn + ' note' + (nn === 1 ? '' : 's') }, '💬 ' + nn) : null, h('span', { class: 'grow' }), avatars(t.assignees)));
+    c.addEventListener('dragstart', e => { e.dataTransfer.setData('text/plain', String(t.id)); e.dataTransfer.effectAllowed = 'move'; c.classList.add('drag'); });
+    c.addEventListener('dragend', () => c.classList.remove('drag'));
+    return c;
+  };
+  const sortT = (a, b) => (a.due || '9999') < (b.due || '9999') ? -1 : (a.due || '9999') > (b.due || '9999') ? 1 : ['urgent', 'high', 'normal', 'low'].indexOf(a.priority) - ['urgent', 'high', 'normal', 'low'].indexOf(b.priority);
+  let main;
+  if (!list.length) main = h('div', { class: 'pb-start' }, h('b', {}, PL.tasks.length ? 'No tasks here' : 'No tasks yet'), h('p', {}, PL.scope === 'mine' ? 'Tasks given to you show up here. You can also make your own with “+ New task”.' : 'Nothing matches.'));
+  else if (PL.view === 'list') {
+    main = h('div', { class: 'pl-tablewrap' }, h('table', { class: 'pl-table' }, h('thead', {}, h('tr', {}, ...['Task', 'Status', 'For', 'Due', 'Priority', 'Notes', 'Updated'].map(x => h('th', {}, x)))),
+      h('tbody', {}, ...list.slice().sort((a, b) => (a.status === 'done') - (b.status === 'done') || sortT(a, b)).map(t => h('tr', { class: t.status === 'done' ? 'done' : '', onclick: () => openTask(t) },
+        h('td', {}, h('b', {}, t.title)), h('td', {}, h('span', { class: 'pl-stp st-' + t.status }, stLabel(t.status))), h('td', {}, (t.assignees || []).map(a => a.name).join(', ')),
+        h('td', { class: 'pl-due ' + dueState(t) }, t.due ? fmtDay(t.due) : '—'), h('td', {}, priLabel(t.priority)), h('td', {}, String((t.notes || []).filter(n => n.kind === 'note').length)), h('td', {}, ago(t.updatedAt)))))));
+  } else {
+    main = h('div', { class: 'pl-board' }, ...ST.map(s => {
+      let items = list.filter(t => t.status === s.id).sort(sortT), older = 0;
+      if (s.id === 'done') { items.sort((a, b) => Date.parse(b.doneAt || 0) - Date.parse(a.doneAt || 0)); if (!PL.oldDone) { const keep = items.filter(t => Date.now() - Date.parse(t.doneAt || 0) < 14 * DAY); older = items.length - keep.length; items = keep; } }
+      const col = h('div', { class: 'pl-col pl-col-' + s.id, 'data-st': s.id }, h('h4', {}, h('i', {}), s.label, h('em', {}, String(items.length + older))),
+        h('div', { class: 'pl-cards' }, ...items.map(cardOf), !items.length ? h('p', { class: 'pl-none' }, s.id === 'done' ? 'Finished tasks land here.' : 'Nothing here.') : null),
+        older ? h('button', { class: 'linkbtn pl-older', type: 'button', onclick: () => { PL.oldDone = true; renderPlanner(); } }, 'Show ' + older + ' older') : null);
+      col.addEventListener('dragover', e => { e.preventDefault(); col.classList.add('over'); });
+      col.addEventListener('dragleave', () => col.classList.remove('over'));
+      col.addEventListener('drop', e => { e.preventDefault(); col.classList.remove('over'); const t = PL.tasks.find(x => String(x.id) === e.dataTransfer.getData('text/plain')); if (t) { if (!canUpdT(t)) tst(ERR.TASK_EDIT_DENIED, true); else setStatus(t, s.id); } });
+      return col;
+    }));
+  }
+  host.replaceChildren(head, stats, bar, main);
+}
+window.renderPlaybook = renderPlaybook; window.renderPlanner = renderPlanner;
+/* tasks are checked every 2 minutes while someone uses the page (and the badge stays current) */
+if (window.TDNET) TDNET.poller('tasks', 120000, async () => { await plLoad(true); if (typeof state !== 'undefined' && state.view === 'planner') renderPlanner(); }, () => online());
+setTimeout(() => { if (online()) plLoad(true); }, 4000);
+})();
+</script>
+
 </body>
 </html>
