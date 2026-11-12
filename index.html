@@ -10,7 +10,7 @@
 <meta name="format-detection" content="telephone=no">
 <link rel="preconnect" href="https://iiogwevtyzgedhoaqlrn.supabase.co" crossorigin><link rel="dns-prefetch" href="https://iiogwevtyzgedhoaqlrn.supabase.co">
 <link rel="icon" href="data:,">
-<title>Team Dashboard · 3.80.0</title>
+<title>Team Dashboard · 3.81.0</title>
 <link rel="preconnect" href="https://fonts.googleapis.com"><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin><link href="https://fonts.googleapis.com/css2?family=Public+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet">
 <style>
 :root {
@@ -2086,7 +2086,7 @@ button.ovx-chip { cursor:pointer; } button.ovx-chip:hover { filter:brightness(.9
 @media (max-width:760px) { #pageSummary.ov { grid-template-columns:minmax(0,1fr) !important; grid-template-areas:"glance" "att" "req" "up" !important; } #pageSummary.ov #ovRequests, #pageSummary.ov #ovUpcoming { height:auto !important; max-height:520px; } }
 #pageSummary.ov #cardAttendance .ovx-head { position:relative; z-index:5; }
 #pageSummary.ov #cardAttendance .tdmore-menu { z-index:90; }
-html body .sidebar nav.tabs .tab[data-view="backups"], html body .tab[data-view="backups"] { display:none !important; }   /* v3.58.0: Backup report is a tab inside Attendance */
+.tab[data-view="backups"]::before { content:'⛨'; }   /* v3.81.0: Backups is its own page again */
 /* v3.58.1: Real / pseudo names switch in the Who is out More menu */
 .tdmore-menu label.ovx-nsw { font-size:13px !important; font-weight:550 !important; line-height:1.3; display:flex !important; align-items:center; justify-content:space-between !important; gap:14px; cursor:pointer; }
 .ovx-nsw input { position:absolute; opacity:0; width:1px; height:1px; }
@@ -2447,6 +2447,10 @@ article.al-d { --alc:#c62828; }
 .xl-newp { display:grid; grid-template-columns:20px minmax(140px,1.2fr) 110px minmax(0,2fr); gap:10px; align-items:center; padding:6px 4px; font-size:13px; cursor:pointer; } .xl-newp.off { opacity:.55; } .xl-nid { color:var(--ink-2); font-variant-numeric:tabular-nums; } .xl-nf { color:var(--ink-2); font-size:12px; }
 @media (max-width:700px) { .xl-newp { grid-template-columns:20px 1fr; } .xl-nid, .xl-nf { grid-column:2; } }
 html body .atabs.atabs > .atab[hidden] { display:none !important; }
+/* v3.81.0: Backups page */
+.bk-mod-head { display:flex; align-items:center; gap:12px; flex-wrap:wrap; margin:0 0 14px; } .bk-mod-head h2 { margin:0; font-size:20px; flex:1; }
+#psnPageHost .psn-inline > .body { padding:0; } #psnPageHost .psn-inline { max-width:1100px; }
+
 /* v3.79.1: big task pop-up */
 .pdlg-veil.tp-veil { z-index:1500 !important; }
 .pdlg.tp-pop { width:min(760px, 94vw); max-height:90vh; } .pdlg.tp-pop > header { border-bottom:0; padding-bottom:0; } .pdlg.tp-pop > header h3:empty { display:none; }
@@ -2703,6 +2707,84 @@ body.v-plain #pinnedHeader .pinned-filters, body.v-plain #pinnedHeader #scopeLin
   .ovx-t > b { font-size:24px !important; }
   #tbl tbody tr { grid-template-columns:minmax(0,1fr); }
 }
+</style><style id="v381-ios">
+/* ===== v3.81.0: iOS look for the whole dashboard; the left menu stays dark ===== */
+:root {
+  --bg:#f2f2f7; --surface:#ffffff; --surface-2:#f2f2f7; --ink:#1c1c1e; --ink-2:#3c3c43; --muted:#8a8a8e; --border:#e5e5ea;
+  --grid:#e5e5ea; --axis:#d1d1d6; --wash:#eef4ff; --accent:#007aff; --royal:#007aff; --royal-2:#0062cc; --band-2:#007aff; --band-3:#007aff;
+  --accent-soft:rgba(0,122,255,.10); --r-card:16px; --r-ctl:10px; --lift:0 1px 2px rgba(0,0,0,.04);
+  --ov-bg:#f2f2f7; --ov-card:#fff; --ov-line:#e5e5ea; --ov-chip:#f2f2f7;
+  --ios-sep:rgba(60,60,67,.14); --ios-fill:rgba(118,118,128,.12);
+}
+:root[data-theme="dark"] {
+  --bg:#000000; --surface:#1c1c1e; --surface-2:#2c2c2e; --ink:#f2f2f7; --ink-2:#d1d1d6; --muted:#8e8e93; --border:#38383a;
+  --grid:#38383a; --axis:#48484a; --wash:#0a2540; --accent:#0a84ff; --royal:#0a84ff; --royal-2:#409cff; --band-2:#0a84ff; --band-3:#0a84ff;
+  --accent-soft:rgba(10,132,255,.18); --ov-bg:#000; --ov-card:#1c1c1e; --ov-line:#38383a; --ov-chip:#2c2c2e;
+  --ios-sep:rgba(84,84,88,.6); --ios-fill:rgba(118,118,128,.24);
+}
+@media (prefers-color-scheme: dark) { :root:not([data-theme="light"]) {
+  --bg:#000000; --surface:#1c1c1e; --surface-2:#2c2c2e; --ink:#f2f2f7; --ink-2:#d1d1d6; --muted:#8e8e93; --border:#38383a;
+  --grid:#38383a; --axis:#48484a; --accent:#0a84ff; --royal:#0a84ff; --accent-soft:rgba(10,132,255,.18); --ios-sep:rgba(84,84,88,.6); --ios-fill:rgba(118,118,128,.24);
+} }
+html, body, button, input, select, textarea { font-family:-apple-system, BlinkMacSystemFont, "SF Pro Text", "SF Pro Display", "Inter", "Segoe UI", system-ui, "Helvetica Neue", Arial, sans-serif !important; }
+body { letter-spacing:-.01em; background:var(--bg) !important; }
+h1, h2, h3, .workspace-heading h2 { letter-spacing:-.02em; }
+.workspace-heading h2, .overview-heading h2, .bk-mod-head h2 { font-weight:700 !important; }
+/* cards: white, rounded, no heavy borders, no coloured top bands */
+.card, #cardAttendance, #cardComing, #ovRequests, #ovUpcoming, #cardWatch, .metric, .drawer, .pdlg, .tp-pop, dialog {
+  border-radius:16px !important; border:0 !important; box-shadow:0 1px 2px rgba(0,0,0,.04), 0 0 0 .5px var(--ios-sep) !important; }
+#pageSummary.ov #cardAttendance, #pageSummary.ov #ovRequests, #pageSummary.ov #ovUpcoming, #pageSummary.ov #cardWatch,
+body #cardAttendance, body #ovRequests, body #ovUpcoming, body #cardWatch { border-top:0 !important; }
+:root:not([data-theme="dark"]) .card, :root:not([data-theme="dark"]) #ovRequests, :root:not([data-theme="dark"]) #ovUpcoming { box-shadow:0 1px 2px rgba(0,0,0,.04), 0 0 0 .5px var(--ios-sep) !important; }
+/* buttons: filled blue for the main one, tinted grey for the others */
+.btn { border-radius:10px !important; font-weight:600 !important; border-color:transparent !important; background:var(--ios-fill) !important; color:var(--accent) !important; box-shadow:none !important; }
+.btn:hover { filter:brightness(.97); }
+.btn.primary:not(.danger), .btn.primary { background:var(--accent) !important; color:#fff !important; border-color:transparent !important; }
+.btn.danger { background:rgba(255,59,48,.12) !important; color:#ff3b30 !important; }
+.btn.primary.danger { background:#ff3b30 !important; color:#fff !important; }
+.btn.ghost { background:transparent !important; }
+/* inputs: soft grey fields */
+.input, input[type="text"], input[type="search"], input[type="date"], input[type="number"], input[type="password"], input[type="email"], input[type="tel"], select, textarea {
+  border-radius:10px !important; border:1px solid transparent !important; background-color:var(--ios-fill) !important; color:var(--ink) !important; box-shadow:none !important; }
+.input:focus, input:focus, select:focus, textarea:focus { outline:none !important; border-color:var(--accent) !important; background-color:var(--surface) !important; box-shadow:0 0 0 3px var(--accent-soft) !important; }
+/* switches look like iOS toggles */
+input[type="checkbox"].switch, .switch input[type="checkbox"], input[role="switch"] { accent-color:#34c759; }
+input[type="checkbox"], input[type="radio"] { accent-color:var(--accent); }
+/* segmented controls */
+.att-seg, .pl-seg, .seg, .fm-tabs, .atabs { background:var(--ios-fill) !important; border-radius:9px !important; padding:2px !important; border:0 !important; }
+.pl-seg button[aria-pressed="true"], .seg button[aria-pressed="true"], .fm-tabs button[aria-selected="true"], .atabs .atab.on, .atabs .atab[aria-selected="true"] {
+  background:var(--surface) !important; color:var(--ink) !important; border-radius:7px !important; box-shadow:0 3px 8px rgba(0,0,0,.12), 0 3px 1px rgba(0,0,0,.04) !important; }
+/* tables: hairline rows, quiet headers */
+#tbl thead th, :root:not([data-theme="dark"]) #tbl thead th, table thead th { background:var(--surface) !important; color:var(--muted) !important; font-weight:600 !important; text-transform:none !important; letter-spacing:0 !important; border-bottom:.5px solid var(--ios-sep) !important; }
+table td { border-color:var(--ios-sep) !important; }
+/* chips and badges: pill shaped */
+.chip, .pill, .tag, .badge { border-radius:999px !important; }
+/* side panels and dialogs: sheet style */
+#overlay { background:rgba(0,0,0,.28) !important; backdrop-filter:blur(2px); }
+.drawer > header, .pdlg > header { border-bottom:.5px solid var(--ios-sep) !important; }
+.toast, #toast { border-radius:14px !important; background:rgba(28,28,30,.92) !important; color:#fff !important; backdrop-filter:blur(20px); }
+/* top bar: translucent, like an iOS navigation bar */
+.sticky-top.pinned-top, .pinned-top { background:color-mix(in srgb, var(--bg) 82%, transparent) !important; backdrop-filter:saturate(180%) blur(20px); -webkit-backdrop-filter:saturate(180%) blur(20px); border-bottom:.5px solid var(--ios-sep) !important; box-shadow:none !important; }
+/* ---- the left menu stays dark ---- */
+@media (min-width:701px) {
+  .sidebar { background:#1c1c1e !important; border-right:0 !important; box-shadow:none !important; }
+  :root[data-theme="dark"] .sidebar { background:#111113 !important; border-right:.5px solid #2c2c2e !important; }
+  .sidebar .brand { border-bottom:.5px solid rgba(255,255,255,.1) !important; }
+  .sidebar .brand h1::before { background-color:#007aff !important; border-radius:9px !important; }
+  .sidebar .tab { color:rgba(235,235,245,.72) !important; border-radius:10px !important; font-weight:500 !important; }
+  .sidebar .tab:hover { background:rgba(255,255,255,.07) !important; color:#fff !important; }
+  .sidebar .tab.on, .sidebar .tab[aria-selected="true"] { background:#007aff !important; color:#fff !important; font-weight:600 !important; box-shadow:none !important; }
+  .sidebar .tabn, .sidebar .nav-badge { background:#ff3b30 !important; color:#fff !important; }
+  .sidebar .ver { background:rgba(255,255,255,.1) !important; color:rgba(235,235,245,.8) !important; border-radius:6px !important; }
+  .sidebar a, .sidebar .linkbtn, .sidebar button.linkbtn { color:#64a8ff !important; }
+}
+/* phones: the bottom tab bar is dark too, with the open page in blue */
+@media (max-width:700px) {
+  .sidebar nav.tabs { background:rgba(28,28,30,.94) !important; backdrop-filter:saturate(180%) blur(20px); -webkit-backdrop-filter:saturate(180%) blur(20px); border-top:.5px solid rgba(255,255,255,.08) !important; box-shadow:none !important; }
+  .sidebar nav.tabs .tab { color:rgba(235,235,245,.6) !important; background:transparent !important; }
+  .sidebar nav.tabs .tab.on, .sidebar nav.tabs .tab[aria-selected="true"] { color:#0a84ff !important; background:transparent !important; box-shadow:none !important; }
+  .card, #cardAttendance, #cardComing { border-radius:14px !important; }
+}
 </style></head>
 
 
@@ -2724,9 +2806,10 @@ body.v-plain #pinnedHeader .pinned-filters, body.v-plain #pinnedHeader #scopeLin
       <button class="tab" role="tab" aria-controls="pageAttendance" data-view="attendance" aria-selected="false" data-icon="🗓️" data-short="Attend.">Attendance</button>
       <button class="tab" role="tab" aria-controls="pageActions" data-view="actions" aria-selected="false" data-icon="✅" data-short="Actions">Action center<span class="tabn" id="tabActionsN" hidden></span></button>
       <button class="tab" role="tab" aria-controls="pageReports" data-view="reports" aria-selected="false" data-icon="📊" data-short="Reports">Reports</button>
+      <button class="tab" role="tab" aria-controls="pageBackups" data-view="backups" aria-selected="false" data-icon="⛨" data-short="Backups">Backups</button>
       <button class="tab" role="tab" aria-controls="pagePlanner" data-view="planner" aria-selected="false" data-icon="☑" data-short="Tasks">Planner</button>
       <button class="tab" role="tab" aria-controls="pagePlaybook" data-view="playbook" aria-selected="false" data-icon="📘" data-short="Guide">Playbook</button>
-      <button class="tab" role="tab" aria-controls="pageBackups" data-view="backups" hidden style="display:none" aria-selected="false" data-icon="⛨" data-short="Backups">Backup report</button>
+
       <button class="tab" role="tab" aria-controls="pageSettings" data-view="settings" aria-selected="false" data-icon="⚙️" data-short="Settings">Settings</button></nav><div class="sidebar-bottom"><div class="local-label"><i></i> Connected to your workbook</div></div></aside>
   <div class="sticky-top pinned-top" id="pinnedHeader">
     <header class="top">
@@ -2827,7 +2910,7 @@ body.v-plain #pinnedHeader .pinned-filters, body.v-plain #pinnedHeader #scopeLin
     <div id="pageSettings" hidden></div>
     <div id="pagePlaybook" hidden><section class="card pp-page"><div id="pbHost"></div></section></div>
     <div id="pagePlanner" hidden><section class="card pp-page"><div id="plHost"></div></section></div>
-    <div id="pageBackups" hidden><section class="card bkr-page"><div class="body bkr" id="bkPageHost"></div></section></div>
+    <div id="pageBackups" hidden><section class="card bkr-page"><div class="bk-mod-head"><h2>Backups</h2><div class="pl-seg bk-mod-tabs" id="bkModTabs" role="tablist"></div></div><div class="body bkr" id="bkPageHost"></div><div id="psnPageHost" hidden></div></section></div>
     <div id="pageEmployees" hidden>
       <section class="card c-emp" aria-label="Employee table">
         <div class="tools">
@@ -4975,8 +5058,10 @@ window.PERM = {
   canWrite() { return (this.online() && Array.isArray(CLOUD.user()?.permissions?._attendanceFields) && CLOUD.user().permissions._attendanceFields.length > 0) || ['emp.edit', 'emp.add', 'emp.delete', 'emp.bulk', 'emp.fields', 'att.log', 'att.edit', 'att.rows', 'att.addemp', 'att.approve', 'att.holidays', 'att.fields'].some(k => this.can(k)); },
   /* v3.53.0: the Backup report is its own page: the super admin, and only the people they tick for it (admins included) */
   canBkReport() { if (!this.online()) return true; const u = CLOUD.user(); return u.role === 'superadmin' || !!(u.permissions && u.permissions._bkReport); },
+  canPsn() { if (!this.online()) return true; const u = CLOUD.user(); return u.role === 'superadmin' || !!(u.permissions && (u.permissions._psn || u.permissions._psnEdit)); },
+  canPsnEdit() { if (!this.online()) return true; const u = CLOUD.user(); return u.role === 'superadmin' || !!(u.permissions && u.permissions._psnEdit); },
   canBkRevenue() { if (!this.online()) return true; const u = CLOUD.user(); return u.role === 'superadmin' || !!(u.permissions && u.permissions._bkReport && u.permissions._bkRevenue); },
-  canView(view) { return view === 'settings' || (view === 'backups' ? this.canBkReport() : view === 'attendance' ? (this.can('page.attendance') || this.canBkReport()) : this.can(PAGE_OF[view] || 'page.overview')); },
+  canView(view) { return view === 'settings' || (view === 'backups' ? (this.canBkReport() || this.canPsn()) : view === 'attendance' ? (this.can('page.attendance') || this.canBkReport()) : this.can(PAGE_OF[view] || 'page.overview')); },
   firstView() { return Object.keys(PAGE_OF).find(v => this.canView(v)) || 'summary'; },
   /* v3.20: user groups. People in the same group see each other's attendance requests and request notifications.
      Kept in the team settings (key user_groups) as [{ id, name, members: [{ id, name }] }]; only the super admin changes them. */
@@ -6230,7 +6315,7 @@ function scopeCounts() {
 function shellHtml() {
   if (S.mode === 'reports') return `<div id="view"></div>`;
   const tab = (id, icon, label, extra = '') => `<button class="tab" data-act="nav" data-v="${id}">${ic(icon)}<span>${label}</span>${extra}</button>`;
-  const left = S.mode === 'health' ? `<h2 style="margin:0;font-size:16px">Attendance data health</h2>` : `<nav class="subnav" aria-label="Attendance sections">${can('att.grid') ? tab('grid', 'grid', 'Attendance') + tab('people', 'users', 'People') + tab('hist', 'cal', 'History & upcoming') : ''}${viewAllowed('bk') ? tab('bk', 'shield', 'Backup report') : ''}</nav>`;
+  const left = S.mode === 'health' ? `<h2 style="margin:0;font-size:16px">Attendance data health</h2>` : `<nav class="subnav" aria-label="Attendance sections">${can('att.grid') ? tab('grid', 'grid', 'Attendance') + tab('people', 'users', 'People') + tab('hist', 'cal', 'History & upcoming') : ''}</nav>`;
   return `<div class="topbar">
       ${left}
       <span class="grow"></span>
@@ -10689,7 +10774,7 @@ async function poll() {
 }
 
 /* ============================== filtering ============================== */
-const APP = { title: "Team Dashboard", version: "3.80.0", released: "12 Nov 2026" };
+const APP = { title: "Team Dashboard", version: "3.81.0", released: "2026-11-12" };
 const BASE_DIMS = { status: "status_column", desig: "designation_column", client: "client_column", mode: "mode_column" };
 const STANDARD_STATUSES = ["Active", "Manager", "OJT", "Bench", "New", "Projected", "Left", "Moved"];
 const TILE_ORDER = ["Active", "Manager", "OJT", "Bench", "New", "Projected"];
@@ -12185,7 +12270,7 @@ function renderReview() {
 function syncView() {
   window.placeSavedFilters?.();
   document.body.classList.toggle("clean-overview",state.view === "summary");
-  document.getElementById("cleanPageTitle").textContent = ({summary:"Overview",employees:"Employees",attendance:"Attendance",actions:"Action center",reports:"Reports",playbook:"Playbook",planner:"Planner",backups:"Backup report",settings:"Settings"})[state.view] || "Overview";
+  document.getElementById("cleanPageTitle").textContent = ({summary:"Overview",employees:"Employees",attendance:"Attendance",actions:"Action center",reports:"Reports",playbook:"Playbook",planner:"Planner",backups:"Backups",settings:"Settings"})[state.view] || "Overview";
   $("#pageSettings").hidden = state.view !== "settings";
   $("#pageReports").hidden = state.view !== "reports";
   $("#pageBackups").hidden = state.view !== "backups";
@@ -12199,7 +12284,7 @@ function syncView() {
   $("#pageSummary").hidden = state.view !== "summary"; $("#pageEmployees").hidden = state.view !== "employees";
 }
 function setView(v) {
-  if (v === "backups") { if (window.ATT && (!window.PERM || PERM.canBkReport())) { ATT.go('bk'); return; } v = "attendance"; }   /* v3.58.0: Backup report lives inside Attendance */
+
   if (employeePending) { toast("Wait for the employee changes to save before switching pages.",true); return; }
   if (window.PERM && !PERM.canView(v)) { const f = PERM.firstView(); if (f === v || f === state.view) return; v = f; }
   if (state.view === v) return;
@@ -12960,7 +13045,8 @@ function renderAll() {
   $("#todayLabel").textContent = new Date().toLocaleDateString(undefined,{weekday:"short",month:"short",day:"numeric"});
   setTimeout(celebratePopup, 400);
   if (state.view === "summary") { window.ATT?.renderApprovalRequests(); renderComing(); renderHolidays(); setTimeout(organizeOverview, 0); renderStrip(); if (window.ATT) { ATT.renderCard($("#cardAttendance")); if (window.PERM && PERM.can("ov.watch")) ATT.renderWatch($("#cardWatch")); } } else if (state.view === "reports") renderCharts(); else if (state.view === "actions") { renderActions(); renderReview(); } else if (state.view === "attendance" || state.view === "settings") { /* these pages draw themselves */ } else renderTable();
-  if (state.view === "backups") { const host = $("#bkPageHost"); const busy = host && (host.contains(document.activeElement) && document.activeElement !== document.body || host.querySelector('[data-rev-save]:not([disabled])')); if (host && !busy) { try { ATT.mountBackupReport(host); } catch (e) { host.textContent = "The attendance workbook isn't ready yet."; } } }
+  if (state.view === "backups") window.drawBackupsModule?.();
+  if (state.view === "backups" && window.__bkTab === "report") { const host = $("#bkPageHost"); const busy = host && (host.contains(document.activeElement) && document.activeElement !== document.body || host.querySelector('[data-rev-save]:not([disabled])')); if (host && !busy) { try { ATT.mountBackupReport(host); } catch (e) { host.textContent = "The attendance workbook isn't ready yet."; } } }
   if (state.view === "playbook") window.renderPlaybook?.();
   if (state.view === "planner") window.renderPlanner?.();
   syncActionTabs(); attSync();
@@ -13199,13 +13285,13 @@ function buildField(c, value, isNew) {
    recruiter is replaced or the name made vacant, the end date is chosen too. Every assignment stays in the
    "Pseudo Name History" sheet of the same workbook; the small "i" shows a name's history. */
 const pseudoCol = () => ((state.cols || []).find(c => /pseudo/i.test(c.name)) || {}).name || null;
-const psnIsAdmin = () => !window.PERM || !PERM.online() || PERM.isSuper();
+const psnIsAdmin = () => !window.PERM || !PERM.online() || PERM.isSuper() || PERM.canPsnEdit();   /* v3.81.0: or a role given "manage pseudo names" */
 const psnStatus = r => { const s = gs(r, "status_column").toLowerCase().replace(/\s+/g, "").replace(/&/g, "+"); return /^active\+resign(ed|ation)?$/.test(s) ? "resign" : s === "active" ? "active" : s === "ojt" ? "ojt" : s; };
 const psnEligible = r => ["active", "resign", "ojt"].includes(psnStatus(r));
 const psnMaster = () => { const L = (window.TD_SETTINGS || {}).pseudo_names; if (!Array.isArray(L)) return null;
   const seen = new Set(); return L.map(x => typeof x === "string" ? { name: x.trim(), client: "", active: true } : { name: String((x && x.name) || "").trim(), client: String((x && x.client) || "").trim(), active: !(x && x.active === false) })
     .filter(x => x.name && !seen.has(x.name.toLowerCase()) && seen.add(x.name.toLowerCase())); };
-const psnSaveMaster = (list, text) => window.saveTeamSetting("pseudo_names", list.slice().sort((a, b) => (a.client || "").localeCompare(b.client || "") || a.name.localeCompare(b.name)), { name: "Pseudo names", text });
+const psnSaveMaster = (list, text) => (window.PERM && PERM.online() && !PERM.isAdmin?.() && !PERM.isSuper() ? window.saveSharedSetting : window.saveTeamSetting)("pseudo_names", list.slice().sort((a, b) => (a.client || "").localeCompare(b.client || "") || a.name.localeCompare(b.name)), { name: "Pseudo names", text });
 const psnToday = () => { const d = new Date(); return d.getFullYear() + "-" + String(d.getMonth() + 1).padStart(2, "0") + "-" + String(d.getDate()).padStart(2, "0"); };
 const psnDay = t => { const s = String(t || ""); return /^\d{4}-\d{2}-\d{2}/.test(s) ? s.slice(0, 10) : ""; };
 const psnNice = t => { const d = psnDay(t); if (!d) return String(t || "").replace(/^\(|\)$/g, "") || "—"; return new Date(d + "T00:00:00").toLocaleDateString(undefined, { day: "numeric", month: "short", year: "numeric" }); };
@@ -13255,18 +13341,18 @@ async function psnHistory(name, after) {
 }
 window.psnHistory = psnHistory;
 
-async function openPseudoNames(focusId) {
-  if (employeePending) { toast("Finish saving the current employee first.", true); return; }
+async function openPseudoNames(focusId, host) {   /* v3.81.0: host = draw inside the Backups page instead of a side panel */
+  if (!host && employeePending) { toast("Finish saving the current employee first.", true); return; }
   const canEdit = !window.PERM || PERM.can("emp.edit");
   const body = h("div", { class: "body psn" });
   const aside = h("aside", { class: "drawer psn-drawer", role: "dialog", "aria-label": "Pseudo names" },
     h("header", {}, h("h2", {}, "Pseudo names"), h("button", { class: "btn ghost", type: "button", "aria-label": "Close", onclick: () => closeDrawer() }, "✕")), body);
-  mountDrawer(aside);
+  if (host) host.replaceChildren(h("div", { class: "psn-inline" }, body)); else mountDrawer(aside);
   const pc = pseudoCol();
   if (!pc) {
     const can = !window.PERM || PERM.can("emp.fields");
     body.append(h("p", {}, "The workforce sheet has no Pseudo Name column yet."),
-      can ? h("button", { class: "btn primary", type: "button", onclick: async e => { e.target.disabled = true; try { await api("POST", "/api/columns", { name: "Pseudo Name" }); await loadData(true); closeDrawer(); openPseudoNames(); } catch (err) { e.target.disabled = false; toast(err.message, true); } } }, "Add a Pseudo Name column") : null);
+      can ? h("button", { class: "btn primary", type: "button", onclick: async e => { e.target.disabled = true; try { await api("POST", "/api/columns", { name: "Pseudo Name" }); await loadData(true); if (host) openPseudoNames(null, host); else { closeDrawer(); openPseudoNames(); } } catch (err) { e.target.disabled = false; toast(err.message, true); } } }, "Add a Pseudo Name column") : null);
     return;
   }
   const admin = psnIsAdmin();
@@ -14218,7 +14304,7 @@ window.applyAccess = () => {
   const show = (sel, on) => document.querySelectorAll(sel).forEach(x => { x.hidden = !on; });
   show('#btnAdd', PERM.can('emp.add'));
   show('#btnFill', PERM.can('emp.bulk'));
-  show('#btnPseudo', PERM.can('emp.edit') || PERM.can('page.employees'));
+  show('#btnPseudo', false);   /* v3.81.0: Pseudo names moved to the Backups page */
   show('#btnXlUpdate', PERM.can('emp.bulk') || PERM.can('emp.edit'));
   show('.atab[data-atab="fill"]', PERM.can('emp.bulk'));
   show('.atab[data-atab="health"]', PERM.canView('attendance') && PERM.can('act.health'));
@@ -14863,7 +14949,12 @@ function buildAccessForm(src, users = [], opts = {}) {
   const bkBox = h('div', { class: 'rmod-extra bk-access' }, h('p', { class: 'rmod-subt' }, 'Backups'), bkEdit.el, h('p', { class: 'set-hint' }, 'Untick to keep people in this role from setting or changing backups; they still see them, and leave they record or approve is saved without the backup question.'), bkRep.el, bkRev.el, h('p', { class: 'set-hint' }, 'Backup report: off unless ticked. Super admins always have everything.'));
   const phSee = checkLine('Can see and edit phone & WhatsApp numbers', !!(accessSource && accessSource.permissions && accessSource.permissions._phones));
   const phBox = h('div', { class: 'rmod-extra bk-access', hidden: true }, h('p', { class: 'rmod-subt' }, 'Phone & WhatsApp numbers'), phSee.el, h('p', { class: 'set-hint' }, 'Stored encrypted in the database. Off unless ticked: everyone else sees these fields blank. Super admins always see them.'));
-  const bkPerms = () => ({ _bkReport: bkRep.box.checked, _bkRevenue: bkRep.box.checked && bkRev.box.checked, _phones: phSee.box.checked, _backupEdit: bkEdit.box.checked });
+  /* v3.81.0: Pseudo names (inside the Backups page) only for the roles ticked here */
+  const psnSee = checkLine('Can open Pseudo names (Backups page)', !!(accessSource && accessSource.permissions && (accessSource.permissions._psn || accessSource.permissions._psnEdit)));
+  const psnEd = checkLine('…and manage the pseudo name list (add, change client, active or inactive, dates)', !!(accessSource && accessSource.permissions && accessSource.permissions._psnEdit));
+  const psnSync = () => { psnEd.box.disabled = !psnSee.box.checked; if (!psnSee.box.checked) psnEd.box.checked = false; }; psnSee.box.addEventListener('change', psnSync); psnSync();
+  bkBox.append(psnSee.el, psnEd.el);
+  const bkPerms = () => ({ _bkReport: bkRep.box.checked, _bkRevenue: bkRep.box.checked && bkRev.box.checked, _phones: phSee.box.checked, _backupEdit: bkEdit.box.checked, _psn: psnSee.box.checked, _psnEdit: psnSee.box.checked && psnEd.box.checked });
   const rights = h('div', { class: 'rights' }, roleNote, bkBox, phBox, presets, h('div', { class: 'rrows' }, h('div', { class: 'rgrid-head', 'aria-hidden': 'true' }, h('span', {}, 'Area'), h('span', {}, 'Hide'), h('span', {}, 'View'), h('span', {}, 'Edit'), h('span', {}, '')), ...modules));
   rights.addEventListener('change', () => setTimeout(paintPresets)); rights.addEventListener('click', e => { if (e.target.closest('.rseg-b, .rchk')) setTimeout(paintPresets); });
   const syncRole = () => { syncs.forEach(f => f()); };
@@ -16674,5 +16765,24 @@ document.addEventListener('visibilitychange', () => { if (!document.hidden && on
 })();
 </script>
 
+<script>
+/* v3.81.0: the Backups page: Backup report and Pseudo names, each for the roles given it */
+(() => {
+  window.__bkTab = 'report'; let psnDrawn = false;
+  window.drawBackupsModule = () => {
+    const tabsEl = document.getElementById('bkModTabs'); if (!tabsEl) return;
+    const P = window.PERM, rep = !P || P.canBkReport(), psn = !P || P.canPsn();
+    const tabs = [rep && ['report', 'Backup report'], psn && ['psn', 'Pseudo names']].filter(Boolean);
+    if (!tabs.some(t => t[0] === window.__bkTab)) window.__bkTab = tabs[0] ? tabs[0][0] : 'report';
+    tabsEl.replaceChildren(...tabs.map(([k, l]) => h('button', { type: 'button', role: 'tab', 'aria-pressed': String(k === window.__bkTab), onclick: () => { if (window.__bkTab === k) return; window.__bkTab = k; psnDrawn = false; renderAll(); } }, l)));
+    tabsEl.hidden = tabs.length < 2;
+    const bk = document.getElementById('bkPageHost'), ps = document.getElementById('psnPageHost');
+    bk.hidden = window.__bkTab !== 'report'; ps.hidden = window.__bkTab !== 'psn';
+    if (window.__bkTab === 'psn' && (!psnDrawn || !ps.firstChild)) { psnDrawn = true; try { openPseudoNames(null, ps); } catch (e) { ps.textContent = e.message; } }
+  };
+  /* the Attendance buttons that opened the Backup report now open this page */
+  document.addEventListener('click', e => { const b = e.composedPath && e.composedPath().find(x => x && x.matches && x.matches('[data-act="bk-report"], [data-bk-report]')); if (b) { e.stopPropagation(); e.preventDefault(); window.__bkTab = 'report'; setView('backups'); } }, true);
+})();
+</script>
 </body>
 </html>
