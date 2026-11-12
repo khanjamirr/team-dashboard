@@ -10,7 +10,7 @@
 <meta name="format-detection" content="telephone=no">
 <link rel="preconnect" href="https://iiogwevtyzgedhoaqlrn.supabase.co" crossorigin><link rel="dns-prefetch" href="https://iiogwevtyzgedhoaqlrn.supabase.co">
 <link rel="icon" href="data:,">
-<title>Team Dashboard · 3.79.0</title>
+<title>Team Dashboard · 3.80.0</title>
 <link rel="preconnect" href="https://fonts.googleapis.com"><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin><link href="https://fonts.googleapis.com/css2?family=Public+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet">
 <style>
 :root {
@@ -2447,6 +2447,22 @@ article.al-d { --alc:#c62828; }
 .xl-newp { display:grid; grid-template-columns:20px minmax(140px,1.2fr) 110px minmax(0,2fr); gap:10px; align-items:center; padding:6px 4px; font-size:13px; cursor:pointer; } .xl-newp.off { opacity:.55; } .xl-nid { color:var(--ink-2); font-variant-numeric:tabular-nums; } .xl-nf { color:var(--ink-2); font-size:12px; }
 @media (max-width:700px) { .xl-newp { grid-template-columns:20px 1fr; } .xl-nid, .xl-nf { grid-column:2; } }
 html body .atabs.atabs > .atab[hidden] { display:none !important; }
+/* v3.79.1: big task pop-up */
+.pdlg-veil.tp-veil { z-index:1500 !important; }
+.pdlg.tp-pop { width:min(760px, 94vw); max-height:90vh; } .pdlg.tp-pop > header { border-bottom:0; padding-bottom:0; } .pdlg.tp-pop > header h3:empty { display:none; }
+.pdlg.tp-pop footer { display:flex; gap:8px; align-items:center; flex-wrap:wrap; } .pdlg.tp-pop footer .grow { flex:1; }
+.tp-hero { display:flex; gap:16px; align-items:center; margin:-6px 0 18px; } .tp-bell { display:grid; place-items:center; width:64px; height:64px; border-radius:18px; background:linear-gradient(135deg,#e5eeff,#f1e9ff); font-size:32px; flex:none; }
+.tp-hero h2 { margin:0; font-size:24px; letter-spacing:-.01em; } .tp-hero p { margin:4px 0 0; color:var(--ink-2); font-size:14px; }
+.tp-list { display:flex; flex-direction:column; gap:12px; }
+.tp-card { border:1px solid var(--border); border-left:5px solid #8a94a6; border-radius:14px; padding:14px 16px; background:var(--surface); display:flex; flex-direction:column; gap:10px; }
+.tp-card.pri-urgent { border-left-color:#e0473f; } .tp-card.pri-high { border-left-color:#f0a020; } .tp-card.pri-normal { border-left-color:#2f6fed; }
+.tp-top { display:flex; gap:12px; align-items:flex-start; } .pl-av.tp-av { width:40px; height:40px; font-size:13px; } .tp-from small { color:var(--ink-2); font-size:12.5px; } .tp-from h4 { margin:2px 0 0; font-size:18px; line-height:1.3; overflow-wrap:anywhere; }
+.tp-det { margin:0; font-size:14px; color:var(--ink); line-height:1.5; white-space:pre-wrap; overflow-wrap:anywhere; }
+.tp-meta { display:flex; gap:6px; flex-wrap:wrap; } .tp-chip { font-size:12.5px; font-weight:600; padding:4px 10px; border-radius:999px; background:var(--surface-2); color:var(--ink-2); }
+.tp-chip.due.over { background:#fde8e7; color:#c0302a; } .tp-chip.due.today, .tp-chip.due.soon { background:#fff2dc; color:#a35b00; } .tp-chip.p-urgent { background:#fde8e7; color:#c0302a; } .tp-chip.p-high { background:#fff2dc; color:#a35b00; }
+.tp-acts { display:flex; gap:8px; justify-content:flex-end; flex-wrap:wrap; }
+@media (max-width:700px) { .pdlg.tp-pop { width:100%; max-height:94dvh; } .tp-hero h2 { font-size:20px; } .tp-bell { width:52px; height:52px; font-size:26px; } .tp-acts .btn { flex:1; } .pdlg.tp-pop footer .btn { flex:1 1 40%; } .pdlg.tp-pop footer .grow { display:none; } }
+
 .set-grp { margin:14px 12px 4px; font-size:10.5px; font-weight:800; letter-spacing:.08em; text-transform:uppercase; color:var(--ink-2); opacity:.8; } .set-who + .set-grp { margin-top:6px; }
 .set-subtabs { margin:0 0 14px; } .wb-tiles.wb-tiles3 { grid-template-columns:repeat(3, minmax(0,1fr)); }
 @media (max-width:700px) { .set-page .set-grp { display:none !important; } .wb-tiles.wb-tiles3 { grid-template-columns:repeat(3, minmax(0,1fr)); } .set-subtabs { display:flex; flex-wrap:nowrap; overflow-x:auto; max-width:100%; scrollbar-width:none; } .set-subtabs button { flex:1 0 auto; white-space:nowrap; } }
@@ -4829,6 +4845,7 @@ const CLOUD = (() => {
 
   /* ---------- sidebar: who is signed in ---------- */
   function decorate() {
+    if (session && session.token && window.__tdSignedTok !== session.token) { window.__tdSignedTok = session.token; setTimeout(() => dispatchEvent(new Event('td:signedin')), 0); }   /* v3.79.1 */
     const lab = document.querySelector('.sidebar-bottom .local-label'); if (!lab || mode() !== 'cloud' || !session) return;
     lab.replaceChildren(h('i'), ' ' + session.name + (session.role === 'superadmin' ? ' · Super admin' : session.role === 'admin' ? ' · Admin' : ''));
     const links = h('div', { class: 'cloud-links' },
@@ -4861,7 +4878,7 @@ const CLOUD = (() => {
     request: (team, hours, reason) => rpc('td_access_request', { p_token: tok(), p_team: team, p_hours: hours, p_reason: reason }),
     decide: (id, action, hours) => rpc('td_access_decide', { p_token: tok(), p_id: id, p_action: action, p_hours: hours ?? null })
   };
-  return { phoneKey, contactKeys, fieldKeys, details, teams, atRest: () => dataKeyState, SUPABASE_CONFIG, saveDashboard, changeMyPasscode, passChanged, card, resume, mode, decorate, signOut, useLocalFiles, openAdmin, configured, isAdmin, refreshMe, user, getSettings, setSetting, setShared, saveLeaveRequest, admin, _rpc: rpc };
+  return { phoneKey, contactKeys, fieldKeys, details, teams, atRest: () => dataKeyState, SUPABASE_CONFIG, saveDashboard, changeMyPasscode, passChanged, card, resume, mode, decorate, signOut, useLocalFiles, openAdmin, configured, isAdmin, refreshMe, user, getSettings, setSetting, setShared, saveLeaveRequest, admin, _rpc: rpc, token: () => (session && session.token) || null };
 })();
 
 /* =====================================================================
@@ -10672,7 +10689,7 @@ async function poll() {
 }
 
 /* ============================== filtering ============================== */
-const APP = { title: "Team Dashboard", version: "3.79.0", released: "12 Nov 2026" };
+const APP = { title: "Team Dashboard", version: "3.80.0", released: "12 Nov 2026" };
 const BASE_DIMS = { status: "status_column", desig: "designation_column", client: "client_column", mode: "mode_column" };
 const STANDARD_STATUSES = ["Active", "Manager", "OJT", "Bench", "New", "Projected", "Left", "Moved"];
 const TILE_ORDER = ["Active", "Manager", "OJT", "Bench", "New", "Projected"];
@@ -10743,9 +10760,12 @@ function defaultFilters() {
   const none = () => ({q:'',sel:{},inited:true});
   try {
     const name=localStorage.getItem('team-dashboard.default-view.v1');
-    if(!name)return none();
-    const saved=JSON.parse(localStorage.getItem('team-dashboard.saved-filters.v1')||'[]');
-    const f=Array.isArray(saved)?saved.find(p=>p.name===name)?.filters:null;
+    /* v3.80.0: nobody chose their own default: use the team default view the super admin saved */
+    const team=(window.TD_SETTINGS||{}).team_default_view;
+    let f=null;
+    if(!name||name==='__team__'){ if(team&&team.filters)f=team.filters; else return none(); }
+    else if(name==='__none__')return none();
+    else { const saved=JSON.parse(localStorage.getItem('team-dashboard.saved-filters.v1')||'[]'); f=Array.isArray(saved)?saved.find(p=>p.name===name)?.filters:null; }
     if(!f||typeof f.q!=='string'||!f.sel)return none();
     const valid=k=>k in BASE_COL||k in XDIMS||(k.startsWith('field:')&&state.cols.some(c=>c.name===k.slice(6)));
     const entries=Object.entries(f.sel).filter(([k,v])=>valid(k)&&Array.isArray(v)&&v.every(x=>typeof x==='string'));
@@ -16166,9 +16186,16 @@ function drawPrefs(pane) {
  const defaultKey='team-dashboard.default-view.v1';
  let defaultName='';try{defaultName=localStorage.getItem(defaultKey)||'';}catch{}
  const defaultPicker=document.createElement('select');defaultPicker.className='input';defaultPicker.id='defaultFilterView';defaultPicker.setAttribute('aria-label','Default view on startup');
- const refreshDefault=()=>{defaultPicker.replaceChildren(new Option('None (no filters)',''));saved.forEach(p=>defaultPicker.add(new Option(p.name,p.name)));defaultPicker.value=saved.some(p=>p.name===defaultName)?defaultName:'';};
- const storeDefault=name=>{try{localStorage.setItem(defaultKey,name);defaultName=name;return true;}catch{toast('Could not save the default view. Browser storage is unavailable.',true);return false;}};
- defaultPicker.onchange=()=>{if(storeDefault(defaultPicker.value))toast(defaultName?'Default view saved. It will apply when the dashboard opens.':'Default view is None. The dashboard will open without filters.');else defaultPicker.value=defaultName;};
+ /* v3.80.0: what the super admin saves is shared: their saved filters become Team filters for everyone, and their default view is everyone's default */
+ const isOwnerNow=()=>!!(window.PERM&&PERM.online()&&PERM.isOwner());
+ const okFilter=p=>p&&typeof p.name==='string'&&p.filters&&typeof p.filters.q==='string'&&p.filters.sel&&typeof p.filters.sel==='object';
+ const teamList=()=>{const t=(window.TD_SETTINGS||{}).team_saved_filters;return isOwnerNow()?[]:(Array.isArray(t)?t.filter(okFilter):[]);};
+ const teamDefault=()=>{const t=(window.TD_SETTINGS||{}).team_default_view;return t&&t.filters?t:null;};
+ const pushTeam=(k,v)=>{if(!isOwnerNow()||!window.saveTeamSetting)return;saveTeamSetting(k,v).catch(e=>toast('Saved here, but not shared with the team: '+e.message,true));};
+ const refreshDefault=()=>{const td=teamDefault();defaultPicker.replaceChildren(...(isOwnerNow()?[new Option('None (no filters)','')]:[new Option(td?'Team default · '+td.name:'Team default (none set)',''),new Option('No filters','__none__')]));saved.forEach(p=>defaultPicker.add(new Option(p.name,p.name)));defaultPicker.value=defaultName==='__none__'&&!isOwnerNow()?'__none__':saved.some(p=>p.name===defaultName)?defaultName:'';};
+ const storeDefault=name=>{try{localStorage.setItem(defaultKey,name);defaultName=name;}catch{toast('Could not save the default view. Browser storage is unavailable.',true);return false;}
+   if(isOwnerNow()){const p=saved.find(x=>x.name===name);pushTeam('team_default_view',p?{name:p.name,filters:p.filters}:null);}return true;};
+ defaultPicker.onchange=()=>{if(storeDefault(defaultPicker.value))toast(isOwnerNow()?(defaultName?'Default view saved for everyone: people see “'+defaultName+'” when they open the dashboard.':'No default view: everyone opens the dashboard without filters.'):(defaultName==='__none__'?'You will open the dashboard without filters.':defaultName?'Default view saved. It will apply when the dashboard opens.':'You will see the team default view.'));else defaultPicker.value=defaultName;};
  let saved=[];
  try { const raw=JSON.parse(localStorage.getItem(key)||'[]'); if(Array.isArray(raw)) saved=raw.filter(p=>p&&typeof p.name==='string'&&p.filters&&typeof p.filters.q==='string'&&p.filters.sel&&Object.entries(p.filters.sel).every(([k,v])=>(k in BASE_COL||k in XDIMS||k.startsWith("field:"))&&Array.isArray(v)&&v.every(x=>typeof x==='string'))); } catch {}
  const row=document.createElement('div'); row.className='saved-filter-row';
@@ -16176,7 +16203,9 @@ function drawPrefs(pane) {
  document.getElementById('cleanFilters').append(row);
  const defaultLabel=document.createElement('label');defaultLabel.htmlFor='defaultFilterView';defaultLabel.textContent='Default view';row.append(defaultLabel,defaultPicker);
  const select=row.querySelector('#savedFilterSelect'), name=row.querySelector('input');
- const redraw=(index='')=>{select.replaceChildren(new Option('Choose a filter…','')); saved.forEach((p,i)=>select.add(new Option(p.name,String(i))));select.value=index;row.querySelector('#updateFilter').disabled=index==='';row.querySelector('#deleteFilter').disabled=index==='';row.querySelector('.filter-more').hidden=index==='';if(index==='')row.querySelector('.filter-more').open=false;refreshDefault();window.syncFilterSaveActions?.();};
+ const redraw=(index='')=>{select.replaceChildren(new Option('Choose a filter…',''));const tl=teamList();
+   if(tl.length){const og=document.createElement('optgroup');og.label='Team filters (set by the admin)';tl.forEach((p,i)=>og.append(new Option('★ '+p.name,'t'+i)));select.append(og);const mine=document.createElement('optgroup');mine.label='My filters';saved.forEach((p,i)=>mine.append(new Option(p.name,String(i))));if(saved.length)select.append(mine);}
+   else saved.forEach((p,i)=>select.add(new Option(p.name,String(i))));select.value=index;try{refreshDefault();}catch{}row.querySelector('#updateFilter').disabled=index==='';row.querySelector('#deleteFilter').disabled=index==='';row.querySelector('.filter-more').hidden=index==='';if(index==='')row.querySelector('.filter-more').open=false;refreshDefault();window.syncFilterSaveActions?.();};
  const snapshot=()=>({fields:chosenFilterFields(),q:document.getElementById('fq').value.trim(),sel:Object.fromEntries(Object.entries(state.filters.sel).map(([k,v])=>[k,[...v]]))});
  let startupMatched=false;
  window.syncFilterSaveActions=()=>{
@@ -16185,7 +16214,7 @@ function drawPrefs(pane) {
      const found=saved.findIndex(p=>p.name===defaultName&&filterSignature(p.filters)===filterSignature(snapshot()));
      if(found>=0){select.value=String(found);name.value=saved[found].name;}
    }
-   const selected=select.value===''?null:saved[Number(select.value)],label=name.value.trim();
+   const selected=select.value===''||select.value[0]==='t'?null:saved[Number(select.value)],label=name.value.trim();
    const duplicate=saved.some((p,i)=>p.name.toLowerCase()===label.toLowerCase()&&(!selected||i!==Number(select.value)));
    const changed=!!selected&&(label!==selected.name||filterSignature(snapshot())!==filterSignature(selected.filters));
    const canSave=!selected&&!!label&&!duplicate;
@@ -16197,10 +16226,11 @@ function drawPrefs(pane) {
  };
  name.addEventListener('input',()=>window.syncFilterSaveActions());
  document.getElementById('fq').addEventListener('input',()=>window.syncFilterSaveActions());
- const persist=next=>{try{localStorage.setItem(key,JSON.stringify(next));saved=next;return true;}catch{toast('Could not save filters. Browser storage is unavailable.',true);return false;}};
+ const persist=next=>{try{localStorage.setItem(key,JSON.stringify(next));saved=next;}catch{toast('Could not save filters. Browser storage is unavailable.',true);return false;}
+   if(isOwnerNow()){pushTeam('team_saved_filters',next);const d=next.find(p=>p.name===defaultName);if(d)pushTeam('team_default_view',{name:d.name,filters:d.filters});}return true;};
  select.onchange=()=>{
-   const p=saved[select.value];row.querySelector('#updateFilter').disabled=!p;row.querySelector('#deleteFilter').disabled=!p;row.querySelector('.filter-more').hidden=!p;row.querySelector('.filter-more').open=false;if(!p){name.value='';window.syncFilterSaveActions();return;}
-   clearTimeout(qTimer);clearTimeout(tqTimer);name.value=p.name;
+   const isTeam=select.value[0]==='t',p=isTeam?teamList()[Number(select.value.slice(1))]:saved[select.value];row.querySelector('#updateFilter').disabled=!p||isTeam;row.querySelector('#deleteFilter').disabled=!p;row.querySelector('.filter-more').hidden=!p;row.querySelector('.filter-more').open=false;if(!p){name.value='';window.syncFilterSaveActions();return;}
+   clearTimeout(qTimer);clearTimeout(tqTimer);name.value=isTeam?'':p.name;if(isTeam){row.querySelector('#deleteFilter').disabled=true;row.querySelector('.filter-more').hidden=true;}
    state.filters={fields:Array.isArray(p.filters.fields)?p.filters.fields.filter(k=>typeof k==="string"):undefined,q:p.filters.q,sel:Object.fromEntries(Object.entries(p.filters.sel).map(([k,v])=>[k,new Set(v)])),inited:true};
    state.tf={q:'',cols:{}};document.getElementById('tq').value='';document.getElementById('fq').value=p.filters.q;state.page=1;closePops();renderAll();
  };
@@ -16212,12 +16242,21 @@ function drawPrefs(pane) {
  };
  row.querySelector('#updateFilter').onclick=()=>{
    window.syncFilterSaveActions();if(row.querySelector('#updateFilter').hidden)return;
-   const i=Number(select.value),label=name.value.trim();if(select.value===''||!label)return;
+   const i=Number(select.value),label=name.value.trim();if(select.value===''||select.value[0]==='t'||!label)return;
    if(saved.some((p,j)=>j!==i&&p.name.toLowerCase()===label.toLowerCase())){toast('Choose a unique filter name.',true);return;}
    const wasDefault=saved[i].name===defaultName;const next=saved.map((p,j)=>j===i?{name:label,filters:snapshot()}:p);if(persist(next)){if(wasDefault)storeDefault(label);redraw(String(i));toast('Filter updated.');}
  };
- row.querySelector('#deleteFilter').onclick=()=>{if(select.value==='')return;const i=Number(select.value),wasDefault=saved[i].name===defaultName;row.querySelector('.filter-more').open=false;if(!confirm('Delete the saved filter “'+saved[i].name+'”?'+(wasDefault?' It is your default view, so the dashboard will open without filters.':'')+' The filters on your screen stay as they are.'))return;if(persist(saved.filter((_,j)=>j!==i))){if(wasDefault)storeDefault('');redraw();name.value='';window.syncFilterSaveActions();toast('Saved filter deleted. Current filters are unchanged.');}};
+ row.querySelector('#deleteFilter').onclick=()=>{if(select.value===''||select.value[0]==='t')return;const i=Number(select.value),wasDefault=saved[i].name===defaultName;row.querySelector('.filter-more').open=false;if(!confirm('Delete the saved filter “'+saved[i].name+'”?'+(wasDefault?' It is your default view, so the dashboard will open without filters.':'')+' The filters on your screen stay as they are.'))return;if(persist(saved.filter((_,j)=>j!==i))){if(wasDefault)storeDefault('');redraw();name.value='';window.syncFilterSaveActions();toast('Saved filter deleted. Current filters are unchanged.');}};
  document.addEventListener('click',e=>{const m=row.querySelector('.filter-more');if(m&&m.open&&!m.contains(e.target))m.open=false;});
+ select.addEventListener('mousedown',()=>{const v=select.value;redraw(v);});
+ select.addEventListener('focus',()=>{const v=select.value;redraw(v);});
+ const applyTeamDefault=(n=0)=>{ if(typeof state==='undefined'||!state.schema){ if(n<20)setTimeout(()=>applyTeamDefault(n+1),1500); return; }
+   const untouched=!state.filters.q&&!Object.values(state.filters.sel||{}).some(v=>v&&v.size);
+   if(!isOwnerNow()&&teamDefault()&&(!defaultName||defaultName==='__team__')&&untouched&&!(window.PERM&&PERM.fixedFilters&&PERM.fixedFilters())){window.restoreDefaultFilters&&window.restoreDefaultFilters();try{document.getElementById('fq').value=state.filters.q||'';}catch{}}
+ };
+ addEventListener('td:signedin',()=>setTimeout(()=>{try{redraw(select.value);applyTeamDefault();
+   if(isOwnerNow()&&saved.length&&!Array.isArray((window.TD_SETTINGS||{}).team_saved_filters)){pushTeam('team_saved_filters',saved);const d=saved.find(p=>p.name===defaultName);if(d)pushTeam('team_default_view',{name:d.name,filters:d.filters});}
+ }catch(e){console.warn(e);}},4000));
  redraw();placeSavedFilters();
 })();
 
@@ -16408,7 +16447,7 @@ async function plLoad(quiet) {
   catch (e) { PL.err = /not set up/i.test(e.message || '') ? 'nosql' : friendly(e); if (!quiet) tst(PL.err === 'nosql' ? friendly(e) : PL.err, true); }
   finally { PL.busy = false; PL.loaded = true; plBadge(); }
 }
-const tok = () => { try { return JSON.parse(localStorage.getItem('td-pass-session') || 'null').token; } catch { return null; } };
+const tok = () => { try { const t = CLOUD.token && CLOUD.token(); if (t) return t; } catch { } try { return JSON.parse(localStorage.getItem('td-pass-session') || 'null').token; } catch { return null; } };   /* v3.79.1: the live session first */
 const myId = () => String((PL.me && PL.me.id) || meU().id || '');
 const isMine = t => (t.assignees || []).some(a => String(a.id) === myId());
 const canEditT = t => !!PL.me && (PL.me.admin || String(t.createdBy) === myId());
@@ -16570,18 +16609,41 @@ function taskEvents() {
   }
   return out;
 }
-function taskPopup() {
-  if (!online() || !PL.me) return;
+/* v3.79.1: a big, clear pop-up for new tasks. It comes back until "Got it" (or the task is opened);
+   "Remind me later" shows it again after 30 minutes. Checked at sign-in, every minute, and when the tab comes back. */
+let taskSnooze = 0, taskPopOpen = false;
+function taskPopup(force) {
+  if (!online() || !PL.me || taskPopOpen) return;
+  if (!force && Date.now() < taskSnooze) return;
   const id = myId(), seen = new Set(lsGet('task_seen', []));
-  const fresh = PL.tasks.filter(t => isMine(t) && String(t.createdBy) !== id && t.status !== 'done' && !seen.has(String(t.id)));
-  if (!fresh.length) return; if (busyScreen()) { setTimeout(taskPopup, 20000); return; }
-  const done = () => { const s2 = new Set(lsGet('task_seen', [])); fresh.forEach(t => s2.add(String(t.id))); lsSet('task_seen', [...s2].slice(-500)); d.close(); };
-  const d = dlg(fresh.length === 1 ? 'You have a new task' : 'You have ' + fresh.length + ' new tasks', h('div', {},
-    h('ul', { class: 'pp-pop-list' }, ...fresh.slice(0, 8).map(t => h('li', {}, h('span', { class: 'pl-av' }, initials(t.createdByName)), h('div', {}, h('b', {}, t.title),
-      h('small', {}, 'From ' + (t.createdByName || 'someone') + (t.due ? ' · due ' + fmtDay(t.due) : '') + (t.priority !== 'normal' ? ' · ' + priLabel(t.priority) + ' priority' : '')))))),
-    fresh.length > 8 ? h('p', { class: 'pb-muted' }, '…and ' + (fresh.length - 8) + ' more in the Planner.') : null),
-    [h('button', { class: 'btn', type: 'button', onclick: done }, 'Got it'), h('button', { class: 'btn primary', type: 'button', onclick: () => { done(); setView('planner'); if (fresh.length === 1) setTimeout(() => openTask(PL.tasks.find(x => x.id === fresh[0].id) || fresh[0]), 300); } }, fresh.length === 1 ? 'Open the task' : 'Open the Planner')], 'pp-pop');
-  d.box.querySelector('.pdlg-x')?.addEventListener('click', done);
+  const fresh = PL.tasks.filter(t => isMine(t) && String(t.createdBy) !== id && t.status !== 'done' && !seen.has(String(t.id)))
+    .sort((a, b) => ['urgent', 'high', 'normal', 'low'].indexOf(a.priority) - ['urgent', 'high', 'normal', 'low'].indexOf(b.priority) || String(a.due || '9').localeCompare(String(b.due || '9')));
+  if (!fresh.length) return;
+  { const app = document.getElementById('app'); if (!app || app.hidden || document.hidden || document.querySelector('#pcDialog')) { clearTimeout(taskPopup._t); taskPopup._t = setTimeout(() => taskPopup(), 8000); return; } }   /* tasks come first: shown on top of other windows */
+  taskPopOpen = true;
+  const markSeen = list => { const s2 = new Set(lsGet('task_seen', [])); list.forEach(t => s2.add(String(t.id))); lsSet('task_seen', [...s2].slice(-500)); };
+  const close = () => { taskPopOpen = false; d.close(); };
+  const dueTxt = t => { if (!t.due) return 'No due date'; const n = Math.round((Date.parse(String(t.due).slice(0, 10)) - Date.parse(todayIso())) / DAY); return n < 0 ? 'Overdue · ' + fmtDay(t.due) : n === 0 ? 'Due today' : n === 1 ? 'Due tomorrow' : 'Due ' + fmtDay(t.due) + ' · in ' + n + ' days'; };
+  const card = t => h('article', { class: 'tp-card pri-' + t.priority },
+    h('div', { class: 'tp-top' }, h('span', { class: 'pl-av tp-av', title: t.createdByName }, initials(t.createdByName)), h('div', { class: 'tp-from' }, h('small', {}, 'From ' + (t.createdByName || 'someone') + ' · ' + ago(t.createdAt)), h('h4', {}, t.title))),
+    t.details ? h('p', { class: 'tp-det' }, String(t.details).slice(0, 300)) : null,
+    h('div', { class: 'tp-meta' }, h('span', { class: 'tp-chip due ' + dueState(t) }, '📅 ' + dueTxt(t)), t.priority !== 'normal' ? h('span', { class: 'tp-chip p-' + t.priority }, '⚑ ' + priLabel(t.priority) + ' priority') : null,
+      (t.assignees || []).length > 1 ? h('span', { class: 'tp-chip' }, '👥 With ' + (t.assignees || []).filter(a => String(a.id) !== id).map(a => a.name).join(', ')) : null),
+    h('div', { class: 'tp-acts' },
+      h('button', { class: 'btn', type: 'button', onclick: () => { markSeen([t]); close(); setView('planner'); setTimeout(() => openTask(PL.tasks.find(x => x.id === t.id) || t), 250); } }, 'Open task'),
+      h('button', { class: 'btn primary', type: 'button', onclick: async e => { const btn = e.currentTarget; btn.disabled = true; markSeen([t]); await setStatus(PL.tasks.find(x => x.id === t.id) || t, 'doing'); btn.textContent = '✓ Started'; } }, '▶ Start now')));
+  const d = dlg('', h('div', { class: 'tp-wrap' },
+    h('div', { class: 'tp-hero' }, h('span', { class: 'tp-bell', 'aria-hidden': 'true' }, '📋'),
+      h('div', {}, h('h2', {}, fresh.length === 1 ? 'You have a new task' : 'You have ' + fresh.length + ' new tasks'), h('p', {}, 'Assigned to you in the Planner. Start it now, or open it to read the details and add notes.'))),
+    h('div', { class: 'tp-list' }, ...fresh.slice(0, 6).map(card)),
+    fresh.length > 6 ? h('p', { class: 'pb-muted' }, '…and ' + (fresh.length - 6) + ' more in the Planner.') : null),
+    [h('button', { class: 'btn', type: 'button', onclick: () => { taskSnooze = Date.now() + 30 * 60000; close(); tst('We’ll remind you again in 30 minutes.'); } }, 'Remind me later'),
+     h('span', { class: 'grow' }),
+     h('button', { class: 'btn', type: 'button', onclick: () => { markSeen(fresh); close(); setView('planner'); } }, 'Open the Planner'),
+     h('button', { class: 'btn primary', type: 'button', onclick: () => { markSeen(fresh); close(); } }, 'Got it')], 'tp-pop');
+  d.box.closest('.pdlg-veil')?.classList.add('tp-veil');
+  d.box.querySelector('.pdlg-x')?.addEventListener('click', () => { taskSnooze = Date.now() + 30 * 60000; taskPopOpen = false; });
+  d.box.closest('.pdlg-veil')?.addEventListener('mousedown', e => { if (e.target === e.currentTarget) taskPopOpen = false; });
 }
 const pbMine = x => (x.updatedBy || x.createdBy) === (meU().name || (typeof BE !== 'undefined' && BE.userName ? BE.userName() : ''));
 function pbEvents() {
@@ -16590,6 +16652,7 @@ function pbEvents() {
 }
 function pbPopup() {
   if (typeof state === 'undefined' || !state.schema || (window.PERM && !PERM.canView('playbook'))) return;
+  if (taskPopOpen) return;
   let since = lsGet('pb_seen', null); if (since == null) { since = Date.now() - 7 * DAY; lsSet('pb_seen', since); }
   const fresh = pbList().filter(x => !pbMine(x) && Date.parse(x.updatedAt || x.createdAt || 0) > since);
   if (!fresh.length) return; if (busyScreen()) { setTimeout(pbPopup, 20000); return; }
@@ -16606,6 +16669,8 @@ window.renderPlaybook = renderPlaybook; window.renderPlanner = renderPlanner;
 if (window.TDNET) TDNET.poller('tasks', 60000, async () => { await plLoad(true); if (typeof state !== 'undefined' && state.view === 'planner') renderPlanner(); taskPopup(); window.refreshNotifications?.(); }, () => online());
 if (window.TDNET) TDNET.poller('pbpop', 30000, () => pbPopup());
 setTimeout(async () => { if (online()) { await plLoad(true); taskPopup(); window.refreshNotifications?.(); } pbPopup(); }, 5000);
+addEventListener('td:signedin', () => setTimeout(async () => { if (online()) { PL.loaded = false; await plLoad(true); taskPopup(true); window.refreshNotifications?.(); } pbPopup(); }, 2500));
+document.addEventListener('visibilitychange', () => { if (!document.hidden && online()) setTimeout(() => taskPopup(), 1500); });
 })();
 </script>
 
