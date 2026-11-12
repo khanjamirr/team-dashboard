@@ -10,7 +10,7 @@
 <meta name="format-detection" content="telephone=no">
 <link rel="preconnect" href="https://iiogwevtyzgedhoaqlrn.supabase.co" crossorigin><link rel="dns-prefetch" href="https://iiogwevtyzgedhoaqlrn.supabase.co">
 <link rel="icon" href="data:,">
-<title>Team Dashboard · 3.77.0</title>
+<title>Team Dashboard · 3.78.1</title>
 <link rel="preconnect" href="https://fonts.googleapis.com"><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin><link href="https://fonts.googleapis.com/css2?family=Public+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet">
 <style>
 :root {
@@ -2446,6 +2446,71 @@ article.al-d { --alc:#c62828; }
 .xl-new-box { margin-top:14px; padding:10px 12px; border:1px dashed var(--border); border-radius:10px; } .xl-new-box h5 { margin:0 0 8px; }
 .xl-newp { display:grid; grid-template-columns:20px minmax(140px,1.2fr) 110px minmax(0,2fr); gap:10px; align-items:center; padding:6px 4px; font-size:13px; cursor:pointer; } .xl-newp.off { opacity:.55; } .xl-nid { color:var(--ink-2); font-variant-numeric:tabular-nums; } .xl-nf { color:var(--ink-2); font-size:12px; }
 @media (max-width:700px) { .xl-newp { grid-template-columns:20px 1fr; } .xl-nid, .xl-nf { grid-column:2; } }
+html body .atabs.atabs > .atab[hidden] { display:none !important; }
+/* v3.78.1: rights editor as cards */
+.ra { display:flex; flex-direction:column; gap:12px; }
+.ra-sec-h h4 { margin:6px 0 2px; font-size:14px; } .ra-sec-h p { margin:0; font-size:12.5px; color:var(--ink-2); }
+.ra-grid { display:grid; grid-template-columns:repeat(auto-fill, minmax(270px, 1fr)); gap:10px; }
+.ra-tile { display:flex; flex-direction:column; gap:10px; padding:12px; border:1px solid var(--border); border-radius:14px; background:var(--surface); transition:border-color .15s, background .15s; }
+.ra-tile[data-lv="none"] { background:var(--surface-2); } .ra-tile[data-lv="none"] .ra-ic { filter:grayscale(1); opacity:.6; }
+.ra-tile[data-lv="view"] { border-color:#b9cdf8; } .ra-tile[data-lv="edit"] { border-color:#f3cf8f; } .ra-tile[data-lv="full"] { border-color:#9fd9b5; } .ra-tile[data-lv="custom"] { border-color:#f3cf8f; border-style:dashed; }
+.ra-top { display:flex; gap:10px; align-items:flex-start; } .ra-ic { display:grid; place-items:center; width:34px; height:34px; border-radius:10px; background:var(--surface-2); font-size:17px; flex:none; }
+.ra-name { min-width:0; } .ra-name b { display:flex; align-items:center; gap:6px; font-size:14px; } .ra-name small { display:block; font-size:12px; color:var(--ink-2); line-height:1.35; }
+.ra-tile .rt-seg { width:100%; } .ra-tile .rt-lv { flex:1; min-width:0; padding:7px 4px; }
+.ra-quick { display:grid; grid-template-columns:repeat(auto-fill, minmax(260px, 1fr)); gap:6px 14px; padding:10px 12px; border:1px solid var(--border); border-radius:14px; }
+.ra-q { display:flex; align-items:center; gap:10px; font-size:13px; padding:4px 0; cursor:pointer; }
+.ra-more { padding:6px 12px; border:1px solid var(--border); border-radius:14px; } .ra-more .rmod-subt { font-weight:700; margin:8px 0 4px; }
+.ra-adv { border:1px solid var(--border); border-radius:14px; padding:10px 12px; } .ra-adv > summary { cursor:pointer; font-weight:650; font-size:13px; color:var(--accent); }
+.ra-adv-body { display:flex; flex-direction:column; gap:14px; margin-top:12px; } .ra-adv-g h5 { margin:0 0 6px; font-size:13px; } .ra-adv-g h5 .rt-cnt { font-weight:500; color:var(--ink-2); }
+@media (max-width:700px) { .ra-grid, .ra-quick { grid-template-columns:1fr; } }
+
+.wb-hero + .err:empty { display:none; }
+.wb-hero { display:flex; align-items:center; gap:14px; flex-wrap:wrap; padding:16px; border:1px solid var(--border); border-radius:14px; background:var(--surface); margin-bottom:12px; }
+.wb-file { display:flex; align-items:center; gap:12px; flex:1 1 280px; min-width:0; } .wb-file b { display:block; font-size:15px; } .wb-file small { color:var(--ink-2); font-size:12.5px; }
+.wb-ic { display:grid; place-items:center; width:46px; height:46px; border-radius:12px; background:#e3f6ea; color:#167a3e; font-size:11px; font-weight:800; letter-spacing:.04em; flex:none; }
+.wb-acts { display:flex; gap:8px; flex-wrap:wrap; }
+.wb-tiles { display:grid; grid-template-columns:repeat(4, minmax(0,1fr)); gap:10px; margin-bottom:12px; }
+.wb-tile { border:1px solid var(--border); border-radius:12px; padding:10px 14px; background:var(--surface); } .wb-tile b { display:block; font-size:22px; line-height:1.15; } .wb-tile span { font-size:12px; color:var(--ink-2); } .wb-tile.bad b { color:#c0302a; }
+.wb-card { padding:12px 14px !important; } .wb-tabs { margin-bottom:10px; }
+.wb-list { list-style:none; margin:0; padding:0; max-height:420px; overflow:auto; }
+.wb-row { display:flex; align-items:center; gap:12px; padding:9px 4px; border-top:1px solid var(--border); } .wb-row:first-child { border-top:0; }
+.wb-main { flex:1; min-width:0; } .wb-main b { display:block; font-size:13.5px; overflow:hidden; text-overflow:ellipsis; white-space:nowrap; } .wb-main small { color:var(--ink-2); font-size:12px; }
+.wb-av { display:grid; place-items:center; width:32px; height:32px; border-radius:50%; background:color-mix(in srgb, var(--accent) 14%, var(--surface)); color:var(--accent); font-size:11px; font-weight:800; flex:none; } .wb-av.cal { border-radius:9px; background:var(--surface-2); color:var(--ink); font-size:13px; }
+.wb-chip { font-size:11.5px; font-weight:700; padding:2px 9px; border-radius:999px; background:var(--surface-2); color:var(--ink-2); white-space:nowrap; } .wb-chip.ok { background:#e3f6ea; color:#167a3e; } .wb-chip.bad { background:#fde8e7; color:#c0302a; }
+.wb-row.fail b { color:#c0302a; } .wb-empty { color:var(--ink-2); font-size:13px; margin:8px 4px; } .wb-more { margin:8px 4px 0; font-size:13px; }
+@media (max-width:700px) { .wb-tiles { grid-template-columns:repeat(2, minmax(0,1fr)); } .wb-acts, .wb-acts .btn { width:100%; } .wb-acts .btn { flex:1; } }
+.rt-simple .rt-legend { font-size:12.5px; color:var(--ink-2); margin:0 0 10px; }
+.rt-simple .rt-r2 { display:flex !important; align-items:center; gap:14px; flex-wrap:wrap; grid-template-columns:none !important; }
+.rt-simple .rt-r2 .rt-p { flex:1 1 220px; min-width:0; } .rt-simple .rt-p b { display:flex; align-items:center; gap:8px; }
+.rt-seg { display:inline-flex; padding:3px; gap:2px; border-radius:10px; background:var(--surface-2); border:1px solid var(--border); flex-wrap:wrap; }
+.rt-lv { border:0; background:transparent; font:inherit; font-size:12.5px; font-weight:600; color:var(--ink-2); padding:6px 12px; border-radius:8px; cursor:pointer; min-width:64px; }
+.rt-lv[aria-pressed="true"] { background:var(--surface); color:var(--ink); box-shadow:0 1px 2px rgba(16,24,40,.14); }
+.rt-lv-view[aria-pressed="true"] { color:#2f6fed; } .rt-lv-edit[aria-pressed="true"] { color:#a35b00; } .rt-lv-full[aria-pressed="true"] { color:#167a3e; }
+.rt-custom { font-size:10.5px; font-weight:700; padding:1px 7px; border-radius:999px; background:#fff2dc; color:#a35b00; }
+.rt-simple .rt-sec > summary { font-size:12.5px; } .rt-simple .rt-g { padding:10px 0; border-top:1px solid var(--border); } .rt-simple .rt-g:first-of-type { border-top:0; }
+@media (max-width:700px) { .rt-seg { width:100%; } .rt-lv { flex:1; min-width:0; padding:8px 4px; } }
+.nf-drawer header { display:flex; align-items:center; gap:8px; } .nf-markall { font-size:13px; } .nf-markall:disabled { opacity:.45; text-decoration:none; cursor:default; }
+.nf-drawer .body { display:flex; flex-direction:column; gap:12px; }
+.nf-inbox:empty { display:none; }
+.nf-chips { display:flex; gap:6px; flex-wrap:wrap; }
+.nf-chip { border:1px solid var(--border); background:var(--surface); color:var(--ink-2); border-radius:999px; padding:6px 12px; font:inherit; font-size:12.5px; font-weight:600; cursor:pointer; }
+.nf-chip.on { background:var(--ink); color:var(--surface); border-color:var(--ink); }
+.nf-day { margin:4px 0 6px; font-size:11.5px; font-weight:700; letter-spacing:.05em; text-transform:uppercase; color:var(--ink-2); }
+.nf-list { list-style:none; margin:0; padding:0; display:flex; flex-direction:column; gap:4px; }
+.nf-item { position:relative; display:flex; align-items:stretch; border-radius:12px; } .nf-item.unread { background:color-mix(in srgb, var(--accent) 7%, var(--surface)); }
+.nf-main { flex:1; display:flex; gap:12px; align-items:flex-start; text-align:left; border:0; background:transparent; font:inherit; color:inherit; padding:10px 34px 10px 10px; border-radius:12px; cursor:pointer; min-width:0; }
+.nf-main:hover { background:var(--surface-2); }
+.nf-ic { display:grid; place-items:center; width:36px; height:36px; border-radius:50%; background:var(--surface-2); font-size:16px; flex:none; }
+.nf-task .nf-ic { background:#e5eeff; } .nf-request .nf-ic { background:#fff2dc; } .nf-playbook .nf-ic { background:#f1e9ff; }
+.nf-txt { flex:1; min-width:0; display:flex; flex-direction:column; gap:2px; } .nf-txt b { font-size:13.5px; } .nf-txt span { font-size:13px; color:var(--ink-2); overflow-wrap:anywhere; display:-webkit-box; -webkit-line-clamp:2; -webkit-box-orient:vertical; overflow:hidden; }
+.nf-item.unread .nf-txt b { color:var(--ink); }
+.nf-time { font-size:11.5px; color:var(--ink-2); white-space:nowrap; padding-top:2px; }
+.nf-dot { position:absolute; right:12px; top:50%; width:10px; height:10px; margin-top:-5px; border-radius:50%; background:var(--accent); border:0; padding:0; cursor:pointer; }
+.nf-empty { display:flex; flex-direction:column; align-items:center; gap:4px; padding:40px 10px; text-align:center; } .nf-empty span { font-size:28px; } .nf-empty small { color:var(--ink-2); }
+.nf-more { align-self:center; } .nf-log { align-self:flex-start; font-size:13px; }
+.pp-pop .pdlg-body { display:flex; flex-direction:column; gap:10px; } .pp-pop-list { list-style:none; margin:0; padding:0; display:flex; flex-direction:column; gap:8px; max-height:50vh; overflow:auto; }
+.pp-pop-list li { display:flex; gap:10px; align-items:flex-start; padding:10px 12px; border:1px solid var(--border); border-radius:12px; background:var(--surface); }
+.pp-pop-list li b { display:block; font-size:14px; } .pp-pop-list li small { color:var(--ink-2); font-size:12.5px; } .pdlg.pp-pop { width:min(520px, 96vw); } .pdlg.pp-pop footer { display:flex; gap:8px; justify-content:flex-end; }
 /* ================= v3.77.0: Playbook and Planner ================= */
 #ovUpTabs > button { padding-left:6px !important; padding-right:6px !important; gap:5px !important; font-size:12.5px !important; }
 body.v-plain #pinnedHeader .pinned-filters, body.v-plain #pinnedHeader #scopeLine { display:none !important; }
@@ -2728,7 +2793,7 @@ body.v-plain #pinnedHeader .pinned-filters, body.v-plain #pinnedHeader #scopeLin
       <div class="section-heading"><div><h2>Action center</h2><p>Everything that needs a decision or a fix, in one place · follows the filters at the top</p></div><span id="todayLabel"></span></div>
       <div class="atabs" role="tablist" aria-label="Action center sections">
         <button class="atab on" role="tab" data-atab="actions" aria-selected="true"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M9 11l3 3 8-8"/><path d="M20 12v7a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11"/></svg>Action items <b id="cntActions" hidden></b></button>
-        <button class="atab" role="tab" data-atab="review" aria-selected="false"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="9" cy="8" r="4"/><path d="M2 21c0-3.9 3.1-7 7-7"/><path d="M16 14l2 2 4-4"/></svg>Designation reviews <b id="cntReview" hidden></b></button>
+        <button class="atab" role="tab" data-atab="review" aria-selected="false" hidden><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="9" cy="8" r="4"/><path d="M2 21c0-3.9 3.1-7 7-7"/><path d="M16 14l2 2 4-4"/></svg>Designation reviews <b id="cntReview" hidden></b></button>
         <button class="atab" role="tab" data-atab="health" aria-selected="false"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M3 12h4l3-8 4 16 3-8h4"/></svg>Attendance data health <b id="cntHealth" hidden></b></button>
         <button class="atab" role="tab" data-atab="fill" aria-selected="false"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="3" y="3" width="18" height="18" rx="2"/><path d="M3 9h18M9 21V9"/></svg>Fill in bulk <b id="cntFill" hidden></b></button>
         <button class="atab" role="tab" data-atab="log" aria-selected="false" hidden><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M4 4h11a3 3 0 0 1 3 3v13H7a3 3 0 0 1-3-3z"/><path d="M8 8h6M8 12h6M8 16h3"/></svg>Admin log <b id="cntLog" hidden></b></button>
@@ -4808,7 +4873,7 @@ const PERM_GROUPS = [
   { name: 'Attendance', page: 'page.attendance', items: [['att.who', 'See leave applications (LA) waiting in the tracker'], ['att.grid', 'See the attendance grid and People'], ['att.log', 'Use Record attendance (with the types ticked below)'], ['att.direct', 'Record attendance straight into the tracker (no manager approval)'], ['att.edit', 'Mark attendance in day cells'], ['att.rows', 'Edit any cell or row in the tracker (names, Emp IDs, clients, days) and delete rows'], ['att.holidays', 'Add holidays for everyone'], ['att.fields', 'Add or delete fields in the attendance tracker'], ['att.addemp', 'Add employees to the attendance tracker (new rows, start a month)']],
     /* v3.14.2: which leave types appear in the Log leave “Type” list */
     sub: { title: 'Types in Record attendance', items: [['log.LA', 'LA · Leave application (pending)'], ['log.AL', 'AL · Approved leave'], ['log.CL', 'CL · Casual leave'], ['log.SL', 'SL · Sick leave'], ['log.UL', 'UL · Unplanned leave'], ['log.AB', 'AB · Absent'], ['log.HD1', 'HD1 · Half day, 1st half'], ['log.HD2', 'HD2 · Half day, 2nd half'], ['log.R', 'R · Remote'], ['log.L', 'L · Late coming'], ['log.C', 'C · Cab late']] } },
-  { name: 'Action center', page: 'page.actions', items: [['act.items', 'See Action items'], ['act.review', 'See Designation reviews'], ['act.health', 'See Attendance data health']] },
+  { name: 'Action center', page: 'page.actions', items: [['act.items', 'See Action items'], ['act.health', 'See Attendance data health']] },
   { name: 'Reports', page: 'page.reports', items: [['rep.team', 'Team composition'], ['rep.growth', 'Tenure & growth'], ['rep.location', 'Location & travel'], ['rep.attendance', 'Attendance reports'], ['rep.custom', 'See custom dashboards (their own and shared ones)'], ['rep.export', 'Copy report tables and charts'], ['rep.build', 'Create and edit custom dashboards']] },
   { name: 'Planner', page: 'page.planner', items: [['plan.assign', 'Create tasks for other people'], ['plan.all', 'See everyone’s tasks']] },
   { name: 'Playbook', page: 'page.playbook', items: [['pb.edit', 'Add, edit and delete playbook entries']] },
@@ -10603,7 +10668,7 @@ async function poll() {
 }
 
 /* ============================== filtering ============================== */
-const APP = { title: "Team Dashboard", version: "3.77.0", released: "12 Nov 2026" };
+const APP = { title: "Team Dashboard", version: "3.78.1", released: "12 Nov 2026" };
 const BASE_DIMS = { status: "status_column", desig: "designation_column", client: "client_column", mode: "mode_column" };
 const STANDARD_STATUSES = ["Active", "Manager", "OJT", "Bench", "New", "Projected", "Left", "Moved"];
 const TILE_ORDER = ["Active", "Manager", "OJT", "Bench", "New", "Projected"];
@@ -12133,6 +12198,7 @@ function actionCounts() {
 function syncActionTabs() {
   if (!state.schema) return;
   /* v3.14: a tab the passcode may not see is hidden; fall back to the first visible one */
+  for (const t of ['review', 'log']) { const b = document.querySelector('.atab[data-atab="' + t + '"]'); if (b) b.hidden = true; }   /* v3.78.0: removed tabs stay hidden */
   const visTab = t => { const b = document.querySelector('.atab[data-atab="' + t + '"]'); return !!b && !b.hidden; };
   if (!visTab(actionTab)) actionTab = ACT_TABS.find(visTab) || "none";
   const c = actionCounts();
@@ -14133,7 +14199,7 @@ window.applyAccess = () => {
   show('.atab[data-atab="fill"]', PERM.can('emp.bulk'));
   show('.atab[data-atab="health"]', PERM.canView('attendance') && PERM.can('act.health'));
   show('.atab[data-atab="actions"]', PERM.can('act.items'));
-  show('.atab[data-atab="review"]', PERM.can('act.review'));
+  show('.atab[data-atab="review"]', false);   /* v3.78.0: Designation reviews removed from the Action center */
   show('.atab[data-atab="log"]', false);   /* v3.77.0: the Admin log tab is removed from the Action center (its entries stay in the workbook) */
   show('#cardAttendance', PERM.canView('attendance') && PERM.can('ov.attendance'));
   window.ATT?.renderApprovalRequests();
@@ -14227,25 +14293,47 @@ function markNotificationsRead(ids) {
   catch { toast('Could not save read status in this browser.',true); return; }
   bellShow(unreadCount()); drawNotifications();
 }
+/* v3.78.0: a simpler notification center: filter chips, grouped by day, one tap opens the thing it is about */
+let nfFilter = 'all', nfShow = 40;
+const NF_TYPES = { task: ['☑', 'Tasks'], request: ['📅', 'Requests'], playbook: ['📘', 'Playbook'], activity: ['✎', 'Activity'] };
+const nfAgo = t => { const d = Date.parse(t); if (!d) return ''; const m = Math.max(0, (Date.now() - d) / 60000); return m < 1 ? 'now' : m < 60 ? Math.round(m) + 'm' : m < 1440 ? Math.round(m / 60) + 'h' : m < 1440 * 7 ? Math.round(m / 1440) + 'd' : new Date(d).toLocaleDateString(undefined, { day: 'numeric', month: 'short' }); };
+function nfOpen(it) {
+  markNotificationsRead([it.id]);
+  if (it.type === 'task') { closeDrawer(); setView('planner'); if (it.taskId != null) setTimeout(() => window.TDTASKS?.open(it.taskId), 300); }
+  else if (it.type === 'playbook') { closeDrawer(); setView('playbook'); }
+  else if (it.type === 'request') { closeDrawer(); setView('summary'); }
+}
 function drawNotifications() {
   if (!notificationBody?.isConnected) return;
-  const read=notificationReads(), unread=unreadCount();
-  const allRead=h('button',{class:'btn mini',disabled:!unread,onclick:()=>markNotificationsRead(notificationItems.map(it=>it.id))},'Mark all read');
-  const inbox=h('div',{class:'ib-box'}); if (window.drawAccessInbox) drawAccessInbox(inbox);   /* v3.65.0 */
-  notificationBody.replaceChildren(inbox,
-    h('div',{class:'activity-controls'},h('b',{},`${unread} unread`),h('span',{class:'spacer'}),allRead,h('button',{class:'btn mini',onclick:()=>bellCheck()},'Refresh')),
-    h('p',{class:'set-hint'},'Read status is saved for your account on this browser. Opening this panel does not mark notifications as read.'),
-    ...(activityError ? [h('p',{class:'err',role:'status'},activityError)] : []),
-    notificationItems.length ? h('ul',{class:'act'},...notificationItems.map(it=>h('li',{style:read.has(it.id)?'':'border-left:3px solid var(--danger);padding-left:12px'},
-      h('div',{class:'line'},h('b',{},it.title),h('span',{class:'time'},new Date(it.time).toLocaleString())),
-      h('p',{},it.detail),read.has(it.id)?h('span',{class:'hint'},'Read'):h('button',{class:'btn mini',onclick:()=>markNotificationsRead([it.id])},'Mark as read')))) : h('div',{class:'empty'},'No notifications to show.'),
-    PERM.can('activity.view') ? h('button',{class:'btn',onclick:()=>openActivity(notificationBody)},'Open activity log · all users') : null);
+  const read = notificationReads(), unread = unreadCount();
+  const inbox = h('div', { class: 'ib-box nf-inbox' }); if (window.drawAccessInbox) drawAccessInbox(inbox);
+  const types = Object.keys(NF_TYPES).filter(t => notificationItems.some(it => it.type === t));
+  if (nfFilter !== 'all' && nfFilter !== 'unread' && !types.includes(nfFilter)) nfFilter = 'all';
+  const chips = h('div', { class: 'nf-chips' }, ...[['all', 'All'], ['unread', 'Unread' + (unread ? ' · ' + unread : '')], ...types.map(t => [t, NF_TYPES[t][1]])].map(([v, l]) =>
+    h('button', { type: 'button', class: 'nf-chip' + (nfFilter === v ? ' on' : ''), onclick: () => { nfFilter = v; nfShow = 40; drawNotifications(); } }, l)));
+  const list = notificationItems.filter(it => nfFilter === 'all' || (nfFilter === 'unread' ? !read.has(it.id) : it.type === nfFilter));
+  const t0 = new Date(); t0.setHours(0, 0, 0, 0); const day = it => { const d = Date.parse(it.time) || 0; return d >= t0.getTime() ? 'Today' : d >= t0.getTime() - 864e5 ? 'Yesterday' : 'Earlier'; };
+  const groups = [];
+  for (const it of list.slice(0, nfShow)) { const g = day(it); let G = groups.find(x => x.g === g); if (!G) groups.push(G = { g, items: [] }); G.items.push(it); }
+  const row = it => { const un = !read.has(it.id), [ic] = NF_TYPES[it.type] || ['•'];
+    return h('li', { class: 'nf-item nf-' + (it.type || 'x') + (un ? ' unread' : '') },
+      h('button', { type: 'button', class: 'nf-main', onclick: () => nfOpen(it) }, h('span', { class: 'nf-ic', 'aria-hidden': 'true' }, ic),
+        h('span', { class: 'nf-txt' }, h('b', {}, it.title), h('span', {}, it.detail)), h('span', { class: 'nf-time' }, nfAgo(it.time))),
+      un ? h('button', { type: 'button', class: 'nf-dot', title: 'Mark as read', 'aria-label': 'Mark as read', onclick: () => markNotificationsRead([it.id]) }) : null); };
+  notificationBody.replaceChildren(...[
+    inbox, chips,
+    activityError ? h('p', { class: 'err', role: 'status' }, activityError) : null,
+    groups.length ? h('div', { class: 'nf-groups' }, ...groups.map(G => h('section', {}, h('h4', { class: 'nf-day' }, G.g), h('ul', { class: 'nf-list' }, ...G.items.map(row)))))
+      : h('div', { class: 'nf-empty' }, h('span', { 'aria-hidden': 'true' }, '🔔'), h('b', {}, nfFilter === 'unread' ? 'You’re all caught up' : 'No notifications'), h('small', {}, 'New tasks, requests and playbook updates show up here.')),
+    list.length > nfShow ? h('button', { class: 'btn nf-more', type: 'button', onclick: () => { nfShow += 40; drawNotifications(); } }, 'Show older') : null,
+    PERM.can('activity.view') ? h('button', { class: 'linkbtn nf-log', type: 'button', onclick: () => openActivity(notificationBody) }, 'Open the full activity log →') : null].filter(Boolean));
+  const ma = document.getElementById('nfMarkAll'); if (ma) ma.disabled = !unread;
 }
 async function bellCheck() {
   if (bellBusy || el('app').hidden || document.hidden) return;
   const owner=notificationKey();
   if (notificationOwner !== owner) { notificationOwner=owner; notificationItems=[]; activityError=''; }
-  if (!notificationPermission() && !PERM.can('activity.view')) { notificationItems=[];bellShow(0);drawNotifications();try{DETAILS.load();}catch{}return; }
+  if (!notificationPermission() && !PERM.can('activity.view')) { notificationItems=[...(window.TDTASKS?TDTASKS.events():[]),...(window.TDPB?TDPB.events():[])].sort((a,b)=>(Date.parse(b.time)||0)-(Date.parse(a.time)||0));bellShow(unreadCount());drawNotifications();try{DETAILS.load();}catch{}return; }
   bellBusy=true;
   try {
     if (window.__tdSetP) await window.__tdSetP; else if (!window.__tdSetAt || Date.now() - window.__tdSetAt > 30000) await loadTeamSettings(true);   /* v3.74.1: settings fetched in the last 30 s are reused */
@@ -14256,7 +14344,7 @@ async function bellCheck() {
     }
     if (owner !== notificationKey()) return;
     // Recheck access after asynchronous reads so changed permissions take effect.
-    notificationItems=[...notificationRequestEvents(),...(PERM.can('activity.view')?activity:[])].sort((a,b)=>(Date.parse(b.time)||0)-(Date.parse(a.time)||0));
+    notificationItems=[...notificationRequestEvents(),...(window.TDTASKS?TDTASKS.events():[]),...(window.TDPB?TDPB.events():[]),...(PERM.can('activity.view')?activity:[])].sort((a,b)=>(Date.parse(b.time)||0)-(Date.parse(a.time)||0));   /* v3.78.0: tasks and playbook too */
     bellShow(unreadCount());drawNotifications();window.ATT?.renderApprovalRequests();
   } catch(e) { activityError='Notifications could not be refreshed: '+e.message;drawNotifications(); }
   finally { bellBusy=false; }
@@ -14264,14 +14352,14 @@ async function bellCheck() {
 window.refreshNotifications=()=>{
   if (notificationOwner !== notificationKey()) notificationItems=[];
   const allowedIds=new Set(notificationRequestEvents().map(it=>it.id));
-  notificationItems=notificationItems.filter(it=>it.type==='request'?allowedIds.has(it.id):PERM.can('activity.view'));
+  notificationItems=notificationItems.filter(it=>it.type==='request'?allowedIds.has(it.id):it.type==='task'||it.type==='playbook'?true:PERM.can('activity.view'));
   bellShow(unreadCount());drawNotifications();bellCheck();
 };
 window.bellRecount=()=>bellShow(unreadCount());
 window.openBell=()=>{
   if (!notificationPermission() && !PERM.can('activity.view') && !PERM.online()) { toast('Notification access is disabled for your account.',true);return; }
   notificationBody=h('div',{class:'body'},h('div',{class:'empty'},'Loading notifications…'));
-  mountDrawer(h('aside',{class:'drawer activity-drawer',role:'dialog','aria-modal':'true','aria-label':'Notifications'},h('header',{},h('h2',{},'Notifications'),h('button',{class:'btn ghost',onclick:closeDrawer,'aria-label':'Close'},'✕')),notificationBody));
+  mountDrawer(h('aside',{class:'drawer activity-drawer nf-drawer',role:'dialog','aria-modal':'true','aria-label':'Notifications'},h('header',{},h('h2',{},'Notifications'),h('span',{class:'spacer',style:'flex:1'}),h('button',{class:'linkbtn nf-markall',id:'nfMarkAll',type:'button',onclick:()=>markNotificationsRead(notificationItems.map(it=>it.id))},'Mark all read'),h('button',{class:'btn ghost',onclick:closeDrawer,'aria-label':'Close'},'✕')),notificationBody));
   bellCheck();
 };
 el('btnBell').addEventListener('click',()=>window.openBell());
@@ -14407,7 +14495,7 @@ const MODULES = [
   { id: 'people', name: 'People & access', show: () => PERM.online() && PERM.isOwner(), draw: drawPeople },
   { id: 'fields', name: 'Mandatory fields', show: () => PERM.isSuper() || PERM.can('set.fields'), draw: drawFields },
   { id: 'choices', name: 'Fields & drop-downs', show: () => PERM.isSuper() || PERM.can('set.fields'), draw: drawChoices },
-  { id: 'sync', name: 'Save & sync', show: () => PERM.can('sync.view'), draw: drawSync },
+  { id: 'sync', name: 'Save & sync', show: () => false, draw: drawSync },   /* v3.78.0: removed (saving is automatic) */
   { id: 'signins', name: 'Sign-in log', show: () => PERM.online() && PERM.can('set.workbook'), draw: drawSignins },
   { id: 'storage', name: 'Storage & clean-up', show: () => PERM.isSuper(), draw: drawStorage },
   { id: 'workbook', name: 'Workbook & backups', show: () => PERM.can('set.workbook') || PERM.can('workbook.download'), draw: drawWorkbook },
@@ -14746,10 +14834,11 @@ function buildAccessForm(src, users = [], opts = {}) {
   /* v3.62.0: the table layout: one row per page, a View / Edit / Delete & manage switch each, the details underneath */
   let outEl = rights;
   if (opts.table) {
-    const HINT = { 'Overview': 'Home page: attendance, Request Center, coming up', 'Employees': 'Employee list and details', 'Attendance': 'Tracker, People, History & upcoming', 'Action center': 'Action items, reviews, data health', 'Reports': 'Charts and custom dashboards', 'Save & sync': 'The saving status page', 'ⓘ Leave card': 'Past and upcoming leave next to names', 'Notifications': 'The bell and the activity log', 'Filters': 'Search and filters at the top', 'Settings': 'Settings pages and tools' };
+    const HINT = { 'Overview': 'Home page: attendance, Request Center, coming up', 'Employees': 'Employee list and details', 'Attendance': 'Tracker, People, History & upcoming', 'Action center': 'Action items and data health', 'Reports': 'Charts and custom dashboards', 'Save & sync': 'The saving status page', 'ⓘ Leave card': 'Past and upcoming leave next to names', 'Notifications': 'The bell and the activity log', 'Filters': 'Search and filters at the top', 'Settings': 'Settings pages and tools' };
     const labelOf = (g, k) => k === g.page ? 'Open the ' + g.name + ' page' : (([...g.items, ...((g.sub && g.sub.items) || [])].find(i => i[0] === k) || [k, k])[1]);
     const short = t => t.length > 60 ? t.slice(0, 58).replace(/\s+\S*$/, '') + '…' : t;
     const paintAll = [], repaint = () => { syncs.forEach(f => f()); paintAll.forEach(f => f()); };
+    const ADV = [], ICON = { 'Overview': '🏠', 'Employees': '👥', 'Attendance': '🗓️', 'Action center': '✅', 'Reports': '📊', 'Planner': '☑️', 'Playbook': '📘', 'ⓘ Leave card': 'ⓘ', 'Notifications': '🔔', 'Filters': '⧩', 'Settings': '⚙️' };
     const rowsT = PARTS.map(P => {
       const g = P.g, keys = [...(g.page ? [g.page] : []), ...P.allIt.map(([k]) => k)];
       const B = { view: keys.filter(k => k === g.page || !PERM.isEditKey(k)), edit: keys.filter(k => k !== g.page && PERM.isEditKey(k) && !MANAGE_KEYS.has(k)), manage: keys.filter(k => MANAGE_KEYS.has(k)) };
@@ -14757,23 +14846,47 @@ function buildAccessForm(src, users = [], opts = {}) {
       const set = (b, val) => { for (const k of B[b]) boxes[k].checked = val; if (val && b !== 'view' && g.page) boxes[g.page].checked = true; if (!val && b === 'view') for (const k of [...B.edit, ...B.manage]) boxes[k].checked = false; repaint(); };
       const more = ks => ks.length > 1 ? ' + ' + (ks.length - 1) + ' more' : '';
       const desc = b => b === 'view' && g.page ? 'See the page' + (B.view.length > 1 ? ' and its ' + (B.view.length - 1) + ' sections' : '') : short(labelOf(g, B[b][0])) + more(B[b]);
-      const cell = b => {
-        if (!B[b].length) return h('div', { class: 'rt-c rt-na' }, '—');
-        const sw = h('button', { type: 'button', class: 'rt-sw', role: 'switch', 'aria-label': ({ view: 'View', edit: 'Edit', manage: 'Delete & manage' })[b] + ' · ' + g.name });
-        const paint = () => { const st = stOf(b); sw.setAttribute('aria-checked', st === 'on' ? 'true' : st === 'some' ? 'mixed' : 'false'); sw.title = st === 'some' ? 'Some of these are on. Open the details below to see which.' : ''; };
-        paintAll.push(paint); paint(); sw.addEventListener('click', () => set(b, stOf(b) !== 'on'));
-        return h('div', { class: 'rt-c' }, sw, h('span', { class: 'rt-d' }, desc(b)));
-      };
-      const cnt = h('small', { class: 'rt-cnt' }), pc = () => { const on = keys.filter(k => boxes[k].checked).length; cnt.textContent = on === keys.length ? '· all on' : on === 0 ? '· all off' : '· ' + on + ' of ' + keys.length + ' on'; };
+      /* v3.78.0: one simple choice per page: No access · View · Edit · Full (Full = edit + delete & manage) */
+      const LV = [['none', 'Off'], ['view', 'View'], ...(B.edit.length ? [['edit', 'Edit']] : []), ...(B.manage.length ? [['full', 'Full']] : [])];
+      if (LV.length === 2 && !g.page) LV[1][1] = 'On';
+      const anyOn = b => B[b].some(k => boxes[k].checked);
+      const lvOf = () => {
+        if (g.page ? !boxes[g.page].checked : !(anyOn('view') || anyOn('edit') || anyOn('manage'))) return 'none';
+        if (anyOn('manage')) return stOf('manage') === 'on' && (!B.edit.length || stOf('edit') === 'on') ? 'full' : 'custom';
+        if (anyOn('edit')) return stOf('edit') === 'on' ? 'edit' : 'custom';
+        return 'view'; };
+      const setLv = lv => { const on = { none: [], view: ['view'], edit: ['view', 'edit'], full: ['view', 'edit', 'manage'] }[lv];
+        for (const bb of ['view', 'edit', 'manage']) for (const k of B[bb]) boxes[k].checked = on.includes(bb);
+        if (g.page) boxes[g.page].checked = lv !== 'none'; repaint(); };
+      const segB = LV.map(([lv, t]) => h('button', { type: 'button', 'data-lv': lv, class: 'rt-lv rt-lv-' + lv, title: ({ none: 'Hidden from this role', view: 'Can see, cannot change', edit: 'Can see and change', full: 'Can also delete and manage' })[lv], onclick: () => setLv(lv) }, t));
+      const custom = h('span', { class: 'rt-custom', hidden: true }, 'Custom');
+      const tileRef = {};
+      const paintSeg = () => { const lv = lvOf(); segB.forEach(x => x.setAttribute('aria-pressed', String(x.dataset.lv === lv))); custom.hidden = lv !== 'custom'; if (tileRef.el) tileRef.el.dataset.lv = lv; };
+      paintAll.push(paintSeg); paintSeg();
+      const segEl = h('div', { class: 'rt-seg', role: 'group', 'aria-label': g.name + ' access' }, ...segB);
+      const cnt = h('small', { class: 'rt-cnt' }), pc = () => { const on = keys.filter(k => boxes[k].checked).length; cnt.textContent = on + ' of ' + keys.length + ' on'; };
       paintAll.push(pc); pc();
       const parts = [P.itemsBox, P.subBox, P.extra].filter(Boolean);
-      const allOn = e => { e.preventDefault(); keys.forEach(k => { boxes[k].checked = true; }); repaint(); }, allOff = e => { e.preventDefault(); keys.filter(k => k !== g.page).forEach(k => { boxes[k].checked = false; }); repaint(); };
-      const sec = parts.length ? h('details', { class: 'rt-sec' }, h('summary', {}, h('span', {}, 'Sections and details on the ' + g.name + ' line'), cnt, h('button', { type: 'button', class: 'linkbtn', onclick: allOn }, 'Show all'), h('button', { type: 'button', class: 'linkbtn', onclick: allOff }, 'Hide all')), h('div', { class: 'rt-sec-body' }, ...parts)) : null;
-      return h('div', { class: 'rt-g' }, h('div', { class: 'rt-r' }, h('div', { class: 'rt-p' }, h('b', {}, g.name), h('small', {}, HINT[g.name] || '')), cell('view'), cell('edit'), cell('manage')), sec);
-    });
-    const tableT = h('div', { class: 'rt' }, h('div', { class: 'rt-h' }, ...['Page', 'View', 'Edit', 'Delete & manage'].map(t => h('span', {}, t))), ...rowsT);
+      /* v3.78.1: each area is a small card; the single sections move to one "Advanced" list at the end */
+      if (parts.length) ADV.push(h('div', { class: 'ra-adv-g' }, h('h5', {}, ICON[g.name] || '•', ' ', g.name, ' ', cnt), ...parts));
+      tileRef.el = h('div', { class: 'ra-tile', 'data-lv': lvOf() }, h('div', { class: 'ra-top' }, h('span', { class: 'ra-ic', 'aria-hidden': 'true' }, ICON[g.name] || '•'), h('div', { class: 'ra-name' }, h('b', {}, g.name, custom), h('small', {}, HINT[g.name] || ''))), segEl);
+      return tileRef.el;
+    }).filter((x, i) => PARTS[i].g.name !== 'Save & sync');
+    /* v3.78.1: the most asked-for rights as plain switches */
+    const QUICK = [['att.approve', 'Approve or reject leave requests'], ['att.direct', 'Record leave without waiting for approval'], ['emp.edit', 'Edit employee details'], ['emp.add', 'Add new employees'], ['emp.delete', 'Delete employees'],
+      ['plan.assign', 'Give tasks to other people'], ['plan.all', 'See everyone’s tasks'], ['pb.edit', 'Write and edit the Playbook'], ['workbook.download', 'Download the workbook']].filter(([k]) => boxes[k]);
+    const quick = h('div', { class: 'ra-quick' }, ...QUICK.map(([k, t]) => { const sw = h('button', { type: 'button', class: 'rt-sw', role: 'switch', 'aria-label': t });
+      const paint = () => sw.setAttribute('aria-checked', String(!!boxes[k].checked)); paintAll.push(paint); paint();
+      sw.addEventListener('click', () => { boxes[k].checked = !boxes[k].checked; const grp = PERM.groups.find(g => [...g.items, ...((g.sub && g.sub.items) || [])].some(i => i[0] === k)); if (boxes[k].checked && grp && grp.page && boxes[grp.page]) boxes[grp.page].checked = true; repaint(); });
+      return h('label', { class: 'ra-q' }, sw, h('span', {}, t)); }));
+    const tableT = h('div', { class: 'ra' },
+      h('div', { class: 'ra-sec-h' }, h('h4', {}, 'Pages'), h('p', {}, 'Pick how much people in this role can do on each page. ', h('b', {}, 'Off'), ' = hidden · ', h('b', {}, 'View'), ' = see only · ', h('b', {}, 'Edit'), ' = see and change · ', h('b', {}, 'Full'), ' = also delete and manage.')),
+      h('div', { class: 'ra-grid' }, ...rowsT),
+      h('div', { class: 'ra-sec-h' }, h('h4', {}, 'Key rights'), h('p', {}, 'Switch single rights on or off without changing the page levels.')), quick,
+      h('div', { class: 'ra-sec-h' }, h('h4', {}, 'Backups & phone numbers')), h('div', { class: 'ra-more' }, bkBox, phBox),
+      ADV.length ? h('details', { class: 'ra-adv' }, h('summary', {}, 'Advanced: choose single sections on each page'), h('div', { class: 'ra-adv-body' }, ...ADV)) : null);
     tableT.addEventListener('change', () => setTimeout(() => paintAll.forEach(f => f())));
-    outEl = h('div', { class: 'rights rights-t' }, tableT, h('div', { class: 'rt-more' }, h('h5', {}, 'More rights'), bkBox, phBox));
+    outEl = h('div', { class: 'rights rights-t' }, tableT);
   }
   return { el: outEl, read: () => ({ rights: rightsNow(), extras: { ...bkPerms(), _attendanceFields: fieldChecks.filter(c => c.box.checked).map(c => c.field), _notificationAudience: { mode: audienceMode.value, users: audienceChecks.filter(c => c.box.checked).map(c => c.id) }, ...(fixed ? { _filters: fixed } : {}) } }), summary: () => PERM.keys.filter(k => boxes[k].checked).length };
 }
@@ -15159,8 +15272,7 @@ function drawAccessInbox(box) {
   const items = DETAILS.items();
   if (admin) {
     const pend = DETAILS.pending(), open = items.filter(a => a.status === 'approved' && Date.parse(a.expires_at) > DETAILS.now());
-    parts.push(h('section', { class: 'ib-s' }, h('h4', {}, 'Requests to approve', pend.length ? h('span', { class: 'ppl-tab-n hot' }, String(pend.length)) : null),
-      !pend.length ? h('p', { class: 'set-hint' }, 'Nothing waiting.') : null,
+    if (pend.length) parts.push(h('section', { class: 'ib-s' }, h('h4', {}, '🔐 Number requests to approve', h('span', { class: 'ppl-tab-n hot' }, String(pend.length))),   /* v3.78.0: only shown when something waits */
       pend.map(a => h('div', { class: 'tm-req' }, h('div', { class: 'tm-req-t' }, h('b', {}, a.user_name || 'Someone'), ' wants to see ', h('b', {}, a.emp_name || a.emp_id), '’s ', (a.labels || a.fields || []).join(', '), h('small', {}, ' · ' + dtAgo(a.requested_at))),
         a.reason ? h('p', { class: 'tm-why' }, '“' + a.reason + '”') : null,
         h('div', { class: 'tm-req-b' }, h('span', { class: 'set-hint' }, '🔐 Private details · opens for ' + (a.minutes || 15) + ' min'), h('span', { class: 'grow' }),
@@ -15176,7 +15288,7 @@ function drawAccessInbox(box) {
     const lbl = { rejected: ['Declined', 'no'], expired: ['Ended', 'x'], revoked: ['Locked', 'x'], cancelled: ['Cancelled', 'x'], approved: ['Ended', 'x'] };
     const openEmp = a => { const r = state.rows.find(x => String(x.id) === String(a.emp_id)); if (r) { closeDrawer(); setTimeout(() => openDrawer(r), 0); } else toast('That person is not in your list.', true); };
     parts.push(h('section', { class: 'ib-s' }, h('div', { class: 'ib-head' }, h('h4', {}, 'Private details'), h('span', { class: 'grow' }), h('button', { class: 'btn mini primary', type: 'button', onclick: () => openDetailRequest(null) }, '+ Ask for a number')),
-      h('p', { class: 'set-hint' }, 'Phone and WhatsApp numbers are locked. Ask for the person’s number you need (Active, Active + Resign, OJT, New or Bench); an admin approves it and you see it for 15 minutes. Other private details stay with admins.'),
+      h('p', { class: 'set-hint' }, 'Need someone’s phone number? Ask, and once an admin approves you see it for 15 minutes.'),
       open.map(a => h('div', { class: 'tm-live' }, h('span', { class: 'tm-pulse' }), h('span', {}, h('b', {}, a.emp_name || a.emp_id), h('small', {}, ' · ' + (a.labels || []).join(', '))), h('span', { class: 'grow' }), dtLeftEl(a.expires_at),
         h('button', { class: 'btn mini primary', type: 'button', onclick: () => openEmp(a) }, 'Show'),
         h('button', { class: 'pt-act', type: 'button', onclick: e => { e.target.disabled = true; act(() => DETAILS.call(() => CLOUD.details.decide(a.id, 'revoke')), 'Locked again.'); } }, 'Done'))),
@@ -15865,21 +15977,41 @@ async function drawWorkbook(pane) {
   }
   const dl = h('button', { class: 'btn', type: 'button', onclick: () => run(async () => downloadWorkbook(state.file || 'Team Dashboard.xlsx', () => CLOUD.admin.download(), 'the current workbook')) }, 'Download current workbook');
   if (!PERM.can('set.workbook')) { fill(pane, h('p', { class: 'set-hint' }, 'Download a copy of the team workbook to open in Excel. Changes made in the copy are not sent back.'), h('div', { class: 'set-actions flat' }, dl), err); return; }
-  fill(pane, h('p', { class: 'set-hint' }, 'Loading history…'));
+  fill(pane, h('p', { class: 'set-hint' }, 'Loading…'));
   const hist = await CLOUD.admin.history();
-  const list = (items, fmt, empty) => items.length ? h('ul', { class: 'td-hist' }, ...items.map(x => h('li', {}, ...fmt(x)))) : h('p', { class: 'set-hint' }, empty);
   const replace = confirmButton('Replace workbook…', 'Click again, then choose the file', () => run(async () => {
     if (window.ATT && ATT.dirty()) throw new Error('Save your attendance changes first.');
     const f = await pickXlsx(); if (!f) return;
-    await CLOUD.admin.replace(f); toast('Workbook replaced. Today’s backup keeps the previous version.');
+    await CLOUD.admin.replace(f); toast('Workbook replaced. Today’s backup keeps the previous version.'); drawWorkbook(pane);
   }), 'btn');
-  fill(pane, 
-    h('p', { class: 'set-hint' }, 'The team workbook is stored online. The first save of each day keeps a backup for 30 days. To restore one, download it and use Replace workbook.'),
-    h('div', { class: 'set-actions flat' }, dl, replace), err,
-    h('div', { class: 'set-grid' },
-      h('div', { class: 'set-card' }, h('h4', {}, 'Daily backups (30 days)'), list(hist.backups, b => [h('b', {}, String(b.day)), ` · ${Math.round(b.size / 1024)} KB · v${b.version} `, h('button', { class: 'linkbtn', type: 'button', onclick: () => run(async () => downloadWorkbook(String(b.name).replace(/\.xlsx$/i, '') + ' backup ' + b.day + '.xlsx', () => CLOUD.admin.backup(b.name, b.day), 'the backup of ' + b.day)) }, 'Download')], 'No backups yet. The first save of each day keeps one.')),
-      h('div', { class: 'set-card' }, h('h4', {}, 'Recent sign-ins'), list(hist.logins.slice(0, 10), l => [h('span', { class: l.ok ? '' : 'bad' }, (l.login_id ? l.login_id + ' · ' : '') + (l.name || '?') + ' · ' + signinReason(l)), ' · ' + when(l.at)], 'None yet.'), h('button', { class: 'linkbtn', type: 'button', onclick: () => window.openSettings('signins') }, 'Open the full sign-in log')),
-      h('div', { class: 'set-card' }, h('h4', {}, 'Recent saves'), list(hist.saves.slice(0, 25), x => [h('b', {}, x.saved_by || '?'), ' · ' + when(x.at) + ' · v' + x.version], 'None yet.'))));
+  /* v3.78.0: a simpler page: the file and its two buttons, three numbers, then Backups · Sign-ins · Saves in tabs */
+  dl.className = 'btn primary';
+  const saves = hist.saves || [], logins = hist.logins || [], backups = hist.backups || [], last = saves[0];
+  const dayMs = 864e5, t0 = new Date(); t0.setHours(0, 0, 0, 0);
+  const dayName = d => { const t = Date.parse(d + 'T00:00:00'); const n = Math.round((t0 - t) / dayMs); return n === 0 ? 'Today' : n === 1 ? 'Yesterday' : new Date(t).toLocaleDateString(undefined, { weekday: 'short', day: 'numeric', month: 'short' }); };
+  const ini = n => String(n || '?').trim().split(/\s+/).slice(0, 2).map(x => x[0]).join('').toUpperCase();
+  const week = Date.now() - 7 * dayMs, ok7 = logins.filter(l => l.ok && l.reason === 'ok' && Date.parse(l.at) >= week).length, bad7 = logins.filter(l => !l.ok && Date.parse(l.at) >= week).length;
+  const savesToday = saves.filter(x => Date.parse(x.at) >= t0.getTime()).length;
+  const hero = h('div', { class: 'wb-hero' },
+    h('div', { class: 'wb-file' }, h('span', { class: 'wb-ic', 'aria-hidden': 'true' }, 'XLSX'),
+      h('div', {}, h('b', {}, state.file || 'Team Dashboard.xlsx'), h('small', {}, last ? 'Version ' + last.version + ' · saved ' + agoText(last.at).toLowerCase() + (last.saved_by ? ' by ' + last.saved_by : '') : 'Stored online, encrypted'))),
+    h('div', { class: 'wb-acts' }, dl, replace));
+  const tile = (n, t, cls) => h('div', { class: 'wb-tile ' + (cls || '') }, h('b', {}, String(n)), h('span', {}, t));
+  const tiles = h('div', { class: 'wb-tiles' }, tile(backups.length, backups.length === 1 ? 'daily backup kept' : 'daily backups kept'), tile(savesToday, savesToday === 1 ? 'save today' : 'saves today'), tile(ok7, 'sign-ins this week'), tile(bad7, 'failed sign-ins this week', bad7 ? 'bad' : ''));
+  const row = (av, main, sub, right, cls) => h('li', { class: 'wb-row ' + (cls || '') }, av, h('div', { class: 'wb-main' }, main, sub ? h('small', {}, sub) : null), right);
+  const lists = {
+    backups: () => backups.length ? h('ul', { class: 'wb-list' }, ...backups.map(b => row(h('span', { class: 'wb-av cal', 'aria-hidden': 'true' }, String(b.day).slice(8, 10)), h('b', {}, dayName(String(b.day))), Math.round(b.size / 1024) + ' KB · version ' + b.version,
+        h('button', { class: 'btn mini', type: 'button', onclick: () => run(async () => downloadWorkbook(String(b.name).replace(/\.xlsx$/i, '') + ' backup ' + b.day + '.xlsx', () => CLOUD.admin.backup(b.name, b.day), 'the backup of ' + b.day)) }, '⬇ Download'))))
+      : h('p', { class: 'wb-empty' }, 'No backups yet. The first save of each day keeps one for 30 days.'),
+    signins: () => h('div', {}, logins.length ? h('ul', { class: 'wb-list' }, ...logins.slice(0, 15).map(l => row(h('span', { class: 'wb-av' }, ini(l.name || l.login_id)), h('b', {}, (l.name || 'Unknown') + (l.login_id ? ' · ' + l.login_id : '')), agoText(l.at), h('span', { class: 'wb-chip ' + (l.ok ? 'ok' : 'bad') }, signinReason(l)), l.ok ? '' : 'fail'))) : h('p', { class: 'wb-empty' }, 'No sign-ins yet.'),
+      h('button', { class: 'linkbtn wb-more', type: 'button', onclick: () => window.openSettings('signins') }, 'Open the full sign-in log →')),
+    saves: () => saves.length ? h('ul', { class: 'wb-list' }, ...saves.slice(0, 20).map(x => row(h('span', { class: 'wb-av' }, ini(x.saved_by)), h('b', {}, x.saved_by || '?'), agoText(x.at), h('span', { class: 'wb-chip' }, 'v' + x.version)))) : h('p', { class: 'wb-empty' }, 'No saves yet.'),
+  };
+  let tab = 'backups'; const box = h('div', { class: 'wb-box' });
+  const tabs = h('div', { class: 'pl-seg wb-tabs', role: 'tablist' }, ...[['backups', 'Backups'], ['signins', 'Sign-ins'], ['saves', 'Saves']].map(([v, l]) => h('button', { type: 'button', role: 'tab', 'aria-pressed': String(v === tab), onclick: e => { tab = v; for (const b of tabs.children) b.setAttribute('aria-pressed', String(b === e.currentTarget)); box.replaceChildren(lists[tab]()); } }, l)));
+  box.replaceChildren(lists[tab]());
+  fill(pane, hero, err, tiles, h('div', { class: 'set-card wb-card' }, tabs, box),
+    h('p', { class: 'set-hint' }, 'The first save of each day keeps a backup for 30 days. To go back to one, download it, then use Replace workbook.'));
 }
 
 /* ----- v3.18: sign-in log: every attempt, with the login ID typed and why it failed ----- */
@@ -16402,10 +16534,59 @@ function renderPlanner() {
   }
   host.replaceChildren(head, stats, bar, main);
 }
+/* ---------- v3.78.0: popups and notifications for new tasks and new playbook entries ---------- */
+const who = () => String(meU().id ?? '') || (typeof BE !== 'undefined' && BE.userName ? BE.userName() : 'local');
+const lsKey = k => 'td_' + k + ':' + ((typeof CLOUD !== 'undefined' && CLOUD.SUPABASE_CONFIG && CLOUD.SUPABASE_CONFIG.url) || 'local') + ':' + who();
+const lsGet = (k, d) => { try { const v = JSON.parse(localStorage.getItem(lsKey(k)) || 'null'); return v == null ? d : v; } catch { return d; } };
+const lsSet = (k, v) => { try { localStorage.setItem(lsKey(k), JSON.stringify(v)); } catch { } };
+const busyScreen = () => { const app = document.getElementById('app'); return !app || app.hidden || document.hidden || !!document.querySelector('.pdlg-veil, #pcDialog, .cel-veil, .bkdue-veil, #overlay .drawer'); };
+const prettySt = t => String(t || '').replace(/\b(todo|doing|blocked|done)\b/g, m => stLabel(m));
+function taskEvents() {
+  if (!PL.me) return []; const id = myId(), out = [];
+  for (const t of PL.tasks) {
+    const mine = isMine(t), made = String(t.createdBy) === id; if (!mine && !made) continue;
+    if (mine && !made) out.push({ id: 'task:' + t.id + ':new', time: t.createdAt, type: 'task', taskId: t.id, title: 'New task for you', detail: t.title + ' · from ' + (t.createdByName || 'someone') + (t.due ? ' · due ' + fmtDay(t.due) : '') });
+    for (const n of t.notes || []) if (String(n.byId) !== id && n.text !== 'Created the task' && Date.now() - Date.parse(n.at) < 30 * DAY)
+      out.push({ id: 'task:' + t.id + ':' + n.at, time: n.at, type: 'task', taskId: t.id, title: n.kind === 'status' ? n.by + ' updated a task' : n.by + ' added a note', detail: t.title + ' · ' + (n.kind === 'status' ? prettySt(n.text) : '“' + n.text + '”') });
+  }
+  return out;
+}
+function taskPopup() {
+  if (!online() || !PL.me) return;
+  const id = myId(), seen = new Set(lsGet('task_seen', []));
+  const fresh = PL.tasks.filter(t => isMine(t) && String(t.createdBy) !== id && t.status !== 'done' && !seen.has(String(t.id)));
+  if (!fresh.length) return; if (busyScreen()) { setTimeout(taskPopup, 20000); return; }
+  const done = () => { const s2 = new Set(lsGet('task_seen', [])); fresh.forEach(t => s2.add(String(t.id))); lsSet('task_seen', [...s2].slice(-500)); d.close(); };
+  const d = dlg(fresh.length === 1 ? 'You have a new task' : 'You have ' + fresh.length + ' new tasks', h('div', {},
+    h('ul', { class: 'pp-pop-list' }, ...fresh.slice(0, 8).map(t => h('li', {}, h('span', { class: 'pl-av' }, initials(t.createdByName)), h('div', {}, h('b', {}, t.title),
+      h('small', {}, 'From ' + (t.createdByName || 'someone') + (t.due ? ' · due ' + fmtDay(t.due) : '') + (t.priority !== 'normal' ? ' · ' + priLabel(t.priority) + ' priority' : '')))))),
+    fresh.length > 8 ? h('p', { class: 'pb-muted' }, '…and ' + (fresh.length - 8) + ' more in the Planner.') : null),
+    [h('button', { class: 'btn', type: 'button', onclick: done }, 'Got it'), h('button', { class: 'btn primary', type: 'button', onclick: () => { done(); setView('planner'); if (fresh.length === 1) setTimeout(() => openTask(PL.tasks.find(x => x.id === fresh[0].id) || fresh[0]), 300); } }, fresh.length === 1 ? 'Open the task' : 'Open the Planner')], 'pp-pop');
+  d.box.querySelector('.pdlg-x')?.addEventListener('click', done);
+}
+const pbMine = x => (x.updatedBy || x.createdBy) === (meU().name || (typeof BE !== 'undefined' && BE.userName ? BE.userName() : ''));
+function pbEvents() {
+  return pbList().filter(x => !pbMine(x) && Date.now() - Date.parse(x.updatedAt || x.createdAt || 0) < 30 * DAY).map(x => ({ id: 'pb:' + x.id + ':' + (x.updatedAt || ''), time: x.updatedAt || x.createdAt, type: 'playbook',
+    title: (x.createdAt && x.createdAt === x.updatedAt ? 'New in the Playbook' : 'Playbook updated'), detail: x.title + ' · ' + ((PB_CATS.find(c => c.id === x.cat) || {}).label || '') }));
+}
+function pbPopup() {
+  if (typeof state === 'undefined' || !state.schema || (window.PERM && !PERM.canView('playbook'))) return;
+  let since = lsGet('pb_seen', null); if (since == null) { since = Date.now() - 7 * DAY; lsSet('pb_seen', since); }
+  const fresh = pbList().filter(x => !pbMine(x) && Date.parse(x.updatedAt || x.createdAt || 0) > since);
+  if (!fresh.length) return; if (busyScreen()) { setTimeout(pbPopup, 20000); return; }
+  const done = () => { lsSet('pb_seen', Date.now()); d.close(); };
+  const d = dlg('New in the Playbook', h('div', {}, h('p', { class: 'pb-muted', style: 'margin:0' }, 'Please read these updates to the team’s recruitment rules and steps.'),
+    h('ul', { class: 'pp-pop-list' }, ...fresh.slice(0, 8).map(x => { const c = PB_CATS.find(y => y.id === x.cat) || PB_CATS[0]; return h('li', { class: 'pb-k-' + x.cat }, h('span', { class: 'pb-ico' }, c.icon), h('div', {}, h('b', {}, x.title), h('small', {}, c.label + ' · ' + (x.createdAt === x.updatedAt ? 'new' : 'updated') + (x.updatedBy ? ' by ' + x.updatedBy : '') + ' · ' + ago(x.updatedAt)))); }))),
+    [h('button', { class: 'btn', type: 'button', onclick: done }, 'Later'), h('button', { class: 'btn primary', type: 'button', onclick: () => { done(); setView('playbook'); } }, 'Read now')], 'pp-pop');
+  d.box.querySelector('.pdlg-x')?.addEventListener('click', done);
+}
+window.TDTASKS = { events: taskEvents, open: tid => { const t = PL.tasks.find(x => String(x.id) === String(tid)); if (t) openTask(t); } };
+window.TDPB = { events: pbEvents };
 window.renderPlaybook = renderPlaybook; window.renderPlanner = renderPlanner;
 /* tasks are checked every 2 minutes while someone uses the page (and the badge stays current) */
-if (window.TDNET) TDNET.poller('tasks', 120000, async () => { await plLoad(true); if (typeof state !== 'undefined' && state.view === 'planner') renderPlanner(); }, () => online());
-setTimeout(() => { if (online()) plLoad(true); }, 4000);
+if (window.TDNET) TDNET.poller('tasks', 60000, async () => { await plLoad(true); if (typeof state !== 'undefined' && state.view === 'planner') renderPlanner(); taskPopup(); window.refreshNotifications?.(); }, () => online());
+if (window.TDNET) TDNET.poller('pbpop', 30000, () => pbPopup());
+setTimeout(async () => { if (online()) { await plLoad(true); taskPopup(); window.refreshNotifications?.(); } pbPopup(); }, 5000);
 })();
 </script>
 
