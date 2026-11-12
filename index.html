@@ -10,7 +10,7 @@
 <meta name="format-detection" content="telephone=no">
 <link rel="preconnect" href="https://iiogwevtyzgedhoaqlrn.supabase.co" crossorigin><link rel="dns-prefetch" href="https://iiogwevtyzgedhoaqlrn.supabase.co">
 <link rel="icon" href="data:,">
-<title>Team Dashboard · 3.78.1</title>
+<title>Team Dashboard · 3.79.0</title>
 <link rel="preconnect" href="https://fonts.googleapis.com"><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin><link href="https://fonts.googleapis.com/css2?family=Public+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet">
 <style>
 :root {
@@ -2447,6 +2447,10 @@ article.al-d { --alc:#c62828; }
 .xl-newp { display:grid; grid-template-columns:20px minmax(140px,1.2fr) 110px minmax(0,2fr); gap:10px; align-items:center; padding:6px 4px; font-size:13px; cursor:pointer; } .xl-newp.off { opacity:.55; } .xl-nid { color:var(--ink-2); font-variant-numeric:tabular-nums; } .xl-nf { color:var(--ink-2); font-size:12px; }
 @media (max-width:700px) { .xl-newp { grid-template-columns:20px 1fr; } .xl-nid, .xl-nf { grid-column:2; } }
 html body .atabs.atabs > .atab[hidden] { display:none !important; }
+.set-grp { margin:14px 12px 4px; font-size:10.5px; font-weight:800; letter-spacing:.08em; text-transform:uppercase; color:var(--ink-2); opacity:.8; } .set-who + .set-grp { margin-top:6px; }
+.set-subtabs { margin:0 0 14px; } .wb-tiles.wb-tiles3 { grid-template-columns:repeat(3, minmax(0,1fr)); }
+@media (max-width:700px) { .set-page .set-grp { display:none !important; } .wb-tiles.wb-tiles3 { grid-template-columns:repeat(3, minmax(0,1fr)); } .set-subtabs { display:flex; flex-wrap:nowrap; overflow-x:auto; max-width:100%; scrollbar-width:none; } .set-subtabs button { flex:1 0 auto; white-space:nowrap; } }
+
 /* v3.78.1: rights editor as cards */
 .ra { display:flex; flex-direction:column; gap:12px; }
 .ra-sec-h h4 { margin:6px 0 2px; font-size:14px; } .ra-sec-h p { margin:0; font-size:12.5px; color:var(--ink-2); }
@@ -10668,7 +10672,7 @@ async function poll() {
 }
 
 /* ============================== filtering ============================== */
-const APP = { title: "Team Dashboard", version: "3.78.1", released: "12 Nov 2026" };
+const APP = { title: "Team Dashboard", version: "3.79.0", released: "12 Nov 2026" };
 const BASE_DIMS = { status: "status_column", desig: "designation_column", client: "client_column", mode: "mode_column" };
 const STANDARD_STATUSES = ["Active", "Manager", "OJT", "Bench", "New", "Projected", "Left", "Moved"];
 const TILE_ORDER = ["Active", "Manager", "OJT", "Bench", "New", "Projected"];
@@ -14491,21 +14495,35 @@ function confirmButton(label, sure, fn, cls = 'btn danger') {
 }
 const checkLine = (text, checked, attrs = {}) => { const c = h('input', { type: 'checkbox', checked, ...attrs }); return { box: c, el: h('label', { class: 'chk-line' }, c, h('span', {}, text)) }; };
 
+/* v3.79.0: fewer, grouped settings pages; pages that covered the same thing are merged into one page with tabs */
+const SUBTAB = {};
+const tabbed = (key, tabs) => async pane => {
+  const vis = tabs.filter(t => !t.show || t.show());
+  if (!vis.length) { fill(pane, h('p', { class: 'set-hint' }, 'Nothing here for your account.')); return; }
+  if (!vis.some(t => t.id === SUBTAB[key])) SUBTAB[key] = vis[0].id;
+  if (vis.length === 1) return vis[0].draw(pane);
+  const body = h('div', { class: 'set-sub' });
+  const seg = h('div', { class: 'pl-seg set-subtabs', role: 'tablist' }, ...vis.map(t => h('button', { type: 'button', role: 'tab', 'aria-pressed': String(t.id === SUBTAB[key]), onclick: () => { SUBTAB[key] = t.id; tabbed(key, tabs)(pane); } }, t.name)));
+  fill(pane, seg, body);
+  return (vis.find(t => t.id === SUBTAB[key])).draw(body);
+};
+const drawPrefsTools = pane => { const a = h('div'), b = h('div'); fill(pane, a, b); drawPrefs(a); if (PERM.can('tools.distance')) drawTools(b); };
 const MODULES = [
-  { id: 'people', name: 'People & access', show: () => PERM.online() && PERM.isOwner(), draw: drawPeople },
-  { id: 'fields', name: 'Mandatory fields', show: () => PERM.isSuper() || PERM.can('set.fields'), draw: drawFields },
-  { id: 'choices', name: 'Fields & drop-downs', show: () => PERM.isSuper() || PERM.can('set.fields'), draw: drawChoices },
-  { id: 'sync', name: 'Save & sync', show: () => false, draw: drawSync },   /* v3.78.0: removed (saving is automatic) */
-  { id: 'signins', name: 'Sign-in log', show: () => PERM.online() && PERM.can('set.workbook'), draw: drawSignins },
-  { id: 'storage', name: 'Storage & clean-up', show: () => PERM.isSuper(), draw: drawStorage },
-  { id: 'workbook', name: 'Workbook & backups', show: () => PERM.can('set.workbook') || PERM.can('workbook.download'), draw: drawWorkbook },
-  { id: 'backups', name: 'Leave backups', show: () => PERM.isSuper() || PERM.can('set.fields'), draw: drawBackupSettings },
-  { id: 'tools', name: 'Tools', show: () => PERM.can('tools.distance'), draw: drawTools },
-  { id: 'prefs', name: 'Preferences', show: () => true, draw: drawPrefs },
+  { id: 'people', group: 'Team', name: 'People & access', show: () => PERM.online() && PERM.isOwner(), draw: drawPeople },
+  { id: 'signins', group: 'Team', name: 'Sign-in log', show: () => PERM.online() && PERM.can('set.workbook') && !PERM.isOwner(), draw: drawSignins },   /* the super admin finds it in People & access */
+  { id: 'fields', group: 'Data', name: 'Fields', show: () => PERM.isSuper() || PERM.can('set.fields'), draw: tabbed('fields', [...[['emp', 'Employee fields'], ['att', 'Attendance fields'], ['priv', '🔒 Private details']].map(([k, n]) => ({ id: k === 'emp' ? 'choices' : k, name: n, show: () => k !== 'priv' || (PERM.isSuper() && PERM.online()), draw: pane => { drawChoices.tab = k; drawChoices.flat = true; return drawChoices(pane); } })), { id: 'mandatory', name: 'Mandatory fields', draw: drawFields }]) },
+  { id: 'backups', group: 'Data', name: 'Leave backups', show: () => PERM.isSuper() || PERM.can('set.fields'), draw: drawBackupSettings },
+  { id: 'data', group: 'Data', name: 'Workbook & storage', show: () => PERM.can('set.workbook') || PERM.can('workbook.download') || PERM.isSuper(), draw: tabbed('data', [{ id: 'workbook', name: 'Workbook & backups', show: () => PERM.can('set.workbook') || PERM.can('workbook.download'), draw: drawWorkbook }, { id: 'storage', name: 'Storage & clean-up', show: () => PERM.isSuper(), draw: drawStorage }]) },
+  { id: 'prefs', group: 'General', name: 'Preferences', show: () => true, draw: drawPrefsTools },
 ];
+/* old page names still work (links inside the dashboard) */
+const SET_ALIAS = { att: ['fields', 'att'], priv: ['fields', 'priv'], workbook: ['data', 'workbook'], storage: ['data', 'storage'], choices: ['fields', 'choices'], mandatory: ['fields', 'mandatory'], tools: ['prefs'], sync: ['prefs'] };
 let current = null, ticker = null;
 /* v3.12: Settings is a page in the left menu (no longer a dialog) */
-window.openSettings = id => { if (id) current = id; if (state.view !== 'settings') setView('settings'); else drawSettingsPage(); };
+window.openSettings = id => {
+  if (id === 'signins' && PERM.online() && PERM.isOwner()) { PPL.tab = 'signins'; id = 'people'; }
+  if (SET_ALIAS[id]) { const [m, t] = SET_ALIAS[id]; if (t) SUBTAB[m] = t; id = m; }
+  if (id) current = id; if (state.view !== 'settings') setView('settings'); else drawSettingsPage(); };
 window.drawSettingsPage = () => {
   const host = el('pageSettings'); if (!host || typeof state === 'undefined' || state.view !== 'settings') return;
   clearInterval(ticker); ticker = null;
@@ -14515,7 +14533,7 @@ window.drawSettingsPage = () => {
   const u = CLOUD.user(), who = PERM.online() ? ('Signed in as ' + u.name + ' · ' + (PERM.roleNames[u.role] || 'User')) : 'Excel file on this computer';
   const pane = h('div', { class: 'set-pane' });
   fill(host, h('div', { class: 'set-page' },
-    h('nav', { class: 'set-nav', 'aria-label': 'Settings sections' }, h('p', { class: 'set-who' }, who), ...mods.map(m => h('button', { class: 'set-nav-item', type: 'button', 'aria-current': m === mod ? 'page' : null, onclick: () => { current = m.id; drawSettingsPage(); } }, m.name))),
+    h('nav', { class: 'set-nav', 'aria-label': 'Settings sections' }, h('p', { class: 'set-who' }, who), ...mods.flatMap((m, i) => [i === 0 || mods[i - 1].group !== m.group ? h('p', { class: 'set-grp' }, m.group) : null, h('button', { class: 'set-nav-item', type: 'button', 'aria-current': m === mod ? 'page' : null, onclick: () => { current = m.id; drawSettingsPage(); } }, m.name)])),
     h('section', { class: 'set-main', 'aria-labelledby': 'setModTitle' }, h('h3', { class: 'set-title', id: 'setModTitle' }, mod.name), pane)));
   Promise.resolve().then(() => mod.draw(pane)).catch(e => fill(pane, h('p', { class: 'err' }, e.message || String(e))));
 };
@@ -14558,13 +14576,14 @@ async function drawPeople(pane, selectId) {
   const body = h('div', { class: 'ppl-body' });
   const tabBtn = (id, label, n, hot) => h('button', { type: 'button', class: 'ppl-tab', role: 'tab', 'aria-selected': String(PPL.tab === id), onclick: () => { PPL.tab = id; drawPeople(pane, selectId); } }, label, n != null ? h('span', { class: 'ppl-tab-n' + (hot ? ' hot' : '') }, String(n)) : null);
   const tabs = h('div', { class: 'ppl-tabs', role: 'tablist', 'aria-label': 'People & access' },
-    tabBtn('people', 'People', users.length), tabBtn('roles', 'Roles', tdRoles().length), tabBtn('passcodes', 'Passcodes', pending.length || null, pending.length > 0));
+    tabBtn('people', 'People', users.length), tabBtn('roles', 'Roles', tdRoles().length), tabBtn('passcodes', 'Passcodes', pending.length || null, pending.length > 0), tabBtn('signins', 'Sign-in log'));
   /* v3.62.0: header like the reference: what this is, People | Roles | Passcodes, + Add user */
   const addBtn = h('button', { class: 'btn primary', type: 'button', onclick: () => { if (PPL.tab !== 'people') { PPL.tab = 'people'; drawPeople(pane).then(() => drawPeopleTable.add && drawPeopleTable.add()); } else drawPeopleTable.add && drawPeopleTable.add(); } }, '+ Add user');
   fill(pane, h('div', { class: 'ua-head' }, h('p', { class: 'set-hint' }, 'Add people, set their passcodes and choose what they can open.'), h('span', { class: 'grow' }), tabs, addBtn), body);
 
   if (PPL.tab === 'groups') PPL.tab = 'roles';
   if (PPL.tab === 'roles') { drawRoleCards(body, users, () => reload(selectId), groups); return; }
+  if (PPL.tab === 'signins') { await drawSignins(body); return; }   /* v3.79.0: the sign-in log lives here (it was also a separate page) */
   if (PPL.tab === 'teams') PPL.tab = 'people';   /* v3.66.0: teams were removed */
 
   if (PPL.tab === 'passcodes') {
@@ -15726,7 +15745,7 @@ async function drawChoices(pane) {
   if (!state.schema) { fill(pane, h('p', { class: 'set-hint' }, 'Open the workbook first.')); return; }
   const sup = PERM.isSuper();
   const tab = drawChoices.tab || 'emp';
-  const tabs = h('div', { class: 'ppl-tabs', role: 'tablist' },
+  const tabs = drawChoices.flat ? h('span', { hidden: true }) : h('div', { class: 'ppl-tabs', role: 'tablist' },
     ...[['emp', 'Employee fields'], ['att', 'Attendance fields'], ...(sup && PERM.online() ? [['priv', '🔒 Private details']] : [])].map(([k, l]) => h('button', { type: 'button', class: 'ppl-tab', role: 'tab', 'aria-selected': String(tab === k), onclick: () => { drawChoices.tab = k; drawChoices(pane); } }, l)));
   if (tab === 'att') { drawAttFieldNames(pane, tabs, sup); return; }
   if (tab === 'priv' && sup) { drawPrivateFields(pane, tabs); return; }   /* v3.65.0 */
@@ -15997,7 +16016,7 @@ async function drawWorkbook(pane) {
       h('div', {}, h('b', {}, state.file || 'Team Dashboard.xlsx'), h('small', {}, last ? 'Version ' + last.version + ' · saved ' + agoText(last.at).toLowerCase() + (last.saved_by ? ' by ' + last.saved_by : '') : 'Stored online, encrypted'))),
     h('div', { class: 'wb-acts' }, dl, replace));
   const tile = (n, t, cls) => h('div', { class: 'wb-tile ' + (cls || '') }, h('b', {}, String(n)), h('span', {}, t));
-  const tiles = h('div', { class: 'wb-tiles' }, tile(backups.length, backups.length === 1 ? 'daily backup kept' : 'daily backups kept'), tile(savesToday, savesToday === 1 ? 'save today' : 'saves today'), tile(ok7, 'sign-ins this week'), tile(bad7, 'failed sign-ins this week', bad7 ? 'bad' : ''));
+  const tiles = h('div', { class: 'wb-tiles wb-tiles3' }, tile(backups.length, backups.length === 1 ? 'daily backup kept' : 'daily backups kept'), tile(savesToday, savesToday === 1 ? 'save today' : 'saves today'), tile(last ? 'v' + last.version : '—', 'current version'));
   const row = (av, main, sub, right, cls) => h('li', { class: 'wb-row ' + (cls || '') }, av, h('div', { class: 'wb-main' }, main, sub ? h('small', {}, sub) : null), right);
   const lists = {
     backups: () => backups.length ? h('ul', { class: 'wb-list' }, ...backups.map(b => row(h('span', { class: 'wb-av cal', 'aria-hidden': 'true' }, String(b.day).slice(8, 10)), h('b', {}, dayName(String(b.day))), Math.round(b.size / 1024) + ' KB · version ' + b.version,
@@ -16008,7 +16027,7 @@ async function drawWorkbook(pane) {
     saves: () => saves.length ? h('ul', { class: 'wb-list' }, ...saves.slice(0, 20).map(x => row(h('span', { class: 'wb-av' }, ini(x.saved_by)), h('b', {}, x.saved_by || '?'), agoText(x.at), h('span', { class: 'wb-chip' }, 'v' + x.version)))) : h('p', { class: 'wb-empty' }, 'No saves yet.'),
   };
   let tab = 'backups'; const box = h('div', { class: 'wb-box' });
-  const tabs = h('div', { class: 'pl-seg wb-tabs', role: 'tablist' }, ...[['backups', 'Backups'], ['signins', 'Sign-ins'], ['saves', 'Saves']].map(([v, l]) => h('button', { type: 'button', role: 'tab', 'aria-pressed': String(v === tab), onclick: e => { tab = v; for (const b of tabs.children) b.setAttribute('aria-pressed', String(b === e.currentTarget)); box.replaceChildren(lists[tab]()); } }, l)));
+  const tabs = h('div', { class: 'pl-seg wb-tabs', role: 'tablist' }, ...[['backups', 'Backups'], ['saves', 'Saves']].map(([v, l]) => h('button', { type: 'button', role: 'tab', 'aria-pressed': String(v === tab), onclick: e => { tab = v; for (const b of tabs.children) b.setAttribute('aria-pressed', String(b === e.currentTarget)); box.replaceChildren(lists[tab]()); } }, l)));
   box.replaceChildren(lists[tab]());
   fill(pane, hero, err, tiles, h('div', { class: 'set-card wb-card' }, tabs, box),
     h('p', { class: 'set-hint' }, 'The first save of each day keeps a backup for 30 days. To go back to one, download it, then use Replace workbook.'));
