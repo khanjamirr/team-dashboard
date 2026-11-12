@@ -10,7 +10,7 @@
 <meta name="format-detection" content="telephone=no">
 <link rel="preconnect" href="https://iiogwevtyzgedhoaqlrn.supabase.co" crossorigin><link rel="dns-prefetch" href="https://iiogwevtyzgedhoaqlrn.supabase.co">
 <link rel="icon" href="data:,">
-<title>Team Dashboard · 3.85.0</title>
+<title>Team Dashboard · 3.85.1</title>
 <link rel="preconnect" href="https://fonts.googleapis.com"><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin><link href="https://fonts.googleapis.com/css2?family=Public+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet">
 <style>
 :root {
@@ -3100,6 +3100,17 @@ tr.act-zero td { color:var(--muted); }
 .act-form .act-pi label > span.pl-av { flex:none; } .act-form .act-pn b { font-weight:600; }
 .act-form .act-pn { display:flex !important; flex-direction:column !important; align-items:flex-start !important; gap:0 !important; }
 #actHost .pb-head h2 { display:none; }
+/* v3.85.1: pseudo names by client and sub client */
+.psn-subgroup { display:flex; align-items:baseline; gap:8px; padding:8px 4px 6px 18px; margin-top:4px; border-left:3px solid color-mix(in srgb, var(--accent) 40%, transparent); }
+.psn-subgroup b { font-size:13px; } .psn-subgroup small { color:var(--muted); font-size:11.5px; }
+.psn-counts { margin:4px 0 12px; border:1px solid var(--border); border-radius:14px; background:var(--surface); overflow:hidden; }
+.psn-counts > summary { cursor:pointer; padding:10px 14px; font-weight:650; font-size:13px; }
+.psn-ct { width:100%; border-collapse:collapse; font-size:12.5px; } .psn-ct th { text-align:left; font-weight:600; color:var(--muted); padding:6px 14px; border-top:1px solid var(--border); }
+.psn-ct td { padding:6px 14px; border-top:1px solid var(--border); } .psn-ct td:not(:first-child), .psn-ct th:not(:first-child) { text-align:right; width:110px; }
+.psn-ct tr { cursor:pointer; } .psn-ct tbody tr:hover { background:var(--ios-fill, rgba(118,118,128,.08)); } .psn-ct tr.on { background:color-mix(in srgb, var(--accent) 10%, transparent); }
+.psn-ct-s td:first-child { padding-left:28px; color:var(--ink-2); }
+.psn-ct td.warn { color:#c77700; font-weight:700; } .psn-ct td.hot { color:#d70015; font-weight:700; }
+@media (max-width:700px) { .psn-ct td:not(:first-child), .psn-ct th:not(:first-child) { width:auto; padding:6px 8px; } .psn-ct th:nth-child(6), .psn-ct td:nth-child(6), .psn-ct th:nth-child(3), .psn-ct td:nth-child(3) { display:none; } .psn-ct { font-size:12px; } }
 </style></head>
 
 
@@ -11092,7 +11103,7 @@ async function poll() {
 }
 
 /* ============================== filtering ============================== */
-const APP = { title: "Team Dashboard", version: "3.85.0", released: "2026-11-12" };
+const APP = { title: "Team Dashboard", version: "3.85.1", released: "2026-11-12" };
 const BASE_DIMS = { status: "status_column", desig: "designation_column", client: "client_column", mode: "mode_column" };
 const STANDARD_STATUSES = ["Active", "Manager", "OJT", "Bench", "New", "Projected", "Left", "Moved"];
 const TILE_ORDER = ["Active", "Manager", "OJT", "Bench", "New", "Projected"];
@@ -13609,12 +13620,13 @@ function buildField(c, value, isNew) {
    Each active name is tagged to one real recruiter (Active, Active + Resign or OJT), from a chosen date; when the
    recruiter is replaced or the name made vacant, the end date is chosen too. Every assignment stays in the
    "Pseudo Name History" sheet of the same workbook; the small "i" shows a name's history. */
+let psnCountsOpen = true;   /* v3.85.1 */
 const pseudoCol = () => ((state.cols || []).find(c => /pseudo/i.test(c.name)) || {}).name || null;
 const psnIsAdmin = () => !window.PERM || !PERM.online() || PERM.isSuper() || PERM.canPsnEdit();   /* v3.81.0: or a role given "manage pseudo names" */
 const psnStatus = r => { const s = gs(r, "status_column").toLowerCase().replace(/\s+/g, "").replace(/&/g, "+"); return /^active\+resign(ed|ation)?$/.test(s) ? "resign" : s === "active" ? "active" : s === "ojt" ? "ojt" : s; };
 const psnEligible = r => ["active", "resign", "ojt"].includes(psnStatus(r));
 const psnMaster = () => { const L = (window.TD_SETTINGS || {}).pseudo_names; if (!Array.isArray(L)) return null;
-  const seen = new Set(); return L.map(x => typeof x === "string" ? { name: x.trim(), client: "", active: true } : { name: String((x && x.name) || "").trim(), client: String((x && x.client) || "").trim(), active: !(x && x.active === false) })
+  const seen = new Set(); return L.map(x => typeof x === "string" ? { name: x.trim(), client: "", active: true } : { name: String((x && x.name) || "").trim(), client: String((x && x.client) || "").trim(), sub: String((x && x.sub) || "").trim(), active: !(x && x.active === false) })
     .filter(x => x.name && !seen.has(x.name.toLowerCase()) && seen.add(x.name.toLowerCase())); };
 const psnSaveMaster = (list, text) => (window.PERM && PERM.online() && !PERM.isAdmin?.() && !PERM.isSuper() ? window.saveSharedSetting : window.saveTeamSetting)("pseudo_names", list.slice().sort((a, b) => (a.client || "").localeCompare(b.client || "") || a.name.localeCompare(b.name)), { name: "Pseudo names", text });
 const psnToday = () => { const d = new Date(); return d.getFullYear() + "-" + String(d.getMonth() + 1).padStart(2, "0") + "-" + String(d.getDate()).padStart(2, "0"); };
@@ -13681,7 +13693,10 @@ async function openPseudoNames(focusId, host) {   /* v3.81.0: host = draw inside
     return;
   }
   const admin = psnIsAdmin();
-  let hist = null, q = "", tab = "current", editing = null, editMeta = null, busy = false, filter = "all", client = "all";
+  let hist = null, q = "", tab = "current", editing = null, editMeta = null, busy = false, filter = "all", client = "all", sub = "all";
+  /* v3.85.1: a pseudo name's sub client: the one set for it, or else its recruiter's */
+  const scOf = r => { try { return state.schema.subclient_column ? gs(r, "subclient_column") : ""; } catch { return ""; } };
+  const subOf = s => s.sub || (s.r ? scOf(s.r) : "");
   const pv = r => S(g(r, pc)).trim(), nm = r => gs(r, "name_column") || String(r.id), cl = r => gs(r, "client_column");
   const holders = () => { const m = new Map(); for (const r of state.rows) { const v = pv(r); if (!v || isInactive(r)) continue; m.set(v.toLowerCase(), r); } return m; };
   const search = h("input", { class: "input", type: "search", placeholder: "Search a pseudo name, recruiter or Emp ID", "aria-label": "Search pseudo names" });
@@ -13719,7 +13734,7 @@ async function openPseudoNames(focusId, host) {   /* v3.81.0: host = draw inside
     }
     const clients = [...new Set([...master.map(x => x.client || ""), ...state.rows.filter(psnEligible).map(cl)].filter(Boolean))].sort((a, b) => a.localeCompare(b));
     const seats = master.map(x => { const r = cur.get(x.name.toLowerCase()) || null; return { ...x, r, flag: !!r && psnStatus(r) === "resign" }; });
-    const inClient = s => client === "all" || (s.client || "") === client;
+    const inClient = s => (client === "all" || (s.client || "") === client) && (client === "all" || sub === "all" || subOf(s) === sub);
     const pool = seats.filter(inClient);
     const act = pool.filter(s => s.active);
     const counts = { all: act.length, filled: act.filter(s => s.r).length, vacant: act.filter(s => !s.r).length, flag: act.filter(s => s.flag).length, inactive: pool.filter(s => !s.active).length };
@@ -13727,20 +13742,44 @@ async function openPseudoNames(focusId, host) {   /* v3.81.0: host = draw inside
     const notListed = [...cur.values()].filter(r => !master.some(x => x.name.toLowerCase() === pv(r).toLowerCase()));
     const chip = (k, l, n, cls) => h("button", { type: "button", class: "psn-chip " + (cls || "") + (filter === k ? " on" : ""), onclick: () => { filter = k; editing = editMeta = null; drawList(); } }, l, h("b", {}, String(n)));
     const csel = h("select", { class: "input psn-client", "aria-label": "Client" }, h("option", { value: "all" }, "All clients · " + seats.filter(s => s.active).length), ...clients.map(c => h("option", { value: c, selected: client === c }, c + " · " + seats.filter(s => s.active && s.client === c).length)), seats.some(s => !s.client) ? h("option", { value: "", selected: client === "" }, "No client") : null);
-    csel.addEventListener("change", () => { client = csel.value; editing = editMeta = null; drawList(); });
+    csel.addEventListener("change", () => { client = csel.value; sub = "all"; editing = editMeta = null; drawList(); });
+    const subsHere = client === "all" ? [] : [...new Set(seats.filter(x => x.active && x.client === client).map(subOf))].sort((a, b) => (a ? 0 : 1) - (b ? 0 : 1) || a.localeCompare(b));
+    const ssel = subsHere.length > 1 || (subsHere.length === 1 && subsHere[0]) ? h("select", { class: "input psn-client", "aria-label": "Sub client" }, h("option", { value: "all" }, "All sub clients"), ...subsHere.map(x => h("option", { value: x, selected: sub === x }, (x || "No sub client") + " · " + seats.filter(y => y.active && y.client === client && subOf(y) === x).length))) : null;
+    if (ssel) ssel.addEventListener("change", () => { sub = ssel.value; editing = editMeta = null; drawList(); });
     /* v3.72.1: one click copies what is shown: pseudo name, recruiter, Emp ID (pastes as columns in Excel / Sheets, as a table in Outlook / Teams) */
     let copyRows = () => [];
     const copyBtn = h("button", { class: "btn mini psn-copy", type: "button", title: "Copy the pseudo names shown (pseudo name, recruiter, Emp ID)", onclick: async () => {
       const rows = copyRows(); if (!rows.length) { toast("Nothing to copy."); return; }
-      const hd = ["Pseudo name", "Recruiter", "Emp ID"], e = v => String(v ?? "").replace(/[&<>"]/g, c => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;" }[c]));
+      const hd = ["Pseudo name", "Recruiter", "Emp ID", "Client", "Sub client"], e = v => String(v ?? "").replace(/[&<>"]/g, c => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;" }[c]));
       const txt = [hd.join("\t"), ...rows.map(r => r.join("\t"))].join("\n");
       const html = '<table border="1" cellpadding="4" cellspacing="0" style="border-collapse:collapse;font:12px Segoe UI,Arial,sans-serif"><thead><tr>' + hd.map(x => '<th style="background:#f1f3f7;text-align:left">' + x + '</th>').join("") + '</tr></thead><tbody>' + rows.map(r => '<tr>' + r.map(x => '<td>' + e(x) + '</td>').join("") + '</tr>').join("") + '</tbody></table>';
       try { if (window.ClipboardItem && navigator.clipboard?.write) await navigator.clipboard.write([new ClipboardItem({ "text/plain": new Blob([txt], { type: "text/plain" }), "text/html": new Blob([html], { type: "text/html" }) })]); else await navigator.clipboard.writeText(txt); toast("Copied " + rows.length + (rows.length === 1 ? " row" : " rows") + ": pseudo name, recruiter, Emp ID."); }
       catch { try { const ta = document.createElement("textarea"); ta.value = txt; ta.style.position = "fixed"; ta.style.opacity = "0"; document.body.append(ta); ta.select(); document.execCommand("copy"); ta.remove(); toast("Copied " + rows.length + " rows."); } catch { toast("The browser blocked copying.", true); } }
     } }, "⧉ Copy");
-    const head = h("div", { class: "psn-top" }, csel, copyBtn, h("div", { class: "psn-chips" }, chip("all", "All", counts.all), chip("filled", "Tagged", counts.filled), chip("vacant", "Vacant", counts.vacant, counts.vacant ? "warn" : ""),
+    const head = h("div", { class: "psn-top" }, csel, ssel, copyBtn, h("div", { class: "psn-chips" }, chip("all", "All", counts.all), chip("filled", "Tagged", counts.filled), chip("vacant", "Vacant", counts.vacant, counts.vacant ? "warn" : ""),
       chip("flag", "Needs replacement", counts.flag, counts.flag ? "hot" : ""), chip("nobody", "Recruiters without one", withoutOne.length), admin ? chip("inactive", "Inactive", counts.inactive) : null));
     const parts = [head];
+    /* v3.85.1: the counts by client and sub client; click a line to show only those */
+    { const tree = new Map();
+      for (const x of seats) { const c = x.client || "", sc = subOf(x); if (!tree.has(c)) tree.set(c, new Map()); const t = tree.get(c); if (!t.has(sc)) t.set(sc, []); t.get(sc).push(x); }
+      const cnt = list => { const a = list.filter(x => x.active); return [a.length, a.filter(x => x.r).length, a.filter(x => !x.r).length, a.filter(x => x.flag).length, list.filter(x => !x.active).length]; };
+      const cell = (v, cls) => h("td", { class: cls && v ? cls : "" }, v ? String(v) : "–");
+      const rows = [];
+      for (const [c, subs] of [...tree.entries()].sort((a, b) => (a[0] ? 0 : 1) - (b[0] ? 0 : 1) || a[0].localeCompare(b[0]))) {
+        const all = [...subs.values()].flat(), [n, t, v, f, off] = cnt(all);
+        rows.push(h("tr", { class: "psn-ct-c" + (client === c && sub === "all" ? " on" : ""), onclick: () => { client = client === c && sub === "all" ? "all" : c; sub = "all"; editing = editMeta = null; drawList(); } },
+          h("td", {}, h("b", {}, c || "No client")), h("td", {}, h("b", {}, String(n))), cell(t), cell(v, "warn"), cell(f, "hot"), cell(off)));
+        const named = [...subs.keys()];
+        if (named.length > 1 || (named.length === 1 && named[0])) for (const sc of named.sort((a, b) => (a ? 0 : 1) - (b ? 0 : 1) || a.localeCompare(b))) {
+          const [n2, t2, v2, f2, off2] = cnt(subs.get(sc));
+          rows.push(h("tr", { class: "psn-ct-s" + (client === c && sub === sc ? " on" : ""), onclick: () => { if (client === c && sub === sc) { sub = "all"; } else { client = c; sub = sc; } editing = editMeta = null; drawList(); } },
+            h("td", {}, "↳ " + (sc || "No sub client")), h("td", {}, String(n2)), cell(t2), cell(v2, "warn"), cell(f2, "hot"), cell(off2)));
+        }
+      }
+      const open = psnCountsOpen;
+      parts.push(h("details", { class: "psn-counts", ...(open ? { open: true } : {}), ontoggle: e => { psnCountsOpen = e.currentTarget.open; } }, h("summary", {}, "Counts by client and sub client"),
+        h("table", { class: "psn-ct" }, h("thead", {}, h("tr", {}, ...["Client / sub client", "Names", "Tagged", "Vacant", "Need replacement", "Inactive"].map(x => h("th", {}, x)))), h("tbody", {}, ...rows))));
+    }
     if (admin) parts.push(addForm(master, clients));
     if (admin && notListed.length) parts.push(h("p", { class: "psn-warn" }, "⚠ " + notListed.length + " pseudo " + (notListed.length === 1 ? "name is" : "names are") + " in use but not in your list: " + notListed.slice(0, 6).map(pv).join(", ") + (notListed.length > 6 ? "…" : "") + " ",
       h("button", { class: "linkbtn", type: "button", onclick: async () => { try { await psnSaveMaster([...master, ...notListed.map(r => ({ name: pv(r), client: cl(r), active: true }))], "Added " + notListed.length + " names in use"); drawList(); } catch (e) { toast(e.message, true); } } }, "Add them")));
@@ -13754,18 +13793,29 @@ async function openPseudoNames(focusId, host) {   /* v3.81.0: host = draw inside
         box.append(h("div", { class: "psn-row" }, h("div", { class: "psn-who" }, h("b", {}, nm(r)), h("small", {}, [r.id, gs(r, "status_column"), cl(r)].filter(Boolean).join(" · "))), psnStatus(r) === "resign" ? h("span", { class: "psn-flag" }, "Resigning") : null, sel));
         sel.addEventListener("change", () => { if (!sel.value) return; const s = seats.find(x => x.name === sel.value); confirmTag(s, r, () => { sel.value = ""; }); });
       }
-      copyRows = () => withoutOne.filter(r => hit(nm(r), r.id)).map(r => ["", nm(r), String(r.id)]);
+      copyRows = () => withoutOne.filter(r => hit(nm(r), r.id)).map(r => ["", nm(r), String(r.id), cl(r), scOf(r)]);
       if (!box.firstChild) box.append(h("p", { class: "hint" }, "Every Active, Active + Resign and OJT recruiter" + (client !== "all" ? " of " + (client || "no client") : "") + " has a pseudo name."));
       listBox.replaceChildren(...parts, box); return;
     }
     const shown = pool.filter(s => (filter === "inactive" ? !s.active : s.active) && (filter === "all" || filter === "inactive" || (filter === "filled" && s.r) || (filter === "vacant" && !s.r) || (filter === "flag" && s.flag)) && hit(s.name, s.client, s.r && nm(s.r), s.r && s.r.id));
-    copyRows = () => [...shown].sort((a, b) => (a.client || "").localeCompare(b.client || "") || a.name.localeCompare(b.name, undefined, { sensitivity: "base" })).map(s => [s.name, s.r ? nm(s.r) : "", s.r ? String(s.r.id) : ""]);
+    copyRows = () => [...shown].sort((a, b) => (a.client || "").localeCompare(b.client || "") || subOf(a).localeCompare(subOf(b)) || a.name.localeCompare(b.name, undefined, { sensitivity: "base" })).map(s => [s.name, s.r ? nm(s.r) : "", s.r ? String(s.r.id) : "", s.client || "", subOf(s)]);
     const groups = new Map(); for (const s of shown) { const k = s.client || ""; if (!groups.has(k)) groups.set(k, []); groups.get(k).push(s); }
     for (const [c, list] of [...groups.entries()].sort((a, b) => (a[0] ? 0 : 1) - (b[0] ? 0 : 1) || a[0].localeCompare(b[0]))) {
       list.sort((a, b) => (b.flag - a.flag) || a.name.localeCompare(b.name, undefined, { sensitivity: "base" }));
-      const vac = list.filter(s => !s.r).length, fl = list.filter(s => s.flag).length;
-      box.append(h("div", { class: "psn-group" }, h("b", {}, c || "No client"), h("small", {}, list.length + (list.length === 1 ? " name" : " names") + (filter === "inactive" ? " (inactive)" : (vac ? " · " + vac + " vacant" : "") + (fl ? " · " + fl + " need a replacement" : "")))));
-      for (const s of list) {
+      const vac = list.filter(s => !s.r).length, fl = list.filter(s => s.flag).length, tg = list.length - vac;
+      const cntTxt = (l, v, f, t) => l + (l === 1 ? " name" : " names") + (filter === "inactive" ? " (inactive)" : " · " + t + " tagged" + (v ? " · " + v + " vacant" : "") + (f ? " · " + f + " need a replacement" : ""));
+      box.append(h("div", { class: "psn-group" }, h("b", {}, c || "No client"), h("small", {}, cntTxt(list.length, vac, fl, tg))));
+      /* v3.85.1: then by sub client, each with its counts */
+      const bySub = new Map(); for (const s of list) { const k = subOf(s); if (!bySub.has(k)) bySub.set(k, []); bySub.get(k).push(s); }
+      const showSubs = bySub.size > 1 || (bySub.size === 1 && [...bySub.keys()][0]);
+      const ordered = [];
+      for (const [sc, sl] of [...bySub.entries()].sort((a, b) => (a[0] ? 0 : 1) - (b[0] ? 0 : 1) || a[0].localeCompare(b[0]))) {
+        if (showSubs) { const v2 = sl.filter(s => !s.r).length, f2 = sl.filter(s => s.flag).length; ordered.push({ head: h("div", { class: "psn-subgroup" }, h("b", {}, sc || "No sub client"), h("small", {}, cntTxt(sl.length, v2, f2, sl.length - v2))) }); }
+        for (const s of sl) ordered.push({ s });
+      }
+      for (const o of ordered) {
+        if (o.head) { box.append(o.head); continue; }
+        const s = o.s;
         const was = !s.r ? (hist || []).filter(x => x.pseudo && x.pseudo.toLowerCase() === s.name.toLowerCase() && x.to).sort((a, b) => String(psnDay(b.to)).localeCompare(String(psnDay(a.to))))[0] : null;
         const key = s.name;
         box.append(h("div", { class: "psn-row psn-seat" + (s.flag ? " psn-flagrow" : "") + (!s.r ? " vacant" : "") + (!s.active ? " off" : "") + (editing === key ? " on" : "") },
@@ -13804,14 +13854,18 @@ async function openPseudoNames(focusId, host) {   /* v3.81.0: host = draw inside
   /* admins: client, active / inactive, remove */
   function metaEditor(s, master, clients) {
     const csel = h("select", { class: "input", "aria-label": "Client" }, h("option", { value: "" }, "No client"), ...clients.map(c => h("option", { value: c, selected: s.client === c }, c)));
+    const knownSubs = () => [...new Set([...state.rows.filter(r => cl(r) === csel.value).map(scOf), ...master.filter(x => x.client === csel.value).map(x => x.sub || "")].filter(Boolean))].sort();
+    const subIn = h("select", { class: "input", "aria-label": "Sub client" });
+    const fillSubs = () => { const auto = s.r ? scOf(s.r) : ""; subIn.replaceChildren(h("option", { value: "" }, auto ? "Same as the recruiter (" + auto + ")" : "No sub client"), ...knownSubs().map(x => h("option", { value: x, selected: s.sub === x }, x))); };
+    fillSubs(); csel.addEventListener("change", fillSubs);
     const act = h("input", { type: "checkbox", checked: s.active, disabled: !!s.r && s.active });
     const save = h("button", { class: "btn mini primary", type: "button" }, "Save");
     save.addEventListener("click", async () => {
       save.disabled = true;
-      try { await psnSaveMaster(master.map(x => x.name === s.name ? { ...x, client: csel.value, active: act.checked } : x), "“" + s.name + "”: " + (csel.value || "no client") + ", " + (act.checked ? "active" : "inactive")); editMeta = null; toast("Saved “" + s.name + "”."); drawList(); }
+      try { await psnSaveMaster(master.map(x => x.name === s.name ? { ...x, client: csel.value, sub: subIn.value, active: act.checked } : x), "“" + s.name + "”: " + (csel.value || "no client") + (subIn.value ? " / " + subIn.value : "") + ", " + (act.checked ? "active" : "inactive")); editMeta = null; toast("Saved “" + s.name + "”."); drawList(); }
       catch (e) { toast(e.message, true); save.disabled = false; }
     });
-    return h("div", { class: "psn-edit psn-meta" }, h("label", { class: "psn-dl" }, h("small", {}, "Client"), csel),
+    return h("div", { class: "psn-edit psn-meta" }, h("label", { class: "psn-dl" }, h("small", {}, "Client"), csel), h("label", { class: "psn-dl" }, h("small", {}, "Sub client"), subIn),
       h("label", { class: "chk-line", title: s.r && s.active ? "Make it vacant first" : "" }, act, h("span", {}, "Active" + (s.r && s.active ? " (make it vacant before turning it off)" : ""))),
       h("span", { class: "grow" }),
       !s.r ? h("button", { class: "btn mini danger", type: "button", onclick: async () => { if (!confirm("Remove “" + s.name + "” from the list? Its history is kept.")) return; try { await psnSaveMaster(master.filter(x => x.name !== s.name), "Removed “" + s.name + "”"); editMeta = null; drawList(); } catch (e) { toast(e.message, true); } } }, "Remove") : null,
