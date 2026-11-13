@@ -10,7 +10,7 @@
 <meta name="format-detection" content="telephone=no">
 <link rel="preconnect" href="https://iiogwevtyzgedhoaqlrn.supabase.co" crossorigin><link rel="dns-prefetch" href="https://iiogwevtyzgedhoaqlrn.supabase.co">
 <link rel="icon" href="data:,">
-<title>Team Dashboard · 3.92.2</title>
+<title>Team Dashboard · 3.93.1</title>
 <link rel="preconnect" href="https://fonts.googleapis.com"><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin><link href="https://fonts.googleapis.com/css2?family=Public+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet">
 <style>
 :root {
@@ -3391,6 +3391,25 @@ body.has-tzbar .toast-host, body.has-tzbar #toast { bottom:72px !important; }
 .tg-det .rte-tbl { font-size:11px; } .tg-none { margin:0; font-size:12px; color:var(--muted); }
 .tg-note { font-size:12px; background:var(--ios-fill, #f4f4f7); border-radius:10px; padding:7px 9px; } .tg-note small { color:var(--muted); display:block; margin-bottom:2px; } .tg-note div { white-space:pre-line; max-height:4.5em; overflow:hidden; }
 .tg-foot { color:var(--muted); font-size:11px; }
+/* v3.93.0: greeting on top, page name under it */
+html body div#pinnedHeader.sticky-top.pinned-top { display:flex !important; flex-wrap:wrap !important; align-items:center !important; column-gap:12px !important; row-gap:2px !important; }
+html body #pinnedHeader > .top-greet { order:0; flex:1 1 auto; min-width:0; }
+html body #pinnedHeader > header.top, html body #pinnedHeader > header.top > * { order:1; }
+html body #pinnedHeader > .workspace-heading { order:2; flex:1 1 100% !important; width:100%; margin:0 !important; padding:0 !important; text-align:left; }
+html body #pinnedHeader > .workspace-heading > div { text-align:left; }
+.top-greet .tg1 { margin:0; font-size:26px; font-weight:800; letter-spacing:-.03em; line-height:1.15; color:var(--gz-ink, var(--ink)); white-space:nowrap; overflow:hidden; text-overflow:ellipsis; }
+.top-greet .tg1::after { content:" 👋"; }
+.top-greet .tg2 { margin:2px 0 0; font-size:13px; color:var(--gz-ink2, var(--muted)); white-space:nowrap; overflow:hidden; text-overflow:ellipsis; }
+html body #pinnedHeader #cleanPageTitle { font-size:15px !important; font-weight:700 !important; letter-spacing:.02em !important; color:var(--gz-ink2, var(--ink-2)) !important; margin:6px 0 0 !important; text-transform:uppercase; }
+/* the Overview no longer repeats the greeting: only its date controls stay */
+html body #pageSummary.ov .ovx-hero > .grow > h1, html body #pageSummary.ov .ovx-hero > .grow > p { display:none !important; }
+html body #pageSummary.ov .ovx-hero { justify-content:flex-end; margin-bottom:12px !important; }
+@media (max-width:700px) {
+  html body #pinnedHeader.pinned-top { display:flex !important; }
+  html body #pinnedHeader > .top-greet { order:0; flex:1 1 100%; }
+  .top-greet .tg1 { font-size:21px; } .top-greet .tg2 { font-size:12px; }
+  html body #pinnedHeader #cleanPageTitle { font-size:13px !important; margin:2px 0 0 !important; }
+}
 </style></head>
 
 
@@ -5460,6 +5479,7 @@ const CLOUD = (() => {
     save: (id, name, code, role, active, permissions, loginId) => rpc('td_admin_save_user', { p_token: tok(), p_id: id, p_name: name, p_passcode: code, p_role: role, p_active: active, p_permissions: permissions ?? null, p_login_id: loginId ?? null }),
     resetRequests: () => rpc('td_admin_reset_requests', { p_token: tok() }),
     closeReset: (id, status) => rpc('td_admin_close_reset', { p_token: tok(), p_id: id, p_status: status }),
+    resetPasscode: (reqId, userId, code) => rpc('td_admin_reset_passcode', { p_token: tok(), p_request_id: reqId, p_user_id: userId, p_passcode: code }),
     remove: id => rpc('td_admin_delete_user', { p_token: tok(), p_id: id }),
     history: () => rpc('td_admin_history', { p_token: tok() }),
     /* v3.74.0: storage meter and clean-up (storage.sql) */
@@ -11445,7 +11465,7 @@ async function poll() {
 }
 
 /* ============================== filtering ============================== */
-const APP = { title: "Team Dashboard", version: "3.92.2", released: "2026-11-13" };
+const APP = { title: "Team Dashboard", version: "3.93.1", released: "2026-11-13" };
 const BASE_DIMS = { status: "status_column", desig: "designation_column", client: "client_column", mode: "mode_column" };
 const STANDARD_STATUSES = ["Active", "Manager", "OJT", "Bench", "New", "Projected", "Left", "Moved"];
 const TILE_ORDER = ["Active", "Manager", "OJT", "Bench", "New", "Projected"];
@@ -15596,6 +15616,35 @@ async function drawPeople(pane, selectId) {
   if (PPL.tab === 'signins') { await drawSignins(body); return; }   /* v3.79.0: the sign-in log lives here (it was also a separate page) */
   if (PPL.tab === 'teams') PPL.tab = 'people';   /* v3.66.0: teams were removed */
 
+  /* v3.93.1: set the new passcode right here: default Ims$$123#, they choose their own at the next sign-in */
+  const resetDialog = (r, who) => {
+    const code = h('input', { class: 'input', type: 'text', value: CLOUD.admin.DEFAULT_CODE || 'Ims$$123#', autocomplete: 'off', spellcheck: 'false', 'aria-label': 'New passcode' });
+    const err = h('p', { class: 'err', role: 'alert' });
+    const go = h('button', { class: 'btn primary', type: 'button' }, 'Set passcode');
+    const d = pdlg('New passcode for ' + who.name, h('div', {},
+      h('p', { class: 'set-hint' }, 'Login ID ' + (who.login_id || r.login_id) + '. They will be signed out everywhere and must choose their own passcode when they next sign in.'),
+      h('label', { class: 'signin-label' }, 'New passcode'), h('div', { class: 'pc-wrap' }, code,
+        h('button', { class: 'btn', type: 'button', onclick: () => { code.value = CLOUD.admin.DEFAULT_CODE || 'Ims$$123#'; } }, 'Default'),
+        h('button', { class: 'btn', type: 'button', onclick: () => { code.value = CLOUD.admin.genCode(); } }, 'Random')), err),
+      [h('button', { class: 'btn', type: 'button', onclick: () => d.close() }, 'Cancel'), go]);
+    go.addEventListener('click', async () => {
+      const v = code.value.trim(); err.textContent = '';
+      if (v.length < 4) { err.textContent = 'At least 4 characters.'; return; }
+      go.disabled = true; go.textContent = 'Saving…';
+      try {
+        try { await CLOUD.admin.resetPasscode(r.id, who.id, v); }
+        catch (e) { if (!/schema cache|Could not find/i.test(e.message || '')) throw e;
+          await CLOUD.admin.save(who.id, who.name, v, who.role, who.active !== false, null, who.login_id || r.login_id); await CLOUD.admin.closeReset(r.id, 'done').catch(() => { }); }
+        d.close(); window.refreshResetBadge && window.refreshResetBadge();
+        const msg = who.name + ' · login ID ' + (who.login_id || r.login_id) + ' · passcode ' + v;
+        const done = pdlg('Passcode set', h('div', {}, h('p', { class: 'set-hint' }, 'Send this to ' + who.name + ' privately. They must choose their own passcode when they sign in.'), h('pre', { class: 'fb-codes' }, msg),
+          h('button', { class: 'btn', type: 'button', onclick: async () => { try { await navigator.clipboard.writeText(msg); toast('Copied.'); } catch { } } }, '⧉ Copy')),
+          [h('button', { class: 'btn primary', type: 'button', onclick: () => done.close() }, 'Done')]);
+        reload(selectId);
+      } catch (e) { err.textContent = e.message; go.disabled = false; go.textContent = 'Set passcode'; }
+    });
+    setTimeout(() => { code.focus(); code.select(); }, 30);
+  };
   if (PPL.tab === 'passcodes') {
     const selfOn = settings.self_passcode !== false;
     const selfBox = checkLine('Let people change their own passcode (they must type their current one)', selfOn);
@@ -15605,13 +15654,13 @@ async function drawPeople(pane, selectId) {
     });
     fill(body,
       h('div', { class: 'set-card' }, h('h4', {}, 'Reset requests' + (pending.length ? ' · ' + pending.length : '')),
-        pending.length ? h('p', { class: 'set-hint' }, 'Press “Set new passcode”, save, and send them the new passcode privately. Saving closes the request.') : h('p', { class: 'set-hint', style: 'margin:0' }, 'No one is waiting for a new passcode.'),
+        pending.length ? h('p', { class: 'set-hint' }, 'Press “Set new passcode” (it suggests the default Ims$$123#), then send it to them privately. That closes the request, and they choose their own passcode when they sign in.') : h('p', { class: 'set-hint', style: 'margin:0' }, 'No one is waiting for a new passcode.'),
         pending.length ? h('ul', { class: 'ppl-resets' }, ...pending.map(r => {
           const who = users.find(x => x.id === r.user_id);
           return h('li', {},
             h('span', { class: 'ppl-av' }, pplInitials(who ? who.name : r.login_id)),
             h('span', { class: 'ppl-rs-main' }, h('b', {}, who ? who.name : r.login_id), h('small', {}, 'ID ' + r.login_id + ' · ' + when(r.at) + (r.note ? ' · “' + r.note + '”' : '') + (who ? '' : ' · no account has this login ID'))),
-            who ? h('button', { class: 'btn mini primary', type: 'button', onclick: () => { PPL.tab = 'people'; drawPeople(pane, who.id).then(() => setTimeout(() => pane.querySelector('.pc-wrap .btn:nth-of-type(2)')?.click(), 0)); } }, 'Set new passcode') : null,
+            who ? h('button', { class: 'btn mini primary', type: 'button', onclick: () => resetDialog(r, who) }, 'Set new passcode') : null,
             h('button', { class: 'btn mini', type: 'button', onclick: async () => { try { await CLOUD.admin.closeReset(r.id, 'dismissed'); window.refreshResetBadge && window.refreshResetBadge(); reload(selectId); } catch (e) { toast(e.message, true); } } }, 'Dismiss'));
         })) : null),
       h('div', { class: 'set-card' }, h('h4', {}, 'Sign-in rules'), selfBox.el,
@@ -18643,6 +18692,27 @@ document.addEventListener('visibilitychange', () => { if (!document.hidden && on
   const fit = () => { const out = !!document.querySelector('.signin-login')?.offsetParent; bar.hidden = out; document.body.classList.toggle('has-tzbar', !out);
     const sd = document.querySelector('.sidebar'), wide = innerWidth > 700 && sd && !document.body.classList.contains('nav-auto'); bar.style.left = wide ? Math.max(0, Math.round(sd.getBoundingClientRect().right)) + 'px' : ''; };
   fit(); setInterval(fit, 1000); addEventListener('resize', fit);
+})();
+</script>
+<script>
+/* v3.93.0: the greeting sits at the top of every page; the page name goes under it */
+(() => {
+  const ph = document.getElementById('pinnedHeader'); if (!ph) return;
+  const g = h('div', { class: 'top-greet', id: 'topGreet' }, h('h1', { class: 'tg1' }), h('p', { class: 'tg2' }));
+  ph.prepend(g);
+  const DOW = ['Sunday', 'Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday'], MON = ['January', 'February', 'March', 'April', 'May', 'June', 'July', 'August', 'September', 'October', 'November', 'December'];
+  let sig = '';
+  const draw = () => {
+    let name = ''; try { name = (typeof CLOUD !== 'undefined' && CLOUD.user && CLOUD.user() || {}).name || (typeof BE !== 'undefined' && BE.userName ? BE.userName() : '') || ''; } catch { }
+    const first = String(name || '').trim().split(/\s+/)[0] || '';
+    const now = new Date(), hr = now.getHours();
+    const hello = (hr < 12 ? 'Good morning' : hr < 17 ? 'Good afternoon' : 'Good evening') + (first ? ', ' + first : '');
+    const heroP = document.querySelector('#pageSummary .ovx-hero p');
+    const sub = (typeof state !== 'undefined' && state.view === 'summary' && heroP && heroP.textContent) ? heroP.textContent : DOW[now.getDay()] + ', ' + now.getDate() + ' ' + MON[now.getMonth()];
+    const nx = hello + '|' + sub; if (nx === sig) return; sig = nx;
+    g.querySelector('.tg1').textContent = hello; g.querySelector('.tg2').textContent = sub;
+  };
+  draw(); setInterval(draw, 1000);
 })();
 </script>
 </body>
