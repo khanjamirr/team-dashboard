@@ -10,7 +10,7 @@
 <meta name="format-detection" content="telephone=no">
 <link rel="preconnect" href="https://iiogwevtyzgedhoaqlrn.supabase.co" crossorigin><link rel="dns-prefetch" href="https://iiogwevtyzgedhoaqlrn.supabase.co">
 <link rel="icon" href="data:,">
-<title>Team Dashboard · 3.91.0</title>
+<title>Team Dashboard · 3.91.1</title>
 <link rel="preconnect" href="https://fonts.googleapis.com"><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin><link href="https://fonts.googleapis.com/css2?family=Public+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet">
 <style>
 :root {
@@ -3334,20 +3334,32 @@ html body #pageSummary.ov .ovt-on { color:var(--gz-lime) !important; }
 .mob-ic[data-view="playbook"]::before { content:"📘"; } .mob-ic[data-view="settings"]::before { content:"⚙️"; }
 .mob-links { display:flex; gap:10px; margin-top:16px; } .mob-link { all:unset; box-sizing:border-box; flex:1; text-align:center; padding:12px; border-radius:14px; border:1px solid var(--border); font-weight:600; font-size:14px; cursor:pointer; color:var(--accent); } .mob-link.out { color:#ff3b30; }
 #btnRefresh.spin { animation:tdSpin .8s linear infinite; } @keyframes tdSpin { to { transform:rotate(360deg); } }
-/* v3.91.0: world clocks */
-html body #pageSummary.ov .ovx-hero { align-items:center !important; }
-.ovx-clocks { display:flex; gap:8px; flex:0 1 auto; margin:0 auto; }
-.ovx-clk { display:flex; flex-direction:column; align-items:flex-start; min-width:92px; padding:8px 12px; border-radius:16px; background:var(--gz-card, var(--surface)); border:1px solid var(--gz-line, var(--border)); line-height:1.15; }
-.ovx-clk-l { display:flex; align-items:center; gap:6px; font-size:11px; font-weight:800; letter-spacing:.06em; color:var(--gz-mute, var(--muted)); }
-.ovx-clk-l i { width:7px; height:7px; border-radius:50%; background:var(--gz-mute, #aaa); }
-.ovx-clk.work .ovx-clk-l i { background:var(--gz-lime, #34c759); box-shadow:0 0 0 3px color-mix(in srgb, var(--gz-lime, #34c759) 25%, transparent); }
-.ovx-clk.night .ovx-clk-l i { background:var(--gz-violet, #5e5ce6); }
-.ovx-clk b { font-size:18px; font-weight:800; letter-spacing:-.02em; color:var(--gz-ink, var(--ink)); margin-top:3px; font-variant-numeric:tabular-nums; white-space:nowrap; }
-.ovx-clk small { font-size:11px; color:var(--gz-mute, var(--muted)); }
-.ovx-clk:first-child { background:var(--gz-violet-t, #efebff); border-color:transparent; }
-@media (max-width:1280px) { .ovx-clk { min-width:78px; padding:7px 9px; } .ovx-clk b { font-size:15px; } }
-@media (max-width:1100px) { html body #pageSummary.ov .ovx-hero { flex-wrap:wrap; } .ovx-clocks { order:3; flex:1 1 100%; margin:4px 0 0; } }
-@media (max-width:700px) { .ovx-clocks { overflow-x:auto; scrollbar-width:none; margin:2px -4px 0; padding:0 4px; } .ovx-clocks::-webkit-scrollbar { display:none; } .ovx-clk { flex:0 0 auto; } }
+/* v3.91.1: bottom bar with the world clocks, on every page */
+.tzbar { position:fixed; left:0; right:0; bottom:0; z-index:90; display:flex; justify-content:center; gap:8px; padding:6px 12px calc(6px + env(safe-area-inset-bottom));
+  background:color-mix(in srgb, var(--surface, #fff) 82%, transparent); -webkit-backdrop-filter:blur(18px) saturate(170%); backdrop-filter:blur(18px) saturate(170%); border-top:1px solid var(--border); }
+.tzbar[hidden] { display:none; }
+.tzc { position:relative; display:flex; align-items:center; gap:8px; padding:5px 12px 5px 8px; border-radius:14px; min-width:150px; color:#fff; overflow:hidden; box-shadow:inset 0 1px 0 rgba(255,255,255,.25); transition:background .6s; }
+.tzc.ph-dawn { background:linear-gradient(135deg, #ff9a8b 0%, #ffc36b 100%); color:#4a2312; }
+.tzc.ph-day { background:linear-gradient(135deg, #4facfe 0%, #00c6fb 100%); color:#06263f; }
+.tzc.ph-dusk { background:linear-gradient(135deg, #f857a6 0%, #ff8a4c 100%); color:#fff; }
+.tzc.ph-night { background:linear-gradient(135deg, #141e46 0%, #3a2a78 100%); color:#e8e6ff; }
+.tzc.ph-night::after { content:""; position:absolute; inset:0; background:radial-gradient(1px 1px at 70% 30%, #fff, transparent), radial-gradient(1px 1px at 85% 70%, #fff, transparent), radial-gradient(1.5px 1.5px at 60% 80%, rgba(255,255,255,.8), transparent); pointer-events:none; }
+.tzc-ic { font-size:18px; line-height:1; }
+.tzc-z { display:flex; flex-direction:column; line-height:1.05; } .tzc-z b { font-size:12px; font-weight:800; letter-spacing:.05em; } .tzc-z small { font-size:10px; opacity:.8; }
+.tzc-t { font-size:16px; font-weight:800; letter-spacing:-.02em; font-variant-numeric:tabular-nums; margin-left:auto; white-space:nowrap; }
+.tzc-d { font-size:10.5px; font-weight:700; opacity:.8; }
+.tzc-w { position:absolute; top:5px; right:5px; width:6px; height:6px; border-radius:50%; background:transparent; }
+.tzc.work .tzc-w { background:#3ddc84; box-shadow:0 0 0 2px rgba(255,255,255,.7); }
+body.has-tzbar #app { padding-bottom:64px !important; }
+body.has-tzbar .toast-host, body.has-tzbar #toast { bottom:72px !important; }
+@media (max-width:1100px) { .tzc { min-width:0; flex:1 1 0; padding:5px 8px 5px 6px; gap:5px; } .tzc-z small { display:none; } .tzc-t { font-size:14px; } }
+@media (max-width:700px) {
+  .tzbar { bottom:calc(104px + env(safe-area-inset-bottom)); padding:4px 10px; gap:4px; border-top:0; background:transparent; -webkit-backdrop-filter:none; backdrop-filter:none; overflow-x:auto; justify-content:flex-start; scrollbar-width:none; }
+  .tzbar::-webkit-scrollbar { display:none; }
+  .tzc { flex:0 0 auto; min-width:0; padding:4px 8px 4px 6px; border-radius:12px; } .tzc-ic { font-size:14px; } .tzc-t { font-size:13px; } .tzc-d { display:none; } .tzc-z b { font-size:10.5px; }
+  body.has-tzbar #app { padding-bottom:150px !important; }
+}
+@media print { .tzbar { display:none !important; } }
 </style></head>
 
 
@@ -11399,7 +11411,7 @@ async function poll() {
 }
 
 /* ============================== filtering ============================== */
-const APP = { title: "Team Dashboard", version: "3.91.0", released: "2026-11-13" };
+const APP = { title: "Team Dashboard", version: "3.91.1", released: "2026-11-13" };
 const BASE_DIMS = { status: "status_column", desig: "designation_column", client: "client_column", mode: "mode_column" };
 const STANDARD_STATUSES = ["Active", "Manager", "OJT", "Bench", "New", "Projected", "Left", "Moved"];
 const TILE_ORDER = ["Active", "Manager", "OJT", "Bench", "New", "Projected"];
@@ -18484,26 +18496,32 @@ document.addEventListener('visibilitychange', () => { if (!document.hidden && on
 })();
 </script>
 <script>
-/* v3.91.0: world clocks on the Overview: India and the four US time zones; green while it's working hours there */
+/* v3.91.1: world clocks in a bar fixed at the bottom of every page; each clock is coloured by the time of day there
+   (dawn, day, dusk, night); a green dot while it's working hours */
 (() => {
-  const Z = [['IST', 'India', 'Asia/Kolkata', '🇮🇳'], ['ET', 'Eastern', 'America/New_York', '🇺🇸'], ['CT', 'Central', 'America/Chicago', '🇺🇸'], ['MT', 'Mountain', 'America/Denver', '🇺🇸'], ['PT', 'Pacific', 'America/Los_Angeles', '🇺🇸']];
+  const Z = [['IST', 'India', 'Asia/Kolkata'], ['ET', 'Eastern', 'America/New_York'], ['CT', 'Central', 'America/Chicago'], ['MT', 'Mountain', 'America/Denver'], ['PT', 'Pacific', 'America/Los_Angeles']];
   const fmt = Z.map(z => ({ t: new Intl.DateTimeFormat('en-US', { timeZone: z[2], hour: 'numeric', minute: '2-digit', hour12: true }),
-    p: new Intl.DateTimeFormat('en-US', { timeZone: z[2], weekday: 'short', hour: 'numeric', hour12: false, year: 'numeric', month: '2-digit', day: '2-digit' }) }));
+    p: new Intl.DateTimeFormat('en-US', { timeZone: z[2], weekday: 'short', hour: 'numeric', minute: 'numeric', hour12: false, day: '2-digit' }) }));
+  const PH = h0 => h0 >= 5 && h0 < 8 ? ['dawn', '🌅', 'Early morning'] : h0 >= 8 && h0 < 17 ? ['day', '☀️', 'Daytime'] : h0 >= 17 && h0 < 20 ? ['dusk', '🌇', 'Evening'] : ['night', '🌙', 'Night'];
+  const bar = h('div', { id: 'tzBar', class: 'tzbar', role: 'group', 'aria-label': 'Time around the team' },
+    ...Z.map(z => h('div', { class: 'tzc', title: z[1] + ' time' }, h('span', { class: 'tzc-ic', 'aria-hidden': 'true' }), h('span', { class: 'tzc-z' }, h('b', {}, z[0]), h('small', {}, z[1])), h('span', { class: 'tzc-t' }), h('span', { class: 'tzc-d' }), h('i', { class: 'tzc-w', title: 'Working hours there' }))));
+  document.body.append(bar); document.body.classList.add('has-tzbar');
   const tick = () => {
-    const hero = document.querySelector('#pageSummary .ovx-hero'); if (!hero) return;
-    let box = hero.querySelector('.ovx-clocks');
-    if (!box) { box = h('div', { class: 'ovx-clocks', role: 'group', 'aria-label': 'Time around the team' }, ...Z.map(z => h('div', { class: 'ovx-clk', title: z[1] + ' time (' + z[2] + ')' }, h('span', { class: 'ovx-clk-l' }, h('i'), z[0]), h('b'), h('small')))); const g = hero.querySelector('.grow'); g ? g.after(box) : hero.prepend(box); }
-    const now = new Date(), here = new Date(now.toLocaleString('en-US')).getDate();
-    [...box.children].forEach((el, i) => {
-      const parts = Object.fromEntries(fmt[i].p.formatToParts(now).map(x => [x.type, x.value])), hr = +parts.hour % 24, day = +parts.day;
-      const t = fmt[i].t.format(now).replace(/\s?(AM|PM)/, (m, ap) => ' ' + ap.toLowerCase());
-      el.querySelector('b').textContent = t;
-      el.querySelector('small').textContent = parts.weekday + (day !== here ? (day > here || (here > 25 && day < 5) ? ' · tomorrow' : ' · yesterday') : '');
-      el.classList.toggle('work', parts.weekday !== 'Sat' && parts.weekday !== 'Sun' && hr >= 9 && hr < 18);
-      el.classList.toggle('night', hr >= 22 || hr < 6);
+    const now = new Date(), here = now.getDate();
+    [...bar.children].forEach((el, i) => {
+      const pr = Object.fromEntries(fmt[i].p.formatToParts(now).map(x => [x.type, x.value])), hr = +pr.hour % 24, day = +pr.day, ph = PH(hr);
+      el.className = 'tzc ph-' + ph[0] + (pr.weekday !== 'Sat' && pr.weekday !== 'Sun' && hr >= 9 && hr < 18 ? ' work' : '');
+      el.querySelector('.tzc-ic').textContent = ph[1];
+      el.querySelector('.tzc-t').textContent = fmt[i].t.format(now).replace(/\s?(AM|PM)/, (m, ap) => ' ' + ap.toLowerCase());
+      el.querySelector('.tzc-d').textContent = pr.weekday + (day !== here ? (day > here || (here > 25 && day < 5) ? ' +1' : ' −1') : '');
+      el.title = Z[i][1] + ' time · ' + ph[2] + ' · ' + pr.weekday + (el.classList.contains('work') ? ' · working hours' : '');
     });
   };
-  tick(); setInterval(tick, 15000); setInterval(() => { const hb = document.querySelector('#pageSummary .ovx-hero'); if (hb && !hb.querySelector('.ovx-clocks')) tick(); }, 800);
+  tick(); setInterval(tick, 15000);
+  /* hidden on the sign-in screen */
+  const fit = () => { const out = !!document.querySelector('.signin-login')?.offsetParent; bar.hidden = out; document.body.classList.toggle('has-tzbar', !out);
+    const sd = document.querySelector('.sidebar'), wide = innerWidth > 700 && sd && !document.body.classList.contains('nav-auto'); bar.style.left = wide ? Math.max(0, Math.round(sd.getBoundingClientRect().right)) + 'px' : ''; };
+  fit(); setInterval(fit, 1000); addEventListener('resize', fit);
 })();
 </script>
 </body>
