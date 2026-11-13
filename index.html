@@ -10,7 +10,7 @@
 <meta name="format-detection" content="telephone=no">
 <link rel="preconnect" href="https://iiogwevtyzgedhoaqlrn.supabase.co" crossorigin><link rel="dns-prefetch" href="https://iiogwevtyzgedhoaqlrn.supabase.co">
 <link rel="icon" href="data:,">
-<title>Team Dashboard · 3.88.0</title>
+<title>Team Dashboard · 3.88.1</title>
 <link rel="preconnect" href="https://fonts.googleapis.com"><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin><link href="https://fonts.googleapis.com/css2?family=Public+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet">
 <style>
 :root {
@@ -11240,7 +11240,7 @@ async function poll() {
 }
 
 /* ============================== filtering ============================== */
-const APP = { title: "Team Dashboard", version: "3.88.0", released: "2026-11-13" };
+const APP = { title: "Team Dashboard", version: "3.88.1", released: "2026-11-13" };
 const BASE_DIMS = { status: "status_column", desig: "designation_column", client: "client_column", mode: "mode_column" };
 const STANDARD_STATUSES = ["Active", "Manager", "OJT", "Bench", "New", "Projected", "Left", "Moved"];
 const TILE_ORDER = ["Active", "Manager", "OJT", "Bench", "New", "Projected"];
@@ -12460,7 +12460,7 @@ function organizeRequests() {
     { id: "rejected", host: $("#cardRejectedRequests"), label: "History" },
   ].filter(d => d.host);
   let c = {}; try { c = (window.ATT && ATT.requestCounts) ? ATT.requestCounts() : {}; } catch { }
-  const rec = $("#rcRecord"); if (rec) { let ok = false; try { ok = !!(window.ATT && ATT.canRecord && ATT.canRecord()) && (!window.PERM || PERM.canView("attendance")); } catch { } rec.hidden = !ok; }
+  const rec = $("#rcRecord"); if (rec) { let ok = false; try { ok = !!(window.ATT && ATT.canRecord && ATT.canRecord());   /* v3.88.1: no need for the Attendance page */ } catch { } rec.hidden = !ok; }
   const vis = defs.filter(d => !d.host.hidden).map(d => ({ ...d, n: c[d.id] || 0 }));
   wrap.hidden = !vis.length; if (!vis.length) return;
   if (!OV.rc || !vis.some(d => d.id === OV.rc)) OV.rc = (vis.find(d => d.id !== "rejected" && d.n) || vis.find(d => d.id === "rejected") || vis[0]).id;
@@ -15699,11 +15699,14 @@ function buildAccessForm(src, users = [], opts = {}) {
       return tileRef.el;
     }).filter((x, i) => PARTS[i].g.name !== 'Save & sync');
     /* v3.78.1: the most asked-for rights as plain switches */
-    const QUICK = [['att.approve', 'Approve or reject leave requests'], ['att.direct', 'Record leave without waiting for approval'], ['emp.edit', 'Edit employee details'], ['emp.add', 'Add new employees'], ['emp.delete', 'Delete employees'],
+    const QUICK = [['att.log', 'Record attendance (the “+ Record attendance” button on the Overview)'], ['att.approve', 'Approve or reject leave requests'], ['att.direct', 'Record leave without waiting for approval'], ['emp.edit', 'Edit employee details'], ['emp.add', 'Add new employees'], ['emp.delete', 'Delete employees'],
       ['plan.assign', 'Give tasks to other people'], ['plan.all', 'See everyone’s tasks'], ['pb.edit', 'Write and edit the Playbook'], ['workbook.download', 'Download the workbook']].filter(([k]) => boxes[k]);
     const quick = h('div', { class: 'ra-quick' }, ...QUICK.map(([k, t]) => { const sw = h('button', { type: 'button', class: 'rt-sw', role: 'switch', 'aria-label': t });
       const paint = () => sw.setAttribute('aria-checked', String(!!boxes[k].checked)); paintAll.push(paint); paint();
-      sw.addEventListener('click', () => { boxes[k].checked = !boxes[k].checked; const grp = PERM.groups.find(g => [...g.items, ...((g.sub && g.sub.items) || [])].some(i => i[0] === k)); if (boxes[k].checked && grp && grp.page && boxes[grp.page]) boxes[grp.page].checked = true; repaint(); });
+      sw.addEventListener('click', () => { boxes[k].checked = !boxes[k].checked; const grp = PERM.groups.find(g => [...g.items, ...((g.sub && g.sub.items) || [])].some(i => i[0] === k));
+        /* v3.88.1: recording attendance works from the Overview alone, so it doesn't switch the Attendance page on; it needs at least one attendance type */
+        if (k === 'att.log') { if (boxes[k].checked) { const lk = Object.keys(boxes).filter(x => /^log\./.test(x)); if (!lk.some(x => boxes[x].checked)) lk.forEach(x => { boxes[x].checked = true; }); if (boxes['page.overview']) boxes['page.overview'].checked = true; } }
+        else if (boxes[k].checked && grp && grp.page && boxes[grp.page]) boxes[grp.page].checked = true; repaint(); });
       return h('label', { class: 'ra-q' }, sw, h('span', {}, t)); }));
     const tableT = h('div', { class: 'ra' },
       h('div', { class: 'ra-sec-h' }, h('h4', {}, 'Pages'), h('p', {}, 'Pick how much people in this role can do on each page. ', h('b', {}, 'Off'), ' = hidden · ', h('b', {}, 'View'), ' = see only · ', h('b', {}, 'Edit'), ' = see and change · ', h('b', {}, 'Full'), ' = also delete and manage.')),
