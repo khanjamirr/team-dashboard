@@ -10,7 +10,7 @@
 <meta name="format-detection" content="telephone=no">
 <link rel="preconnect" href="https://iiogwevtyzgedhoaqlrn.supabase.co" crossorigin><link rel="dns-prefetch" href="https://iiogwevtyzgedhoaqlrn.supabase.co">
 <link rel="icon" href="data:,">
-<title>Team Dashboard · 3.91.1</title>
+<title>Team Dashboard · 3.92.1</title>
 <link rel="preconnect" href="https://fonts.googleapis.com"><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin><link href="https://fonts.googleapis.com/css2?family=Public+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet">
 <style>
 :root {
@@ -1250,7 +1250,7 @@ div.rmod-head { cursor:default; }
 .rmod-extra { border-top:1px solid var(--border); margin-top:6px; padding-top:8px; }
 .copy-access { margin:12px 0; }
 .pc-first { margin:6px 0 10px; padding:9px 12px; border-radius:10px; font-size:13px; background:color-mix(in srgb, var(--accent) 10%, var(--surface)); border:1px solid color-mix(in srgb, var(--accent) 30%, var(--border)); }
-.pc-overlay { position:fixed; inset:0; z-index:1000; display:flex; align-items:center; justify-content:center; padding:16px; background:rgba(0,0,0,.35); }
+.pc-overlay { position:fixed; inset:0; z-index:5000; display:flex; align-items:center; justify-content:center; padding:16px; background:rgba(0,0,0,.35); }
 .pc-card { width:100%; max-width:400px; padding:22px; border-radius:14px; background:var(--surface, #fff); color:var(--ink); box-shadow:0 20px 50px rgba(0,0,0,.25); }
 .reset-queue { margin:0 0 14px; padding:12px 14px; border:1px solid var(--c-yellow, #d9a400); border-radius:10px; background:var(--wash); }
 .reset-queue h4 { margin:0 0 4px; }
@@ -3360,6 +3360,26 @@ body.has-tzbar .toast-host, body.has-tzbar #toast { bottom:72px !important; }
   body.has-tzbar #app { padding-bottom:150px !important; }
 }
 @media print { .tzbar { display:none !important; } }
+/* v3.92.0: time zone converter */
+.tzc.tzc-conv { all:unset; box-sizing:border-box; display:flex; align-items:center; padding:0 16px; border-radius:14px; font-weight:800; font-size:13px; cursor:pointer; background:var(--ink, #16161d); color:var(--surface, #fff); }
+.tzc.tzc-conv:hover { background:#7c5cff; color:#fff; }
+.tzv { position:fixed; z-index:2600; right:16px; bottom:72px; width:min(440px, calc(100vw - 24px)); max-height:calc(100vh - 100px); overflow:auto; padding:14px 16px 16px; border-radius:22px; background:var(--surface, #fff); color:var(--ink); border:1px solid var(--border); box-shadow:0 30px 70px -20px rgba(0,0,0,.4); display:flex; flex-direction:column; gap:10px; animation:mobUp .2s ease-out; }
+.tzv-h { display:flex; align-items:center; gap:8px; } .tzv-h b { font-size:15px; } .tzv-h .grow { flex:1; }
+.tzv-close { all:unset; cursor:pointer; width:28px; height:28px; display:grid; place-items:center; border-radius:50%; } .tzv-close:hover { background:var(--ios-fill, #eee); }
+.tzv-l { display:flex; flex-direction:column; gap:4px; font-size:12px; font-weight:700; color:var(--muted); } .tzv-l .input { height:40px; }
+.tzv-quick { display:flex; gap:6px; flex-wrap:wrap; } .tzv-q { all:unset; cursor:pointer; padding:4px 10px; border-radius:999px; background:var(--ios-fill, #f1f1f6); font-size:12px; font-weight:700; } .tzv-q:hover { background:#7c5cff; color:#fff; }
+.tzv-dt { display:flex; gap:8px; } .tzv-dt .input { flex:1; height:40px; min-width:0; }
+.tzv-err { margin:0; color:#d70015; font-size:12.5px; } .tzv-err:empty { display:none; }
+.tzv-out { display:flex; flex-direction:column; gap:6px; }
+.tzv-row { position:relative; display:flex; align-items:center; gap:10px; padding:8px 12px; border-radius:14px; }
+.tzv-row.ph-dawn { background:linear-gradient(135deg, #ff9a8b, #ffc36b); color:#4a2312; } .tzv-row.ph-day { background:linear-gradient(135deg, #4facfe, #00c6fb); color:#06263f; }
+.tzv-row.ph-dusk { background:linear-gradient(135deg, #f857a6, #ff8a4c); color:#fff; } .tzv-row.ph-night { background:linear-gradient(135deg, #141e46, #3a2a78); color:#e8e6ff; }
+.tzv-row.from { outline:3px solid var(--ink, #16161d); outline-offset:-1px; }
+.tzv-ic { font-size:18px; } .tzv-z { display:flex; flex-direction:column; line-height:1.15; min-width:0; flex:1; } .tzv-z b { font-size:13px; } .tzv-z small { font-size:11px; opacity:.8; }
+.tzv-t { display:flex; flex-direction:column; align-items:flex-end; font-size:18px; font-weight:800; letter-spacing:-.02em; font-variant-numeric:tabular-nums; line-height:1.1; } .tzv-t small { font-size:11px; font-weight:600; opacity:.85; letter-spacing:0; }
+.tzv-w { width:8px; height:8px; border-radius:50%; background:#3ddc84; box-shadow:0 0 0 2px rgba(255,255,255,.7); flex:none; } .tzv-w.off { visibility:hidden; }
+.tzv-x { all:unset; cursor:pointer; position:absolute; top:2px; right:6px; font-size:14px; opacity:.7; } .tzv-x:hover { opacity:1; }
+@media (max-width:700px) { .tzc.tzc-conv { order:-1; } .tzv { left:12px; right:12px; width:auto; bottom:calc(150px + env(safe-area-inset-bottom)); max-height:calc(100vh - 220px); } .tzc.tzc-conv { flex:0 0 auto; padding:0 12px; } }
 </style></head>
 
 
@@ -5441,6 +5461,7 @@ const CLOUD = (() => {
       await wb().meta(true); await wb().put(blob, wb()._meta ? wb()._meta.version : 0); await open();
     },
     genCode: () => { const a = new Uint32Array(1); crypto.getRandomValues(a); return String(100000 + (a[0] % 900000)); },
+    DEFAULT_CODE: 'Ims$$123#',   /* v3.92.1: every new user starts with this and must change it at the first sign-in */
     selfUpdated(name) { if (!session) return; session.name = name; ls.set(LS_SESSION, session); BE.setUser(name); decorate(); },
   };
   async function signOut() {
@@ -5549,7 +5570,9 @@ const CLOUD = (() => {
       h('button', { class: 'linkbtn', type: 'button', onclick: signOut }, 'Sign out'));
     if (session.role === 'superadmin') setTimeout(() => window.refreshResetBadge && window.refreshResetBadge(), 500);
     /* v3.76.0: a passcode given by the admin: ask the person to choose their own, once per sign-in */
-    if (session.must_change && user().selfPasscode && !window.__pcAsked) { window.__pcAsked = true; const t = justTyped; justTyped = ''; setTimeout(() => window.openChangePasscode && window.openChangePasscode({ first: true, current: t }), 900); }
+    if (session.must_change && !window.__pcAsked) {   /* v3.92.1: always, and it can't be skipped */ window.__pcAsked = true; const t = justTyped; justTyped = ''; setTimeout(() => window.openChangePasscode && window.openChangePasscode({ first: true, current: t }), 900);
+      /* it comes back if it is closed any other way, until the new passcode is saved */
+      const keep = setInterval(() => { if (!session || !session.must_change) { clearInterval(keep); return; } if (!document.getElementById('pcDialog') && window.openChangePasscode) window.openChangePasscode({ first: true, current: t }); }, 1500); }
     lab.after(links);
     document.querySelectorAll('.cloud-links').forEach((el, i, all) => { if (i < all.length - 1) el.remove(); });
   }
@@ -11411,7 +11434,7 @@ async function poll() {
 }
 
 /* ============================== filtering ============================== */
-const APP = { title: "Team Dashboard", version: "3.91.1", released: "2026-11-13" };
+const APP = { title: "Team Dashboard", version: "3.92.1", released: "2026-11-13" };
 const BASE_DIMS = { status: "status_column", desig: "designation_column", client: "client_column", mode: "mode_column" };
 const STANDARD_STATUSES = ["Active", "Manager", "OJT", "Bench", "New", "Projected", "Left", "Moved"];
 const TILE_ORDER = ["Active", "Manager", "OJT", "Bench", "New", "Projected"];
@@ -16622,9 +16645,9 @@ function drawEditor(box, u, reload, users = [], template = null, groups = []) {
   const me = CLOUD.user(), isNew = !u, self = u && u.id === me.id;
   const err = h('p', { class: 'err', role: 'alert' });
   const name = h('input', { class: 'input', value: u ? u.name : '', 'aria-label': 'Name', autocomplete: 'off' });
-  const code = h('input', { class: 'input', type: isNew ? 'text' : 'password', value: u ? u.passcode : CLOUD.admin.genCode(), 'aria-label': 'Passcode', autocomplete: 'off', spellcheck: 'false' });
+  const code = h('input', { class: 'input', type: isNew ? 'text' : 'password', value: u ? u.passcode : CLOUD.admin.DEFAULT_CODE, 'aria-label': 'Passcode', autocomplete: 'off', spellcheck: 'false' });
   const eye = h('button', { class: 'btn', type: 'button', onclick: () => { code.type = code.type === 'password' ? 'text' : 'password'; eye.textContent = code.type === 'password' ? 'Show' : 'Hide'; } }, isNew ? 'Hide' : 'Show');
-  const fresh = h('button', { class: 'btn', type: 'button', onclick: () => { code.value = CLOUD.admin.genCode(); code.type = 'text'; eye.textContent = 'Hide'; } }, 'New');
+  const fresh = h('button', { class: 'btn', type: 'button', title: 'Set the default passcode (' + CLOUD.admin.DEFAULT_CODE + '). They must change it at their next sign-in.', onclick: () => { code.value = CLOUD.admin.DEFAULT_CODE; code.type = 'text'; eye.textContent = 'Hide'; } }, 'Default');
   const loginId = h('input', { class: 'input', list: 'setLoginList', value: u ? (u.login_id || '') : '', placeholder: 'Emp ID', 'aria-label': 'Login ID', autocomplete: 'off', spellcheck: 'false', maxlength: 100 });
   let loginAuto = !u || !u.login_id;
   loginId.addEventListener('input', () => { loginAuto = !loginId.value.trim(); });
@@ -17102,17 +17125,17 @@ window.openChangePasscode = (opt = {}) => {   /* v3.76.0: opt.first = asked afte
   document.getElementById('pcDialog')?.remove();
   const err = h('p', { class: 'err', role: 'alert' });
   const field = (label, id, ac) => { const i = h('input', { class: 'input', type: 'password', id, autocomplete: ac, spellcheck: 'false', style: 'width:100%' }); return [h('label', { class: 'signin-label', for: id, style: 'display:block;margin-top:10px' }, label), i]; };
-  const [l1, oldI] = field('Current passcode', 'pcOld', 'current-password'), [l2, newI] = field('New passcode (at least 6 characters)', 'pcNew', 'new-password'), [l3, again] = field('New passcode again', 'pcAgain', 'new-password');
+  const [l1, oldI] = field(opt.first ? 'Current passcode (the one you signed in with)' : 'Current passcode', 'pcOld', 'current-password'), [l2, newI] = field('New passcode (at least 6 characters)', 'pcNew', 'new-password'), [l3, again] = field('New passcode again', 'pcAgain', 'new-password');
   const close = () => wrap.remove();
   if (opt.current) { oldI.value = opt.current; }
   const go = h('button', { class: 'btn primary', type: 'submit' }, opt.first ? 'Save my passcode' : 'Change passcode');
   const form = h('form', { class: 'pc-card', role: 'dialog', 'aria-modal': 'true', 'aria-labelledby': 'pcTitle' },
     h('h3', { id: 'pcTitle', style: 'margin:0 0 4px' }, opt.first ? 'Welcome! Choose your own passcode' : 'Change your passcode'),
-    opt.first ? h('p', { class: 'pc-first' }, 'Your passcode was set by the admin. Choose a new one that only you know: at least 6 characters, and not the same as before.') : null,
+    opt.first ? h('p', { class: 'pc-first' }, 'You signed in with a passcode given to you (such as the default one). To move forward, choose a new one that only you know: at least 6 characters, and not the same as before.') : null,
     h('p', { class: 'set-hint', style: 'margin:0' }, 'Signed in as ' + CLOUD.user().name + ' · login ID ' + (CLOUD.user().loginId || '—') + '. Your login ID stays the same. You will be signed out on other computers.'),
     ...(opt.current ? [] : [l1, oldI]), l2, newI, l3, again, err,
-    h('div', { class: 'set-actions flat', style: 'margin-top:14px;justify-content:flex-end' }, h('button', { class: 'btn', type: 'button', onclick: close }, opt.first ? 'Later' : 'Cancel'), go),
-    opt.first ? h('p', { class: 'set-hint', style: 'margin:8px 0 0;text-align:right' }, '“Later” asks again at your next sign-in. You can also use Change passcode at the bottom left.') : null);
+    h('div', { class: 'set-actions flat', style: 'margin-top:14px;justify-content:flex-end' }, opt.first ? h('button', { class: 'btn', type: 'button', onclick: () => CLOUD.signOut ? CLOUD.signOut() : location.reload() }, 'Sign out') : h('button', { class: 'btn', type: 'button', onclick: close }, 'Cancel'), go),
+    opt.first ? h('p', { class: 'set-hint', style: 'margin:8px 0 0;text-align:right' }, 'You need to choose your own passcode to continue.') : null);
   form.addEventListener('submit', async ev => {
     ev.preventDefault(); err.textContent = '';
     if (!oldI.value) { err.textContent = 'Enter your current passcode.'; return; }
@@ -17123,7 +17146,7 @@ window.openChangePasscode = (opt = {}) => {   /* v3.76.0: opt.first = asked afte
     try { await CLOUD.changeMyPasscode(oldI.value, newI.value.trim()); CLOUD.passChanged && CLOUD.passChanged(); close(); toast('Passcode changed. Use the new one next time you sign in.'); BE.appendActivity([{ time: BE.nowText(), user: BE.userName(), action: 'settings', key: '', name: CLOUD.user().name, details: { note: CLOUD.user().name + ' changed their own passcode' } }]); }
     catch (e) { err.textContent = e.message; go.disabled = false; go.textContent = 'Change passcode'; }
   });
-  const wrap = h('div', { id: 'pcDialog', class: 'pc-overlay', onclick: e => { if (e.target === wrap && !opt.first) close(); }, onkeydown: e => { if (e.key === 'Escape') close(); } }, form);
+  const wrap = h('div', { id: 'pcDialog', class: 'pc-overlay', onclick: e => { if (e.target === wrap && !opt.first) close(); }, onkeydown: e => { if (e.key === 'Escape' && !opt.first) close(); } }, form);
   document.body.append(wrap); (opt.current ? newI : oldI).focus();
 };
 /* ----- v3.18: red number on Settings when passcode reset requests are waiting (super admin) ----- */
@@ -18508,7 +18531,7 @@ document.addEventListener('visibilitychange', () => { if (!document.hidden && on
   document.body.append(bar); document.body.classList.add('has-tzbar');
   const tick = () => {
     const now = new Date(), here = now.getDate();
-    [...bar.children].forEach((el, i) => {
+    [...bar.children].filter(x => !x.classList.contains('tzc-conv')).forEach((el, i) => {
       const pr = Object.fromEntries(fmt[i].p.formatToParts(now).map(x => [x.type, x.value])), hr = +pr.hour % 24, day = +pr.day, ph = PH(hr);
       el.className = 'tzc ph-' + ph[0] + (pr.weekday !== 'Sat' && pr.weekday !== 'Sun' && hr >= 9 && hr < 18 ? ' work' : '');
       el.querySelector('.tzc-ic').textContent = ph[1];
@@ -18517,6 +18540,58 @@ document.addEventListener('visibilitychange', () => { if (!document.hidden && on
       el.title = Z[i][1] + ' time · ' + ph[2] + ' · ' + pr.weekday + (el.classList.contains('work') ? ' · working hours' : '');
     });
   };
+  /* v3.92.0: time zone converter: any time in any zone, shown in the team's zones and any others you add */
+  const ALLZ = (() => { try { return Intl.supportedValuesOf('timeZone'); } catch { return Z.map(z => z[2]).concat(['UTC', 'Europe/London', 'Europe/Berlin', 'Asia/Dubai', 'Asia/Singapore', 'Asia/Manila', 'Australia/Sydney', 'America/Phoenix', 'America/Anchorage', 'Pacific/Honolulu', 'America/Toronto', 'America/Mexico_City']); } })();
+  const NICK = { 'Asia/Kolkata': 'India (IST)', 'America/New_York': 'Eastern (ET)', 'America/Chicago': 'Central (CT)', 'America/Denver': 'Mountain (MT)', 'America/Los_Angeles': 'Pacific (PT)', 'America/Phoenix': 'Arizona (no DST)', 'UTC': 'UTC / GMT', 'Europe/London': 'London (UK)', 'Asia/Manila': 'Philippines', 'Asia/Dubai': 'Dubai (GST)', 'Asia/Singapore': 'Singapore', 'Australia/Sydney': 'Sydney', 'Pacific/Honolulu': 'Hawaii', 'America/Anchorage': 'Alaska' };
+  const zName = z => NICK[z] || z.split('/').pop().replace(/_/g, ' ') + ' (' + z.split('/')[0] + ')';
+  const partsIn = (z, ms) => Object.fromEntries(new Intl.DateTimeFormat('en-US', { timeZone: z, hourCycle: 'h23', year: 'numeric', month: '2-digit', day: '2-digit', hour: '2-digit', minute: '2-digit', second: '2-digit' }).formatToParts(new Date(ms)).map(x => [x.type, x.value]));
+  const offsetOf = (z, ms) => { const p = partsIn(z, ms); return Date.UTC(+p.year, +p.month - 1, +p.day, +p.hour % 24, +p.minute, +p.second) - Math.floor(ms / 1000) * 1000; };
+  const toUtc = (z, y, mo, d, hh, mm) => { const guess = Date.UTC(y, mo - 1, d, hh, mm); let ms = guess - offsetOf(z, guess); ms = guess - offsetOf(z, ms); return ms; };
+  const shortOff = (z, ms) => { try { return new Intl.DateTimeFormat('en-US', { timeZone: z, timeZoneName: 'short' }).formatToParts(new Date(ms)).find(x => x.type === 'timeZoneName').value; } catch { return ''; } };
+  const extra = [];
+  let panel = null;
+  function openConv(fromZone) {
+    if (panel) { panel.remove(); panel = null; if (!fromZone) return; }
+    const now = new Date(), from = fromZone || Intl.DateTimeFormat().resolvedOptions().timeZone || 'Asia/Kolkata', p0 = partsIn(from, now.getTime());
+    const dl = h('datalist', { id: 'tzAll' }, ...ALLZ.map(z => h('option', { value: z }, zName(z))));
+    const zIn = h('input', { class: 'input', list: 'tzAll', value: from, 'aria-label': 'From time zone', placeholder: 'Type a city or zone, e.g. London' });
+    const quick = h('div', { class: 'tzv-quick' }, ...Z.map(z => h('button', { type: 'button', class: 'tzv-q', onclick: () => { zIn.value = z[2]; run(); } }, z[0])));
+    const dIn = h('input', { class: 'input', type: 'date', value: p0.year + '-' + p0.month + '-' + p0.day, 'aria-label': 'Date' });
+    const tIn = h('input', { class: 'input', type: 'time', value: p0.hour + ':' + p0.minute, 'aria-label': 'Time' });
+    const nowBtn = h('button', { type: 'button', class: 'btn mini', onclick: () => { const q = partsIn(resolve(), Date.now()); dIn.value = q.year + '-' + q.month + '-' + q.day; tIn.value = q.hour + ':' + q.minute; run(); } }, 'Now');
+    const out = h('div', { class: 'tzv-out' }), err = h('p', { class: 'tzv-err' });
+    const addIn = h('input', { class: 'input', list: 'tzAll', placeholder: '+ Add a zone (e.g. London, Manila, Dubai)', 'aria-label': 'Add a time zone' });
+    addIn.addEventListener('change', () => { const z = match(addIn.value); if (z && !extra.includes(z) && !Z.some(x => x[2] === z)) extra.push(z); addIn.value = ''; run(); });
+    function match(v) { v = String(v || '').trim(); if (!v) return ''; if (ALLZ.includes(v)) return v; const l = v.toLowerCase(); return ALLZ.find(z => z.toLowerCase() === l) || ALLZ.find(z => zName(z).toLowerCase().includes(l) || z.toLowerCase().replace(/_/g, ' ').includes(l)) || ''; }
+    const resolve = () => match(zIn.value) || from;
+    function run() {
+      err.textContent = ''; const z = match(zIn.value);
+      if (!z) { err.textContent = 'Pick a time zone from the list (type a city such as London or Manila).'; out.replaceChildren(); return; }
+      const [y, mo, d] = dIn.value.split('-').map(Number), [hh, mm] = tIn.value.split(':').map(Number);
+      if (!y || isNaN(hh)) { out.replaceChildren(); return; }
+      const ms = toUtc(z, y, mo, d, hh, mm), base = Date.UTC(y, mo - 1, d);
+      const zones = [...new Set([z, ...Z.map(x => x[2]), ...extra])];
+      out.replaceChildren(...zones.map(t => { const p = partsIn(t, ms), hr = +p.hour % 24, dd = Math.round((Date.UTC(+p.year, +p.month - 1, +p.day) - base) / 864e5);
+        const tm = new Intl.DateTimeFormat('en-US', { timeZone: t, hour: 'numeric', minute: '2-digit' }).format(new Date(ms)).replace(/\s?(AM|PM)/, (m, a) => ' ' + a.toLowerCase());
+        const wd = new Intl.DateTimeFormat('en-US', { timeZone: t, weekday: 'short', day: 'numeric', month: 'short' }).format(new Date(ms));
+        const ph = PH(hr), work = !/Sat|Sun/.test(wd) && hr >= 9 && hr < 18;
+        return h('div', { class: 'tzv-row ph-' + ph[0] + (t === z ? ' from' : '') }, h('span', { class: 'tzv-ic' }, ph[1]), h('span', { class: 'tzv-z' }, h('b', {}, zName(t)), h('small', {}, shortOff(t, ms) + (t === z ? ' · from' : ''))),
+          h('span', { class: 'tzv-t' }, tm, h('small', {}, wd + (dd ? (dd > 0 ? ' · +' + dd + ' day' : ' · ' + dd + ' day') : ''))), work ? h('i', { class: 'tzv-w', title: 'Working hours there' }) : h('i', { class: 'tzv-w off' }),
+          extra.includes(t) ? h('button', { type: 'button', class: 'tzv-x', title: 'Remove', onclick: () => { extra.splice(extra.indexOf(t), 1); run(); } }, '×') : null); }));
+    }
+    zIn.addEventListener('change', run); zIn.addEventListener('input', () => { if (ALLZ.includes(zIn.value)) run(); }); dIn.addEventListener('input', run); tIn.addEventListener('input', run);
+    const copy = h('button', { type: 'button', class: 'btn mini', onclick: async () => { const txt = [...out.children].map(r => r.querySelector('.tzv-z b').textContent + ': ' + r.querySelector('.tzv-t').childNodes[0].textContent + ' (' + r.querySelector('.tzv-t small').textContent + ')').join('\n'); try { await navigator.clipboard.writeText(txt); conv.textContent = '✓ Copied'; setTimeout(() => { conv.textContent = '⇄ Convert'; }, 1500); } catch { } } }, '⧉ Copy');
+    panel = h('div', { class: 'tzv', role: 'dialog', 'aria-label': 'Time zone converter' }, dl,
+      h('div', { class: 'tzv-h' }, h('b', {}, '⇄ Time zone converter'), h('span', { class: 'grow' }), copy, h('button', { type: 'button', class: 'tzv-close', 'aria-label': 'Close', onclick: () => { panel.remove(); panel = null; } }, '✕')),
+      h('label', { class: 'tzv-l' }, h('span', {}, 'From'), zIn), quick,
+      h('div', { class: 'tzv-dt' }, dIn, tIn, nowBtn), err, out, addIn);
+    document.body.append(panel); run(); setTimeout(() => tIn.focus(), 30);
+  }
+  const conv = h('button', { type: 'button', class: 'tzc tzc-conv', title: 'Convert a time between time zones', onclick: () => openConv() }, '⇄ Convert');
+  bar.append(conv);
+  [...bar.querySelectorAll('.tzc:not(.tzc-conv)')].forEach((el, i) => { el.style.cursor = 'pointer'; el.addEventListener('click', () => openConv(Z[i][2])); });
+  document.addEventListener('keydown', e => { if (e.key === 'Escape' && panel) { panel.remove(); panel = null; } });
+  document.addEventListener('pointerdown', e => { if (panel && !panel.contains(e.target) && !bar.contains(e.target)) { panel.remove(); panel = null; } }, true);
   tick(); setInterval(tick, 15000);
   /* hidden on the sign-in screen */
   const fit = () => { const out = !!document.querySelector('.signin-login')?.offsetParent; bar.hidden = out; document.body.classList.toggle('has-tzbar', !out);
