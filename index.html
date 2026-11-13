@@ -10,7 +10,7 @@
 <meta name="format-detection" content="telephone=no">
 <link rel="preconnect" href="https://iiogwevtyzgedhoaqlrn.supabase.co" crossorigin><link rel="dns-prefetch" href="https://iiogwevtyzgedhoaqlrn.supabase.co">
 <link rel="icon" href="data:,">
-<title>Team Dashboard · 3.90.0</title>
+<title>Team Dashboard · 3.90.2</title>
 <link rel="preconnect" href="https://fonts.googleapis.com"><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin><link href="https://fonts.googleapis.com/css2?family=Public+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet">
 <style>
 :root {
@@ -8853,11 +8853,12 @@ function requestBuckets() {
   const deciding = new Set(approvals.map(r => r.id));
   const waiting = can('requests.own') ? reqList().filter(r => r.status === 'pending' && !deciding.has(r.id) && inScope(r)).sort((a, b) => (b.at || '').localeCompare(a.at || '')) : [];
   const seeRejected = r => r.status === 'rejected' && can('requests.rejected') && (RC.scope !== 'mine' || rcMine(r)) && !!window.requestNotificationVisible?.(r);
-  const history = (can('requests.own') || can('requests.rejected')) ? reqList().filter(r => r.status !== 'pending' && ((can('requests.own') && (inScope(r) || (me && String(r.decidedById) === me && RC.scope !== 'mine'))) || seeRejected(r)))
+  void seeRejected;   /* v3.90.2: History lists every decided request for everyone who can see the Request Center */
+  const history = myId() ? reqList().filter(r => r.status !== 'pending')
     .sort((a, b) => (b.decidedAt || b.at || '').localeCompare(a.decidedAt || a.at || '')) : [];
   return { approvals, waiting, history, hasGroup: mates.size > 0 };
 }
-const REQUEST_CARD_CSS = ":host {display:block;font-size:13px;} .rq-hist {flex:1 1 100%;margin-top:4px;} ";
+const REQUEST_CARD_CSS = ":host {display:block;font-size:13px;} .rq-hist {flex:1 1 100%;margin-top:4px;} .rq-side{display:flex;flex-direction:column;align-items:flex-end;gap:4px;} .rq-db{font-size:11px;font-weight:700;padding:2px 8px;border-radius:999px;background:rgba(142,142,147,.16);color:var(--ink-2,#555);white-space:nowrap;} .rq-db.ok{background:rgba(52,199,89,.15);color:#1f7a3a;} .rq-db.warn{background:rgba(255,149,0,.16);color:#a85d00;} .rq-db.bad{background:rgba(255,59,48,.14);color:#d70015;} ";
 function rqRow(r, actions) {
   const who = rcMine(r) ? 'you' : r.by, st = r.status === 'pending' ? 'Pending' : r.status[0].toUpperCase() + r.status.slice(1);
   const decided = r.status !== 'pending' && r.decidedBy ? (r.status === 'cancelled' ? 'Cancelled' : st) + ' by ' + (String(r.decidedById) === myId() ? 'you' : r.decidedBy) + ' · ' + reqWhen(r.decidedAt) : '';
@@ -8912,6 +8913,24 @@ function rqAppRow(r) {
     <span class="rq-l">${r.by ? 'Applied by ' + esc(r.by === me ? 'you' : r.by) + (r.at ? ' · ' + esc(reqWhen(r.at)) + ' · ' : ' · ') : 'Applied in the tracker · '}${st} by ${esc(r.decidedBy === me ? 'you' : (r.decidedBy || 'someone'))}${r.decidedAt ? ' · ' + esc(reqWhen(r.decidedAt)) : ''}</span></div>
     <div class="rq-side"><span class="rq-st ${esc(r.status)}">${esc(st)}</span></div></div>`;
 }
+/* v3.90.2: is an approved leave really in the attendance tracker? Checks each day against the saved tracker. */
+function trackerState(r) {
+  if (!r || r.status !== 'approved' || S.status !== 'ready' || !S.ctx) return { k: '' };
+  const p = resolvePerson(r.name); if (!p) return { k: 'gone' };
+  const want = String(r.code || '').trim().toUpperCase(), dates = r.dates || []; let ok = 0;
+  for (const d of dates) { const t = new Date(String(d).slice(0, 10) + 'T00:00:00Z'); if (isNaN(t)) continue;
+    const ms = Engine.monthSerial(t.getUTCFullYear(), t.getUTCMonth()), row = p.rows ? p.rows.find(x => x.month === ms) : null, cur = row ? String(row.days[t.getUTCDate() - 1] ?? '').trim().toUpperCase() : '';
+    if (cur === want || (want === 'LA' && cur && cur !== 'LA')) ok++; }
+  return { k: !dates.length ? '' : ok === dates.length ? 'saved' : ok ? 'partial' : 'missing', ok, n: dates.length };
+}
+function trackerBadge(r) {
+  const t = trackerState(r);
+  if (t.k === 'saved') return '<span class="rq-db ok" title="Every day of this leave is in the attendance tracker">✓ In attendance</span>';
+  if (t.k === 'partial') return `<span class="rq-db warn" title="Some days are not in the attendance tracker">⚠ ${t.ok} of ${t.n} days in attendance</span>`;
+  if (t.k === 'missing') return '<span class="rq-db bad" title="Approved, but the attendance tracker does not show it">⚠ Not in attendance</span>';
+  if (t.k === 'gone') return '<span class="rq-db" title="This person is no longer in the tracker">Not in tracker</span>';
+  return '';
+}
 function renderRequestHistory() {
   const { waiting, history, hasGroup } = requestBuckets();
   rcDraw('cardMyRequests', !!myId() && can('requests.own') && !isAdminRole(),
@@ -8919,18 +8938,18 @@ function renderRequestHistory() {
      <div class="rc-list">${waiting.length ? waiting.map(r => rqRow(r, `<span class="rq-st pending">Pending</span>${rcMine(r) ? `<button class="btn sm" data-cancel="${esc(r.id)}">Cancel</button>` : ''}`)).join('') : '<div class="rc-empty">Nothing waiting. New requests you send appear here.</div>'}</div>`,
     root => root.querySelectorAll('[data-cancel]').forEach(b => { b.onclick = async () => { b.disabled = true; try { await cancelRequest(b.dataset.cancel); } finally { renderApprovalRequests(); } }; }));
   /* v3.60.0: approved / rejected leave applications from the tracker join the request decisions, newest first */
-  if (S.status === 'ready' && S.ctx && (canDecide() || can('att.who'))) {
+  if (S.status === 'ready' && S.ctx) {
     const me = BE.userName(); let apps = appHistory();
-    if (RC.scope === 'mine') apps = apps.filter(r => r.decidedBy === me || r.by === me);
+    void me;
     history.push(...apps); history.sort((a, b) => (b.decidedAt || b.at || '').localeCompare(a.decidedAt || a.at || ''));
   }
-  const n = s => history.filter(r => r.status === s).length;
-  if (RC.hist !== 'all' && !n(RC.hist)) RC.hist = 'all';
-  const list = RC.hist === 'all' ? history : history.filter(r => r.status === RC.hist);
+  const n = s => history.filter(r => r.status === s).length, nNot = history.filter(r => trackerState(r).k === 'missing' || trackerState(r).k === 'partial').length;
+  if (RC.hist !== 'all' && !(RC.hist === 'notupd' ? nNot : n(RC.hist))) RC.hist = 'all';
+  const list = RC.hist === 'all' ? history : RC.hist === 'notupd' ? history.filter(r => ['missing', 'partial'].includes(trackerState(r).k)) : history.filter(r => r.status === RC.hist);
   const chip = (k, label, c) => `<button class="rc-chip" data-rc-hist="${k}" aria-pressed="${RC.hist === k}">${label} · ${c}</button>`;
-  rcDraw('cardRejectedRequests', !!myId() && (can('requests.own') || can('requests.rejected') || canDecide()),
-    `<div class="rc-top"><div class="rc-chips grow">${chip('all', 'All', history.length)}${n('approved') ? chip('approved', 'Approved', n('approved')) : ''}${n('rejected') ? chip('rejected', 'Rejected', n('rejected')) : ''}${n('cancelled') ? chip('cancelled', 'Cancelled', n('cancelled')) : ''}</div>${rcScopeChips(hasGroup)}</div>
-     <div class="rc-list">${list.length ? list.slice(0, 80).map(r => r.src === 'app' ? rqAppRow(r) : rqRow(r)).join('') : '<div class="rc-empty">No decisions yet.</div>'}</div>`,
+  rcDraw('cardRejectedRequests', !!myId(),   /* v3.90.2: everyone sees the full history */
+    `<div class="rc-top"><div class="rc-chips grow">${chip('all', 'All', history.length)}${n('approved') ? chip('approved', 'Approved', n('approved')) : ''}${n('rejected') ? chip('rejected', 'Rejected', n('rejected')) : ''}${n('cancelled') ? chip('cancelled', 'Cancelled', n('cancelled')) : ''}${nNot ? chip('notupd', '⚠ Not in attendance', nNot) : ''}</div></div>
+     <div class="rc-list">${list.length ? list.slice(0, 120).map(r => (r.src === 'app' ? rqAppRow(r) : rqRow(r)).replace('<div class="rq-side">', '<div class="rq-side">' + trackerBadge(r))).join('') : '<div class="rc-empty">No decisions yet.</div>'}</div>`,
     root => { if (!root._laInfo) { root._laInfo = true; root.addEventListener('click', e => { const b = e.target.closest('[data-lainfo]'); if (b && ACTIONS['la-info']) ACTIONS['la-info'](b, e); }); } });
 }
 function renderApprovalRequests() {
@@ -11361,7 +11380,7 @@ async function poll() {
 }
 
 /* ============================== filtering ============================== */
-const APP = { title: "Team Dashboard", version: "3.90.0", released: "2026-11-13" };
+const APP = { title: "Team Dashboard", version: "3.90.2", released: "2026-11-13" };
 const BASE_DIMS = { status: "status_column", desig: "designation_column", client: "client_column", mode: "mode_column" };
 const STANDARD_STATUSES = ["Active", "Manager", "OJT", "Bench", "New", "Projected", "Left", "Moved"];
 const TILE_ORDER = ["Active", "Manager", "OJT", "Bench", "New", "Projected"];
@@ -18184,7 +18203,7 @@ function renderOvTasks(force) {
   const over = list.filter(t => dueState(t) === 'over').length, today = list.filter(t => dueState(t) === 'today').length;
   const bell = !('Notification' in window) ? null : Notification.permission === 'granted' ? h('span', { class: 'ovt-on', title: 'Browser reminders are on' }, '🔔 Reminders on')
     : Notification.permission === 'denied' ? h('span', { class: 'ovt-off', title: 'Allow notifications for this site in the browser’s settings (the lock icon next to the address)' }, '🔕 Blocked in the browser')
-    : h('button', { class: 'btn mini', type: 'button', onclick: async () => { try { await Notification.requestPermission(); } catch { } renderOvTasks(true); if (notifOk()) remindNow(true); } }, '🔔 Turn on reminders');
+    : h('button', { class: 'btn mini', type: 'button', onclick: async () => { try { await Notification.requestPermission(); } catch { } renderOvTasks(true); if (notifOk()) remindNow(true); } }, '🔔 Turn on reminders');   /* tasks, birthdays, anniversaries and holidays */
   const row = t => { const mp = myPart(t), ds = dueState(t);
     return h('li', { class: 'ovt-row d-' + ds, onclick: e => { if (e.target.closest('button')) return; setView('planner'); setTimeout(() => openTask(PL.tasks.find(x => x.id === t.id) || t), 250); } },
       h('span', { class: 'ovt-pri p-' + t.priority, title: priLabel(t.priority) + ' priority' }),
@@ -18206,7 +18225,7 @@ const notified = new Map(); let firstSeen = null, lastSummary = 0;
 function notify(title, body, tag, taskId) {
   if (!notifOk()) return;
   try { const n = new Notification(title, { body, tag, renotify: true, requireInteraction: false, icon: 'data:image/svg+xml,' + encodeURIComponent('<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 64 64"><rect width="64" height="64" rx="14" fill="#0a84ff"/><path d="M18 33l9 9 19-21" stroke="#fff" stroke-width="7" fill="none" stroke-linecap="round" stroke-linejoin="round"/></svg>') });
-    n.onclick = () => { try { window.focus(); } catch { } n.close(); setView('planner'); if (taskId != null) setTimeout(() => { const t = PL.tasks.find(x => String(x.id) === String(taskId)); if (t) openTask(t); }, 300); }; } catch { }
+    n.onclick = () => { try { window.focus(); } catch { } n.close(); if (/^(bday|anniv|hol)/.test(tag)) { setView('summary'); return; } setView('planner'); if (taskId != null) setTimeout(() => { const t = PL.tasks.find(x => String(x.id) === String(taskId)); if (t) openTask(t); }, 300); }; } catch { }
 }
 function remindNow(force) {
   if (!online() || !PL.me) return;
@@ -18217,11 +18236,34 @@ function remindNow(force) {
   for (const t of hot.slice(0, 3)) { notified.set(String(t.id), now); notify((dueState(t) === 'over' ? '⚠ Overdue: ' : '⏰ Due today: ') + t.title, dueWord(t) + ' · your part: ' + stLabel(myPart(t)) + '. Click to open it.', 'task-' + t.id, t.id); }
   if (list.length && (force || now - lastSummary >= 60 * 60000)) { lastSummary = now; if (!hot.length || force) notify('You have ' + list.length + ' pending task' + (list.length === 1 ? '' : 's'), list.slice(0, 3).map(t => '• ' + t.title + ' (' + dueWord(t).toLowerCase() + ')').join('\n') + (list.length > 3 ? '\n…and ' + (list.length - 3) + ' more' : ''), 'tasks-summary', null); }
 }
-function afterTasks() { try { renderOvTasks(); tabTitle(); remindNow(); } catch (e) { console.warn(e); } }
+/* v3.89.1: birthdays, work anniversaries and holidays as browser notifications: once each day the page is open,
+   at sign-in and again after midnight; a heads-up the day before a holiday */
+const dayDone = new Set();
+function remindDays(force) {
+  if (!notifOk() || typeof state === 'undefined' || !state.rows || !state.rows.length) return;
+  const t = new Date(), today = t.getFullYear() + '-' + String(t.getMonth() + 1).padStart(2, '0') + '-' + String(t.getDate()).padStart(2, '0');
+  if (dayDone.has(today) && !force) return; dayDone.add(today);
+  const names = l => l.slice(0, 4).map(x => x.name).join(', ') + (l.length > 4 ? ' and ' + (l.length - 4) + ' more' : '');
+  if (!window.PERM || !PERM.can || PERM.can('ov.coming')) {
+    let bd = [], an = []; try { bd = upcoming('dob_column', 'bday', 0); an = upcoming('doj_column', 'anniv', 0); } catch { }
+    if (bd.length) notify('🎂 Birthday' + (bd.length > 1 ? 's' : '') + ' today', names(bd) + (bd.length === 1 ? ' has a birthday today. Wish them!' : ' have birthdays today. Wish them!'), 'bday-' + today, null);
+    if (an.length) notify('🎉 Work anniversar' + (an.length > 1 ? 'ies' : 'y') + ' today', an.slice(0, 4).map(x => x.name + ' · ' + x.years + (x.years === 1 ? ' year' : ' years')).join('\n') + (an.length > 4 ? '\n…and ' + (an.length - 4) + ' more' : ''), 'anniv-' + today, null);
+  }
+  try {
+    const d0 = Date.UTC(t.getFullYear(), t.getMonth(), t.getDate()), years = [t.getFullYear(), t.getFullYear() + 1];
+    const all = [...years.flatMap(usHolidays).map(x => ({ ...x, flag: '🇺🇸', c: 'USA' })), ...years.flatMap(inHolidays).map(x => ({ ...x, flag: '🇮🇳', c: 'India' }))];
+    const on = n => { const seen = new Set(); return all.filter(x => x.obs.getTime() === d0 + n * 86400000 && !seen.has(x.c + x.name) && seen.add(x.c + x.name)); };
+    const now = on(0), next = on(1);
+    if (now.length) notify('🏖️ Holiday today', now.map(x => x.flag + ' ' + x.name + ' (' + x.c + ')').join('\n'), 'hol-' + today, null);
+    if (next.length) notify('📅 Holiday tomorrow', next.map(x => x.flag + ' ' + x.name + ' (' + x.c + ')').join('\n') + '\nPlan the backups today.', 'holnext-' + today, null);
+  } catch { }
+}
+function afterTasks() { try { renderOvTasks(); tabTitle(); remindNow(); } catch (e) { console.warn(e); } try { remindDays(); } catch (e) { console.warn(e); } }
+setInterval(() => { try { remindDays(); } catch { } }, 10 * 60000);   /* picks up the new day */
 setInterval(() => { if (typeof state !== 'undefined' && state.view === 'summary') renderOvTasks(); tabTitle(); }, 400);
 /* keeps checking every 5 minutes even when the tab is in the background, so reminders still arrive */
 setInterval(async () => { if (!online() || !document.hidden) return; try { await plLoad(true); } catch { } afterTasks(); }, 5 * 60000);
-window.TDTASKS_REMIND = { remindNow, renderOvTasks };
+window.TDTASKS_REMIND = { remindNow, renderOvTasks, remindDays: f => remindDays(f) };
 window.renderPlaybook = renderPlaybook; window.renderPlanner = renderPlanner;
 /* tasks are checked every 2 minutes while someone uses the page (and the badge stays current) */
 if (window.TDNET) TDNET.poller('tasks', 60000, async () => { await plLoad(true); if (typeof state !== 'undefined' && state.view === 'planner') renderPlanner(); taskPopup(); window.refreshNotifications?.(); afterTasks(); }, () => online());
