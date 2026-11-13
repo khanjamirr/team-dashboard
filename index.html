@@ -10,7 +10,7 @@
 <meta name="format-detection" content="telephone=no">
 <link rel="preconnect" href="https://iiogwevtyzgedhoaqlrn.supabase.co" crossorigin><link rel="dns-prefetch" href="https://iiogwevtyzgedhoaqlrn.supabase.co">
 <link rel="icon" href="data:,">
-<title>Team Dashboard · 3.87.1</title>
+<title>Team Dashboard · 3.88.0</title>
 <link rel="preconnect" href="https://fonts.googleapis.com"><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin><link href="https://fonts.googleapis.com/css2?family=Public+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet">
 <style>
 :root {
@@ -3189,6 +3189,29 @@ tr.act-zero td { color:var(--muted); }
 .act-role-chip { font-size:11.5px; font-weight:700; padding:2px 8px; border-radius:999px; background:rgba(175,82,222,.14); color:#8e3cb8; } .act-role-chip.gold { background:rgba(255,204,0,.2); color:#8a6200; }
 @media (max-width:700px) { .act-grid2 { grid-template-columns:1fr; } .act-viewseg { margin-left:0; } .act-vph .input { width:100%; } }
 .wbs-b:not(:empty) { margin-top:22px; padding-top:18px; border-top:1px solid var(--border); }
+/* v3.88.0: my tasks on the Overview */
+#ovTasks.ov-tasks { margin:0 0 14px; padding:14px 16px !important; } #ovTasks[hidden] { display:none !important; }
+.ovt-head { display:flex; align-items:center; flex-wrap:wrap; gap:8px 12px; } .ovt-head h2 { margin:0; font-size:16px; } .ovt-head .grow { flex:1; }
+.ovt-sum { font-size:13px; color:var(--ink-2); } .ovt-sum .bad { color:#d70015; }
+.ovt-on { font-size:12px; font-weight:600; color:#1f9d47; } .ovt-off { font-size:12px; color:var(--muted); }
+.ovt-list { list-style:none; margin:10px 0 0; padding:0; display:flex; flex-direction:column; border:1px solid var(--border); border-radius:14px; overflow:hidden; }
+.ovt-row { display:flex; align-items:center; gap:10px; padding:9px 12px; border-top:1px solid var(--border); cursor:pointer; background:var(--surface); }
+.ovt-row:first-child { border-top:0; } .ovt-row:hover { background:color-mix(in srgb, var(--accent) 5%, var(--surface)); }
+.ovt-row.d-over { box-shadow:inset 3px 0 0 #ff3b30; } .ovt-row.d-today { box-shadow:inset 3px 0 0 #ff9500; }
+.ovt-pri { width:9px; height:9px; border-radius:50%; background:#c7c7cc; flex:none; } .ovt-pri.p-high { background:#ff9500; } .ovt-pri.p-urgent { background:#ff3b30; } .ovt-pri.p-low { background:#8fd19e; }
+.ovt-main { flex:1; min-width:0; display:flex; flex-direction:column; } .ovt-main b { font-size:13.5px; white-space:nowrap; overflow:hidden; text-overflow:ellipsis; } .ovt-main small { font-size:12px; color:var(--muted); }
+.ovt-row.d-over .ovt-main small { color:#d70015; font-weight:600; } .ovt-row.d-today .ovt-main small { color:#c77700; font-weight:600; }
+.ovt-empty { margin:8px 0 0; color:var(--ink-2); font-size:13px; } .ovt-more { margin-top:8px; }
+@media (max-width:700px) { .ovt-row { flex-wrap:wrap; } .ovt-main { flex-basis:calc(100% - 30px); } .ovt-row .pl-stp { margin-left:19px; } }
+/* v3.88.0: My tasks as a fourth column on the Overview */
+#pageSummary.ov.has-tasks { grid-template-columns:repeat(4, minmax(0,1fr)) !important; grid-template-areas:"glance glance glance glance" "att req up tasks" !important; }
+#pageSummary.ov #ovTasks { grid-area:tasks; height:470px !important; margin:0 !important; padding:14px 16px !important; display:flex !important; flex-direction:column; overflow:hidden !important; }
+#ovTasks .ovt-head h2 { font-size:15px; } #ovTasks .ovt-sub { display:flex; flex-wrap:wrap; align-items:center; gap:4px 10px; margin:4px 0 0; font-size:12px; }
+#ovTasks .ovt-list { flex:1; min-height:0; overflow:auto; margin-top:10px; }
+#ovTasks .ovt-row { flex-wrap:wrap; gap:4px 8px; padding:8px 10px; } #ovTasks .ovt-main { flex:1 1 calc(100% - 20px); }
+#ovTasks .ovt-row .pl-stp { margin-left:17px; margin-right:auto; } #ovTasks .ovt-row .btn.mini { padding:3px 9px !important; font-size:11.5px !important; }
+@media (max-width:1280px) { #pageSummary.ov.has-tasks { grid-template-columns:minmax(0,1fr) minmax(0,1fr) !important; grid-template-areas:"glance glance" "att tasks" "req up" !important; } #pageSummary.ov #ovTasks { height:auto !important; max-height:460px; } }
+@media (max-width:760px) { #pageSummary.ov.has-tasks { grid-template-columns:minmax(0,1fr) !important; grid-template-areas:"glance" "tasks" "att" "req" "up" !important; } }
 </style></head>
 
 
@@ -11217,7 +11240,7 @@ async function poll() {
 }
 
 /* ============================== filtering ============================== */
-const APP = { title: "Team Dashboard", version: "3.87.1", released: "2026-11-13" };
+const APP = { title: "Team Dashboard", version: "3.88.0", released: "2026-11-13" };
 const BASE_DIMS = { status: "status_column", desig: "designation_column", client: "client_column", mode: "mode_column" };
 const STANDARD_STATUSES = ["Active", "Manager", "OJT", "Bench", "New", "Projected", "Left", "Moved"];
 const TILE_ORDER = ["Active", "Manager", "OJT", "Bench", "New", "Projected"];
@@ -18016,12 +18039,70 @@ function renderActivities() {
 window.TDREFRESH = async () => { AC.loaded = false; PR.data = null; try { await plLoad(true); } catch { } try { if (typeof renderAll === 'function') renderAll(); } catch { } };   /* v3.87.0: after a restore */
 window.renderActivities = renderActivities; window.renderActivityReport = renderActivityReport; window.renderPlannerReport = renderPlannerReport;
 
+/* ====== v3.88.0: my pending tasks at the top of the Overview, and browser reminders ====== */
+const DUE_RANK = { over: 0, today: 1, soon: 2, later: 3, none: 4 };
+const myPending = () => !PL.me ? [] : PL.tasks.filter(t => isMine(t) && t.status !== 'done' && myPart(t) !== 'done')
+  .sort((a, b) => (DUE_RANK[dueState(a)] ?? 5) - (DUE_RANK[dueState(b)] ?? 5) || ['urgent', 'high', 'normal', 'low'].indexOf(a.priority) - ['urgent', 'high', 'normal', 'low'].indexOf(b.priority) || String(a.due || '9').localeCompare(String(b.due || '9')));
+const gaveWaiting = () => !PL.me ? [] : PL.tasks.filter(t => String(t.createdBy) === myId() && !isMine(t) && t.status !== 'done');
+const dueWord = t => { if (!t.due) return 'No due date'; const n = Math.round((Date.parse(String(t.due).slice(0, 10)) - Date.parse(todayIso())) / DAY); return n < 0 ? 'Overdue ' + (-n) + ' day' + (n === -1 ? '' : 's') : n === 0 ? 'Due today' : n === 1 ? 'Due tomorrow' : 'Due ' + fmtDay(t.due); };
+const notifOk = () => 'Notification' in window && Notification.permission === 'granted';
+let ovSig = '';
+function renderOvTasks(force) {
+  const page = document.getElementById('pageSummary'); if (!page) return;
+  let box = document.getElementById('ovTasks');
+  if (!online() || !PL.me || (window.PERM && !PERM.canView('planner'))) { box?.remove(); page.classList.remove('has-tasks'); ovSig = ''; return; }
+  const list = myPending(), gave = gaveWaiting();
+  const sig = list.map(t => t.id + ':' + t.status + ':' + myPart(t) + ':' + t.due + ':' + t.priority + ':' + t.title).join('|') + '#' + gave.length + '#' + (('Notification' in window) ? Notification.permission : '-');
+  if (!force && box && sig === ovSig) return; ovSig = sig;
+  if (!box) { box = h('section', { class: 'card ov-tasks', id: 'ovTasks', 'aria-label': 'My pending tasks' }); page.append(box); }   /* a column beside Who is out, Request Center and Coming up */
+  page.classList.add('has-tasks');
+  const over = list.filter(t => dueState(t) === 'over').length, today = list.filter(t => dueState(t) === 'today').length;
+  const bell = !('Notification' in window) ? null : Notification.permission === 'granted' ? h('span', { class: 'ovt-on', title: 'Browser reminders are on' }, '🔔 Reminders on')
+    : Notification.permission === 'denied' ? h('span', { class: 'ovt-off', title: 'Allow notifications for this site in the browser’s settings (the lock icon next to the address)' }, '🔕 Blocked in the browser')
+    : h('button', { class: 'btn mini', type: 'button', onclick: async () => { try { await Notification.requestPermission(); } catch { } renderOvTasks(true); if (notifOk()) remindNow(true); } }, '🔔 Turn on reminders');
+  const row = t => { const mp = myPart(t), ds = dueState(t);
+    return h('li', { class: 'ovt-row d-' + ds, onclick: e => { if (e.target.closest('button')) return; setView('planner'); setTimeout(() => openTask(PL.tasks.find(x => x.id === t.id) || t), 250); } },
+      h('span', { class: 'ovt-pri p-' + t.priority, title: priLabel(t.priority) + ' priority' }),
+      h('div', { class: 'ovt-main' }, h('b', {}, t.title), h('small', {}, [dueWord(t), t.createdByName && String(t.createdBy) !== myId() ? 'from ' + t.createdByName : '', (t.assignees || []).length > 1 ? progressOf(t).done + '/' + progressOf(t).n + ' done' : ''].filter(Boolean).join(' · '))),
+      h('span', { class: 'pl-stp st-' + mp }, stLabel(mp)),
+      mp === 'todo' ? h('button', { class: 'btn mini', type: 'button', onclick: () => setStatus(t, 'doing', isMine(t) && !isOwnerT(t) ? true : null).then(() => renderOvTasks(true)) }, '▶ Start') : null,
+      h('button', { class: 'btn mini primary', type: 'button', title: 'Mark ' + ((t.assignees || []).length > 1 ? 'my part' : 'it') + ' done', onclick: () => setStatus(t, 'done', (t.assignees || []).length > 1 || !isOwnerT(t) ? true : null).then(() => renderOvTasks(true)) }, '✓ Done')); };
+  box.replaceChildren(
+    ...[h('div', { class: 'ovt-head' }, h('h2', {}, 'My tasks'), h('span', { class: 'grow' }), h('button', { class: 'linkbtn', type: 'button', onclick: () => setView('planner') }, 'Planner →')),
+    h('div', { class: 'ovt-sub' }, h('span', { class: 'ovt-sum' }, ...[list.length ? list.length + ' pending' : 'Nothing pending', over ? ' · ' : '', over ? h('b', { class: 'bad' }, over + ' overdue') : null, today ? ' · ' + today + ' due today' : '', gave.length ? ' · ' + gave.length + ' you gave open' : ''].filter(Boolean)), bell),
+    list.length ? h('ul', { class: 'ovt-list' }, ...list.slice(0, 20).map(row)) : h('p', { class: 'ovt-empty' }, '🎉 You’re all caught up.'),
+    list.length > 20 ? h('button', { class: 'linkbtn ovt-more', type: 'button', onclick: () => { PL.scope = 'mine'; setView('planner'); } }, '+ ' + (list.length - 20) + ' more in the Planner') : null].filter(Boolean));
+}
+/* the tab title shows how many are pending, so it reminds you in the browser's tab bar too */
+const baseTitle = document.title.replace(/^\(\d+\)\s*/, '');
+function tabTitle() { const n = online() && PL.me ? myPending().length : 0; const t = (n ? '(' + n + ') ' : '') + document.title.replace(/^\(\d+\)\s*/, ''); if (document.title !== t) document.title = t; void baseTitle; }
+/* browser notifications: a new task at once; pending tasks again every hour; overdue and due-today ones every 30 minutes */
+const notified = new Map(); let firstSeen = null, lastSummary = 0;
+function notify(title, body, tag, taskId) {
+  if (!notifOk()) return;
+  try { const n = new Notification(title, { body, tag, renotify: true, requireInteraction: false, icon: 'data:image/svg+xml,' + encodeURIComponent('<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 64 64"><rect width="64" height="64" rx="14" fill="#0a84ff"/><path d="M18 33l9 9 19-21" stroke="#fff" stroke-width="7" fill="none" stroke-linecap="round" stroke-linejoin="round"/></svg>') });
+    n.onclick = () => { try { window.focus(); } catch { } n.close(); setView('planner'); if (taskId != null) setTimeout(() => { const t = PL.tasks.find(x => String(x.id) === String(taskId)); if (t) openTask(t); }, 300); }; } catch { }
+}
+function remindNow(force) {
+  if (!online() || !PL.me) return;
+  const list = myPending(), now = Date.now();
+  if (firstSeen == null) { firstSeen = new Set(list.map(t => String(t.id))); }
+  else for (const t of list) if (!firstSeen.has(String(t.id))) { firstSeen.add(String(t.id)); notified.set(String(t.id), now); notify('New task: ' + t.title, (t.createdByName ? 'From ' + t.createdByName + ' · ' : '') + dueWord(t) + (t.priority !== 'normal' ? ' · ' + priLabel(t.priority) + ' priority' : ''), 'task-' + t.id, t.id); }
+  const hot = list.filter(t => ['over', 'today'].includes(dueState(t)) && now - (notified.get(String(t.id)) || 0) >= 30 * 60000);
+  for (const t of hot.slice(0, 3)) { notified.set(String(t.id), now); notify((dueState(t) === 'over' ? '⚠ Overdue: ' : '⏰ Due today: ') + t.title, dueWord(t) + ' · your part: ' + stLabel(myPart(t)) + '. Click to open it.', 'task-' + t.id, t.id); }
+  if (list.length && (force || now - lastSummary >= 60 * 60000)) { lastSummary = now; if (!hot.length || force) notify('You have ' + list.length + ' pending task' + (list.length === 1 ? '' : 's'), list.slice(0, 3).map(t => '• ' + t.title + ' (' + dueWord(t).toLowerCase() + ')').join('\n') + (list.length > 3 ? '\n…and ' + (list.length - 3) + ' more' : ''), 'tasks-summary', null); }
+}
+function afterTasks() { try { renderOvTasks(); tabTitle(); remindNow(); } catch (e) { console.warn(e); } }
+setInterval(() => { if (typeof state !== 'undefined' && state.view === 'summary') renderOvTasks(); tabTitle(); }, 400);
+/* keeps checking every 5 minutes even when the tab is in the background, so reminders still arrive */
+setInterval(async () => { if (!online() || !document.hidden) return; try { await plLoad(true); } catch { } afterTasks(); }, 5 * 60000);
+window.TDTASKS_REMIND = { remindNow, renderOvTasks };
 window.renderPlaybook = renderPlaybook; window.renderPlanner = renderPlanner;
 /* tasks are checked every 2 minutes while someone uses the page (and the badge stays current) */
-if (window.TDNET) TDNET.poller('tasks', 60000, async () => { await plLoad(true); if (typeof state !== 'undefined' && state.view === 'planner') renderPlanner(); taskPopup(); window.refreshNotifications?.(); }, () => online());
+if (window.TDNET) TDNET.poller('tasks', 60000, async () => { await plLoad(true); if (typeof state !== 'undefined' && state.view === 'planner') renderPlanner(); taskPopup(); window.refreshNotifications?.(); afterTasks(); }, () => online());
 if (window.TDNET) TDNET.poller('pbpop', 30000, () => pbPopup());
-setTimeout(async () => { if (online()) { await plLoad(true); taskPopup(); window.refreshNotifications?.(); } pbPopup(); }, 5000);
-addEventListener('td:signedin', () => setTimeout(async () => { if (online()) { PL.loaded = false; await plLoad(true); taskPopup(true); window.refreshNotifications?.(); } pbPopup(); }, 2500));
+setTimeout(async () => { if (online()) { await plLoad(true); taskPopup(); window.refreshNotifications?.(); afterTasks(); } pbPopup(); }, 5000);
+addEventListener('td:signedin', () => setTimeout(async () => { if (online()) { PL.loaded = false; await plLoad(true); taskPopup(true); window.refreshNotifications?.(); afterTasks(); } pbPopup(); }, 2500));
 document.addEventListener('visibilitychange', () => { if (!document.hidden && online()) setTimeout(() => taskPopup(), 1500); });
 })();
 </script>
