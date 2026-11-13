@@ -10,7 +10,7 @@
 <meta name="format-detection" content="telephone=no">
 <link rel="preconnect" href="https://iiogwevtyzgedhoaqlrn.supabase.co" crossorigin><link rel="dns-prefetch" href="https://iiogwevtyzgedhoaqlrn.supabase.co">
 <link rel="icon" href="data:,">
-<title>Team Dashboard · 3.92.1</title>
+<title>Team Dashboard · 3.92.2</title>
 <link rel="preconnect" href="https://fonts.googleapis.com"><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin><link href="https://fonts.googleapis.com/css2?family=Public+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet">
 <style>
 :root {
@@ -3380,6 +3380,17 @@ body.has-tzbar .toast-host, body.has-tzbar #toast { bottom:72px !important; }
 .tzv-w { width:8px; height:8px; border-radius:50%; background:#3ddc84; box-shadow:0 0 0 2px rgba(255,255,255,.7); flex:none; } .tzv-w.off { visibility:hidden; }
 .tzv-x { all:unset; cursor:pointer; position:absolute; top:2px; right:6px; font-size:14px; opacity:.7; } .tzv-x:hover { opacity:1; }
 @media (max-width:700px) { .tzc.tzc-conv { order:-1; } .tzv { left:12px; right:12px; width:auto; bottom:calc(150px + env(safe-area-inset-bottom)); max-height:calc(100vh - 220px); } .tzc.tzc-conv { flex:0 0 auto; padding:0 12px; } }
+/* v3.92.2: task at a glance */
+.pl-field { display:flex; flex-direction:column; gap:6px; }
+.tg { position:fixed; z-index:4500; width:min(380px, calc(100vw - 16px)); max-height:min(460px, calc(100vh - 16px)); overflow:hidden; padding:14px 16px; border-radius:18px; background:var(--surface, #fff); color:var(--ink); border:1px solid var(--border); box-shadow:0 24px 60px -16px rgba(0,0,0,.35); display:flex; flex-direction:column; gap:9px; pointer-events:none; animation:ttPop .14s ease-out; }
+.tg-h { display:flex; gap:8px; align-items:flex-start; } .tg-h b { font-size:15px; line-height:1.3; }
+.tg-meta { display:flex; flex-wrap:wrap; gap:6px 10px; align-items:center; font-size:12px; color:var(--ink-2); }
+.tg-ppl { display:flex; flex-direction:column; gap:4px; font-size:12px; } .tg-pl { display:flex; gap:6px; align-items:baseline; color:var(--ink-2); } .tg-pl b { font-weight:700; color:var(--ink); white-space:nowrap; }
+.tg-pl i { width:8px; height:8px; border-radius:50%; flex:none; transform:translateY(1px); } .tg-pl i.s-done { background:#34c759; } .tg-pl i.s-doing { background:#007aff; } .tg-pl i.s-blocked { background:#ff3b30; } .tg-pl i.s-todo { background:#c7c7cc; }
+.tg-det { font-size:12.5px; max-height:170px; overflow:hidden; border-top:1px solid var(--border); padding-top:8px; -webkit-mask-image:linear-gradient(180deg, #000 80%, transparent); mask-image:linear-gradient(180deg, #000 80%, transparent); }
+.tg-det .rte-tbl { font-size:11px; } .tg-none { margin:0; font-size:12px; color:var(--muted); }
+.tg-note { font-size:12px; background:var(--ios-fill, #f4f4f7); border-radius:10px; padding:7px 9px; } .tg-note small { color:var(--muted); display:block; margin-bottom:2px; } .tg-note div { white-space:pre-line; max-height:4.5em; overflow:hidden; }
+.tg-foot { color:var(--muted); font-size:11px; }
 </style></head>
 
 
@@ -11434,7 +11445,7 @@ async function poll() {
 }
 
 /* ============================== filtering ============================== */
-const APP = { title: "Team Dashboard", version: "3.92.1", released: "2026-11-13" };
+const APP = { title: "Team Dashboard", version: "3.92.2", released: "2026-11-13" };
 const BASE_DIMS = { status: "status_column", desig: "designation_column", client: "client_column", mode: "mode_column" };
 const STANDARD_STATUSES = ["Active", "Manager", "OJT", "Bench", "New", "Projected", "Left", "Moved"];
 const TILE_ORDER = ["Active", "Manager", "OJT", "Bench", "New", "Projected"];
@@ -17599,7 +17610,7 @@ async function openTask(t0) {
   const del = !isNew && edit ? twice('Delete', 'Click again to delete', async () => { try { await rpc('td_task_delete', { p_token: tok(), p_id: t.id }); PL.tasks = PL.tasks.filter(x => x.id !== t.id); d.close(); renderPlanner(); plBadge(); tst('Task deleted.'); } catch (e) { err.textContent = friendly(e); } }) : null;
   const meta = !isNew ? h('p', { class: 'pl-meta' }, 'Created by ' + (t.createdByName || '—') + ' · ' + ago(t.createdAt) + (t.updatedBy ? ' · last change by ' + t.updatedBy + ' ' + ago(t.updatedAt) : '')) : null;
   const d = dlg(isNew ? 'New task' : 'Task', h('div', { class: 'pl-form' },
-    h('label', {}, h('span', {}, 'Title'), title), h('label', {}, h('span', {}, 'Details'), details),
+    h('label', {}, h('span', {}, 'Title'), title), h('div', { class: 'pl-field' }, h('span', { class: 'pb-lbl' }, 'Details'), details),   /* v3.92.2: not a <label> */
     mineT ? h('div', { class: 'pl-mine' }, h('div', {}, h('span', { class: 'pb-lbl' }, 'My part'), partBtns), doneBtn) : null,
     h('div', { class: 'pl-row3' }, h('label', {}, h('span', {}, 'Due date'), due), h('label', {}, h('span', {}, 'Priority'), pri), h('div', { class: 'pl-stwrap' }, h('span', {}, ownT ? 'Overall status' : 'Overall status (set by ' + (t.createdByName || 'the creator') + ')'), stBtns)),
     progBox,
@@ -17672,7 +17683,7 @@ function renderPlanner() {
   const bar = h('div', { class: 'pl-bar' }, seg(scopes, PL.scope, v => { PL.scope = v; }, 'Whose tasks'), search, whoSel, h('span', { class: 'grow' }), seg([['board', 'Board'], ['list', 'List'], ['report', 'Report']], PL.view, v => { PL.view = v; }, 'View'));
   const cardOf = t => {
     const ds = dueState(t), nn = (t.notes || []).filter(n => n.kind === 'note').length;
-    const c = h('div', { class: 'pl-card pri-' + t.priority + (ds ? ' due-' + ds : ''), draggable: canUpdT(t) ? 'true' : null, tabindex: '0', role: 'button', 'aria-label': t.title, onclick: () => openTask(t), onkeydown: e => { if (e.key === 'Enter') openTask(t); } },
+    const c = h('div', { 'data-tid': String(t.id), class: 'pl-card pri-' + t.priority + (ds ? ' due-' + ds : ''), draggable: canUpdT(t) ? 'true' : null, tabindex: '0', role: 'button', 'aria-label': t.title, onclick: () => openTask(t), onkeydown: e => { if (e.key === 'Enter') openTask(t); } },
       h('div', { class: 'pl-ct' }, t.priority !== 'normal' ? h('span', { class: 'pl-pri p-' + t.priority }, priLabel(t.priority)) : null, h('b', {}, t.title)),
       !isMine(t) && String(t.createdBy) === myId() ? h('span', { class: 'pl-given' }, 'You gave this to ' + ((t.assignees || []).length === 1 ? t.assignees[0].name : (t.assignees || []).length + ' people')) : null,
       PL.scope !== 'mine' && PL.scope !== 'created' && !isMine(t) && String(t.createdBy) !== myId() ? h('span', { class: 'pl-given other' }, (t.public ? '👥 Team · ' : '🔒 Private · ') + 'by ' + (t.createdByName || '—')) : null,
@@ -17697,7 +17708,7 @@ function renderPlanner() {
   if (!list.length) main = h('div', { class: 'pb-start' }, h('b', {}, PL.tasks.length ? 'No tasks here' : 'No tasks yet'), h('p', {}, PL.scope === 'mine' ? 'Tasks given to you, and tasks you give to others, show up here. Make one with “+ New task”.' : 'Nothing matches.'));
   else if (PL.view === 'list') {
     main = h('div', { class: 'pl-tablewrap' }, h('table', { class: 'pl-table' }, h('thead', {}, h('tr', {}, ...['Task', 'Status', 'Progress', 'For', 'Due', 'Priority', 'Notes', 'Updated'].map(x => h('th', {}, x)))),
-      h('tbody', {}, ...list.slice().sort((a, b) => (a.status === 'done') - (b.status === 'done') || sortT(a, b)).map(t => h('tr', { class: t.status === 'done' ? 'done' : '', onclick: () => openTask(t) },
+      h('tbody', {}, ...list.slice().sort((a, b) => (a.status === 'done') - (b.status === 'done') || sortT(a, b)).map(t => h('tr', { 'data-tid': String(t.id), class: t.status === 'done' ? 'done' : '', onclick: () => openTask(t) },
         h('td', {}, h('b', {}, t.title), t.public ? h('small', { class: 'pb-muted' }, ' · 👥 Team') : null), h('td', {}, h('span', { class: 'pl-stp st-' + t.status }, stLabel(t.status))), h('td', {}, progStack(t, true)), h('td', {}, (t.assignees || []).map(a => a.name + (partSt(a, t) === 'done' ? ' ✓' : '')).join(', ')),
         h('td', { class: 'pl-due ' + dueState(t) }, t.due ? fmtDay(t.due) : '—'), h('td', {}, priLabel(t.priority)), h('td', {}, String((t.notes || []).filter(n => n.kind === 'note').length)), h('td', {}, ago(t.updatedAt)))))));
   } else {
@@ -17982,6 +17993,8 @@ function rteEditor(opts = {}) {
     h('div', { class: 'rte-g' }, (linkBtn = B('🔗', 'Link (Ctrl+K)', e => linkPop(e.currentTarget))), B('▦', 'Table', e => tablePop(e.currentTarget)), B('🖼', 'Picture', () => { keep(); picIn.click(); }), B('📎', 'Attach file', () => { keep(); attIn.click(); }), B('―', 'Line', () => cmd('insertHorizontalRule'))),
     h('div', { class: 'rte-g' }, B('⌫', 'Clear formatting', () => { cmd('removeFormat'); cmd('unlink'); }), B('↶', 'Undo (Ctrl+Z)', () => cmd('undo')), B('↷', 'Redo (Ctrl+Y)', () => cmd('redo'))), picIn, attIn);
   const root = h('div', { class: 'rte' + (opts.compact ? ' compact' : '') + (opts.disabled ? ' off' : '') }, opts.disabled ? null : tools, ed);
+  /* v3.92.2: never let a surrounding <label> send clicks in the text to the Font list */
+  ed.addEventListener('click', e => { if (root.closest('label')) e.preventDefault(); });
   Object.defineProperty(root, 'value', {
     get() { if (pending > 0) { tst('Wait a moment: a picture or file is still uploading.', true); throw new Error('Wait a moment: a picture or file is still uploading.'); }
       if (ed.classList.contains('empty') || (!ed.textContent.trim() && !ed.querySelector('img,table,a[data-file],hr'))) return '';
@@ -18261,7 +18274,7 @@ function renderOvTasks(force) {
     : Notification.permission === 'denied' ? h('span', { class: 'ovt-off', title: 'Allow notifications for this site in the browser’s settings (the lock icon next to the address)' }, '🔕 Blocked in the browser')
     : h('button', { class: 'btn mini', type: 'button', onclick: async () => { try { await Notification.requestPermission(); } catch { } renderOvTasks(true); if (notifOk()) remindNow(true); } }, '🔔 Turn on reminders');   /* tasks, birthdays, anniversaries and holidays */
   const row = t => { const mp = myPart(t), ds = dueState(t);
-    return h('li', { class: 'ovt-row d-' + ds, onclick: e => { if (e.target.closest('button')) return; setView('planner'); setTimeout(() => openTask(PL.tasks.find(x => x.id === t.id) || t), 250); } },
+    return h('li', { 'data-tid': String(t.id), class: 'ovt-row d-' + ds, onclick: e => { if (e.target.closest('button')) return; setView('planner'); setTimeout(() => openTask(PL.tasks.find(x => x.id === t.id) || t), 250); } },
       h('span', { class: 'ovt-pri p-' + t.priority, title: priLabel(t.priority) + ' priority' }),
       h('div', { class: 'ovt-main' }, h('b', {}, t.title), h('small', {}, [dueWord(t), t.createdByName && String(t.createdBy) !== myId() ? 'from ' + t.createdByName : '', (t.assignees || []).length > 1 ? progressOf(t).done + '/' + progressOf(t).n + ' done' : ''].filter(Boolean).join(' · '))),
       h('span', { class: 'pl-stp st-' + mp }, stLabel(mp)),
@@ -18319,6 +18332,39 @@ setInterval(() => { try { remindDays(); } catch { } }, 10 * 60000);   /* picks u
 setInterval(() => { if (typeof state !== 'undefined' && state.view === 'summary') renderOvTasks(); tabTitle(); }, 400);
 /* keeps checking every 5 minutes even when the tab is in the background, so reminders still arrive */
 setInterval(async () => { if (!online() || !document.hidden) return; try { await plLoad(true); } catch { } afterTasks(); }, 5 * 60000);
+
+/* v3.92.2: hover (or long-press on a phone) over a task to see it at a glance */
+(() => {
+  let tip = null, timer = 0, cur = null;
+  const hide = () => { clearTimeout(timer); tip?.remove(); tip = null; cur = null; };
+  const show = (el, x, y) => {
+    const t = PL.tasks.find(v => String(v.id) === el.getAttribute('data-tid')); if (!t) return;
+    hide(); cur = el;
+    const g = partGroups(t), det = h('div', { class: 'tg-det' });
+    if (t.details) { rteShow(det, t.details); det.querySelectorAll('img').forEach(i => { i.style.maxHeight = '120px'; i.style.width = 'auto'; }); }
+    const lastNote = (t.notes || []).filter(n => n.kind === 'note').slice(-1)[0];
+    tip = h('div', { class: 'tg', role: 'tooltip' },
+      h('div', { class: 'tg-h' }, t.priority !== 'normal' ? h('span', { class: 'pl-pri p-' + t.priority }, priLabel(t.priority)) : null, h('b', {}, t.title)),
+      h('div', { class: 'tg-meta' }, h('span', { class: 'pl-stp st-' + t.status }, stLabel(t.status)), h('span', { class: 'pl-due ' + dueState(t) }, dueWord(t)), h('span', {}, t.public ? '👥 Team' : '🔒 Private'), h('span', {}, 'by ' + (t.createdByName || '—'))),
+      (t.assignees || []).length ? h('div', { class: 'tg-ppl' }, progStack(t, true), ...PART_ORDER.filter(k => g[k].length).map(k => h('div', { class: 'tg-pl' }, h('i', { class: 's-' + k }), h('b', {}, PART_WORD[k] + ': '), g[k].map(a => a.name).join(', ')))) : null,
+      t.details ? det : h('p', { class: 'tg-none' }, 'No details.'),
+      lastNote ? h('div', { class: 'tg-note' }, h('small', {}, 'Last note · ' + (lastNote.by || '') + ' · ' + ago(lastNote.at)), h('div', {}, plainOf(lastNote.text, 180))) : null,
+      h('small', { class: 'tg-foot' }, 'Click to open'));
+    document.body.append(tip);
+    const r = tip.getBoundingClientRect(), W = innerWidth, H = innerHeight;
+    let L = x + 16, T = y + 12; if (L + r.width > W - 8) L = Math.max(8, x - r.width - 16); if (T + r.height > H - 8) T = Math.max(8, H - r.height - 8);
+    tip.style.left = L + 'px'; tip.style.top = T + 'px';
+  };
+  document.addEventListener('mouseover', e => {
+    const el = e.target.closest && e.target.closest('[data-tid]');
+    if (!el) { if (cur && !(tip && tip.contains(e.target))) hide(); return; }
+    if (el === cur) return; clearTimeout(timer); const x = e.clientX, y = e.clientY; timer = setTimeout(() => show(el, x, y), 350);
+  });
+  document.addEventListener('mousedown', hide, true); addEventListener('scroll', hide, true); document.addEventListener('dragstart', hide, true);
+  /* phones: press and hold */
+  let lp = 0; document.addEventListener('touchstart', e => { const el = e.target.closest && e.target.closest('[data-tid]'); if (!el) { hide(); return; } const t0 = e.touches[0]; lp = setTimeout(() => show(el, t0.clientX, t0.clientY), 550); }, { passive: true });
+  document.addEventListener('touchend', () => clearTimeout(lp)); document.addEventListener('touchmove', () => clearTimeout(lp), { passive: true });
+})();
 window.TDTASKS_REMIND = { remindNow, renderOvTasks, remindDays: f => remindDays(f) };
 window.renderPlaybook = renderPlaybook; window.renderPlanner = renderPlanner;
 /* tasks are checked every 2 minutes while someone uses the page (and the badge stays current) */
