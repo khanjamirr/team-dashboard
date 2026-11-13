@@ -10,7 +10,7 @@
 <meta name="format-detection" content="telephone=no">
 <link rel="preconnect" href="https://iiogwevtyzgedhoaqlrn.supabase.co" crossorigin><link rel="dns-prefetch" href="https://iiogwevtyzgedhoaqlrn.supabase.co">
 <link rel="icon" href="data:,">
-<title>Team Dashboard · 3.90.2</title>
+<title>Team Dashboard · 3.91.0</title>
 <link rel="preconnect" href="https://fonts.googleapis.com"><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin><link href="https://fonts.googleapis.com/css2?family=Public+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet">
 <style>
 :root {
@@ -3333,6 +3333,21 @@ html body #pageSummary.ov .ovt-on { color:var(--gz-lime) !important; }
 .mob-ic[data-view="reports"]::before { content:"📊"; } .mob-ic[data-view="backups"]::before { content:"🛟"; } .mob-ic[data-view="planner"]::before { content:"📋"; } .mob-ic[data-view="activities"]::before { content:"⭐"; }
 .mob-ic[data-view="playbook"]::before { content:"📘"; } .mob-ic[data-view="settings"]::before { content:"⚙️"; }
 .mob-links { display:flex; gap:10px; margin-top:16px; } .mob-link { all:unset; box-sizing:border-box; flex:1; text-align:center; padding:12px; border-radius:14px; border:1px solid var(--border); font-weight:600; font-size:14px; cursor:pointer; color:var(--accent); } .mob-link.out { color:#ff3b30; }
+#btnRefresh.spin { animation:tdSpin .8s linear infinite; } @keyframes tdSpin { to { transform:rotate(360deg); } }
+/* v3.91.0: world clocks */
+html body #pageSummary.ov .ovx-hero { align-items:center !important; }
+.ovx-clocks { display:flex; gap:8px; flex:0 1 auto; margin:0 auto; }
+.ovx-clk { display:flex; flex-direction:column; align-items:flex-start; min-width:92px; padding:8px 12px; border-radius:16px; background:var(--gz-card, var(--surface)); border:1px solid var(--gz-line, var(--border)); line-height:1.15; }
+.ovx-clk-l { display:flex; align-items:center; gap:6px; font-size:11px; font-weight:800; letter-spacing:.06em; color:var(--gz-mute, var(--muted)); }
+.ovx-clk-l i { width:7px; height:7px; border-radius:50%; background:var(--gz-mute, #aaa); }
+.ovx-clk.work .ovx-clk-l i { background:var(--gz-lime, #34c759); box-shadow:0 0 0 3px color-mix(in srgb, var(--gz-lime, #34c759) 25%, transparent); }
+.ovx-clk.night .ovx-clk-l i { background:var(--gz-violet, #5e5ce6); }
+.ovx-clk b { font-size:18px; font-weight:800; letter-spacing:-.02em; color:var(--gz-ink, var(--ink)); margin-top:3px; font-variant-numeric:tabular-nums; white-space:nowrap; }
+.ovx-clk small { font-size:11px; color:var(--gz-mute, var(--muted)); }
+.ovx-clk:first-child { background:var(--gz-violet-t, #efebff); border-color:transparent; }
+@media (max-width:1280px) { .ovx-clk { min-width:78px; padding:7px 9px; } .ovx-clk b { font-size:15px; } }
+@media (max-width:1100px) { html body #pageSummary.ov .ovx-hero { flex-wrap:wrap; } .ovx-clocks { order:3; flex:1 1 100%; margin:4px 0 0; } }
+@media (max-width:700px) { .ovx-clocks { overflow-x:auto; scrollbar-width:none; margin:2px -4px 0; padding:0 4px; } .ovx-clocks::-webkit-scrollbar { display:none; } .ovx-clk { flex:0 0 auto; } }
 </style></head>
 
 
@@ -3507,7 +3522,7 @@ window.TDNET = (() => {
   let touched = Date.now();
   const idle = () => document.hidden || Date.now() - touched > IDLE_MS;
   const due = (key, ms) => { if (idle()) return false; const n = Date.now(); if (last[key] && n - last[key] < ms) return false; last[key] = n; return true; };
-  const runAll = () => { for (const k in last) delete last[k]; for (const p of list) { try { if (!p.cond || p.cond()) { last[p.key] = Date.now(); p.fn(); } } catch (e) { console.warn(e); } } };
+  const runAll = () => { for (const k in last) delete last[k]; const jobs = []; for (const p of list) { try { if (!p.cond || p.cond()) { last[p.key] = Date.now(); jobs.push(Promise.resolve(p.fn()).catch(e => console.warn(e))); } } catch (e) { console.warn(e); } } return Promise.all(jobs); };   /* v3.90.3: says when it's done */
   const wake = () => { const was = Date.now() - touched > IDLE_MS; touched = Date.now(); if (was && !document.hidden) setTimeout(runAll, 50); };
   for (const ev of ['pointerdown', 'keydown', 'wheel', 'touchstart']) addEventListener(ev, wake, { passive: true, capture: true });
   document.addEventListener('visibilitychange', () => { if (!document.hidden) { touched = Date.now(); setTimeout(runAll, 50); } });
@@ -11292,9 +11307,13 @@ function showTip(x, y, title, rows) {
 }
 const hideTip = () => { tip.hidden = true; tip.classList.remove("wide"); };
 function toast(msg, bad) {
+  /* v3.90.3: the same message is shown once (its timer restarts), and no more than three at a time */
+  const box = $("#toast"); if (!box) return;
+  const same = [...box.children].find(x => x.textContent === String(msg) && x.classList.contains("bad") === !!bad);
+  if (same) { clearTimeout(same._t); same._t = setTimeout(() => same.remove(), bad ? 6000 : 3200); return; }
   const t = h("div", { class: "toast" + (bad ? " bad" : "") }, msg);
-  $("#toast").append(t);
-  setTimeout(() => t.remove(), bad ? 6000 : 3200);
+  box.append(t); while (box.children.length > 3) box.firstElementChild.remove();
+  t._t = setTimeout(() => t.remove(), bad ? 6000 : 3200);
 }
 
 /* ============================== data access ============================== */
@@ -11380,7 +11399,7 @@ async function poll() {
 }
 
 /* ============================== filtering ============================== */
-const APP = { title: "Team Dashboard", version: "3.90.2", released: "2026-11-13" };
+const APP = { title: "Team Dashboard", version: "3.91.0", released: "2026-11-13" };
 const BASE_DIMS = { status: "status_column", desig: "designation_column", client: "client_column", mode: "mode_column" };
 const STANDARD_STATUSES = ["Active", "Manager", "OJT", "Bench", "New", "Projected", "Left", "Moved"];
 const TILE_ORDER = ["Active", "Manager", "OJT", "Bench", "New", "Projected"];
@@ -14777,7 +14796,9 @@ new ResizeObserver(() => {
 }).observe($("#charts"));
 
 TDNET.poller('version', 20000, poll);
-document.getElementById('btnRefresh')?.addEventListener('click', ev => { const b = ev.currentTarget; b.classList.add('spin'); setTimeout(() => b.classList.remove('spin'), 900); TDNET.refresh(); toast('Getting the latest…'); });   /* v3.74.1: was every 2 s */
+document.getElementById('btnRefresh')?.addEventListener('click', async ev => { const b = ev.currentTarget; if (b.classList.contains('spin')) return;   /* v3.90.3: one refresh at a time, no pile of messages */
+  b.classList.add('spin'); b.setAttribute('aria-busy', 'true'); const t0 = Date.now();
+  try { await TDNET.refresh(); } finally { setTimeout(() => { b.classList.remove('spin'); b.removeAttribute('aria-busy'); toast('Up to date ✓'); }, Math.max(0, 600 - (Date.now() - t0))); } });   /* v3.74.1: was every 2 s */
 document.addEventListener("visibilitychange", () => { if (!document.hidden) poll(); });
 
 (async function boot() {
@@ -18460,6 +18481,29 @@ document.addEventListener('visibilitychange', () => { if (!document.hidden && on
   mq.addEventListener ? mq.addEventListener('change', layout) : mq.addListener(layout);
   setInterval(layout, 1000);
   document.addEventListener('click', e => { if (e.target.closest && e.target.closest('.sidebar .tab[data-view]')) setTimeout(layout, 50); });
+})();
+</script>
+<script>
+/* v3.91.0: world clocks on the Overview: India and the four US time zones; green while it's working hours there */
+(() => {
+  const Z = [['IST', 'India', 'Asia/Kolkata', '🇮🇳'], ['ET', 'Eastern', 'America/New_York', '🇺🇸'], ['CT', 'Central', 'America/Chicago', '🇺🇸'], ['MT', 'Mountain', 'America/Denver', '🇺🇸'], ['PT', 'Pacific', 'America/Los_Angeles', '🇺🇸']];
+  const fmt = Z.map(z => ({ t: new Intl.DateTimeFormat('en-US', { timeZone: z[2], hour: 'numeric', minute: '2-digit', hour12: true }),
+    p: new Intl.DateTimeFormat('en-US', { timeZone: z[2], weekday: 'short', hour: 'numeric', hour12: false, year: 'numeric', month: '2-digit', day: '2-digit' }) }));
+  const tick = () => {
+    const hero = document.querySelector('#pageSummary .ovx-hero'); if (!hero) return;
+    let box = hero.querySelector('.ovx-clocks');
+    if (!box) { box = h('div', { class: 'ovx-clocks', role: 'group', 'aria-label': 'Time around the team' }, ...Z.map(z => h('div', { class: 'ovx-clk', title: z[1] + ' time (' + z[2] + ')' }, h('span', { class: 'ovx-clk-l' }, h('i'), z[0]), h('b'), h('small')))); const g = hero.querySelector('.grow'); g ? g.after(box) : hero.prepend(box); }
+    const now = new Date(), here = new Date(now.toLocaleString('en-US')).getDate();
+    [...box.children].forEach((el, i) => {
+      const parts = Object.fromEntries(fmt[i].p.formatToParts(now).map(x => [x.type, x.value])), hr = +parts.hour % 24, day = +parts.day;
+      const t = fmt[i].t.format(now).replace(/\s?(AM|PM)/, (m, ap) => ' ' + ap.toLowerCase());
+      el.querySelector('b').textContent = t;
+      el.querySelector('small').textContent = parts.weekday + (day !== here ? (day > here || (here > 25 && day < 5) ? ' · tomorrow' : ' · yesterday') : '');
+      el.classList.toggle('work', parts.weekday !== 'Sat' && parts.weekday !== 'Sun' && hr >= 9 && hr < 18);
+      el.classList.toggle('night', hr >= 22 || hr < 6);
+    });
+  };
+  tick(); setInterval(tick, 15000); setInterval(() => { const hb = document.querySelector('#pageSummary .ovx-hero'); if (hb && !hb.querySelector('.ovx-clocks')) tick(); }, 800);
 })();
 </script>
 </body>
