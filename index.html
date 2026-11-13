@@ -10,7 +10,7 @@
 <meta name="format-detection" content="telephone=no">
 <link rel="preconnect" href="https://iiogwevtyzgedhoaqlrn.supabase.co" crossorigin><link rel="dns-prefetch" href="https://iiogwevtyzgedhoaqlrn.supabase.co">
 <link rel="icon" href="data:,">
-<title>Team Dashboard · 3.86.0</title>
+<title>Team Dashboard · 3.87.1</title>
 <link rel="preconnect" href="https://fonts.googleapis.com"><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin><link href="https://fonts.googleapis.com/css2?family=Public+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet">
 <style>
 :root {
@@ -3163,6 +3163,32 @@ tr.act-zero td { color:var(--muted); }
 .pl-nt.rte-view img, .act-card img { max-height:240px; width:auto !important; max-width:100%; }
 .act-thumb { width:100%; height:120px; object-fit:cover; border-radius:10px; background:var(--ios-fill, #eee); }
 @media (max-width:700px) { .pl-nadd { flex-direction:column !important; align-items:stretch !important; } .pl-nadd .btn { align-self:flex-end; } }
+.fb-codes { background:var(--surface-2, #f4f5f7); border:1px solid var(--border); border-radius:10px; padding:10px 12px; font-size:13px; max-height:260px; overflow:auto; white-space:pre-wrap; }
+.fb-note h4 { margin:0 0 6px; }
+/* v3.87.0: activities, nicer */
+.act-grid2 { display:grid; grid-template-columns:repeat(auto-fill, minmax(250px, 1fr)); gap:14px; }
+.act-card2 { display:flex; flex-direction:column; border:1px solid var(--border); border-radius:18px; overflow:hidden; background:var(--surface); cursor:pointer; transition:transform .15s, box-shadow .15s; }
+.act-card2:hover { transform:translateY(-2px); box-shadow:0 12px 28px -14px rgba(0,0,0,.3); } .act-card2:focus-visible { outline:2px solid var(--accent); outline-offset:2px; }
+.act-cover { width:100%; height:130px; object-fit:cover; display:block; background:var(--ios-fill, #eee); }
+.act-cover.none { display:grid; place-items:center; } .act-cover.none span { font-size:44px; font-weight:800; color:rgba(255,255,255,.9); }
+.act-cc-0 { background:linear-gradient(135deg, #ff9f0a, #ff375f); } .act-cc-1 { background:linear-gradient(135deg, #5e5ce6, #bf5af2); } .act-cc-2 { background:linear-gradient(135deg, #30d158, #0a84ff); } .act-cc-3 { background:linear-gradient(135deg, #ff375f, #bf5af2); } .act-cc-4 { background:linear-gradient(135deg, #64d2ff, #5e5ce6); }
+.act-c2b { padding:12px 14px 14px; display:flex; flex-direction:column; gap:9px; }
+.act-c2t { display:flex; gap:10px; align-items:flex-start; } .act-c2t > div { display:flex; flex-direction:column; gap:4px; min-width:0; } .act-c2t h4 { margin:0; font-size:15px; line-height:1.25; }
+.act-day.sm { width:38px; height:42px; border-radius:10px; } .act-day.sm b { font-size:16px; }
+.act-chips { display:flex; flex-wrap:wrap; gap:6px; } .act-chips span { font-size:11.5px; font-weight:600; padding:3px 9px; border-radius:999px; background:var(--ios-fill, rgba(118,118,128,.12)); color:var(--ink-2); }
+.act-chips .gold { background:rgba(255,204,0,.2); color:#8a6200; }
+.act-names { margin:0; font-size:12.5px; color:var(--ink-2); } .act-names.muted { color:var(--muted); }
+.act-viewseg { margin-left:auto; }
+.act-table tr { cursor:pointer; }
+.act-view { display:flex; flex-direction:column; gap:16px; }
+.act-vh { display:flex; gap:14px; align-items:flex-start; } .act-vh .act-day { width:56px; height:60px; border-radius:14px; } .act-vh .act-day b { font-size:22px; }
+.act-vmeta { display:flex; gap:10px; align-items:center; margin-bottom:8px; font-size:13px; color:var(--ink-2); }
+.act-vnotes { border:1px solid var(--border); border-radius:14px; padding:12px 14px; max-height:420px; overflow:auto; }
+.act-vph { display:flex; align-items:center; gap:8px; flex-wrap:wrap; margin-bottom:8px; } .act-vph .input { width:200px; height:34px; } .act-vph .grow { flex:1; }
+.act-vtable { max-height:340px; overflow:auto; }
+.act-role-chip { font-size:11.5px; font-weight:700; padding:2px 8px; border-radius:999px; background:rgba(175,82,222,.14); color:#8e3cb8; } .act-role-chip.gold { background:rgba(255,204,0,.2); color:#8a6200; }
+@media (max-width:700px) { .act-grid2 { grid-template-columns:1fr; } .act-viewseg { margin-left:0; } .act-vph .input { width:100%; } }
+.wbs-b:not(:empty) { margin-top:22px; padding-top:18px; border-top:1px solid var(--border); }
 </style></head>
 
 
@@ -3414,7 +3440,38 @@ window.OFFCRYPT = (() => {
     CFB.utils.cfb_add(cfb, "/\u0006DataSpaces/TransformInfo/StrongEncryptionTransform/\u0006Primary", primary);
     return new Uint8Array(CFB.write(cfb, { type: "array", fileType: "cfb" }));
   }
-  return { encrypt };
+  /* v3.87.0: open a password-protected file again (for restoring a backup). Same "agile" format, any of its hashes. */
+  async function cbcDec(keyBytes, iv, data) {
+    const ke = await C.importKey("raw", keyBytes, "AES-CBC", false, ["encrypt"]), kd = await C.importKey("raw", keyBytes, "AES-CBC", false, ["decrypt"]);
+    const last = data.slice(data.length - 16), pad = new Uint8Array(16).fill(16);
+    const extra = new Uint8Array(await C.encrypt({ name: "AES-CBC", iv: last }, ke, pad)).slice(0, 16);   /* lets WebCrypto see valid padding */
+    return new Uint8Array(await C.decrypt({ name: "AES-CBC", iv }, kd, cat(data, extra)));
+  }
+  async function decrypt(file, password) {
+    const cfb = CFB.read(file, { type: "array" }), get = n => { const e = CFB.find(cfb, n); if (!e) throw new Error("This isn't a password-protected Excel file."); return new Uint8Array(e.content); };
+    const info = get("EncryptionInfo"), pkg = get("EncryptedPackage");
+    const xml = new TextDecoder().decode(info.slice(8)), doc = new DOMParser().parseFromString(xml.slice(xml.indexOf("<")), "application/xml");
+    const kd = doc.getElementsByTagName("keyData")[0], ek = [...doc.getElementsByTagName("*")].find(e => e.localName === "encryptedKey");
+    if (!kd || !ek) throw new Error("This file uses an Excel protection the dashboard can't open. Open it in Excel, remove the password, and try again.");
+    const ub = s => Uint8Array.from(atob(s), c => c.charCodeAt(0));
+    const alg = a => ({ SHA512: "SHA-512", SHA384: "SHA-384", SHA256: "SHA-256", SHA1: "SHA-1" })[String(a || "SHA512").replace("-", "").toUpperCase()] || "SHA-512";
+    const hA = alg(ek.getAttribute("hashAlgorithm")), hK = alg(kd.getAttribute("hashAlgorithm"));
+    const hash = async (a, b) => new Uint8Array(await C.digest(a, b));
+    const pwSalt = ub(ek.getAttribute("saltValue")), spin = +ek.getAttribute("spinCount") || 100000, kb = (+ek.getAttribute("keyBits") || 256) / 8;
+    const pw = new Uint8Array(password.length * 2); for (let i = 0; i < password.length; i++) { const c = password.charCodeAt(i); pw[i * 2] = c & 255; pw[i * 2 + 1] = c >> 8; }
+    let H = await hash(hA, cat(pwSalt, pw));
+    for (let i = 0; i < spin; i++) H = await hash(hA, cat(le32(i), H));
+    const keyFor = async blk => fit(await hash(hA, cat(H, new Uint8Array(blk))), kb, 0x36);
+    const vIn = (await cbcDec(await keyFor(BK.vIn), pwSalt, ub(ek.getAttribute("encryptedVerifierHashInput")))).slice(0, 16);
+    const vHash = await cbcDec(await keyFor(BK.vHash), pwSalt, ub(ek.getAttribute("encryptedVerifierHashValue")));
+    const want = await hash(hA, vIn); if (want.some((b, i) => b !== vHash[i])) throw new Error("Wrong password.");
+    const pkgKey = (await cbcDec(await keyFor(BK.key), pwSalt, ub(ek.getAttribute("encryptedKeyValue")))).slice(0, (+kd.getAttribute("keyBits") || 256) / 8);
+    const keySalt = ub(kd.getAttribute("saltValue")), size = new DataView(pkg.buffer, pkg.byteOffset, 8).getUint32(0, true), body = pkg.slice(8), out = [];
+    for (let i = 0, n = 0; i < body.length; i += 4096, n++) { let seg = body.slice(i, i + 4096); if (seg.length % 16) seg = seg.slice(0, seg.length - (seg.length % 16)); if (!seg.length) break;
+      out.push(await cbcDec(pkgKey, (await hash(hK, cat(keySalt, le32(n)))).slice(0, 16), seg)); }
+    return cat(...out).slice(0, size);
+  }
+  return { encrypt, decrypt };
 })();
 </script>
 <script>
@@ -5247,7 +5304,12 @@ const CLOUD = (() => {
       const run = async fn => { try { err.textContent = ''; await fn(); } catch (e) { err.textContent = e.message; } };
       if (!isAdmin()) wrap.append(h('p', { class: 'signin-note' }, 'Signed in as ' + session.name + '. The workbook isn’t online yet. Ask the admin to set it up, then sign in again.'), h('button', { class: 'linkbtn', onclick: signOut }, 'Sign out'));
       else wrap.append(h('p', { class: 'signin-note' }, 'Signed in as ' + session.name + '. Put the team workbook online to start: one Excel file with the workforce sheet and an “Attendance Tracker” sheet.'),
-        h('button', { class: 'btn primary signin-go', onclick: () => run(async () => { const f = await pickFile(); if (!f) return; await wb().put(await checkWorkbook(f), 0); missing = false; await open(); }) }, 'Upload workbook'),
+        h('button', { class: 'btn primary signin-go', onclick: () => run(async () => { const f = await pickFile(); if (!f) return;
+          /* v3.87.0: a full backup (even a password-protected one) brings everything back into a new project */
+          let u8 = window.FULLBK ? await FULLBK.open(f) : new Uint8Array(await f.arrayBuffer()); if (!u8) return;
+          const extra = window.FULLBK ? await FULLBK.read(u8) : null; if (extra) u8 = await FULLBK.strip(u8);
+          await wb().put(await checkWorkbook(new File([u8], f.name)), 0); missing = false; await open();
+          if (extra) setTimeout(() => window.fbAskRestore && window.fbAskRestore(extra, () => { }), 2500); }) }, 'Upload workbook or backup'),
         h('button', { class: 'linkbtn signin-alt', onclick: () => run(async () => { await wb().put(await starterWorkbook('combined'), 0); missing = false; await open(); }) }, 'Start with a blank workbook'),
         err, h('button', { class: 'linkbtn signin-alt', onclick: signOut }, 'Sign out'));
       return wrap;
@@ -11155,7 +11217,7 @@ async function poll() {
 }
 
 /* ============================== filtering ============================== */
-const APP = { title: "Team Dashboard", version: "3.86.0", released: "2026-11-13" };
+const APP = { title: "Team Dashboard", version: "3.87.1", released: "2026-11-13" };
 const BASE_DIMS = { status: "status_column", desig: "designation_column", client: "client_column", mode: "mode_column" };
 const STANDARD_STATUSES = ["Active", "Manager", "OJT", "Bench", "New", "Projected", "Left", "Moved"];
 const TILE_ORDER = ["Active", "Manager", "OJT", "Bench", "New", "Projected"];
@@ -15034,8 +15096,111 @@ async function fullCopy(u8, opts = {}) {
     const rows = reqs.map(r => [r.name, r.code || '', (r.dates || []).join(', '), String((r.dates || []).length), r.status || '', r.by || '', fmtD(r.at), r.decidedBy || '', r.decidedAt ? fmtD(r.decidedAt) : '', r.note || '', r.reason || '']);
     try { u8 = await BE.addSheetToCopy(u8, 'Leave Requests', REQ_HEAD, rows, [26, 10, 34, 6, 11, 20, 17, 20, 17, 30, 30]); } catch (e) { console.warn('Leave requests sheet:', e); }
   }
+  if (opts.everything) u8 = await fbAddEverything(u8, opts);   /* v3.87.0 */
   return u8;
 }
+/* ===================== v3.87.0: one backup file with everything =====================
+   The downloaded workbook also carries the settings, the users, the Planner, the Activities and the pictures and files
+   (sheets "TD Backup" and "TD Files", plus readable "Planner Tasks" and "Activities" sheets). Replace workbook with such a
+   file puts all of it back, into this database or a brand-new one. */
+const FB_SHEET = 'TD Backup', FB_FILES = 'TD Files', FB_CHUNK = 30000;
+const fbRpc = (fn, args) => CLOUD._rpc(fn, { p_token: CLOUD.token(), ...args });
+const fbChunks = s => { const out = []; for (let i = 0; i < s.length; i += FB_CHUNK) out.push(s.slice(i, i + FB_CHUNK)); return out.length ? out : ['']; };
+const fbPlain = html => { const s = String(html || ''); if (!/<[a-z]/i.test(s)) return s; const d = new DOMParser().parseFromString('<body>' + s + '</body>', 'text/html'); d.querySelectorAll('br').forEach(b => b.replaceWith('\n')); d.querySelectorAll('p,div,li,tr').forEach(b => b.append('\n')); d.querySelectorAll('img').forEach(i => i.replaceWith('[picture]')); return (d.body.textContent || '').replace(/\n{3,}/g, '\n\n').trim(); };
+async function fbAddEverything(u8, opts) {
+  if (!(window.PERM && PERM.online() && PERM.isSuper())) return u8;
+  let ex;
+  try { ex = await fbRpc('td_backup_export', { p_with_hashes: !!opts.hashes }); }
+  catch (e) { if (/schema cache|Could not find/i.test(e.message || '')) { toast('Run backup-restore.sql in Supabase so the download also carries the Planner, Activities, pictures and settings.', true); return u8; } throw e; }
+  const set = opts.progress || (() => { });
+  /* readable sheets */
+  const tasks = ex.tasks || [], acts = ex.activities || [], users = ex.users || [];
+  const nameOf = id => (users.find(u => String(u.id) === String(id)) || {}).name || '';
+  if (tasks.length) u8 = await BE.addSheetToCopy(u8, 'Planner Tasks', ['ID', 'Task', 'Status', 'Priority', 'Due', 'For', 'Each person', 'Visible to', 'Details', 'Notes', 'Created by', 'Created', 'Done'],
+    tasks.map(t => [t.id, t.title, t.status, t.priority, t.due || '', (t.assignees || []).map(a => a.name).join(', '), (t.assignees || []).map(a => a.name + ': ' + (a.st || (t.status === 'done' ? 'done' : 'todo'))).join(' · '), t.is_public ? 'Team' : 'Private',
+      fbPlain(t.details).slice(0, 30000), (t.notes || []).map(n => (n.at || '').slice(0, 16).replace('T', ' ') + ' ' + (n.by || '') + ': ' + fbPlain(n.text)).join('\n').slice(0, 30000), t.created_by_name || nameOf(t.created_by), (t.created_at || '').slice(0, 10), (t.done_at || '').slice(0, 10)]),
+    [8, 40, 10, 10, 12, 30, 40, 10, 50, 60, 20, 12, 12]);
+  if (acts.length) u8 = await BE.addSheetToCopy(u8, 'Activities', ['Date', 'Activity', 'Type', 'People', 'Who took part', 'Winners', 'Notes'],
+    acts.map(a => [a.day, a.title, a.category, (a.people || []).length, (a.people || []).map(p => p.name + ' (' + p.emp + ')').join(', ').slice(0, 30000), (a.people || []).filter(p => /winner|runner/i.test(p.role || '')).map(p => p.name + ' · ' + p.role).join(', '), fbPlain(a.notes).slice(0, 30000)]),
+    [12, 36, 14, 8, 60, 30, 50]);
+  /* the pictures and files */
+  const fileRows = [];
+  const files = ex.files || [];
+  for (let i = 0; i < files.length; i++) {
+    set('Adding pictures and files… ' + (i + 1) + ' of ' + files.length);
+    try { const f = await fbRpc('td_attach_get', { p_id: files[i].id }); const parts = fbChunks(f.b64 || ''); parts.forEach((c, j) => fileRows.push([f.id, f.name, f.mime, f.size, j + 1, parts.length, c])); }
+    catch (e) { console.warn('file', files[i].id, e); }
+  }
+  /* everything else, as data the dashboard reads back */
+  const data = { version: 1, at: ex.at, by: (window.BE && BE.userName && BE.userName()) || '', settings: ex.settings || [], users, tasks, activities: acts };
+  const rows = []; for (const part of ['settings', 'users', 'tasks', 'activities']) { const parts = fbChunks(JSON.stringify(data[part] || [])); parts.forEach((c, j) => rows.push([part, j + 1, parts.length, c])); }
+  rows.push(['about', 1, 1, JSON.stringify({ version: 1, at: ex.at, by: data.by, counts: { settings: data.settings.length, users: users.length, tasks: tasks.length, activities: acts.length, files: files.length } })]);
+  u8 = await BE.addSheetToCopy(u8, FB_SHEET, ['Part', 'Piece', 'Of', 'Data (used by the dashboard to restore: do not edit)'], rows, [12, 6, 6, 80]);
+  u8 = await BE.addSheetToCopy(u8, FB_FILES, ['ID', 'Name', 'Type', 'Size', 'Piece', 'Of', 'Data (do not edit)'], fileRows, [38, 30, 20, 10, 6, 6, 60]);
+  return u8;
+}
+/* read the extra parts of a backup file (null when it has none) */
+async function fbRead(u8) {
+  let book; try { book = await BE.readUpload(u8); } catch { return null; }
+  if (!(book.sheets || []).includes(FB_SHEET) && !(await fbHasSheet(u8, FB_SHEET))) return null;
+  const main = await BE.readUpload(u8, FB_SHEET); if (main.sheet !== FB_SHEET) return null;
+  const parts = {}; let about = null;
+  for (const r of main.rows) { const [part, piece, of, chunk] = r; if (!part) continue; if (part === 'about') { try { about = JSON.parse(chunk); } catch { } continue; } (parts[part] = parts[part] || [])[(+piece || 1) - 1] = String(chunk == null ? '' : chunk); }
+  const out = { about, files: [] };
+  for (const [k, arr] of Object.entries(parts)) { try { out[k] = JSON.parse(arr.join('')); } catch { throw new Error('The backup part “' + k + '” is damaged. Was the file edited in Excel?'); } }
+  try { const fb = await BE.readUpload(u8, FB_FILES); if (fb.sheet === FB_FILES) { const by = new Map(); for (const r of fb.rows) { const [id, name, mime, size, piece, , chunk] = r; if (!id) continue; if (!by.has(id)) by.set(id, { id: String(id), name, mime, size: +size, parts: [] }); by.get(id).parts[(+piece || 1) - 1] = String(chunk || ''); } out.files = [...by.values()]; } } catch { }
+  return out;
+}
+const fbHasSheet = async (u8, name) => { try { const b = await BE.readUpload(u8, name); return b.sheet === name; } catch { return false; } };
+/* the stored workbook doesn't keep these sheets: they are rebuilt on every download */
+async function fbStrip(u8) {
+  for (const [name, head] of [[FB_SHEET, ['Part', 'Piece', 'Of', 'Data']], [FB_FILES, ['ID', 'Name', 'Type', 'Size', 'Piece', 'Of', 'Data']], ['Planner Tasks', ['ID', 'Task']], ['Activities', ['Date', 'Activity']]])
+    if (await fbHasSheet(u8, name)) u8 = await BE.addSheetToCopy(u8, name, head, [], head.map(() => 12));
+  return u8;
+}
+/* ask for the password of a protected file */
+const fbAskPassword = (fname, again) => new Promise(res => {
+  const pw = h('input', { class: 'input', type: 'password', autocomplete: 'off', placeholder: 'The file’s password' });
+  const ok = h('button', { class: 'btn primary', type: 'button', onclick: () => { d.close(); res(pw.value); } }, 'Open');
+  const d = pdlg('Password-protected file', h('div', {}, h('p', { class: 'set-hint' }, (again ? 'That password didn’t open it. ' : '') + '“' + fname + '” is protected. Type the password it was downloaded with.'), pw),
+    [h('button', { class: 'btn', type: 'button', onclick: () => { d.close(); res(null); } }, 'Cancel'), ok]);
+  pw.addEventListener('keydown', e => { if (e.key === 'Enter') ok.click(); }); setTimeout(() => pw.focus(), 30);
+});
+async function fbOpenFile(file) {
+  let u8 = new Uint8Array(await file.arrayBuffer());
+  if (u8[0] === 0xD0 && u8[1] === 0xCF && u8[2] === 0x11 && u8[3] === 0xE0) {
+    for (let tries = 0; ; tries++) {
+      const pw = await fbAskPassword(file.name, tries > 0); if (pw == null) return null;
+      try { u8 = await OFFCRYPT.decrypt(u8, pw); break; } catch (e) { if (!/password/i.test(e.message || '')) throw e; }
+    }
+  }
+  return u8;
+}
+/* put the extra parts back, with a progress line; returns a summary */
+async function fbRestore(x, progress) {
+  const say = progress || (() => { }), res = { settings: 0, users: 0, tasks: 0, activities: 0, files: 0, codes: [] };
+  if ((x.settings || []).length) { say('Restoring the settings…'); res.settings = (await fbRpc('td_backup_restore', { p_part: 'settings', p_data: x.settings })).count; }
+  let ids = {};
+  if ((x.users || []).length) { say('Restoring the users…'); const r = await fbRpc('td_backup_restore', { p_part: 'users', p_data: x.users }); ids = r.ids || {}; res.users = r.count; res.codes = r.codes || []; }
+  const map = v => (v == null || v === '' ? v : ids[String(v)] || v);
+  if ((x.tasks || []).length) {
+    say('Restoring the Planner…');
+    const tasks = x.tasks.map(t => ({ ...t, created_by: map(t.created_by), assignees: (t.assignees || []).map(a => ({ ...a, id: String(map(a.id)) })), notes: (t.notes || []).map(n => ({ ...n, byId: n.byId != null ? String(map(n.byId)) : n.byId })) }));
+    for (let i = 0; i < tasks.length; i += 200) res.tasks += (await fbRpc('td_backup_restore', { p_part: 'tasks', p_data: tasks.slice(i, i + 200) })).count;
+  }
+  if ((x.activities || []).length) {
+    say('Restoring the activities…');
+    const acts = x.activities.map(a => ({ ...a, created_by: map(a.created_by) }));
+    for (let i = 0; i < acts.length; i += 200) res.activities += (await fbRpc('td_backup_restore', { p_part: 'activities', p_data: acts.slice(i, i + 200) })).count;
+  }
+  for (let i = 0; i < (x.files || []).length; i++) {
+    const f = x.files[i]; say('Restoring pictures and files… ' + (i + 1) + ' of ' + x.files.length);
+    try { const r = await fbRpc('td_attach_restore', { p_id: f.id, p_name: f.name, p_mime: f.mime, p_b64: f.parts.join('') }); if (!r.skipped) res.files++; } catch (e) { console.warn('restore file', f.id, e); }
+  }
+  return res;
+}
+window.FULLBK = { add: fbAddEverything, read: fbRead, strip: fbStrip, open: fbOpenFile, restore: fbRestore };
+
 /* v3.63.1: one clear screen: protected file recommended, password set right here (or generated), phone numbers optional, every download logged */
 const PW_ABC = 'ABCDEFGHJKLMNPQRSTUVWXYZabcdefghijkmnpqrstuvwxyz23456789';
 const genPassword = () => { const a = crypto.getRandomValues(new Uint32Array(15)); let out = ''; for (let i = 0; i < 15; i++) { if (i && i % 5 === 0) out += '-'; out += PW_ABC[a[i] % PW_ABC.length]; } return out; };
@@ -15057,7 +15222,7 @@ function downloadWorkbook(name, getBytes, what) {
     h('p', { class: 'dlw-note' }, 'Share the password separately from the file (for example by phone or chat, not in the same email). It can’t be recovered if it is lost.'));
   const phones = canPh ? checkLine('Include private details (phone, WhatsApp, date of birth…)', true) : null;
   const phHint = h('small', { class: 'dlw-hint' });
-  const inside = h('div', { class: 'dlw-in' }, h('b', {}, 'In the file'), h('div', { class: 'pc-chips' }, ...['Employees', 'Attendance & backups', 'Activity log', 'Admin log', 'Pseudo name history', 'Leave requests'].map(t => h('span', { class: 'pc-chip' }, t))),
+  const inside = h('div', { class: 'dlw-in' }, h('b', {}, 'In the file'), h('div', { class: 'pc-chips' }, ...['Employees', 'Attendance & backups', 'Activity log', 'Admin log', 'Pseudo name history', 'Leave requests', ...(window.PERM && PERM.isSuper() ? ['Settings & roles', 'Playbook', 'Planner', 'Activities', 'Pictures & files', 'Users'] : [])].map(t => h('span', { class: 'pc-chip' }, t))),
     phones ? h('div', { class: 'dlw-ph' }, phones.el, phHint) : h('small', { class: 'dlw-hint' }, 'Phone and WhatsApp numbers are left out: your access doesn’t include them.'));
   const fname = h('code', { class: 'dlw-fn' });
   const err = h('p', { class: 'err', role: 'alert' });
@@ -15083,7 +15248,7 @@ function downloadWorkbook(name, getBytes, what) {
     try {
       go.textContent = 'Preparing…';
       const withPh = phones ? phones.box.checked : false;
-      let u8 = await fullCopy(await getBytes(), { phones: withPh });
+      let u8 = await fullCopy(await getBytes(), { phones: withPh, everything: true, hashes: mode === 'locked', progress: t => { go.textContent = t; } });
       if (mode === 'locked') { go.textContent = 'Encrypting…'; u8 = await OFFCRYPT.encrypt(u8, pw.value); }
       download(fname.textContent, u8);
       try { BE.appendActivity([{ time: BE.nowText(), user: BE.userName(), action: 'settings', key: '', name: 'Workbook download', details: { note: 'Downloaded ' + (what || 'the workbook') + ' · ' + (mode === 'locked' ? 'password-protected' : 'readable') + ' · phone numbers ' + (withPh ? 'included' : 'left out') } }]); } catch { }
@@ -15123,11 +15288,11 @@ const MODULES = [
   { id: 'people', group: 'Team', name: 'People & access', show: () => PERM.online() && PERM.isOwner(), draw: drawPeople },
   { id: 'signins', group: 'Team', name: 'Sign-in log', show: () => PERM.online() && PERM.can('set.workbook') && !PERM.isOwner(), draw: drawSignins },   /* the super admin finds it in People & access */
   { id: 'fields', group: 'Data', name: 'Fields', show: () => PERM.isSuper() || PERM.can('set.fields'), draw: tabbed('fields', [...[['emp', 'Employee fields'], ['att', 'Attendance fields'], ['priv', '🔒 Private details']].map(([k, n]) => ({ id: k === 'emp' ? 'choices' : k, name: n, show: () => k !== 'priv' || (PERM.isSuper() && PERM.online()), draw: pane => { drawChoices.tab = k; drawChoices.flat = true; return drawChoices(pane); } })), { id: 'mandatory', name: 'Mandatory fields', draw: drawFields }, { id: 'backups', name: 'Leave backups', draw: drawBackupSettings }]) },   /* v3.82.1: Leave backups moved here */
-  { id: 'data', group: 'Data', name: 'Workbook & storage', show: () => PERM.can('set.workbook') || PERM.can('workbook.download') || PERM.isSuper(), draw: tabbed('data', [{ id: 'workbook', name: 'Workbook & backups', show: () => PERM.can('set.workbook') || PERM.can('workbook.download'), draw: drawWorkbook }, { id: 'storage', name: 'Storage & clean-up', show: () => PERM.isSuper(), draw: drawStorage }]) },
+  { id: 'data', group: 'Data', name: 'Workbook & storage', show: () => PERM.can('set.workbook') || PERM.can('workbook.download') || PERM.isSuper(), draw: drawWbStorage },   /* v3.87.1: one page, no tabs */
   { id: 'prefs', group: 'You', name: 'Preferences', show: () => true, draw: drawPrefsTools },
 ];
 /* old page names still work (links inside the dashboard) */
-const SET_ALIAS = { backups: ['fields', 'backups'], att: ['fields', 'att'], priv: ['fields', 'priv'], workbook: ['data', 'workbook'], storage: ['data', 'storage'], choices: ['fields', 'choices'], mandatory: ['fields', 'mandatory'], tools: ['prefs'], sync: ['prefs'] };
+const SET_ALIAS = { workbook: ['data'], storage: ['data'], backups: ['fields', 'backups'], att: ['fields', 'att'], priv: ['fields', 'priv'], workbook: ['data', 'workbook'], storage: ['data', 'storage'], choices: ['fields', 'choices'], mandatory: ['fields', 'mandatory'], tools: ['prefs'], sync: ['prefs'] };
 let current = null, ticker = null;
 /* v3.12: Settings is a page in the left menu (no longer a dialog) */
 window.openSettings = id => {
@@ -16543,6 +16708,7 @@ async function drawStorage(pane) {
       h('h4', {}, 'Database'),
       h('div', { class: 'stg-big' }, h('b', {}, mb(used)), h('span', {}, ' of 500 MB (free plan) used · ' + pct.toFixed(pct < 10 ? 1 : 0) + '%')),
       h('div', { class: 'stg-bar', role: 'progressbar', 'aria-valuemin': 0, 'aria-valuemax': 100, 'aria-valuenow': Math.round(pct) }, h('i', { style: 'width:' + Math.max(1, pct) + '%;background:' + col })),
+      h('p', { class: 'set-hint' }, 'Everything the dashboard keeps in Supabase: the workbook and its daily backups, the Planner, Activities, pictures and files, users, settings and logs. This is what counts against the free plan.'),
       pct >= 85 ? h('p', { class: 'err' }, 'Almost full: clean up old backups and logs below.') : null);
   } else if (online) meter = h('div', { class: 'set-card' }, h('h4', {}, 'Database'), srvErr === 'nosql'
     ? h('p', { class: 'set-hint' }, 'To see the database size and clean up the server logs and backups, open Supabase → SQL Editor, paste storage.sql (it came with this version), press Run, then reload.')
@@ -16589,20 +16755,59 @@ async function drawStorage(pane) {
 
   /* what takes the room */
   let detail = null;
-  if (srv && (srv.tables || []).length) {
+  if (false && srv && (srv.tables || []).length) {   /* v3.87.0: not shown any more */
     const rows = srv.tables.slice().sort((a, b) => b.bytes - a.bytes);
     detail = h('details', { class: 'set-card stg-detail' }, h('summary', {}, 'What takes the room (' + rows.length + ' tables)'),
       h('div', { class: 'login-wrap' }, h('table', { class: 'login-table' },
         h('thead', {}, h('tr', {}, ...['Table', 'Size', 'Rows', 'Oldest', 'Clean-up'].map(t => h('th', {}, t)))),
         h('tbody', {}, ...rows.map(t => h('tr', {}, h('td', {}, t.name), h('td', {}, mb(+t.bytes)), h('td', {}, (+t.rows || 0).toLocaleString()), h('td', {}, t.oldest ? new Date(t.oldest).toLocaleDateString(undefined, { day: 'numeric', month: 'short', year: 'numeric' }) : '—'), h('td', {}, t.kind ? KIND_NAMES[t.kind] : 'Kept'))))))) ;
   }
-  const wbCard = info ? h('div', { class: 'set-card' }, h('h4', {}, 'Workbook'), h('div', { class: 'stg-big' }, h('b', {}, mb(info.bytes))),
+  const wbCard = info ? h('div', { class: 'set-card' }, h('h4', {}, 'Workbook'), h('div', { class: 'stg-big' }, h('b', {}, mb(info.bytes)), h('span', {}, ' · part of the database')),
+    h('p', { class: 'set-hint' }, 'The employee and attendance Excel file only: the sheets you see when you download it.'),
     h('p', { class: 'set-hint' }, (info.sheets || []).map(x => x.name + ' ' + mb(x.packed)).join(' · ') || 'Employees and attendance only.'),
     h('p', { class: 'set-hint' }, online ? 'Every daily backup is a full copy of the workbook, so a smaller Activity Log also makes every backup smaller.' : 'This is the Excel file on this computer.')) : null;
   fill(pane, h('p', { class: 'set-hint' }, online ? 'Stay inside the Supabase free plan (500 MB database, 5 GB a month sent out): stop or shorten the Activity Log and delete old logs and backups you no longer need.' : 'Keep the workbook small: stop or shorten the Activity Log and delete old entries.'),
     err, h('div', { class: 'set-grid', style: 'margin-bottom:14px' }, meter, wbCard), act, server, detail);
 }
 
+/* v3.87.0: after the workbook, offer to put back everything else the backup carries */
+function fbAskRestore(x, done) {
+  const c = (x.about && x.about.counts) || {}, n = k => (x[k] || []).length;
+  if (!PERM.isSuper()) { toast('Workbook replaced. Only the super admin can restore the Planner, Activities, pictures and settings from this file.'); done(); return; }
+  const lines = [['settings', 'Settings, roles, playbook, pseudo names', n('settings')], ['users', 'Users (matched by login ID; new ones are added)', n('users')], ['tasks', 'Planner tasks', n('tasks')], ['activities', 'Activities', n('activities')], ['files', 'Pictures & files', n('files')]].filter(l => l[2]);
+  const checks = lines.map(([k, t, cnt]) => ({ k, ...checkLine(t + ' · ' + cnt, true) }));
+  const status = h('p', { class: 'set-hint' }), err = h('p', { class: 'err', role: 'alert' });
+  const go = h('button', { class: 'btn primary', type: 'button' }, 'Restore');
+  const d = pdlg('Restore everything from this backup?', h('div', {}, h('p', { class: 'set-hint' }, 'The workbook has been replaced. This file also carries the rest of the dashboard' + (x.about && x.about.at ? ', saved ' + new Date(x.about.at).toLocaleString() + (x.about.by ? ' by ' + x.about.by : '') : '') + '. Tick what to put back. Tasks and activities with the same number are overwritten; pictures already here are kept.'),
+    ...checks.map(cc => cc.el), status, err), [h('button', { class: 'btn', type: 'button', onclick: () => { d.close(); done(); } }, 'Not now'), go]);
+  go.addEventListener('click', async () => {
+    go.disabled = true; err.textContent = '';
+    const want = new Set(checks.filter(cc => cc.box.checked).map(cc => cc.k)), sel = {};
+    for (const k of ['settings', 'users', 'tasks', 'activities', 'files']) sel[k] = want.has(k) ? x[k] : [];
+    try {
+      const r = await fbRestore(sel, t => { status.textContent = t; });
+      try { await window.loadTeamSettings(true); } catch { }
+      d.close(); renderAll(); try { await window.TDREFRESH?.(); } catch { }
+      const msg = [r.settings && r.settings + ' settings', r.users && r.users + ' new users', r.tasks && r.tasks + ' tasks', r.activities && r.activities + ' activities', r.files && r.files + ' pictures & files'].filter(Boolean).join(', ');
+      if (r.codes.length) {
+        const txt = r.codes.map(u => u.name + ' · ' + u.login_id + ' · ' + u.code).join('\n');
+        pdlg('New sign-in passcodes', h('div', {}, h('p', { class: 'set-hint' }, 'These people were added from the backup. The file had no passcodes (it was a readable download), so each has a one-time passcode and must choose a new one at first sign-in. Share them privately.'),
+          h('pre', { class: 'fb-codes' }, txt), h('button', { class: 'btn', type: 'button', onclick: async () => { try { await navigator.clipboard.writeText(txt); toast('Copied.'); } catch { } } }, '⧉ Copy')), null);
+      }
+      toast('Restored: ' + (msg || 'nothing new') + '.'); done();
+    } catch (e) { err.textContent = (/schema cache|Could not find/i.test(e.message || '') ? 'Run backup-restore.sql in Supabase first, then try again. ' : '') + e.message; go.disabled = false; }
+  });
+}
+window.fbAskRestore = fbAskRestore;
+/* v3.87.1: Workbook and Storage on one page */
+async function drawWbStorage(pane) {
+  const a = h('div', { class: 'wbs-a' }), b = h('div', { class: 'wbs-b' });
+  pane.replaceChildren(a, b);
+  const jobs = [];
+  if (PERM.can('set.workbook') || PERM.can('workbook.download')) jobs.push(drawWorkbook(a)); else a.remove();
+  if (PERM.isSuper()) jobs.push(drawStorage(b)); else b.remove();
+  await Promise.all(jobs);
+}
 /* ----- Workbook & backups ----- */
 async function drawWorkbook(pane) {
   const err = h('p', { class: 'err', role: 'alert' });
@@ -16620,7 +16825,13 @@ async function drawWorkbook(pane) {
   const replace = confirmButton('Replace workbook…', 'Click again, then choose the file', () => run(async () => {
     if (window.ATT && ATT.dirty()) throw new Error('Save your attendance changes first.');
     const f = await pickXlsx(); if (!f) return;
-    await CLOUD.admin.replace(f); toast('Workbook replaced. Today’s backup keeps the previous version.'); drawWorkbook(pane);
+    /* v3.87.0: a protected file is opened with its password; a full backup also restores everything else */
+    let u8 = await FULLBK.open(f); if (!u8) return;
+    const extra = await FULLBK.read(u8);
+    if (extra) u8 = await FULLBK.strip(u8);
+    await CLOUD.admin.replace(new File([u8], f.name, { type: 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet' }));
+    if (!extra) { toast('Workbook replaced. Today’s backup keeps the previous version.'); drawWorkbook(pane); return; }
+    fbAskRestore(extra, () => drawWorkbook(pane));
   }), 'btn');
   /* v3.78.0: a simpler page: the file and its two buttons, three numbers, then Backups · Sign-ins · Saves in tabs */
   dl.className = 'btn primary';
@@ -16635,7 +16846,7 @@ async function drawWorkbook(pane) {
       h('div', {}, h('b', {}, state.file || 'Team Dashboard.xlsx'), h('small', {}, last ? 'Version ' + last.version + ' · saved ' + agoText(last.at).toLowerCase() + (last.saved_by ? ' by ' + last.saved_by : '') : 'Stored online, encrypted'))),
     h('div', { class: 'wb-acts' }, dl, replace));
   const tile = (n, t, cls) => h('div', { class: 'wb-tile ' + (cls || '') }, h('b', {}, String(n)), h('span', {}, t));
-  const tiles = h('div', { class: 'wb-tiles wb-tiles3' }, tile(backups.length, backups.length === 1 ? 'daily backup kept' : 'daily backups kept'), tile(savesToday, savesToday === 1 ? 'save today' : 'saves today'), tile(last ? 'v' + last.version : '—', 'current version'));
+  const tiles = h('div', { class: 'wb-tiles' }, tile(savesToday, savesToday === 1 ? 'save today' : 'saves today'), tile(last ? 'v' + last.version : '—', 'current version'));
   const row = (av, main, sub, right, cls) => h('li', { class: 'wb-row ' + (cls || '') }, av, h('div', { class: 'wb-main' }, main, sub ? h('small', {}, sub) : null), right);
   const lists = {
     backups: () => backups.length ? h('ul', { class: 'wb-list' }, ...backups.map(b => row(h('span', { class: 'wb-av cal', 'aria-hidden': 'true' }, String(b.day).slice(8, 10)), h('b', {}, dayName(String(b.day))), Math.round(b.size / 1024) + ' KB · version ' + b.version,
@@ -16648,8 +16859,10 @@ async function drawWorkbook(pane) {
   let tab = 'backups'; const box = h('div', { class: 'wb-box' });
   const tabs = h('div', { class: 'pl-seg wb-tabs', role: 'tablist' }, ...[['backups', 'Backups'], ['saves', 'Saves']].map(([v, l]) => h('button', { type: 'button', role: 'tab', 'aria-pressed': String(v === tab), onclick: e => { tab = v; for (const b of tabs.children) b.setAttribute('aria-pressed', String(b === e.currentTarget)); box.replaceChildren(lists[tab]()); } }, l)));
   box.replaceChildren(lists[tab]());
-  fill(pane, hero, err, tiles, h('div', { class: 'set-card wb-card' }, tabs, box),
-    h('p', { class: 'set-hint' }, 'The first save of each day keeps a backup for 30 days. To go back to one, download it, then use Replace workbook.'));
+  void tabs; void box;   /* v3.87.0: the backups and saves lists are gone: the download is the backup */
+  fill(pane, hero, err, tiles,
+    h('div', { class: 'set-card fb-note' }, h('h4', {}, 'Your backup'), h('p', { class: 'set-hint' }, 'Download current workbook gives you one Excel file with everything: employees, attendance, logs and pseudo name history' + (PERM.isSuper() ? ', plus the settings and roles, playbook, Planner, Activities, pictures and files, and the user list' : '') + '. Keep it somewhere safe.'),
+      h('p', { class: 'set-hint' }, 'To bring it back, here or in a brand-new Supabase project (after running setup.sql and signing in), use Replace workbook and choose that file. A password-protected file asks for its password. ' + (PERM.isSuper() ? 'You then choose what to restore.' : ''))));
 }
 
 /* ----- v3.18: sign-in log: every attempt, with the login ID typed and why it failed ----- */
@@ -17698,6 +17911,25 @@ function acStats() {
   for (const a of items) for (const p of a.people || []) { if (AC.client && p.client !== AC.client) continue; const k = String(p.emp); if (!per.has(k)) per.set(k, { emp: k, name: p.name, client: p.client, n: 0, last: '', cats: new Map(), wins: 0, list: [] }); const x = per.get(k); x.n++; x.list.push({ a, role: p.role }); if (String(a.day) > x.last) x.last = String(a.day).slice(0, 10); x.cats.set(a.category, (x.cats.get(a.category) || 0) + 1); if (/winner|runner/i.test(p.role || '')) x.wins++; }
   return { items, per };
 }
+/* v3.87.0: one activity, to read: photos, notes, who took part; Edit for those who may record */
+function activityView(a) {
+  const ppl = (a.people || []).slice().sort((x, y) => (/winner/i.test(y.role || '') - /winner/i.test(x.role || '')) || (/runner/i.test(y.role || '') - /runner/i.test(x.role || '')) || String(x.name).localeCompare(String(y.name)));
+  const wins = ppl.filter(p => /winner|runner|organiser|volunteer/i.test(p.role || ''));
+  const q = h('input', { class: 'input', type: 'search', placeholder: 'Find someone…' });
+  const tb = h('tbody');
+  const paint = () => { const t = q.value.trim().toLowerCase(); tb.replaceChildren(...ppl.filter(p => !t || (p.name + ' ' + p.emp + ' ' + p.client).toLowerCase().includes(t)).map(p => h('tr', {}, h('td', {}, h('b', {}, p.name)), h('td', {}, p.emp), h('td', {}, p.client || ''), h('td', {}, p.role ? h('span', { class: 'act-role-chip ' + (/winner/i.test(p.role) ? 'gold' : '') }, p.role) : 'Took part')))); };
+  q.addEventListener('input', paint); paint();
+  const notes = a.notes ? rteShow(h('div', { class: 'act-vnotes' }), a.notes) : null;
+  const d = dlg(a.title, h('div', { class: 'act-view' },
+    h('div', { class: 'act-vh' }, h('span', { class: 'act-day' }, h('b', {}, String(a.day).slice(8, 10)), h('small', {}, MONS[+String(a.day).slice(5, 7) - 1])),
+      h('div', {}, h('div', { class: 'act-vmeta' }, h('span', { class: 'act-cat' }, a.category), h('span', {}, fmtDay(a.day) + ' ' + String(a.day).slice(0, 4))), h('div', { class: 'act-chips' }, h('span', {}, '👥 ' + ppl.length + ' took part'), ...wins.map(p => h('span', { class: /winner/i.test(p.role) ? 'gold' : '' }, (/winner/i.test(p.role) ? '🏆 ' : /runner/i.test(p.role) ? '🥈 ' : '⭐ ') + p.name + ' · ' + p.role))))),
+    notes ? h('div', {}, h('span', { class: 'pb-lbl' }, 'Notes & photos'), notes) : null,
+    h('div', {}, h('div', { class: 'act-vph' }, h('span', { class: 'pb-lbl' }, 'Who took part (' + ppl.length + ')'), h('span', { class: 'grow' }), q,
+      h('button', { class: 'btn mini', type: 'button', onclick: () => copyTable(['Emp ID', 'Name', 'Client', 'Role'], ppl.map(p => [p.emp, p.name, p.client, p.role || 'Took part']), 'List') }, '⧉ Copy')),
+      h('div', { class: 'pl-tablewrap act-vtable' }, h('table', { class: 'pl-table' }, h('thead', {}, h('tr', {}, ...['Name', 'Emp ID', 'Client', 'Role'].map(x => h('th', {}, x)))), tb))),
+    h('p', { class: 'pl-meta' }, 'Added by ' + (a.createdByName || '—') + ' · ' + ago(a.createdAt) + (a.updatedBy ? ' · last change by ' + a.updatedBy + ' ' + ago(a.updatedAt) : ''))),
+    [h('span', { class: 'grow' }), h('button', { class: 'btn', type: 'button', onclick: () => d.close() }, 'Close'), AC.edit ? h('button', { class: 'btn primary', type: 'button', onclick: () => { d.close(); openActivity(a); } }, '✎ Edit') : null], 'pl-dlg act-dlg');
+}
 function personHistory(emp, name) {
   const rows = AC.items.filter(a => (a.people || []).some(p => String(p.emp) === String(emp))).map(a => ({ a, p: a.people.find(p => String(p.emp) === String(emp)) }));
   dlg(name + ' · activities', h('div', { class: 'act-hist' }, rows.length ? h('table', { class: 'pl-table' }, h('thead', {}, h('tr', {}, ...['Date', 'Activity', 'Type', 'Role'].map(x => h('th', {}, x)))),
@@ -17758,20 +17990,30 @@ function renderActivities() {
   } else {
     const list = items.filter(a => !q || (a.title + ' ' + a.category + ' ' + (a.people || []).map(p => p.name + ' ' + p.emp).join(' ')).toLowerCase().includes(q));
     const months = new Map(); for (const a of list) { const m = String(a.day).slice(0, 7); if (!months.has(m)) months.set(m, []); months.get(m).push(a); }
+    /* v3.87.0: cleaner cards (cover photo, counts, names) and a list view; click for the full activity */
+    const photosOf = a => [...String(a.notes || '').matchAll(/<img[^>]*data-file="([0-9a-f-]{36})"/gi)].map(m => m[1]);
+    const card = a => { const ppl = (a.people || []).filter(p => !AC.client || p.client === AC.client), wins = ppl.filter(p => /winner|runner/i.test(p.role || '')), ph = photosOf(a), hasNotes = !!plainOf(a.notes || '').replace(/\[picture\]/g, '').trim();
+      const cover = ph.length ? (() => { const im = h('img', { class: 'act-cover', alt: '', loading: 'lazy' }); fileUrl(ph[0]).then(f => { im.src = f.url; }).catch(() => im.remove()); return im; })() : h('div', { class: 'act-cover none act-cc-' + (Math.abs([...a.category].reduce((x, c) => x + c.charCodeAt(0), 0)) % 5) }, h('span', {}, (a.category || 'A').slice(0, 1)));
+      return h('article', { class: 'act-card2', tabindex: '0', role: 'button', 'aria-label': a.title, onclick: () => activityView(a), onkeydown: e => { if (e.key === 'Enter') activityView(a); } },
+        cover,
+        h('div', { class: 'act-c2b' },
+          h('div', { class: 'act-c2t' }, h('span', { class: 'act-day sm' }, h('b', {}, String(a.day).slice(8, 10)), h('small', {}, MONS[+String(a.day).slice(5, 7) - 1])), h('div', {}, h('h4', {}, a.title), h('span', { class: 'act-cat' }, a.category))),
+          h('div', { class: 'act-chips' }, h('span', {}, '👥 ' + ppl.length + ' took part'), wins.length ? h('span', { class: 'gold' }, '🏆 ' + wins.length) : null, ph.length ? h('span', {}, '📷 ' + ph.length) : null, hasNotes ? h('span', {}, '📝 Notes') : null),
+          ppl.length ? h('p', { class: 'act-names' }, ppl.slice(0, 4).map(p => String(p.name || '').split(/\s+/)[0]).join(', ') + (ppl.length > 4 ? ' and ' + (ppl.length - 4) + ' more' : '')) : h('p', { class: 'act-names muted' }, 'Nobody added yet'))); };
+    const listView = () => h('div', { class: 'pl-tablewrap' }, h('table', { class: 'pl-table act-table' }, h('thead', {}, h('tr', {}, ...['Date', 'Activity', 'Type', 'Took part', 'Winners', 'Photos', 'Notes'].map(x => h('th', {}, x)))),
+      h('tbody', {}, ...list.map(a => { const ppl = (a.people || []).filter(p => !AC.client || p.client === AC.client), wins = ppl.filter(p => /winner|runner/i.test(p.role || ''));
+        return h('tr', { onclick: () => activityView(a) }, h('td', {}, fmtDay(a.day)), h('td', {}, h('b', {}, a.title)), h('td', {}, h('span', { class: 'act-cat' }, a.category)), h('td', {}, String(ppl.length)), h('td', {}, wins.map(p => p.name).join(', ')), h('td', {}, photosOf(a).length ? '📷 ' + photosOf(a).length : ''), h('td', {}, plainOf(a.notes || '', 80).replace(/\[picture\]\s*/g, ''))); }))));
+    const viewSeg = h('div', { class: 'pl-seg act-viewseg', role: 'group', 'aria-label': 'View' }, ...[['cards', '▦ Cards'], ['list', '☰ List']].map(([v, l]) => h('button', { type: 'button', 'aria-pressed': String((AC.view || 'cards') === v), onclick: () => { AC.view = v; renderActivities(); } }, l)));
+    bar.append(viewSeg);
     main = !AC.items.length ? h('div', { class: 'pb-start' }, h('b', {}, 'No activities yet'), h('p', {}, AC.edit ? 'Record each fun activity on the floor (a celebration, a contest, a game…) with the date and who took part. You can then see who joins in, and who hasn’t yet, in the Report.' : 'Nothing has been recorded yet.'), AC.edit ? h('button', { class: 'btn primary', type: 'button', onclick: () => openActivity(null) }, '+ Record the first activity') : null)
       : !list.length ? h('p', { class: 'pb-muted' }, 'Nothing in this period.')
-      : h('div', { class: 'act-months' }, ...[...months.entries()].map(([m, arr]) => { const [y, mm] = m.split('-').map(Number);
-        return h('section', {}, h('h3', { class: 'act-mh' }, MONS[mm - 1] + ' ' + y, h('em', {}, arr.length + ' · ' + arr.reduce((s, a) => s + (a.people || []).length, 0) + ' took part')),
-          h('div', { class: 'act-grid' }, ...arr.map(a => { const ppl = (a.people || []).filter(p => !AC.client || p.client === AC.client), wins = ppl.filter(p => /winner|runner/i.test(p.role || ''));
-            return h('div', { class: 'act-card', tabindex: '0', role: 'button', onclick: () => openActivity(a), onkeydown: e => { if (e.key === 'Enter') openActivity(a); } },
-              h('div', { class: 'act-ct' }, h('span', { class: 'act-day' }, h('b', {}, String(a.day).slice(8, 10)), h('small', {}, MONS[+String(a.day).slice(5, 7) - 1])), h('div', {}, h('b', {}, a.title), h('span', { class: 'act-cat' }, a.category))),
-              h('div', { class: 'act-cf' }, h('span', { class: 'pl-avs' }, ...ppl.slice(0, 6).map(p => h('span', { class: 'pl-av', title: p.name + (p.role ? ' · ' + p.role : '') }, initials(p.name))), ppl.length > 6 ? h('span', { class: 'pl-av more' }, '+' + (ppl.length - 6)) : null),
-                h('span', { class: 'grow' }), h('small', {}, ppl.length + ' took part'), wins.length ? h('small', { title: wins.map(p => p.name + ' · ' + p.role).join('\n') }, ' · 🏆 ' + wins.length) : null),
-              a.notes ? h('p', { class: 'act-notes' }, plainOf(a.notes, 140).replace(/\[picture\]\s*/g, '')) : null,
-              (() => { const m = String(a.notes || '').match(/<img[^>]*data-file="([0-9a-f-]{36})"/i); if (!m) return null; const im = h('img', { class: 'act-thumb', alt: 'photo', loading: 'lazy' }); fileUrl(m[1]).then(f => { im.src = f.url; }).catch(() => im.remove()); return im; })()); }))); }));
+      : (AC.view === 'list' ? listView() : h('div', { class: 'act-months' }, ...[...months.entries()].map(([m, arr]) => { const [y, mm] = m.split('-').map(Number);
+        return h('section', {}, h('h3', { class: 'act-mh' }, MONS[mm - 1] + ' ' + y, h('em', {}, arr.length + (arr.length === 1 ? ' activity' : ' activities') + ' · ' + arr.reduce((s2, a) => s2 + (a.people || []).length, 0) + ' took part')),
+          h('div', { class: 'act-grid2' }, ...arr.map(card))); })));
   }
   host.replaceChildren(head, bar, main);
 }
+window.TDREFRESH = async () => { AC.loaded = false; PR.data = null; try { await plLoad(true); } catch { } try { if (typeof renderAll === 'function') renderAll(); } catch { } };   /* v3.87.0: after a restore */
 window.renderActivities = renderActivities; window.renderActivityReport = renderActivityReport; window.renderPlannerReport = renderPlannerReport;
 
 window.renderPlaybook = renderPlaybook; window.renderPlanner = renderPlanner;
