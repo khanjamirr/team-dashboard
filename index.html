@@ -15,7 +15,7 @@
 <meta name="apple-mobile-web-app-title" content="Blasters Deck">
 <meta name="application-name" content="Blasters Deck">
 <meta name="apple-mobile-web-app-status-bar-style" content="default">
-<title>Blasters Deck · 3.95.0</title>
+<title>Blasters Deck · 3.95.1</title>
 <link rel="preconnect" href="https://fonts.googleapis.com"><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin><link href="https://fonts.googleapis.com/css2?family=Public+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet">
 <style>
 :root {
@@ -3553,6 +3553,17 @@ html body.ios #pageEmployees #btnAddMore { background:var(--ios-tint) !important
 /* v3.95.0: the Blasters Deck logo in the menu */
 html body .sidebar .brand h1::before { background:url("data:image/svg+xml,%3Csvg%20xmlns%3D%22http%3A//www.w3.org/2000/svg%22%20viewBox%3D%220%200%20120%20120%22%3E%3Cdefs%3E%3ClinearGradient%20id%3D%22g%22%20x1%3D%220%22%20y1%3D%221%22%20x2%3D%221%22%20y2%3D%220%22%3E%3Cstop%20offset%3D%220%22%20stop-color%3D%22%2310b981%22/%3E%3Cstop%20offset%3D%221%22%20stop-color%3D%22%2384cc16%22/%3E%3C/linearGradient%3E%3C/defs%3E%3Crect%20width%3D%22120%22%20height%3D%22120%22%20rx%3D%2228%22%20fill%3D%22%230f1220%22/%3E%3Cg%20transform%3D%22translate%2860%2060%29%20scale%281%29%20translate%28-60%20-60%29%22%3E%3Ccircle%20cx%3D%2274%22%20cy%3D%2246%22%20r%3D%2216%22%20fill%3D%22url%28%23g%29%22/%3E%3Cpath%20d%3D%22M62%2058%2024%2096%22%20stroke%3D%22url%28%23g%29%22%20stroke-width%3D%2210%22%20stroke-linecap%3D%22round%22/%3E%3Cpath%20d%3D%22M58%2046%2030%2074M74%2062%2046%2090%22%20stroke%3D%22url%28%23g%29%22%20stroke-width%3D%225%22%20stroke-linecap%3D%22round%22%20opacity%3D%22.6%22/%3E%3C/g%3E%3C/svg%3E") center/cover no-repeat !important; background-color:transparent !important; box-shadow:0 4px 12px -4px rgba(16,185,129,.55) !important; border-radius:9px !important; }
 html body .sidebar .brand h1.bd-brand > .bd-logo { display:none !important; }
+/* v3.95.1: notifications are required */
+.ng-veil { position:fixed; inset:0; z-index:5000; display:grid; place-items:center; padding:20px; background:radial-gradient(1200px 600px at 20% -10%, rgba(16,185,129,.18), transparent 60%), radial-gradient(900px 500px at 110% 110%, rgba(132,204,22,.14), transparent 60%), var(--bg, #f3f4f8); overflow:auto; }
+body.ng-locked { overflow:hidden !important; }
+.ng-card { width:min(460px, 100%); background:var(--surface, #fff); color:var(--ink); border-radius:24px; padding:28px 26px 20px; box-shadow:0 24px 60px -24px rgba(0,0,0,.35); border:1px solid var(--border, #e5e7eb); text-align:left; }
+.ng-logo { width:64px; height:64px; border-radius:16px; display:block; margin-bottom:16px; box-shadow:0 10px 22px -8px rgba(16,185,129,.5); }
+.ng-card h2 { font-size:22px; letter-spacing:-.01em; margin:0 0 8px; } .ng-card p { margin:0 0 14px; color:var(--ink-2, #4b5563); font-size:14.5px; line-height:1.45; }
+.ng-steps { list-style:none; margin:0 0 16px; padding:0; display:flex; flex-direction:column; gap:10px; }
+.ng-steps li { display:flex; gap:10px; align-items:flex-start; font-size:14px; line-height:1.4; } .ng-n { width:22px; height:22px; flex:none; border-radius:50%; display:grid; place-items:center; background:#10b981; color:#fff; font-size:12px; font-weight:700; }
+.ng-hint { display:block; color:var(--muted, #6b7280); font-size:12px; margin:-6px 0 14px; }
+.ng-go { width:100%; justify-content:center; padding:12px !important; font-size:15px !important; border-radius:14px !important; }
+.ng-out { display:block; margin:14px auto 0; font-size:13px; }
 </style></head>
 
 
@@ -11609,7 +11620,7 @@ async function poll() {
 }
 
 /* ============================== filtering ============================== */
-const APP = { title: "Blasters Deck", version: "3.95.0", released: "2026-11-15" };
+const APP = { title: "Blasters Deck", version: "3.95.1", released: "2026-11-15" };
 const BASE_DIMS = { status: "status_column", desig: "designation_column", client: "client_column", mode: "mode_column" };
 const STANDARD_STATUSES = ["Active", "Manager", "OJT", "Bench", "New", "Projected", "Left", "Moved"];
 const TILE_ORDER = ["Active", "Manager", "OJT", "Bench", "New", "Projected"];
@@ -19237,32 +19248,49 @@ window.TDN = (() => {
     for (const it of now.slice(0, 4)) show(String(it.title || 'Blasters Deck'), String(it.detail || ''), 'nf-' + it.id, () => open(it));
     if (now.length > 4) show('Blasters Deck', (now.length - 4) + ' more new notifications', 'nf-more', () => window.openBell && openBell());
   }
-  /* ask when the page opens (browsers only allow the question after a tap, so it is a card with a button) */
+  /* v3.95.1: notifications are required. After signing in, nothing can be used until they are allowed on this device.
+     Browsers only show the question after a tap, so it is a full-screen page with a button; it comes back if they are switched off. */
   const standalone = () => matchMedia('(display-mode: standalone)').matches || navigator.standalone === true;
-  const iosBrowser = () => /iPhone|iPad|iPod/i.test(navigator.userAgent) && !standalone();
-  const rpc = prefs => CLOUD._rpc('td_my_prefs', { p_token: CLOUD.token(), p_prefs: prefs });
-  let asked = false;
-  async function ask() {
-    if (asked || typeof CLOUD === 'undefined' || !CLOUD.token || !CLOUD.token() || document.getElementById('app')?.hidden) return;
-    if (document.querySelector('.pdlg-veil, #pcDialog, .drawer, .tdc-veil, .a2hs, .bkw, .ntf')) return;
-    const perm = supported() ? Notification.permission : (iosBrowser() ? 'ios' : 'none');
-    if (perm === 'granted' || perm === 'none') { asked = true; return; }
-    asked = true;
-    let p = {}; try { p = await rpc(null) || {}; } catch { }
-    if (p.notif_snooze && Date.parse(p.notif_snooze) > Date.now()) return;
-    const close = async days => { card.classList.remove('in'); setTimeout(() => card.remove(), 300); if (days) { try { await rpc({ notif_snooze: new Date(Date.now() + days * 864e5).toISOString() }); } catch { } } };
-    const turnOn = h('button', { type: 'button', class: 'btn primary', onclick: async () => { let r = 'default'; try { r = await Notification.requestPermission(); } catch { }
-      if (r === 'granted') { close(0); toast('Notifications are on.'); show('Notifications are on ✓', 'New requests, approvals, tasks and reminders will show here.', 'bd-welcome'); try { window.remindNow && remindNow(true); } catch { } }
-      else { close(3); toast('Notifications stay off. You can turn them on later from the 🔔 bell.', true); } } }, '🔔 Turn on');
-    const msg = perm === 'ios' ? 'On iPhone, notifications work in the Home Screen app: tap Share ⬆︎ → Add to Home Screen, open Blasters Deck from there, and turn them on.'
-      : perm === 'denied' ? 'They are blocked for this site. Click the 🔒 or ⓘ next to the web address → Notifications → Allow, then reload.'
-      : 'Get new leave requests, approvals, tasks, birthdays and reminders as notifications on this ' + (document.body.classList.contains('ios') ? 'phone' : 'computer') + ', even when the tab is in the background.';
-    const card = h('div', { class: 'ntf', role: 'dialog', 'aria-label': 'Turn on notifications' },
-      h('span', { class: 'ntf-ic', 'aria-hidden': 'true' }, '🔔'), h('div', { class: 'ntf-t' }, h('b', {}, perm === 'denied' ? 'Notifications are blocked' : 'Turn on notifications?'), h('small', {}, msg)),
-      h('div', { class: 'ntf-a' }, h('button', { type: 'button', class: 'btn', onclick: () => close(3) }, perm === 'granted' ? 'OK' : 'Not now'), perm === 'default' ? turnOn : null));
-    document.body.append(card); requestAnimationFrame(() => card.classList.add('in'));
+  const isIOS = () => /iPhone|iPad|iPod/i.test(navigator.userAgent) || (navigator.platform === 'MacIntel' && navigator.maxTouchPoints > 1);
+  const isAndroid = () => /Android/i.test(navigator.userAgent);
+  const signedIn = () => typeof CLOUD !== 'undefined' && CLOUD.token && CLOUD.token() && !document.getElementById('app')?.hidden;
+  const state_ = () => !supported() ? (isIOS() && !standalone() ? 'ios-browser' : 'unsupported') : Notification.permission;
+  let gateEl = null, lastSt = null;
+  const step = (n, html) => { const t = h('span'); t.innerHTML = html; return h('li', {}, h('span', { class: 'ng-n' }, String(n)), t); };   /* fixed text only */
+  function steps(st) {
+    if (st === 'ios-browser') return [h('p', {}, 'On iPhone and iPad, notifications only work in the Home Screen app.'),
+      h('ol', { class: 'ng-steps' }, step(1, 'Tap <b>Share</b> ⬆︎ at the bottom of Safari'), step(2, 'Choose <b>Add to Home Screen</b>, then <b>Add</b>'), step(3, 'Open <b>Blasters Deck</b> from your Home Screen and sign in'), step(4, 'Tap <b>Turn on notifications</b> and choose <b>Allow</b>')),
+      h('small', { class: 'ng-hint' }, 'Needs iOS 16.4 or newer.')];
+    if (st === 'unsupported') return [h('p', {}, 'This browser can’t show notifications.'), h('ol', { class: 'ng-steps' }, step(1, 'Open this page in <b>Chrome</b>, <b>Edge</b>, <b>Safari</b> or <b>Firefox</b>'), step(2, 'If you opened it from WhatsApp or another app, tap ⋮ and choose <b>Open in browser</b>'))];
+    if (st === 'denied') return [h('p', {}, 'Notifications are blocked for this site. Allow them, then tap “I’ve allowed them”.'),
+      h('ol', { class: 'ng-steps' }, ...(isIOS() ? [step(1, 'Open the iPhone <b>Settings</b> app → <b>Notifications</b>'), step(2, 'Find <b>Blasters Deck</b> and switch on <b>Allow Notifications</b>')]
+        : isAndroid() ? [step(1, 'Tap the <b>⋮</b> menu (or 🔒 next to the address) → <b>Site settings</b> / ⓘ'), step(2, 'Tap <b>Notifications</b> → <b>Allow</b>')]
+        : [step(1, 'Click the <b>🔒</b> or <b>ⓘ</b> just left of the web address'), step(2, 'Set <b>Notifications</b> to <b>Allow</b>')]))];
+    return [h('p', {}, 'Blasters Deck sends new leave requests, approvals, tasks, birthdays and reminders as notifications. Turn them on to continue.')];
   }
-  setTimeout(() => setInterval(ask, 4000), 3000);
+  function draw(st) {
+    lastSt = st;
+    const btn = st === 'default' ? h('button', { type: 'button', class: 'btn primary ng-go', onclick: async e => { e.currentTarget.disabled = true; try { await Notification.requestPermission(); } catch { } check(true); } }, '🔔 Turn on notifications')
+      : st === 'denied' ? h('button', { type: 'button', class: 'btn primary ng-go', onclick: () => { if (supported() && Notification.permission === 'granted') check(true); else location.reload(); } }, 'I’ve allowed them')
+      : null;
+    const out = h('button', { type: 'button', class: 'linkbtn ng-out', onclick: () => { try { document.getElementById('btnLogout')?.click() || CLOUD.signOut?.(); } catch { } } }, 'Sign out');
+    const box = h('div', { class: 'ng-card' }, h('img', { class: 'ng-logo', alt: '', src: document.querySelector('img.bd-logo')?.src || 'icon-192.png' }),
+      h('h2', {}, st === 'denied' ? 'Notifications are blocked' : st === 'default' ? 'Turn on notifications to continue' : 'Notifications are needed to continue'), ...steps(st), btn, out);
+    if (!gateEl) { gateEl = h('div', { class: 'ng-veil', role: 'dialog', 'aria-modal': 'true', 'aria-label': 'Turn on notifications' }); document.body.append(gateEl); document.body.classList.add('ng-locked'); }
+    gateEl.replaceChildren(box);
+  }
+  function check(fromTap) {
+    if (!signedIn() || document.getElementById('pcDialog')) { if (gateEl && !signedIn()) { gateEl.remove(); gateEl = null; document.body.classList.remove('ng-locked'); } return; }
+    const st = state_();
+    if (st === 'granted') {
+      if (gateEl) { gateEl.remove(); gateEl = null; document.body.classList.remove('ng-locked'); if (fromTap) { toast('Notifications are on.'); show('Notifications are on ✓', 'New requests, approvals, tasks and reminders will show here.', 'bd-welcome'); try { window.remindNow && remindNow(true); } catch { } } }
+      return;
+    }
+    if (!gateEl || st !== lastSt) draw(st);
+  }
+  setInterval(check, 1500);
+  try { navigator.permissions?.query({ name: 'notifications' }).then(ps => { ps.onchange = () => check(true); }).catch(() => { }); } catch { }
+  const ask = () => check(false);
   /* in the background the bell is checked every 90 seconds so new things still pop up */
   setInterval(() => { if (document.hidden && on() && typeof bellCheck === 'function') bellCheck(); }, 90000);
   return { show, items, on, ask };
