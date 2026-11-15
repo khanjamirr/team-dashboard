@@ -15,7 +15,7 @@
 <meta name="apple-mobile-web-app-title" content="Blasters Deck">
 <meta name="application-name" content="Blasters Deck">
 <meta name="apple-mobile-web-app-status-bar-style" content="default">
-<title>Blasters Deck · 3.96.0</title>
+<title>Blasters Deck · 3.96.2</title>
 <link rel="preconnect" href="https://fonts.googleapis.com"><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin><link href="https://fonts.googleapis.com/css2?family=Public+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet">
 <style>
 :root {
@@ -3599,6 +3599,40 @@ body.ios .wn-veil { align-items:flex-end; padding:0; } body.ios .wn { width:100%
 .wn-it { display:flex; gap:12px; margin:0 0 12px; } .wn-it i { font-style:normal; width:34px; height:34px; flex:none; border-radius:10px; display:grid; place-items:center; background:var(--surface-2,#f2f2f7); font-size:17px; }
 .wn-it b { display:block; font-size:15px; } .wn-it span { display:block; font-size:13px; color:var(--ink-2,#555); line-height:1.4; margin-top:1px; }
 .wn-ok { width:100%; justify-content:center; padding:12px !important; border-radius:14px !important; font-size:15px !important; margin-top:6px; }
+/* v3.96.1: pseudo names as cards, grouped by client and sub client */
+html body .psn-people { display:grid; grid-template-columns:repeat(auto-fill, minmax(290px, 1fr)); gap:10px; align-items:stretch; }
+html body .psn-people > :not(.psn-seat) { grid-column:1 / -1; }
+html body .psn-people .psn-group { display:flex; align-items:baseline; gap:10px; margin:18px 0 2px; padding:0 0 8px; border-bottom:1px solid var(--border, #e5e7eb); }
+html body .psn-people .psn-group:first-child { margin-top:4px; }
+html body .psn-people .psn-group b { font-size:17px; letter-spacing:-.01em; }
+html body .psn-people .psn-group small, html body .psn-people .psn-subgroup small { color:var(--muted, #6b7280); font-size:12px; }
+html body .psn-people .psn-subgroup { display:flex; align-items:baseline; gap:8px; margin:8px 0 0; padding:0 0 0 10px; border:0 !important; border-left:3px solid #10b981 !important; background:none !important; }
+html body .psn-people .psn-subgroup b { font-size:13.5px; font-weight:700; }
+html body .psn-people .psn-seat { display:flex; flex-wrap:wrap; align-items:center; gap:8px; margin:0 !important; padding:12px 14px !important; border-radius:14px !important; background:var(--surface, #fff) !important; border:1px solid var(--border, #e6e9f0) !important; box-shadow:0 1px 2px rgba(20,40,110,.04); transition:box-shadow .15s, transform .15s; min-width:0; }
+html body .psn-people .psn-seat:hover { box-shadow:0 8px 22px -12px rgba(20,40,110,.35); }
+html body .psn-people .psn-seat .psn-name { order:1; max-width:100%; }
+html body .psn-people .psn-seat .psn-arrow { display:none !important; }
+html body .psn-people .psn-seat .psn-who { order:2; flex:1 1 100%; min-width:0; padding-top:2px; }
+html body .psn-people .psn-seat .psn-who b { display:block; font-size:15px; white-space:nowrap; overflow:hidden; text-overflow:ellipsis; }
+html body .psn-people .psn-seat .psn-who small { display:block; color:var(--muted, #6b7280); font-size:12px; margin-top:1px; }
+html body .psn-people .psn-seat .psn-flag { order:3; }
+html body .psn-people .psn-seat > .btn { order:4; padding:4px 12px !important; min-height:0 !important; font-size:12.5px !important; }
+html body .psn-people .psn-seat > .btn:first-of-type { margin-left:auto; }
+html body .psn-people .psn-seat.vacant { border-style:dashed !important; background:color-mix(in srgb, #f59e0b 5%, var(--surface, #fff)) !important; }
+html body .psn-people .psn-seat.psn-flagrow { border-color:color-mix(in srgb, #ef4444 45%, transparent) !important; background:color-mix(in srgb, #ef4444 5%, var(--surface, #fff)) !important; }
+html body .psn-people .psn-seat.off { opacity:.6; }
+html body .psn-people .psn-seat.on { border-color:var(--accent, #2563eb) !important; box-shadow:0 0 0 3px color-mix(in srgb, var(--accent, #2563eb) 18%, transparent); }
+@media (max-width:700px) { html body .psn-people { grid-template-columns:1fr; gap:8px; } }
+html body .psn-people .psn-subgroup b, html body .psn-people .psn-group b { white-space:nowrap; } html body .psn-people .psn-subgroup, html body .psn-people .psn-group { flex-wrap:wrap; }
+html:root:root body.ios.ios #pinnedHeader#pinnedHeader.sticky-top { background:var(--ios-bg, #f2f2f7) !important; }
+/* v3.96.2: check notifications */
+.pc-h { font-size:13px; text-transform:uppercase; letter-spacing:.04em; color:var(--muted,#6b7280); margin:6px 0 8px; }
+.pc-list { list-style:none; margin:0 0 14px; padding:0; display:flex; flex-direction:column; gap:8px; }
+.pc-l { display:flex; gap:10px; align-items:flex-start; padding:10px 12px; border-radius:12px; background:var(--surface-2,#f4f6fa); }
+.pc-l b { display:block; font-size:14px; } .pc-l small { display:block; font-size:12.5px; color:var(--ink-2,#4b5563); margin-top:2px; line-height:1.4; }
+.pc-i { width:22px; height:22px; flex:none; border-radius:50%; display:grid; place-items:center; font-size:12px; font-weight:800; color:#fff; background:#9ca3af; }
+.pc-l.ok .pc-i { background:#34c759; } .pc-l.bad { background:color-mix(in srgb, #ef4444 9%, var(--surface,#fff)); } .pc-l.bad .pc-i { background:#ef4444; } .pc-l.info .pc-i { background:#0a84ff; }
+.pc-acts { display:flex; gap:8px; justify-content:flex-end; flex-wrap:wrap; } .pc-note { margin-top:10px; }
 </style></head>
 
 
@@ -11656,7 +11690,7 @@ async function poll() {
 }
 
 /* ============================== filtering ============================== */
-const APP = { title: "Blasters Deck", version: "3.96.0", released: "2026-11-15" };
+const APP = { title: "Blasters Deck", version: "3.96.2", released: "2026-11-15" };
 const BASE_DIMS = { status: "status_column", desig: "designation_column", client: "client_column", mode: "mode_column" };
 const STANDARD_STATUSES = ["Active", "Manager", "OJT", "Bench", "New", "Projected", "Left", "Moved"];
 const TILE_ORDER = ["Active", "Manager", "OJT", "Bench", "New", "Projected"];
@@ -15450,6 +15484,7 @@ function drawNotifications() {
       : h('div', { class: 'nf-empty' }, h('span', { 'aria-hidden': 'true' }, '🔔'), h('b', {}, nfFilter === 'unread' ? 'You’re all caught up' : 'No notifications'), h('small', {}, 'New tasks, requests and playbook updates show up here.')),
     list.length > nfShow ? h('button', { class: 'btn nf-more', type: 'button', onclick: () => { nfShow += 40; drawNotifications(); } }, 'Show older') : null,
     PERM.can('activity.view') ? h('button', { class: 'linkbtn nf-log', type: 'button', onclick: () => openActivity(notificationBody) }, 'Open the full activity log →') : null,
+    h('button', { class: 'linkbtn nf-log', type: 'button', onclick: () => { closeDrawer(); window.bdPushCheck && bdPushCheck(); } }, '🔔 Check notifications on this device'),
     h('button', { class: 'linkbtn nf-log', type: 'button', onclick: () => { closeDrawer(); window.bdWhatsNew && bdWhatsNew(true); } }, '✨ What’s new in ' + APP.version)].filter(Boolean));
   const ma = document.getElementById('nfMarkAll'); if (ma) ma.disabled = !unread;
 }
@@ -16200,6 +16235,7 @@ function pdlg(title, body, foot, cls) {
   document.addEventListener('keydown', esc, true); document.body.append(v);
   return { close, box };
 }
+window.pdlg = pdlg;   /* v3.96.2: used by Check notifications */
 const agoText = t => { const d = Date.parse(t); if (!d) return 'Never'; const m = Math.max(0, (Date.now() - d) / 60000); return m < 1 ? 'Just now' : m < 60 ? Math.round(m) + ' min ago' : m < 1440 ? Math.round(m / 60) + ' h ago' : m < 1440 * 60 ? Math.round(m / 1440) + ' d ago' : new Date(d).toLocaleDateString(undefined, { day: 'numeric', month: 'short', year: 'numeric' }); };
 const kindOf = u => u.role === 'superadmin' ? 'Super admin' : u.role === 'admin' ? 'Admin' : 'User';
 /* the page chips for a role or a person */
@@ -18915,6 +18951,7 @@ document.addEventListener('visibilitychange', () => { if (!document.hidden && on
       u.name ? h('div', { class: 'ios-me' }, h('span', { class: 'ios-av' }, String(u.name).split(/\s+/).slice(0, 2).map(x => x[0]).join('').toUpperCase()), h('div', {}, h('b', {}, u.name), h('small', {}, (({ superadmin: 'Super admin', admin: 'Admin' })[u.role] || 'Team member') + (u.loginId ? ' · ' + u.loginId : '')))) : null,
       rest.length ? group('Pages', ...rest.map(t => { const n = t.querySelector('.tabn'); return row(tile(t.dataset.view), nm(t.dataset.view), { badge: n && !n.hidden && n.textContent.trim() ? n.textContent.trim() : '', onclick: () => { close(); t.click(); } }); })) : null,
       group(null, row(h('span', { class: 'ios-tile', style: 'background:#007aff' }, h('b', {}, '☆')), 'Edit tab bar', { sub: 'Choose the 4 pages at the bottom', onclick: () => { close(); editPins(); } }),
+        row(h('span', { class: 'ios-tile', style: 'background:#ff3b30' }, h('b', {}, '🔔')), 'Check notifications', { sub: 'Test that they reach this phone', onclick: () => { close(); window.bdPushCheck && bdPushCheck(); } }),
         row(h('span', { class: 'ios-tile', style: 'background:#10b981' }, h('b', {}, '✨')), 'What’s new', { sub: 'In version ' + APP.version, onclick: () => { close(); window.bdWhatsNew && bdWhatsNew(true); } })),
       clocks.length ? group('World clocks', ...clocks.map(c => { const z = c.querySelector('.tzc-z b')?.textContent, zn = c.querySelector('.tzc-z small')?.textContent, ic = c.querySelector('.tzc-ic')?.textContent;
         return row(h('span', { class: 'ios-tile ios-ph ' + ([...c.classList].find(x => x.startsWith('ph-')) || '') }, h('b', {}, ic || '🕐')), zn + ' (' + z + ')', { value: c.querySelector('.tzc-t')?.textContent + ' · ' + (c.querySelector('.tzc-d')?.textContent || ''), noChevron: true, sub: c.classList.contains('work') ? 'Working hours' : '' }); }),
@@ -19334,7 +19371,7 @@ window.TDN = (() => {
   setInterval(() => { if (document.hidden && on() && typeof bellCheck === 'function') bellCheck(); }, 90000);
   /* v3.96.0: notifications when the app is closed. This device is registered with the server (Web Push); the server
      sends new tasks, comments, leave requests and answers, private-detail requests and passcode resets. */
-  let pushOn = false, pushUser = null, pushEp = null, pushBusy = false;
+  let pushOn = false, pushUser = null, pushEp = null, pushBusy = false, lastErr = '';
   const b64u = t => { const p = '='.repeat((4 - t.length % 4) % 4); return Uint8Array.from(atob((t + p).replace(/-/g, '+').replace(/_/g, '/')), c => c.charCodeAt(0)); };
   const ub64 = buf => btoa(String.fromCharCode(...new Uint8Array(buf))).replace(/\+/g, '-').replace(/\//g, '_').replace(/=+$/, '');
   async function pushSetup() {
@@ -19346,13 +19383,14 @@ window.TDN = (() => {
       if (window.PERM && PERM.isOwner() && CLOUD.cfg) { const c = CLOUD.cfg(); try { await CLOUD._rpc('td_push_config', { p_token: tk, p_url: c.url, p_key: c.anonKey }); } catch { } }
       let pub = null; try { pub = await CLOUD._rpc('td_push_public_key', { p_token: tk }); } catch { }
       if (!pub) return;   /* the server part is not set up yet: try again later */
-      const r = reg || await navigator.serviceWorker.ready;
+      const r = reg || await Promise.race([navigator.serviceWorker.ready, new Promise((_, no) => setTimeout(() => no(new Error('The notification helper (sw.js) is not installed')), 6000))]);
       let sub = await r.pushManager.getSubscription();
       if (sub && sub.options && sub.options.applicationServerKey && ub64(sub.options.applicationServerKey) !== pub) { try { await sub.unsubscribe(); } catch { } sub = null; }
       if (!sub) sub = await r.pushManager.subscribe({ userVisibleOnly: true, applicationServerKey: b64u(pub) });
       await CLOUD._rpc('td_push_subscribe', { p_token: tk, p_sub: sub.toJSON(), p_ua: navigator.userAgent.slice(0, 200) });
       pushUser = uid; pushOn = true; pushEp = sub.endpoint;
-    } catch (e) { console.warn('Notifications with the app closed:', e && e.message); }
+      lastErr = '';
+    } catch (e) { lastErr = (e && e.message) || String(e); console.warn('Notifications with the app closed:', lastErr); }
     finally { pushBusy = false; }
   }
   setInterval(pushSetup, 15000); setTimeout(pushSetup, 4000);
@@ -19370,7 +19408,7 @@ window.TDN = (() => {
     } catch { }
   }
   { const q = new URLSearchParams(location.search).get('n'); if (q) { const t = setInterval(() => { if (signedIn() && typeof state !== 'undefined' && state.schema && !document.querySelector('.ng-veil')) { clearInterval(t); try { history.replaceState(null, '', location.pathname); } catch { } route(q); } }, 700); } }
-  return { show, items, on, ask, route, pushOn: () => pushOn, pushSetup };
+  return { show, items, on, ask, route, pushOn: () => pushOn, pushSetup, again: async () => { pushUser = null; await pushSetup(); return lastErr; }, lastErr: () => lastErr };
 })();
 </script>
 <script>
@@ -19473,6 +19511,54 @@ window.bdWhatsNew = (() => {
   setInterval(check, 3000);
   return force => show(NOTES.filter(n => cmp(n.v, APP.version) <= 0).slice(0, 2), false);
 })();
+</script>
+<script>
+/* v3.96.2: Check notifications: every step from this device to the server, with what to do when one fails, and a test */
+window.bdPushCheck = async function () {
+  const isIOS = /iPhone|iPad|iPod/i.test(navigator.userAgent) || (navigator.platform === 'MacIntel' && navigator.maxTouchPoints > 1);
+  const standalone = matchMedia('(display-mode: standalone)').matches || navigator.standalone === true;
+  const owner = window.PERM && PERM.isOwner();
+  const body = h('div', { class: 'pc-body' }, h('p', { class: 'set-hint' }, 'Checking…'));
+  const d = pdlg('Check notifications', body, [h('span', { class: 'grow' }), h('button', { class: 'btn', type: 'button', onclick: () => d.close() }, 'Close')], 'pc-dlg');
+  const line = (ok, t, fix) => h('li', { class: 'pc-l ' + (ok === true ? 'ok' : ok === false ? 'bad' : 'wait') }, h('span', { class: 'pc-i' }, ok === true ? '✓' : ok === false ? '!' : '…'), h('div', {}, h('b', {}, t), fix && ok !== true ? h('small', {}, fix) : null));
+  async function run() {
+    const L = [];
+    const perm = 'Notification' in window ? Notification.permission : 'none';
+    L.push(line(perm === 'granted', 'Notifications allowed on this device', perm === 'denied' ? 'They are blocked: allow them in the browser’s site settings (or iPhone Settings → Notifications → Blasters Deck).' : 'Not allowed yet.'));
+    if (isIOS) L.push(line(standalone, 'Opened from the Home Screen (iPhone / iPad)', 'On iPhone, notifications only reach the Home Screen app: Share ⬆︎ → Add to Home Screen, then open it from there and sign in again.'));
+    let reg = null; try { reg = navigator.serviceWorker ? await navigator.serviceWorker.getRegistration() : null; } catch { }
+    L.push(line(!!(reg && reg.active), 'Notification helper installed', 'sw.js is missing on the website. Upload sw.js into the same folder as index.html on Vercel, then reload.'));
+    L.push(line('PushManager' in window, 'This browser can receive notifications when closed', 'Use Chrome on Android, or the Home Screen app on iPhone (iOS 16.4 or newer).'));
+    let sub = null; try { sub = reg && reg.pushManager ? await reg.pushManager.getSubscription() : null; } catch { }
+    let c = null; try { c = await CLOUD._rpc('td_push_check', { p_token: CLOUD.token(), p_endpoint: sub ? sub.endpoint : '' }); } catch (e) { c = { err: e.message }; }
+    if (c && c.err) L.push(line(false, 'Server part set up', /schema cache|Could not find/i.test(c.err) ? 'Run push.sql and push-check.sql in Supabase → SQL Editor.' : c.err));
+    else {
+      L.push(line(c.url_ready, 'Server knows the dashboard’s address', 'The super admin needs to sign in once after push.sql was run.'));
+      L.push(line(c.key_ready, 'Sending service has run (its key is made)', 'The Edge Function td-push has not run yet. Check: it is deployed with the name td-push, “Verify JWT” is OFF, and pg_net is switched on. The checks below (super admin) show the error.'));
+      L.push(line(!!(sub && c.this_device), 'This device is registered for notifications', TDN.lastErr() ? 'Last error: ' + TDN.lastErr() : 'Tap “Register this device” below.'));
+      if (c.my_last) L.push(line(c.my_last.sent ? true : c.my_last.tries >= 5 ? false : null, 'Last notification for you: “' + c.my_last.title + '”', c.my_last.sent ? '' : c.my_last.tries >= 5 ? 'It could not be sent (5 tries). See the server checks below.' : 'Waiting to be sent (it goes out within a minute).'));
+    }
+    const S = c && c.server; const srv = [];
+    if (owner && S) {
+      srv.push(line(S.pg_net, 'pg_net extension on', 'Supabase → Database → Extensions → pg_net → enable, then run push.sql again.'));
+      srv.push(line(S.pg_cron, 'pg_cron extension on', 'Supabase → Database → Extensions → pg_cron → enable, then run push.sql again.'));
+      const job = (S.jobs || []).find(j => j.job === 'td-push');
+      srv.push(line(!!(job && job.active), 'Sending schedule running (every minute)', 'Run push.sql again after switching on pg_cron.'));
+      const last = (S.calls || [])[0];
+      if (last) { const st = last.status; srv.push(line(st >= 200 && st < 300, 'Last call to the sending service: ' + (st || 'no answer'), st === 401 || st === 403 ? 'Turn OFF “Verify JWT” for the td-push function (Supabase → Edge Functions → td-push → Details / Settings).' : st === 404 ? 'The function is not found: deploy it with the exact name td-push.' : (last.error || last.reply || 'See Supabase → Edge Functions → td-push → Logs.'))); }
+      else srv.push(line(null, 'No call to the sending service yet', 'It is only called when something is waiting. Press “Send me a test”.'));
+      srv.push(h('li', { class: 'pc-l info' }, h('span', { class: 'pc-i' }, 'ⓘ'), h('div', {}, h('b', {}, S.devices + ' device' + (S.devices === 1 ? '' : 's') + ' of ' + S.people + ' ' + (S.people === 1 ? 'person' : 'people') + ' registered'), h('small', {}, S.sent_24h + ' sent in the last 24 h · ' + S.waiting + ' waiting · ' + S.failed + ' failed' + (S.last_sent ? ' · last sent ' + new Date(S.last_sent).toLocaleString() : '')))));
+    }
+    const again = h('button', { class: 'btn', type: 'button', onclick: async () => { again.disabled = true; again.textContent = 'Registering…'; if (perm !== 'granted') { try { await Notification.requestPermission(); } catch { } } const e = await TDN.again(); toast(e ? 'Could not register: ' + e : 'This device is registered.', !!e); run(); } }, 'Register this device');
+    const test = h('button', { class: 'btn primary', type: 'button', onclick: async () => { test.disabled = true; test.textContent = 'Sending…';
+      try { const r = await CLOUD._rpc('td_push_test', { p_token: CLOUD.token() }); if (!r.ok) { toast('This account has no registered device yet. Tap “Register this device” first.', true); test.disabled = false; test.textContent = 'Send me a test'; return; }
+        toast('Test sent to ' + r.devices + ' device' + (r.devices === 1 ? '' : 's') + '. Close the app now: it should arrive within a minute.'); setTimeout(run, 8000); }
+      catch (e) { toast(/TOO_SOON/.test(e.message) ? 'Wait a minute between tests.' : e.message, true); test.disabled = false; test.textContent = 'Send me a test'; } } }, 'Send me a test');
+    body.replaceChildren(h('h4', { class: 'pc-h' }, 'This device'), h('ul', { class: 'pc-list' }, ...L), srv.length ? h('h4', { class: 'pc-h' }, 'Server (only you see this)') : null, srv.length ? h('ul', { class: 'pc-list' }, ...srv) : null,
+      h('div', { class: 'pc-acts' }, again, test), h('p', { class: 'set-hint pc-note' }, 'After “Send me a test”, close the app completely (swipe it away). The test should still arrive.'));
+  }
+  run();
+};
 </script>
 </body>
 </html>
