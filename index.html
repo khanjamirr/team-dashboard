@@ -10,7 +10,7 @@
 <meta name="format-detection" content="telephone=no">
 <link rel="preconnect" href="https://iiogwevtyzgedhoaqlrn.supabase.co" crossorigin><link rel="dns-prefetch" href="https://iiogwevtyzgedhoaqlrn.supabase.co">
 <link rel="icon" href="data:,">
-<title>Team Dashboard · 3.93.1</title>
+<title>Team Dashboard · 3.94.0</title>
 <link rel="preconnect" href="https://fonts.googleapis.com"><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin><link href="https://fonts.googleapis.com/css2?family=Public+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet">
 <style>
 :root {
@@ -3409,6 +3409,185 @@ html body #pageSummary.ov .ovx-hero { justify-content:flex-end; margin-bottom:12
   html body #pinnedHeader > .top-greet { order:0; flex:1 1 100%; }
   .top-greet .tg1 { font-size:21px; } .top-greet .tg2 { font-size:12px; }
   html body #pinnedHeader #cleanPageTitle { font-size:13px !important; margin:2px 0 0 !important; }
+}
+</style><style id="v394-ios-phone">
+/* ===== v3.94.0: phones look and feel like an iOS app ===== */
+@media (max-width:700px) {
+  :root { --ios-bg:#f2f2f7; --ios-card:#ffffff; --ios-sep:rgba(60,60,67,.18); --ios-lbl2:rgba(60,60,67,.6); --ios-tint:#007aff; --ios-bar:rgba(249,249,249,.86); }
+  :root[data-theme="dark"] { --ios-bg:#000; --ios-card:#1c1c1e; --ios-sep:rgba(84,84,88,.6); --ios-lbl2:rgba(235,235,245,.6); --ios-tint:#0a84ff; --ios-bar:rgba(22,22,24,.86); }
+  html:root:root body.ios.ios, html:root:root body.ios.ios.clean-overview, html:root:root body.ios.ios.v-summary { background:var(--ios-bg) !important; background-image:none !important; -webkit-text-size-adjust:100%; }
+  html body.ios table.data td, html body.ios table.data tr, html body.ios table.data tr td.cc-cell, html body.ios table.data tr:hover td { background:transparent !important; }
+  html body.ios .tablewrap { max-height:none !important; }
+  html body.ios main, html body.ios #app, html body.ios .workspace { background:transparent !important; background-image:none !important; }
+  html body.ios #app { padding:0 0 calc(64px + env(safe-area-inset-bottom)) !important; margin:0 !important; }
+  /* the world clock bar moves into More on phones */
+  html body.ios .tzbar { display:none !important; }
+  html body.ios .tzv { bottom:calc(66px + env(safe-area-inset-bottom)) !important; }
+  /* ---- navigation bar ---- */
+  html body.ios div#pinnedHeader.sticky-top.pinned-top { position:sticky !important; top:0 !important; z-index:60 !important; display:grid !important; grid-template-columns:1fr auto; grid-template-areas:"greet icons" "title title" "tabs tabs";
+    gap:0 !important; padding:calc(6px + env(safe-area-inset-top)) 16px 8px !important; margin:0 !important; background:var(--ios-bar) !important; -webkit-backdrop-filter:saturate(180%) blur(20px); backdrop-filter:saturate(180%) blur(20px);
+    border:0 !important; border-bottom:.5px solid transparent !important; box-shadow:none !important; border-radius:0 !important; transition:border-color .2s; }
+  html body.ios #pinnedHeader::before { display:none !important; }
+  html body.ios.ios-scrolled #pinnedHeader { border-bottom-color:var(--ios-sep) !important; }
+  html body.ios #pinnedHeader > header.top { grid-area:icons; display:flex !important; align-items:center; gap:0 !important; margin:0 !important; padding:0 !important; min-height:0 !important; background:transparent !important; }
+  html body.ios #pinnedHeader > header.top > .spacer { display:none !important; }
+  html body.ios #pinnedHeader > .top-greet { grid-area:greet; align-self:center; min-width:0; }
+  html body.ios .top-greet .tg1 { font-size:13px !important; font-weight:600 !important; letter-spacing:0 !important; color:var(--ios-lbl2) !important; }
+  html body.ios .top-greet .tg1::after { content:"" !important; }
+  html body.ios .top-greet .tg2 { display:none !important; }
+  html body.ios #pinnedHeader > .workspace-heading { display:none !important; }
+  html body.ios #pinnedHeader > .ios-title { grid-area:title; margin:2px 0 0; font-size:34px; font-weight:800; letter-spacing:-.03em; line-height:1.15; color:var(--ink); }
+  html body:not(.ios) .ios-title { display:none; }
+  html body.ios.ios-scrolled #pinnedHeader > .ios-title { grid-area:greet; font-size:17px; font-weight:700; letter-spacing:-.01em; text-align:center; margin:0; align-self:center; }
+  html body.ios.ios-scrolled #pinnedHeader > .top-greet { opacity:0; }
+  /* icons: plain tinted glyphs on the right, like bar buttons */
+  html body.ios #pinnedHeader .tt-filt, html body.ios #pinnedHeader #btnRefresh, html body.ios #pinnedHeader #btnBell, html body.ios #pinnedHeader .tt-opt-btn, html body.ios #pinnedHeader .tt-tables {
+    width:36px !important; height:36px !important; min-width:0 !important; padding:0 !important; margin:0 !important; border:0 !important; border-radius:50% !important; background:transparent !important; box-shadow:none !important; color:var(--ios-tint) !important; justify-content:center !important; position:relative; }
+  html body.ios #pinnedHeader .tt-filt .tt-filt-ic { font-size:20px; }
+  html body.ios #pinnedHeader .tt-filt .tt-filt-n { position:absolute; top:2px; right:0; min-width:16px; height:16px; font-size:10px; }
+  html body.ios #pinnedHeader .ios-icons { grid-area:icons; display:flex; gap:2px; align-items:center; }
+  html body.ios #pinnedHeader .top-tabs { grid-area:tabs; margin:10px 0 0 !important; width:100% !important; }
+  html body.ios #pinnedHeader .top-tabs .tt-grp { flex:1 0 auto; background:rgba(118,118,128,.12) !important; border:0 !important; border-radius:9px !important; padding:2px !important; }
+  html body.ios #pinnedHeader .top-tabs button { border-radius:7px !important; padding:6px 12px !important; font-size:13px !important; flex:1 0 auto; justify-content:center; }
+  html body.ios #pinnedHeader .top-tabs button[aria-selected="true"] { background:var(--ios-card) !important; box-shadow:0 3px 8px rgba(0,0,0,.12), 0 3px 1px rgba(0,0,0,.04) !important; }
+  /* ---- content: grouped, white, 16px gutters ---- */
+  html body.ios main, html body.ios .workspace, html body.ios #app > main { padding:8px 16px 16px !important; }
+  html body.ios .card, html body.ios .set-page, html body.ios #ovTasks, html body.ios #pageSummary.ov #cardAttendance, html body.ios #pageSummary.ov #ovRequests, html body.ios #pageSummary.ov #ovUpcoming {
+    background:var(--ios-card) !important; border:0 !important; border-radius:12px !important; box-shadow:none !important; -webkit-backdrop-filter:none !important; backdrop-filter:none !important; }
+  html body.ios .card .card { border-radius:10px !important; background:var(--ios-bg) !important; }
+  html body.ios input:not([type=checkbox]):not([type=radio]), html body.ios select, html body.ios textarea { font-size:16px !important; min-height:44px; border-radius:10px !important; }
+  html body.ios .btn { min-height:40px; border-radius:10px !important; font-size:15px !important; box-shadow:none !important; }
+  html body.ios .btn.mini { min-height:32px; font-size:13px !important; }
+  html body.ios .emp-card [class*="field"], html body.ios .emp-card dd, html body.ios .emp-card dt, html body.ios .emp-card > * { background:transparent !important; }
+  html body.ios .section-heading h2, html body.ios .card > .head h2 { font-size:20px !important; }
+  /* ---- tab bar ---- */
+  html body.ios .sidebar nav.tabs { position:fixed !important; left:0 !important; right:0 !important; bottom:0 !important; top:auto !important; display:flex !important; justify-content:space-around; align-items:flex-start; gap:0 !important;
+    height:auto !important; min-height:0 !important; margin:0 !important; padding:6px 4px calc(4px + env(safe-area-inset-bottom)) !important; border-radius:0 !important; border:0 !important; border-top:.5px solid var(--ios-sep) !important;
+    background:var(--ios-bar) !important; -webkit-backdrop-filter:saturate(180%) blur(20px); backdrop-filter:saturate(180%) blur(20px); box-shadow:none !important; z-index:80 !important; width:auto !important; max-width:none !important; }
+  html body.ios .sidebar nav.tabs .tab { flex:1 1 0 !important; min-width:0 !important; max-width:none !important; height:auto !important; display:flex !important; flex-direction:column !important; align-items:center !important; gap:2px !important;
+    padding:2px 0 0 !important; margin:0 !important; background:transparent !important; border:0 !important; border-radius:0 !important; box-shadow:none !important; color:#8e8e93 !important; font-size:0 !important; position:relative; }
+  html body.ios .sidebar nav.tabs .tab::after { content:attr(data-mob-name); font-size:10px; font-weight:600; letter-spacing:.01em; line-height:1.2; white-space:nowrap; }
+  html body.ios .sidebar nav.tabs .tab.mob-more::after { content:"More"; }
+  html body.ios .sidebar nav.tabs .tab::before { width:26px !important; height:26px !important; margin:0 !important; }
+  html body.ios .sidebar nav.tabs .tab.on, html body.ios .sidebar nav.tabs .tab[aria-selected="true"], html body.ios .sidebar nav.tabs .tab.mob-more.on { color:var(--ios-tint) !important; background:transparent !important; }
+  html body.ios .sidebar nav.tabs .tab.mob-extra, html body.ios .sidebar nav.tabs .tab[hidden], html body.ios .sidebar nav.tabs .tab.mob-more[hidden] { display:none !important; }
+  html body.ios .sidebar nav.tabs .tab.mob-more::before { content:"" !important; -webkit-mask:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24'%3E%3Ccircle cx='5' cy='12' r='2'/%3E%3Ccircle cx='12' cy='12' r='2'/%3E%3Ccircle cx='19' cy='12' r='2'/%3E%3C/svg%3E") center/22px no-repeat !important; mask:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24'%3E%3Ccircle cx='5' cy='12' r='2'/%3E%3Ccircle cx='12' cy='12' r='2'/%3E%3Ccircle cx='19' cy='12' r='2'/%3E%3C/svg%3E") center/22px no-repeat !important; background:currentColor !important; display:block !important; font-size:0 !important; }
+  html body.ios .sidebar nav.tabs .tab .tabn { position:absolute !important; top:-2px !important; left:calc(50% + 6px) !important; right:auto !important; min-width:18px; height:18px; padding:0 5px !important; font-size:11px !important; line-height:18px !important; border-radius:9px !important; background:#ff3b30 !important; color:#fff !important; border:0 !important; }
+  html body.ios .sidebar nav.tabs .tab.mob-more .mob-dot { top:2px; right:calc(50% - 16px); }
+  html body.ios .pl-seg { flex-wrap:nowrap !important; overflow-x:auto; scrollbar-width:none; max-width:100%; } html body.ios .pl-seg::-webkit-scrollbar { display:none; } html body.ios .pl-seg > button { flex:0 0 auto; white-space:nowrap; }
+  html body.ios .toast-host, html body.ios #toast { bottom:calc(72px + env(safe-area-inset-bottom)) !important; }
+  html body.ios .mob-veil { display:none !important; }
+}
+/* ---- iOS sheets (More, Edit tab bar) ---- */
+.ios-veil { position:fixed; inset:0; z-index:2600; background:rgba(0,0,0,.4); display:flex; align-items:flex-end; animation:mobIn .2s ease-out; }
+.ios-veil.out { opacity:0; transition:opacity .2s; }
+.ios-sheet { width:100%; height:calc(100% - 44px - env(safe-area-inset-top)); background:var(--ios-bg, #f2f2f7); color:var(--ink); border-radius:12px 12px 0 0; display:flex; flex-direction:column; overflow:hidden; animation:mobUp .28s cubic-bezier(.2,.8,.2,1); }
+.ios-sheet.out { transform:translateY(100%); transition:transform .22s; }
+.ios-grab { width:36px; height:5px; border-radius:3px; background:rgba(128,128,140,.4); margin:6px auto 0; flex:none; }
+.ios-sh { display:grid; grid-template-columns:1fr auto 1fr; align-items:center; padding:8px 16px 10px; flex:none; } .ios-sh b { font-size:17px; font-weight:700; } .ios-sh > :last-child { justify-self:end; } .ios-sh > :first-child { justify-self:start; }
+.ios-done { all:unset; color:var(--ios-tint, #007aff); font-size:17px; font-weight:600; cursor:pointer; } .ios-done.plain { font-weight:400; }
+.ios-sb { flex:1; overflow:auto; padding:0 16px calc(24px + env(safe-area-inset-bottom)); -webkit-overflow-scrolling:touch; }
+.ios-me { display:flex; align-items:center; gap:14px; background:var(--ios-card, #fff); border-radius:12px; padding:12px 14px; margin:6px 0 22px; }
+.ios-me b { display:block; font-size:19px; } .ios-me small { color:var(--ios-lbl2, #888); font-size:13px; }
+.ios-av { width:56px; height:56px; border-radius:50%; display:grid; place-items:center; font-size:20px; font-weight:700; color:#fff; background:linear-gradient(180deg, #a0a0aa, #7a7a85); flex:none; }
+.ios-grp { margin:0 0 24px; } .ios-gh { margin:0 0 6px 16px; font-size:13px; text-transform:uppercase; color:var(--ios-lbl2, #888); letter-spacing:.02em; }
+.ios-list { background:var(--ios-card, #fff); border-radius:12px; overflow:hidden; }
+.ios-row { all:unset; box-sizing:border-box; display:flex; align-items:center; gap:12px; width:100%; min-height:46px; padding:6px 16px; cursor:pointer; position:relative; font-size:17px; color:var(--ink); }
+.ios-row:active { background:rgba(128,128,140,.15); }
+.ios-row + .ios-row::before { content:""; position:absolute; top:0; right:0; left:58px; border-top:.5px solid var(--ios-sep, #ddd); }
+.ios-row:not(:has(.ios-tile)) + .ios-row::before, .ios-row:not(:has(.ios-tile))::before { left:16px; }
+.ios-rl { flex:1; min-width:0; display:flex; flex-direction:column; } .ios-rl small { font-size:12.5px; color:var(--ios-lbl2, #888); }
+.ios-val { color:var(--ios-lbl2, #888); font-size:15px; font-variant-numeric:tabular-nums; white-space:nowrap; }
+.ios-chev { color:rgba(60,60,67,.3); font-size:22px; line-height:1; margin-right:-4px; }
+.ios-badge { font-style:normal; min-width:22px; height:22px; padding:0 7px; border-radius:11px; background:#ff3b30; color:#fff; font-size:13px; font-weight:600; display:grid; place-items:center; }
+.ios-row.danger { color:#ff3b30; justify-content:center; } .ios-row.danger .ios-rl { align-items:center; }
+.ios-row.dim { opacity:.45; }
+.ios-tile { width:30px; height:30px; border-radius:7px; display:grid; place-items:center; flex:none; color:#fff; }
+.ios-tile i { width:19px; height:19px; background:#fff; -webkit-mask-repeat:no-repeat; mask-repeat:no-repeat; -webkit-mask-position:center; mask-position:center; -webkit-mask-size:contain; mask-size:contain; }
+.ios-tile b { font-size:16px; line-height:1; }
+.ios-tile.ios-ph.ph-day { background:linear-gradient(135deg, #4facfe, #00c6fb); } .ios-tile.ios-ph.ph-night { background:linear-gradient(135deg, #141e46, #3a2a78); } .ios-tile.ios-ph.ph-dawn { background:linear-gradient(135deg, #ff9a8b, #ffc36b); } .ios-tile.ios-ph.ph-dusk { background:linear-gradient(135deg, #f857a6, #ff8a4c); }
+.ios-note { font-size:13px; color:var(--ios-lbl2, #888); margin:4px 16px 18px; line-height:1.4; }
+.ios-plain { all:unset; display:block; text-align:center; color:var(--ios-tint, #007aff); font-size:17px; padding:10px; cursor:pointer; width:100%; }
+.ios-foot { text-align:center; color:var(--ios-lbl2, #999); font-size:12px; margin:0; }
+:root[data-theme="dark"] .ios-sheet { --ios-bg:#000; --ios-card:#1c1c1e; --ios-sep:rgba(84,84,88,.6); --ios-lbl2:rgba(235,235,245,.6); }
+/* v3.94.0: phones: employees as an iOS list */
+@media (max-width:700px) {
+  html body.ios #pageEmployees > .card { background:transparent !important; padding:0 !important; }
+  html body.ios #pageEmployees .tools:not(.row2) { display:flex !important; flex-wrap:wrap; align-items:center; gap:8px !important; margin:0 0 10px !important; padding:0 !important; }
+  html body.ios #pageEmployees .tools:not(.row2) > h2 { display:none !important; }
+  html body.ios #pageEmployees .tools:not(.row2) > .count { order:9; flex:1 1 100%; font-size:13px; color:var(--ios-lbl2); margin:2px 4px 0; }
+  html body.ios #pageEmployees .tools:not(.row2) > .spacer { display:none; }
+  html body.ios #pageEmployees .tools .btn, html body.ios #pageEmployees .tools summary, html body.ios #pageEmployees .tools.row2 .btn { min-height:34px !important; height:34px; padding:0 14px !important; font-size:14px !important; border-radius:17px !important; background:var(--ios-card) !important; color:var(--ios-tint) !important; border:0 !important; }
+  html body.ios #pageEmployees #btnAdd { margin-left:auto; background:var(--ios-tint) !important; color:#fff !important; }
+  html body.ios #pageEmployees .tools.row2 { display:flex !important; flex-wrap:wrap !important; gap:8px !important; margin:0 0 12px !important; padding:0 !important; }
+  html body.ios #pageEmployees #tq { flex:1 1 100% !important; order:-1; height:38px !important; min-height:38px !important; border-radius:10px !important; border:0 !important; background:rgba(118,118,128,.12) url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%238e8e93' stroke-width='2.4' stroke-linecap='round'%3E%3Ccircle cx='11' cy='11' r='7'/%3E%3Cpath d='M20 20l-3.5-3.5'/%3E%3C/svg%3E") 10px center/18px no-repeat !important; padding-left:36px !important; font-size:17px !important; box-shadow:none !important; }
+  html body.ios #pageEmployees #sortBy { flex:1 1 auto; height:34px !important; min-height:34px !important; font-size:14px !important; border-radius:17px !important; border:0 !important; background-color:var(--ios-card) !important; padding:0 30px 0 14px !important; }
+  html body.ios #pageEmployees #tchips:empty { display:none; }
+  /* the list */
+  html body.ios #pageEmployees .tablewrap { border:0 !important; border-radius:12px !important; overflow:hidden !important; background:var(--ios-card) !important; box-shadow:none !important; }
+  html body.ios #tbl, html body.ios #tbl tbody { display:block !important; width:100% !important; }
+  html body.ios #tbl thead { display:none !important; }
+  html body.ios #tbl tbody tr[data-ios] { display:grid !important; grid-template-columns:44px minmax(0,1fr) auto 12px; grid-template-rows:auto; align-items:center; column-gap:12px; padding:10px 14px 10px 16px !important; margin:0 !important;
+    border:0 !important; border-radius:0 !important; box-shadow:none !important; background:var(--ios-card) !important; position:relative; cursor:pointer; min-height:62px; }
+  html body.ios #tbl tbody tr[data-ios] + tr[data-ios]::after { content:""; position:absolute; top:0; left:72px; right:0; border-top:.5px solid var(--ios-sep); }
+  html body.ios #tbl tbody tr[data-ios]:active { background:rgba(128,128,140,.14) !important; }
+  html body.ios #tbl tbody tr[data-ios]::before { content:attr(data-ini); grid-column:1; grid-row:1; width:44px; height:44px; border-radius:50%; display:grid; place-items:center; font-size:16px; font-weight:700; color:#fff;
+    background:linear-gradient(180deg, color-mix(in srgb, var(--st, #8e8e93) 75%, #fff), var(--st, #8e8e93)); }
+  html body.ios #tbl tbody tr[data-ios] > td { display:none !important; padding:0 !important; border:0 !important; background:transparent !important; box-shadow:none !important; position:static !important; }
+  html body.ios #tbl tbody tr[data-ios] > td.td-name { display:block !important; grid-column:2; grid-row:1; font-size:17px !important; font-weight:600 !important; line-height:1.25; white-space:nowrap; overflow:hidden; text-overflow:ellipsis; color:var(--ink); }
+  html body.ios #tbl tbody tr[data-ios] > td.td-name::after { content:attr(data-sub); display:block; font-size:14px; font-weight:400; color:var(--ios-lbl2); margin-top:2px; white-space:nowrap; overflow:hidden; text-overflow:ellipsis; }
+  html body.ios #tbl tbody tr[data-ios] > td.td-name::before { display:none !important; }
+  html body.ios #tbl tbody tr[data-ios] > td[data-label="Status"] { display:block !important; grid-column:3; grid-row:1; }
+  html body.ios #tbl tbody tr[data-ios] > td[data-label="Status"]::before, html body.ios #tbl tbody tr[data-ios] .cellcopy { display:none !important; }
+  html body.ios #tbl tbody tr[data-ios] > td[data-label="Status"] .pill { font-size:12px !important; padding:3px 9px !important; border-radius:999px !important; background:color-mix(in srgb, var(--st, #8e8e93) 14%, transparent) !important; color:var(--ink) !important; border:0 !important; }
+  html body.ios #tbl tbody tr[data-ios] > td[data-label="Status"] .pill .dot { display:none; }
+  html body.ios #tbl tbody tr[data-ios] > td:last-child { display:block !important; grid-column:4; grid-row:1; font-size:0 !important; width:12px; }
+  html body.ios #tbl tbody tr[data-ios] > td:last-child > * { display:none !important; }
+  html body.ios #tbl tbody tr[data-ios] > td.td-name { white-space:nowrap !important; }
+  html body.ios #pageEmployees > .card { border:0 !important; }
+  html body.ios #pageEmployees .tools.row2 { flex-wrap:nowrap !important; }
+  html body.ios #pageEmployees .tools.row2 { flex-wrap:wrap !important; } html body.ios #pageEmployees #sortBy { flex:1 1 0 !important; min-width:0 !important; width:auto !important; } html body.ios #pageEmployees #sortDir, html body.ios #pageEmployees #btnFilter { flex:0 0 auto !important; }
+  html body.ios #tbl tbody tr[data-ios] > td:last-child::after { content:"›"; font-size:24px; line-height:1; color:rgba(60,60,67,.3); }
+  html body.ios #pageEmployees .pager { display:flex !important; align-items:center; justify-content:space-between; gap:8px; margin:12px 4px 0 !important; font-size:13px; color:var(--ios-lbl2); }
+}
+/* v3.94.0: employee form */
+#overlay .drawer { z-index:1001 !important; } #overlay .scrim { z-index:1000 !important; }
+.emp3-nav { display:none; }
+.drawer.emp3 .emp3-hero { display:flex; align-items:center; gap:14px; padding:16px 18px; margin:0 0 14px; border-radius:16px; background:linear-gradient(135deg, color-mix(in srgb, var(--accent) 10%, var(--surface)), var(--surface)); border:1px solid var(--border); }
+.emp3-av { width:56px; height:56px; border-radius:50%; flex:none; display:grid; place-items:center; font-size:20px; font-weight:800; color:#fff; background:linear-gradient(135deg, #5ac8fa, #007aff); box-shadow:0 6px 16px -6px rgba(0,122,255,.6); }
+.emp3-av.empty { background:rgba(118,118,128,.18); color:var(--muted); box-shadow:none; font-weight:400; }
+.emp3-who { flex:1; min-width:0; display:flex; flex-direction:column; } .emp3-nm { font-size:19px; letter-spacing:-.01em; white-space:nowrap; overflow:hidden; text-overflow:ellipsis; } .emp3-sb { color:var(--muted); font-size:13px; white-space:nowrap; overflow:hidden; text-overflow:ellipsis; }
+.emp3-req { flex:none; font-size:12px; font-weight:700; padding:4px 10px; border-radius:999px; background:rgba(255,149,0,.15); color:#a85d00; } .emp3-req.ok { background:rgba(52,199,89,.15); color:#1f7a3a; }
+.drawer.emp3 .emp3-miss label::after, .drawer.emp3 .emp3-miss .flabel::after { content:" · required"; color:#c77700; font-weight:600; font-size:11px; }
+.drawer.emp3 .emp-sec { border-radius:16px !important; }
+.drawer.emp3 .fgrid input:not([type=checkbox]):not([type=radio]), .drawer.emp3 .fgrid select, .drawer.emp3 .fgrid textarea { min-height:42px; }
+@media (min-width:701px) {
+  .drawer.emp3.is-new { width:min(1000px, calc(100vw - 40px)) !important; }
+  .drawer.emp3 .emp2-foot { position:sticky; bottom:0; z-index:2; }
+  .drawer.emp3 { max-height:calc(100vh - 110px) !important; top:24px !important; }
+  .drawer.emp3 .emp2-head .emp2-av { display:none; }
+}
+@media (max-width:700px) {
+  html body .drawer.emp3 { position:fixed !important; inset:0 !important; width:100% !important; max-width:none !important; height:100% !important; max-height:none !important; border-radius:0 !important; margin:0 !important;
+    background:var(--ios-bg, #f2f2f7) !important; display:flex !important; flex-direction:column !important; }
+  .drawer.emp3 .emp3-nav { display:grid; grid-template-columns:1fr auto 1fr; align-items:center; padding:calc(10px + env(safe-area-inset-top)) 16px 10px; background:var(--ios-bar, rgba(249,249,249,.9)); -webkit-backdrop-filter:blur(20px); backdrop-filter:blur(20px); border-bottom:.5px solid var(--ios-sep, #ddd); flex:none; }
+  .emp3-nav button { all:unset; cursor:pointer; color:var(--ios-tint, #007aff); font-size:17px; } .emp3-nav-r { justify-self:end; font-weight:700; } .emp3-nav-r:disabled { opacity:.4; } .emp3-nav-t { font-size:17px; padding:0 8px; white-space:nowrap; }
+  .drawer.emp3 .emp2-head, .drawer.emp3 .emp2-foot { display:none !important; }
+  .drawer.emp3 > .body { display:block !important; flex:1; overflow:auto; padding:14px 16px calc(30px + env(safe-area-inset-bottom)) !important; background:transparent !important; }
+  .drawer.emp3 .emp3-hero { flex-direction:column; text-align:center; gap:8px; background:transparent; border:0; padding:6px 0 10px; }
+  .drawer.emp3 .emp3-av { width:84px; height:84px; font-size:30px; } .drawer.emp3 .emp3-who { align-items:center; } .drawer.emp3 .emp3-nm { font-size:22px; }
+  .drawer.emp3 .emp-nav { position:sticky; top:-14px; z-index:3; margin:0 -16px 12px !important; padding:8px 16px !important; background:var(--ios-bg, #f2f2f7) !important; display:flex !important; overflow-x:auto; gap:6px; scrollbar-width:none; border:0 !important; }
+  .drawer.emp3 .emp-nav::-webkit-scrollbar { display:none; }
+  .drawer.emp3 .emp-jump { flex:0 0 auto !important; border-radius:999px !important; padding:6px 12px !important; background:var(--ios-card, #fff) !important; border:0 !important; font-size:13px !important; }
+  .drawer.emp3 > .body > * { flex-shrink:0 !important; }
+  .drawer.emp3 .emp-sec { background:var(--ios-card, #fff) !important; border:0 !important; border-radius:12px !important; box-shadow:none !important; margin:0 0 18px !important; padding:0 !important; overflow:hidden; }
+  .drawer.emp3 .emp-sec > summary { padding:12px 16px !important; font-size:13px !important; text-transform:uppercase; color:var(--ios-lbl2, #888) !important; background:var(--ios-bg, #f2f2f7) !important; letter-spacing:.02em; }
+  .drawer.emp3 .emp-sec > summary b { font-weight:600 !important; }
+  .drawer.emp3 .fgrid { display:block !important; padding:0 !important; }
+  .drawer.emp3 .fgrid > * { padding:8px 16px !important; margin:0 !important; position:relative; }
+  .drawer.emp3 .fgrid > * + *::before { content:""; position:absolute; top:0; left:16px; right:0; border-top:.5px solid var(--ios-sep, #ddd); }
+  .drawer.emp3 .fgrid label, .drawer.emp3 .fgrid .flabel { font-size:12px !important; color:var(--ios-lbl2, #888) !important; margin:0 0 2px !important; font-weight:600 !important; }
+  .drawer.emp3 .fgrid input:not([type=checkbox]):not([type=radio]), .drawer.emp3 .fgrid select, .drawer.emp3 .fgrid textarea, html body .drawer.emp3 .fgrid select.input { border:0 !important; background-color:transparent !important; padding:4px 0 !important; min-height:34px !important; font-size:17px !important; box-shadow:none !important; border-radius:0 !important; width:100% !important; }
 }
 </style></head>
 
@@ -11465,7 +11644,7 @@ async function poll() {
 }
 
 /* ============================== filtering ============================== */
-const APP = { title: "Team Dashboard", version: "3.93.1", released: "2026-11-13" };
+const APP = { title: "Team Dashboard", version: "3.94.0", released: "2026-11-14" };
 const BASE_DIMS = { status: "status_column", desig: "designation_column", client: "client_column", mode: "mode_column" };
 const STANDARD_STATUSES = ["Active", "Manager", "OJT", "Bench", "New", "Projected", "Left", "Moved"];
 const TILE_ORDER = ["Active", "Manager", "OJT", "Bench", "New", "Projected"];
@@ -18404,7 +18583,9 @@ setInterval(async () => { if (!online() || !document.hidden) return; try { await
     let L = x + 16, T = y + 12; if (L + r.width > W - 8) L = Math.max(8, x - r.width - 16); if (T + r.height > H - 8) T = Math.max(8, H - r.height - 8);
     tip.style.left = L + 'px'; tip.style.top = T + 'px';
   };
+  const canHover = matchMedia('(hover: hover) and (pointer: fine)');
   document.addEventListener('mouseover', e => {
+    if (!canHover.matches) return;   /* phones use press-and-hold */
     const el = e.target.closest && e.target.closest('[data-tid]');
     if (!el) { if (cur && !(tip && tip.contains(e.target))) hide(); return; }
     if (el === cur) return; clearTimeout(timer); const x = e.clientX, y = e.clientY; timer = setTimeout(() => show(el, x, y), 350);
@@ -18567,50 +18748,94 @@ document.addEventListener('visibilitychange', () => { if (!document.hidden && on
 })();
 </script>
 <script>
-/* v3.90.0: phones: a tidy bottom bar (4 pages + More) and a "More" sheet with every other page, your name, passcode and sign out */
+/* v3.94.0: phones work like an iOS app: a large-title navigation bar that shrinks on scroll, a tab bar with the pages you
+   pin (kept per person in the database), and a "More" screen in iOS list style with every other page, world clocks and your account */
 (() => {
   const mq = matchMedia('(max-width:700px)');
   const nav = document.querySelector('.sidebar nav.tabs'); if (!nav) return;
-  const PREF = ['summary', 'attendance', 'planner', 'actions', 'employees', 'reports', 'backups', 'activities', 'playbook', 'settings'];
-  const more = h('button', { type: 'button', class: 'tab mob-more', 'aria-haspopup': 'dialog', 'data-icon': '⋯', 'data-short': 'More', onclick: () => openSheet() }, 'More', h('span', { class: 'mob-dot', 'aria-hidden': 'true' }));
+  const DEF = ['summary', 'attendance', 'planner', 'employees'];
+  const NAMES = { summary: 'Home', employees: 'People', attendance: 'Attendance', actions: 'Action center', reports: 'Reports', backups: 'Backups', planner: 'Planner', activities: 'Activities', playbook: 'Playbook', settings: 'Settings' };
+  const TINT = { summary: '#007aff', employees: '#34c759', attendance: '#ff9500', actions: '#ff3b30', reports: '#5856d6', backups: '#30b0c7', planner: '#af52de', activities: '#ff2d55', playbook: '#a2845e', settings: '#8e8e93' };
+  const more = h('button', { type: 'button', class: 'tab mob-more', 'aria-haspopup': 'dialog', 'data-short': 'More', onclick: () => openMore() }, 'More', h('span', { class: 'mob-dot', 'aria-hidden': 'true' }));
   nav.append(more);
-  const shown = t => t !== more && !t.hidden && t.style.display !== 'none' && getComputedStyle(t).getPropertyValue('--never') === '' && (t.dataset.view ? (!window.PERM || PERM.canView(t.dataset.view)) : true);
-  let sig = '';
-  const label = t => t.dataset.short || (t.childNodes[0] && t.childNodes[0].textContent || t.textContent).trim();
+  /* pins: from the database (td_my_prefs), else the defaults; nothing is kept in the browser */
+  let pins = null;
+  const rpcp = prefs => (typeof CLOUD !== 'undefined' && CLOUD._rpc && CLOUD.token && CLOUD.token()) ? CLOUD._rpc('td_my_prefs', { p_token: CLOUD.token(), p_prefs: prefs }) : Promise.reject(new Error('offline'));
+  let loaded = false;
+  const loadPins = async () => { if (loaded) return; try { const r = await rpcp(null); loaded = true; if (r && Array.isArray(r.mob_pins) && r.mob_pins.length) { pins = r.mob_pins; layout(); } } catch { } };
+  const savePins = async list => { const old = pins; pins = list; layout(); try { await rpcp({ mob_pins: list }); typeof toast === 'function' && toast('Tab bar saved'); } catch (e) { pins = old; layout(); typeof toast === 'function' && toast('Could not save the tab bar. Run my-prefs.sql in Supabase first.', 'err'); } };
+  const allTabs = () => [...nav.querySelectorAll('.tab[data-view]')];
+  const allowed = () => allTabs().filter(t => !t.hidden && t.style.display !== 'none' && (!window.PERM || !PERM.online() || PERM.canView(t.dataset.view)));
+  const nm = v => NAMES[v] || v;
   function layout() {
-    const tabs = [...nav.querySelectorAll('.tab[data-view]')];
-    if (!mq.matches) { tabs.forEach(t => t.classList.remove('mob-extra')); more.hidden = true; document.body.classList.remove('mob-nav'); return; }
-    document.body.classList.add('mob-nav');
-    const vis = tabs.filter(t => !t.hidden && t.style.display !== 'none' && (!window.PERM || !PERM.online() || PERM.canView(t.dataset.view)));
+    const tabs = allTabs();
+    if (!mq.matches) { tabs.forEach(t => { t.classList.remove('mob-extra'); t.style.order = ''; }); more.hidden = true; document.body.classList.remove('mob-nav', 'ios');
+      const tt = document.querySelector('.top-tabs'), ht = document.querySelector('#pinnedHeader header.top'); if (tt && ht && tt.parentElement !== ht) ht.insertBefore(tt, ht.querySelector('.spacer')); return; }
+    document.body.classList.add('mob-nav', 'ios');
+    const vis = allowed(), have = new Set(vis.map(t => t.dataset.view));
+    const want = (pins && pins.length ? pins : DEF).filter(v => have.has(v)).slice(0, 4);
+    for (const v of DEF) if (want.length < Math.min(4, vis.length) && !want.includes(v) && have.has(v)) want.push(v);
+    for (const t of vis) if (want.length < Math.min(4, vis.length) && !want.includes(t.dataset.view)) want.push(t.dataset.view);
+    const k = new Set(want);
+    tabs.forEach(t => { t.classList.toggle('mob-extra', !k.has(t.dataset.view)); t.style.order = k.has(t.dataset.view) ? String(want.indexOf(t.dataset.view)) : ''; t.dataset.mobName = nm(t.dataset.view); });
+    more.style.order = '9'; more.hidden = vis.length <= 4;
     const cur = typeof state !== 'undefined' ? state.view : '';
-    const order = vis.slice().sort((a, b) => (PREF.indexOf(a.dataset.view) + 1 || 99) - (PREF.indexOf(b.dataset.view) + 1 || 99));
-    let keep = order.length <= 5 ? order : order.slice(0, 4);
-    /* the page you're on is always in the bar */
-    if (order.length > 5 && cur && !keep.some(t => t.dataset.view === cur)) { const c = order.find(t => t.dataset.view === cur); if (c) keep = [...keep.slice(0, 3), c]; }
-    const k = new Set(keep); tabs.forEach(t => t.classList.toggle('mob-extra', !k.has(t)));
-    more.hidden = order.length <= 5;
-    const extras = order.filter(t => !k.has(t)); more.classList.toggle('has-n', extras.some(t => { const n = t.querySelector('.tabn'); return n && !n.hidden && n.textContent.trim(); }));
-    void sig; void label;
+    more.classList.toggle('on', !k.has(cur) && !!cur);
+    more.classList.toggle('has-n', vis.filter(t => !k.has(t.dataset.view)).some(t => { const n = t.querySelector('.tabn'); return n && !n.hidden && n.textContent.trim(); }));
+    /* the large title */
+    let it = document.getElementById('iosTitle'); const ph = document.getElementById('pinnedHeader');
+    if (!it && ph) { it = h('h1', { id: 'iosTitle', class: 'ios-title' }); ph.append(it); }
+    const nt = cur === 'summary' ? 'Overview' : nm(cur); if (it && it.textContent !== nt) it.textContent = nt;
+    const tt = document.querySelector('.top-tabs'), ht = ph && ph.querySelector('header.top'); if (tt && ph && tt.parentElement !== ph) ph.append(tt);
   }
-  function openSheet() {
-    const tabs = [...nav.querySelectorAll('.tab[data-view].mob-extra')].filter(t => !t.hidden && t.style.display !== 'none');
+  const iconOf = t => { try { return getComputedStyle(t, '::before').webkitMaskImage || getComputedStyle(t, '::before').maskImage || ''; } catch { return ''; } };
+  const tile = v => { const t = allTabs().find(x => x.dataset.view === v); const s = h('span', { class: 'ios-tile', style: 'background:' + (TINT[v] || '#8e8e93') }); const i = h('i'); const m = t ? iconOf(t) : ''; if (m && m !== 'none') { i.style.webkitMaskImage = m; i.style.maskImage = m; } s.append(i); return s; };
+  /* full-screen sheet, iOS style */
+  function sheet(title, build, opts = {}) {
+    const veil = h('div', { class: 'ios-veil', onclick: e => { if (e.target === veil) close(); } });
+    const close = () => { pane.classList.add('out'); veil.classList.add('out'); setTimeout(() => veil.remove(), 220); };
+    const right = opts.right ? opts.right(close) : h('button', { type: 'button', class: 'ios-done', onclick: close }, 'Done');
+    const pane = h('div', { class: 'ios-sheet', role: 'dialog', 'aria-label': title }, h('div', { class: 'ios-grab' }), h('div', { class: 'ios-sh' }, opts.left ? opts.left(close) : h('span'), h('b', {}, title), right), h('div', { class: 'ios-sb' }, ...build(close)));
+    veil.append(pane); document.body.append(veil); return close;
+  }
+  const row = (lead, label, opts = {}) => h('button', { type: 'button', class: 'ios-row' + (opts.danger ? ' danger' : '') + (opts.cls ? ' ' + opts.cls : ''), onclick: opts.onclick || null }, lead || null, h('span', { class: 'ios-rl' }, label, opts.sub ? h('small', {}, opts.sub) : null), opts.badge ? h('em', { class: 'ios-badge' }, opts.badge) : null, opts.value ? h('span', { class: 'ios-val' }, opts.value) : null, opts.noChevron ? null : h('span', { class: 'ios-chev', 'aria-hidden': 'true' }, '›'));
+  const group = (head, ...rows) => h('div', { class: 'ios-grp' }, head ? h('p', { class: 'ios-gh' }, head) : null, h('div', { class: 'ios-list' }, ...rows.filter(Boolean)));
+  function openMore() {
     const u = (() => { try { return CLOUD.user() || {}; } catch { return {}; } })();
-    const veil = h('div', { class: 'mob-veil', onclick: e => { if (e.target === veil) close(); } });
-    const close = () => { sheet.classList.add('out'); veil.classList.add('out'); setTimeout(() => veil.remove(), 200); };
-    const item = t => { const n = t.querySelector('.tabn'); return h('button', { type: 'button', class: 'mob-it' + (t.classList.contains('on') ? ' on' : ''), onclick: () => { close(); t.click(); } },
-      h('span', { class: 'mob-ic', 'data-view': t.dataset.view }), h('span', {}, t.dataset.short === 'Fun' ? 'Activities' : label(t) === 'Tasks' ? 'Planner' : label(t)), n && !n.hidden && n.textContent.trim() ? h('em', {}, n.textContent.trim()) : null); };
-    const links = [...document.querySelectorAll('.sidebar .cloud-links button')].map(b => h('button', { type: 'button', class: 'mob-link' + (/sign out/i.test(b.textContent) ? ' out' : ''), onclick: () => { close(); b.click(); } }, b.textContent.trim()));
-    const sheet = h('div', { class: 'mob-sheet', role: 'dialog', 'aria-label': 'More' },
-      h('div', { class: 'mob-grab' }),
-      u.name ? h('div', { class: 'mob-me' }, h('span', { class: 'mob-av' }, String(u.name).split(/\s+/).slice(0, 2).map(x => x[0]).join('').toUpperCase()), h('div', {}, h('b', {}, u.name), h('small', {}, ({ superadmin: 'Super admin', admin: 'Admin' })[u.role] || 'Team member'))) : null,
-      h('div', { class: 'mob-grid' }, ...tabs.map(item)),
-      links.length ? h('div', { class: 'mob-links' }, ...links) : null);
-    veil.append(sheet); document.body.append(veil);
+    const pinned = new Set([...nav.querySelectorAll('.tab[data-view]:not(.mob-extra)')].map(t => t.dataset.view));
+    const rest = allowed().filter(t => !pinned.has(t.dataset.view));
+    const clocks = [...document.querySelectorAll('#tzBar .tzc:not(.tzc-conv)')];
+    const links = [...document.querySelectorAll('.sidebar .cloud-links button')];
+    sheet('More', close => [
+      u.name ? h('div', { class: 'ios-me' }, h('span', { class: 'ios-av' }, String(u.name).split(/\s+/).slice(0, 2).map(x => x[0]).join('').toUpperCase()), h('div', {}, h('b', {}, u.name), h('small', {}, (({ superadmin: 'Super admin', admin: 'Admin' })[u.role] || 'Team member') + (u.loginId ? ' · ' + u.loginId : '')))) : null,
+      rest.length ? group('Pages', ...rest.map(t => { const n = t.querySelector('.tabn'); return row(tile(t.dataset.view), nm(t.dataset.view), { badge: n && !n.hidden && n.textContent.trim() ? n.textContent.trim() : '', onclick: () => { close(); t.click(); } }); })) : null,
+      group(null, row(h('span', { class: 'ios-tile', style: 'background:#007aff' }, h('b', {}, '☆')), 'Edit tab bar', { sub: 'Choose the 4 pages at the bottom', onclick: () => { close(); editPins(); } })),
+      clocks.length ? group('World clocks', ...clocks.map(c => { const z = c.querySelector('.tzc-z b')?.textContent, zn = c.querySelector('.tzc-z small')?.textContent, ic = c.querySelector('.tzc-ic')?.textContent;
+        return row(h('span', { class: 'ios-tile ios-ph ' + ([...c.classList].find(x => x.startsWith('ph-')) || '') }, h('b', {}, ic || '🕐')), zn + ' (' + z + ')', { value: c.querySelector('.tzc-t')?.textContent + ' · ' + (c.querySelector('.tzc-d')?.textContent || ''), noChevron: true, sub: c.classList.contains('work') ? 'Working hours' : '' }); }),
+        row(h('span', { class: 'ios-tile', style: 'background:#1c1c1e' }, h('b', {}, '⇄')), 'Time zone converter', { onclick: () => { close(); setTimeout(() => document.querySelector('#tzBar .tzc-conv')?.click(), 250); } })) : null,
+      links.length ? group('Account', ...links.map(bt => row(null, bt.textContent.trim(), { danger: /sign out/i.test(bt.textContent), noChevron: /sign out/i.test(bt.textContent), onclick: () => { close(); bt.click(); } }))) : null,
+      h('p', { class: 'ios-foot' }, document.title.replace(/^\(\d+\)\s*/, ''))]);
   }
-  layout();
+  function editPins() {
+    const vis = allowed().map(t => t.dataset.view);
+    let list = [...nav.querySelectorAll('.tab[data-view]:not(.mob-extra)')].sort((a, b) => +a.style.order - +b.style.order).map(t => t.dataset.view);
+    const body = h('div');
+    const paint = () => body.replaceChildren(
+      h('p', { class: 'ios-note' }, 'Pick up to 4 pages for the tab bar. Tap in the order you want them. Everything else stays in More. This follows you to any phone you sign in on.'),
+      group('In the tab bar', ...list.map((v, i) => row(tile(v), nm(v), { value: String(i + 1), noChevron: true, onclick: () => { list = list.filter(x => x !== v); paint(); } }))),
+      group('Other pages', ...vis.filter(v => !list.includes(v)).map(v => row(tile(v), nm(v), { noChevron: true, cls: list.length >= 4 ? 'dim' : '', value: list.length >= 4 ? '' : '＋', onclick: () => { if (list.length >= 4) { toast('Four pages at most: remove one first.'); return; } list.push(v); paint(); } }))),
+      h('button', { type: 'button', class: 'ios-plain', onclick: () => { list = DEF.filter(v => vis.includes(v)); paint(); } }, 'Reset to the defaults'));
+    paint();
+    sheet('Edit tab bar', () => [body], { left: close => h('button', { type: 'button', class: 'ios-done plain', onclick: close }, 'Cancel'), right: close => h('button', { type: 'button', class: 'ios-done', onclick: () => { if (!list.length) { toast('Pick at least one page.'); return; } savePins(list.slice(0, 4)); close(); toast('Tab bar saved.'); } }, 'Save') });
+  }
+  /* the large title collapses into the bar as you scroll, like iOS */
+  const onScroll = () => { if (!document.body.classList.contains('ios')) return; document.body.classList.toggle('ios-scrolled', (window.scrollY || document.documentElement.scrollTop) > 44); };
+  addEventListener('scroll', onScroll, { passive: true });
+  layout(); onScroll();
   mq.addEventListener ? mq.addEventListener('change', layout) : mq.addListener(layout);
-  setInterval(layout, 1000);
-  document.addEventListener('click', e => { if (e.target.closest && e.target.closest('.sidebar .tab[data-view]')) setTimeout(layout, 50); });
+  setInterval(() => { layout(); if (!loaded && document.body.classList.contains('ios')) loadPins(); }, 1000);
+  document.addEventListener('click', e => { if (e.target.closest && e.target.closest('.sidebar .tab[data-view]')) { setTimeout(layout, 50); setTimeout(() => scrollTo({ top: 0 }), 0); } });
+  window.TDMOB = { openMore, editPins };
 })();
 </script>
 <script>
@@ -18713,6 +18938,70 @@ document.addEventListener('visibilitychange', () => { if (!document.hidden && on
     g.querySelector('.tg1').textContent = hello; g.querySelector('.tg2').textContent = sub;
   };
   draw(); setInterval(draw, 1000);
+})();
+</script>
+<script>
+/* v3.94.0: phones: the employee table becomes an iOS contacts-style list (avatar, name, designation · client, status) */
+(() => {
+  const deco = () => {
+    if (!document.body.classList.contains('ios')) return;
+    document.querySelectorAll('#tbl tbody tr:not([data-ios])').forEach(tr => {
+      const name = tr.querySelector('.td-name'); if (!name) return;
+      const v = l => { const td = tr.querySelector('td[data-label="' + l + '"]'); return td ? (td.getAttribute('title') || td.textContent || '').trim() : ''; };
+      const sub = [v('Designation'), v('Client'), v('Sub Client/Type')].filter(Boolean).join(' · ') || v('Emp ID') || v('Emp Code');
+      const nm = name.textContent.trim().replace(/\s+\d+$/, '');
+      tr.dataset.ini = nm.split(/\s+/).slice(0, 2).map(x => x[0] || '').join('').toUpperCase();
+      name.dataset.sub = sub;
+      const dot = tr.querySelector('td[data-label="Status"] .dot'); if (dot) tr.style.setProperty('--st', dot.style.background || '#8e8e93');
+      tr.dataset.ios = '1';
+    });
+  };
+  new MutationObserver(deco).observe(document.body, { childList: true, subtree: true });
+  setInterval(deco, 1500);
+})();
+</script>
+<script>
+/* v3.94.0: the employee form: a live card at the top (initials, name, Emp ID, job), a clear "required left" count,
+   and on phones an iOS sheet with Cancel / Add in the navigation bar */
+(() => {
+  const lab = w => (w.querySelector('label, .flabel') || {}).textContent || '';
+  const fieldBy = (d, re) => [...d.querySelectorAll('.fgrid > *')].find(w => re.test(lab(w).replace(/\s*\*\s*$/, '').trim()));
+  const valOf = w => { if (!w) return ''; const el = w.querySelector('input:not([type=hidden]), select, textarea'); if (!el) return ''; return el.tagName === 'SELECT' ? (el.value ? el.options[el.selectedIndex].text : '') : el.value; };
+  function enhance(d) {
+    if (d.dataset.emp3) return; d.dataset.emp3 = '1';
+    const body = d.querySelector('.body'), head = d.querySelector('.emp2-head'), foot = d.querySelector('.emp2-foot'); if (!body || !head || !foot) return;
+    const isNew = /add employee/i.test(head.textContent);
+    d.classList.add('emp3'); if (isNew) d.classList.add('is-new');
+    const av = h('span', { class: 'emp3-av' }), nm = h('b', { class: 'emp3-nm' }), sb = h('small', { class: 'emp3-sb' }), req = h('span', { class: 'emp3-req' });
+    const hero = h('div', { class: 'emp3-hero' }, av, h('div', { class: 'emp3-who' }, nm, sb), req);
+    body.prepend(hero);
+    const saveBtn = foot.querySelector('.btn.primary'), cancelBtn = [...foot.querySelectorAll('.btn')].find(b => /cancel|close/i.test(b.textContent));
+    /* phone navigation bar */
+    const navL = h('button', { type: 'button', class: 'emp3-nav-l', onclick: () => (cancelBtn || head.querySelector('.emp2-x'))?.click() }, 'Cancel');
+    const navR = h('button', { type: 'button', class: 'emp3-nav-r', onclick: () => saveBtn?.click() }, isNew ? 'Add' : 'Save');
+    const navT = h('b', { class: 'emp3-nav-t' }, isNew ? 'New Employee' : 'Employee');
+    d.prepend(h('div', { class: 'emp3-nav' }, navL, navT, navR));
+    const paint = () => {
+      const name = valOf(fieldBy(d, /^(name|employee name|full name)$/i)) || '', id = valOf(fieldBy(d, /^(emp ?id|emp ?code|employee ?(id|code))$/i)) || '';
+      const job = [valOf(fieldBy(d, /^designation$/i)), valOf(fieldBy(d, /^client$/i))].filter(x => x && x !== '—').join(' · ');
+      av.textContent = name.trim() ? name.trim().split(/\s+/).slice(0, 2).map(x => x[0]).join('').toUpperCase() : '＋';
+      av.classList.toggle('empty', !name.trim());
+      nm.textContent = name.trim() || (isNew ? 'New employee' : '—');
+      sb.textContent = [id ? 'ID ' + id : (isNew ? 'Emp ID not set' : ''), job].filter(Boolean).join(' · ');
+      const reqs = [...d.querySelectorAll('.fgrid > *')].filter(w => /\*\s*$/.test(lab(w).trim()) || w.querySelector('[required]'));
+      const left = reqs.filter(w => !String(valOf(w) || '').trim() || valOf(w) === '—');
+      req.textContent = left.length ? left.length + ' required left' : '✓ Ready';
+      req.classList.toggle('ok', !left.length);
+      reqs.forEach(w => w.classList.toggle('emp3-miss', left.includes(w)));
+      navR.disabled = !!(saveBtn && saveBtn.disabled);
+      if (saveBtn) navR.textContent = /saving/i.test(saveBtn.textContent) ? 'Saving…' : (isNew ? 'Add' : 'Save');
+    };
+    d.querySelectorAll('.fgrid > *').forEach(w => { const el = w.querySelector('input:not([type=hidden]):not([type=checkbox]):not([type=radio]):not([type=date]), textarea'); if (el && !el.placeholder) el.placeholder = lab(w).replace(/\s*\*\s*$/, '').trim(); });
+    d.addEventListener('input', paint); d.addEventListener('change', paint);
+    new MutationObserver(paint).observe(foot, { subtree: true, childList: true, characterData: true, attributes: true });
+    paint();
+  }
+  new MutationObserver(() => { const d = document.querySelector('#overlay .drawer.emp2:not([data-emp3])'); if (d) enhance(d); }).observe(document.body, { childList: true, subtree: true });
 })();
 </script>
 </body>
