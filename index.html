@@ -15,7 +15,7 @@
 <meta name="apple-mobile-web-app-title" content="Blasters Deck">
 <meta name="application-name" content="Blasters Deck">
 <meta name="apple-mobile-web-app-status-bar-style" content="default">
-<title>Blasters Deck · 3.96.2</title>
+<title>Blasters Deck · 3.96.3</title>
 <link rel="preconnect" href="https://fonts.googleapis.com"><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin><link href="https://fonts.googleapis.com/css2?family=Public+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet">
 <style>
 :root {
@@ -11690,7 +11690,7 @@ async function poll() {
 }
 
 /* ============================== filtering ============================== */
-const APP = { title: "Blasters Deck", version: "3.96.2", released: "2026-11-15" };
+const APP = { title: "Blasters Deck", version: "3.96.3", released: "2026-11-15" };
 const BASE_DIMS = { status: "status_column", desig: "designation_column", client: "client_column", mode: "mode_column" };
 const STANDARD_STATUSES = ["Active", "Manager", "OJT", "Bench", "New", "Projected", "Left", "Moved"];
 const TILE_ORDER = ["Active", "Manager", "OJT", "Bench", "New", "Projected"];
@@ -19550,12 +19550,17 @@ window.bdPushCheck = async function () {
       srv.push(h('li', { class: 'pc-l info' }, h('span', { class: 'pc-i' }, 'ⓘ'), h('div', {}, h('b', {}, S.devices + ' device' + (S.devices === 1 ? '' : 's') + ' of ' + S.people + ' ' + (S.people === 1 ? 'person' : 'people') + ' registered'), h('small', {}, S.sent_24h + ' sent in the last 24 h · ' + S.waiting + ' waiting · ' + S.failed + ' failed' + (S.last_sent ? ' · last sent ' + new Date(S.last_sent).toLocaleString() : '')))));
     }
     const again = h('button', { class: 'btn', type: 'button', onclick: async () => { again.disabled = true; again.textContent = 'Registering…'; if (perm !== 'granted') { try { await Notification.requestPermission(); } catch { } } const e = await TDN.again(); toast(e ? 'Could not register: ' + e : 'This device is registered.', !!e); run(); } }, 'Register this device');
-    const test = h('button', { class: 'btn primary', type: 'button', onclick: async () => { test.disabled = true; test.textContent = 'Sending…';
-      try { const r = await CLOUD._rpc('td_push_test', { p_token: CLOUD.token() }); if (!r.ok) { toast('This account has no registered device yet. Tap “Register this device” first.', true); test.disabled = false; test.textContent = 'Send me a test'; return; }
-        toast('Test sent to ' + r.devices + ' device' + (r.devices === 1 ? '' : 's') + '. Close the app now: it should arrive within a minute.'); setTimeout(run, 8000); }
-      catch (e) { toast(/TOO_SOON/.test(e.message) ? 'Wait a minute between tests.' : e.message, true); test.disabled = false; test.textContent = 'Send me a test'; } } }, 'Send me a test');
+    const sendTest = (delay, b, label) => async () => { b.disabled = true; b.textContent = 'Sending…';
+      try { const r = await CLOUD._rpc('td_push_test', { p_token: CLOUD.token(), p_delay: delay }); if (!r.ok) { toast('This account has no registered device yet. Tap “Register this device” first.', true); b.disabled = false; b.textContent = label; return; }
+        if (delay) { b.textContent = 'Close the app now ✓'; toast('Now close Blasters Deck completely (swipe it away). The test arrives in about 1 minute.'); }
+        else { toast('Test sent. It should arrive within a few seconds.'); setTimeout(() => { b.disabled = false; b.textContent = label; }, 31000); }
+        setTimeout(run, 70000); }
+      catch (e) { toast(/TOO_SOON/.test(e.message) ? 'Wait 30 seconds between tests.' : e.message, true); b.disabled = false; b.textContent = label; } };
+    const now = h('button', { class: 'btn', type: 'button' }, 'Send a test now');
+    const test = h('button', { class: 'btn primary', type: 'button' }, 'Send in 1 minute, then close the app');
+    now.addEventListener('click', sendTest(0, now, 'Send a test now')); test.addEventListener('click', sendTest(60, test, 'Send in 1 minute, then close the app'));
     body.replaceChildren(h('h4', { class: 'pc-h' }, 'This device'), h('ul', { class: 'pc-list' }, ...L), srv.length ? h('h4', { class: 'pc-h' }, 'Server (only you see this)') : null, srv.length ? h('ul', { class: 'pc-list' }, ...srv) : null,
-      h('div', { class: 'pc-acts' }, again, test), h('p', { class: 'set-hint pc-note' }, 'After “Send me a test”, close the app completely (swipe it away). The test should still arrive.'));
+      h('div', { class: 'pc-acts' }, again, now, test), h('p', { class: 'set-hint pc-note' }, 'To check closed-app notifications: tap “Send in 1 minute”, then close Blasters Deck completely (swipe it away from recent apps). The test should arrive about a minute later. Every morning at 9:30 you also get a reminder of tasks due today or overdue.'));
   }
   run();
 };
