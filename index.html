@@ -15,7 +15,7 @@
 <meta name="apple-mobile-web-app-title" content="Blasters Deck">
 <meta name="application-name" content="Blasters Deck">
 <meta name="apple-mobile-web-app-status-bar-style" content="default">
-<title>Blasters Deck · 3.95.1</title>
+<title>Blasters Deck · 3.96.0</title>
 <link rel="preconnect" href="https://fonts.googleapis.com"><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin><link href="https://fonts.googleapis.com/css2?family=Public+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet">
 <style>
 :root {
@@ -3564,6 +3564,41 @@ body.ng-locked { overflow:hidden !important; }
 .ng-hint { display:block; color:var(--muted, #6b7280); font-size:12px; margin:-6px 0 14px; }
 .ng-go { width:100%; justify-content:center; padding:12px !important; font-size:15px !important; border-radius:14px !important; }
 .ng-out { display:block; margin:14px auto 0; font-size:13px; }
+/* v3.96.0: search */
+#gsBtn { display:none; } body.ios #gsBtn { display:inline-flex; }
+.gs-veil { position:fixed; inset:0; z-index:1004; background:rgba(15,18,32,.35); display:flex; justify-content:center; align-items:flex-start; padding:8vh 16px 16px; }
+.gs { width:min(640px, 100%); max-height:80vh; display:flex; flex-direction:column; background:var(--ios-bg, var(--surface-2, #f2f2f7)); color:var(--ink); border-radius:18px; box-shadow:0 30px 70px -20px rgba(0,0,0,.45); overflow:hidden; }
+body.ios .gs-veil { padding:0; background:var(--ios-bg,#f2f2f7); } body.ios .gs { width:100%; max-height:none; height:100%; border-radius:0; box-shadow:none; padding-top:env(safe-area-inset-top); }
+.gs-top { display:flex; gap:10px; align-items:center; padding:12px 14px 8px; }
+.gs-box { flex:1; display:flex; align-items:center; gap:6px; background:rgba(118,118,128,.14); border-radius:11px; padding:0 10px; color:var(--muted,#8e8e93); }
+.gs-in { flex:1; border:0 !important; background:transparent !important; box-shadow:none !important; outline:none; font-size:17px; padding:9px 0; color:var(--ink); min-width:0; }
+.gs-cancel { all:unset; cursor:pointer; color:var(--ios-tint, #007aff); font-size:16px; }
+.gs-seg { display:flex; gap:6px; padding:0 14px 8px; overflow-x:auto; scrollbar-width:none; } .gs-seg::-webkit-scrollbar { display:none; }
+.gs-chip { flex:none; border:0; border-radius:99px; padding:6px 12px; font:500 13px system-ui, sans-serif; background:var(--ios-card, var(--surface,#fff)); color:var(--ink); cursor:pointer; } .gs-chip.on { background:var(--ink); color:var(--surface, #fff); }
+.gs-list { flex:1; overflow:auto; padding:0 14px calc(18px + env(safe-area-inset-bottom)); }
+.gs-list h6 { font:600 12px system-ui, sans-serif; color:var(--ios-lbl2, var(--muted,#8e8e93)); text-transform:uppercase; letter-spacing:.02em; margin:10px 0 6px 14px; }
+.gs-card { background:var(--ios-card, var(--surface,#fff)); border-radius:12px; overflow:hidden; }
+.gs-row { all:unset; box-sizing:border-box; cursor:pointer; display:flex; gap:11px; align-items:center; width:100%; padding:9px 12px; position:relative; }
+.gs-row + .gs-row::before { content:""; position:absolute; top:0; left:56px; right:0; border-top:.5px solid var(--ios-sep, #d1d1d6); }
+.gs-row:hover, .gs-row:focus-visible { background:rgba(118,118,128,.08); }
+.gs-av { width:34px; height:34px; flex:none; border-radius:50%; display:grid; place-items:center; color:#fff; font:700 12px system-ui, sans-serif; background:linear-gradient(135deg,#5ac8fa,#007aff); }
+.gs-ic { width:34px; height:34px; flex:none; border-radius:9px; display:grid; place-items:center; font-size:15px; color:#1d4ed8; }
+.gs-t { flex:1; min-width:0; } .gs-t b { display:block; font-size:15px; font-weight:600; white-space:nowrap; overflow:hidden; text-overflow:ellipsis; } .gs-t small { display:block; color:var(--ios-lbl2, var(--muted,#8e8e93)); font-size:12.5px; white-space:nowrap; overflow:hidden; text-overflow:ellipsis; }
+.gs-t mark { background:rgba(255,214,10,.45); color:inherit; border-radius:3px; padding:0 1px; }
+.gs-more { all:unset; cursor:pointer; display:block; padding:9px 14px; color:var(--ios-tint,#007aff); font-size:14px; border-top:.5px solid var(--ios-sep, #d1d1d6); }
+.gs-hint { text-align:center; color:var(--ios-lbl2, var(--muted,#8e8e93)); margin:28px 0; font-size:14px; }
+/* v3.96.0: what's new */
+.wn-veil { position:fixed; inset:0; z-index:1005; background:rgba(0,0,0,0); display:flex; align-items:center; justify-content:center; padding:16px; transition:background .25s; }
+.wn-veil.in { background:rgba(0,0,0,.38); }
+.wn { width:min(460px, 100%); max-height:86vh; overflow:auto; background:var(--surface,#fff); color:var(--ink); border-radius:22px; padding:22px 22px 18px; box-shadow:0 30px 70px -20px rgba(0,0,0,.45); transform:translateY(18px) scale(.98); opacity:0; transition:transform .28s cubic-bezier(.2,.8,.2,1), opacity .2s; }
+.wn-veil.in .wn { transform:none; opacity:1; }
+body.ios .wn-veil { align-items:flex-end; padding:0; } body.ios .wn { width:100%; border-radius:22px 22px 0 0; padding-bottom:calc(20px + env(safe-area-inset-bottom)); transform:translateY(100%); } body.ios .wn-veil.in .wn { transform:none; }
+.wn-tag { display:inline-block; font:700 11px system-ui, sans-serif; letter-spacing:.04em; color:#0f9f6e; background:rgba(16,185,129,.13); padding:4px 10px; border-radius:99px; }
+.wn h2 { font-size:24px; margin:10px 0 2px; letter-spacing:-.01em; } .wn-sub { color:var(--muted,#8e8e93); font-size:13.5px; margin:0 0 14px; }
+.wn-list h6 { font:600 11.5px system-ui, sans-serif; color:var(--muted,#8e8e93); text-transform:uppercase; letter-spacing:.03em; margin:14px 0 8px; }
+.wn-it { display:flex; gap:12px; margin:0 0 12px; } .wn-it i { font-style:normal; width:34px; height:34px; flex:none; border-radius:10px; display:grid; place-items:center; background:var(--surface-2,#f2f2f7); font-size:17px; }
+.wn-it b { display:block; font-size:15px; } .wn-it span { display:block; font-size:13px; color:var(--ink-2,#555); line-height:1.4; margin-top:1px; }
+.wn-ok { width:100%; justify-content:center; padding:12px !important; border-radius:14px !important; font-size:15px !important; margin-top:6px; }
 </style></head>
 
 
@@ -3604,6 +3639,7 @@ body.ng-locked { overflow:hidden !important; }
       <button class="btn ghost" id="btnLogout" title="Connect your two workbooks">Linked files</button>
       <button class="btn ghost autosync" id="btnAutoSync" hidden></button>
       <button class="btn ghost" id="btnSaveNow" hidden></button>
+      <button class="btn ghost bell" id="gsBtn" type="button" aria-label="Search" title="Search people, tasks and activities (Ctrl + K)"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" aria-hidden="true"><circle cx="11" cy="11" r="7"/><path d="m20 20-3.5-3.5"/></svg></button>
       <button class="btn ghost bell" id="btnRefresh" type="button" aria-label="Refresh" title="Get the latest changes, requests and notifications now" hidden><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M21 12a9 9 0 1 1-2.64-6.36"/><path d="M21 3v6h-6"/></svg></button>
       <button class="btn ghost bell" id="btnBell" type="button" aria-label="Activity" title="Activity: every change, newest first" hidden><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M6 8a6 6 0 0 1 12 0c0 7 3 9 3 9H3s3-2 3-9"/><path d="M10.3 21a1.94 1.94 0 0 0 3.4 0"/></svg><span class="bell-n" id="bellN" hidden></span></button>
     </header>
@@ -5783,7 +5819,7 @@ const CLOUD = (() => {
     request: (team, hours, reason) => rpc('td_access_request', { p_token: tok(), p_team: team, p_hours: hours, p_reason: reason }),
     decide: (id, action, hours) => rpc('td_access_decide', { p_token: tok(), p_id: id, p_action: action, p_hours: hours ?? null })
   };
-  return { phoneKey, contactKeys, fieldKeys, details, teams, atRest: () => dataKeyState, SUPABASE_CONFIG, saveDashboard, changeMyPasscode, passChanged, card, resume, mode, decorate, signOut, useLocalFiles, openAdmin, configured, isAdmin, refreshMe, user, getSettings, setSetting, setShared, saveLeaveRequest, admin, _rpc: rpc, token: () => (session && session.token) || null };
+  return { cfg: () => { const c = cfg(); return { url: c.url, anonKey: c.anonKey }; }, phoneKey, contactKeys, fieldKeys, details, teams, atRest: () => dataKeyState, SUPABASE_CONFIG, saveDashboard, changeMyPasscode, passChanged, card, resume, mode, decorate, signOut, useLocalFiles, openAdmin, configured, isAdmin, refreshMe, user, getSettings, setSetting, setShared, saveLeaveRequest, admin, _rpc: rpc, token: () => (session && session.token) || null };
 })();
 
 /* =====================================================================
@@ -5809,7 +5845,7 @@ const PERM_GROUPS = [
   { name: 'ⓘ Leave card', items: [['att.info', 'See the ⓘ button next to names (Request Center, Applications ahead, attendance card) with anyone’s past and upcoming leave and late comings']] },
   { name: 'Notifications', items: [['notifications.view', 'Open notifications and receive request updates'], ['activity.view', 'See the activity log for all users']] },
   { name: 'Filters', items: [['filters.custom', 'Change the filters (search, status, client…)']] },
-  { name: 'Settings', items: [['set.fields', 'Choose the mandatory fields'], ['set.workbook', 'Backups, sign-in history and replacing the workbook'], ['workbook.download', 'Download a copy of the workbook'], ['tools.distance', 'Use the distance tool']] },
+  { name: 'Settings', items: [['set.fields', 'Choose the mandatory fields'], ['set.workbook', 'See the sign-in history'], ['tools.distance', 'Use the distance tool']] },
 ];
 const PERM_VERSION = 16;
 const LOG_CODES = ['AL', 'CL', 'SL', 'UL', 'AB', 'HD1', 'HD2', 'LA', 'R', 'L', 'C'];
@@ -11620,7 +11656,7 @@ async function poll() {
 }
 
 /* ============================== filtering ============================== */
-const APP = { title: "Blasters Deck", version: "3.95.1", released: "2026-11-15" };
+const APP = { title: "Blasters Deck", version: "3.96.0", released: "2026-11-15" };
 const BASE_DIMS = { status: "status_column", desig: "designation_column", client: "client_column", mode: "mode_column" };
 const STANDARD_STATUSES = ["Active", "Manager", "OJT", "Bench", "New", "Projected", "Left", "Moved"];
 const TILE_ORDER = ["Active", "Manager", "OJT", "Bench", "New", "Projected"];
@@ -15413,7 +15449,8 @@ function drawNotifications() {
     groups.length ? h('div', { class: 'nf-groups' }, ...groups.map(G => h('section', {}, h('h4', { class: 'nf-day' }, G.g), h('ul', { class: 'nf-list' }, ...G.items.map(row)))))
       : h('div', { class: 'nf-empty' }, h('span', { 'aria-hidden': 'true' }, '🔔'), h('b', {}, nfFilter === 'unread' ? 'You’re all caught up' : 'No notifications'), h('small', {}, 'New tasks, requests and playbook updates show up here.')),
     list.length > nfShow ? h('button', { class: 'btn nf-more', type: 'button', onclick: () => { nfShow += 40; drawNotifications(); } }, 'Show older') : null,
-    PERM.can('activity.view') ? h('button', { class: 'linkbtn nf-log', type: 'button', onclick: () => openActivity(notificationBody) }, 'Open the full activity log →') : null].filter(Boolean));
+    PERM.can('activity.view') ? h('button', { class: 'linkbtn nf-log', type: 'button', onclick: () => openActivity(notificationBody) }, 'Open the full activity log →') : null,
+    h('button', { class: 'linkbtn nf-log', type: 'button', onclick: () => { closeDrawer(); window.bdWhatsNew && bdWhatsNew(true); } }, '✨ What’s new in ' + APP.version)].filter(Boolean));
   const ma = document.getElementById('nfMarkAll'); if (ma) ma.disabled = !unread;
 }
 async function bellCheck() {
@@ -15711,7 +15748,7 @@ const MODULES = [
   { id: 'people', group: 'Team', name: 'People & access', show: () => PERM.online() && PERM.isOwner(), draw: drawPeople },
   { id: 'signins', group: 'Team', name: 'Sign-in log', show: () => PERM.online() && PERM.can('set.workbook') && !PERM.isOwner(), draw: drawSignins },   /* the super admin finds it in People & access */
   { id: 'fields', group: 'Data', name: 'Fields', show: () => PERM.isSuper() || PERM.can('set.fields'), draw: tabbed('fields', [...[['emp', 'Employee fields'], ['att', 'Attendance fields'], ['priv', '🔒 Private details']].map(([k, n]) => ({ id: k === 'emp' ? 'choices' : k, name: n, show: () => k !== 'priv' || (PERM.isSuper() && PERM.online()), draw: pane => { drawChoices.tab = k; drawChoices.flat = true; return drawChoices(pane); } })), { id: 'mandatory', name: 'Mandatory fields', draw: drawFields }, { id: 'backups', name: 'Leave backups', draw: drawBackupSettings }]) },   /* v3.82.1: Leave backups moved here */
-  { id: 'data', group: 'Data', name: 'Workbook & storage', show: () => PERM.can('set.workbook') || PERM.can('workbook.download') || PERM.isSuper(), draw: drawWbStorage },   /* v3.87.1: one page, no tabs */
+  { id: 'data', group: 'Data', name: 'Workbook & storage', show: () => PERM.isSuper(), draw: drawWbStorage },   /* v3.87.1: one page, no tabs */
   { id: 'prefs', group: 'You', name: 'Preferences', show: () => true, draw: drawPrefsTools },
 ];
 /* old page names still work (links inside the dashboard) */
@@ -16130,7 +16167,7 @@ function buildAccessForm(src, users = [], opts = {}) {
     }).filter((x, i) => PARTS[i].g.name !== 'Save & sync');
     /* v3.78.1: the most asked-for rights as plain switches */
     const QUICK = [['att.log', 'Record attendance (the “+ Record attendance” button on the Overview)'], ['att.approve', 'Approve or reject leave requests'], ['att.direct', 'Record leave without waiting for approval'], ['emp.edit', 'Edit employee details'], ['emp.add', 'Add new employees'], ['emp.delete', 'Delete employees'],
-      ['plan.assign', 'Give tasks to other people'], ['plan.all', 'See everyone’s tasks'], ['pb.edit', 'Write and edit the Playbook'], ['workbook.download', 'Download the workbook']].filter(([k]) => boxes[k]);
+      ['plan.assign', 'Give tasks to other people'], ['plan.all', 'See everyone’s tasks'], ['pb.edit', 'Write and edit the Playbook']].filter(([k]) => boxes[k]);
     const quick = h('div', { class: 'ra-quick' }, ...QUICK.map(([k, t]) => { const sw = h('button', { type: 'button', class: 'rt-sw', role: 'switch', 'aria-label': t });
       const paint = () => sw.setAttribute('aria-checked', String(!!boxes[k].checked)); paintAll.push(paint); paint();
       sw.addEventListener('click', () => { boxes[k].checked = !boxes[k].checked; const grp = PERM.groups.find(g => [...g.items, ...((g.sub && g.sub.items) || [])].some(i => i[0] === k));
@@ -17261,7 +17298,7 @@ async function drawWbStorage(pane) {
   pane.replaceChildren(a, b);
   const jobs = [];
   if (PERM.isOwner()) jobs.push(drawWorkbook(a));   /* v3.95.0: backups are for the super admin only */
-  else if (PERM.can('set.workbook') || PERM.can('workbook.download')) fill(a, h('div', { class: 'set-card' }, h('h4', {}, 'Workbook & backups'), h('p', { class: 'set-hint' }, 'Downloading and restoring backups is for the super admin only.')));
+  else if (PERM.isSuper()) fill(a, h('div', { class: 'set-card' }, h('h4', {}, 'Workbook & backups'), h('p', { class: 'set-hint' }, 'Downloading and restoring backups is for the super admin only.')));
   else a.remove();
   if (PERM.isSuper()) jobs.push(drawStorage(b)); else b.remove();
   await Promise.all(jobs);
@@ -18094,6 +18131,7 @@ function pbPopup() {
 }
 window.TDTASKS = { events: taskEvents, open: tid => { const t = PL.tasks.find(x => String(x.id) === String(tid)); if (t) openTask(t); } };
 window.TDPB = { events: pbEvents };
+window.TDSRC = { tasks: () => PL.tasks || [], tasksLoaded: () => PL.loaded, loadTasks: () => plLoad(true), openTask: t => openTask(t), acts: () => AC.items || [], actsLoaded: () => AC.loaded, loadActs: () => acLoad(true), openAct: a => openActivity(a) };   /* v3.96.0: search */
 /* ================= v3.86.0: rich notes, Outlook-style: formatted text, pictures and attached files =================
    The text is kept as clean HTML. Pictures and files go to their own encrypted table (td_attach) and are fetched only
    when someone opens the note, so the Planner, Activities and Playbook stay quick. */
@@ -18595,7 +18633,7 @@ function remindNow(force) {
   if (!online() || !PL.me) return;
   const list = myPending(), now = Date.now();
   if (firstSeen == null) { firstSeen = new Set(list.map(t => String(t.id))); }
-  else for (const t of list) if (!firstSeen.has(String(t.id))) { firstSeen.add(String(t.id)); notified.set(String(t.id), now); notify('New task: ' + t.title, (t.createdByName ? 'From ' + t.createdByName + ' · ' : '') + dueWord(t) + (t.priority !== 'normal' ? ' · ' + priLabel(t.priority) + ' priority' : ''), 'task-' + t.id, t.id); }
+  else for (const t of list) if (!firstSeen.has(String(t.id))) { firstSeen.add(String(t.id)); notified.set(String(t.id), now); if (window.TDN && TDN.pushOn()) continue; notify('New task: ' + t.title, (t.createdByName ? 'From ' + t.createdByName + ' · ' : '') + dueWord(t) + (t.priority !== 'normal' ? ' · ' + priLabel(t.priority) + ' priority' : ''), 'task-' + t.id, t.id); }
   const hot = list.filter(t => ['over', 'today'].includes(dueState(t)) && now - (notified.get(String(t.id)) || 0) >= 30 * 60000);
   for (const t of hot.slice(0, 3)) { notified.set(String(t.id), now); notify((dueState(t) === 'over' ? '⚠ Overdue: ' : '⏰ Due today: ') + t.title, dueWord(t) + ' · your part: ' + stLabel(myPart(t)) + '. Click to open it.', 'task-' + t.id, t.id); }
   if (list.length && (force || now - lastSummary >= 60 * 60000)) { lastSummary = now; if (!hot.length || force) notify('You have ' + list.length + ' pending task' + (list.length === 1 ? '' : 's'), list.slice(0, 3).map(t => '• ' + t.title + ' (' + dueWord(t).toLowerCase() + ')').join('\n') + (list.length > 3 ? '\n…and ' + (list.length - 3) + ' more' : ''), 'tasks-summary', null); }
@@ -18791,7 +18829,7 @@ document.addEventListener('visibilitychange', () => { if (!document.hidden && on
   /* ---- Filters: one button in the top bar opens the search & filters panel ---- */
   const box = document.querySelector('.workspace-filters');
   const fb = h('button', { type: 'button', class: 'btn tt-filt', 'aria-expanded': 'false', 'aria-haspopup': 'true', title: 'Search & filters', onclick: e => { e.stopPropagation(); toggle(); } },
-    h('span', { class: 'tt-filt-ic', 'aria-hidden': 'true' }, '⌕'), h('span', { class: 'tt-filt-l' }, 'Filters'), h('em', { class: 'tt-filt-n', hidden: true }));
+    (() => { const ic = h('span', { class: 'tt-filt-ic', 'aria-hidden': 'true' }); ic.innerHTML = '<svg viewBox="0 0 24 24" width="1em" height="1em" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linejoin="round"><path d="M4 5h16l-6 7.5V19l-4-2v-4.5z"/></svg>'; return ic; })(), h('span', { class: 'tt-filt-l' }, 'Filters'),   /* v3.96.0: a funnel, so it isn't mistaken for search */ h('em', { class: 'tt-filt-n', hidden: true }));
   header.insertBefore(fb, spacer ? spacer.nextSibling : null);
   const toggle = open => { open = open == null ? !document.body.classList.contains('tt-filt-open') : open; document.body.classList.toggle('tt-filt-open', open); fb.setAttribute('aria-expanded', String(open));
     if (open) { const cf = document.getElementById('cleanFilters'); if (cf) cf.open = true; setTimeout(() => document.getElementById('fq')?.focus({ preventScroll: true }), 50); } };
@@ -18876,7 +18914,8 @@ document.addEventListener('visibilitychange', () => { if (!document.hidden && on
     sheet('More', close => [
       u.name ? h('div', { class: 'ios-me' }, h('span', { class: 'ios-av' }, String(u.name).split(/\s+/).slice(0, 2).map(x => x[0]).join('').toUpperCase()), h('div', {}, h('b', {}, u.name), h('small', {}, (({ superadmin: 'Super admin', admin: 'Admin' })[u.role] || 'Team member') + (u.loginId ? ' · ' + u.loginId : '')))) : null,
       rest.length ? group('Pages', ...rest.map(t => { const n = t.querySelector('.tabn'); return row(tile(t.dataset.view), nm(t.dataset.view), { badge: n && !n.hidden && n.textContent.trim() ? n.textContent.trim() : '', onclick: () => { close(); t.click(); } }); })) : null,
-      group(null, row(h('span', { class: 'ios-tile', style: 'background:#007aff' }, h('b', {}, '☆')), 'Edit tab bar', { sub: 'Choose the 4 pages at the bottom', onclick: () => { close(); editPins(); } })),
+      group(null, row(h('span', { class: 'ios-tile', style: 'background:#007aff' }, h('b', {}, '☆')), 'Edit tab bar', { sub: 'Choose the 4 pages at the bottom', onclick: () => { close(); editPins(); } }),
+        row(h('span', { class: 'ios-tile', style: 'background:#10b981' }, h('b', {}, '✨')), 'What’s new', { sub: 'In version ' + APP.version, onclick: () => { close(); window.bdWhatsNew && bdWhatsNew(true); } })),
       clocks.length ? group('World clocks', ...clocks.map(c => { const z = c.querySelector('.tzc-z b')?.textContent, zn = c.querySelector('.tzc-z small')?.textContent, ic = c.querySelector('.tzc-ic')?.textContent;
         return row(h('span', { class: 'ios-tile ios-ph ' + ([...c.classList].find(x => x.startsWith('ph-')) || '') }, h('b', {}, ic || '🕐')), zn + ' (' + z + ')', { value: c.querySelector('.tzc-t')?.textContent + ' · ' + (c.querySelector('.tzc-d')?.textContent || ''), noChevron: true, sub: c.classList.contains('work') ? 'Working hours' : '' }); }),
         row(h('span', { class: 'ios-tile', style: 'background:#1c1c1e' }, h('b', {}, '⇄')), 'Time zone converter', { onclick: () => { close(); setTimeout(() => document.querySelector('#tzBar .tzc-conv')?.click(), 250); } })) : null,
@@ -19230,7 +19269,7 @@ window.TDN = (() => {
   let reg = null;
   if ('serviceWorker' in navigator && /^https?:$/.test(location.protocol)) {
     navigator.serviceWorker.register('sw.js', { scope: './' }).then(r => { reg = r; }).catch(() => { });
-    navigator.serviceWorker.addEventListener('message', e => { const m = e.data || {}; if (m.type === 'bd-notification-click') { const f = handlers.get(m.tag); try { window.focus(); } catch { } if (f) f(); } });
+    navigator.serviceWorker.addEventListener('message', e => { const m = e.data || {}; if (m.type === 'bd-notification-click') { const f = handlers.get(m.tag); try { window.focus(); } catch { } if (f) f(); else route(m.tag); } });
   }
   async function show(title, body, tag, onClick) {
     if (!on()) return;
@@ -19242,7 +19281,7 @@ window.TDN = (() => {
   /* the bell: anything new since the page opened (tasks have their own reminders) */
   let seen = null;
   function items(list, read, open) {
-    const fresh = (list || []).filter(it => it && it.id && it.type !== 'task' && !(read && read.has(it.id)));
+    const fresh = (list || []).filter(it => it && it.id && it.type !== 'task' && !(pushOn && it.type === 'request') && !(read && read.has(it.id)));   /* v3.96.0: the server sends requests itself */
     if (seen == null) { seen = new Set(fresh.map(it => it.id)); return; }
     const now = fresh.filter(it => !seen.has(it.id)); now.forEach(it => seen.add(it.id));
     for (const it of now.slice(0, 4)) show(String(it.title || 'Blasters Deck'), String(it.detail || ''), 'nf-' + it.id, () => open(it));
@@ -19283,7 +19322,7 @@ window.TDN = (() => {
     if (!signedIn() || document.getElementById('pcDialog')) { if (gateEl && !signedIn()) { gateEl.remove(); gateEl = null; document.body.classList.remove('ng-locked'); } return; }
     const st = state_();
     if (st === 'granted') {
-      if (gateEl) { gateEl.remove(); gateEl = null; document.body.classList.remove('ng-locked'); if (fromTap) { toast('Notifications are on.'); show('Notifications are on ✓', 'New requests, approvals, tasks and reminders will show here.', 'bd-welcome'); try { window.remindNow && remindNow(true); } catch { } } }
+      if (gateEl) { gateEl.remove(); gateEl = null; document.body.classList.remove('ng-locked'); pushSetup(); if (fromTap) { toast('Notifications are on.'); show('Notifications are on ✓', 'New requests, approvals, tasks and reminders will show here.', 'bd-welcome'); try { window.remindNow && remindNow(true); } catch { } } }
       return;
     }
     if (!gateEl || st !== lastSt) draw(st);
@@ -19293,7 +19332,146 @@ window.TDN = (() => {
   const ask = () => check(false);
   /* in the background the bell is checked every 90 seconds so new things still pop up */
   setInterval(() => { if (document.hidden && on() && typeof bellCheck === 'function') bellCheck(); }, 90000);
-  return { show, items, on, ask };
+  /* v3.96.0: notifications when the app is closed. This device is registered with the server (Web Push); the server
+     sends new tasks, comments, leave requests and answers, private-detail requests and passcode resets. */
+  let pushOn = false, pushUser = null, pushEp = null, pushBusy = false;
+  const b64u = t => { const p = '='.repeat((4 - t.length % 4) % 4); return Uint8Array.from(atob((t + p).replace(/-/g, '+').replace(/_/g, '/')), c => c.charCodeAt(0)); };
+  const ub64 = buf => btoa(String.fromCharCode(...new Uint8Array(buf))).replace(/\+/g, '-').replace(/\//g, '_').replace(/=+$/, '');
+  async function pushSetup() {
+    if (pushBusy || !on() || !signedIn() || !('PushManager' in window) || !navigator.serviceWorker) return;
+    const uid = String((CLOUD.user() || {}).id || ''); if (!uid || pushUser === uid) return;
+    pushBusy = true;
+    try {
+      const tk = CLOUD.token();
+      if (window.PERM && PERM.isOwner() && CLOUD.cfg) { const c = CLOUD.cfg(); try { await CLOUD._rpc('td_push_config', { p_token: tk, p_url: c.url, p_key: c.anonKey }); } catch { } }
+      let pub = null; try { pub = await CLOUD._rpc('td_push_public_key', { p_token: tk }); } catch { }
+      if (!pub) return;   /* the server part is not set up yet: try again later */
+      const r = reg || await navigator.serviceWorker.ready;
+      let sub = await r.pushManager.getSubscription();
+      if (sub && sub.options && sub.options.applicationServerKey && ub64(sub.options.applicationServerKey) !== pub) { try { await sub.unsubscribe(); } catch { } sub = null; }
+      if (!sub) sub = await r.pushManager.subscribe({ userVisibleOnly: true, applicationServerKey: b64u(pub) });
+      await CLOUD._rpc('td_push_subscribe', { p_token: tk, p_sub: sub.toJSON(), p_ua: navigator.userAgent.slice(0, 200) });
+      pushUser = uid; pushOn = true; pushEp = sub.endpoint;
+    } catch (e) { console.warn('Notifications with the app closed:', e && e.message); }
+    finally { pushBusy = false; }
+  }
+  setInterval(pushSetup, 15000); setTimeout(pushSetup, 4000);
+  /* signing out: this device stops getting that person's notifications */
+  document.addEventListener('click', e => { if (!e.target.closest || !e.target.closest('#btnLogout, .ng-out')) return; if (pushEp && signedIn()) { try { CLOUD._rpc('td_push_unsubscribe', { p_token: CLOUD.token(), p_endpoint: pushEp }).catch(() => { }); } catch { } } pushOn = false; pushUser = null; }, true);
+  /* opening a notification goes to the right place */
+  function route(tag) {
+    tag = String(tag || ''); const [k, id] = [tag.split(':')[0], tag.slice(tag.indexOf(':') + 1)];
+    try {
+      if (k === 'task' && window.TDTASKS) { setView('planner'); setTimeout(() => TDTASKS.open(id), 500); }
+      else if (k === 'leave') setView('summary');
+      else if (k === 'detail' || k === 'reset') { if (window.openBell) openBell(); }
+      else if (k === 'backup') { if (window.openSettings) openSettings('data'); }
+      else if (window.openBell) openBell();
+    } catch { }
+  }
+  { const q = new URLSearchParams(location.search).get('n'); if (q) { const t = setInterval(() => { if (signedIn() && typeof state !== 'undefined' && state.schema && !document.querySelector('.ng-veil')) { clearInterval(t); try { history.replaceState(null, '', location.pathname); } catch { } route(q); } }, 700); } }
+  return { show, items, on, ask, route, pushOn: () => pushOn, pushSetup };
+})();
+</script>
+<script>
+/* v3.96.0: search people, tasks and activities from one box (the 🔍 at the top on phones; Ctrl + K on a computer) */
+window.bdSearch = (() => {
+  const norm = t => String(t == null ? '' : t).toLowerCase().normalize('NFD').replace(/[̀-ͯ]/g, '');
+  const mark = (text, q) => { text = String(text == null ? '' : text); const i = q ? norm(text).indexOf(q) : -1; if (i < 0) return document.createTextNode(text); return h('span', {}, text.slice(0, i), h('mark', {}, text.slice(i, i + q.length)), text.slice(i + q.length)); };
+  const ini = n => String(n || '?').trim().split(/\s+/).slice(0, 2).map(x => x[0]).join('').toUpperCase();
+  const fmtD = iso => { if (!iso) return ''; const d = new Date(String(iso).slice(0, 10) + 'T00:00:00'); return isNaN(d) ? '' : d.toLocaleDateString(undefined, { day: 'numeric', month: 'short' }); };
+  const ST = { todo: 'To do', doing: 'In progress', blocked: 'Blocked', done: 'Done' };
+  function people(q) {
+    if (typeof state === 'undefined' || !state.rows) return [];
+    const extra = ['designation_column', 'client_column', 'subclient_column'].map(k => state.schema[k]).filter(Boolean);
+    const pc = (state.cols.find(c => /pseudo/i.test(c.name)) || {}).name;
+    const out = [];
+    for (const r of state.rows) {
+      const name = gs(r, 'name_column'), bits = [name, r.id, pc ? S(g(r, pc)) : '', ...extra.map(c => S(g(r, c)))];
+      const hit = bits.find(b => norm(b).includes(q)); if (!hit) continue;
+      out.push({ k: 'p', score: norm(name).startsWith(q) ? 0 : norm(name).includes(q) ? 1 : 2, name, sub: [gs(r, 'designation_column'), gs(r, 'client_column'), r.id].filter(Boolean).join(' · ') + (hit !== name && hit !== r.id && !norm(name).includes(q) ? ' · ' + hit : ''), r });
+    }
+    return out.sort((a, b) => a.score - b.score || a.name.localeCompare(b.name));
+  }
+  function tasks(q) {
+    if (!window.TDSRC) return [];
+    return TDSRC.tasks().filter(t => [t.title, (t.assignees || []).map(a => a.name).join(' '), t.createdByName, typeof plainOf === 'function' ? plainOf(t.details || '', 400) : ''].some(x => norm(x).includes(q)))
+      .map(t => ({ k: 't', score: norm(t.title).includes(q) ? 0 : 1, name: t.title, sub: [t.due ? 'Due ' + fmtD(t.due) : '', ST[t.status] || t.status, 'For ' + (t.assignees || []).map(a => a.name).slice(0, 3).join(', ')].filter(Boolean).join(' · '), t }))
+      .sort((a, b) => a.score - b.score || (a.t.status === 'done') - (b.t.status === 'done'));
+  }
+  function acts(q) {
+    if (!window.TDSRC) return [];
+    return TDSRC.acts().filter(a => [a.title, a.category, (a.people || []).map(p => p.name + ' ' + p.emp).join(' ')].some(x => norm(x).includes(q)))
+      .map(a => { const who = (a.people || []).find(p => norm(p.name).includes(q) || norm(p.emp).includes(q)); return { k: 'a', score: norm(a.title).includes(q) ? 0 : 1, name: a.title, sub: [fmtD(a.day), a.category, who ? who.name + ' took part' : (a.people || []).length + ' took part'].filter(Boolean).join(' · '), a }; })
+      .sort((a, b) => a.score - b.score || String(b.a.day).localeCompare(String(a.a.day)));
+  }
+  let veil = null;
+  function close() { if (!veil) return; veil.remove(); veil = null; document.removeEventListener('keydown', esc, true); }
+  const esc = e => { if (e.key === 'Escape') { e.stopPropagation(); close(); } };
+  function open() {
+    if (veil) return;
+    if (window.TDSRC) { if (!TDSRC.tasksLoaded()) TDSRC.loadTasks()?.then?.(() => draw()); if (!TDSRC.actsLoaded()) TDSRC.loadActs()?.then?.(() => draw()); }
+    let kind = 'all';
+    const inp = h('input', { class: 'gs-in', type: 'search', placeholder: 'Search people, tasks, activities', 'aria-label': 'Search', autocomplete: 'off', enterkeyhint: 'search' });
+    const seg = h('div', { class: 'gs-seg', role: 'tablist' }), list = h('div', { class: 'gs-list' });
+    const go = it => { close(); if (it.k === 'p') { if (window.TDCARD && TDCARD.want()) TDCARD.open(it.r); else { setView('employees'); setTimeout(() => openDrawer(it.r), 150); } } else if (it.k === 't') { setView('planner'); setTimeout(() => TDSRC.openTask(it.t), 300); } else { setView('activities'); setTimeout(() => TDSRC.openAct(it.a), 300); } };
+    const ICON = { p: null, t: ['☑', '#e8f1ff'], a: ['🎉', '#fff1e6'] };
+    function draw() {
+      if (!veil) return;
+      const q = norm(inp.value.trim());
+      if (!q) { seg.replaceChildren(); list.replaceChildren(h('p', { class: 'gs-hint' }, 'Type a name, Emp ID, client, task or activity.')); return; }
+      const R = { p: people(q), t: tasks(q), a: acts(q) }, n = R.p.length + R.t.length + R.a.length;
+      seg.replaceChildren(...[['all', 'All', n], ['p', 'People', R.p.length], ['t', 'Tasks', R.t.length], ['a', 'Activities', R.a.length]].filter(([k, , c]) => k === 'all' || c).map(([k, l, c]) => h('button', { type: 'button', class: 'gs-chip' + (kind === k ? ' on' : ''), onclick: () => { kind = k; draw(); } }, l + (k === 'all' ? '' : ' ' + c))));
+      const grp = (k, title) => { const arr = R[k]; if (!arr.length || (kind !== 'all' && kind !== k)) return null; const lim = kind === 'all' ? 6 : 60;
+        return h('section', {}, h('h6', {}, title), h('div', { class: 'gs-card' }, ...arr.slice(0, lim).map(it => h('button', { type: 'button', class: 'gs-row', onclick: () => go(it) },
+          it.k === 'p' ? h('span', { class: 'gs-av' }, ini(it.name)) : h('span', { class: 'gs-ic', style: 'background:' + ICON[it.k][1] }, ICON[it.k][0]),
+          h('span', { class: 'gs-t' }, h('b', {}, mark(it.name, q)), h('small', {}, mark(it.sub, q))))),
+          arr.length > lim ? h('button', { type: 'button', class: 'gs-more', onclick: () => { kind = k; draw(); } }, 'Show all ' + arr.length) : null)); };
+      list.replaceChildren(...[grp('p', 'People'), grp('t', 'Tasks'), grp('a', 'Activities'), n ? null : h('p', { class: 'gs-hint' }, 'Nothing found for “' + inp.value.trim() + '”.')].filter(Boolean));
+    }
+    inp.addEventListener('input', () => { kind = 'all'; draw(); });
+    inp.addEventListener('keydown', e => { if (e.key === 'Enter') { const b = list.querySelector('.gs-row'); if (b) b.click(); } });
+    veil = h('div', { class: 'gs-veil', onclick: e => { if (e.target === veil) close(); } },
+      h('div', { class: 'gs', role: 'dialog', 'aria-modal': 'true', 'aria-label': 'Search' },
+        h('div', { class: 'gs-top' }, h('label', { class: 'gs-box' }, h('span', { 'aria-hidden': 'true' }, '⌕'), inp), h('button', { type: 'button', class: 'gs-cancel', onclick: close }, 'Cancel')), seg, list));
+    document.body.append(veil); document.addEventListener('keydown', esc, true); draw();
+    setTimeout(() => inp.focus(), 30);
+  }
+  document.addEventListener('click', e => { if (e.target.closest && e.target.closest('#gsBtn')) open(); });
+  document.addEventListener('keydown', e => { if ((e.ctrlKey || e.metaKey) && e.key.toLowerCase() === 'k' && typeof state !== 'undefined' && state.schema && !document.querySelector('.ng-veil')) { e.preventDefault(); open(); } });
+  return { open, close };
+})();
+
+/* v3.96.0: "What's new" once per person after each update (remembered in the database); again from More or the bell */
+window.bdWhatsNew = (() => {
+  const NOTES = [
+    { v: '3.96.0', items: [['🔔', 'Notifications even when the app is closed', 'New tasks, comments, leave requests and their answers reach your phone or computer.'], ['🔍', 'Search everything', 'People, tasks and activities from one box: the 🔍 at the top (Ctrl + K on a computer).'], ['✨', 'What’s new', 'This note after each update. Find it again in More on a phone, or at the bottom of the 🔔 notifications.']] },
+    { v: '3.95.0', items: [['☄️', 'Blasters Deck', 'A new name and logo for Team Blasters, and an icon for your Home Screen.'], ['🔁', 'Repeating tasks', 'Daily, weekdays, weekly or monthly: the next one appears by itself.'], ['💬', 'Comments like a chat', 'In every Planner task.'], ['📇', 'Contact cards on phones', 'Tap a person to call, WhatsApp or copy (when you may see the number).'], ['🌙', 'Dark mode on phones', 'Follows your phone’s own setting.']] }];
+  const cmp = (a, b) => { const x = String(a).split('.').map(Number), y = String(b).split('.').map(Number); for (let i = 0; i < 3; i++) { if ((x[i] || 0) !== (y[i] || 0)) return (x[i] || 0) - (y[i] || 0); } return 0; };
+  const rpc = prefs => CLOUD._rpc('td_my_prefs', { p_token: CLOUD.token(), p_prefs: prefs });
+  const signedIn = () => typeof CLOUD !== 'undefined' && CLOUD.token && CLOUD.token() && !document.getElementById('app')?.hidden && typeof state !== 'undefined' && state.schema;
+  let done = false, busy = false;
+  function show(list, save) {
+    if (document.querySelector('.wn-veil')) return;
+    const close = () => { veil.classList.remove('in'); setTimeout(() => veil.remove(), 250); if (save) rpc({ seen_version: APP.version }).catch(() => { }); };
+    const veil = h('div', { class: 'wn-veil', onclick: e => { if (e.target === veil) close(); } },
+      h('div', { class: 'wn', role: 'dialog', 'aria-modal': 'true', 'aria-label': 'What’s new' },
+        h('span', { class: 'wn-tag' }, 'UPDATED · ' + APP.version), h('h2', {}, 'What’s new'), h('p', { class: 'wn-sub' }, 'Blasters Deck was updated' + (APP.released ? ' on ' + new Date(APP.released + 'T00:00:00').toLocaleDateString(undefined, { day: 'numeric', month: 'long' }) : '')),
+        h('div', { class: 'wn-list' }, ...list.flatMap((n, i) => [list.length > 1 ? h('h6', {}, i === 0 ? 'In ' + n.v : 'Earlier · ' + n.v) : null, ...n.items.map(([ic, t, d]) => h('div', { class: 'wn-it' }, h('i', { 'aria-hidden': 'true' }, ic), h('div', {}, h('b', {}, t), h('span', {}, d))))]).filter(Boolean)),
+        h('button', { type: 'button', class: 'btn primary wn-ok', onclick: close }, 'Got it')));
+    document.body.append(veil); requestAnimationFrame(() => veil.classList.add('in'));
+  }
+  async function check() {
+    if (done || busy || !signedIn() || document.querySelector('.ng-veil, #pcDialog, .pdlg-veil, .drawer, .tdc-veil, .gs-veil')) return;
+    busy = true; let p; try { p = await rpc(null) || {}; } catch { busy = false; return; } busy = false; done = true;
+    const seen = p.seen_version;
+    if (seen && cmp(seen, APP.version) >= 0) return;
+    const list = NOTES.filter(n => cmp(n.v, APP.version) <= 0 && (!seen || cmp(n.v, seen) > 0)).slice(0, seen ? 3 : 1);
+    if (!list.length) { rpc({ seen_version: APP.version }).catch(() => { }); return; }
+    show(list, true);
+  }
+  setInterval(check, 3000);
+  return force => show(NOTES.filter(n => cmp(n.v, APP.version) <= 0).slice(0, 2), false);
 })();
 </script>
 </body>
