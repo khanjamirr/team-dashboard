@@ -15,7 +15,7 @@
 <meta name="apple-mobile-web-app-title" content="Blasters Deck">
 <meta name="application-name" content="Blasters Deck">
 <meta name="apple-mobile-web-app-status-bar-style" content="default">
-<title>Blasters Deck · 3.96.3</title>
+<title>Blasters Deck · 3.96.4</title>
 <link rel="preconnect" href="https://fonts.googleapis.com"><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin><link href="https://fonts.googleapis.com/css2?family=Public+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet">
 <style>
 :root {
@@ -3633,6 +3633,36 @@ html:root:root body.ios.ios #pinnedHeader#pinnedHeader.sticky-top { background:v
 .pc-i { width:22px; height:22px; flex:none; border-radius:50%; display:grid; place-items:center; font-size:12px; font-weight:800; color:#fff; background:#9ca3af; }
 .pc-l.ok .pc-i { background:#34c759; } .pc-l.bad { background:color-mix(in srgb, #ef4444 9%, var(--surface,#fff)); } .pc-l.bad .pc-i { background:#ef4444; } .pc-l.info .pc-i { background:#0a84ff; }
 .pc-acts { display:flex; gap:8px; justify-content:flex-end; flex-wrap:wrap; } .pc-note { margin-top:10px; }
+/* v3.96.4: counts by client and sub client, a clean table */
+html body details.psn-counts { border:1px solid var(--border, #e6e9f0) !important; border-radius:16px !important; background:var(--surface, #fff) !important; overflow:hidden; padding:0 !important; box-shadow:0 1px 2px rgba(20,40,110,.04); }
+html body details.psn-counts > summary { list-style:none; cursor:pointer; display:flex; align-items:center; gap:8px; padding:14px 18px !important; font-size:14.5px; font-weight:700; }
+html body details.psn-counts > summary::-webkit-details-marker { display:none; }
+html body details.psn-counts > summary::before { content:"›"; display:inline-grid; place-items:center; width:22px; height:22px; border-radius:7px; background:var(--surface-2, #f1f4f9); color:var(--muted, #6b7280); font-size:16px; transition:transform .2s; }
+html body details.psn-counts[open] > summary::before { transform:rotate(90deg); }
+html body details.psn-counts[open] > summary { border-bottom:1px solid var(--border, #eef0f5); }
+html body table.psn-ct { width:100%; border-collapse:collapse; font-size:13.5px; font-variant-numeric:tabular-nums; }
+html body table.psn-ct thead th { padding:10px 18px !important; font-size:11px !important; font-weight:700 !important; letter-spacing:.06em; text-transform:uppercase; color:var(--muted, #8a94a6) !important; background:transparent !important; text-align:center; border:0 !important; white-space:nowrap; }
+html body table.psn-ct thead th:first-child { text-align:left; }
+html body table.psn-ct td { padding:9px 18px !important; border:0 !important; text-align:center; color:var(--ink, #1f2937); background:transparent; }
+html body table.psn-ct td:first-child { text-align:left; }
+html body table.psn-ct tbody tr { cursor:pointer; transition:background .12s; }
+html body table.psn-ct tr.psn-ct-c td { background:var(--surface-2, #f5f7fb) !important; font-weight:700; padding-top:11px !important; padding-bottom:11px !important; }
+html body table.psn-ct tr.psn-ct-c td:first-child { border-radius:0; font-size:14px; }
+html body table.psn-ct tr.psn-ct-c + tr.psn-ct-s td, html body table.psn-ct tr.psn-ct-s + tr.psn-ct-c td { border-top:0 !important; }
+html body table.psn-ct tr.psn-ct-s td { color:var(--ink-2, #374151); }
+html body table.psn-ct tr.psn-ct-s + tr.psn-ct-s td { border-top:1px solid var(--border, #f0f2f6) !important; }
+html body table.psn-ct .psn-ct-sub { display:inline-flex; align-items:center; gap:9px; padding-left:14px; }
+html body table.psn-ct .psn-ct-sub::before { content:""; width:6px; height:6px; border-radius:50%; background:#10b981; flex:none; }
+html body table.psn-ct tbody tr:hover td { background:color-mix(in srgb, var(--accent, #2563eb) 6%, var(--surface, #fff)) !important; }
+html body table.psn-ct tr.on td { background:color-mix(in srgb, var(--accent, #2563eb) 10%, var(--surface, #fff)) !important; }
+html body table.psn-ct tr.on td:first-child { box-shadow:inset 3px 0 var(--accent, #2563eb); }
+html body table.psn-ct td.zero { color:var(--muted, #c0c6d1) !important; font-weight:400 !important; }
+html body table.psn-ct td.warn span, html body table.psn-ct td.hot span { display:inline-block; min-width:26px; padding:2px 9px; border-radius:99px; font-weight:700; font-size:12.5px; }
+html body table.psn-ct td.warn span { background:rgba(245,158,11,.15); color:#b45309; }
+html body table.psn-ct td.hot { color:inherit !important; } html body table.psn-ct td.hot span { background:rgba(239,68,68,.13); color:#dc2626; }
+@media (max-width:700px) { html body table.psn-ct td, html body table.psn-ct thead th { padding-left:10px !important; padding-right:10px !important; } html body table.psn-ct thead th { font-size:10px !important; letter-spacing:.02em; white-space:normal; } html body details.psn-counts { overflow-x:auto; } }
+:root[data-theme="dark"] table.psn-ct td.warn span { color:#fbbf24 !important; background:rgba(251,191,36,.16) !important; } :root[data-theme="dark"] table.psn-ct td.hot span { color:#f87171 !important; background:rgba(248,113,113,.16) !important; }
+@media (prefers-color-scheme: dark) { :root:not([data-theme="light"]) table.psn-ct td.warn span { color:#fbbf24 !important; background:rgba(251,191,36,.16) !important; } :root:not([data-theme="light"]) table.psn-ct td.hot span { color:#f87171 !important; background:rgba(248,113,113,.16) !important; } }
 </style></head>
 
 
@@ -11690,7 +11720,7 @@ async function poll() {
 }
 
 /* ============================== filtering ============================== */
-const APP = { title: "Blasters Deck", version: "3.96.3", released: "2026-11-15" };
+const APP = { title: "Blasters Deck", version: "3.96.4", released: "2026-11-15" };
 const BASE_DIMS = { status: "status_column", desig: "designation_column", client: "client_column", mode: "mode_column" };
 const STANDARD_STATUSES = ["Active", "Manager", "OJT", "Bench", "New", "Projected", "Left", "Moved"];
 const TILE_ORDER = ["Active", "Manager", "OJT", "Bench", "New", "Projected"];
@@ -14355,7 +14385,7 @@ async function openPseudoNames(focusId, host) {   /* v3.81.0: host = draw inside
     { const tree = new Map();
       for (const x of seats) { const c = x.client || "", sc = subOf(x); if (!tree.has(c)) tree.set(c, new Map()); const t = tree.get(c); if (!t.has(sc)) t.set(sc, []); t.get(sc).push(x); }
       const cnt = list => { const a = list.filter(x => x.active); return [a.length, a.filter(x => x.r).length, a.filter(x => !x.r).length, a.filter(x => x.flag).length, list.filter(x => !x.active).length]; };
-      const cell = (v, cls) => h("td", { class: cls && v ? cls : "" }, v ? String(v) : "–");
+      const cell = (v, cls) => h("td", { class: (cls && v ? cls : "") + (v ? "" : " zero") }, v ? h("span", {}, String(v)) : "–");
       const rows = [];
       for (const [c, subs] of [...tree.entries()].sort((a, b) => (a[0] ? 0 : 1) - (b[0] ? 0 : 1) || a[0].localeCompare(b[0]))) {
         const all = [...subs.values()].flat(), [n, t, v, f, off] = cnt(all);
@@ -14365,7 +14395,7 @@ async function openPseudoNames(focusId, host) {   /* v3.81.0: host = draw inside
         if (named.length > 1 || (named.length === 1 && named[0])) for (const sc of named.sort((a, b) => (a ? 0 : 1) - (b ? 0 : 1) || a.localeCompare(b))) {
           const [n2, t2, v2, f2, off2] = cnt(subs.get(sc));
           rows.push(h("tr", { class: "psn-ct-s" + (client === c && sub === sc ? " on" : ""), onclick: () => { if (client === c && sub === sc) { sub = "all"; } else { client = c; sub = sc; } editing = editMeta = null; drawList(); } },
-            h("td", {}, "↳ " + (sc || "No sub client")), h("td", {}, String(n2)), cell(t2), cell(v2, "warn"), cell(f2, "hot"), cell(off2)));
+            h("td", {}, h("span", { class: "psn-ct-sub" }, sc || "No sub client")), h("td", {}, String(n2)), cell(t2), cell(v2, "warn"), cell(f2, "hot"), cell(off2)));
         }
       }
       const open = psnCountsOpen;
