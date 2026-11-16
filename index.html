@@ -15,7 +15,7 @@
 <meta name="apple-mobile-web-app-title" content="Blasters Deck">
 <meta name="application-name" content="Blasters Deck">
 <meta name="apple-mobile-web-app-status-bar-style" content="default">
-<title>Blasters Deck · 3.103.4</title>
+<title>Blasters Deck · 3.103.5</title>
 <link rel="preconnect" href="https://fonts.googleapis.com"><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin><link href="https://fonts.googleapis.com/css2?family=Public+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet">
 <style>
 :root {
@@ -12113,7 +12113,7 @@ async function poll() {
 }
 
 /* ============================== filtering ============================== */
-const APP = { title: "Blasters Deck", version: "3.103.4", released: "2026-11-17" };
+const APP = { title: "Blasters Deck", version: "3.103.5", released: "2026-11-17" };
 const BASE_DIMS = { status: "status_column", desig: "designation_column", client: "client_column", mode: "mode_column" };
 const STANDARD_STATUSES = ["Active", "Manager", "OJT", "Bench", "New", "Projected", "Left", "Moved"];
 const TILE_ORDER = ["Active", "Manager", "OJT", "Bench", "New", "Projected"];
@@ -16142,6 +16142,21 @@ function nfPretty(it) {
   let [icon, verb] = V[a] || (/^external-/.test(a) ? ['📄', 'changed in Excel:'] : ['•', String(a || 'changed').replace(/[-_]/g, ' ')]);
   let subject = name;
   if (a === 'settings') { const m = name.match(/^role\s+(.+)$/i); subject = m ? 'the ' + m[1] + ' role' : name ? name.charAt(0).toLowerCase() + name.slice(1) : 'settings'; verb = m ? 'updated' : 'changed'; }
+  /* v3.103.5: settings changes in plain words ("Jamir created a user account · Simran Krishnani") */
+  if (a === 'settings') {
+    const note = String((it.details && it.details.note) || '').trim(), cap = t => String(t || '').trim().replace(/\b([a-z])/g, (m0, c) => c.toUpperCase());
+    const bits = note.split(/\s·\s/).map(x => x.trim()).filter(Boolean);
+    const S2 = (ic, t, b) => ({ icon: ic, title: nfClip(ic + ' ' + t, 64), body: nfClip(b || '', 90) });
+    let m;
+    if ((m = note.match(/^Added (.+?)(?:\s·|$)/))) { const role = bits.find(x => /^role /i.test(x)), r2 = role ? role.replace(/^role /i, '') : bits.find(x => /^(no role|Super admin)$/i.test(x)); return S2('👤', who + ' created a user account: ' + cap(m[1]), [r2 ? (/^no role$/i.test(r2) ? 'No role' : 'Role: ' + r2) : '', bits.includes('sign-in disabled') ? 'Sign-in disabled' : ''].filter(Boolean).join(' · ')); }
+    if ((m = note.match(/^Updated (?!role )(.+?)(?:\s·|$)/))) { const role = bits.find(x => /^role /i.test(x)), r2 = role ? role.replace(/^role /i, '') : bits.find(x => /^(no role|Super admin)$/i.test(x)); return S2('👤', who + ' updated ' + cap(m[1]) + '’s account', [r2 ? (/^no role$/i.test(r2) ? 'No role' : 'Role: ' + r2) : '', bits.includes('sign-in disabled') ? 'Sign-in disabled' : ''].filter(Boolean).join(' · ')); }
+    if ((m = note.match(/^Created role (.+?)(?:\s·|$)/))) return S2('🛡️', who + ' created the ' + m[1] + ' role', bits.slice(1).join(' · '));
+    if ((m = note.match(/^Updated role (.+?)(?:\s·|$)/))) return S2('🛡️', who + ' updated the ' + m[1] + ' role', bits.slice(1).filter(x => x.length <= 52).slice(0, 3).join(' · '));
+    if (/changed their own passcode/.test(note)) return S2('🔑', who + ' changed their passcode', '');
+    if (/^Downloaded /.test(note)) return S2('⬇️', who + ' downloaded the workbook', bits.slice(1).join(' · '));
+    if (name === 'Record attendance' && /Employee box shows/.test(note)) return S2('👥', who + ' changed who shows in Record attendance', note.replace(/^Employee box shows:?\s*/, 'Shows: '));
+    if (name === 'Backup reminder') return S2('⏰', who + ' changed the backup reminder', note);
+  }
   const title = nfClip(icon + ' ' + who + ' ' + verb + (subject ? ' ' + subject : ''), 64);
   /* the detail: drop parts that repeat the title, keep short facts, at most 3 */
   let raw = (typeof BE !== 'undefined' && BE.actDetails ? BE.actDetails(it) : '') || '';
