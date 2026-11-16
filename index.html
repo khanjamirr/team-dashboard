@@ -15,7 +15,7 @@
 <meta name="apple-mobile-web-app-title" content="Blasters Deck">
 <meta name="application-name" content="Blasters Deck">
 <meta name="apple-mobile-web-app-status-bar-style" content="default">
-<title>Blasters Deck · 3.100.0</title>
+<title>Blasters Deck · 3.101.0</title>
 <link rel="preconnect" href="https://fonts.googleapis.com"><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin><link href="https://fonts.googleapis.com/css2?family=Public+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet">
 <style>
 :root {
@@ -1901,6 +1901,15 @@ button.ovx-t { cursor:pointer; transition:transform .15s ease; } button.ovx-t:ho
 .ovx-list { list-style:none; margin:0; padding:0; }
 .ovx-list li { display:flex; align-items:center; gap:12px; padding:10px 0; border-top:1px solid var(--ov-line); }
 .ovx-list li:first-child { border-top:0; }
+.ovx-grp { display:inline-flex; width:max-content; align-self:flex-start; gap:2px; padding:2px; margin:2px 0 6px; border-radius:9px; background:var(--surface-2,#f1f3f7); }
+.ovx-grp button { border:0; background:transparent; padding:4px 10px; border-radius:7px; font:inherit; font-size:11.5px; font-weight:600; color:var(--ink-2,#5b6475); cursor:pointer; }
+.ovx-grp button[aria-pressed="true"] { background:var(--surface,#fff); color:var(--ink); box-shadow:0 1px 2px rgba(0,0,0,.08); }
+.ovx-list li.ovx-gh { position:sticky; top:0; z-index:1; display:flex; align-items:baseline; justify-content:space-between; gap:8px; padding:12px 0 4px; border-top:0; background:var(--ov-card, var(--surface,#fff)); }
+.ovx-list li.ovx-gh + li { border-top:0; }
+.ovx-gn { font-size:11px; letter-spacing:.06em; text-transform:uppercase; color:var(--ink-2,#5b6475); min-width:0; overflow:hidden; text-overflow:ellipsis; white-space:nowrap; } .ovx-gn b { font-weight:750; color:var(--ink); }
+.ovx-gs { margin-left:5px; font-weight:600; }
+.ovx-gc { font-size:11.5px; color:var(--ink-3,#8a93a3); white-space:nowrap; } .ovx-gc em { font-style:normal; color:#c0392b; font-weight:600; }
+.ovx-list.grouped li:not(.ovx-gh) { padding-left:6px; }
 .ovx-av { flex:none; width:32px; height:32px; border-radius:50%; background:var(--ov-chip); display:grid; place-items:center; font-size:11px; font-weight:700; color:var(--ov-ink2); }
 .ovx-nm { flex:1; min-width:0; } .ovx-nm b { display:block; font-weight:600; white-space:nowrap; overflow:hidden; text-overflow:ellipsis; } .ovx-nm small { display:block; font-size:12px; color:var(--ov-ink2); white-space:nowrap; overflow:hidden; text-overflow:ellipsis; }
 .ovx-code { flex:none; font-size:12px; font-weight:700; color:var(--ov-ink2); min-width:34px; text-align:right; }
@@ -3017,6 +3026,15 @@ tr.act-zero td { color:var(--muted); }
 .rte-area p, .rte-view p { margin:0 0 .5em; } .rte-area ul, .rte-area ol, .rte-view ul, .rte-view ol { margin:.3em 0 .5em; padding-left:1.6em; }
 .rte-area blockquote, .rte-view blockquote { margin:.4em 0 .4em .4em; padding-left:.8em; border-left:3px solid var(--border); color:var(--ink-2); }
 .rte-tbl { border-collapse:collapse; margin:.4em 0; max-width:100%; } .rte-tbl td, .rte-tbl th { border:1px solid #bfbfbf; padding:4px 8px; min-width:40px; vertical-align:top; }
+.rte-men { display:inline; padding:1px 6px; border-radius:6px; background:color-mix(in srgb, var(--accent,#2563eb) 12%, transparent); color:var(--accent,#2563eb); font-weight:600; white-space:nowrap; }
+.pl-msg.me .rte-men { color:#fff; background:rgba(255,255,255,.22); }
+.rte-men.me { background:#fff1c2; color:#8a5300; }
+.men-pop { position:fixed; z-index:3000; width:240px; max-height:300px; overflow:auto; background:var(--surface,#fff); border:1px solid var(--border,#e3e6ec); border-radius:12px; box-shadow:0 16px 40px rgba(15,23,42,.2); padding:5px; }
+.men-h { font-size:10.5px; font-weight:700; letter-spacing:.06em; text-transform:uppercase; color:var(--ink-3,#8a93a3); padding:6px 8px 4px; }
+.men-opt { display:flex; align-items:center; gap:9px; width:100%; border:0; background:none; padding:7px 8px; border-radius:8px; cursor:pointer; text-align:left; font:inherit; font-size:13.5px; color:var(--ink); }
+.men-opt.on, .men-opt:hover { background:color-mix(in srgb, var(--accent,#2563eb) 10%, transparent); }
+.men-av { width:26px; height:26px; flex:none; border-radius:50%; display:grid; place-items:center; background:var(--surface-2,#eef1f6); font-size:11px; font-weight:700; color:var(--ink-2); }
+.men-btn { font-weight:700 !important; }
 .rte-att { display:inline-flex; align-items:center; gap:4px; padding:3px 10px; margin:2px 2px; border-radius:8px; border:1px solid var(--border); background:var(--surface-2, #f4f5f7); color:var(--ink) !important; text-decoration:none !important; font-size:12.5px; cursor:pointer; user-select:none; }
 .rte-att:hover { border-color:var(--accent); } .rte-att.up { opacity:.6; }
 .rte-view { font-family:Calibri, Aptos, "Segoe UI", system-ui, sans-serif; font-size:10.5pt; line-height:1.45; overflow-wrap:anywhere; } .rte-view a:not(.rte-att) { color:var(--accent); }
@@ -11040,16 +11058,30 @@ function renderOutCard(el) {
   if (OVP.names == null) { try { OVP.names = localStorage.getItem('td_ov_names') || 'real'; } catch { OVP.names = 'real'; } }
   const pz = OVP.names === 'pseudo', nmOf = r => pz ? (bkPseudo(r) || r.name.trim()) : r.name.trim();
   const more = window.tdMore([`<button type="button" class="btn" data-ov-mail>Email the update</button>`, can('ov.openatt') && can('page.attendance') ? `<button type="button" class="btn" data-att-go="grid">Open attendance</button>` : '', `<button type="button" class="btn" data-att-hist>History &amp; upcoming</button>`, `<hr>`, `<label class="ovx-nsw" title="Show pseudo names instead of real names in this list"><span>Pseudo names</span><input type="checkbox" role="switch" data-ov-names${pz ? ' checked' : ''}><i aria-hidden="true"></i></label>`], "More", "left");
-  const rows = shown.map((e, ix) => { const [t, c] = OV_ST[e.st], act = ed && ['backup', 'none', 'unset', 'live'].includes(e.st);
-    return `<li><span class="ovx-av">${esc(ini(nmOf(e.r)))}</span><span class="ovx-nm"><b>${esc(nmOf(e.r))}</b><small>${esc([OVP.p === 'today' ? '' : bkFmtD(e.iso), cl(e.r), dg(e.r)].filter(Boolean).join(' · '))}</small></span>${e.half ? (pz ? `<span class="ovx-code${ovCanCode(e) ? ' can' : ''}"${ovCanCode(e) ? ` data-ovc="${ix}" role="button" tabindex="0" aria-label="Change the leave type for ${esc(nmOf(e.r))}"` : ''} title="${esc(labelOf(e.v))} in attendance · billed as a half day">HD</span>` : `<span class="ovx-code${ovCanCode(e) ? ' can' : ''}"${ovCanCode(e) ? ` data-ovc="${ix}" role="button" tabindex="0" aria-label="Change the leave type for ${esc(nmOf(e.r))}"` : ''} title="${esc(labelOf(e.v))} · cover set for half a day, billed as a half day">${esc(e.v)}<em class="ovx-half">½ day</em></span>`) : `<span class="ovx-code${ovCanCode(e) ? ' can' : ''}"${ovCanCode(e) ? ` data-ovc="${ix}" role="button" tabindex="0" aria-label="Change the leave type for ${esc(nmOf(e.r))}"` : ''} title="${esc(labelOf(e.v))}">${esc(e.v)}</span>`}${act ? `<button type="button" class="ovx-chip ${c}" data-ovbk="${esc(e.key)}" data-iso="${e.iso}" title="Set or change the backup">${t}</button>` : `<span class="ovx-chip ${c}">${t}</span>`}</li>`; }).join('');
+  const rowArr = shown.map((e, ix) => { const [t, c] = OV_ST[e.st], act = ed && ['backup', 'none', 'unset', 'live'].includes(e.st);
+    return `<li><span class="ovx-av">${esc(ini(nmOf(e.r)))}</span><span class="ovx-nm"><b>${esc(nmOf(e.r))}</b><small>${esc([OVP.p === 'today' ? '' : bkFmtD(e.iso), cl(e.r), dg(e.r)].filter(Boolean).join(' · '))}</small></span>${e.half ? (pz ? `<span class="ovx-code${ovCanCode(e) ? ' can' : ''}"${ovCanCode(e) ? ` data-ovc="${ix}" role="button" tabindex="0" aria-label="Change the leave type for ${esc(nmOf(e.r))}"` : ''} title="${esc(labelOf(e.v))} in attendance · billed as a half day">HD</span>` : `<span class="ovx-code${ovCanCode(e) ? ' can' : ''}"${ovCanCode(e) ? ` data-ovc="${ix}" role="button" tabindex="0" aria-label="Change the leave type for ${esc(nmOf(e.r))}"` : ''} title="${esc(labelOf(e.v))} · cover set for half a day, billed as a half day">${esc(e.v)}<em class="ovx-half">½ day</em></span>`) : `<span class="ovx-code${ovCanCode(e) ? ' can' : ''}"${ovCanCode(e) ? ` data-ovc="${ix}" role="button" tabindex="0" aria-label="Change the leave type for ${esc(nmOf(e.r))}"` : ''} title="${esc(labelOf(e.v))}">${esc(e.v)}</span>`}${act ? `<button type="button" class="ovx-chip ${c}" data-ovbk="${esc(e.key)}" data-iso="${e.iso}" title="Set or change the backup">${t}</button>` : `<span class="ovx-chip ${c}">${t}</span>`}</li>`; });
+  /* v3.100.1: group the list by client, or by client and sub client (kept for this visit only) */
+  const gb = OVP.grp || 'none', subOf = r => { try { return bkSubOf(r) || ''; } catch { return ''; } };
+  let rows = '';
+  if (gb === 'none' || !rowArr.length) rows = rowArr.join('');
+  else {
+    const G = new Map(); shown.forEach((e, ix) => { const c0 = cl(e.r) || 'No client', k = gb === 'sub' ? c0 + ' › ' + (subOf(e.r) || 'No sub client') : c0; (G.get(k) || G.set(k, []).get(k)).push(ix); });
+    rows = [...G.entries()].sort((a, b) => b[1].length - a[1].length || a[0].localeCompare(b[0])).map(([k, ixs]) => {
+      const es = ixs.map(x => shown[x]), nb = es.filter(e => e.st === 'none' || e.st === 'unset').length, ppl = new Set(es.map(e => e.key)).size;
+      const [c1, s1] = k.split(' › ');
+      return `<li class="ovx-gh"><span class="ovx-gn"><b>${esc(c1)}</b>${s1 ? `<span class="ovx-gs">› ${esc(s1)}</span>` : ''}</span><span class="ovx-gc">${ppl} ${OVP.f === 'late' ? 'late' : 'out'}${OVP.f !== 'late' && nb ? ` · <em>${nb} without backup</em>` : ''}</span></li>` + ixs.map(x => rowArr[x]).join('');
+    }).join('');
+  }
+  const grpSel = `<div class="ovx-grp" role="group" aria-label="Group by">${[['none', 'List'], ['client', 'By client'], ['sub', 'By sub client']].map(([k, l]) => `<button type="button" data-ovg="${k}" aria-pressed="${gb === k}">${l}</button>`).join('')}</div>`;
   /* this week, Monday to Friday: covered (green) and not covered (red) */
   const T0 = ovDay(), ws = addDays(T0, -T0.getUTCDay()), days = [1, 2, 3, 4, 5].map(k => addDays(ws, k)), wk = days.map(dt => { const es = ovEntries(dt, dt).filter(e => ['backup', 'none', 'unset'].includes(e.st)); return { dt, cov: es.filter(e => e.st === 'backup').length, not: es.length - es.filter(e => e.st === 'backup').length, fut: dt > TODAY }; });
   const mx = Math.max(1, ...wk.map(x => x.cov + x.not));
   const week = `<div class="ovx-week"><div class="ovx-wh">${T0.getTime() === TODAY.getTime() ? 'This week' : 'That week'} <span><i class="g"></i>covered <i class="r"></i>no backup</span></div><div class="ovx-days">${wk.map(x => { const isT = x.dt.getTime() === T0.getTime(); return `<div class="ovx-day${isT ? ' on' : ''}${x.fut ? ' fut' : ''}" title="${esc(longDate(x.dt))}: ${x.cov} covered · ${x.not} without a backup"><div class="ovx-bars"><i class="g" style="height:${x.cov / mx * 100}%"></i><i class="r" style="height:${x.not / mx * 100}%"></i></div><small>${WEEKDAYS[x.dt.getUTCDay()]} ${x.dt.getUTCDate()}${x.fut && x.cov + x.not ? ' · ' + (x.cov + x.not) + ' planned' : ''}</small></div>`; }).join('')}</div></div>`;
   el.innerHTML = `<div class="ovx-head"><h2>Who is out <span class="ovx-sub">${esc(R.label)}${OVP.p === 'today' ? '' : ' · ' + esc(bkShortD(isoDate(R.from)) + ' – ' + bkShortD(isoDate(R.to)))}</span></h2>${seg}${more}</div>
-    ${rows ? `<ul class="ovx-list">${rows}</ul>` : `<div class="ovx-empty">${OVP.f === 'abs' ? 'Nobody on leave.' : OVP.f === 'late' ? 'No late comings.' : OVP.p === 'today' ? (ovDay().getTime() === TODAY.getTime() ? 'Nobody is out today.' : 'Nobody was out on this day.') : 'Nobody is out in this period.'}</div>`}
+    ${shown.length ? grpSel : ''}${rows ? `<ul class="ovx-list${gb !== 'none' ? ' grouped' : ''}">${rows}</ul>` : `<div class="ovx-empty">${OVP.f === 'abs' ? 'Nobody on leave.' : OVP.f === 'late' ? 'No late comings.' : OVP.p === 'today' ? (ovDay().getTime() === TODAY.getTime() ? 'Nobody is out today.' : 'Nobody was out on this day.') : 'Nobody is out in this period.'}</div>`}
 `;
   el.querySelectorAll('[data-ovf]').forEach(b => b.addEventListener('click', () => { OVP.f = b.dataset.ovf; OVP.all = false; renderOutCard(el); }));
+  el.querySelectorAll('[data-ovg]').forEach(b => b.addEventListener('click', () => { OVP.grp = b.dataset.ovg; renderOutCard(el); }));
   el.querySelector('[data-ov-all]')?.addEventListener('click', () => { OVP.all = !OVP.all; renderOutCard(el); });
   el.querySelectorAll('[data-ovbk]').forEach(b => b.addEventListener('click', () => openBackupBox(b.dataset.ovbk, b.dataset.iso, () => { renderOutCard(el); window.organizeOverview?.(); })));
   /* v3.74.2: click the leave code to change the leave type for that day */
@@ -12013,7 +12045,7 @@ async function poll() {
 }
 
 /* ============================== filtering ============================== */
-const APP = { title: "Blasters Deck", version: "3.100.0", released: "2026-11-16" };
+const APP = { title: "Blasters Deck", version: "3.101.0", released: "2026-11-16" };
 const BASE_DIMS = { status: "status_column", desig: "designation_column", client: "client_column", mode: "mode_column" };
 const STANDARD_STATUSES = ["Active", "Manager", "OJT", "Bench", "New", "Projected", "Left", "Moved"];
 const TILE_ORDER = ["Active", "Manager", "OJT", "Bench", "New", "Projected"];
@@ -18472,7 +18504,8 @@ const tok = () => { try { const t = CLOUD.token && CLOUD.token(); if (t) return 
 const myId = () => String((PL.me && PL.me.id) || meU().id || '');
 const isMine = t => (t.assignees || []).some(a => String(a.id) === myId());
 const canEditT = t => !!PL.me && (PL.me.admin || String(t.createdBy) === myId());
-const canUpdT = t => !!PL.me && (PL.me.admin || isMine(t) || String(t.createdBy) === myId());
+const isMentioned = t => (t.mentions || []).map(String).includes(myId());   /* v3.101.0 */
+const canUpdT = t => !!PL.me && (PL.me.admin || isMine(t) || String(t.createdBy) === myId() || isMentioned(t));
 /* v3.83.0: everyone on a task has their own part; the task follows from all of them */
 const partSt = (a, t) => a && a.st ? a.st : (t.status === 'done' ? 'done' : (t.assignees || []).length === 1 ? t.status : 'todo');
 const myPart = t => { const a = (t.assignees || []).find(x => String(x.id) === myId()); return a ? partSt(a, t) : null; };
@@ -18527,6 +18560,55 @@ const progStack = (t, big) => { const as = t.assignees || []; if (as.length < 2 
 const progBar = (t, big) => { const p = progressOf(t); if (p.n < 2 && !big) return null;
   return h('div', { class: 'pl-prog' + (big ? ' big' : '') + (p.done === p.n ? ' all' : ''), title: p.done + ' of ' + p.n + ' people have finished their part' },
     h('div', { class: 'pl-prog-t' }, h('i', { style: 'width:' + p.pct + '%' })), h('span', {}, p.done + '/' + p.n + ' done')); };
+/* v3.101.0: @mentions. Type @ in a comment, pick a teammate; they get a notification and can see and reply to the task. */
+let MEN_PEOPLE = null;
+async function mentionPeople() {
+  if (MEN_PEOPLE) return MEN_PEOPLE;
+  try { MEN_PEOPLE = await rpc('td_mention_people', { p_token: tok() }); } catch { MEN_PEOPLE = await people(); }
+  return MEN_PEOPLE || [];
+}
+function mentionify(root) {
+  const ed = root.querySelector('.rte-area'); if (!ed) return;
+  let pop = null, list = [], ix = 0, ctx = null;
+  const close = () => { pop?.remove(); pop = null; ctx = null; };
+  const find = () => {   /* the "@word" right before the caret, inside one text node */
+    const sel = getSelection(); if (!sel.rangeCount || !sel.isCollapsed) return null;
+    const r = sel.getRangeAt(0), nd = r.startContainer; if (nd.nodeType !== 3 || !ed.contains(nd)) return null;
+    const before = nd.textContent.slice(0, r.startOffset), m = before.match(/(^|[\s( ])@([^\s@]{0,30})$/); if (!m) return null;
+    return { node: nd, start: r.startOffset - m[2].length - 1, end: r.startOffset, q: m[2].toLowerCase() };
+  };
+  const pick = p => {
+    if (!ctx || !p) return; const { node, start, end } = ctx;
+    const r = document.createRange(); r.setStart(node, start); r.setEnd(node, end); r.deleteContents();
+    const sp = document.createElement('span'); sp.className = 'rte-men'; sp.setAttribute('data-uid', String(p.id)); sp.setAttribute('contenteditable', 'false'); sp.textContent = '@' + p.name;
+    const gap = document.createTextNode(' '); r.insertNode(gap); r.insertNode(sp);
+    const s2 = getSelection(), r2 = document.createRange(); r2.setStartAfter(gap); r2.collapse(true); s2.removeAllRanges(); s2.addRange(r2);
+    close(); ed.dispatchEvent(new Event('input', { bubbles: true })); ed.focus();
+  };
+  const draw = async () => {
+    ctx = find(); if (!ctx) { close(); return; }
+    const all = await mentionPeople(), q = ctx.q, me = myId();
+    list = all.filter(p => String(p.id) !== me && (!q || p.name.toLowerCase().split(/\s+/).some(w => w.startsWith(q)) || p.name.toLowerCase().includes(q))).slice(0, 8);
+    if (!list.length) { close(); return; }
+    ix = Math.min(ix, list.length - 1);
+    if (!pop) { pop = h('div', { class: 'men-pop', role: 'listbox' }); document.body.append(pop); }
+    pop.replaceChildren(h('div', { class: 'men-h' }, 'Tag someone'), ...list.map((p, k) => h('button', { type: 'button', role: 'option', class: 'men-opt' + (k === ix ? ' on' : ''), onmousedown: e => { e.preventDefault(); pick(p); } }, h('span', { class: 'men-av' }, initials(p.name)), h('span', {}, p.name))));
+    const r = getSelection().getRangeAt(0).getBoundingClientRect(), w = 240, hh = pop.offsetHeight;
+    let x = Math.min(Math.max(8, r.left), innerWidth - w - 8), y = r.bottom + 6; if (y + hh > innerHeight - 8) y = Math.max(8, r.top - hh - 6);
+    pop.style.left = x + 'px'; pop.style.top = y + 'px';
+  };
+  ed.addEventListener('input', () => { ix = 0; draw(); });
+  ed.addEventListener('keydown', e => {
+    if (!pop) return;
+    if (e.key === 'ArrowDown' || e.key === 'ArrowUp') { e.preventDefault(); ix = (ix + (e.key === 'ArrowDown' ? 1 : -1) + list.length) % list.length; draw(); }
+    else if (e.key === 'Enter' || e.key === 'Tab') { e.preventDefault(); e.stopPropagation(); pick(list[ix]); }
+    else if (e.key === 'Escape') { e.preventDefault(); e.stopPropagation(); close(); }
+  }, true);
+  ed.addEventListener('blur', () => setTimeout(close, 150));
+  /* an @ button on the toolbar for phones */
+  const bar = root.querySelector('.rte-bar, .rte-tb, [role="toolbar"]');
+  if (bar) bar.append(h('button', { type: 'button', class: 'rte-b men-btn', title: 'Tag someone (@)', 'aria-label': 'Tag someone', onmousedown: e => { e.preventDefault(); ed.focus(); document.execCommand('insertText', false, ' @'); ix = 0; draw(); } }, '@'));
+}
 async function openTask(t0) {
   const isNew = !t0; let t = t0 ? { ...t0 } : { public: false, title: '', details: '', status: 'todo', priority: 'normal', due: '', assignees: [{ id: myId(), name: (PL.me && PL.me.name) || meU().name || 'Me' }], notes: [] };
   const edit = isNew || canEditT(t), upd = isNew || canUpdT(t), assign = !!(PL.me && PL.me.assign);
@@ -18569,6 +18651,7 @@ async function openTask(t0) {
   paintWho();
   /* notes */
   const noteIn = rteEditor({ compact: true, disabled: !upd, placeholder: upd ? 'Write a comment: progress, a question, a blocker… paste a screenshot or attach a file' : 'Only the people this task is for can comment.', minHeight: 64, maxHeight: 300, label: 'New note' });
+  if (upd && !isNew) mentionify(noteIn);   /* v3.101.0: type @ to tag someone */
   const notesBox = h('div', { class: 'pl-notes' });
   /* v3.95.0: comments read like a chat (yours on the right); 'All activity' also shows the status changes */
   let nview = 'comments';
@@ -18717,10 +18800,10 @@ const prettySt = t => String(t || '').replace(/\b(todo|doing|blocked|done)\b/g, 
 function taskEvents() {
   if (!PL.me) return []; const id = myId(), out = [];
   for (const t of PL.tasks) {
-    const mine = isMine(t), made = String(t.createdBy) === id; if (!mine && !made) continue;
+    const mine = isMine(t), made = String(t.createdBy) === id, ment = isMentioned(t); if (!mine && !made && !ment) continue;
     if (mine && !made) out.push({ id: 'task:' + t.id + ':new', time: t.createdAt, type: 'task', taskId: t.id, title: 'New task for you', detail: t.title + ' · from ' + (t.createdByName || 'someone') + (t.due ? ' · due ' + fmtDay(t.due) : '') });
     for (const n of t.notes || []) if (String(n.byId) !== id && n.text !== 'Created the task' && Date.now() - Date.parse(n.at) < 30 * DAY)
-      out.push({ id: 'task:' + t.id + ':' + n.at, time: n.at, type: 'task', taskId: t.id, title: n.kind === 'status' ? n.by + ' updated a task' : n.by + ' added a note', detail: t.title + ' · ' + (n.kind === 'status' ? prettySt(n.text) : '“' + plainOf(n.text, 140) + '”') });
+      out.push({ id: 'task:' + t.id + ':' + n.at, time: n.at, type: 'task', taskId: t.id, title: n.kind === 'status' ? n.by + ' updated a task' : (n.mentions || []).map(String).includes(id) ? '📣 ' + n.by + ' mentioned you' : n.by + ' added a note', detail: t.title + ' · ' + (n.kind === 'status' ? prettySt(n.text) : '“' + plainOf(n.text, 140) + '”') });
   }
   return out;
 }
@@ -18808,6 +18891,9 @@ function rteClean(html, mode) {
         else if (n.getAttribute('data-up')) { const im = document.createElement('img'); im.setAttribute('data-up', n.getAttribute('data-up')); if (mode !== 'save') im.setAttribute('src', n.getAttribute('src') || ''); into.append(im); }
         continue;
       }
+      if (tag === 'SPAN' && /^\d{1,12}$/.test(n.getAttribute('data-uid') || '')) {   /* v3.101.0: an @mention */
+        const m = document.createElement('span'); m.className = 'rte-men'; m.setAttribute('data-uid', n.getAttribute('data-uid')); m.setAttribute('contenteditable', 'false');
+        m.textContent = '@' + String(n.textContent || '').replace(/^@+/, '').trim().slice(0, 80); into.append(m); continue; }
       const el = document.createElement(tag === 'FONT' ? 'span' : tag);
       if (tag === 'FONT') { const c = n.getAttribute('color'), f = n.getAttribute('face'); if (c && /^#?[\w]+$/.test(c)) el.style.color = c; if (f) el.style.fontFamily = f.replace(/[^\w\s,'"-]/g, ''); }
       if (tag === 'A') {
@@ -18863,6 +18949,7 @@ async function uploadFile(file) {
 /* show a saved note: safe markup, pictures fetched when shown, files open on click */
 function rteShow(el, html) {
   el.classList.add('rte-view'); el.innerHTML = rteClean(html);
+  { let me = ''; try { me = String((CLOUD.user() || {}).id || ''); } catch { } if (me) el.querySelectorAll('.rte-men[data-uid="' + me + '"]').forEach(m => m.classList.add('me')); el.querySelectorAll('.rte-men').forEach(m => m.removeAttribute('contenteditable')); }
   el.querySelectorAll('img[data-file]').forEach(im => { im.classList.add('rte-loading'); fileUrl(im.getAttribute('data-file')).then(f => { im.src = f.url; im.classList.remove('rte-loading'); }).catch(() => { im.alt = '(picture not available)'; im.classList.add('rte-missing'); });
     im.addEventListener('click', () => fileUrl(im.getAttribute('data-file')).then(f => rteLightbox(f.url, f.name))); });
   el.querySelectorAll('a[data-file]').forEach(a => { a.removeAttribute('contenteditable'); a.addEventListener('click', e => { e.preventDefault(); e.stopPropagation(); rteDownload(a.getAttribute('data-file'), a.getAttribute('data-name')); }); });
@@ -20097,6 +20184,7 @@ window.bdSearch = (() => {
 /* v3.96.0: "What's new" once per person after each update (remembered in the database); again from More or the bell */
 window.bdWhatsNew = (() => {
   const NOTES = [
+    { v: '3.101.0', items: [['📣', 'Tag people in task comments', 'Type @ in a comment and pick a teammate: they get a notification and can see and reply to the task.'], ['🏢', 'Who is out by client', 'Group the Who is out list by client, or by client and sub client.']] },
     { v: '3.100.0', items: [['➕', 'Record attendance from the top bar', 'One way for everyone: late, remote and other updates go straight into attendance; leave goes in as LA (pending) until an approver confirms it.'], ['⏳', 'Leaves pending', 'The amber pill at the top shows how many leaves wait for approval; tap it to approve or reject.'], ['🛠', 'Troubleshoot notifications', 'The wrench beside the bell checks and fixes notifications on this device.']] },
     { v: '3.99.0', items: [['🕘', 'A proper shift picker', 'Shifts are grouped by time zone and show the India time next to the US time, with ☀️ day or 🌙 night at a glance.'], ['🔕', 'Fewer, combined notifications', 'Several changes to the same employee by one person in one sitting arrive as one notification; changes to different employees stay separate.']] },
     { v: '3.98.5', items: [['💬', 'WhatsApp number is a normal box again', 'It no longer turns into a dropdown for some employees.']] },
