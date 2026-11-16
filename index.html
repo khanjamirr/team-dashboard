@@ -15,7 +15,7 @@
 <meta name="apple-mobile-web-app-title" content="Blasters Deck">
 <meta name="application-name" content="Blasters Deck">
 <meta name="apple-mobile-web-app-status-bar-style" content="default">
-<title>Blasters Deck · 3.97.1</title>
+<title>Blasters Deck · 3.97.2</title>
 <link rel="preconnect" href="https://fonts.googleapis.com"><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin><link href="https://fonts.googleapis.com/css2?family=Public+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet">
 <style>
 :root {
@@ -10541,11 +10541,20 @@ function bkGridData(cycle, client, sub, range, merge) {
       /* v3.97.1: the pseudo name dates decide who held the seat each day. If that person has no attendance that month,
          the day counts as a blank (present on a weekday), the same as any blank cell; otherwise the best cell wins as before. */
       const seat = (g[0].pseudo || '').trim().toLowerCase(), H = (window.__PSH || []).filter(x => String(x.pseudo || '').trim().toLowerCase() === seat);
-      const holderOn = iso => { const x = H.find(e => (!psnDay(e.from) || psnDay(e.from) <= iso) && (!psnDay(e.to) || iso < psnDay(e.to) || (psnDay(e.to) === iso && !H.some(o => o !== e && psnDay(o.from) === iso)))); return x ? g.find(P => (P.emp && String(x.key) === P.emp) || personKey(x.name) === P.key) || { ext: x } : null; };
+      /* v3.97.2: everyone whose dates cover the day counts (dates can overlap while a replacement starts): a working
+         day wins; next, a replacement with no attendance that month counts as a blank (present); SR only if nobody else */
+      const covering = iso => H.filter(e => (!psnDay(e.from) || psnDay(e.from) <= iso) && (!psnDay(e.to) || iso <= psnDay(e.to)))
+        .map(x => g.find(P => (P.emp && String(x.key) === P.emp) || personKey(x.name) === P.key) || { ext: x, name: x.name })
+        .filter((m, i, a) => a.findIndex(o => o === m || (o.ext && m.ext && o.name === m.name)) === i);
       const holders = [];
-      const cells = g[0].cells.map((_, j) => { const iso = isoDate(G_days[j]), hd = H.length ? holderOn(iso) : null; holders[j] = hd ? (hd.ext ? hd.ext.name : hd.name) : '';
+      const cells = g[0].cells.map((_, j) => { const iso = isoDate(G_days[j]), cov = H.length ? covering(iso) : [];
         const best = g.map(P => P.cells[j]).sort((a, b) => score(b) - score(a))[0];
-        if (hd && !hd.ext && !hd.cells[j] && (!best || best.cls === 'sr')) { const we = G_days[j].getUTCDay() % 6 === 0, def = we ? BKG.L : BKG.P; return { key: hd.key, iso, t: def[0], cls: def[1], bill: def[2], viaDates: true, title: bkFmtD(iso) + ' · ' + hd.name + ' held this pseudo name (pseudo name dates) but has no attendance this month · counted as blank = ' + (we ? 'week end' : 'present') }; }
+        const fromOf = m => String(psnDay((H.filter(e => e.name === m.name).sort((x, y) => String(psnDay(y.from)).localeCompare(String(psnDay(x.from))))[0] || {}).from));
+        const work = cov.filter(m => !m.ext && m.cells[j] && m.cells[j].cls !== 'sr').sort((a, b) => score(b.cells[j]) - score(a.cells[j]) || fromOf(b).localeCompare(fromOf(a)))[0];
+        const fill = !work ? cov.filter(m => m.ext || !m.cells[j]).sort((a, b) => String(psnDay((H.find(e => e.name === b.name) || {}).from)).localeCompare(String(psnDay((H.find(e => e.name === a.name) || {}).from))))[0] : null;
+        holders[j] = work ? work.name : fill ? fill.name : cov.map(m => m.name).join(', ');
+        if (work) return score(work.cells[j]) >= score(best) ? work.cells[j] : best;
+        if (fill && (!best || best.cls === 'sr')) { const we = G_days[j].getUTCDay() % 6 === 0, def = we ? BKG.L : BKG.P; return { key: fill.key || '', iso, t: def[0], cls: def[1], bill: def[2], viaDates: true, title: bkFmtD(iso) + ' · ' + fill.name + ' had this pseudo name (pseudo name dates) but has no attendance this month · counted as blank = ' + (we ? 'week end' : 'present') }; }
         return best; });
       const act = g.find(P => P.pass) || g[0];
       return { ...act, name: g.map(P => P.name).join(' / '), cells, total: cells.reduce((a, c) => a + (c ? c.bill : 0), 0), members: g.map(P => P.name), parts: g.map(P => ({ name: P.name, emp: P.emp, cells: P.cells })), holders, hist: H };
@@ -11856,7 +11865,7 @@ async function poll() {
 }
 
 /* ============================== filtering ============================== */
-const APP = { title: "Blasters Deck", version: "3.97.1", released: "2026-11-16" };
+const APP = { title: "Blasters Deck", version: "3.97.2", released: "2026-11-16" };
 const BASE_DIMS = { status: "status_column", desig: "designation_column", client: "client_column", mode: "mode_column" };
 const STANDARD_STATUSES = ["Active", "Manager", "OJT", "Bench", "New", "Projected", "Left", "Moved"];
 const TILE_ORDER = ["Active", "Manager", "OJT", "Bench", "New", "Projected"];
