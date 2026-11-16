@@ -15,7 +15,7 @@
 <meta name="apple-mobile-web-app-title" content="Blasters Deck">
 <meta name="application-name" content="Blasters Deck">
 <meta name="apple-mobile-web-app-status-bar-style" content="default">
-<title>Blasters Deck · 3.96.4</title>
+<title>Blasters Deck · 3.96.5</title>
 <link rel="preconnect" href="https://fonts.googleapis.com"><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin><link href="https://fonts.googleapis.com/css2?family=Public+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet">
 <style>
 :root {
@@ -3663,6 +3663,49 @@ html body table.psn-ct td.hot { color:inherit !important; } html body table.psn-
 @media (max-width:700px) { html body table.psn-ct td, html body table.psn-ct thead th { padding-left:10px !important; padding-right:10px !important; } html body table.psn-ct thead th { font-size:10px !important; letter-spacing:.02em; white-space:normal; } html body details.psn-counts { overflow-x:auto; } }
 :root[data-theme="dark"] table.psn-ct td.warn span { color:#fbbf24 !important; background:rgba(251,191,36,.16) !important; } :root[data-theme="dark"] table.psn-ct td.hot span { color:#f87171 !important; background:rgba(248,113,113,.16) !important; }
 @media (prefers-color-scheme: dark) { :root:not([data-theme="light"]) table.psn-ct td.warn span { color:#fbbf24 !important; background:rgba(251,191,36,.16) !important; } :root:not([data-theme="light"]) table.psn-ct td.hot span { color:#f87171 !important; background:rgba(248,113,113,.16) !important; } }
+/* v3.96.5: counts as client cards */
+html body details.psc .psc-hint { font-weight:400; color:var(--muted,#8a94a6); font-size:12px; margin-left:6px; }
+.psc-grid { display:grid; grid-template-columns:repeat(auto-fill, minmax(260px, 1fr)); gap:12px; padding:14px 16px 16px; }
+.psc-card { border:1px solid var(--border, #e8ebf2); border-radius:16px; padding:14px; background:var(--surface,#fff); display:flex; flex-direction:column; gap:10px; transition:box-shadow .15s, border-color .15s; }
+.psc-card:hover { box-shadow:0 10px 26px -16px rgba(20,40,110,.35); } .psc-card.on { border-color:var(--accent,#2563eb); box-shadow:0 0 0 3px color-mix(in srgb, var(--accent,#2563eb) 15%, transparent); }
+.psc-head { all:unset; cursor:pointer; display:flex; align-items:flex-start; justify-content:space-between; gap:10px; }
+.psc-name { font-size:15.5px; font-weight:750; letter-spacing:-.01em; line-height:1.25; }
+.psc-num { text-align:right; line-height:1; } .psc-num b { display:block; font-size:24px; font-weight:800; font-variant-numeric:tabular-nums; } .psc-num small { font-size:11px; color:var(--muted,#8a94a6); }
+.psc-bar { display:flex; height:8px; border-radius:99px; overflow:hidden; background:var(--surface-2,#eef1f6); } .psc-bar i { display:block; height:100%; }
+.psc-bar .t { background:linear-gradient(90deg,#34d399,#10b981); } .psc-bar .f { background:#ef4444; } .psc-bar .v { background:repeating-linear-gradient(45deg,#fbbf24 0 4px,#fde68a 4px 8px); }
+.psc-chips { display:flex; flex-wrap:wrap; gap:6px; } .psc-c { font-size:11.5px; font-weight:650; padding:3px 9px; border-radius:99px; }
+.psc-c.ok { background:rgba(16,185,129,.12); color:#047857; } .psc-c.v { background:rgba(245,158,11,.15); color:#b45309; } .psc-c.f { background:rgba(239,68,68,.12); color:#dc2626; } .psc-c.off { background:var(--surface-2,#f1f4f9); color:var(--muted,#6b7280); }
+.psc-subs { display:flex; flex-direction:column; border-top:1px solid var(--border,#eef0f5); padding-top:6px; margin-top:2px; }
+.psc-sub { all:unset; cursor:pointer; display:flex; align-items:center; gap:8px; padding:6px 8px; margin:0 -8px; border-radius:9px; font-size:13px; }
+.psc-sub:hover { background:var(--surface-2,#f4f6fa); } .psc-sub.on { background:color-mix(in srgb, var(--accent,#2563eb) 10%, transparent); }
+.psc-sn { flex:1; min-width:0; white-space:nowrap; overflow:hidden; text-overflow:ellipsis; } .psc-sn::before { content:""; display:inline-block; width:6px; height:6px; border-radius:50%; background:#10b981; margin-right:8px; vertical-align:middle; }
+.psc-sc { font-variant-numeric:tabular-nums; color:var(--muted,#6b7280); font-size:12.5px; }
+.psc-dot { min-width:18px; height:18px; padding:0 5px; border-radius:99px; display:inline-grid; place-items:center; font-size:11px; font-weight:700; } .psc-dot.f { background:rgba(239,68,68,.13); color:#dc2626; } .psc-dot.v { background:rgba(245,158,11,.16); color:#b45309; }
+@media (prefers-color-scheme: dark) { :root:not([data-theme="light"]) .psc-c.ok { color:#34d399; } :root:not([data-theme="light"]) .psc-c.v, :root:not([data-theme="light"]) .psc-dot.v { color:#fbbf24; } :root:not([data-theme="light"]) .psc-c.f, :root:not([data-theme="light"]) .psc-dot.f { color:#f87171; } }
+:root[data-theme="dark"] .psc-c.ok { color:#34d399; } :root[data-theme="dark"] .psc-c.v, :root[data-theme="dark"] .psc-dot.v { color:#fbbf24; } :root[data-theme="dark"] .psc-c.f, :root[data-theme="dark"] .psc-dot.f { color:#f87171; }
+/* v3.96.5: a simpler Change panel */
+html body .psn-picker { border:1px solid var(--border,#e6e9f0) !important; border-radius:16px !important; background:var(--surface,#fff) !important; padding:14px !important; box-shadow:0 12px 30px -20px rgba(20,40,110,.35); }
+html body .psn-picker .psn-mode { display:inline-flex !important; width:auto !important; margin:0 0 12px !important; }
+html body .psn-picker .psn-mode button { font-size:13px !important; padding:6px 14px !important; }
+.pk2-box { display:flex; flex-direction:column; gap:10px; }
+.pk2-search { display:flex; align-items:center; gap:8px; background:var(--surface-2,#f1f4f9); border-radius:12px; padding:0 12px; color:var(--muted,#8a94a6); }
+.pk2-search input { flex:1; border:0 !important; background:transparent !important; box-shadow:none !important; outline:none; font-size:15px; padding:11px 0 !important; min-width:0; }
+.pk2-dates { display:flex; align-items:flex-end; gap:12px; flex-wrap:wrap; } .pk2-dates label { margin:0 !important; } .pk2-dates small { font-size:11.5px; color:var(--muted,#6b7280); }
+.pk2-link { font-size:12.5px; padding-bottom:8px; }
+html body .pk2-box .psn-res { max-height:300px; overflow:auto; border:1px solid var(--border,#eef0f5) !important; border-radius:12px !important; background:var(--surface,#fff) !important; }
+html body .pk2-box .psn-opt.pk2 { display:flex; align-items:center; gap:11px; padding:9px 12px !important; border:0 !important; border-bottom:1px solid var(--border,#f1f3f7) !important; cursor:pointer; background:transparent !important; }
+html body .pk2-box .psn-opt.pk2:last-child { border-bottom:0 !important; } html body .pk2-box .psn-opt.pk2:hover, html body .pk2-box .psn-opt.pk2:focus-visible { background:color-mix(in srgb, var(--accent,#2563eb) 6%, transparent) !important; }
+.pk2-av { width:32px; height:32px; flex:none; border-radius:50%; display:grid; place-items:center; font:700 11.5px system-ui,sans-serif; color:#fff; background:linear-gradient(135deg,#5ac8fa,#007aff); }
+html body .pk2-box .psn-on { flex:1; min-width:0; } html body .pk2-box .psn-on b { display:block; font-size:14px; } html body .pk2-box .psn-on span { display:block; font-size:12px; color:var(--muted,#6b7280); }
+.pk2-has { font-size:12px; color:var(--muted,#6b7280); background:var(--surface-2,#f1f4f9); padding:3px 9px; border-radius:99px; white-space:nowrap; }
+.pk2-free { font-size:12px; font-weight:650; color:#047857; background:rgba(16,185,129,.12); padding:3px 9px; border-radius:99px; }
+.pk2-foot { display:flex; align-items:center; gap:10px; } .pk2-vac { color:#b45309 !important; font-size:13px; }
+html body .pk2-search input.input, html body .pk2-search input[type=search] { border:0 !important; background:transparent !important; box-shadow:none !important; outline:none !important; height:auto !important; }
+html body .pk2-search:focus-within { box-shadow:0 0 0 2px color-mix(in srgb, var(--accent,#2563eb) 35%, transparent); }
+.pk2-foot .grow { flex:1; } html body .pk2-link, html body .pk2-vac { text-decoration:none !important; } html body .pk2-link:hover, html body .pk2-vac:hover { text-decoration:underline !important; }
+html body .psn-picker .psn-mode { max-width:640px; }
+@media (max-width:700px) { html body .psn-picker { min-width:0; max-width:100%; overflow:hidden; padding:12px !important; } html body .psn-picker .psn-mode { display:flex !important; width:100% !important; max-width:none; } html body .psn-picker .psn-mode button { flex:1 1 0; min-width:0; white-space:normal !important; line-height:1.25; font-size:12.5px !important; padding:7px 8px !important; }
+  html body details.psc .psc-hint { display:none; } .psc-grid { padding:12px; } html body .pk2-box .psn-opt.pk2 { padding:9px 10px !important; } .pk2-has { max-width:42%; overflow:hidden; text-overflow:ellipsis; } }
 </style></head>
 
 
@@ -11720,7 +11763,7 @@ async function poll() {
 }
 
 /* ============================== filtering ============================== */
-const APP = { title: "Blasters Deck", version: "3.96.4", released: "2026-11-15" };
+const APP = { title: "Blasters Deck", version: "3.96.5", released: "2026-11-16" };
 const BASE_DIMS = { status: "status_column", desig: "designation_column", client: "client_column", mode: "mode_column" };
 const STANDARD_STATUSES = ["Active", "Manager", "OJT", "Bench", "New", "Projected", "Left", "Moved"];
 const TILE_ORDER = ["Active", "Manager", "OJT", "Bench", "New", "Projected"];
@@ -14385,22 +14428,27 @@ async function openPseudoNames(focusId, host) {   /* v3.81.0: host = draw inside
     { const tree = new Map();
       for (const x of seats) { const c = x.client || "", sc = subOf(x); if (!tree.has(c)) tree.set(c, new Map()); const t = tree.get(c); if (!t.has(sc)) t.set(sc, []); t.get(sc).push(x); }
       const cnt = list => { const a = list.filter(x => x.active); return [a.length, a.filter(x => x.r).length, a.filter(x => !x.r).length, a.filter(x => x.flag).length, list.filter(x => !x.active).length]; };
-      const cell = (v, cls) => h("td", { class: (cls && v ? cls : "") + (v ? "" : " zero") }, v ? h("span", {}, String(v)) : "–");
-      const rows = [];
+      /* v3.96.5: one card per client: a progress bar (tagged / vacant / needs replacement) and its sub clients */
+      const bar = (n, t, v, f) => { const pct = x => n ? (100 * x / n).toFixed(2) + "%" : "0%";
+        return h("div", { class: "psc-bar", title: t + " tagged · " + v + " vacant" + (f ? " · " + f + " need a replacement" : "") }, h("i", { class: "t", style: "width:" + pct(Math.max(0, t - f)) }), h("i", { class: "f", style: "width:" + pct(f) }), h("i", { class: "v", style: "width:" + pct(v) })); };
+      const cards = [];
       for (const [c, subs] of [...tree.entries()].sort((a, b) => (a[0] ? 0 : 1) - (b[0] ? 0 : 1) || a[0].localeCompare(b[0]))) {
         const all = [...subs.values()].flat(), [n, t, v, f, off] = cnt(all);
-        rows.push(h("tr", { class: "psn-ct-c" + (client === c && sub === "all" ? " on" : ""), onclick: () => { client = client === c && sub === "all" ? "all" : c; sub = "all"; editing = editMeta = null; drawList(); } },
-          h("td", {}, h("b", {}, c || "No client")), h("td", {}, h("b", {}, String(n))), cell(t), cell(v, "warn"), cell(f, "hot"), cell(off)));
-        const named = [...subs.keys()];
-        if (named.length > 1 || (named.length === 1 && named[0])) for (const sc of named.sort((a, b) => (a ? 0 : 1) - (b ? 0 : 1) || a.localeCompare(b))) {
-          const [n2, t2, v2, f2, off2] = cnt(subs.get(sc));
-          rows.push(h("tr", { class: "psn-ct-s" + (client === c && sub === sc ? " on" : ""), onclick: () => { if (client === c && sub === sc) { sub = "all"; } else { client = c; sub = sc; } editing = editMeta = null; drawList(); } },
-            h("td", {}, h("span", { class: "psn-ct-sub" }, sc || "No sub client")), h("td", {}, String(n2)), cell(t2), cell(v2, "warn"), cell(f2, "hot"), cell(off2)));
-        }
+        const named = [...subs.keys()], showSubs = named.length > 1 || (named.length === 1 && named[0]);
+        const pick = (cc, sc) => { if (client === cc && sub === sc) { if (sc === "all") client = "all"; else sub = "all"; } else { client = cc; sub = sc; } editing = editMeta = null; drawList(); };
+        cards.push(h("div", { class: "psc-card" + (client === c ? " on" : "") },
+          h("button", { type: "button", class: "psc-head" + (client === c && sub === "all" ? " on" : ""), onclick: () => pick(c, "all"), title: "Show only " + (c || "no client") },
+            h("span", { class: "psc-name" }, c || "No client"), h("span", { class: "psc-num" }, h("b", {}, String(n)), h("small", {}, n === 1 ? "name" : "names"))),
+          bar(n, t, v, f),
+          h("div", { class: "psc-chips" }, h("span", { class: "psc-c ok" }, t + " tagged"), v ? h("span", { class: "psc-c v" }, v + " vacant") : null, f ? h("span", { class: "psc-c f" }, f + " need" + (f === 1 ? "s" : "") + " replacement") : null, off ? h("span", { class: "psc-c off" }, off + " inactive") : null),
+          showSubs ? h("div", { class: "psc-subs" }, ...named.sort((a, b) => (a ? 0 : 1) - (b ? 0 : 1) || a.localeCompare(b)).map(sc => { const [n2, t2, v2, f2] = cnt(subs.get(sc));
+            return h("button", { type: "button", class: "psc-sub" + (client === c && sub === sc ? " on" : ""), onclick: () => pick(c, sc) },
+              h("span", { class: "psc-sn" }, sc || "No sub client"), f2 ? h("span", { class: "psc-dot f", title: f2 + " need a replacement" }, String(f2)) : null, v2 ? h("span", { class: "psc-dot v", title: v2 + " vacant" }, String(v2)) : null,
+              h("span", { class: "psc-sc" }, t2 + "/" + n2)); })) : null));
       }
       const open = psnCountsOpen;
-      parts.push(h("details", { class: "psn-counts", ...(open ? { open: true } : {}), ontoggle: e => { psnCountsOpen = e.currentTarget.open; } }, h("summary", {}, "Counts by client and sub client"),
-        h("table", { class: "psn-ct" }, h("thead", {}, h("tr", {}, ...["Client / sub client", "Names", "Tagged", "Vacant", "Need replacement", "Inactive"].map(x => h("th", {}, x)))), h("tbody", {}, ...rows))));
+      parts.push(h("details", { class: "psn-counts psc", ...(open ? { open: true } : {}), ontoggle: e => { psnCountsOpen = e.currentTarget.open; } }, h("summary", {}, "Counts by client and sub client", h("small", { class: "psc-hint" }, "click a client or sub client to show only those")),
+        h("div", { class: "psc-grid" }, ...cards)));
     }
     if (admin) parts.push(addForm(master, clients));
     if (admin && notListed.length) parts.push(h("p", { class: "psn-warn" }, "⚠ " + notListed.length + " pseudo " + (notListed.length === 1 ? "name is" : "names are") + " in use but not in your list: " + notListed.slice(0, 6).map(pv).join(", ") + (notListed.length > 6 ? "…" : "") + " ",
@@ -14571,26 +14619,29 @@ async function openPseudoNames(focusId, host) {   /* v3.81.0: host = draw inside
   function recruiterPicker(s) {
     const inp = h("input", { class: "input", type: "search", placeholder: "Search the recruiter by name or Emp ID", "aria-label": "Recruiter for " + s.name });
     const res = h("div", { class: "psn-res" });
-    const from = dateIn(s.r ? "New recruiter from" : "Assigned from"), to = s.r ? dateIn(nm(s.r) + " removed on") : null;
+    const from = dateIn(s.r ? "Date of the change" : "Starts on"), to = s.r ? dateIn(nm(s.r) + "’s last day") : null;   /* v3.96.5: one date; a second only if needed */
+    if (to) { to.el.hidden = true; from.i.addEventListener('change', () => { if (to.el.hidden) to.i.value = from.i.value; }); }
     const draw = () => {
       const t = inp.value.trim().toLowerCase();
       const ppl = state.rows.filter(r => psnEligible(r) && (!s.r || r.id !== s.r.id) && (!t || (nm(r) + " " + r.id + " " + cl(r)).toLowerCase().includes(t)))
         .sort((a, b) => ((cl(b) === s.client) - (cl(a) === s.client)) || (!!pv(a) - !!pv(b)) || ((psnStatus(a) === "resign") - (psnStatus(b) === "resign")) || nm(a).localeCompare(nm(b))).slice(0, 40);
-      res.replaceChildren(...ppl.map(r => { const has = pv(r), rs = psnStatus(r) === "resign";
-        return h("div", { class: "psn-opt", role: "button", tabindex: "0", onclick: () => tag(s, r, from.i.value, to && to.i.value), onkeydown: e => { if (e.key === "Enter") tag(s, r, from.i.value, to && to.i.value); } },
-          h("div", { class: "psn-on" }, h("b", {}, nm(r)), h("span", {}, [r.id, gs(r, "status_column"), cl(r)].filter(Boolean).join(" · "))),
-          cl(r) === s.client && s.client ? h("span", { class: "psn-same" }, s.client) : null,
-          rs ? h("span", { class: "psn-flag sm" }, "Resigning") : null, has ? h("span", { class: "psn-has" }, "has " + has + " → it becomes vacant") : h("span", { class: "psn-free" }, "no pseudo name")); }),
+      res.replaceChildren(...ppl.map(r => { const has = pv(r), rs = psnStatus(r) === "resign", go = () => tag(s, r, from.i.value, to && (to.el.hidden ? from.i.value : to.i.value));
+        return h("div", { class: "psn-opt pk2", role: "button", tabindex: "0", onclick: go, onkeydown: e => { if (e.key === "Enter") go(); } },
+          h("span", { class: "pk2-av" }, String(nm(r) || "?").trim().split(/\s+/).slice(0, 2).map(x => x[0]).join("").toUpperCase()),
+          h("div", { class: "psn-on" }, h("b", {}, nm(r)), h("span", {}, [r.id, gs(r, "status_column"), cl(r) !== s.client ? cl(r) : ""].filter(Boolean).join(" · "))),
+          rs ? h("span", { class: "psn-flag sm" }, "Resigning") : null,
+          has ? h("span", { class: "pk2-has", title: "“" + has + "” becomes vacant" }, "has " + has) : h("span", { class: "pk2-free" }, "free")); }),
         ppl.length ? null : h("p", { class: "hint" }, "No Active, Active + Resign or OJT recruiter matches."));
     };
     inp.addEventListener("input", draw); inp.addEventListener("keydown", e => { if (e.key === "Escape") { editing = null; drawList(); } if (e.key === "Enter") { const b = res.querySelector(".psn-opt"); if (b) b.click(); } });
     draw(); setTimeout(() => inp.focus(), 0);
-    const vac = s.r ? dateIn("Removed on") : null;
-    return h("div", { class: s.r ? "psn-rp" : "psn-edit psn-picker" },
-      h("div", { class: "psn-pk-dates" }, from.el, to ? to.el : null, h("span", { class: "grow" }),
-        s.r ? h("span", { class: "psn-vacbox" }, vac.el, h("button", { class: "btn mini", type: "button", onclick: () => untag(s, vac.i.value) }, "Make vacant")) : null,
-        h("button", { class: "btn mini", type: "button", onclick: () => { editing = null; drawList(); } }, "Cancel")),
-      inp, res);
+    const two = to ? h("button", { class: "linkbtn pk2-link", type: "button", onclick: e => { to.el.hidden = !to.el.hidden; e.currentTarget.textContent = to.el.hidden ? "Different last day?" : "Same day"; } }, "Different last day?") : null;
+    return h("div", { class: (s.r ? "psn-rp" : "psn-edit psn-picker") + " pk2-box" },
+      h("label", { class: "pk2-search" }, h("span", { "aria-hidden": "true" }, "⌕"), inp),
+      h("div", { class: "pk2-dates" }, from.el, to ? to.el : null, two),
+      res,
+      h("div", { class: "pk2-foot" }, s.r ? h("button", { class: "linkbtn pk2-vac", type: "button", onclick: () => untag(s, from.i.value) }, "Make “" + s.name + "” vacant instead") : null, h("span", { class: "grow" }),
+        h("button", { class: "btn", type: "button", onclick: () => { editing = null; drawList(); } }, "Cancel")));
   }
   function confirmTag(s, r, reset) {
     const from = dateIn("Assigned from");
