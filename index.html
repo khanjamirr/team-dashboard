@@ -15,7 +15,7 @@
 <meta name="apple-mobile-web-app-title" content="Blasters Deck">
 <meta name="application-name" content="Blasters Deck">
 <meta name="apple-mobile-web-app-status-bar-style" content="default">
-<title>Blasters Deck · 3.103.2</title>
+<title>Blasters Deck · 3.103.4</title>
 <link rel="preconnect" href="https://fonts.googleapis.com"><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin><link href="https://fonts.googleapis.com/css2?family=Public+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet">
 <style>
 :root {
@@ -6113,6 +6113,7 @@ const PERM_GROUPS = [
   { name: 'Activities', page: 'page.activities', items: [['fun.edit', 'Record activities and who took part']] },   /* v3.85.0 */
   { name: 'Save & sync', items: [['sync.view', 'Open the Save & sync settings'], ['sync.auto', 'Start or stop auto-sync'], ['sync.save', 'Save now and undo']] },
 
+  { name: 'Trends', items: [['trends.view', 'See Trends: who takes more leave than usual, leave patterns, late streaks and sickroom habits (the 📈 button)']] },   /* v3.103.3 */
   { name: 'ⓘ Leave card', items: [['att.info', 'See the ⓘ button next to names (Request Center, Applications ahead, attendance card) with anyone’s past and upcoming leave and late comings']] },
   { name: 'Notifications', items: [['notifications.view', 'Open notifications and receive request updates'], ['activity.view', 'See the activity log for all users']] },
   { name: 'Filters', items: [['filters.custom', 'Change the filters (search, status, client…)']] },
@@ -10468,9 +10469,29 @@ function approveWithBackup(pKey, name, isos, approve, label) {
 /* v3.44.0: one day before (and on the day), admins must set the backup for everyone on leave who doesn't have one yet.
    A reminder box lists them; "Remind me in 1 minute" closes it and it comes back a minute later until every one is set. */
 const BKDUE = { snooze: 0, timer: null, box: null };
+/* v3.103.4: admins set how often it comes back and how far ahead it looks (team settings: bkdue_cfg) */
+const bkDueCfg = () => { const c = (window.TD_SETTINGS || {}).bkdue_cfg || {}; return { every: [1, 5, 10, 15, 30, 60, 120].includes(+c.every) ? +c.every : 1, ahead: [0, 1, 2, 3].includes(+c.ahead) ? +c.ahead : 1 }; };
+const bkEveryTxt = n => n < 60 ? n + (n === 1 ? ' minute' : ' minutes') : (n / 60) + (n === 60 ? ' hour' : ' hours');
+function bkDueSettings() {
+  if (!(window.PERM && PERM.isSuper())) return;
+  const c = bkDueCfg();
+  const every = document.createElement('select'); every.className = 'input'; every.innerHTML = [1, 5, 10, 15, 30, 60, 120].map(n => `<option value="${n}" ${n === c.every ? 'selected' : ''}>Every ${bkEveryTxt(n)}</option>`).join('');
+  const ahead = document.createElement('select'); ahead.className = 'input'; ahead.innerHTML = [[0, 'Today only'], [1, 'Today and tomorrow'], [2, 'Today and the next 2 days'], [3, 'Today and the next 3 days']].map(([n, l]) => `<option value="${n}" ${n === c.ahead ? 'selected' : ''}>${l}</option>`).join('');
+  const body = document.createElement('div');
+  body.innerHTML = '<p class="set-hint" style="margin:0 0 12px">The “Backup needed for upcoming leave” box keeps coming back until every backup is set. Choose how often it comes back after “Remind me later”, and how far ahead it looks. This applies to everyone who sets backups.</p>';
+  const grid = document.createElement('div'); grid.className = 'bkr-grid';
+  const l1 = document.createElement('label'); l1.append('Comes back', every); const l2 = document.createElement('label'); l2.append('Looks at leave on', ahead); grid.append(l1, l2); body.append(grid);
+  const save = document.createElement('button'); save.className = 'btn primary'; save.type = 'button'; save.textContent = 'Save';
+  const cancel = document.createElement('button'); cancel.className = 'btn'; cancel.type = 'button'; cancel.textContent = 'Cancel';
+  const d = window.pdlg('Backup reminder: timing', body, [cancel, save]);
+  cancel.onclick = () => d.close();
+  save.onclick = async () => { save.disabled = true; try { const next = { every: +every.value, ahead: +ahead.value }; await window.saveTeamSetting('bkdue_cfg', next, { name: 'Backup reminder', text: 'Comes back every ' + bkEveryTxt(next.every) + ' · ' + ahead.options[ahead.selectedIndex].text.toLowerCase() }); d.close(); BKDUE.snooze = Math.min(BKDUE.snooze, Date.now() + next.every * 60000); toast('Saved: it comes back every ' + bkEveryTxt(next.every) + '.'); } catch (e) { save.disabled = false; toast('Could not save: ' + e.message, true); } };
+  d.box.closest('.pdlg-veil').style.zIndex = 10000;
+}
+window.bkDueSettings = bkDueSettings;
 function bkDueList() {
   if (S.status !== 'ready' || !S.ctx || !canBackup()) return [];
-  const d = D(true), out = new Map(), days = [TODAY, new Date(TODAY.getTime() + 86400000)];
+  const d = D(true), out = new Map(), days = Array.from({ length: bkDueCfg().ahead + 1 }, (_, k) => new Date(TODAY.getTime() + k * 86400000));
   for (const dt of days) {
     const ms = Engine.monthSerial(dt.getUTCFullYear(), dt.getUTCMonth()), i = dt.getUTCDate() - 1, iso = isoDate(dt);
     for (const r of d.byMonth.get(ms) || []) {
@@ -10489,19 +10510,20 @@ function bkDueCheck(force) {
   if (isSup) { try { if (localStorage.getItem('td_bkdue_skip') === isoDate(TODAY)) return; } catch { } }
   const list = bkDueList(); if (!list.length) return;
   const v = document.createElement('div'); BKDUE.box = v; v.className = 'bkdue-veil'; v.style.cssText = 'position:fixed;inset:0;z-index:9990;background:rgba(10,14,24,.5);display:grid;place-items:center;padding:16px';
-  const day = iso => iso === isoDate(TODAY) ? 'today' : 'tomorrow';
+  const day = iso => iso === isoDate(TODAY) ? 'today' : iso === isoDate(new Date(TODAY.getTime() + 86400000)) ? 'tomorrow' : 'on ' + bkFmtD(iso);   const every = bkDueCfg().every;
   v.innerHTML = `<div role="alertdialog" aria-modal="true" aria-label="Backup needed" style="background:var(--surface,#fff);color:var(--ink,#1f2937);border:1px solid var(--border,#e3e6ec);border-top:4px solid #e34948;border-radius:14px;padding:18px 20px;width:min(560px,100%);max-height:calc(100vh - 32px);overflow:auto;box-shadow:0 20px 60px rgba(0,0,0,.35)">
     <h3 style="margin:0 0 6px;font-size:17px">Backup needed for upcoming leave</h3>
-    <p style="margin:0 0 12px;font-size:13.5px;color:var(--ink-2,#445)">${list.length === 1 ? 'This person is' : 'These people are'} on leave today or tomorrow and no backup is set yet. Choose <b>Backup Provided</b>, <b>Backup Not Provided</b> or <b>Seat Shown Live</b> for each.</p>
+    <p style="margin:0 0 12px;font-size:13.5px;color:var(--ink-2,#445)">${list.length === 1 ? 'This person is' : 'These people are'} on leave ${bkDueCfg().ahead === 0 ? 'today' : bkDueCfg().ahead === 1 ? 'today or tomorrow' : 'in the next ' + (bkDueCfg().ahead + 1) + ' days'} and no backup is set yet. Choose <b>Backup Provided</b>, <b>Backup Not Provided</b> or <b>Seat Shown Live</b> for each.</p>
     <div style="border:1px solid var(--border,#e3e6ec);border-radius:10px;overflow:hidden">${list.map(o => `<div style="display:flex;align-items:center;gap:10px;padding:9px 12px;border-top:1px solid var(--border,#e3e6ec)"><div style="flex:1;min-width:0"><b>${esc(o.name)}</b><div style="font-size:12px;color:var(--muted,#667)">${o.items.map(x => esc(x.code) + ' ' + day(x.iso) + ' (' + esc(longDate(new Date(x.iso + 'T00:00:00Z'))) + ')').join(' · ')}</div></div><button type="button" class="btn" data-due="${esc(o.key)}" style="background:var(--accent,#2f6b4f);color:#fff;border-color:transparent">Set backup</button></div>`).join('')}</div>
-    <div style="display:flex;justify-content:flex-end;gap:8px;margin-top:14px">${isSup ? '<button type="button" class="btn" data-due-skip style="padding:7px 14px;margin-right:auto" title="Super admin only: no more reminders today">Skip for today</button>' : ''}<button type="button" class="btn" data-due-later style="padding:7px 14px">Remind me in 1 minute</button></div></div>`;
+    <div style="display:flex;justify-content:flex-end;gap:8px;margin-top:14px">${isSup ? '<button type="button" class="btn ghost" data-due-cfg style="padding:7px 12px" title="How often this comes back">⏰ Timing</button>' : ''}${isSup ? '<button type="button" class="btn" data-due-skip style="padding:7px 14px;margin-right:auto" title="Super admin only: no more reminders today">Skip for today</button>' : ''}<button type="button" class="btn" data-due-later style="padding:7px 14px">Remind me in ${bkEveryTxt(every)}</button></div></div>`;
   const close = () => { v.remove(); BKDUE.box = null; };
   v.addEventListener('click', e => {
     const b = e.target.closest('[data-due]');
-    if (b) { const o = list.find(x => x.key === b.dataset.due); close(); BKDUE.snooze = Date.now() + 60000;
+    if (b) { const o = list.find(x => x.key === b.dataset.due); close(); BKDUE.snooze = Date.now() + every * 60000;
       const days = o.items.map(x => x.iso); openBackupBox(o.key, days[0], () => { BKDUE.snooze = 0; setTimeout(() => bkDueCheck(), 400); }, { days, confirm: 'Save backup' }); return; }
     if (e.target.closest('[data-due-skip]')) { close(); try { localStorage.setItem('td_bkdue_skip', isoDate(TODAY)); } catch { } toast('Backup reminders skipped for today.'); return; }
-    if (e.target.closest('[data-due-later]')) { close(); BKDUE.snooze = Date.now() + 60000; toast('OK. You’ll be reminded again in 1 minute.'); }
+    if (e.target.closest('[data-due-cfg]')) { close(); BKDUE.snooze = Date.now() + every * 60000; bkDueSettings(); return; }
+    if (e.target.closest('[data-due-later]')) { close(); BKDUE.snooze = Date.now() + every * 60000; toast('OK. You’ll be reminded again in ' + bkEveryTxt(every) + '.'); }
   });
   document.body.append(v); v.querySelector('[data-due]')?.focus();
 }
@@ -12091,7 +12113,7 @@ async function poll() {
 }
 
 /* ============================== filtering ============================== */
-const APP = { title: "Blasters Deck", version: "3.103.2", released: "2026-11-17" };
+const APP = { title: "Blasters Deck", version: "3.103.4", released: "2026-11-17" };
 const BASE_DIMS = { status: "status_column", desig: "designation_column", client: "client_column", mode: "mode_column" };
 const STANDARD_STATUSES = ["Active", "Manager", "OJT", "Bench", "New", "Projected", "Left", "Moved"];
 const TILE_ORDER = ["Active", "Manager", "OJT", "Bench", "New", "Projected"];
@@ -16852,11 +16874,11 @@ function buildAccessForm(src, users = [], opts = {}) {
   /* v3.62.0: the table layout: one row per page, a View / Edit / Delete & manage switch each, the details underneath */
   let outEl = rights;
   if (opts.table) {
-    const HINT = { 'Overview': 'Home page: attendance, Request Center, coming up', 'Employees': 'Employee list and details', 'Attendance': 'Tracker, People, History & upcoming', 'Action center': 'Action items and data health', 'Reports': 'Charts and custom dashboards', 'Save & sync': 'The saving status page', 'ⓘ Leave card': 'Past and upcoming leave next to names', 'Notifications': 'The bell and the activity log', 'Filters': 'Search and filters at the top', 'Settings': 'Settings pages and tools' };
+    const HINT = { 'Overview': 'Home page: attendance, Request Center, coming up', 'Employees': 'Employee list and details', 'Attendance': 'Tracker, People, History & upcoming', 'Action center': 'Action items and data health', 'Reports': 'Charts and custom dashboards', 'Save & sync': 'The saving status page', 'ⓘ Leave card': 'Past and upcoming leave next to names', 'Notifications': 'The bell and the activity log', 'Trends': 'Leave, late and sickroom patterns (📈 button)', 'Activities': 'Team activities and who took part', 'Filters': 'Search and filters at the top', 'Settings': 'Settings pages and tools' };
     const labelOf = (g, k) => k === g.page ? 'Open the ' + g.name + ' page' : (([...g.items, ...((g.sub && g.sub.items) || [])].find(i => i[0] === k) || [k, k])[1]);
     const short = t => t.length > 60 ? t.slice(0, 58).replace(/\s+\S*$/, '') + '…' : t;
     const paintAll = [], repaint = () => { syncs.forEach(f => f()); paintAll.forEach(f => f()); };
-    const ADV = [], ICON = { 'Overview': '🏠', 'Employees': '👥', 'Attendance': '🗓️', 'Action center': '✅', 'Reports': '📊', 'Planner': '☑️', 'Playbook': '📘', 'ⓘ Leave card': 'ⓘ', 'Notifications': '🔔', 'Filters': '⧩', 'Settings': '⚙️' };
+    const ADV = [], ICON = { 'Overview': '🏠', 'Employees': '👥', 'Attendance': '🗓️', 'Action center': '✅', 'Reports': '📊', 'Planner': '☑️', 'Playbook': '📘', 'ⓘ Leave card': 'ⓘ', 'Notifications': '🔔', 'Trends': '📈', 'Activities': '🎉', 'Filters': '⧩', 'Settings': '⚙️' };
     const rowsT = PARTS.map(P => {
       const g = P.g, keys = [...(g.page ? [g.page] : []), ...P.allIt.map(([k]) => k)];
       const B = { view: keys.filter(k => k === g.page || !PERM.isEditKey(k)), edit: keys.filter(k => k !== g.page && PERM.isEditKey(k) && !MANAGE_KEYS.has(k)), manage: keys.filter(k => MANAGE_KEYS.has(k)) };
@@ -18094,7 +18116,7 @@ async function drawWorkbook(pane) {
   box.replaceChildren(lists[tab]());
   void tabs; void box;   /* v3.87.0: the backups and saves lists are gone: the download is the backup */
   fill(pane, hero, err, tiles,
-    h('div', { class: 'set-card fb-note' }, h('h4', {}, 'Your backup'), h('p', { class: 'set-hint' }, 'Download current workbook gives you one Excel file with everything: employees, attendance, logs and pseudo name history' + (PERM.isSuper() ? ', plus the settings and roles, playbook, Planner, Activities, pictures and files, and the user list' : '') + '. Keep it somewhere safe.'),
+    h('div', { class: 'set-card fb-note' }, h('h4', {}, PERM.isOwner() ? h('button', { class: 'btn mini', type: 'button', style: 'float:right', onclick: () => window.bdBackupReminderSettings && bdBackupReminderSettings() }, '⏰ Backup reminder timing') : null, PERM.isSuper() ? h('button', { class: 'btn mini', type: 'button', style: 'float:right;margin-right:8px', title: 'How often “Backup needed for upcoming leave” comes back', onclick: () => window.bkDueSettings && bkDueSettings() }, '⏰ Leave-backup reminder') : null, 'Your backup'), h('p', { class: 'set-hint' }, 'Download current workbook gives you one Excel file with everything: employees, attendance, logs and pseudo name history' + (PERM.isSuper() ? ', plus the settings and roles, playbook, Planner, Activities, pictures and files, and the user list' : '') + '. Keep it somewhere safe.'),
       h('p', { class: 'set-hint' }, 'To bring it back, here or in a brand-new Supabase project (after running setup.sql and signing in), use Replace workbook and choose that file. A password-protected file asks for its password. ' + (PERM.isSuper() ? 'You then choose what to restore.' : ''))));
   if (PERM.isOwner() && window.drawAutoBackups) drawAutoBackups(pane);   /* v3.95.0 */
 }
@@ -18149,8 +18171,7 @@ async function drawAutoBackups(host) {
   };
   const status = d.schedule ? h('div', { class: 'abk-ok' }, h('span', { class: 'abk-ic' }, '✓'), h('div', { class: 'grow' }, h('b', {}, last ? 'Last backup: ' + dayT(last.at) : 'Switched on: the first one runs tonight'), h('small', {}, 'Runs by itself every night at 2:00 am (India time) and keeps the last 30. Everything: employees, attendance, settings, users, Planner, Activities, pictures and files. Stays encrypted.')), now)
     : h('div', { class: 'abk-ok warn' }, h('span', { class: 'abk-ic' }, '!'), h('div', { class: 'grow' }, h('b', {}, 'The nightly backup is not scheduled yet'), h('small', {}, 'In Supabase open Database → Extensions, switch on pg_cron, then run v395.sql again. “Back up now” works already.')), now);
-  const remB = PERM.isOwner() ? h('button', { class: 'btn mini', type: 'button', style: 'float:right', onclick: () => window.bdBackupReminderSettings && bdBackupReminderSettings() }, '⏰ Backup reminder') : null;
-  fill(box, h('h4', {}, remB, 'Automatic backups'), status,
+  fill(box, h('h4', {}, 'Automatic backups'), status,
     items.length ? h('ul', { class: 'wb-list abk-list' }, ...items.slice(0, 40).map(it => h('li', { class: 'wb-row' }, h('span', { class: 'wb-av cal', 'aria-hidden': 'true' }, String(new Date(it.at).getDate())),
       h('div', { class: 'wb-main' }, h('b', {}, dayT(it.at)), h('small', {}, (it.kind === 'manual' ? 'Made by ' + (it.by || 'you') : 'Nightly') + ' · ' + kb(it.size || 0) + ' · ' + (it.counts ? it.counts.users + ' users, ' + it.counts.tasks + ' tasks, ' + it.counts.activities + ' activities, ' + it.counts.files + ' files' : ''))),
       h('button', { class: 'btn mini', type: 'button', onclick: dl(it) }, '⬇ Download')))) : h('p', { class: 'wb-empty' }, 'No backups yet.'),
@@ -19710,6 +19731,7 @@ document.addEventListener('visibilitychange', () => { if (!document.hidden && on
       rest.length ? group('Pages', ...rest.map(t => { const n = t.querySelector('.tabn'); return row(tile(t.dataset.view), nm(t.dataset.view), { badge: n && !n.hidden && n.textContent.trim() ? n.textContent.trim() : '', onclick: () => { close(); t.click(); } }); })) : null,
       group(null, row(h('span', { class: 'ios-tile', style: 'background:#007aff' }, h('b', {}, '☆')), 'Edit tab bar', { sub: 'Choose the 4 pages at the bottom', onclick: () => { close(); editPins(); } }),
         document.getElementById('trBtn') && !document.getElementById('trBtn').hidden ? row(h('span', { class: 'ios-tile', style: 'background:#7c3aed' }, h('b', {}, '📈')), 'Trends', { sub: 'Leave, late and sickroom patterns', onclick: () => { close(); setTimeout(() => window.trOpen && trOpen(), 250); } }) : null,
+        window.PERM && PERM.isOwner() && window.bdBackupReminderSettings ? row(h('span', { class: 'ios-tile', style: 'background:#0ea5e9' }, h('b', {}, '⏰')), 'Backup reminder', { sub: 'How often and when (ET)', onclick: () => { close(); setTimeout(() => bdBackupReminderSettings(), 250); } }) : null,
         document.getElementById('btnRefresh') ? row(h('span', { class: 'ios-tile', style: 'background:#34c759' }, h('b', {}, '↻')), 'Refresh', { sub: 'Get the latest changes now', onclick: () => { close(); document.getElementById('btnRefresh').click(); } }) : null,
         row(h('span', { class: 'ios-tile', style: 'background:#ff3b30' }, h('b', {}, '🔔')), 'Check notifications', { sub: 'Test that they reach this phone', onclick: () => { close(); window.bdPushCheck && bdPushCheck(); } }),
         row(h('span', { class: 'ios-tile', style: 'background:#10b981' }, h('b', {}, '✨')), 'What’s new', { sub: 'In version ' + APP.version, onclick: () => { close(); window.bdWhatsNew && bdWhatsNew(true); } })),
@@ -20282,7 +20304,7 @@ window.bdSearch = (() => {
 /* v3.96.0: "What's new" once per person after each update (remembered in the database); again from More or the bell */
 window.bdWhatsNew = (() => {
   const NOTES = [
-    { v: '3.103.0', items: [['🎯', 'Record attendance types per person', 'In People & access, give one person their own types (say, Remote) instead of their role’s.'], ['💬', 'Internal remarks', 'Add a remark while recording attendance; it shows as a dot and on hover in the grid, and in Who is out.'], ['⏰', 'Backup reminder timing', 'Choose how often, which day and what time (ET) the backup reminder comes.'], ['👥', 'Choose who shows in Record attendance', 'Admins pick the employee statuses the team records for; only they show in the Employee box.']] },
+    { v: '3.103.0', items: [['🎯', 'Record attendance types per person', 'In People & access, give one person their own types (say, Remote) instead of their role’s.'], ['💬', 'Internal remarks', 'Add a remark while recording attendance; it shows as a dot and on hover in the grid, and in Who is out.'], ['⏰', 'Backup reminder timing', 'Settings › Workbook & storage › “⏰ Backup reminder timing” (or the button on the reminder itself): how often, which day and what time (ET).'], ['⏰', 'Upcoming-leave backup reminder timing', 'Admins choose how often “Backup needed for upcoming leave” comes back and how far ahead it looks (⏰ Timing on the box).'], ['📈', 'Trends by role', 'Settings › Roles has a new “See Trends” right; admins always see it.'], ['👥', 'Choose who shows in Record attendance', 'Admins pick the employee statuses the team records for; only they show in the Employee box.']] },
     { v: '3.102.0', items: [['🩺', 'Sickroom', 'Send someone to the sickroom and check them back: live timers, a log, and who goes how often and for how long.'], ['🧠', 'Trends', 'In its own deck (the 📈 button at the top): who takes more leave than usual, leave patterns, late streaks and sickroom habits, spotted automatically.']] },
     { v: '3.101.0', items: [['📣', 'Tag people in task comments', 'Type @ in a comment and pick a teammate: they get a notification and can see and reply to the task.'], ['🏢', 'Who is out by client', 'Group the Who is out list by client, or by client and sub client.']] },
     { v: '3.100.0', items: [['➕', 'Record attendance from the top bar', 'One way for everyone: late, remote and other updates go straight into attendance; leave goes in as LA (pending) until an approver confirms it.'], ['⏳', 'Leaves pending', 'The amber pill at the top shows how many leaves wait for approval; tap it to approve or reject.'], ['🛠', 'Troubleshoot notifications', 'The wrench beside the bell checks and fixes notifications on this device.']] },
@@ -20933,7 +20955,7 @@ html body #pageSummary #cardTrends { grid-area:auto !important; grid-column:1 / 
   const $ = id => document.getElementById(id);
   const DAY = 86400000;
   const TR = { at: 0, busy: false, items: [], team: [], f: 'all', all: false, err: '' };
-  const allowed = () => { try { return !!(window.PERM && PERM.online && PERM.online() && (PERM.isSuper() || PERM.can('att.approve'))); } catch { return false; } };
+  const allowed = () => { try { return !!(window.PERM && PERM.online && PERM.online() && (PERM.isSuper() || PERM.can('trends.view'))); } catch { return false; } };   /* v3.103.3: admins, and roles given “See Trends” */
   const esc = v => String(v == null ? '' : v).replace(/[&<>"']/g, c => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' })[c]);
   const ini = n => String(n || '?').trim().split(/\s+/).slice(0, 2).map(x => x[0]).join('').toUpperCase();
   const key = n => String(n || '').trim().toLowerCase().replace(/\s+/g, ' ');
@@ -20967,7 +20989,7 @@ html body #pageSummary #cardTrends { grid-area:auto !important; grid-column:1 / 
     }
     /* ---- the sickroom ---- */
     let SR = [];
-    if (window.SKAPI && SKAPI.can()) { try { SR = await SKAPI.list(60); } catch { SR = []; } }
+    if (window.SKAPI) { try { SR = await SKAPI.list(60); } catch { SR = []; } }
     const nowMs = Date.now(), len = v => (v.end ? Date.parse(v.end) : nowMs) - Date.parse(v.start);
     const byE = new Map(); for (const v of SR) { const a = byE.get(v.emp) || []; a.push(v); byE.set(v.emp, a); }
     const leaveDay = new Map(); for (const e of E) if (e.cat === 'sick' || e.cat === 'unplanned' || e.cat === 'half') leaveDay.set(key(e.name) + '|' + e.date.getTime(), e.code);
@@ -21020,14 +21042,14 @@ html body #pageSummary #cardTrends { grid-area:auto !important; grid-column:1 / 
     const list = TR.f === 'all' ? TR.items : TR.items.filter(o => o.tags.has(TR.f)), shown = TR.all ? list : list.slice(0, 6);
     const ago = TR.at ? Math.round((Date.now() - TR.at) / 60000) : null;
     const TAG = { leave: 'Leave', sick: 'Sickroom', late: 'Late' };
-    c.innerHTML = `<div class="tr-hd"><span class="tr-ic" aria-hidden="true">🧠</span><div><h2>Trends</h2><small>Spotted automatically from attendance${window.SKAPI && SKAPI.can() ? ', lates and the sickroom' : ' and lates'} · ${ago == null ? 'working it out…' : ago < 1 ? 'updated just now' : 'updated ' + ago + ' min ago'}</small></div><span class="grow"></span>
+    c.innerHTML = `<div class="tr-hd"><span class="tr-ic" aria-hidden="true">🧠</span><div><h2>Trends</h2><small>Spotted automatically from attendance, lates and the sickroom · ${ago == null ? 'working it out…' : ago < 1 ? 'updated just now' : 'updated ' + ago + ' min ago'}</small></div><span class="grow"></span>
       <div class="tr-seg" role="group" aria-label="Show">${[['all', 'All'], ['leave', 'Leave'], ['sick', 'Sickroom'], ['late', 'Late']].map(([k, l]) => `<button type="button" data-trf="${k}" aria-pressed="${TR.f === k}">${l}<b>${n(k)}</b></button>`).join('')}</div>
       <button class="tr-re" type="button" data-trre title="Look again now" aria-label="Refresh trends">↻</button></div>
       ${TR.team.length ? `<div class="tr-team">${TR.team.map(t => `<span class="tr-t">${t}</span>`).join('')}</div>` : ''}
       ${shown.length ? `<div class="tr-list">${shown.map(o => `<div class="tr-item ${o.sev >= 2 ? 'red' : o.sev === 1 ? '' : 'info'}"><span class="tr-av">${esc(ini(o.name))}</span><div class="tr-bd"><div class="tr-nm"><b>${esc(o.name)}</b>${o.client ? `<small>${esc(o.client)}</small>` : ''}${[...o.tags].map(t => `<span class="tr-tag ${t}">${TAG[t]}</span>`).join('')}</div><ul class="tr-why">${o.why.slice(0, 4).map(w => `<li>${esc(w)}</li>`).join('')}${o.why.length > 4 ? `<li>and ${o.why.length - 4} more</li>` : ''}</ul></div></div>`).join('')}</div>`
         : `<div class="tr-empty">${TR.at ? 'Nothing unusual right now. 👍' : 'Looking at the last 120 days…'}</div>`}
       ${list.length > 6 ? `<button class="tr-more" type="button" data-trall>${TR.all ? 'Show less' : 'Show all ' + list.length}</button>` : ''}
-      <p class="tr-note">Patterns, not verdicts: planned leave on its own is never flagged, and each person is compared with their own usual. Only approvers and admins see this.</p>`;
+      <p class="tr-note">Patterns, not verdicts: planned leave on its own is never flagged, and each person is compared with their own usual. Only admins and the roles given “See Trends” see this.</p>`;
   }
   async function run(force) {
     if (TR.busy) return; if (!allowed()) { draw(); return; }
