@@ -15,7 +15,7 @@
 <meta name="apple-mobile-web-app-title" content="Blasters Deck">
 <meta name="application-name" content="Blasters Deck">
 <meta name="apple-mobile-web-app-status-bar-style" content="default">
-<title>Blasters Deck · 3.103.0</title>
+<title>Blasters Deck · 3.103.1</title>
 <link rel="preconnect" href="https://fonts.googleapis.com"><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin><link href="https://fonts.googleapis.com/css2?family=Public+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet">
 <style>
 :root {
@@ -1901,6 +1901,7 @@ button.ovx-t { cursor:pointer; transition:transform .15s ease; } button.ovx-t:ho
 .ovx-list { list-style:none; margin:0; padding:0; }
 .ovx-list li { display:flex; align-items:center; gap:12px; padding:10px 0; border-top:1px solid var(--ov-line); }
 .ovx-list li:first-child { border-top:0; }
+.ovx-rem { font-size:12px; cursor:help; } .ovx-remt { display:block; font-style:italic; color:var(--ink-2,#5b6475) !important; }
 .ovx-grp { display:inline-flex; width:max-content; align-self:flex-start; gap:2px; padding:2px; margin:2px 0 6px; border-radius:9px; background:var(--surface-2,#f1f3f7); }
 .ovx-grp button { border:0; background:transparent; padding:4px 10px; border-radius:7px; font:inherit; font-size:11.5px; font-weight:600; color:var(--ink-2,#5b6475); cursor:pointer; }
 .ovx-grp button[aria-pressed="true"] { background:var(--surface,#fff); color:var(--ink); box-shadow:0 1px 2px rgba(0,0,0,.08); }
@@ -8046,7 +8047,7 @@ function fieldBar() {
 const fieldMenuItems = () => attUserFields().filter(canFillField).map(n => `<button class="btn" data-act="log-field" data-field="${esc(n)}" data-tip="Values are saved per employee and month, and show as a column next to Emp ID">Log ${esc(n)}</button>`);
 /* ---------- ATTENDANCE GRID ---------- */
 function cellTip(r, i) {
-  const v = r.days[i]; const note = r.notes && r.notes[i] ? '<br><i>' + esc(r.notes[i].replace(/\r/g, '')) + '</i>' : '';
+  const v = r.days[i]; const rem0 = window.tdRemarkOf ? tdRemarkOf(r.name, isoDate(dateOf(r.month, i))) : null; const note = (r.notes && r.notes[i] ? '<br><i>' + esc(r.notes[i].replace(/\r/g, '')) + '</i>' : '') + (rem0 ? '<br>💬 <i>' + esc(rem0.text) + '</i> <small>— ' + esc(rem0.by || '') + '</small>' : '');
   const dt = dateOf(r.month, i);
   return `<b>${esc(r.name.trim())}</b><br>${longDate(dt)}<br>${v == null ? (!trackedOn(r, i) ? 'Blank · not tracked (' + (departure(r).kind === 'left' ? 'left the team' : 'moved') + ')' : impliedCode(r.month, i) === 'WO' ? 'Blank · week off (Sat / Sun)' : 'Blank · counts as present (P)') : esc(String(v).trim()) + ' · ' + esc(labelOf(v))}${LEAVE_CATS.has(catOf(v)) && canBackup() ? '<br>' + bkTipLine(bkGet(personKey(r.name), isoDate(dt))) : ''}${note}`;
 }
@@ -8064,7 +8065,7 @@ function gridTable(rows, { mode = 'month', month = null, hl = null } = {}) {
     for (let i = 0; i < dim; i++) {
       const w = dow(r.month, i), wk = w % 6 === 0 && i < rdim, isT = r.month === TODAY_MS && i === TODAY_IDX; const v = r.days[i];
       if (i >= rdim) { cells += `<td class="beyond">${v != null ? chip(v) : ''}</td>`; continue; }
-      cells += `<td class="cell ${wk ? 'wk' : ''} ${isT ? 'tdy' : ''} ${v == null ? 'empty' : ''}${MSEL.has(r.uid + ':' + i) ? ' msel' : ''}" data-act="cell" data-r="${r.uid}" data-d="${i}" data-tip="${esc(cellTip(r, i))}">${v != null ? chip(v, hl && !hl.has(cellCode(v)) ? 'faded' : '') : impliedChip(r.month, i, r)}${bkMark(r, i)}${r.notes && r.notes[i] ? '<span class="note-dot"></span>' : ''}</td>`;
+      cells += `<td class="cell ${wk ? 'wk' : ''} ${isT ? 'tdy' : ''} ${v == null ? 'empty' : ''}${MSEL.has(r.uid + ':' + i) ? ' msel' : ''}" data-act="cell" data-r="${r.uid}" data-d="${i}" data-tip="${esc(cellTip(r, i))}">${v != null ? chip(v, hl && !hl.has(cellCode(v)) ? 'faded' : '') : impliedChip(r.month, i, r)}${bkMark(r, i)}${(r.notes && r.notes[i]) || (window.tdRemarkOf && tdRemarkOf(r.name, isoDate(dateOf(r.month, i)))) ? '<span class="note-dot"></span>' : ''}</td>`;
     }
     const wr = mode === 'month' && hasRoster() ? rowRoster(r) : null;
     const dp = mode === 'month' ? departure(r) : null, dpText = dp && dp.dated ? ' ' + longDate(dateOf(dp.ms, dp.i)).replace(/^\w+ /, '') : '';
@@ -9141,16 +9142,16 @@ function openLogLeave(preKey) {
   const m = openModal({
     title: 'Record attendance',
     body: `<style>${PAST_CSS}.cbx{position:relative}.cbx-list{position:absolute;left:0;right:0;top:calc(100% + 4px);z-index:5;max-height:260px;overflow:auto;background:var(--surface);border:1px solid var(--line-2);border-radius:10px;box-shadow:0 10px 30px rgba(0,0,0,.18);padding:4px}.cbx-opt{display:flex;justify-content:space-between;gap:12px;width:100%;border:0;background:transparent;text-align:left;padding:7px 10px;border-radius:7px;font-size:13px;color:var(--ink);font-weight:500}.cbx-opt small{color:var(--ink-3);font-weight:400}.cbx-opt.on,.cbx-opt:hover{background:var(--accent-soft)}.cbx-empty{padding:10px;color:var(--ink-3);font-size:12px}.cbx-caret{position:absolute;right:8px;top:50%;transform:translateY(-50%);border:0;background:transparent;color:var(--ink-3);padding:4px 6px}</style>
-      <div class="form"><div class="full" style="display:flex;flex-direction:column;gap:4px"><span style="font-size:12px;font-weight:600;color:var(--ink-2);display:flex;align-items:center;gap:8px">Employee <button type="button" id="l-who" title="Choose which employee types show in this list" style="border:1px solid var(--line,#e3e6ec);background:var(--surface-2,#f4f6f9);border-radius:999px;padding:2px 10px;font:inherit;font-size:11.5px;font-weight:600;color:var(--ink-2);cursor:pointer">👥 Showing: <span id="l-who-t">${esc(whoLabel())}</span> ▾</button></span><div class="cbx"><input type="text" id="l-name" value="${esc(pre || '')}" placeholder="Pick or type a name" autocomplete="off" role="combobox" aria-expanded="false" aria-controls="l-list" aria-label="Employee" style="width:100%;padding-right:32px"><button type="button" class="cbx-caret" id="l-caret" tabindex="-1" aria-label="Show all employees">▾</button><div class="cbx-list" id="l-list" role="listbox" hidden></div></div></div>
-      <div style="display:flex;flex-direction:column;gap:4px"><span style="font-size:12px;font-weight:600;color:var(--ink-2)">Type <small style="font-weight:400;color:var(--ink-3)">· type a code or a word, ↑↓ Enter · Alt+T</small>${window.PERM && PERM.isSuper() ? ' <button type="button" id="l-notes-ed" style="border:0;background:none;padding:0;color:var(--accent);font:inherit;font-size:11.5px;font-weight:600;cursor:pointer">✎ Descriptions</button>' : ''}</span><div class="cbx"><input type="text" id="l-type" autocomplete="off" role="combobox" aria-expanded="false" aria-controls="l-tlist" aria-label="Type" style="width:100%" placeholder="Choose a type, e.g. SL or sick"><button type="button" class="cbx-caret" tabindex="-1" aria-hidden="true" id="l-tcaret">▾</button><div class="cbx-list" id="l-tlist" role="listbox" hidden></div></div><select id="l-code" hidden aria-hidden="true" tabindex="-1"><option value="" selected></option>${codesAllowed.map(c => `<option value="${c}">${c} · ${CODES[c].label}</option>`).join('')}</select></div><div class="l-desc" id="l-desc" aria-live="polite"></div>
+      <div class="form"><div class="full" style="display:flex;flex-direction:column;gap:4px"><span style="font-size:12px;font-weight:600;color:var(--ink-2);display:flex;align-items:center;gap:8px">Employee <button type="button" id="l-who" title="Choose which employee statuses show in this list" style="border:1px solid var(--line,#e3e6ec);background:var(--surface-2,#f4f6f9);border-radius:999px;padding:2px 10px;font:inherit;font-size:11.5px;font-weight:600;color:var(--ink-2);cursor:pointer">👥 Showing: <span id="l-who-t">${esc(whoLabel())}</span> ▾</button></span><div class="cbx"><input type="text" id="l-name" value="${esc(pre || '')}" placeholder="Pick or type a name" autocomplete="off" role="combobox" aria-expanded="false" aria-controls="l-list" aria-label="Employee" style="width:100%;padding-right:32px"><button type="button" class="cbx-caret" id="l-caret" tabindex="-1" aria-label="Show all employees">▾</button><div class="cbx-list" id="l-list" role="listbox" hidden></div></div></div>
+      <div style="display:flex;flex-direction:column;gap:4px"><span style="font-size:12px;font-weight:600;color:var(--ink-2)">Type <small style="font-weight:400;color:var(--ink-3)">· type a code or a word, ↑↓ Enter · Alt+T</small></span><div class="cbx"><input type="text" id="l-type" autocomplete="off" role="combobox" aria-expanded="false" aria-controls="l-tlist" aria-label="Type" style="width:100%" placeholder="Choose a type, e.g. SL or sick"><button type="button" class="cbx-caret" tabindex="-1" aria-hidden="true" id="l-tcaret">▾</button><div class="cbx-list" id="l-tlist" role="listbox" hidden></div></div><select id="l-code" hidden aria-hidden="true" tabindex="-1"><option value="" selected></option>${codesAllowed.map(c => `<option value="${c}">${c} · ${CODES[c].label}</option>`).join('')}</select></div><span></span>
       <label>From<input type="date" id="l-from" value="${today}"></label><label>To<input type="date" id="l-to" value="${today}"></label>
+      <label class="full">Internal remark <span style="font-weight:400;color:var(--ink-3)">(optional · only the team sees it)</span><textarea id="l-remark" maxlength="500" rows="2" style="resize:vertical;min-height:44px;font:inherit;padding:8px 10px;border-radius:8px;border:1px solid var(--line);background:var(--surface);color:var(--ink)" placeholder="e.g. Informed TL at 9:10 AM ET on WhatsApp · doctor’s note to follow"></textarea></label>
       ${needsApproval() ? `<label class="full" id="l-notewrap" hidden>Note for your approver <span style="color:var(--bad,#c0392b)">*</span> (needed for leave)<input type="text" id="l-note" maxlength="200" aria-required="true" placeholder="e.g. family function, doctor’s appointment" autocomplete="off"></label><div class="full sm" id="l-lanote" hidden style="padding:8px 10px;border-radius:8px;background:var(--accent-soft)">Leave is saved as <b>LA (pending)</b> straight away, and becomes the leave type once an approver confirms it. Late, remote and other updates are saved directly.</div>` : ''}</div>
       <div id="l-prev" class="sm" style="margin-top:12px;padding:10px 12px;border:1px solid var(--line);border-radius:8px;background:var(--surface-2)"></div><div class="err" id="l-err"></div>
       <div id="l-hist" class="ph-box" style="margin-top:12px"></div>`,
     footer: `<span class="grow"></span><button class="btn" data-close>Cancel</button><button class="btn primary" id="l-go">Save</button>`,
   });
   const plan = () => {
-    { const c = ($('#l-code', m) || {}).value, d = $('#l-desc', m), n = c && window.tdLogNote ? tdLogNote(c) : ''; if (d) d.innerHTML = n ? '<b>' + esc(c) + ':</b> ' + esc(n) : ''; }   /* v3.103.0: the team's own description of the type */
     { const c = ($('#l-code', m) || {}).value, on = needsLA(c); const w = $('#l-notewrap', m), n2 = $('#l-lanote', m); if (w) w.hidden = !on; if (n2) n2.hidden = !on; }   /* v3.100.0 */
     const name = $('#l-name', m).value, p = resolvePerson(name), from = new Date($('#l-from', m).value + 'T00:00:00Z'), to = new Date($('#l-to', m).value + 'T00:00:00Z');
     if (!p) return { err: name.trim() ? 'No employee with that name in the workforce file or the tracker.' : 'Pick an employee.' };
@@ -9225,6 +9226,8 @@ function openLogLeave(preKey) {
   $('#l-go', m).onclick = async () => {
     const pl = plan(); if (pl.err) return;
     if (!(await confirmOverwrite(pl.p.name, [...overwriteList(pl.p, pl.set.map(x => x.t), pl.code), ...pendingClash(pl.p.key, pl.set.map(x => isoDate(x.t)), pl.code)]))) return;
+    /* v3.103.1: the internal remark goes with every day recorded */
+    { const rm = (($('#l-remark', m) || {}).value || '').trim(); if (rm && window.tdRemarkSave) { const idn = identityOf(pl.p); tdRemarkSave(pl.set.map(x => ({ emp: String(idn.empId ?? ''), name: idn.name || pl.p.name, day: isoDate(x.t), code: pl.code, text: rm }))); } }
     if (needsLA(pl.code)) { const note = ($('#l-note', m) || {}).value || ''; closeModal(); sendLeaveRequest(pl, note); return; }
     closeModal();
     const doLog = val => mutate(`Logged ${pl.code} for ${pl.p.name} · ${pl.set.length} day${pl.set.length === 1 ? '' : 's'} (${longDate(pl.set[0].t)}${pl.set.length > 1 ? ' – ' + longDate(pl.set[pl.set.length - 1].t) : ''})`, () => {
@@ -11100,7 +11103,7 @@ function renderOutCard(el) {
   const pz = OVP.names === 'pseudo', nmOf = r => pz ? (bkPseudo(r) || r.name.trim()) : r.name.trim();
   const more = window.tdMore([`<button type="button" class="btn" data-ov-mail>Email the update</button>`, can('ov.openatt') && can('page.attendance') ? `<button type="button" class="btn" data-att-go="grid">Open attendance</button>` : '', `<button type="button" class="btn" data-att-hist>History &amp; upcoming</button>`, `<hr>`, `<label class="ovx-nsw" title="Show pseudo names instead of real names in this list"><span>Pseudo names</span><input type="checkbox" role="switch" data-ov-names${pz ? ' checked' : ''}><i aria-hidden="true"></i></label>`], "More", "left");
   const rowArr = shown.map((e, ix) => { const [t, c] = OV_ST[e.st], act = ed && ['backup', 'none', 'unset', 'live'].includes(e.st);
-    return `<li><span class="ovx-av">${esc(ini(nmOf(e.r)))}</span><span class="ovx-nm"><b>${esc(nmOf(e.r))}</b><small>${esc([OVP.p === 'today' ? '' : bkFmtD(e.iso), cl(e.r), dg(e.r)].filter(Boolean).join(' · '))}</small></span>${e.half ? (pz ? `<span class="ovx-code${ovCanCode(e) ? ' can' : ''}"${ovCanCode(e) ? ` data-ovc="${ix}" role="button" tabindex="0" aria-label="Change the leave type for ${esc(nmOf(e.r))}"` : ''} title="${esc(labelOf(e.v))} in attendance · billed as a half day">HD</span>` : `<span class="ovx-code${ovCanCode(e) ? ' can' : ''}"${ovCanCode(e) ? ` data-ovc="${ix}" role="button" tabindex="0" aria-label="Change the leave type for ${esc(nmOf(e.r))}"` : ''} title="${esc(labelOf(e.v))} · cover set for half a day, billed as a half day">${esc(e.v)}<em class="ovx-half">½ day</em></span>`) : `<span class="ovx-code${ovCanCode(e) ? ' can' : ''}"${ovCanCode(e) ? ` data-ovc="${ix}" role="button" tabindex="0" aria-label="Change the leave type for ${esc(nmOf(e.r))}"` : ''} title="${esc(labelOf(e.v))}">${esc(e.v)}</span>`}${act ? `<button type="button" class="ovx-chip ${c}" data-ovbk="${esc(e.key)}" data-iso="${e.iso}" title="Set or change the backup">${t}</button>` : `<span class="ovx-chip ${c}">${t}</span>`}</li>`; });
+    return `<li><span class="ovx-av">${esc(ini(nmOf(e.r)))}</span><span class="ovx-nm"><b>${esc(nmOf(e.r))}${(() => { const rm = window.tdRemarkOf ? tdRemarkOf(nmOf(e.r), e.iso) : null; return rm ? ` <span class="ovx-rem" title="${esc(rm.text + ' — ' + (rm.by || ''))}">💬</span>` : ''; })()}</b><small>${esc([OVP.p === 'today' ? '' : bkFmtD(e.iso), cl(e.r), dg(e.r)].filter(Boolean).join(' · '))}</small>${(() => { const rm = window.tdRemarkOf ? tdRemarkOf(nmOf(e.r), e.iso) : null; return rm ? `<small class="ovx-remt">“${esc(rm.text.length > 70 ? rm.text.slice(0, 70) + '…' : rm.text)}”</small>` : ''; })()}</span>${e.half ? (pz ? `<span class="ovx-code${ovCanCode(e) ? ' can' : ''}"${ovCanCode(e) ? ` data-ovc="${ix}" role="button" tabindex="0" aria-label="Change the leave type for ${esc(nmOf(e.r))}"` : ''} title="${esc(labelOf(e.v))} in attendance · billed as a half day">HD</span>` : `<span class="ovx-code${ovCanCode(e) ? ' can' : ''}"${ovCanCode(e) ? ` data-ovc="${ix}" role="button" tabindex="0" aria-label="Change the leave type for ${esc(nmOf(e.r))}"` : ''} title="${esc(labelOf(e.v))} · cover set for half a day, billed as a half day">${esc(e.v)}<em class="ovx-half">½ day</em></span>`) : `<span class="ovx-code${ovCanCode(e) ? ' can' : ''}"${ovCanCode(e) ? ` data-ovc="${ix}" role="button" tabindex="0" aria-label="Change the leave type for ${esc(nmOf(e.r))}"` : ''} title="${esc(labelOf(e.v))}">${esc(e.v)}</span>`}${act ? `<button type="button" class="ovx-chip ${c}" data-ovbk="${esc(e.key)}" data-iso="${e.iso}" title="Set or change the backup">${t}</button>` : `<span class="ovx-chip ${c}">${t}</span>`}</li>`; });
   /* v3.100.1: group the list by client, or by client and sub client (kept for this visit only) */
   const gb = OVP.grp || 'none', subOf = r => { try { return bkSubOf(r) || ''; } catch { return ''; } };
   let rows = '';
@@ -12088,7 +12091,7 @@ async function poll() {
 }
 
 /* ============================== filtering ============================== */
-const APP = { title: "Blasters Deck", version: "3.103.0", released: "2026-11-17" };
+const APP = { title: "Blasters Deck", version: "3.103.1", released: "2026-11-17" };
 const BASE_DIMS = { status: "status_column", desig: "designation_column", client: "client_column", mode: "mode_column" };
 const STANDARD_STATUSES = ["Active", "Manager", "OJT", "Bench", "New", "Projected", "Left", "Moved"];
 const TILE_ORDER = ["Active", "Manager", "OJT", "Bench", "New", "Projected"];
@@ -20279,7 +20282,7 @@ window.bdSearch = (() => {
 /* v3.96.0: "What's new" once per person after each update (remembered in the database); again from More or the bell */
 window.bdWhatsNew = (() => {
   const NOTES = [
-    { v: '3.103.0', items: [['🎯', 'Record attendance types per person', 'In People & access, give one person their own types (say, Remote) instead of their role’s.'], ['📝', 'Type descriptions', 'Admins can describe each type; everyone sees it under the Type box in Record attendance.'], ['⏰', 'Backup reminder timing', 'Choose how often, which day and what time (ET) the backup reminder comes.'], ['👥', 'Choose who shows in Record attendance', 'Pick the employee types you record for (e.g. by Designation); only they show in the Employee box.']] },
+    { v: '3.103.0', items: [['🎯', 'Record attendance types per person', 'In People & access, give one person their own types (say, Remote) instead of their role’s.'], ['💬', 'Internal remarks', 'Add a remark while recording attendance; it shows as a dot and on hover in the grid, and in Who is out.'], ['⏰', 'Backup reminder timing', 'Choose how often, which day and what time (ET) the backup reminder comes.'], ['👥', 'Choose who shows in Record attendance', 'Pick the employee statuses you record for; only they show in the Employee box.']] },
     { v: '3.102.0', items: [['🩺', 'Sickroom', 'Send someone to the sickroom and check them back: live timers, a log, and who goes how often and for how long.'], ['🧠', 'Trends', 'In its own deck (the 📈 button at the top): who takes more leave than usual, leave patterns, late streaks and sickroom habits, spotted automatically.']] },
     { v: '3.101.0', items: [['📣', 'Tag people in task comments', 'Type @ in a comment and pick a teammate: they get a notification and can see and reply to the task.'], ['🏢', 'Who is out by client', 'Group the Who is out list by client, or by client and sub client.']] },
     { v: '3.100.0', items: [['➕', 'Record attendance from the top bar', 'One way for everyone: late, remote and other updates go straight into attendance; leave goes in as LA (pending) until an approver confirms it.'], ['⏳', 'Leaves pending', 'The amber pill at the top shows how many leaves wait for approval; tap it to approve or reject.'], ['🛠', 'Troubleshoot notifications', 'The wrench beside the bell checks and fixes notifications on this device.']] },
@@ -21075,30 +21078,49 @@ html body #pageSummary #cardTrends { grid-area:auto !important; grid-column:1 / 
 (() => {
   let F = null, loaded = false;
   const rpc = prefs => CLOUD._rpc('td_my_prefs', { p_token: CLOUD.token(), p_prefs: prefs });
-  window.tdRecFilter = () => F;
+  window.tdRecFilter = () => (F && typeof state !== 'undefined' && state.schema && F.field === state.schema.status_column ? F : null);   /* v3.103.1: status only */
   const fill = (el, ...k) => el.replaceChildren(...k.flat().filter(Boolean));
   const checkLine = (text, checked) => { const c = h('input', { type: 'checkbox' }); c.checked = !!checked; return { box: c, el: h('label', { class: 'chk-line' }, c, h('span', {}, text)) }; };
   async function load() { if (loaded || typeof CLOUD === 'undefined' || !CLOUD.token || !CLOUD.token()) return; try { const p = await rpc(null); F = p && p.rec_filter && typeof p.rec_filter === 'object' ? p.rec_filter : null; loaded = true; } catch { } }
   setInterval(load, 5000); setTimeout(load, 1200);
   const guess = cols => cols.find(c => /employee\s*type|emp\.?\s*type|staff\s*type/i.test(c)) || cols.find(c => /designation|job\s*title|role|position/i.test(c)) || cols[0];
   window.tdRecFilterPick = (rows, done) => {
-    const skip = new Set(Object.values(state.schema || {}).filter(v => typeof v === 'string' && /name|emp ?id|phone|whats|mail|dob|birth|date|address|aadha|pan|account/i.test(v)));
-    const cols = (state.cols || []).map(c => c.name).filter(c => c && !skip.has(c)).filter(c => { const v = new Set(rows.map(r => String(g(r, c) ?? '').trim())); return v.size >= 2 && v.size <= 40; });
-    if (!cols.length) { toast('There is no field with a few fixed values (like Designation) to choose by.'); return; }
-    let field = F && cols.includes(F.field) ? F.field : guess(cols), pick = new Set(F && F.field === field ? F.values : []);
-    const sel = h('select', { class: 'input' }, ...cols.map(c => h('option', { value: c, selected: c === field }, c)));
+    /* v3.103.1: by employee status only */
+    const field = (state.schema && state.schema.status_column) || ''; if (!field) { toast('The workforce file has no Status column to choose by.'); return; }
+    let pick = new Set(F && F.field === field ? F.values : []);
+    const sel = null;
     const list = h('div', { class: 'ulog-grid', style: 'max-height:320px;overflow:auto' });
     const draw = () => { const cnt = new Map(); for (const r of rows) { const v = String(g(r, field) ?? '').trim() || '(blank)'; cnt.set(v, (cnt.get(v) || 0) + 1); }
       fill(list, ...[...cnt].sort((a, b) => b[1] - a[1] || a[0].localeCompare(b[0])).map(([v, n]) => { const c = checkLine(v + ' · ' + n, pick.has(v)); c.box.addEventListener('change', () => { c.box.checked ? pick.add(v) : pick.delete(v); }); return c.el; })); };
-    sel.addEventListener('change', () => { field = sel.value; pick = new Set(); draw(); });
     draw();
     const err = h('span', { class: 'err' });
     const apply = async next => { F = next; try { await rpc({ rec_filter: next }); } catch (e) { err.textContent = e.message; return; } d.close(); done && done(); };
-    const d = pdlg('Show in the Employee box', h('div', {}, h('p', { class: 'set-hint', style: 'margin:0 0 10px' }, 'Pick the employee types you record attendance for. Only they show in the Employee list. This is just for you, on every device.'),
-      h('label', { style: 'display:flex;flex-direction:column;gap:5px;font-size:12px;font-weight:600;margin-bottom:10px' }, 'Choose by', sel), list),
+    const d = pdlg('Show in the Employee box', h('div', {}, h('p', { class: 'set-hint', style: 'margin:0 0 10px' }, 'Pick the employee statuses you record attendance for (for example Active and Active + Resign). Only people with those statuses show in the Employee list. This is just for you, on every device.'), list),
       [err, h('button', { class: 'btn', type: 'button', onclick: () => apply(null) }, 'Show everyone'), h('button', { class: 'btn primary', type: 'button', onclick: () => apply(pick.size ? { field, values: [...pick] } : null) }, 'Show these')]);
     d.box.closest('.pdlg-veil').style.zIndex = 5000;
   };
+})();
+</script>
+<script>
+/* v3.103.1: internal remarks on recorded attendance, kept in Supabase (td_att_remarks): one per person per day */
+(() => {
+  const M = new Map(); let at = 0, busy = false;
+  const k = (name, iso) => String(name || '').trim().toLowerCase().replace(/\s+/g, ' ') + '|' + iso;
+  window.tdRemarkOf = (name, iso) => M.get(k(name, iso)) || null;
+  const ok = () => typeof CLOUD !== 'undefined' && CLOUD.token && CLOUD.token() && !document.getElementById('app')?.hidden;
+  async function load(force) {
+    if (busy || !ok() || (!force && Date.now() - at < 120000)) return; busy = true;
+    try { const p = tzParts(Date.now()), d0 = new Date(Date.UTC(p.y, p.m - 4, 1)).toISOString().slice(0, 10), d1 = new Date(Date.UTC(p.y, p.m + 4, 0)).toISOString().slice(0, 10);
+      const r = await CLOUD._rpc('td_att_remarks_list', { p_token: CLOUD.token(), p_from: d0, p_to: d1 }); M.clear(); for (const x of (Array.isArray(r) ? r : [])) M.set(k(x.name, String(x.day).slice(0, 10)), x); at = Date.now();
+      try { window.dispatchEvent(new Event('att:remarks')); } catch { } } catch { }
+    busy = false;
+  }
+  window.tdRemarkSave = async items => {
+    for (const x of items) M.set(k(x.name, x.day), { ...x, by: (CLOUD.user() || {}).name || '', at: new Date().toISOString() });
+    try { await CLOUD._rpc('td_att_remarks_save', { p_token: CLOUD.token(), p_items: items }); }
+    catch (e) { toast(/schema cache|Could not find/i.test(e.message || '') ? 'The remark was not saved: the super admin needs to run att-remarks.sql in Supabase.' : 'The remark was not saved: ' + e.message, true); }
+  };
+  setInterval(() => load(false), 15000); setTimeout(() => load(true), 2000);
 })();
 </script>
 </body>
