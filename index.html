@@ -15,7 +15,7 @@
 <meta name="apple-mobile-web-app-title" content="Blasters Deck">
 <meta name="application-name" content="Blasters Deck">
 <meta name="apple-mobile-web-app-status-bar-style" content="default">
-<title>Blasters Deck · 3.103.5</title>
+<title>Blasters Deck · 3.103.6</title>
 <link rel="preconnect" href="https://fonts.googleapis.com"><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin><link href="https://fonts.googleapis.com/css2?family=Public+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet">
 <style>
 :root {
@@ -12113,7 +12113,7 @@ async function poll() {
 }
 
 /* ============================== filtering ============================== */
-const APP = { title: "Blasters Deck", version: "3.103.5", released: "2026-11-17" };
+const APP = { title: "Blasters Deck", version: "3.103.6", released: "2026-11-17" };
 const BASE_DIMS = { status: "status_column", desig: "designation_column", client: "client_column", mode: "mode_column" };
 const STANDARD_STATUSES = ["Active", "Manager", "OJT", "Bench", "New", "Projected", "Left", "Moved"];
 const TILE_ORDER = ["Active", "Manager", "OJT", "Bench", "New", "Projected"];
@@ -18895,7 +18895,15 @@ const prettySt = t => String(t || '').replace(/\b(todo|doing|blocked|done)\b/g, 
 function taskEvents() {
   if (!PL.me) return []; const id = myId(), out = [];
   for (const t of PL.tasks) {
-    const mine = isMine(t), made = String(t.createdBy) === id, ment = isMentioned(t); if (!mine && !made && !ment) continue;
+    const mine = isMine(t), made = String(t.createdBy) === id, ment = isMentioned(t);
+    if (!mine && !made && !ment) {   /* v3.103.6: admins also hear about everyone else's tasks (never their own actions) */
+      if (!(window.PERM && PERM.isSuper())) continue;
+      const who = (t.assignees || []).map(a => a.name).filter(Boolean).slice(0, 3).join(', ');
+      if (t.createdAt && Date.now() - Date.parse(t.createdAt) < 30 * DAY) out.push({ id: 'task:' + t.id + ':new', time: t.createdAt, type: 'task', taskId: t.id, title: (t.createdByName || 'Someone') + ' created a task', detail: t.title + (who ? ' · for ' + who : '') + (t.due ? ' · due ' + fmtDay(t.due) : '') });
+      for (const n of t.notes || []) if (String(n.byId) !== id && n.text !== 'Created the task' && Date.now() - Date.parse(n.at) < 30 * DAY)
+        out.push({ id: 'task:' + t.id + ':' + n.at, time: n.at, type: 'task', taskId: t.id, title: n.kind === 'status' ? n.by + ' updated a task' : n.by + ' commented on a task', detail: t.title + ' · ' + (n.kind === 'status' ? prettySt(n.text) : '“' + plainOf(n.text, 140) + '”') });
+      continue;
+    }
     if (mine && !made) out.push({ id: 'task:' + t.id + ':new', time: t.createdAt, type: 'task', taskId: t.id, title: 'New task for you', detail: t.title + ' · from ' + (t.createdByName || 'someone') + (t.due ? ' · due ' + fmtDay(t.due) : '') });
     for (const n of t.notes || []) if (String(n.byId) !== id && n.text !== 'Created the task' && Date.now() - Date.parse(n.at) < 30 * DAY)
       out.push({ id: 'task:' + t.id + ':' + n.at, time: n.at, type: 'task', taskId: t.id, title: n.kind === 'status' ? n.by + ' updated a task' : (n.mentions || []).map(String).includes(id) ? '📣 ' + n.by + ' mentioned you' : n.by + ' added a note', detail: t.title + ' · ' + (n.kind === 'status' ? prettySt(n.text) : '“' + plainOf(n.text, 140) + '”') });
