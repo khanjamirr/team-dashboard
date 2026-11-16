@@ -15,7 +15,7 @@
 <meta name="apple-mobile-web-app-title" content="Blasters Deck">
 <meta name="application-name" content="Blasters Deck">
 <meta name="apple-mobile-web-app-status-bar-style" content="default">
-<title>Blasters Deck · 3.103.6</title>
+<title>Blasters Deck · 3.104.0</title>
 <link rel="preconnect" href="https://fonts.googleapis.com"><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin><link href="https://fonts.googleapis.com/css2?family=Public+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet">
 <style>
 :root {
@@ -11043,6 +11043,45 @@ function ovEntries(from, to) {
   }
   return out;
 }
+
+/* v3.104.0: decision tiles for the Overview: compared with your usual, looking ahead, and what it costs */
+function decisionStats() {
+  if (S.status !== 'ready' || !S.ctx) return null;
+  const T = ovDay(), d = D(), DAY = 86400000, wk = t => t.getUTCDay() % 6 !== 0;
+  const rowsOn = t => d.byMonth.get(Engine.monthSerial(t.getUTCFullYear(), t.getUTCMonth())) || [];
+  const outOn = t => { const rows = rowsOn(t), i = t.getUTCDate() - 1; let full = 0, half = 0; for (const r of rows) { const c = catOf(r.days[i]); if (!c || !LEAVE_CATS.has(c)) continue; c === 'half' ? half++ : full++; } return { tracked: rows.length, full, half }; };
+  const pctOn = t => { const o = outOn(t); return o.tracked ? Math.round((o.tracked - o.full - o.half * 0.5) / o.tracked * 1000) / 10 : null; };
+  /* 1. attendance compared with the same weekday over the last 4 weeks */
+  const today = outOn(T), pct = pctOn(T), same = [7, 14, 21, 28].map(k => pctOn(addDays(T, -k))).filter(v => v != null), usual = same.length ? Math.round(same.reduce((a, b) => a + b, 0) / same.length * 10) / 10 : null;
+  const line = []; for (let k = 0, t = T; line.length < 22 && k < 40; k++, t = addDays(t, -1)) { if (!wk(t)) continue; const v = pctOn(t); if (v != null) line.unshift(v); }
+  /* 2. the next 7 working days: who is out, and backups still missing */
+  const ahead = []; for (let t = addDays(T, 1); ahead.length < 7; t = addDays(t, 1)) { if (!wk(t)) continue; const ent = ovEntries(t, t).filter(e => !['late', 'applied'].includes(e.st)); ahead.push({ t, out: ent.length, missing: ent.filter(e => e.st === 'unset' || e.st === 'none').length, pending: ovEntries(t, t).filter(e => e.st === 'applied').length }); }
+  const busiest = ahead.reduce((m, x) => (x.out > (m ? m.out : -1) ? x : m), null);
+  /* 3. unplanned share of leave: this month so far vs last month */
+  const mStart = new Date(Date.UTC(T.getUTCFullYear(), T.getUTCMonth(), 1)), pStart = new Date(Date.UTC(T.getUTCFullYear(), T.getUTCMonth() - 1, 1)), pEnd = addDays(mStart, -1);
+  const mix = (a, b) => { let un = 0, all = 0; const byC = new Map(); for (let t = a; t <= b; t = addDays(t, 1)) { const rows = rowsOn(t), i = t.getUTCDate() - 1; for (const r of rows) { const c = catOf(r.days[i]); if (!c || !LEAVE_CATS.has(c)) continue; const v = c === 'half' ? 0.5 : 1; all += v; const cl = clientGroup(r.client) || r.client || 'No client'; const o = byC.get(cl) || { un: 0, all: 0 }; o.all += v; if (c === 'unplanned') { un += v; o.un += v; } byC.set(cl, o); } } return { un, all, share: all ? Math.round(un / all * 100) : null, byC }; };
+  const mNow = mix(mStart, T), mPrev = mix(pStart, pEnd);
+  const worst = [...mNow.byC].filter(([, o]) => o.all >= 3).map(([c, o]) => [c, Math.round(o.un / o.all * 100)]).sort((a, b) => b[1] - a[1])[0] || null;
+  /* 4. seats at risk this pay cycle (26th to 25th): leave days with no backup or not updated yet */
+  const cyEnd = T.getUTCDate() > 25 ? new Date(Date.UTC(T.getUTCFullYear(), T.getUTCMonth() + 1, 25)) : new Date(Date.UTC(T.getUTCFullYear(), T.getUTCMonth(), 25)), cyStart = new Date(Date.UTC(cyEnd.getUTCFullYear(), cyEnd.getUTCMonth() - 1, 26));
+  const risk = ovEntries(cyStart, T).filter(e => e.st === 'none' || e.st === 'unset');
+  const riskBy = new Map(); for (const e of risk) { let sub = ''; try { sub = bkSubOf(e.r) || ''; } catch { } const k = (clientGroup(e.r.client) || e.r.client || 'No client') + (sub ? ' › ' + sub : ''); riskBy.set(k, (riskBy.get(k) || 0) + (e.c === 'half' ? 0.5 : 1)); }
+  const riskTop = [...riskBy].sort((a, b) => b[1] - a[1])[0] || null;
+  /* 5. team movement from the workforce file */
+  let notice = 0, joiners = 0; const RR = hasRoster() ? rosterRows() : [];
+  for (const r of RR) { const st = String(rosterStatus(r) || '').trim(); if (/resign|notice/i.test(st) && !isGone(r)) notice++; if (/^(new|ojt|training|trainee)/i.test(st)) joiners++; }
+  const hcNow = rowsOn(T).length, hcThen = rowsOn(addDays(T, -30)).length;
+  /* 6. late arrivals: this week so far vs the same days last week */
+  const mon = addDays(T, -((T.getUTCDay() + 6) % 7)), lates = (a, b) => ovEntries(a, b).filter(e => e.st === 'late');
+  const lw = lates(mon, T), lp = lates(addDays(mon, -7), addDays(T, -7)), l30 = lates(addDays(T, -29), T);
+  const per = new Map(); for (const e of l30) per.set(e.key, (per.get(e.key) || 0) + 1);
+  const wdCount = [0, 0, 0, 0, 0, 0, 0]; for (const e of l30) wdCount[e.dt.getUTCDay()]++;
+  const topWd = wdCount.map((n, i) => [i, n]).filter(([i]) => i % 6).sort((a, b) => b[1] - a[1]).filter(x => x[1]).slice(0, 2).map(([i]) => WEEKDAYS[i]);
+  return { day: T, isToday: T.getTime() === TODAY.getTime(), tracked: today.tracked, pct, usual, line, wd: WEEKDAYS[T.getUTCDay()],
+    ahead, busiest, unNow: mNow.share, unPrev: mPrev.share, unDays: mNow.un, worst,
+    risk: risk.reduce((a, e) => a + (e.c === 'half' ? 0.5 : 1), 0), riskNo: risk.filter(e => e.st === 'none').length, riskUnset: risk.filter(e => e.st === 'unset').length, riskTop, cycleEnd: cyEnd,
+    notice, joiners, hcNow, hcThen, lateWeek: lw.length, lateLast: lp.length, late3: [...per.values()].filter(n => n >= 3).length, lateDays: topWd };
+}
 const OV_ST = { off: ['Not a live seat', 'cu'], backup: ['Backup provided', 'cy'], none: ['No backup', 'cn'], unset: ['Not updated', 'cu'], live: ['Seat shown live', 'cl'], late: ['Late', 'ct'], applied: ['Awaiting approval', 'ca'] };
 function overviewStats() {
   /* v3.58.2: the tiles follow the filters at the top (through D()) and the Today / Week / Month switch and date */
@@ -11654,7 +11693,7 @@ return {
   entries: (from, to) => { if (S.status !== 'ready' || !S.ctx) return null; const d = D(), out = []; for (const m of d.months) { const dim = Engine.daysInMonth(m); for (const r of d.byMonth.get(m) || []) for (let i = 0; i < dim; i++) { const v = r.days[i]; if (v == null || v === '') continue; const dt = dateOf(m, i), t = dt.getTime(); if ((from != null && t < from) || (to != null && t > to)) continue; const cat = catOf(v); out.push({ name: r.name.trim(), empId: r.empId, client: r.client ? String(r.client).trim() : '', date: dt, code: String(v).trim().toUpperCase(), cat, catLabel: CATS[cat] || 'Other' }); } } return out; },
   bkDueNow: () => { BKDUE.snooze = 0; bkDueCheck(true); },
   ovDate: v => { if (v !== undefined) { OVP.d = v && v !== isoDate(TODAY) ? v : null; OVP.all = false; } return isoDate(ovDay()); },
-  overviewStats, ovPeriod: v => { if (v) { OVP.p = v; OVP.all = false; try { localStorage.setItem('td_ovp', v); } catch { } } return OVP.p; },
+  overviewStats, decisionStats: () => { try { return decisionStats(); } catch (e) { console.error(e); return null; } }, ovPeriod: v => { if (v) { OVP.p = v; OVP.all = false; try { localStorage.setItem('td_ovp', v); } catch { } } return OVP.p; },
   todayStats: () => { if (S.status !== 'ready' || !S.ctx) return null; const rows = D().byMonth.get(TODAY_MS) || [], i = TODAY.getUTCDate() - 1, cats = rows.map(r => catOf(r.days[i])); return { full: cats.filter(c => c === 'approved' || c === 'sick' || c === 'unplanned').length, half: cats.filter(c => c === 'half').length, late: cats.filter(c => c === 'late').length, tracked: rows.length }; }, redraw: () => { if (active()) render(); }, state: () => S, dirty: () => S.changes.length,
   prepareSignOut, save: () => save(), undo: () => undo(), toggleAuto: () => { setAuto(!S.auto); if (S.auto) autoTick(); }, setAutoSync: on => { setAuto(on); if (S.auto) autoTick(); }, canWrite: attCanWrite,
   syncInfo: () => { const d = D(true), sc = scopeCounts(); return { fileName: S.fileName, changes: S.changes.length, undoLen: S.undo.length, saving: S.saving, auto: S.auto, autoErr: S.autoErr, autoAt: S.autoAt, diskChanged: S.diskChanged, rows: S.rows.length, people: d.people.size, monthFrom: d.months[0], monthTo: d.latestMonth, unmatched: sc.unmatched, hasRoster: hasRoster() }; },
@@ -12113,7 +12152,7 @@ async function poll() {
 }
 
 /* ============================== filtering ============================== */
-const APP = { title: "Blasters Deck", version: "3.103.6", released: "2026-11-17" };
+const APP = { title: "Blasters Deck", version: "3.104.0", released: "2026-11-17" };
 const BASE_DIMS = { status: "status_column", desig: "designation_column", client: "client_column", mode: "mode_column" };
 const STANDARD_STATUSES = ["Active", "Manager", "OJT", "Bench", "New", "Projected", "Left", "Moved"];
 const TILE_ORDER = ["Active", "Manager", "OJT", "Bench", "New", "Projected"];
@@ -13385,28 +13424,35 @@ function renderGlance() {
       h("h1", {}, (hr < 12 ? "Good morning" : hr < 17 ? "Good afternoon" : "Good evening") + (first ? ", " + first : "")),
       h("p", {}, (st && !st.isToday ? "Showing " + DOW_LONG[st.day.getUTCDay()] + ", " + st.day.getUTCDate() + " " + MON_LONG[st.day.getUTCMonth()] + " " + st.day.getUTCFullYear() : DOW_LONG[now.getDay()] + ", " + now.getDate() + " " + MON_LONG[now.getMonth()]) + (st ? " · " + st.tracked + " people tracked" : "") + " · " + (nNeed ? nNeed + (nNeed === 1 ? " thing needs" : " things need") + " you" : "nothing needs you right now"))), h("div", { class: "ovx-ctrls" }, dateBox, seg));
   const tiles = [];
-  if (st) {
-    const tr = st.trend, mn = Math.min(...tr), mx = Math.max(...tr), W = 220, H = 44;
-    const pts = tr.map((v, i) => (i * W / Math.max(1, tr.length - 1)).toFixed(1) + "," + (mx === mn ? H / 2 : H - 4 - (v - mn) / (mx - mn) * (H - 8)).toFixed(1)).join(" ");
-    const spark = h("span", { class: "ovx-spark", "aria-hidden": "true" }); spark.innerHTML = `<svg viewBox="0 0 ${W} ${H}" preserveAspectRatio="none"><polyline fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" points="${pts}"/></svg>`;
-    const one = st.per === "today", pl = one ? (isToday ? " today" : "") : " · " + st.label.toLowerCase().replace(/^this /, "this ");
-    spark.title = one ? "Present on the last 10 working days" : "Present on each working day of the " + (st.per === "week" ? "week" : "month");
-    /* v3.95.0: nobody tracked for this day yet: say so and offer to take attendance, instead of "0 of 0" */
-    if (one && !st.tracked) { const exp = (state.rows || []).filter(r => !/left|resign|inactive|absconded|terminated/i.test(gs(r, "status_column"))).length;
-      tiles.push(h("div", { class: "ovx-t ovx-green ovx-empty" }, h("small", {}, "Present" + pl), h("strong", {}, isToday ? "Attendance not taken yet" : "Nothing recorded for this day"), h("em", {}, exp + (exp === 1 ? " person" : " people") + (isToday ? " expected today" : " in the team")),
-        h("button", { type: "button", class: "btn primary mini ovx-take", onclick: () => setView("attendance") }, isToday ? "Take now →" : "Open attendance →"))); } else
-    tiles.push(h("div", { class: "ovx-t ovx-green" }, h("small", {}, "Present" + pl), h("b", {}, String(st.present), h("span", {}, " of " + st.tracked + (one ? "" : " a day"))), h("em", { title: one ? "" : "Over " + st.days + " working day" + (st.days === 1 ? "" : "s") }, st.rate + "% attendance"), spark));
-    tiles.push(h("button", { type: "button", class: "ovx-t ovx-peach", onclick: () => { $("#cardAttendance")?.scrollIntoView({ behavior: "smooth", block: "center" }); } }, h("small", {}, (one ? "Out" : "Leave days") + pl), h("b", {}, String(st.full + st.half)), h("em", {}, st.full + " leave · " + st.half + " half day · " + st.late + " late")));
-    tiles.push(h("div", { class: "ovx-t" }, h("small", {}, "Backup cover" + pl), h("b", {}, st.cov == null ? "–" : st.cov + "%"), h("div", { class: "ovx-bar" }, h("i", { style: "width:" + (st.cov == null ? 0 : st.cov) + "%" })), h("em", {}, st.leaveN ? st.covered + " of " + st.leaveN + (one ? " covered" : " leave days covered") : "nobody on leave")));
+  /* v3.104.0: decision tiles — compared with your usual, looking ahead, and what it costs */
+  const ds = attOk && ATT.decisionStats ? ATT.decisionStats() : null;
+  if (ds) {
+    const T = (cls, ic, label, main, sub, extra, act, fn, tip) => h(fn ? "button" : "div", { type: fn ? "button" : undefined, class: "ovx-t dx " + cls, onclick: fn || undefined, title: tip || "" },
+      h("small", {}, h("span", { class: "dx-ic", "aria-hidden": "true" }, ic), label), main, sub ? h("em", {}, ...[].concat(sub)) : null, extra || null, act ? h("span", { class: "dx-act" }, act + " →") : null);
+    const delta = (v, good, unit) => { if (v == null || !isFinite(v) || Math.abs(v) < 0.05) return h("span", { class: "dx-flat" }, "no change"); const up = v > 0, ok = good === "up" ? up : !up; return h("span", { class: ok ? "dx-good" : "dx-bad" }, (up ? "▲ " : "▼ ") + (Math.round(Math.abs(v) * 10) / 10) + (unit || "")); };
+    const spark = vals => { if (vals.length < 2) return null; const W = 220, H = 34, mn = Math.min(...vals), mx = Math.max(...vals); const el = h("span", { class: "dx-spark", "aria-hidden": "true" }); el.innerHTML = `<svg viewBox="0 0 ${W} ${H}" preserveAspectRatio="none"><polyline fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" points="${vals.map((v, i) => (i * W / (vals.length - 1)).toFixed(1) + "," + (mx === mn ? H / 2 : H - 3 - (v - mn) / (mx - mn) * (H - 6)).toFixed(1)).join(" ")}"/></svg>`; return el; };
+    const dLab = t => WD3[t.getUTCDay()] + " " + t.getUTCDate();
+    /* 1 */ tiles.push(!ds.tracked ? T("dx-violet", "📈", "Attendance vs usual", h("b", {}, ds.isToday ? "Not taken yet" : "Nothing recorded"), (state.rows || []).length + " people expected", null, ds.isToday ? "Take attendance" : "Open attendance", () => setView("attendance"))
+      : T("dx-violet", "📈", "Attendance vs usual", h("b", {}, (ds.pct ?? 0) + "%", h("span", {}, ds.isToday ? " today" : " that day")), [delta(ds.usual == null ? null : ds.pct - ds.usual, "up", " pts"), " vs a usual " + ds.wd + (ds.usual != null ? " (" + ds.usual + "%)" : "")], spark(ds.line), "Who's out", () => $("#cardAttendance")?.scrollIntoView({ behavior: "smooth", block: "center" }), "Compared with the same weekday over the last 4 weeks"));
+    /* 2 */ { const mx = Math.max(1, ...ds.ahead.map(x => x.out)), b = ds.busiest, miss = ds.ahead.reduce((a, x) => a + x.missing, 0);
+      const bars = h("span", { class: "dx-bars", "aria-hidden": "true" }, ...ds.ahead.map(x => h("i", { class: x === b && x.out ? "hot" : "", style: "height:" + Math.max(6, x.out / mx * 100) + "%", title: dLab(x.t) + ": " + x.out + " out" + (x.missing ? ", " + x.missing + " without backup" : "") })));
+      const lab = h("span", { class: "dx-days", "aria-hidden": "true" }, ...ds.ahead.map(x => h("span", {}, WD3[x.t.getUTCDay()].slice(0, 2))));
+      tiles.push(T("dx-peach", "🗓", "Next 7 working days", h("b", {}, b && b.out ? dLab(b.t) : "Quiet", h("span", {}, b && b.out ? " busiest · " + b.out + " out" : " nobody out")), null, h("span", { class: "dx-ahead" }, bars, lab), miss ? miss + (miss === 1 ? " backup" : " backups") + " not set yet" : "Backups all set", miss ? () => { window.ATT?.bkDueNow && ATT.bkDueNow(); } : null)); }
+    /* 3 */ tiles.push(T("dx-rose", "⚠️", "Unplanned share", h("b", {}, ds.unNow == null ? "–" : ds.unNow + "%", h("span", {}, " of leave this month")), ds.unNow == null ? "No leave this month yet" : [delta(ds.unPrev == null ? null : ds.unNow - ds.unPrev, "down", " pts"), " vs last month" + (ds.worst ? " · " + ds.worst[0] + " highest (" + ds.worst[1] + "%)" : "")],
+      ds.unNow == null ? null : h("span", { class: "dx-mix", "aria-hidden": "true" }, h("i", { class: "un", style: "width:" + ds.unNow + "%" }), h("i", { class: "pl", style: "width:" + (100 - ds.unNow) + "%" })), window.trOpen ? "See Trends" : null, window.trOpen ? () => trOpen() : null, "Unplanned leave and absences (UL, AB) as a share of all leave days"));
+    /* 4 */ tiles.push(T("dx-amber", "💸", "Seats at risk this cycle", h("b", {}, String(ds.risk), h("span", {}, ds.risk === 1 ? " seat-day" : " seat-days")), ds.risk ? [ds.riskNo + " no backup · " + ds.riskUnset + " not updated", ds.riskTop ? h("br") : null, ds.riskTop ? "Mostly " + ds.riskTop[0] : null] : "Every leave day so far is covered", null, "Open the billing grid", () => { if (typeof openBackupReport === "function") openBackupReport(); else setView("backups"); }, "Pay cycle 26th – 25th · ends " + ds.cycleEnd.getUTCDate() + " " + MON_LONG[ds.cycleEnd.getUTCMonth()]));
+    /* 5 */ { const dh = ds.hcNow - ds.hcThen; tiles.push(T("dx-teal", "👥", "Team movement", h("b", {}, String(ds.notice), h("span", {}, " on notice")), [ds.joiners + (ds.joiners === 1 ? " new joiner" : " new joiners") + " (New / OJT)", h("br"), "Headcount ", dh === 0 ? h("span", { class: "dx-flat" }, "same") : h("span", { class: dh > 0 ? "dx-good" : "dx-bad" }, (dh > 0 ? "▲ " : "▼ ") + Math.abs(dh)), " vs 30 days ago (" + ds.hcNow + ")"], null, "Plan cover", () => setView("employees"))); }
+    /* 6 */ tiles.push(T("dx-blue", "⏰", "Late arrivals", h("b", {}, String(ds.lateWeek), h("span", {}, " this week")), [delta(ds.lateWeek - ds.lateLast, "down"), " vs last week" + (ds.late3 ? " · " + ds.late3 + (ds.late3 === 1 ? " person" : " people") + " late 3+ times in 30 days" : "") + (ds.lateDays.length ? " · mostly " + ds.lateDays.join(" and ") : "")], null, window.trOpen ? "See who" : null, window.trOpen ? () => trOpen() : null));
   } else if (can("ov.coming") && state.schema) {
     let b = 0, a = 0; const toSat = 6 - new Date().getDay(); try { b = upcoming("dob_column", "bday", toSat).length; a = upcoming("doj_column", "anniv", toSat).length; } catch { }
     tiles.push(h("div", { class: "ovx-t ovx-peach" }, h("small", {}, "Celebrations this week"), h("b", {}, String(b + a)), h("em", {}, b + " birthday" + (b === 1 ? "" : "s") + " · " + a + " anniversar" + (a === 1 ? "y" : "ies"))));
   }
-  tiles.push(h("div", { class: "ovx-t ovx-lav" + (nNeed ? "" : " ok") }, h("small", {}, "Needs you"),
+  if (!ds) tiles.push(h("div", { class: "ovx-t ovx-lav" + (nNeed ? "" : " ok") }, h("small", {}, "Needs you"),
     nNeed ? h("ul", { class: "ovx-needs" }, ...needs.map(([n, t, fn]) => h("li", {}, h("button", { type: "button", onclick: fn }, h("b", {}, String(n)), " " + t)))) : h("p", { class: "ovx-ok" }, "All caught up ✓")));
   box.replaceChildren(hero, h("div", { class: "ovx-tiles", style: "--n:" + tiles.length }, ...tiles));
   box.hidden = false;
 }
+const WD3 = ["Sun", "Mon", "Tue", "Wed", "Thu", "Fri", "Sat"];
 const DOW_LONG = ["Sunday", "Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday"], MON_LONG = ["January", "February", "March", "April", "May", "June", "July", "August", "September", "October", "November", "December"];
 function organizeOverview() { if (typeof state === "undefined" || state.view !== "summary" || document.getElementById("pageSummary")?.hidden) return; for (const f of [organizeRequests, organizeUpcoming, renderGlance]) { try { f(); } catch (e) { console.warn(e); } } }
 window.organizeOverview = organizeOverview;
@@ -20327,6 +20373,7 @@ window.bdSearch = (() => {
 /* v3.96.0: "What's new" once per person after each update (remembered in the database); again from More or the bell */
 window.bdWhatsNew = (() => {
   const NOTES = [
+    { v: '3.104.0', items: [['🧭', 'Decision tiles on the Overview', 'Attendance vs your usual, the next 7 days, unplanned share, seats at risk this cycle, team movement and late arrivals: each with what to do next.']] },
     { v: '3.103.0', items: [['🎯', 'Record attendance types per person', 'In People & access, give one person their own types (say, Remote) instead of their role’s.'], ['💬', 'Internal remarks', 'Add a remark while recording attendance; it shows as a dot and on hover in the grid, and in Who is out.'], ['⏰', 'Backup reminder timing', 'Settings › Workbook & storage › “⏰ Backup reminder timing” (or the button on the reminder itself): how often, which day and what time (ET).'], ['⏰', 'Upcoming-leave backup reminder timing', 'Admins choose how often “Backup needed for upcoming leave” comes back and how far ahead it looks (⏰ Timing on the box).'], ['📈', 'Trends by role', 'Settings › Roles has a new “See Trends” right; admins always see it.'], ['👥', 'Choose who shows in Record attendance', 'Admins pick the employee statuses the team records for; only they show in the Employee box.']] },
     { v: '3.102.0', items: [['🩺', 'Sickroom', 'Send someone to the sickroom and check them back: live timers, a log, and who goes how often and for how long.'], ['🧠', 'Trends', 'In its own deck (the 📈 button at the top): who takes more leave than usual, leave patterns, late streaks and sickroom habits, spotted automatically.']] },
     { v: '3.101.0', items: [['📣', 'Tag people in task comments', 'Type @ in a comment and pick a teammate: they get a notification and can see and reply to the task.'], ['🏢', 'Who is out by client', 'Group the Who is out list by client, or by client and sub client.']] },
@@ -20691,6 +20738,30 @@ html body #pinnedHeader #btnBell #bellN[hidden] { display:none !important; }
 #trDeck .tr-hd { padding-right:40px; }
 #trDeck > .sk-x { position:absolute; top:14px; right:14px; z-index:2; }
 @media (max-width:760px) { #trDeck { top:auto; bottom:0; left:0; right:0; width:auto; max-height:88vh; border-radius:20px 20px 0 0; z-index:1200; padding-bottom:calc(76px + env(safe-area-inset-bottom)); } }
+
+/* v3.104.0: decision tiles */
+html body .ovx-tiles:has(.dx) { grid-template-columns:repeat(3, minmax(0, 1fr)) !important; }
+@media (max-width:1100px) { html body .ovx-tiles:has(.dx) { grid-template-columns:repeat(2, minmax(0, 1fr)) !important; } }
+@media (max-width:640px) { html body .ovx-tiles:has(.dx) { grid-template-columns:minmax(0, 1fr) !important; } }
+html body .ovx-t.dx { display:flex !important; flex-direction:column; align-items:stretch; gap:6px; text-align:left; min-height:0 !important; padding:14px 16px !important; font:inherit; color:inherit; cursor:default; }
+html body button.ovx-t.dx { cursor:pointer; } html body button.ovx-t.dx:hover { transform:translateY(-1px); }
+html body .ovx-t.dx > small { display:flex; align-items:center; gap:7px; font-size:11px !important; letter-spacing:.06em; text-transform:uppercase; font-weight:700; color:var(--ink-2,#5b6475); }
+.dx-ic { font-size:14px; letter-spacing:0; }
+html body .ovx-t.dx::before, html body .ovx-t.dx::after { display:none !important; content:none !important; }
+html body .ovx-t.dx { position:relative; overflow:hidden; }
+html body .ovx-t.dx > b { font-size:26px !important; line-height:1.1; font-weight:800; letter-spacing:-.02em; }
+html body .ovx-t.dx > b span { font-size:13px; font-weight:500; color:var(--ink-3,#8a93a3); letter-spacing:0; }
+html body .ovx-t.dx > em { font-style:normal; font-size:12.5px; line-height:1.45; color:var(--ink-2,#5b6475); }
+.dx-good { color:#0f7b55; font-weight:700; } .dx-bad { color:#c0392b; font-weight:700; } .dx-flat { color:var(--ink-3); font-weight:600; }
+.dx-act { margin-top:auto; padding-top:4px; font-size:12.5px; font-weight:650; color:var(--accent,#2563eb); }
+.dx-spark { display:block; height:34px; color:#7c6cf0; } .dx-spark svg { width:100%; height:100%; }
+.dx-ahead { display:flex; flex-direction:column; gap:3px; }
+.dx-bars { display:flex; align-items:flex-end; gap:5px; height:40px; } .dx-bars i { flex:1; border-radius:4px 4px 1px 1px; background:#f3c9b5; } .dx-bars i.hot { background:#e4572e; }
+.dx-days { display:flex; gap:5px; } .dx-days span { flex:1; text-align:center; font-size:10.5px; color:var(--ink-3); }
+.dx-mix { display:flex; height:8px; border-radius:5px; overflow:hidden; background:var(--surface-2,#eef0f4); } .dx-mix .un { background:#e24b4a; } .dx-mix .pl { background:#5dcaa5; }
+html body .ovx-t.dx.dx-violet { border-bottom:3px solid #7c6cf0 !important; } html body .ovx-t.dx.dx-peach { border-bottom:3px solid #e4572e !important; }
+html body .ovx-t.dx.dx-rose { border-bottom:3px solid #e24b4a !important; } html body .ovx-t.dx.dx-amber { border-bottom:3px solid #e59a0c !important; }
+html body .ovx-t.dx.dx-teal { border-bottom:3px solid #10a37f !important; } html body .ovx-t.dx.dx-blue { border-bottom:3px solid #2f6fe0 !important; }
 #skPanel { position:fixed; z-index:60; top:64px; right:16px; width:min(520px, calc(100vw - 24px)); max-height:min(80vh, 760px); overflow:auto; background:var(--surface,#fff); color:var(--ink); border:1px solid var(--border,#e3e6ec); border-radius:18px; box-shadow:0 24px 60px -12px rgba(15,23,42,.28), 0 2px 8px rgba(15,23,42,.08); padding:16px 18px 18px; }
 #skPanel[hidden] { display:none; }
 @media (max-width:760px) { #skPanel { top:auto; bottom:0; left:0; right:0; width:auto; max-height:86vh; border-radius:20px 20px 0 0; z-index:1200; padding-bottom:calc(84px + env(safe-area-inset-bottom)); } }
