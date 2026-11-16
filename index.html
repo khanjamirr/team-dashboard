@@ -15,7 +15,7 @@
 <meta name="apple-mobile-web-app-title" content="Blasters Deck">
 <meta name="application-name" content="Blasters Deck">
 <meta name="apple-mobile-web-app-status-bar-style" content="default">
-<title>Blasters Deck · 3.98.2</title>
+<title>Blasters Deck · 3.98.4</title>
 <link rel="preconnect" href="https://fonts.googleapis.com"><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin><link href="https://fonts.googleapis.com/css2?family=Public+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet">
 <style>
 :root {
@@ -8461,7 +8461,7 @@ function fixEdit(x) {
   if (!e) {
     e = { rr: x.rr || (x.sugg ? x.sugg.rr : null), id: '', idTouched: false, client: '', clientTouched: false, rename: false, on: false };
     fixDefaults(x, e);
-    e.on = x.rr ? !!(e.id || e.client) : !!(x.sugg && x.sugg.sure);   // matched people: fill from the workforce file. Unmatched: only the confident suggestions start ticked.
+    e.on = false;   // v3.98.4: nothing starts ticked, so Apply only changes the people you tick yourself (use “Tick all likely” to tick the suggestions)
     FIX.edits.set(x.key, e);
   }
   return e;
@@ -11959,7 +11959,7 @@ async function poll() {
 }
 
 /* ============================== filtering ============================== */
-const APP = { title: "Blasters Deck", version: "3.98.2", released: "2026-11-16" };
+const APP = { title: "Blasters Deck", version: "3.98.4", released: "2026-11-16" };
 const BASE_DIMS = { status: "status_column", desig: "designation_column", client: "client_column", mode: "mode_column" };
 const STANDARD_STATUSES = ["Active", "Manager", "OJT", "Bench", "New", "Projected", "Left", "Moved"];
 const TILE_ORDER = ["Active", "Manager", "OJT", "Bench", "New", "Projected"];
@@ -15855,7 +15855,14 @@ const notificationRequestEvents = () => {
     return events;
   });
 };
-const activityNotification = it => ({id:'activity:'+(it.eventId || JSON.stringify([it.time,it.user,it.action,it.key,it.name,it.details])),time:it.time,title:(BE.ACT_VERBS[it.action] || it.action || 'Activity')+' · '+(it.name || ''),detail:(it.user || 'Unknown user')+' · '+BE.actDetails(it),type:'activity'});
+/* v3.98.4: who am I (to leave out my own changes) */
+const nfMe = () => { try { const u = CLOUD.user() || {}; return { id: String(u.id || ''), name: String(u.name || '').trim().toLowerCase() }; } catch { return { id: '', name: '' }; } };
+const nfNotMine = ev => { const me = nfMe(); if (!me.id && !me.name) return true;
+  if (/:pending$/.test(ev.id)) return !(String(ev.userId || '') === me.id || String(ev.user || '').trim().toLowerCase() === me.name);
+  const r = ((window.TD_SETTINGS || {}).leave_requests || []).find(x => String(x.id) === String(ev.requestId)); const by = String((r && (r.decidedBy || '')) || '').trim().toLowerCase();
+  return !(by && by === me.name); };
+window.nfMe = nfMe; window.nfNotMine = nfNotMine;
+const activityNotification = it => { const p = nfPretty(it); return { id: 'activity:' + (it.eventId || JSON.stringify([it.time, it.user, it.action, it.key, it.name, it.details])), time: it.time, title: p.title, detail: p.body, icon: p.icon, type: 'activity' }; };
 let notificationItems = [], notificationOwner = '', notificationBody = null, bellBusy = false, activityError = '';
 function bellShow(n) {
   const b=el('bellN'), btn=el('btnBell'); if (!b || !btn) return;
@@ -15872,6 +15879,35 @@ function markNotificationsRead(ids) {
 }
 /* v3.78.0: a simpler notification center: filter chips, grouped by day, one tap opens the thing it is about */
 let nfFilter = 'all', nfShow = 40;
+/* v3.98.3: notifications in plain, short words: "Jamir updated the Team Leaders role" + one line of key facts */
+const NF_MON = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'];
+const nfDates = t => String(t || '').replace(/\b(\d{4})-(\d{2})-(\d{2})\b/g, (_, y, m, d) => (+d) + ' ' + NF_MON[+m - 1]).replace(/\s+/g, ' ').trim();
+const nfClip = (t, n) => { t = nfDates(t); return t.length > n ? t.slice(0, n - 1).replace(/[\s·,;:]+\S*$/, '') + '…' : t; };
+function nfPretty(it) {
+  const who = String(it.user || 'Someone').trim().split(/\s+/)[0], a = it.action || '', name = String(it.name || '').trim();
+  const V = { add: ['➕', 'added'], edit: ['✏️', 'updated'], delete: ['🗑', 'removed'], bulk: ['✏️', 'updated'], 'add-column': ['🧩', 'added the column'], 'delete-column': ['🧩', 'deleted the column'], 'rename-column': ['🧩', 'renamed a column'],
+    'att-edit': ['🗓', 'updated attendance for'], 'att-add': ['🗓', 'added to attendance:'], 'att-delete': ['🗓', 'removed from attendance:'], 'att-link': ['🔗', 'linked'], 'att-unlink': ['🔗', 'unlinked'],
+    'request-submitted': ['📝', 'asked for leave for'], 'request-approved': ['✅', 'approved leave for'], 'request-rejected': ['⛔', 'rejected leave for'], 'request-cancelled': ['↩️', 'cancelled leave for'],
+    overwrite: ['⚠️', 'overwrote changes to'], settings: ['⚙️', 'changed'] };
+  let [icon, verb] = V[a] || (/^external-/.test(a) ? ['📄', 'changed in Excel:'] : ['•', String(a || 'changed').replace(/[-_]/g, ' ')]);
+  let subject = name;
+  if (a === 'settings') { const m = name.match(/^role\s+(.+)$/i); subject = m ? 'the ' + m[1] + ' role' : name ? name.charAt(0).toLowerCase() + name.slice(1) : 'settings'; verb = m ? 'updated' : 'changed'; }
+  const title = nfClip(icon + ' ' + who + ' ' + verb + (subject ? ' ' + subject : ''), 64);
+  /* the detail: drop parts that repeat the title, keep short facts, at most 3 */
+  let raw = (typeof BE !== 'undefined' && BE.actDetails ? BE.actDetails(it) : '') || '';
+  if (/att-edit/.test(a)) raw = raw.replace(/\b([A-Z][a-z]{2}) (\d{4}) · (\d{1,2}) [A-Z][a-z]{2}:/g, '$3 $1:').replace(/\bLA → (AL|CL|SL|UL|HD1|HD2)\b/g, 'LA → $1 (approved)').replace(/\bLA → RJ\b/g, 'LA → RJ (rejected)');
+  const parts = raw.split(/\s·\s/).map(x => x.trim()).filter(Boolean).filter(x => !(name && x.toLowerCase().includes(name.toLowerCase().replace(/^role\s+/i, ''))) && !/^updated role\b/i.test(x));
+  const short = parts.filter(x => x.length <= 52), pool = short.length ? short : parts, pick = (a === 'settings' ? [...pool.filter(x => /\d/.test(x)), ...pool.filter(x => !/\d/.test(x))] : pool).slice(0, 3);
+  return { icon, title, body: nfClip(pick.join(' · '), 90) };
+}
+/* the same clean-up for anything else shown as a notification (requests, tasks, playbook) */
+function nfTidy(title, body) {
+  const T = { 'request submitted': '📝 Leave request', 'request approved': '✅ Leave approved', 'request rejected': '⛔ Leave rejected', 'request cancelled': '↩️ Leave cancelled' };
+  let parts = String(body || '').split(/\s·\s/).map(x => x.trim()).filter(Boolean), t = String(title || '').trim();
+  const k = T[t.toLowerCase()]; if (k && parts.length) { t = k + ': ' + parts[0]; parts = parts.slice(1); }
+  return { title: nfClip(t, 64), body: nfClip(parts.slice(0, 4).join(' · '), 100) };
+}
+window.nfTidy = (a, b) => nfTidy(a, b); window.nfPretty = it => nfPretty(it);
 const NF_TYPES = { task: ['☑', 'Tasks'], request: ['📅', 'Requests'], playbook: ['📘', 'Playbook'], activity: ['✎', 'Activity'] };
 const nfAgo = t => { const d = Date.parse(t); if (!d) return ''; const m = Math.max(0, (Date.now() - d) / 60000); return m < 1 ? 'now' : m < 60 ? Math.round(m) + 'm' : m < 1440 ? Math.round(m / 60) + 'h' : m < 1440 * 7 ? Math.round(m / 1440) + 'd' : new Date(d).toLocaleDateString(undefined, { day: 'numeric', month: 'short' }); };
 function nfOpen(it) {
@@ -15893,10 +15929,10 @@ function drawNotifications() {
   const t0 = new Date(); t0.setHours(0, 0, 0, 0); const day = it => { const d = Date.parse(it.time) || 0; return d >= t0.getTime() ? 'Today' : d >= t0.getTime() - 864e5 ? 'Yesterday' : 'Earlier'; };
   const groups = [];
   for (const it of list.slice(0, nfShow)) { const g = day(it); let G = groups.find(x => x.g === g); if (!G) groups.push(G = { g, items: [] }); G.items.push(it); }
-  const row = it => { const un = !read.has(it.id), [ic] = NF_TYPES[it.type] || ['•'];
+  const row = it => { const un = !read.has(it.id), ic = it.icon || (NF_TYPES[it.type] || ['•'])[0], icEl = h('span', { class: 'nf-ic', 'aria-hidden': 'true' }, ic);
     return h('li', { class: 'nf-item nf-' + (it.type || 'x') + (un ? ' unread' : '') },
-      h('button', { type: 'button', class: 'nf-main', onclick: () => nfOpen(it) }, h('span', { class: 'nf-ic', 'aria-hidden': 'true' }, ic),
-        h('span', { class: 'nf-txt' }, h('b', {}, it.title), h('span', {}, it.detail)), h('span', { class: 'nf-time' }, nfAgo(it.time))),
+      h('button', { type: 'button', class: 'nf-main', onclick: () => nfOpen(it) }, icEl,
+        (() => { const tt = it.type === 'activity' ? { title: it.title, body: it.detail } : nfTidy(it.title, it.detail); const em = tt.title.match(/^(\p{Extended_Pictographic}\uFE0F?)\s+/u); if (em) { tt.title = tt.title.slice(em[0].length); icEl.textContent = em[1]; } return h('span', { class: 'nf-txt' }, h('b', {}, tt.title), h('span', {}, tt.body)); })(), h('span', { class: 'nf-time' }, nfAgo(it.time))),
       un ? h('button', { type: 'button', class: 'nf-dot', title: 'Mark as read', 'aria-label': 'Mark as read', onclick: () => markNotificationsRead([it.id]) }) : null); };
   /* v3.98.0: two tabs (Notifications / Activity) and a clear footer */
   const canAct = PERM.can('activity.view');
@@ -15925,12 +15961,12 @@ async function bellCheck() {
     if (window.__tdSetP) await window.__tdSetP; else if (!window.__tdSetAt || Date.now() - window.__tdSetAt > 30000) await loadTeamSettings(true);   /* v3.74.1: settings fetched in the last 30 s are reused */
     let activity=[];activityError='';
     if (PERM.can('activity.view')) {
-      try { const d=await api('GET','/api/activity'); activity=(d.items || []).filter(it=>!String(it.action || '').startsWith('request-')).map(activityNotification); }
+      try { const d=await api('GET','/api/activity'); const meN=nfMe(); activity=(d.items || []).filter(it=>!String(it.action || '').startsWith('request-') && !(meN.name && String(it.user || '').trim().toLowerCase()===meN.name)).map(activityNotification); }   /* v3.98.4: not your own changes */
       catch(e) { activityError='Activity could not be loaded: '+e.message; }
     }
     if (owner !== notificationKey()) return;
     // Recheck access after asynchronous reads so changed permissions take effect.
-    notificationItems=[...notificationRequestEvents(),...(window.TDTASKS?TDTASKS.events():[]),...(window.TDPB?TDPB.events():[]),...(PERM.can('activity.view')?activity:[])].sort((a,b)=>(Date.parse(b.time)||0)-(Date.parse(a.time)||0));   /* v3.78.0: tasks and playbook too */
+    notificationItems=[...notificationRequestEvents().filter(nfNotMine),...(window.TDTASKS?TDTASKS.events():[]),...(window.TDPB?TDPB.events():[]),...(PERM.can('activity.view')?activity:[])].sort((a,b)=>(Date.parse(b.time)||0)-(Date.parse(a.time)||0));   /* v3.78.0: tasks and playbook too */
     bellShow(unreadCount());drawNotifications();window.ATT?.renderApprovalRequests();
     try { window.TDN?.items(notificationItems, notificationReads(), it => { try { nfOpen(it); } catch { openBell(); } }); } catch { }
   } catch(e) { activityError='Notifications could not be refreshed: '+e.message;drawNotifications(); }
@@ -15951,7 +15987,7 @@ window.openBell=()=>{
 };
 el('btnBell').addEventListener('click',()=>window.openBell());
 setTimeout(bellCheck,4000);
-TDNET.poller('bell', 60000, bellCheck);   /* v3.74.1: was every 15 s */
+window.bellCheck = bellCheck; TDNET.poller('bell', 30000, bellCheck);   /* v3.98.4: every 30 s (was 60 s) */   /* v3.74.1: was every 15 s */
 addEventListener('att:requests',bellCheck);
 addEventListener('att:sync',bellCheck);
 addEventListener('activity:changed',bellCheck);
@@ -19748,7 +19784,7 @@ window.TDN = (() => {
     const fresh = (list || []).filter(it => it && it.id && it.type !== 'task' && !(pushOn && it.type === 'request') && !(read && read.has(it.id)));   /* v3.96.0: the server sends requests itself */
     if (seen == null) { seen = new Set(fresh.map(it => it.id)); return; }
     const now = fresh.filter(it => !seen.has(it.id)); now.forEach(it => seen.add(it.id));
-    for (const it of now.slice(0, 4)) show(String(it.title || 'Blasters Deck'), String(it.detail || ''), 'nf-' + it.id, () => open(it));
+    for (const it of now.slice(0, 4)) { const t = window.nfTidy ? nfTidy(it.title || 'Blasters Deck', it.detail || '') : { title: it.title, body: it.detail }; show(t.title, t.body, 'nf-' + it.id, () => open(it)); }
     if (now.length > 4) show('Blasters Deck', (now.length - 4) + ' more new notifications', 'nf-more', () => window.openBell && openBell());
   }
   /* v3.95.1: notifications are required. After signing in, nothing can be used until they are allowed on this device.
@@ -19795,7 +19831,7 @@ window.TDN = (() => {
   try { navigator.permissions?.query({ name: 'notifications' }).then(ps => { ps.onchange = () => check(true); }).catch(() => { }); } catch { }
   const ask = () => check(false);
   /* in the background the bell is checked every 90 seconds so new things still pop up */
-  setInterval(() => { if (document.hidden && on() && typeof bellCheck === 'function') bellCheck(); }, 90000);
+  setInterval(() => { if (on() && (document.hidden || (window.TDNET && TDNET.idle())) && typeof window.bellCheck === 'function') window.bellCheck(); }, 30000);   /* v3.98.4: was 90 s and only for hidden tabs; idle-but-open pages stopped checking */
   /* v3.96.0: notifications when the app is closed. This device is registered with the server (Web Push); the server
      sends new tasks, comments, leave requests and answers, private-detail requests and passcode resets. */
   let pushOn = false, pushUser = null, pushEp = null, pushBusy = false, lastErr = '';
@@ -19910,6 +19946,7 @@ window.bdSearch = (() => {
 /* v3.96.0: "What's new" once per person after each update (remembered in the database); again from More or the bell */
 window.bdWhatsNew = (() => {
   const NOTES = [
+    { v: '3.98.4', items: [['⚡', 'Faster notifications', 'New changes now show up within about 30 seconds, even when the page has been left open in the background.'], ['🙈', 'No more alerts about your own changes', 'You are only told about what other people do.'], ['🧹', 'Cleaner Chrome pop-ups', 'Short title, one line of detail.'], ['🛡️', 'Fix people starts with nothing ticked', 'Apply only changes the people you tick yourself.']] },
     { v: '3.98.2', items: [['✨', 'What’s new button', 'The ✨ beside the bell opens these notes any time; a green dot means there is something new.'], ['🔄', 'Reload when a new version is out', 'A bar at the top asks you to reload when Blasters Deck is updated.'], ['💬', 'WhatsApp same as phone', 'A tick in the employee form copies the phone number to WhatsApp.']] },
     { v: '3.98.0', items: [['▦', 'Change many attendance cells at once', 'Drag across cells (or Shift / Ctrl + click), then pick the code in the bar that appears.'], ['🔔', 'A cleaner notifications panel', 'Notifications and Activity tabs; activity in plain words, grouped by day, with Approved / Rejected tags.'], ['💻', 'Notification help for computers', 'Check notifications now shows the Windows / Mac and Chrome settings to turn on, and a quick test.']] },
     { v: '3.96.0', items: [['🔔', 'Notifications even when the app is closed', 'New tasks, comments, leave requests and their answers reach your phone or computer.'], ['🔍', 'Search everything', 'People, tasks and activities from one box: the 🔍 at the top (Ctrl + K on a computer).'], ['✨', 'What’s new', 'This note after each update. Find it again in More on a phone, or at the bottom of the 🔔 notifications.']] },
