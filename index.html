@@ -15,7 +15,7 @@
 <meta name="apple-mobile-web-app-title" content="Blasters Deck">
 <meta name="application-name" content="Blasters Deck">
 <meta name="apple-mobile-web-app-status-bar-style" content="default">
-<title>Blasters Deck · 3.103.1</title>
+<title>Blasters Deck · 3.103.2</title>
 <link rel="preconnect" href="https://fonts.googleapis.com"><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin><link href="https://fonts.googleapis.com/css2?family=Public+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet">
 <style>
 :root {
@@ -9142,7 +9142,7 @@ function openLogLeave(preKey) {
   const m = openModal({
     title: 'Record attendance',
     body: `<style>${PAST_CSS}.cbx{position:relative}.cbx-list{position:absolute;left:0;right:0;top:calc(100% + 4px);z-index:5;max-height:260px;overflow:auto;background:var(--surface);border:1px solid var(--line-2);border-radius:10px;box-shadow:0 10px 30px rgba(0,0,0,.18);padding:4px}.cbx-opt{display:flex;justify-content:space-between;gap:12px;width:100%;border:0;background:transparent;text-align:left;padding:7px 10px;border-radius:7px;font-size:13px;color:var(--ink);font-weight:500}.cbx-opt small{color:var(--ink-3);font-weight:400}.cbx-opt.on,.cbx-opt:hover{background:var(--accent-soft)}.cbx-empty{padding:10px;color:var(--ink-3);font-size:12px}.cbx-caret{position:absolute;right:8px;top:50%;transform:translateY(-50%);border:0;background:transparent;color:var(--ink-3);padding:4px 6px}</style>
-      <div class="form"><div class="full" style="display:flex;flex-direction:column;gap:4px"><span style="font-size:12px;font-weight:600;color:var(--ink-2);display:flex;align-items:center;gap:8px">Employee <button type="button" id="l-who" title="Choose which employee statuses show in this list" style="border:1px solid var(--line,#e3e6ec);background:var(--surface-2,#f4f6f9);border-radius:999px;padding:2px 10px;font:inherit;font-size:11.5px;font-weight:600;color:var(--ink-2);cursor:pointer">👥 Showing: <span id="l-who-t">${esc(whoLabel())}</span> ▾</button></span><div class="cbx"><input type="text" id="l-name" value="${esc(pre || '')}" placeholder="Pick or type a name" autocomplete="off" role="combobox" aria-expanded="false" aria-controls="l-list" aria-label="Employee" style="width:100%;padding-right:32px"><button type="button" class="cbx-caret" id="l-caret" tabindex="-1" aria-label="Show all employees">▾</button><div class="cbx-list" id="l-list" role="listbox" hidden></div></div></div>
+      <div class="form"><div class="full" style="display:flex;flex-direction:column;gap:4px"><span style="font-size:12px;font-weight:600;color:var(--ink-2);display:flex;align-items:center;gap:8px">Employee ${window.PERM && PERM.isSuper() ? `<button type="button" id="l-who" title="Choose which employee statuses show in this list (for everyone)" style="border:1px solid var(--line,#e3e6ec);background:var(--surface-2,#f4f6f9);border-radius:999px;padding:2px 10px;font:inherit;font-size:11.5px;font-weight:600;color:var(--ink-2);cursor:pointer">👥 Showing: <span id="l-who-t">${esc(whoLabel())}</span> ▾</button>` : (recF() ? `<span style="font-size:11.5px;font-weight:500;color:var(--ink-3)" title="Set by an admin">👥 ${esc(whoLabel())}</span>` : '')}</span><div class="cbx"><input type="text" id="l-name" value="${esc(pre || '')}" placeholder="Pick or type a name" autocomplete="off" role="combobox" aria-expanded="false" aria-controls="l-list" aria-label="Employee" style="width:100%;padding-right:32px"><button type="button" class="cbx-caret" id="l-caret" tabindex="-1" aria-label="Show all employees">▾</button><div class="cbx-list" id="l-list" role="listbox" hidden></div></div></div>
       <div style="display:flex;flex-direction:column;gap:4px"><span style="font-size:12px;font-weight:600;color:var(--ink-2)">Type <small style="font-weight:400;color:var(--ink-3)">· type a code or a word, ↑↓ Enter · Alt+T</small></span><div class="cbx"><input type="text" id="l-type" autocomplete="off" role="combobox" aria-expanded="false" aria-controls="l-tlist" aria-label="Type" style="width:100%" placeholder="Choose a type, e.g. SL or sick"><button type="button" class="cbx-caret" tabindex="-1" aria-hidden="true" id="l-tcaret">▾</button><div class="cbx-list" id="l-tlist" role="listbox" hidden></div></div><select id="l-code" hidden aria-hidden="true" tabindex="-1"><option value="" selected></option>${codesAllowed.map(c => `<option value="${c}">${c} · ${CODES[c].label}</option>`).join('')}</select></div><span></span>
       <label>From<input type="date" id="l-from" value="${today}"></label><label>To<input type="date" id="l-to" value="${today}"></label>
       <label class="full">Internal remark <span style="font-weight:400;color:var(--ink-3)">(optional · only the team sees it)</span><textarea id="l-remark" maxlength="500" rows="2" style="resize:vertical;min-height:44px;font:inherit;padding:8px 10px;border-radius:8px;border:1px solid var(--line);background:var(--surface);color:var(--ink)" placeholder="e.g. Informed TL at 9:10 AM ET on WhatsApp · doctor’s note to follow"></textarea></label>
@@ -12091,7 +12091,7 @@ async function poll() {
 }
 
 /* ============================== filtering ============================== */
-const APP = { title: "Blasters Deck", version: "3.103.1", released: "2026-11-17" };
+const APP = { title: "Blasters Deck", version: "3.103.2", released: "2026-11-17" };
 const BASE_DIMS = { status: "status_column", desig: "designation_column", client: "client_column", mode: "mode_column" };
 const STANDARD_STATUSES = ["Active", "Manager", "OJT", "Bench", "New", "Projected", "Left", "Moved"];
 const TILE_ORDER = ["Active", "Manager", "OJT", "Bench", "New", "Projected"];
@@ -20282,7 +20282,7 @@ window.bdSearch = (() => {
 /* v3.96.0: "What's new" once per person after each update (remembered in the database); again from More or the bell */
 window.bdWhatsNew = (() => {
   const NOTES = [
-    { v: '3.103.0', items: [['🎯', 'Record attendance types per person', 'In People & access, give one person their own types (say, Remote) instead of their role’s.'], ['💬', 'Internal remarks', 'Add a remark while recording attendance; it shows as a dot and on hover in the grid, and in Who is out.'], ['⏰', 'Backup reminder timing', 'Choose how often, which day and what time (ET) the backup reminder comes.'], ['👥', 'Choose who shows in Record attendance', 'Pick the employee statuses you record for; only they show in the Employee box.']] },
+    { v: '3.103.0', items: [['🎯', 'Record attendance types per person', 'In People & access, give one person their own types (say, Remote) instead of their role’s.'], ['💬', 'Internal remarks', 'Add a remark while recording attendance; it shows as a dot and on hover in the grid, and in Who is out.'], ['⏰', 'Backup reminder timing', 'Choose how often, which day and what time (ET) the backup reminder comes.'], ['👥', 'Choose who shows in Record attendance', 'Admins pick the employee statuses the team records for; only they show in the Employee box.']] },
     { v: '3.102.0', items: [['🩺', 'Sickroom', 'Send someone to the sickroom and check them back: live timers, a log, and who goes how often and for how long.'], ['🧠', 'Trends', 'In its own deck (the 📈 button at the top): who takes more leave than usual, leave patterns, late streaks and sickroom habits, spotted automatically.']] },
     { v: '3.101.0', items: [['📣', 'Tag people in task comments', 'Type @ in a comment and pick a teammate: they get a notification and can see and reply to the task.'], ['🏢', 'Who is out by client', 'Group the Who is out list by client, or by client and sub client.']] },
     { v: '3.100.0', items: [['➕', 'Record attendance from the top bar', 'One way for everyone: late, remote and other updates go straight into attendance; leave goes in as LA (pending) until an approver confirms it.'], ['⏳', 'Leaves pending', 'The amber pill at the top shows how many leaves wait for approval; tap it to approve or reject.'], ['🛠', 'Troubleshoot notifications', 'The wrench beside the bell checks and fixes notifications on this device.']] },
@@ -21078,13 +21078,15 @@ html body #pageSummary #cardTrends { grid-area:auto !important; grid-column:1 / 
 (() => {
   let F = null, loaded = false;
   const rpc = prefs => CLOUD._rpc('td_my_prefs', { p_token: CLOUD.token(), p_prefs: prefs });
-  window.tdRecFilter = () => (F && typeof state !== 'undefined' && state.schema && F.field === state.schema.status_column ? F : null);   /* v3.103.1: status only */
+  /* v3.103.2: one team-wide setting, set by admins (team settings: rec_filter) */
+  window.tdRecFilter = () => { const T = (window.TD_SETTINGS || {}).rec_filter; return T && typeof state !== 'undefined' && state.schema && T.field === state.schema.status_column && Array.isArray(T.values) && T.values.length ? T : null; };
   const fill = (el, ...k) => el.replaceChildren(...k.flat().filter(Boolean));
   const checkLine = (text, checked) => { const c = h('input', { type: 'checkbox' }); c.checked = !!checked; return { box: c, el: h('label', { class: 'chk-line' }, c, h('span', {}, text)) }; };
   async function load() { if (loaded || typeof CLOUD === 'undefined' || !CLOUD.token || !CLOUD.token()) return; try { const p = await rpc(null); F = p && p.rec_filter && typeof p.rec_filter === 'object' ? p.rec_filter : null; loaded = true; } catch { } }
-  setInterval(load, 5000); setTimeout(load, 1200);
   const guess = cols => cols.find(c => /employee\s*type|emp\.?\s*type|staff\s*type/i.test(c)) || cols.find(c => /designation|job\s*title|role|position/i.test(c)) || cols[0];
   window.tdRecFilterPick = (rows, done) => {
+    if (!window.PERM || !PERM.isSuper()) { toast('Only admins choose who shows in the Employee box.'); return; }
+    F = window.tdRecFilter();
     /* v3.103.1: by employee status only */
     const field = (state.schema && state.schema.status_column) || ''; if (!field) { toast('The workforce file has no Status column to choose by.'); return; }
     let pick = new Set(F && F.field === field ? F.values : []);
@@ -21094,8 +21096,8 @@ html body #pageSummary #cardTrends { grid-area:auto !important; grid-column:1 / 
       fill(list, ...[...cnt].sort((a, b) => b[1] - a[1] || a[0].localeCompare(b[0])).map(([v, n]) => { const c = checkLine(v + ' · ' + n, pick.has(v)); c.box.addEventListener('change', () => { c.box.checked ? pick.add(v) : pick.delete(v); }); return c.el; })); };
     draw();
     const err = h('span', { class: 'err' });
-    const apply = async next => { F = next; try { await rpc({ rec_filter: next }); } catch (e) { err.textContent = e.message; return; } d.close(); done && done(); };
-    const d = pdlg('Show in the Employee box', h('div', {}, h('p', { class: 'set-hint', style: 'margin:0 0 10px' }, 'Pick the employee statuses you record attendance for (for example Active and Active + Resign). Only people with those statuses show in the Employee list. This is just for you, on every device.'), list),
+    const apply = async next => { try { await saveTeamSetting('rec_filter', next, { name: 'Record attendance', text: next ? 'Employee box shows: ' + next.values.join(', ') : 'Employee box shows everyone' }); } catch (e) { err.textContent = e.message; return; } d.close(); done && done(); };
+    const d = pdlg('Show in the Employee box', h('div', {}, h('p', { class: 'set-hint', style: 'margin:0 0 10px' }, 'Pick the employee statuses the team records attendance for (for example Active and Active + Resign). Only people with those statuses show in the Employee list, for everyone.'), list),
       [err, h('button', { class: 'btn', type: 'button', onclick: () => apply(null) }, 'Show everyone'), h('button', { class: 'btn primary', type: 'button', onclick: () => apply(pick.size ? { field, values: [...pick] } : null) }, 'Show these')]);
     d.box.closest('.pdlg-veil').style.zIndex = 5000;
   };
