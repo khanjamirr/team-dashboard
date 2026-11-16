@@ -15,7 +15,7 @@
 <meta name="apple-mobile-web-app-title" content="Blasters Deck">
 <meta name="application-name" content="Blasters Deck">
 <meta name="apple-mobile-web-app-status-bar-style" content="default">
-<title>Blasters Deck · 3.97.2</title>
+<title>Blasters Deck · 3.97.3</title>
 <link rel="preconnect" href="https://fonts.googleapis.com"><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin><link href="https://fonts.googleapis.com/css2?family=Public+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet">
 <style>
 :root {
@@ -3849,7 +3849,7 @@ html body .pdlg.sw-dlg .pdlg-body { overflow:auto; }
       </aside>
     </div>
 
-    <div id="pageReports" hidden><div id="reportSticky"><div class="report-controls"><label for="reportGroup">Explore</label><select class="input" id="reportGroup"><option value="team" selected>Team composition</option><option value="growth">Tenure & growth</option><option value="location">Location & travel</option><option value="attendance">Attendance</option><option value="backups" id="optBackups">Leave backups</option><option value="planner" id="optPlanner">Planner</option><option value="activities" id="optActivities">Activities</option><option value="custom">📊 Custom dashboards</option></select><button class="btn mini rep-toggle" id="repTables" type="button" aria-pressed="false" title="Show every chart on this page as a table, or back">Show all as tables</button></div></div>      <section class="charts" id="charts" aria-label="Charts">
+    <div id="pageReports" hidden><div id="reportSticky"><div class="report-controls"><label for="reportGroup">Explore</label><select class="input" id="reportGroup"><option value="team" selected>Team composition</option><option value="growth">Tenure & growth</option><option value="location">Location & travel</option><option value="attendance">Attendance</option><option value="custom">📊 Custom dashboards</option></select><button class="btn mini rep-toggle" id="repTables" type="button" aria-pressed="false" title="Show every chart on this page as a table, or back">Show all as tables</button></div></div>      <section class="charts" id="charts" aria-label="Charts">
         <div class="card chart" id="cardStatus"></div>
         <div class="card chart" id="cardTenure"></div>
         <div class="card chart" id="cardTrend"></div>
@@ -6806,7 +6806,7 @@ const kv = { get: k => BE.kvGet('att:' + k).catch(() => null), set: (k, v) => BE
 /* The attendance UI lives in one shadow root that the host moves between pages. Mode says which page it is on:
    app = the Attendance page, health = Action center > Attendance data health, reports = Reports > Attendance. */
 const active = () => { try { return S.visible && !document.getElementById('app').hidden; } catch { return false; } };
-const APP_VIEWS = ['grid', 'people', 'hist', 'bk'];   /* v3.28: Who's out was retired; its Applications ahead list now lives on the Overview */
+const APP_VIEWS = ['grid', 'people', 'hist'];   /* v3.97.3: the billing grid lives only in Backups › Backup report */   /* v3.28: Who's out was retired; its Applications ahead list now lives on the Overview */
 /* v3.12: Who's out and the grid / People views each need their own right */
 const viewAllowed = v => v === 'bk' ? (!window.PERM || PERM.canBkReport()) : v === 'who' ? can('att.who') : (v === 'grid' || v === 'people' || v === 'hist') ? can('att.grid') : true;
 const viewOf = () => { if (window.__attStartView) { S.ui.view = window.__attStartView; window.__attStartView = null; } if (S.mode === 'health') return 'health'; if (S.mode === 'reports') return 'reports'; let v = APP_VIEWS.includes(S.ui.view) ? S.ui.view : 'grid'; if (!viewAllowed(v)) v = APP_VIEWS.find(viewAllowed) || v; return v; };
@@ -10395,7 +10395,7 @@ const canBkRep = () => !window.PERM || PERM.canBkReport();
 function openBackupReport() {
   /* v3.53.0: the report lives on its own page now */
   if (!canBkRep()) { toast('The Backup report needs access from the super admin.'); return; }
-  go('bk'); return;
+  window.__bkTab = 'report'; if (typeof setView === 'function') setView('backups'); return;   /* v3.97.3: one place for the report */
   const body = document.createElement('div'); body.className = 'body bkr';
   const close = document.createElement('button'); close.className = 'btn ghost'; close.textContent = '✕'; close.setAttribute('aria-label', 'Close'); close.onclick = () => closeDrawer();
   const hd = document.createElement('header'); const h2 = document.createElement('h2'); h2.textContent = 'Backup report'; hd.append(h2, close);
@@ -11865,7 +11865,7 @@ async function poll() {
 }
 
 /* ============================== filtering ============================== */
-const APP = { title: "Blasters Deck", version: "3.97.2", released: "2026-11-16" };
+const APP = { title: "Blasters Deck", version: "3.97.3", released: "2026-11-16" };
 const BASE_DIMS = { status: "status_column", desig: "designation_column", client: "client_column", mode: "mode_column" };
 const STANDARD_STATUSES = ["Active", "Manager", "OJT", "Bench", "New", "Projected", "Left", "Moved"];
 const TILE_ORDER = ["Active", "Manager", "OJT", "Bench", "New", "Projected"];
@@ -12895,7 +12895,7 @@ function renderCharts() {
   if ($("#reportGroup").value === "backups" && !okBk) $("#reportGroup").value = "team";
   /* v3.85.0: Planner and Activities reports */
   { const op = $("#optPlanner"), oa = $("#optActivities"); if (op) op.hidden = !(window.PERM && PERM.online() && PERM.canView('planner')); if (oa) oa.hidden = !(window.PERM && PERM.online() && PERM.canView('activities'));
-    const v0 = $("#reportGroup").value; if ((v0 === "planner" && op && op.hidden) || (v0 === "activities" && oa && oa.hidden)) $("#reportGroup").value = "team"; }
+    const v0 = $("#reportGroup").value; if (["planner", "activities", "backups"].includes(v0) || !v0) $("#reportGroup").value = "team"; }   /* v3.97.3: those reports live in Planner, Activities and Backups */
   { const ext = $("#extReport"), v1 = $("#reportGroup").value; if (ext) { ext.hidden = v1 !== "planner" && v1 !== "activities";
     if (!ext.hidden) { $("#charts").hidden = true; const cd = $("#customDash"); if (cd) cd.hidden = true; const bw0 = $("#bkReportsWrap"); if (bw0) bw0.hidden = true; const aw = $("#attReportsWrap"); if (aw) aw.hidden = true; const rt0 = $("#repTables"); if (rt0) rt0.hidden = true;
       if (v1 === "planner") window.renderPlannerReport?.(ext); else window.renderActivityReport?.(ext); return; } } }
@@ -13803,7 +13803,7 @@ async function fillSave() {
   } catch (e) { toast("Could not save: " + ((e && e.message) || e), true); }
   finally { FILL.saving = false; FILL.sig = ""; renderFill(); syncActionTabs(); }
 }
-$("#btnPseudo").addEventListener("click", () => openPseudoNames());
+$("#btnPseudo").addEventListener("click", () => { window.__bkTab = "psn"; setView("backups"); });   /* v3.97.3: one place for pseudo names (Backups) */
 $("#btnXlUpdate").addEventListener("click", () => { document.getElementById("empMore")?.removeAttribute("open"); window.openExcelUpdate?.(); });
 $("#btnFill").addEventListener("click", () => {
   const ids = sortedRows(tableRows(null)).map(r => r.id);
