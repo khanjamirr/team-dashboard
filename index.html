@@ -15,7 +15,7 @@
 <meta name="apple-mobile-web-app-title" content="Blasters Deck">
 <meta name="application-name" content="Blasters Deck">
 <meta name="apple-mobile-web-app-status-bar-style" content="default">
-<title>Blasters Deck · 3.98.5</title>
+<title>Blasters Deck · 3.99.0</title>
 <link rel="preconnect" href="https://fonts.googleapis.com"><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin><link href="https://fonts.googleapis.com/css2?family=Public+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet">
 <style>
 :root {
@@ -3783,6 +3783,27 @@ html body .nf-day { font-size:11.5px !important; text-transform:uppercase; lette
 .pc-os { padding:12px 14px; border-radius:12px; background:var(--surface-2,#f4f6fa); margin:0 0 14px; font-size:13px; } .pc-os ul { margin:6px 0 0; padding-left:18px; line-height:1.5; } .pc-os p { margin:4px 0; }
 /* v3.98.1: WhatsApp same as phone */
 .wa-same { display:inline-flex !important; align-items:center; gap:7px; margin-top:6px; font-size:12.5px !important; font-weight:500 !important; color:var(--ink-2, #4b5563) !important; cursor:pointer; user-select:none; text-transform:none !important; letter-spacing:0 !important; }
+.sh-wrap { position:relative; }
+.sh-btn { display:flex !important; align-items:center; gap:10px; width:100%; min-height:44px; height:auto !important; padding:8px 12px !important; text-align:left; cursor:pointer; background:var(--surface) !important; }
+.sh-face { display:flex; flex-direction:column; gap:1px; flex:1; min-width:0; line-height:1.3; }
+.sh-face b { font-size:13.5px; font-weight:600; color:var(--ink); }
+.sh-us { font-size:12px; color:var(--ink-2,#5b6475); }
+.sh-ist { font-size:12px; color:#0f7b55; font-weight:600; }
+.sh-none { color:var(--ink-3,#8a93a3); }
+.sh-car { color:var(--ink-3,#8a93a3); font-size:12px; }
+.sh-pop { position:absolute; z-index:60; left:0; right:0; top:calc(100% + 6px); max-height:330px; overflow:auto; background:var(--surface); border:1px solid var(--border,#e3e6ec); border-radius:14px; box-shadow:0 14px 36px rgba(15,23,42,.16); padding:6px; }
+.sh-grp { font-size:10.5px; font-weight:700; letter-spacing:.06em; text-transform:uppercase; color:var(--ink-3,#8a93a3); padding:10px 10px 4px; }
+.sh-opt { display:flex; align-items:center; gap:10px; width:100%; padding:8px 10px; border:0; border-radius:10px; background:none; text-align:left; cursor:pointer; color:var(--ink); }
+.sh-opt:hover { background:var(--surface-2,#f3f5f9); }
+.sh-opt.on { background:color-mix(in srgb, var(--accent,#2563eb) 10%, transparent); }
+.sh-ic { width:30px; height:30px; flex:none; display:grid; place-items:center; border-radius:50%; background:var(--surface-2,#f3f5f9); font-size:14px; }
+.sh-txt { display:flex; flex-direction:column; flex:1; min-width:0; }
+.sh-txt b { font-size:13.5px; font-weight:600; }
+.sh-txt small { font-size:12px; color:#0f7b55; font-weight:500; }
+.sh-tick { color:var(--accent,#2563eb); font-weight:700; }
+.sh-foot { display:flex; flex-wrap:wrap; align-items:center; gap:4px 14px; border-top:1px solid var(--border,#e3e6ec); margin-top:6px; padding:8px 10px 4px; }
+.sh-foot small { flex-basis:100%; font-size:11px; color:var(--ink-3,#8a93a3); }
+.sh-link { border:0; background:none; padding:0; color:var(--accent,#2563eb); font-weight:600; font-size:12.5px; cursor:pointer; }
 .wa-same input { width:16px; height:16px; accent-color:#25a244; margin:0; cursor:pointer; }
 input.wa-linked { background:color-mix(in srgb, #25a244 7%, var(--surface, #fff)) !important; color:var(--muted, #6b7280) !important; }
 /* v3.98.2: What's new button and the reload prompt */
@@ -11960,7 +11981,7 @@ async function poll() {
 }
 
 /* ============================== filtering ============================== */
-const APP = { title: "Blasters Deck", version: "3.98.5", released: "2026-11-16" };
+const APP = { title: "Blasters Deck", version: "3.99.0", released: "2026-11-16" };
 const BASE_DIMS = { status: "status_column", desig: "designation_column", client: "client_column", mode: "mode_column" };
 const STANDARD_STATUSES = ["Active", "Manager", "OJT", "Bench", "New", "Projected", "Left", "Moved"];
 const TILE_ORDER = ["Active", "Manager", "OJT", "Bench", "New", "Projected"];
@@ -14429,6 +14450,75 @@ function choiceSelect(cls, choices, cur, allowOther, label) {
   if (other) sel.addEventListener("change", () => { other.hidden = sel.value !== "__other"; if (!other.hidden) other.focus(); });
   return { sel, other, get: () => (sel.value === "__other" ? (other ? other.value.trim() : "") : sel.value) };
 }
+/* ============================== v3.99.0: Shift picker ==============================
+   Shift values stay exactly as they are stored (e.g. "Early EST - 7:30am to 4:30pm"). The picker reads the US time zone
+   and the hours from the text and shows the same shift in India time (IST), worked out for today, so US daylight saving
+   is always right. Grouped by time zone; day or night shift at a glance. */
+const SHIFT = (() => {
+  const ZONES = [
+    [/\b(e[sd]?t|eastern)\b/i, 'America/New_York', 'US Eastern', 'ET'],
+    [/\b(c[sd]?t|central)\b/i, 'America/Chicago', 'US Central', 'CT'],
+    [/\b(m[sd]?t|mountain)\b/i, 'America/Denver', 'US Mountain', 'MT'],
+    [/\b(p[sd]?t|pacific)\b/i, 'America/Los_Angeles', 'US Pacific', 'PT'],
+    [/\b(gmt|bst|uk|london)\b/i, 'Europe/London', 'UK', 'UK'],
+    [/\b(aest|aedt|sydney|australia)\b/i, 'Australia/Sydney', 'Australia', 'AU'],
+    [/\b(ist|india)\b/i, 'Asia/Kolkata', 'India', 'IST']];
+  const off = (tz, d) => { try { const p = {}; for (const x of new Intl.DateTimeFormat('en-US', { timeZone: tz, hourCycle: 'h23', year: 'numeric', month: 'numeric', day: 'numeric', hour: 'numeric', minute: 'numeric' }).formatToParts(d)) p[x.type] = +x.value; return (Date.UTC(p.year, p.month - 1, p.day, p.hour % 24, p.minute) - Math.floor(d.getTime() / 60000) * 60000) / 60000; } catch { return null; } };
+  const fmt = m => { m = ((m % 1440) + 1440) % 1440; const hh = Math.floor(m / 60), mm = m % 60, ap = hh < 12 ? 'AM' : 'PM', h12 = hh % 12 || 12; return h12 + (mm ? ':' + String(mm).padStart(2, '0') : '') + ' ' + ap; };
+  function parse(v) {
+    const t = String(v || ''), z = ZONES.find(x => x[0].test(t)) || null;
+    const tm = [...t.matchAll(/(\d{1,2})(?:[:.](\d{2}))?\s*(am|pm|a\.m\.|p\.m\.)/gi)].slice(0, 2).map(m => { let hh = +m[1] % 12; if (/^p/i.test(m[3])) hh += 12; return hh * 60 + (+m[2] || 0); });
+    const name = t.replace(/(\d{1,2})(?:[:.](\d{2}))?\s*(am|pm|a\.m\.|p\.m\.)/gi, '').replace(/\b(to|till|until)\b/gi, '').replace(/[-–—:·|,]+\s*$/g, '').replace(/\s*[-–—]\s*$/, '').replace(/\s{2,}/g, ' ').trim() || (z ? z[2] : 'Shift');
+    const out = { raw: t, name, zone: z ? z[2] : 'Other', abbr: z ? z[3] : '', tz: z ? z[1] : null, start: tm[0], end: tm[1] };
+    if (out.tz && tm.length === 2) {
+      out.local = fmt(tm[0]) + ' – ' + fmt(tm[1]);
+      const now = new Date(), d = off('Asia/Kolkata', now) - off(out.tz, now);
+      if (out.tz !== 'Asia/Kolkata' && !isNaN(d)) { const a = tm[0] + d, b = tm[1] + d; out.ist = fmt(a) + ' – ' + fmt(b); const sh = ((a % 1440) + 1440) % 1440; out.night = sh >= 17 * 60 || sh < 5 * 60; out.next = Math.floor(b / 1440) > Math.floor(a / 1440) || (tm[1] < tm[0]); }
+      else { out.ist = out.local; const sh = tm[0]; out.night = sh >= 17 * 60 || sh < 5 * 60; }
+    }
+    return out;
+  }
+  const ORDER = ['India', 'US Eastern', 'US Central', 'US Mountain', 'US Pacific', 'UK', 'Australia', 'Other'];
+  return { parse, ORDER };
+})();
+window.SHIFT = SHIFT;
+function shiftField(c, value, id, choices) {
+  const cur = S(value).trim(); let val = cur;
+  const list = [...new Set([...(choices || []), ...(cur ? [cur] : [])].map(x => String(x || '').trim()).filter(Boolean))];
+  const P = list.map(SHIFT.parse).sort((a, b) => SHIFT.ORDER.indexOf(a.zone) - SHIFT.ORDER.indexOf(b.zone) || (a.start ?? 9e9) - (b.start ?? 9e9) || a.raw.localeCompare(b.raw));
+  const face = h('span', { class: 'sh-face' }), btn = h('button', { type: 'button', class: 'input sh-btn', id, 'aria-haspopup': 'listbox', 'aria-expanded': 'false' }, face, h('span', { class: 'sh-car', 'aria-hidden': 'true' }, '▾'));
+  const pop = h('div', { class: 'sh-pop', role: 'listbox', hidden: true });
+  const other = h('input', { class: 'input', placeholder: 'e.g. EST 9am to 6pm', style: 'margin-top:6px', hidden: true, 'aria-label': c.label + ' (new shift)' });
+  const line = x => x.ist ? h('span', { class: 'sh-ist' }, (x.night ? '🌙 India: ' : '☀️ India: ') + x.ist + ' IST' + (x.next && x.abbr !== 'IST' ? ' · ends next day' : '')) : null;
+  const paint = () => {
+    const x = val ? SHIFT.parse(val) : null;
+    face.replaceChildren(...(x ? [h('b', {}, x.local ? x.name + ' · ' + x.local + (x.abbr && x.abbr !== 'IST' ? ' ' + x.abbr : '') : x.raw), x.abbr !== 'IST' ? line(x) : null].filter(Boolean) : [h('span', { class: 'sh-none' }, 'Choose a shift')]));
+  };
+  const close = () => { pop.hidden = true; btn.setAttribute('aria-expanded', 'false'); document.removeEventListener('mousedown', outside, true); };
+  const outside = e => { if (!pop.contains(e.target) && !btn.contains(e.target)) close(); };
+  const pick = v => { val = v; other.hidden = true; paint(); close(); btn.dispatchEvent(new Event('change', { bubbles: true })); };
+  const draw = () => {
+    const rows = []; let g = null;
+    for (const x of P) {
+      if (x.zone !== g) { g = x.zone; rows.push(h('div', { class: 'sh-grp' }, g === 'Other' ? 'Other shifts' : g + (x.abbr && x.abbr !== 'IST' ? ' (' + x.abbr + ')' : ' (IST)'))); }
+      rows.push(h('button', { type: 'button', role: 'option', class: 'sh-opt' + (x.raw === val ? ' on' : ''), 'aria-selected': x.raw === val ? 'true' : 'false', onclick: () => pick(x.raw) },
+        h('span', { class: 'sh-ic', 'aria-hidden': 'true' }, x.ist ? (x.night ? '🌙' : '☀️') : '🕘'),
+        h('span', { class: 'sh-txt' }, h('b', {}, x.local ? x.name + ' · ' + x.local + (x.abbr && x.abbr !== 'IST' ? ' ' + x.abbr : '') : x.raw), x.ist ? h('small', {}, 'India: ' + x.ist + ' IST' + (x.next && x.abbr !== 'IST' ? ' · ends next day' : '')) : null),
+        x.raw === val ? h('span', { class: 'sh-tick', 'aria-hidden': 'true' }, '✓') : null));
+    }
+    rows.push(h('div', { class: 'sh-foot' },
+      h('button', { type: 'button', class: 'sh-link', onclick: () => pick('') }, 'Clear'),
+      h('button', { type: 'button', class: 'sh-link', onclick: () => { close(); other.hidden = false; other.value = ''; other.focus(); } }, '+ Another shift'),
+      h('small', {}, 'India times are for today and move by 1 hour when US clocks change.')));
+    pop.replaceChildren(...rows);
+  };
+  btn.addEventListener('click', () => { if (!pop.hidden) return close(); draw(); pop.hidden = false; btn.setAttribute('aria-expanded', 'true'); document.addEventListener('mousedown', outside, true); const on = pop.querySelector('.sh-opt.on'); if (on) on.scrollIntoView({ block: 'nearest' }); });
+  btn.addEventListener('keydown', e => { if (e.key === 'Escape') close(); });
+  other.addEventListener('input', () => { val = other.value.trim(); paint(); });
+  paint();
+  const box = h('div', { class: 'sh-wrap' }, btn, pop);
+  return { control: box, extra: other, get: () => val };
+}
 function buildField(c, value, isNew) {
   const name = c.name, id = "f_" + state.idx[name];
   const sch = state.schema;
@@ -14436,6 +14526,10 @@ function buildField(c, value, isNew) {
   const wide = /remark/i.test(name);
   let control, get, extra = null;
   const sug = suggestions(name), fch = fieldChoice(name);
+  if (/\bshift\b/i.test(name) && c.type !== "date" && !c.auto && fch.mode !== "free") {   /* v3.99.0 */
+    const x = shiftField(c, value, id, [...(fch.mode === "list" ? (fch.choices || []) : []), ...sug]);
+    return { wrap: h("div", { class: "field" }, h("label", { for: id }, c.label), x.control, x.extra), get: x.get, name, control: x.control };
+  }
   if (c.type !== "date" && !c.auto && name !== sch.key_column && name !== sch.name_column && fch.mode === "list") {
     const x = choiceSelect("input", (fch.choices || []).filter(Boolean), S(value), fch.other !== false, c.label);
     control = x.sel; control.id = id; extra = x.other; get = x.get;
@@ -15863,6 +15957,29 @@ const nfNotMine = ev => { const me = nfMe(); if (!me.id && !me.name) return true
   const r = ((window.TD_SETTINGS || {}).leave_requests || []).find(x => String(x.id) === String(ev.requestId)); const by = String((r && (r.decidedBy || '')) || '').trim().toLowerCase();
   return !(by && by === me.name); };
 window.nfMe = nfMe; window.nfNotMine = nfNotMine;
+/* v3.99.0: changes made by one person in one sitting (each within 30 minutes of the last) become ONE notification,
+   e.g. "Rajwinder updated attendance for 2 people". A different person or kind of change starts a new one. */
+const nfFamily = a => { a = String(a || '').replace(/^external-/, ''); return /^att-/.test(a) ? 'att' : ['add', 'edit', 'delete', 'bulk'].includes(a) ? 'emp' : a; };
+function nfGroup(items) {
+  const L = items.slice().sort((x, y) => (Date.parse(x.time) || 0) - (Date.parse(y.time) || 0)), groups = [], open = new Map();
+  for (const it of L) {
+    const k = String(it.user || '').trim().toLowerCase() + '|' + nfFamily(it.action), t = Date.parse(it.time) || 0, g = open.get(k);
+    if (g && t - g.last <= 30 * 60000) { g.list.push(it); g.last = t; } else { const n = { k, list: [it], last: t }; groups.push(n); open.set(k, n); }
+  }
+  return groups.map(g => {
+    const one = activityNotification(g.list[g.list.length - 1]); if (g.list.length === 1) return one;
+    const it0 = g.list[0], who = String(it0.user || 'Someone').trim().split(/\s+/)[0], fam = nfFamily(it0.action);
+    const names = [...new Set(g.list.map(x => String(x.name || '').trim()).filter(Boolean))];
+    const per = new Map(); for (const x of g.list) { const nm = String(x.name || '').trim(), b = nfPretty(x).body.replace(/(^|·\s*)[A-Z][a-z]{2} \d{4}\s*·\s*/g, '$1').trim(); if (!b) { per.set(nm, per.get(nm) || []); continue; } (per.get(nm) || per.set(nm, []).get(nm)).push(b); }
+    const icon = fam === 'att' ? '🗓' : fam === 'emp' ? '✏️' : one.icon || '•';
+    const what = fam === 'att' ? 'updated attendance for' : fam === 'emp' ? 'updated' : 'made changes to';
+    const subj = names.length === 1 ? names[0] : names.length + ' people';
+    const title = nfClip(icon + ' ' + who + ' ' + what + ' ' + subj + (names.length === 1 ? ' (' + g.list.length + ' changes)' : ''), 64);
+    const body = names.length === 1 ? (per.get(names[0]) || []).join(' · ') : names.slice(0, 3).map(nm => { const b = (per.get(nm) || []).join(', '); return nm.split(/\s+/).slice(0, 2).join(' ') + (b ? ': ' + b : ''); }).join(' · ') + (names.length > 3 ? ' · +' + (names.length - 3) + ' more' : '');
+    return { ...one, id: one.id + ':g' + g.list.length, tag: 'nf-g-' + g.k + '-' + (Date.parse(it0.time) || 0), time: g.list[g.list.length - 1].time, title, detail: nfClip(body, 110), count: g.list.length };
+  });
+}
+window.nfGroup = nfGroup;
 const activityNotification = it => { const p = nfPretty(it); return { id: 'activity:' + (it.eventId || JSON.stringify([it.time, it.user, it.action, it.key, it.name, it.details])), time: it.time, title: p.title, detail: p.body, icon: p.icon, type: 'activity' }; };
 let notificationItems = [], notificationOwner = '', notificationBody = null, bellBusy = false, activityError = '';
 function bellShow(n) {
@@ -15962,7 +16079,7 @@ async function bellCheck() {
     if (window.__tdSetP) await window.__tdSetP; else if (!window.__tdSetAt || Date.now() - window.__tdSetAt > 30000) await loadTeamSettings(true);   /* v3.74.1: settings fetched in the last 30 s are reused */
     let activity=[];activityError='';
     if (PERM.can('activity.view')) {
-      try { const d=await api('GET','/api/activity'); const meN=nfMe(); activity=(d.items || []).filter(it=>!String(it.action || '').startsWith('request-') && !(meN.name && String(it.user || '').trim().toLowerCase()===meN.name)).map(activityNotification); }   /* v3.98.4: not your own changes */
+      try { const d=await api('GET','/api/activity'); const meN=nfMe(); activity=(d.items || []).filter(it=>!String(it.action || '').startsWith('request-') && !(meN.name && String(it.user || '').trim().toLowerCase()===meN.name)); activity=nfGroup(activity); }   /* v3.98.4: not your own changes · v3.99.0: one notification per burst of changes */
       catch(e) { activityError='Activity could not be loaded: '+e.message; }
     }
     if (owner !== notificationKey()) return;
@@ -19785,8 +19902,10 @@ window.TDN = (() => {
     const fresh = (list || []).filter(it => it && it.id && it.type !== 'task' && !(pushOn && it.type === 'request') && !(read && read.has(it.id)));   /* v3.96.0: the server sends requests itself */
     if (seen == null) { seen = new Set(fresh.map(it => it.id)); return; }
     const now = fresh.filter(it => !seen.has(it.id)); now.forEach(it => seen.add(it.id));
-    for (const it of now.slice(0, 4)) { const t = window.nfTidy ? nfTidy(it.title || 'Blasters Deck', it.detail || '') : { title: it.title, body: it.detail }; show(t.title, t.body, 'nf-' + it.id, () => open(it)); }
-    if (now.length > 4) show('Blasters Deck', (now.length - 4) + ' more new notifications', 'nf-more', () => window.openBell && openBell());
+    /* v3.99.0: never a burst of pop-ups: one new item shows itself, several become one summary; a growing group replaces its own pop-up */
+    const tidy = it => it.type === 'activity' ? { title: it.title, body: it.detail } : window.nfTidy ? nfTidy(it.title || 'Blasters Deck', it.detail || '') : { title: it.title, body: it.detail };
+    if (now.length === 1) { const it = now[0], t = tidy(it); show(t.title, t.body, it.tag || 'nf-' + it.id, () => open(it)); }
+    else if (now.length > 1) { const ts = now.map(it => tidy(it).title.replace(/^(\p{Extended_Pictographic}\uFE0F?)\s+/u, '')); show(now.length + ' new updates', ts.slice(0, 3).join(' · ') + (ts.length > 3 ? ' · +' + (ts.length - 3) + ' more' : ''), 'nf-summary', () => window.openBell && openBell()); }
   }
   /* v3.95.1: notifications are required. After signing in, nothing can be used until they are allowed on this device.
      Browsers only show the question after a tap, so it is a full-screen page with a button; it comes back if they are switched off. */
@@ -19947,6 +20066,7 @@ window.bdSearch = (() => {
 /* v3.96.0: "What's new" once per person after each update (remembered in the database); again from More or the bell */
 window.bdWhatsNew = (() => {
   const NOTES = [
+    { v: '3.99.0', items: [['🕘', 'A proper shift picker', 'Shifts are grouped by time zone and show the India time next to the US time, with ☀️ day or 🌙 night at a glance.'], ['🔕', 'Fewer, combined notifications', 'Several changes by one person in one sitting arrive as one notification, and several new updates at once as one pop-up.']] },
     { v: '3.98.5', items: [['💬', 'WhatsApp number is a normal box again', 'It no longer turns into a dropdown for some employees.']] },
     { v: '3.98.4', items: [['⚡', 'Faster notifications', 'New changes now show up within about 30 seconds, even when the page has been left open in the background.'], ['🙈', 'No more alerts about your own changes', 'You are only told about what other people do.'], ['🧹', 'Cleaner Chrome pop-ups', 'Short title, one line of detail.'], ['🛡️', 'Fix people starts with nothing ticked', 'Apply only changes the people you tick yourself.']] },
     { v: '3.98.2', items: [['✨', 'What’s new button', 'The ✨ beside the bell opens these notes any time; a green dot means there is something new.'], ['🔄', 'Reload when a new version is out', 'A bar at the top asks you to reload when Blasters Deck is updated.'], ['💬', 'WhatsApp same as phone', 'A tick in the employee form copies the phone number to WhatsApp.']] },
