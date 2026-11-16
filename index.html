@@ -15,7 +15,7 @@
 <meta name="apple-mobile-web-app-title" content="Blasters Deck">
 <meta name="application-name" content="Blasters Deck">
 <meta name="apple-mobile-web-app-status-bar-style" content="default">
-<title>Blasters Deck · 3.98.4</title>
+<title>Blasters Deck · 3.98.5</title>
 <link rel="preconnect" href="https://fonts.googleapis.com"><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin><link href="https://fonts.googleapis.com/css2?family=Public+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet">
 <style>
 :root {
@@ -4523,6 +4523,7 @@ function buildSchema(book) {
     }
     if (CFG.autoCols.includes(h) || h === tenureHdr || /tomm\.?$/i.test(h)) { autoCols.add(h); return; }
     if (h === roles.key || h === roles.name || h === roles.phone) return;
+    if (/whats ?app|phone|mobile|contact ?(no|number)|e-?mail|aadha?a?r|\bpan\b|account|ifsc|uan|passport/i.test(h)) return;   /* v3.98.5: contact and private details are always typed, never a dropdown (their values are hidden for most people, which made them look like a short list) */
     if (CFG.dateCols.includes(h) || [roles.dob, roles.doj, roles.left].includes(h) || (s.nf >= 3 && s.numFrac >= 0.8 && (s.dateStyleFrac >= 0.5 || (dateHint.test(h) && s.dateRangeFrac >= 0.6)))) { dateCols.add(h); return; }
     if (CFG.numCols.includes(h) || h === roles.distance || (s.nf >= 3 && s.numFrac >= 0.9 && s.maxNum < 1e9 && !s.dateStyleFrac)) { numCols.add(h); return; }
     if (CFG.selectCols.includes(h) || h === roles.status || (s.nf >= 5 && s.numFrac < 0.5 && s.distinct >= 1 && s.distinct <= 4)) selCols.add(h);
@@ -11959,7 +11960,7 @@ async function poll() {
 }
 
 /* ============================== filtering ============================== */
-const APP = { title: "Blasters Deck", version: "3.98.4", released: "2026-11-16" };
+const APP = { title: "Blasters Deck", version: "3.98.5", released: "2026-11-16" };
 const BASE_DIMS = { status: "status_column", desig: "designation_column", client: "client_column", mode: "mode_column" };
 const STANDARD_STATUSES = ["Active", "Manager", "OJT", "Bench", "New", "Projected", "Left", "Moved"];
 const TILE_ORDER = ["Active", "Manager", "OJT", "Bench", "New", "Projected"];
@@ -19946,6 +19947,7 @@ window.bdSearch = (() => {
 /* v3.96.0: "What's new" once per person after each update (remembered in the database); again from More or the bell */
 window.bdWhatsNew = (() => {
   const NOTES = [
+    { v: '3.98.5', items: [['💬', 'WhatsApp number is a normal box again', 'It no longer turns into a dropdown for some employees.']] },
     { v: '3.98.4', items: [['⚡', 'Faster notifications', 'New changes now show up within about 30 seconds, even when the page has been left open in the background.'], ['🙈', 'No more alerts about your own changes', 'You are only told about what other people do.'], ['🧹', 'Cleaner Chrome pop-ups', 'Short title, one line of detail.'], ['🛡️', 'Fix people starts with nothing ticked', 'Apply only changes the people you tick yourself.']] },
     { v: '3.98.2', items: [['✨', 'What’s new button', 'The ✨ beside the bell opens these notes any time; a green dot means there is something new.'], ['🔄', 'Reload when a new version is out', 'A bar at the top asks you to reload when Blasters Deck is updated.'], ['💬', 'WhatsApp same as phone', 'A tick in the employee form copies the phone number to WhatsApp.']] },
     { v: '3.98.0', items: [['▦', 'Change many attendance cells at once', 'Drag across cells (or Shift / Ctrl + click), then pick the code in the bar that appears.'], ['🔔', 'A cleaner notifications panel', 'Notifications and Activity tabs; activity in plain words, grouped by day, with Approved / Rejected tags.'], ['💻', 'Notification help for computers', 'Check notifications now shows the Windows / Mac and Chrome settings to turn on, and a quick test.']] },
