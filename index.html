@@ -15,7 +15,7 @@
 <meta name="apple-mobile-web-app-title" content="Blasters Deck">
 <meta name="application-name" content="Blasters Deck">
 <meta name="apple-mobile-web-app-status-bar-style" content="default">
-<title>Blasters Deck · 3.96.5</title>
+<title>Blasters Deck · 3.97.0</title>
 <link rel="preconnect" href="https://fonts.googleapis.com"><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin><link href="https://fonts.googleapis.com/css2?family=Public+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet">
 <style>
 :root {
@@ -3706,6 +3706,43 @@ html body .pk2-search:focus-within { box-shadow:0 0 0 2px color-mix(in srgb, var
 html body .psn-picker .psn-mode { max-width:640px; }
 @media (max-width:700px) { html body .psn-picker { min-width:0; max-width:100%; overflow:hidden; padding:12px !important; } html body .psn-picker .psn-mode { display:flex !important; width:100% !important; max-width:none; } html body .psn-picker .psn-mode button { flex:1 1 0; min-width:0; white-space:normal !important; line-height:1.25; font-size:12.5px !important; padding:7px 8px !important; }
   html body details.psc .psc-hint { display:none; } .psc-grid { padding:12px; } html body .pk2-box .psn-opt.pk2 { padding:9px 10px !important; } .pk2-has { max-width:42%; overflow:hidden; text-overflow:ellipsis; } }
+/* v3.97.0: the Change / Tag dialog */
+html body .pdlg.cd-dlg { width:min(640px, calc(100vw - 24px)) !important; max-width:none !important; max-height:calc(100vh - 40px); display:flex; flex-direction:column; border-radius:22px !important; overflow:hidden; }
+html body .pdlg.cd-dlg > header { padding:18px 22px 6px !important; border:0 !important; } html body .pdlg.cd-dlg > header h3 { font-size:19px !important; letter-spacing:-.01em; }
+html body .pdlg.cd-dlg .pdlg-body { padding:8px 22px 14px !important; overflow:auto; flex:1; }
+html body .pdlg.cd-dlg > footer { padding:12px 22px 16px !important; border-top:1px solid var(--border,#eef0f5) !important; display:flex; align-items:center; gap:8px; background:var(--surface,#fff); }
+html body .pdlg.cd-dlg > footer .grow { flex:1; }
+.cd { display:flex; flex-direction:column; gap:14px; }
+.cd-head { display:flex; align-items:center; gap:10px; flex-wrap:wrap; padding:12px 14px; border-radius:14px; background:var(--surface-2,#f4f6fa); }
+.cd-chip { font-weight:700; font-size:14px; padding:5px 13px; border-radius:99px; background:#dbeafe; color:#1e3a8a; } .cd-arrow { color:var(--muted,#9aa3b2); }
+.cd-cur { display:flex; align-items:center; gap:9px; } .cd-cur b { display:block; font-size:14px; } .cd-cur small { display:block; font-size:12px; color:var(--muted,#6b7280); } .cd-cur.vac { color:#b45309; font-weight:650; font-size:14px; }
+.cd-av { width:32px; height:32px; flex:none; border-radius:50%; display:grid; place-items:center; font:700 11.5px system-ui,sans-serif; color:#fff; background:linear-gradient(135deg,#5ac8fa,#007aff); }
+.cd-opts { display:grid; gap:8px; }
+.cd-o { all:unset; box-sizing:border-box; cursor:pointer; display:flex; align-items:center; gap:12px; padding:11px 14px; border-radius:14px; border:1.5px solid var(--border,#e6e9f0); transition:border-color .12s, background .12s; }
+.cd-o:hover { border-color:color-mix(in srgb, var(--accent,#2563eb) 40%, var(--border,#e6e9f0)); } .cd-o.on { border-color:var(--accent,#2563eb); background:color-mix(in srgb, var(--accent,#2563eb) 6%, var(--surface,#fff)); }
+.cd-o b { display:block; font-size:14px; } .cd-o small { display:block; font-size:12.5px; color:var(--muted,#6b7280); margin-top:1px; }
+.cd-oi { width:34px; height:34px; flex:none; border-radius:10px; display:grid; place-items:center; background:var(--surface-2,#f1f4f9); font-size:16px; } .cd-o.on .cd-oi { background:var(--accent,#2563eb); color:#fff; }
+.cd-panel { display:flex; flex-direction:column; gap:10px; }
+.cd-search { display:flex; align-items:center; gap:8px; background:var(--surface-2,#f1f4f9); border-radius:12px; padding:0 12px; color:var(--muted,#8a94a6); }
+.cd-search:focus-within { box-shadow:0 0 0 2px color-mix(in srgb, var(--accent,#2563eb) 35%, transparent); }
+html body .cd-search input.input { flex:1; border:0 !important; background:transparent !important; box-shadow:none !important; outline:none !important; font-size:15px; padding:11px 0 !important; min-width:0; height:auto !important; }
+.cd-list { margin-top:8px; max-height:260px; overflow:auto; border:1px solid var(--border,#eef0f5); border-radius:12px; }
+.cd-opt { all:unset; box-sizing:border-box; cursor:pointer; display:flex; align-items:center; gap:11px; width:100%; padding:9px 12px; border-bottom:1px solid var(--border,#f1f3f7); }
+.cd-opt:last-child { border-bottom:0; } .cd-opt:hover, .cd-opt:focus-visible { background:color-mix(in srgb, var(--accent,#2563eb) 5%, transparent); }
+.cd-opt.on { background:color-mix(in srgb, var(--accent,#2563eb) 10%, transparent); } .cd-opt.on .cd-av { background:var(--accent,#2563eb); font-size:15px; }
+.cd-who { flex:1; min-width:0; } .cd-who b { display:block; font-size:14px; white-space:nowrap; overflow:hidden; text-overflow:ellipsis; } .cd-who small { display:block; font-size:12px; color:var(--muted,#6b7280); }
+.cd-tag { font-size:11.5px; padding:3px 9px; border-radius:99px; background:var(--surface-2,#f1f4f9); color:var(--muted,#6b7280); white-space:nowrap; } .cd-tag.green { background:rgba(16,185,129,.12); color:#047857; font-weight:650; } .cd-tag.red { background:rgba(239,68,68,.12); color:#dc2626; font-weight:650; }
+.cd-empty { padding:16px; text-align:center; color:var(--muted,#6b7280); font-size:13px; margin:0; }
+.cd-dates { display:flex; align-items:flex-end; gap:12px; flex-wrap:wrap; } .cd-date, .cd-f { display:flex; flex-direction:column; gap:4px; } .cd-date small, .cd-f small { font-size:12px; font-weight:600; color:var(--muted,#6b7280); }
+.cd-link { font-size:12.5px; padding-bottom:9px; text-decoration:none !important; } .cd-row { display:flex; gap:10px; flex-wrap:wrap; } .cd-row .grow { flex:1; min-width:180px; }
+.cd-seg { display:inline-flex; background:var(--surface-2,#eef1f6); border-radius:10px; padding:3px; gap:2px; align-self:flex-start; }
+.cd-seg button { all:unset; cursor:pointer; padding:6px 12px; border-radius:8px; font-size:13px; } .cd-seg button[aria-pressed="true"] { background:var(--surface,#fff); font-weight:650; box-shadow:0 1px 2px rgba(0,0,0,.12); }
+.cd-note p { margin:0; padding:12px 14px; border-radius:12px; background:rgba(245,158,11,.1); color:var(--ink,#1f2937); font-size:13.5px; }
+.cd-sum { border-radius:14px; padding:12px 14px; background:color-mix(in srgb, #10b981 8%, var(--surface,#fff)); border:1px solid color-mix(in srgb, #10b981 25%, transparent); }
+.cd-sum > small { display:block; font-size:11px; font-weight:700; text-transform:uppercase; letter-spacing:.06em; color:#047857; margin-bottom:6px; }
+.cd-sl { display:flex; justify-content:space-between; gap:10px; font-size:13.5px; padding:2px 0; } .cd-sl em { font-style:normal; color:var(--muted,#6b7280); font-size:12.5px; white-space:nowrap; }
+.cd-err { color:#dc2626; font-size:13px; margin:0; }
+@media (max-width:700px) { html body .pdlg.cd-dlg { width:100vw !important; max-height:100dvh; height:100dvh; border-radius:0 !important; } html body .psn-veil:has(.cd-dlg) { padding:0 !important; align-items:stretch !important; } .cd-list { max-height:none; } }
 </style></head>
 
 
@@ -11763,7 +11800,7 @@ async function poll() {
 }
 
 /* ============================== filtering ============================== */
-const APP = { title: "Blasters Deck", version: "3.96.5", released: "2026-11-16" };
+const APP = { title: "Blasters Deck", version: "3.97.0", released: "2026-11-16" };
 const BASE_DIMS = { status: "status_column", desig: "designation_column", client: "client_column", mode: "mode_column" };
 const STANDARD_STATUSES = ["Active", "Manager", "OJT", "Bench", "New", "Projected", "Left", "Moved"];
 const TILE_ORDER = ["Active", "Manager", "OJT", "Bench", "New", "Projected"];
@@ -14495,7 +14532,7 @@ async function openPseudoNames(focusId, host) {   /* v3.81.0: host = draw inside
             : h("div", { class: "psn-who" }, h("b", { class: "psn-vac" }, s.active ? "Vacant" : "Inactive"), h("small", {}, was ? "last: " + was.name + (psnDay(was.to) ? " (until " + psnNice(was.to) + ")" : " (left)") : "not tagged yet")),
           s.flag ? h("span", { class: "psn-flag", title: "This recruiter is resigning: tag a replacement" }, "⚠ Needs replacement") : null,
           admin && editMeta !== key ? h("button", { class: "btn mini ghost", type: "button", title: "Client, active / inactive", onclick: () => { editMeta = key; editing = null; drawList(); } }, "Edit") : null,
-          canEdit && s.active && editing !== key ? h("button", { class: "btn mini" + (s.flag || !s.r ? " primary" : ""), type: "button", title: s.r ? "Give this name to someone else, or give " + nm(s.r) + " a different name" : "", onclick: () => { editing = key; editMeta = null; pickMode = "recruiter"; drawList(); } }, s.flag ? "Replace" : s.r ? "Change" : "Tag") : null));
+          canEdit && s.active && editing !== key ? h("button", { class: "btn mini" + (s.flag || !s.r ? " primary" : ""), type: "button", title: s.r ? "Give this name to someone else, or give " + nm(s.r) + " a different name" : "", onclick: () => { editMeta = null; openChange(s); } }, s.flag ? "Replace" : s.r ? "Change" : "Tag") : null));
         if (editMeta === key) box.append(metaEditor(s, master, clients));
         if (editing === key) box.append(picker(s));
       }
@@ -14643,6 +14680,117 @@ async function openPseudoNames(focusId, host) {   /* v3.81.0: host = draw inside
       h("div", { class: "pk2-foot" }, s.r ? h("button", { class: "linkbtn pk2-vac", type: "button", onclick: () => untag(s, from.i.value) }, "Make “" + s.name + "” vacant instead") : null, h("span", { class: "grow" }),
         h("button", { class: "btn", type: "button", onclick: () => { editing = null; drawList(); } }, "Cancel")));
   }
+  /* v3.97.0: Change / Tag / Replace as a real dialog: choose what to do, pick, check the summary, then Save */
+  function openChange(s) {
+    const r0 = s.r, ini = n => String(n || "?").trim().split(/\s+/).slice(0, 2).map(x => x[0]).join("").toUpperCase();
+    let mode = r0 ? (s.flag ? "give" : "give") : "give", pick = null, give2 = null, saving = false;
+    const master = psnMaster() || [], cur = holders();
+    /* a searchable list where one person is chosen (nothing is saved until Save) */
+    const chooser = (exclude, onChange, ph) => {
+      const inp = h("input", { class: "input", type: "search", placeholder: ph, autocomplete: "off" });
+      const list = h("div", { class: "cd-list", role: "listbox" }); let chosen = null;
+      const draw = () => { const t = inp.value.trim().toLowerCase();
+        const ppl = state.rows.filter(x => psnEligible(x) && !exclude.includes(x.id) && (!t || (nm(x) + " " + x.id + " " + cl(x)).toLowerCase().includes(t)))
+          .sort((a, b) => ((cl(b) === s.client) - (cl(a) === s.client)) || (!!pv(a) - !!pv(b)) || nm(a).localeCompare(nm(b))).slice(0, 50);
+        list.replaceChildren(...[...ppl.map(x => { const has = pv(x), on = chosen && chosen.id === x.id;
+          return h("button", { type: "button", class: "cd-opt" + (on ? " on" : ""), role: "option", "aria-selected": String(!!on), onclick: () => { chosen = on ? null : x; draw(); onChange(chosen); } },
+            h("span", { class: "cd-av" }, on ? "✓" : ini(nm(x))), h("span", { class: "cd-who" }, h("b", {}, nm(x)), h("small", {}, [x.id, gs(x, "status_column"), cl(x) !== s.client ? cl(x) : ""].filter(Boolean).join(" · "))),
+            psnStatus(x) === "resign" ? h("span", { class: "cd-tag red" }, "Resigning") : null,
+            has ? h("span", { class: "cd-tag" }, "has " + has) : h("span", { class: "cd-tag green" }, "free")); }),
+          ppl.length ? null : h("p", { class: "cd-empty" }, "Nobody matches. Only Active, Active + Resign and OJT recruiters can have a pseudo name.")].filter(Boolean)); };
+      inp.addEventListener("input", draw); draw();
+      return { el: h("div", { class: "cd-chooser" }, h("label", { class: "cd-search" }, h("span", { "aria-hidden": "true" }, "⌕"), inp), list), focus: () => inp.focus() };
+    };
+    const today = psnToday();
+    const fromI = h("input", { class: "input", type: "date", value: today }), toI = h("input", { class: "input", type: "date", value: today });
+    const toWrap = h("label", { class: "cd-date", hidden: true }, h("small", {}, (r0 ? nm(r0) : "") + "’s last day with it"), toI);
+    const diff = r0 ? h("button", { class: "linkbtn cd-link", type: "button", onclick: e => { toWrap.hidden = !toWrap.hidden; e.currentTarget.textContent = toWrap.hidden ? "Different last day?" : "Use the same day"; if (toWrap.hidden) toI.value = fromI.value; } }, "Different last day?") : null;
+    fromI.addEventListener("change", () => { if (toWrap.hidden) toI.value = fromI.value; paint(); }); toI.addEventListener("change", paint);
+    const dates = h("div", { class: "cd-dates" }, h("label", { class: "cd-date" }, h("small", {}, r0 ? "Date of the change" : "Starts on"), fromI), toWrap, diff);
+    /* rename: the new name */
+    const vac = master.filter(x => x.active && !cur.get(x.name.toLowerCase()) && x.name.toLowerCase() !== s.name.toLowerCase());
+    const NEW = "__new__", rnSel = h("select", { class: "input" }, h("option", { value: "" }, "Choose a vacant pseudo name…"), admin ? h("option", { value: NEW }, "➕ A new pseudo name") : null,
+      ...(() => { const same = vac.filter(x => r0 && x.client === cl(r0)), other = vac.filter(x => !r0 || x.client !== cl(r0)); return [same.length ? h("optgroup", { label: ((r0 && cl(r0)) || "Same client") + " · vacant" }, ...same.map(x => h("option", { value: x.name }, x.name + (x.sub ? " · " + x.sub : "")))) : null, other.length ? h("optgroup", { label: "Other clients · vacant" }, ...other.map(x => h("option", { value: x.name }, x.name + " · " + (x.client || "no client")))) : null]; })());
+    const rnNew = h("input", { class: "input", placeholder: "New pseudo name, e.g. Ellis Morgan", maxlength: "60" });
+    const clients = [...new Set([...master.map(x => x.client), ...state.rows.map(cl)].filter(Boolean))].sort();
+    const rnCl = h("select", { class: "input" }, ...clients.map(c => h("option", { value: c, selected: c === ((r0 && cl(r0)) || s.client) }, c)));
+    const rnNewBox = h("div", { class: "cd-row", hidden: true }, h("label", { class: "cd-f grow" }, h("small", {}, "New name"), rnNew), h("label", { class: "cd-f" }, h("small", {}, "Client"), rnCl));
+    let oldTo = "vacant";
+    const oldSeg = h("div", { class: "cd-seg" });
+    const giveChooser = chooser(r0 ? [r0.id] : [], x => { give2 = x; paint(); }, "Who gets “" + s.name + "”? Search by name or Emp ID");
+    const giveBox = h("div", { hidden: true }, giveChooser.el);
+    const paintOld = () => oldSeg.replaceChildren(...[["vacant", "It becomes vacant"], ["give", "Give it to someone"]].map(([k, l]) => h("button", { type: "button", "aria-pressed": String(oldTo === k), onclick: () => { oldTo = k; giveBox.hidden = k !== "give"; if (k !== "give") give2 = null; paintOld(); paint(); } }, l)));
+    paintOld();
+    [rnSel, rnNew, rnCl].forEach(e => e.addEventListener("input", () => { rnNewBox.hidden = rnSel.value !== NEW; paint(); }));
+    const renameBox = h("div", { class: "cd-panel" }, h("label", { class: "cd-f" }, h("small", {}, (r0 ? nm(r0) : "") + "’s new pseudo name"), rnSel), rnNewBox,
+      h("div", { class: "cd-f" }, h("small", {}, "And “" + s.name + "”?"), oldSeg), giveBox);
+    /* give to someone else / tag */
+    const mainChooser = chooser(r0 ? [r0.id] : [], x => { pick = x; paint(); }, "Search the recruiter by name or Emp ID");
+    const giveMain = h("div", { class: "cd-panel" }, mainChooser.el);
+    const vacantBox = h("div", { class: "cd-panel cd-note" }, h("p", {}, r0 ? nm(r0) + " will have no pseudo name, and “" + s.name + "” becomes free to give to someone later." : ""));
+    const panel = h("div", {});
+    /* what to do */
+    const OPTS = r0 ? [["give", "👤", "Give “" + s.name + "” to someone else", nm(r0) + " stops using it"], ["rename", "✏️", "Give " + nm(r0) + " a different name", "Choose a vacant name or a new one"], ["vacant", "○", "Make “" + s.name + "” vacant", nm(r0) + " will have no pseudo name"]] : [];
+    const optBox = h("div", { class: "cd-opts", role: "radiogroup" });
+    const paintOpts = () => optBox.replaceChildren(...OPTS.map(([k, ic, t, d]) => h("button", { type: "button", class: "cd-o" + (mode === k ? " on" : ""), role: "radio", "aria-checked": String(mode === k), onclick: () => { mode = k; paintOpts(); paint(); } }, h("span", { class: "cd-oi" }, ic), h("span", {}, h("b", {}, t), h("small", {}, d)))));
+    paintOpts();
+    const summary = h("div", { class: "cd-sum" }), err = h("p", { class: "cd-err", role: "alert" });
+    const save = h("button", { class: "btn primary", type: "button" }, "Save");
+    const newName = () => rnSel.value === NEW ? rnNew.value.trim() : rnSel.value;
+    function valid() {
+      if (!fromI.value) return "Pick the date.";
+      if (mode === "give") return pick ? "" : "Choose who gets “" + s.name + "”.";
+      if (mode === "rename") { if (!newName()) return "Choose the new pseudo name."; if (oldTo === "give" && !give2) return "Choose who gets “" + s.name + "”, or let it become vacant."; return ""; }
+      return "";
+    }
+    function paint() {
+      panel.replaceChildren(mode === "give" ? giveMain : mode === "rename" ? renameBox : vacantBox);
+      toWrap.style.display = mode === "give" && r0 ? "" : "none"; if (diff) diff.style.display = mode === "give" ? "" : "none";
+      const day = fromI.value ? psnNice(fromI.value) : "…";
+      const L = [];
+      if (mode === "give" && pick) { L.push(["“" + s.name + "” → " + nm(pick), "from " + day]); if (r0) L.push([nm(r0) + " stops using it", "last day " + (toWrap.hidden ? day : psnNice(toI.value))]); if (pv(pick)) L.push(["“" + pv(pick) + "” (" + nm(pick) + "’s old name) becomes vacant", ""]); }
+      if (mode === "rename" && newName()) { L.push([nm(r0) + " → “" + newName() + "”", "from " + day]); L.push([oldTo === "give" && give2 ? "“" + s.name + "” → " + nm(give2) : "“" + s.name + "” becomes vacant", ""]); if (oldTo === "give" && give2 && pv(give2)) L.push(["“" + pv(give2) + "” (" + nm(give2) + "’s old name) becomes vacant", ""]); }
+      if (mode === "vacant" && r0) L.push(["“" + s.name + "” becomes vacant", "from " + day]);
+      summary.replaceChildren(...(L.length ? [h("small", {}, "What will happen"), ...L.map(([a, b]) => h("div", { class: "cd-sl" }, h("span", {}, a), b ? h("em", {}, b) : null))] : []));
+      summary.hidden = !L.length;
+      const v = valid(); save.disabled = !!v || saving; save.title = v; save.textContent = mode === "vacant" ? "Make vacant" : "Save";
+      err.textContent = "";
+    }
+    save.addEventListener("click", async () => {
+      const v = valid(); if (v) { err.textContent = v; return; }
+      saving = true; save.disabled = true; save.textContent = "Saving…"; let ok = false;
+      try {
+        if (mode === "give") ok = await tag(s, pick, fromI.value, r0 ? (toWrap.hidden ? fromI.value : toI.value) : null);
+        else if (mode === "vacant") ok = await untag(s, fromI.value);
+        else {
+          let nn = newName(); const exists = master.find(x => x.name.toLowerCase() === nn.toLowerCase());
+          if (rnSel.value === NEW && exists) { if (cur.get(exists.name.toLowerCase())) throw new Error("“" + exists.name + "” is already given to " + nm(cur.get(exists.name.toLowerCase())) + "."); nn = exists.name; }
+          if (busy) throw new Error("Another change is still saving. Try again in a moment.");
+          busy = true;
+          try {
+            if (rnSel.value === NEW && !exists) await psnSaveMaster([...master, { name: nn, client: rnCl.value, sub: "", active: true }], "Added “" + nn + "” for " + rnCl.value);
+            const day = fromI.value, ups = [{ id: r0.id, values: { [pc]: nn } }];
+            if (oldTo === "give" && give2) { ups.push({ id: give2.id, values: { [pc]: s.name } }); }
+            BE.setPseudoDates({ from: day, to: day, prevOf: day });
+            await api("POST", "/api/bulk", { updates: ups, note: nm(r0) + ": pseudo name " + s.name + " → " + nn + " from " + day + (oldTo === "give" && give2 ? "; " + s.name + " → " + nm(give2) : "; " + s.name + " vacant") });
+            await loadData(true);
+            toast(nm(r0) + " is now “" + nn + "” from " + psnNice(day) + (oldTo === "give" && give2 ? "; “" + s.name + "” is " + nm(give2) + "’s." : "; “" + s.name + "” is vacant."));
+            await reloadHist(); ok = true;
+          } finally { BE.setPseudoDates(null); busy = false; }
+        }
+      } catch (e) { err.textContent = e.message; }
+      saving = false;
+      if (ok) { m.close(); editing = null; drawList(); } else { paint(); }
+    });
+    const head = h("div", { class: "cd-head" }, h("span", { class: "cd-chip" }, s.name), h("span", { class: "cd-arrow" }, "→"),
+      r0 ? h("span", { class: "cd-cur" }, h("span", { class: "cd-av" }, ini(nm(r0))), h("span", {}, h("b", {}, nm(r0)), h("small", {}, [r0.id, gs(r0, "status_column")].filter(Boolean).join(" · ")))) : h("span", { class: "cd-cur vac" }, "Vacant now"),
+      s.flag ? h("span", { class: "cd-tag red" }, "Resigning: needs a replacement") : null);
+    const m = psnModal(r0 ? (s.flag ? "Replace" : "Change") + " “" + s.name + "”" : "Give “" + s.name + "” to someone",
+      h("div", { class: "cd" }, head, r0 ? optBox : null, panel, dates, summary),
+      [err, h("span", { class: "grow" }), h("button", { class: "btn", type: "button", onclick: () => m.close() }, "Cancel"), save]);
+    [...document.querySelectorAll(".psn-veil")].pop()?.querySelector(".pdlg")?.classList.add("cd-dlg");
+    paint(); setTimeout(() => mainChooser.focus(), 50);
+  }
   function confirmTag(s, r, reset) {
     const from = dateIn("Assigned from");
     const m = psnModal("Give “" + s.name + "” to " + nm(r), h("div", { class: "psn-conf" }, h("p", {}, nm(r) + " · " + r.id + (cl(r) ? " · " + cl(r) : "")), from.el),
@@ -14661,13 +14809,14 @@ async function openPseudoNames(focusId, host) {   /* v3.81.0: host = draw inside
       await api("POST", "/api/bulk", { updates: ups, note: "Pseudo name " + s.name + " → " + nm(r) + " from " + fromDay + (old && old.id !== r.id ? " (was " + nm(old) + " until " + (toDay || fromDay) + ")" : "") });
       await loadData(true); editing = null;
       toast("“" + s.name + "” is now " + nm(r) + "’s, from " + psnNice(fromDay) + ".");
-      await reloadHist();
-    } catch (e) { toast(e.message, true); } finally { BE.setPseudoDates(null); busy = false; }
+      await reloadHist(); return true;
+    } catch (e) { toast(e.message, true); return false; } finally { BE.setPseudoDates(null); busy = false; }
   }
   async function untag(s, day) {
-    if (busy || !s.r) return; busy = true;
-    try { BE.setPseudoDates({ to: day || psnToday() }); await api("POST", "/api/bulk", { updates: [{ id: s.r.id, values: { [pc]: null } }], note: "Pseudo name " + s.name + " made vacant on " + (day || psnToday()) }); await loadData(true); editing = null; toast("“" + s.name + "” is vacant from " + psnNice(day || psnToday()) + "."); await reloadHist(); }
+    if (busy || !s.r) return false; busy = true; let ok = false;
+    try { BE.setPseudoDates({ to: day || psnToday() }); await api("POST", "/api/bulk", { updates: [{ id: s.r.id, values: { [pc]: null } }], note: "Pseudo name " + s.name + " made vacant on " + (day || psnToday()) }); await loadData(true); editing = null; ok = true; toast("“" + s.name + "” is vacant from " + psnNice(day || psnToday()) + "."); await reloadHist(); }
     catch (e) { toast(e.message, true); } finally { BE.setPseudoDates(null); busy = false; }
+    return ok;
   }
   drawTabs(); drawList();
   try { hist = await BE.readPseudoHistory(); } catch (e) { hist = []; console.warn(e); }
