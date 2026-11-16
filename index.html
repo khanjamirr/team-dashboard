@@ -15,7 +15,7 @@
 <meta name="apple-mobile-web-app-title" content="Blasters Deck">
 <meta name="application-name" content="Blasters Deck">
 <meta name="apple-mobile-web-app-status-bar-style" content="default">
-<title>Blasters Deck · 3.99.1</title>
+<title>Blasters Deck · 3.100.0</title>
 <link rel="preconnect" href="https://fonts.googleapis.com"><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin><link href="https://fonts.googleapis.com/css2?family=Public+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet">
 <style>
 :root {
@@ -3852,10 +3852,14 @@ input.wa-linked { background:color-mix(in srgb, #25a244 7%, var(--surface, #fff)
       <button class="btn ghost" id="btnLogout" title="Connect your two workbooks">Linked files</button>
       <button class="btn ghost autosync" id="btnAutoSync" hidden></button>
       <button class="btn ghost" id="btnSaveNow" hidden></button>
+      <button class="lv-pill" id="lvPill" type="button" hidden aria-haspopup="dialog" aria-expanded="false"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M6 2h12M6 22h12M7 2v4a5 5 0 0 0 10 0V2M7 22v-4a5 5 0 0 1 10 0v4"/></svg><span class="lv-n">0</span><span class="lv-t">leaves pending</span></button>
+      <button class="rec-btn" id="recBtn" type="button" hidden title="Record leave, late, remote or a half day"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.6" stroke-linecap="round" aria-hidden="true"><path d="M12 5v14M5 12h14"/></svg><span>Record attendance</span></button>
+      <span class="top-div" id="topDiv" hidden aria-hidden="true"></span>
       <button class="btn ghost bell" id="gsBtn" type="button" aria-label="Search" title="Search people, tasks and activities (Ctrl + K)"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" aria-hidden="true"><circle cx="11" cy="11" r="7"/><path d="m20 20-3.5-3.5"/></svg></button>
       <button class="btn ghost bell" id="btnRefresh" type="button" aria-label="Refresh" title="Get the latest changes, requests and notifications now" hidden><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M21 12a9 9 0 1 1-2.64-6.36"/><path d="M21 3v6h-6"/></svg></button>
-      <button class="btn ghost bell" id="wnBtn" type="button" aria-label="What’s new" title="What’s new in this version"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 3l1.8 4.6L18.5 9l-4.7 1.5L12 15l-1.8-4.5L5.5 9l4.7-1.4z"/><path d="M19 15l.8 2.2L22 18l-2.2.8L19 21l-.8-2.2L16 18l2.2-.8z"/></svg><span class="wn-dot" hidden></span></button>
       <button class="btn ghost bell" id="btnBell" type="button" aria-label="Activity" title="Activity: every change, newest first" hidden><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M6 8a6 6 0 0 1 12 0c0 7 3 9 3 9H3s3-2 3-9"/><path d="M10.3 21a1.94 1.94 0 0 0 3.4 0"/></svg><span class="bell-n" id="bellN" hidden></span></button>
+      <button class="btn ghost bell" id="tsBtn" type="button" aria-label="Not getting notifications? Troubleshoot" title="Not getting notifications? Check and fix this device"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M14.7 6.3a1 1 0 0 0 0 1.4l1.6 1.6a1 1 0 0 0 1.4 0l3.77-3.77a6 6 0 0 1-7.94 7.94l-6.91 6.91a2.12 2.12 0 0 1-3-3l6.91-6.91a6 6 0 0 1 7.94-7.94l-3.76 3.76z"/></svg></button>
+      <button class="btn ghost bell" id="wnBtn" type="button" aria-label="What’s new" title="What’s new in this version"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 3l1.8 4.6L18.5 9l-4.7 1.5L12 15l-1.8-4.5L5.5 9l4.7-1.4z"/><path d="M19 15l.8 2.2L22 18l-2.2.8L19 21l-.8-2.2L16 18l2.2-.8z"/></svg><span class="wn-dot" hidden></span></button>
     </header>
   <div class="workspace-heading overview-heading"><div><p class="eyebrow">TEAM WORKSPACE</p><h2 id="cleanPageTitle">Overview</h2><p>Your people and priorities, at a glance.</p></div></div>
   </div>
@@ -6787,6 +6791,7 @@ let LOG_CTX = false;   // true while a "Log leave" change is applied: the Log le
 function codeAllowed(oldC, newC) {
   const o = oldC == null ? '' : String(oldC).trim().toUpperCase(), n = newC == null ? '' : String(newC).trim().toUpperCase();
   if (o === n) return true;
+  if (LA_WRITE) return true;   /* v3.100.0: writeLA checks the cells itself */
   if (APPROVE_CTX) return can('att.approve');
   /* in Log leave, a type the super admin ticked may be logged; replacing approved leave or a holiday still needs the usual right */
   if (LOG_CTX && LOG_TYPES.includes(n) && logTypeAllowed(n)) { if (APPROVAL_CODES.has(o)) return can('att.approve'); if (o === 'H') return can('att.edit') || can('att.holidays'); return true; }
@@ -7811,11 +7816,11 @@ function reportsView() {
 /* ---------- WHO'S OUT ---------- */
 function pendingApplications(all = false) {
   /* v3.45.1: cached until the tracker or the filters change; past months are skipped (only today onwards counts) */
-  const ck = S.ver + '|' + (all ? 'all' : curSig()) + '|' + rosterRows().length + '|' + TODAY_MS;
+  const cov = laCovered(), ck = S.ver + '|' + (all ? 'all' : curSig()) + '|' + rosterRows().length + '|' + TODAY_MS + '|' + [...cov].join(',');
   const C = pendingApplications.c || (pendingApplications.c = {});
   if (C[all ? 'a' : 's'] && C[all ? 'a' : 's'].k === ck) return C[all ? 'a' : 's'].v.slice();
   const out = [];
-  for (const r of (all ? S.rows : D().rows)) { if (r.month < TODAY_MS) continue; for (let i = 0; i < 31; i++) { if (up(r.days[i]) !== 'LA') continue; if (i >= Engine.daysInMonth(r.month)) continue; const dt = dateOf(r.month, i); if (dt >= TODAY) out.push({ r, i, dt }); } }
+  for (const r of (all ? S.rows : D().rows)) { if (r.month < TODAY_MS) continue; for (let i = 0; i < 31; i++) { if (up(r.days[i]) !== 'LA') continue; if (i >= Engine.daysInMonth(r.month)) continue; const dt = dateOf(r.month, i); if (cov.has(personKey(r.name) + '|' + isoDate(dt))) continue; if (dt >= TODAY) out.push({ r, i, dt }); } }
   out.sort((a, b) => a.dt - b.dt || a.r.name.localeCompare(b.r.name));
   C[all ? 'a' : 's'] = { k: ck, v: out }; return out.slice();
 }
@@ -9082,16 +9087,17 @@ function openLogLeave(preKey) {
       <div class="form"><div class="full" style="display:flex;flex-direction:column;gap:4px"><span style="font-size:12px;font-weight:600;color:var(--ink-2)">Employee</span><div class="cbx"><input type="text" id="l-name" value="${esc(pre || '')}" placeholder="Pick or type a name" autocomplete="off" role="combobox" aria-expanded="false" aria-controls="l-list" aria-label="Employee" style="width:100%;padding-right:32px"><button type="button" class="cbx-caret" id="l-caret" tabindex="-1" aria-label="Show all employees">▾</button><div class="cbx-list" id="l-list" role="listbox" hidden></div></div></div>
       <div style="display:flex;flex-direction:column;gap:4px"><span style="font-size:12px;font-weight:600;color:var(--ink-2)">Type <small style="font-weight:400;color:var(--ink-3)">· type a code or a word, ↑↓ Enter · Alt+T</small></span><div class="cbx"><input type="text" id="l-type" autocomplete="off" role="combobox" aria-expanded="false" aria-controls="l-tlist" aria-label="Type" style="width:100%" placeholder="Choose a type, e.g. SL or sick"><button type="button" class="cbx-caret" tabindex="-1" aria-hidden="true" id="l-tcaret">▾</button><div class="cbx-list" id="l-tlist" role="listbox" hidden></div></div><select id="l-code" hidden aria-hidden="true" tabindex="-1"><option value="" selected></option>${codesAllowed.map(c => `<option value="${c}">${c} · ${CODES[c].label}</option>`).join('')}</select></div><span></span>
       <label>From<input type="date" id="l-from" value="${today}"></label><label>To<input type="date" id="l-to" value="${today}"></label>
-      ${needsApproval() ? `<label class="full">Note for your manager <span style="color:var(--bad,#c0392b)">*</span> (required)<input type="text" id="l-note" maxlength="200" required aria-required="true" placeholder="e.g. family function, doctor’s appointment" autocomplete="off"></label><div class="full sm" style="padding:8px 10px;border-radius:8px;background:var(--accent-soft)">This leave goes to a manager for approval first. It is added to attendance only after they approve it.</div>` : ''}</div>
+      ${needsApproval() ? `<label class="full" id="l-notewrap" hidden>Note for your approver <span style="color:var(--bad,#c0392b)">*</span> (needed for leave)<input type="text" id="l-note" maxlength="200" aria-required="true" placeholder="e.g. family function, doctor’s appointment" autocomplete="off"></label><div class="full sm" id="l-lanote" hidden style="padding:8px 10px;border-radius:8px;background:var(--accent-soft)">Leave is saved as <b>LA (pending)</b> straight away, and becomes the leave type once an approver confirms it. Late, remote and other updates are saved directly.</div>` : ''}</div>
       <div id="l-prev" class="sm" style="margin-top:12px;padding:10px 12px;border:1px solid var(--line);border-radius:8px;background:var(--surface-2)"></div><div class="err" id="l-err"></div>
       <div id="l-hist" class="ph-box" style="margin-top:12px"></div>`,
-    footer: `<span class="grow"></span><button class="btn" data-close>Cancel</button><button class="btn primary" id="l-go">${needsApproval() ? 'Send for approval' : 'Apply'}</button>`,
+    footer: `<span class="grow"></span><button class="btn" data-close>Cancel</button><button class="btn primary" id="l-go">Save</button>`,
   });
   const plan = () => {
+    { const c = ($('#l-code', m) || {}).value, on = needsLA(c); const w = $('#l-notewrap', m), n2 = $('#l-lanote', m); if (w) w.hidden = !on; if (n2) n2.hidden = !on; }   /* v3.100.0 */
     const name = $('#l-name', m).value, p = resolvePerson(name), from = new Date($('#l-from', m).value + 'T00:00:00Z'), to = new Date($('#l-to', m).value + 'T00:00:00Z');
     if (!p) return { err: name.trim() ? 'No employee with that name in the workforce file or the tracker.' : 'Pick an employee.' };
     if (personGone(p)) return { err: p.name.trim() + ' has left or moved, so attendance can’t be recorded for them.' };
-    if (isNaN(from) || isNaN(to)) return { err: 'Choose both dates.' }; if (to < from) return { err: '“To” is before “From”.' }; if ((to - from) / 86400000 > 92) return { err: 'That range is longer than 3 months. Split it up.' }; if (needsApproval() && ((($('#l-note', m) || {}).value || '').trim().length < 3)) return { err: 'Write a note for your manager: it is required (e.g. family function, doctor’s appointment).' };
+    if (isNaN(from) || isNaN(to)) return { err: 'Choose both dates.' }; if (to < from) return { err: '“To” is before “From”.' }; if ((to - from) / 86400000 > 92) return { err: 'That range is longer than 3 months. Split it up.' }; if (needsLA(($('#l-code', m) || {}).value) && ((($('#l-note', m) || {}).value || '').trim().length < 3)) return { err: 'Write a note for your manager: it is required (e.g. family function, doctor’s appointment).' };
     const code = $('#l-code', m).value, skip = true; if (!code) return { err: 'Choose a leave type.' };   /* v3.74.2: no type is chosen for you */ /* v3.22: week offs and holidays are always kept; only a direct edit in the tracker changes them */ const set = [], skipped = [], blocked = [], create = new Set(); let overwrite = 0;
     for (let t = from; t <= to; t = new Date(t.getTime() + 86400000)) {
       const ms = Engine.monthSerial(t.getUTCFullYear(), t.getUTCMonth()), i = t.getUTCDate() - 1; const row = p.rows.find(r => r.month === ms);
@@ -9160,7 +9166,7 @@ function openLogLeave(preKey) {
   $('#l-go', m).onclick = async () => {
     const pl = plan(); if (pl.err) return;
     if (!(await confirmOverwrite(pl.p.name, [...overwriteList(pl.p, pl.set.map(x => x.t), pl.code), ...pendingClash(pl.p.key, pl.set.map(x => isoDate(x.t)), pl.code)]))) return;
-    if (needsApproval()) { const note = ($('#l-note', m) || {}).value || ''; closeModal(); sendLeaveRequest(pl, note); return; }
+    if (needsLA(pl.code)) { const note = ($('#l-note', m) || {}).value || ''; closeModal(); sendLeaveRequest(pl, note); return; }
     closeModal();
     const doLog = val => mutate(`Logged ${pl.code} for ${pl.p.name} · ${pl.set.length} day${pl.set.length === 1 ? '' : 's'} (${longDate(pl.set[0].t)}${pl.set.length > 1 ? ' – ' + longDate(pl.set[pl.set.length - 1].t) : ''})`, () => {
       const idn = identityOf(pl.p); for (const s of pl.set) { let row = S.rows.find(r => r.month === s.ms && personKey(r.name) === pl.p.key); if (!row) { row = newRow(s.ms, idn.name, { empId: idn.empId, client: idn.client }); insertRow(row); } setDay(row, s.i, pl.code); }
@@ -9181,6 +9187,29 @@ function openLogLeave(preKey) {
    manager (anyone with "Approve or reject leave") and only reaches the tracker once approved. Requests are kept in the
    shared team settings in Supabase (key leave_requests), not in the workbook. ---------- */
 const needsApproval = () => !!(window.PERM && PERM.online() && !can('att.direct'));
+/* v3.100.0: one way to record attendance for everyone. Late, remote, cab and other non-leave codes go straight into the
+   tracker. Leave (AL, CL, SL, UL, half days) from someone without "Record leave without approval" goes in as LA (pending)
+   and a request carries the type they asked for; an approver turns it into the leave or RJ from the Leaves pill. */
+const needsLA = code => needsApproval() && LEAVE_CATS.has(catOf(code));
+let LA_WRITE = false;
+const laCovered = () => { const out = new Set(); for (const r of reqList()) if (r.status === 'pending' && r.inTracker) for (const d of r.dates || []) out.add((r.key || personKey(r.name)) + '|' + d); return out; };
+function writeLA(p, dates, back) {   /* put LA (or back: clear / RJ) on the request's dates that are still LA or empty */
+  LA_WRITE = true;
+  try {
+    return mutate(back === 'RJ' ? `Rejected leave for ${p.name}` : back === '' ? `Withdrew leave application for ${p.name}` : `Leave application (LA) for ${p.name} · ${dates.length} day${dates.length === 1 ? '' : 's'}`, () => {
+      const idn = identityOf(p); let n = 0;
+      for (const iso of dates) {
+        const t = new Date(iso + 'T00:00:00Z'), ms = Engine.monthSerial(t.getUTCFullYear(), t.getUTCMonth()), i = t.getUTCDate() - 1;
+        let row = S.rows.find(r => r.month === ms && personKey(r.name) === p.key);
+        if (back != null) { if (row && up(row.days[i]) === 'LA') { row.days[i] = back === '' ? null : back; n++; } continue; }
+        if (!row) { row = newRow(ms, idn.name, { empId: idn.empId, client: idn.client }); insertRow(row); }
+        const cur = up(row.days[i]); if (APPROVAL_CODES.has(cur) || cur === 'H' || catOf(cur) === 'off') continue;
+        row.days[i] = 'LA'; n++;
+      }
+      if (!n) return false;
+    }, { cells: true, log: true });
+  } finally { LA_WRITE = false; }
+}
 const canDecide = () => can('att.approve');
 const reqList = () => { const l = (window.TD_SETTINGS || {}).leave_requests; return Array.isArray(l) ? l : []; };
 const myId = () => { try { const u = CLOUD.user(); return u && u.id != null ? String(u.id) : ''; } catch { return ''; } };
@@ -9218,11 +9247,12 @@ async function sendLeaveRequest(pl, note) {
   if (String(note || '').trim().length < 3) { toast('Write a note for your manager before sending the request.'); return false; }
   const idn = identityOf(pl.p);
   const req = { id: Date.now().toString(36) + Math.random().toString(36).slice(2, 7), status: 'pending', at: new Date().toISOString(), by: BE.userName(), byId: myId(),
-    name: idn.name || pl.p.name, key: pl.p.key, empId: idn.empId ?? null, client: idn.client || '', code: pl.code, dates: pl.set.map(s => isoDate(s.t)), note: String(note || '').slice(0, 200) };
+    name: idn.name || pl.p.name, key: pl.p.key, empId: idn.empId ?? null, client: idn.client || '', code: pl.code, dates: pl.set.map(s => isoDate(s.t)), note: String(note || '').slice(0, 200), inTracker: true };
   try {
     await saveRequests(l => [...l, req]);
+    try { if (writeLA(pl.p, req.dates) !== false && !S.auto) await save(); } catch (e) { console.error(e); }
     BE.appendActivity([{ time: BE.nowText(), user: BE.userName(), action: 'settings', att: S.fileName, key: req.empId || '', name: req.name, details: { note: 'Asked for approval: ' + req.code + ' · ' + reqDatesText(req.dates) + (req.note ? ' · “' + req.note + '”' : '') } }]);
-    toast(`Sent for approval: ${req.code} for ${req.name}. It is added to attendance once a manager approves it.`);
+    toast(`Saved as LA (pending) for ${req.name}: ${req.code} goes in once an approver confirms it.`);
   } catch (e) { toast('Could not send the request: ' + e.message + ' Nothing was changed.'); }
 }
 function applyApproved(p, code, dates, desc) {
@@ -9303,7 +9333,8 @@ function openRejectBox(id) {
       if (!canDecide() || !inMyScope(cur)) { toast('You no longer have access to decide this request.'); return; }
       await saveRequests(l => l.map(r => r.id === id ? { ...r, status: 'rejected', reason: why, decidedBy: BE.userName(), decidedById: myId(), decidedAt: new Date().toISOString() } : r));
       BE.appendActivity([{ time: BE.nowText(), user: BE.userName(), action: 'settings', att: S.fileName, key: req.empId || '', name: req.name, details: { note: 'Rejected ' + req.code + ' · ' + reqDatesText(req.dates) + ' · asked by ' + req.by + (why ? ' · “' + why + '”' : '') } }]);
-      toast('Request rejected. Nothing was added to attendance.');
+      if (cur.inTracker) { const p = resolvePerson(cur.name); if (p && S.status === 'ready' && writeLA(p, cur.dates, 'RJ') !== false) { try { await save(); } catch { } } }
+      toast(cur.inTracker ? 'Rejected: the LA days are now RJ.' : 'Request rejected. Nothing was added to attendance.');
     } catch (e) { toast('Could not reject: ' + e.message); } finally { requestDecisionBusy = false; renderApprovalRequests(); }
   };
 }
@@ -9315,6 +9346,7 @@ async function cancelRequest(id) {
     if (String(cur.byId) !== myId()) { toast('Only the requester can cancel this request.'); return; }
     await saveRequests(l => l.map(r => r.id === id ? { ...r, status: 'cancelled', decidedBy: BE.userName(), decidedById: myId(), decidedAt: new Date().toISOString() } : r));
     await BE.appendActivity([{ time: BE.nowText(), user: BE.userName(), action: 'request-cancelled', name: cur.name, key: cur.empId || '', details: { note: 'Cancelled request ' + cur.code + ' · ' + reqDatesText(cur.dates) } }]);
+    if (cur.inTracker) { const p = resolvePerson(cur.name); if (p && S.status === 'ready' && writeLA(p, cur.dates, '') !== false) { try { await save(); } catch { } } }
     toast('Request cancelled.');
   } catch (e) { toast('Could not cancel: ' + e.message); }
 }
@@ -9774,7 +9806,7 @@ const ACTIONS = {
   'pick-month'(el) { if(S.mode==='reports'){selectAttendanceReport('period','m:'+el.dataset.m);return;} S.ui.period = 'm:' + el.dataset.m; render(); },
   'who-picture'(el) { copyWhoPicture(el); },
   'who-back'() { S.ui.who.start = isoDate(new Date(TODAY.getTime() - 14 * 86400000)); render(); },
-  'review-la'() { try { window.setView('summary'); setTimeout(() => { document.getElementById('ovRequests')?.scrollIntoView({ behavior: 'smooth', block: 'start' }); }, 60); } catch { } },
+  'review-la'() { try { if (window.lvOpen) { window.lvOpen('la'); return; } window.setView('summary'); setTimeout(() => { document.getElementById('ovRequests')?.scrollIntoView({ behavior: 'smooth', block: 'start' }); }, 60); } catch { } },
   'who-days'(el) { S.ui.who.days = +el.dataset.n; render(); },
   'grid-kind'(el) { const g = S.ui.grid, k = el.dataset.k; g.kinds = (g.kinds || []).includes(k) ? g.kinds.filter(x => x !== k) : [...(g.kinds || []), k]; if (!g.kinds.length && g.sort === 'kind') g.sort = 'file'; render(); },
   'tl-kind'(el) { const t = tlUi(), k = el.dataset.k; t.kinds = t.kinds.includes(k) ? t.kinds.filter(x => x !== k) : [...t.kinds, k]; render(); },
@@ -11981,7 +12013,7 @@ async function poll() {
 }
 
 /* ============================== filtering ============================== */
-const APP = { title: "Blasters Deck", version: "3.99.1", released: "2026-11-16" };
+const APP = { title: "Blasters Deck", version: "3.100.0", released: "2026-11-16" };
 const BASE_DIMS = { status: "status_column", desig: "designation_column", client: "client_column", mode: "mode_column" };
 const STANDARD_STATUSES = ["Active", "Manager", "OJT", "Bench", "New", "Projected", "Left", "Moved"];
 const TILE_ORDER = ["Active", "Manager", "OJT", "Bench", "New", "Projected"];
@@ -13238,7 +13270,7 @@ function renderGlance() {
   const per = attOk && ATT.ovPeriod ? ATT.ovPeriod() : "today";
   let actN = 0; try { if (can("act.items")) actN = actionCounts().actions || 0; } catch { }
   const needs = [];
-  if (st && st.toDecide) needs.push([st.toDecide, st.toDecide === 1 ? "leave to approve" : "leaves to approve", () => { OV.rc = "approvals"; organizeRequests(); $("#ovRequests")?.scrollIntoView({ behavior: "smooth", block: "center" }); }]);
+  if (st && st.toDecide) needs.push([st.toDecide, st.toDecide === 1 ? "leave to approve" : "leaves to approve", () => { OV.rc = "approvals"; if (window.lvOpen) lvOpen(); else { organizeRequests(); $("#ovRequests")?.scrollIntoView({ behavior: "smooth", block: "center" }); } }]);
   if (st && st.toSet) needs.push([st.toSet, st.toSet === 1 ? "backup to set" : "backups to set", () => { window.ATT?.bkDueNow && ATT.bkDueNow(); }]);
   if (actN) needs.push([actN, actN === 1 ? "employee record to fix" : "employee records to fix", () => openActionCenter("actions")]);
   const nNeed = needs.reduce((a, x) => a + x[0], 0);
@@ -16059,14 +16091,13 @@ function drawNotifications() {
   const foot = h('div', { class: 'nf-foot' },
     h('button', { type: 'button', class: 'nf-fbtn', onclick: () => { closeDrawer(); window.bdWhatsNew && bdWhatsNew(true); } }, h('span', { 'aria-hidden': 'true' }, '✨'), h('span', {}, h('b', {}, 'What’s new'), h('small', {}, 'Version ' + APP.version))),
     h('button', { type: 'button', class: 'nf-fbtn', onclick: () => { closeDrawer(); window.bdPushCheck && bdPushCheck(); } }, h('span', { 'aria-hidden': 'true' }, '🔔'), h('span', {}, h('b', {}, 'Test notifications'), h('small', {}, 'On this device'))));
-  if (nfTab === 'act') { const host = h('div', { class: 'nf-act' }); notificationBody.replaceChildren(...[tabsEl, host, foot].filter(Boolean)); openActivity(host); const ma0 = document.getElementById('nfMarkAll'); if (ma0) ma0.disabled = !unread; return; }
+  if (nfTab === 'act') { const host = h('div', { class: 'nf-act' }); notificationBody.replaceChildren(...[tabsEl, host].filter(Boolean)); openActivity(host); const ma0 = document.getElementById('nfMarkAll'); if (ma0) ma0.disabled = !unread; return; }
   notificationBody.replaceChildren(...[
     tabsEl, inbox, chips,
     activityError ? h('p', { class: 'err', role: 'status' }, activityError) : null,
     groups.length ? h('div', { class: 'nf-groups' }, ...groups.map(G => h('section', {}, h('h4', { class: 'nf-day' }, G.g), h('ul', { class: 'nf-list' }, ...G.items.map(row)))))
       : h('div', { class: 'nf-empty' }, h('span', { 'aria-hidden': 'true' }, '🔔'), h('b', {}, nfFilter === 'unread' ? 'You’re all caught up' : 'No notifications'), h('small', {}, 'New tasks, requests and playbook updates show up here.')),
-    list.length > nfShow ? h('button', { class: 'btn nf-more', type: 'button', onclick: () => { nfShow += 40; drawNotifications(); } }, 'Show older') : null,
-    foot].filter(Boolean));
+    list.length > nfShow ? h('button', { class: 'btn nf-more', type: 'button', onclick: () => { nfShow += 40; drawNotifications(); } }, 'Show older') : null].filter(Boolean));   /* v3.100.0: What’s new and Troubleshoot moved to the top bar */
   const ma = document.getElementById('nfMarkAll'); if (ma) ma.disabled = !unread;
 }
 async function bellCheck() {
@@ -20066,6 +20097,7 @@ window.bdSearch = (() => {
 /* v3.96.0: "What's new" once per person after each update (remembered in the database); again from More or the bell */
 window.bdWhatsNew = (() => {
   const NOTES = [
+    { v: '3.100.0', items: [['➕', 'Record attendance from the top bar', 'One way for everyone: late, remote and other updates go straight into attendance; leave goes in as LA (pending) until an approver confirms it.'], ['⏳', 'Leaves pending', 'The amber pill at the top shows how many leaves wait for approval; tap it to approve or reject.'], ['🛠', 'Troubleshoot notifications', 'The wrench beside the bell checks and fixes notifications on this device.']] },
     { v: '3.99.0', items: [['🕘', 'A proper shift picker', 'Shifts are grouped by time zone and show the India time next to the US time, with ☀️ day or 🌙 night at a glance.'], ['🔕', 'Fewer, combined notifications', 'Several changes to the same employee by one person in one sitting arrive as one notification; changes to different employees stay separate.']] },
     { v: '3.98.5', items: [['💬', 'WhatsApp number is a normal box again', 'It no longer turns into a dropdown for some employees.']] },
     { v: '3.98.4', items: [['⚡', 'Faster notifications', 'New changes now show up within about 30 seconds, even when the page has been left open in the background.'], ['🙈', 'No more alerts about your own changes', 'You are only told about what other people do.'], ['🧹', 'Cleaner Chrome pop-ups', 'Short title, one line of detail.'], ['🛡️', 'Fix people starts with nothing ticked', 'Apply only changes the people you tick yourself.']] },
@@ -20196,6 +20228,102 @@ window.bdPushCheck = async function () {
   setInterval(() => check(false), 5 * 60e3);
   document.addEventListener('visibilitychange', () => { if (!document.hidden) check(false); });
   setTimeout(() => check(true), 20e3);
+})();
+</script>
+<style id="topbar-3100">
+/* v3.100.0: top bar — actions first (Leaves pending, Record attendance), then tools (search, alerts, troubleshoot, what's new), then you */
+header.top .lv-pill, header.top .rec-btn { display:inline-flex; align-items:center; gap:7px; height:36px; padding:0 14px; border-radius:999px; font-weight:600; font-size:13px; line-height:1; font-family:inherit; cursor:pointer; white-space:nowrap; border:1px solid transparent; transition:background .15s, transform .1s; }
+header.top .lv-pill[hidden], header.top .rec-btn[hidden], header.top .top-div[hidden] { display:none !important; }
+header.top .lv-pill svg, header.top .rec-btn svg { width:16px; height:16px; flex:none; }
+header.top .lv-pill { background:#fff4dc; color:#8a5300; border-color:#f3d48f; }
+header.top .lv-pill:hover { background:#ffecc2; }
+header.top .lv-pill .lv-n { min-width:20px; height:20px; padding:0 6px; border-radius:10px; background:#e59a0c; color:#fff; display:inline-grid; place-items:center; font-size:12px; }
+header.top .lv-pill.mine { background:#eaf2ff; color:#1d4f9a; border-color:#c8dafc; } header.top .lv-pill.mine .lv-n { background:#2f6fe0; }
+header.top .lv-pill.quiet { background:transparent; color:var(--ink-2,#4b5563); border-color:var(--border,#e3e6ec); } header.top .lv-pill.quiet .lv-n { display:none; }
+header.top .lv-pill[aria-expanded="true"] { box-shadow:0 0 0 3px rgba(229,154,12,.22); }
+:root[data-theme="dark"] header.top .lv-pill:not(.quiet):not(.mine) { background:#3a2a08; color:#ffd27a; border-color:#6b4a0c; }
+:root[data-theme="dark"] header.top .lv-pill.mine { background:#14284a; color:#a9c8ff; border-color:#2a4b80; }
+header.top .rec-btn { background:var(--ink,#111827); color:var(--surface,#fff); }
+header.top .rec-btn:hover { transform:translateY(-1px); } header.top .rec-btn:active { transform:none; }
+header.top .top-div { width:1px; height:24px; background:var(--border,#e3e6ec); margin:0 4px; flex:none; }
+#lvPanel { position:fixed; z-index:60; top:64px; right:16px; width:min(480px, calc(100vw - 24px)); max-height:min(76vh, 720px); overflow:auto; background:var(--surface,#fff); color:var(--ink); border:1px solid var(--border,#e3e6ec); border-radius:18px; box-shadow:0 24px 60px -12px rgba(15,23,42,.28), 0 2px 8px rgba(15,23,42,.08); padding:14px 16px 16px; }
+#lvPanel[hidden] { display:none; }
+#lvPanel #ovRequests { display:block !important; border:0 !important; box-shadow:none !important; background:transparent !important; padding:0 !important; margin:0 !important; height:auto !important; max-height:none !important; overflow:visible !important; border-radius:0 !important; }
+#lvPanel #ovRequests .ov-up-head { position:static !important; margin:0 0 6px !important; padding:0 40px 0 0 !important; background:transparent !important; }
+#lvPanel #ovRequests h2::before { display:none !important; }
+#lvPanel #ovRequests h2 { font-size:16px !important; margin:0 !important; }
+#lvPanel #rcRecord { display:none !important; }
+#lvPanel .lv-x { position:absolute; top:10px; right:10px; width:30px; height:30px; border-radius:50%; border:0; background:var(--surface-2,#f3f5f9); color:var(--ink-2); cursor:pointer; font-size:16px; line-height:1; z-index:2; }
+html body #pageSummary.ov.no-req { grid-template-columns:repeat(2,minmax(0,1fr)) !important; grid-template-areas:"glance glance" "att up" !important; }
+html body #pageSummary.ov.no-req.has-tasks { grid-template-columns:repeat(3,minmax(0,1fr)) !important; grid-template-areas:"glance glance glance" "att up tasks" !important; }
+@media (max-width:1280px) { html body #pageSummary.ov.no-req.has-tasks { grid-template-columns:repeat(2,minmax(0,1fr)) !important; grid-template-areas:"glance glance" "att tasks" "up up" !important; } }
+@media (max-width:900px) { html body #pageSummary.ov.no-req, html body #pageSummary.ov.no-req.has-tasks { grid-template-columns:minmax(0,1fr) !important; grid-template-areas:"glance" "att" "up" !important; } html body #pageSummary.ov.no-req.has-tasks { grid-template-areas:"glance" "tasks" "att" "up" !important; } }
+@media (max-width:760px) {
+  header.top .lv-pill .lv-t, header.top .rec-btn span { display:none; }
+  header.top .lv-pill { padding:0 10px; } header.top .lv-pill.quiet { padding:0; width:36px; justify-content:center; border:0; }
+  header.top .rec-btn { width:36px; padding:0; justify-content:center; }
+  header.top .top-div { display:none !important; }
+  #lvPanel { top:auto; bottom:0; right:0; left:0; width:auto; max-height:82vh; border-radius:20px 20px 0 0; z-index:1200; padding-bottom:calc(84px + env(safe-area-inset-bottom)); }
+}
+</style>
+<script>
+/* v3.100.0: Leaves pill + panel, Record attendance and Troubleshoot in the top bar */
+(() => {
+  const $ = id => document.getElementById(id);
+  let panel = null, lastKey = '';
+  const can = k => !window.PERM || PERM.can(k);
+  const signedIn = () => !$('app')?.hidden && typeof state !== 'undefined' && state.schema;
+  function ensurePanel() {
+    if (panel) return panel;
+    const rq = $('ovRequests'); if (!rq) return null;
+    panel = document.createElement('div'); panel.id = 'lvPanel'; panel.hidden = true; panel.setAttribute('role', 'dialog'); panel.setAttribute('aria-label', 'Leaves');
+    const x = document.createElement('button'); x.className = 'lv-x'; x.type = 'button'; x.setAttribute('aria-label', 'Close'); x.textContent = '×'; x.onclick = () => close();
+    panel.append(x, rq); document.body.append(panel);
+    const t = $('requestCenterTitle'); if (t) t.textContent = 'Leaves';
+    $('pageSummary')?.classList.add('no-req');
+    return panel;
+  }
+  function close() { if (!panel || panel.hidden) return; panel.hidden = true; $('lvPill')?.setAttribute('aria-expanded', 'false'); document.removeEventListener('mousedown', outside, true); }
+  const outside = e => { if (panel && !panel.contains(e.target) && !$('lvPill')?.contains(e.target) && !(e.target.closest && e.target.closest('.modal, .modal-bg, dialog, .pdlg, .ovl, #attHost, [role="dialog"]:not(#lvPanel)'))) close(); };
+  function open(tab) {
+    const p = ensurePanel(); if (!p) return;
+    try { if (typeof OV !== 'undefined' && tab) OV.rc = tab; } catch { }
+    p.hidden = false; $('lvPill')?.setAttribute('aria-expanded', 'true');
+    try { window.organizeRequests && organizeRequests(); } catch (e) { console.error(e); }
+    setTimeout(() => document.addEventListener('mousedown', outside, true), 0);
+  }
+  window.lvOpen = open; window.lvClose = close;
+  function paint() {
+    ensurePanel();
+    const pill = $('lvPill'), rec = $('recBtn'), div = $('topDiv'); if (!pill || !rec) return;
+    if (!signedIn()) { pill.hidden = rec.hidden = div.hidden = true; return; }
+    let c = {}, canRec = false; try { c = (window.ATT && ATT.requestCounts) ? ATT.requestCounts() : {}; } catch { } try { canRec = !!(window.ATT && ATT.canRecord && ATT.canRecord()); } catch { }
+    const decide = can('att.approve'), n = decide ? (c.approvals || 0) + (c.la || 0) : (c.own || 0);
+    const show = decide || canRec || n > 0 || (c.rejected || 0) > 0;
+    const key = [show, decide, n, canRec].join('|');
+    if (key !== lastKey) {
+      lastKey = key;
+      pill.hidden = !show; rec.hidden = !canRec; div.hidden = !(show || canRec);
+      pill.classList.toggle('mine', !decide && n > 0); pill.classList.toggle('quiet', !n);
+      pill.querySelector('.lv-n').textContent = String(n);
+      pill.querySelector('.lv-t').textContent = n ? (decide ? (n === 1 ? 'leave pending' : 'leaves pending') : 'waiting for approval') : 'Leaves';
+      pill.title = n ? (decide ? n + ' leave ' + (n === 1 ? 'application' : 'applications') + ' to approve' : n + ' of your requests waiting for approval') : 'Leave applications and history';
+      pill.setAttribute('aria-label', pill.title);
+    }
+    if (panel && !panel.hidden) { try { window.organizeRequests && organizeRequests(); } catch { } }
+  }
+  /* the user chip goes last ("you") */
+  function chipLast() { const u = $('userchip'), hd = u && u.parentElement; if (u && hd && hd.lastElementChild !== u) hd.append(u); }
+  document.addEventListener('click', e => {
+    const t = e.target && e.target.closest ? e.target : null; if (!t) return;
+    if (t.closest('#lvPill')) { panel && !panel.hidden ? close() : open(); }
+    else if (t.closest('#recBtn')) { close(); if (window.ATT && ATT.recordAttendance) ATT.recordAttendance(); }
+    else if (t.closest('#tsBtn')) { if (window.bdPushCheck) bdPushCheck(); }
+  });
+  document.addEventListener('keydown', e => { if (e.key === 'Escape') close(); });
+  window.addEventListener('att:requests', () => { lastKey = ''; paint(); });
+  setInterval(() => { try { paint(); chipLast(); } catch { } }, 4000);
+  setTimeout(() => { try { paint(); chipLast(); } catch { } }, 800);
 })();
 </script>
 </body>
