@@ -15,7 +15,7 @@
 <meta name="apple-mobile-web-app-title" content="Blasters Deck">
 <meta name="application-name" content="Blasters Deck">
 <meta name="apple-mobile-web-app-status-bar-style" content="default">
-<title>Blasters Deck · 3.102.4</title>
+<title>Blasters Deck · 3.103.0</title>
 <link rel="preconnect" href="https://fonts.googleapis.com"><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin><link href="https://fonts.googleapis.com/css2?family=Public+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet">
 <style>
 :root {
@@ -4160,11 +4160,14 @@ window.tdRoleOf = p => (p && p._role ? window.tdRoles().find(r => r.id === p._ro
 window.tdRolePerms = r => ({ ...(r.rights || {}), ...(r.extras || {}), _role: r.id });
 (() => {
   const memo = new WeakMap();
+  /* v3.103.0: a person can have their own Record attendance types (_log), on top of whatever their role says */
+  const withLog = q => { if (!q || !Array.isArray(q._log)) return q; const out = { ...q }; for (const c of ['AL', 'CL', 'SL', 'UL', 'AB', 'HD1', 'HD2', 'LA', 'R', 'L', 'C']) out['log.' + c] = q._log.includes(c); if (q._log.length) out['att.log'] = true; return out; };
   window.tdResolvePerms = p => {
+    if (p && !p._role && Array.isArray(p._log)) { let m = memo.get(p); if (m && m.roles === 'own') return m.out; const out = withLog(p); memo.set(p, { roles: 'own', out }); return out; }
     if (!p || !p._role) return p || {};
     const roles = (window.TD_SETTINGS || {}).user_roles; let m = memo.get(p);
     if (m && m.roles === roles) return m.out;
-    const r = window.tdRoleOf(p), out = r ? { ...window.tdRolePerms(r), ...(p._emp ? { _emp: p._emp, _empName: p._empName } : {}) } : p;
+    const r = window.tdRoleOf(p), out = withLog(r ? { ...window.tdRolePerms(r), ...(p._emp ? { _emp: p._emp, _empName: p._empName } : {}), ...(Array.isArray(p._log) ? { _log: p._log } : {}) } : p);
     memo.set(p, { roles, out }); return out;
   };
 })();
@@ -8693,7 +8696,7 @@ const isLeaver = r => !!r && (isGone(r) || /^(left|moved)$/i.test(rosterStatus(r
 const personGone = p => { try { const x = p && (p.roster || (rosterOfPerson(p) || {}).row); return !!x && isLeaver(x); } catch { return false; } };
 function employeeNames(opts = {}) {
   const out = new Map(), gone = new Set();
-  if (hasRoster()) for (const r of rosterRows()) { if (isGone(r)) { const nm0 = gs(r, 'name_column').trim(); if (nm0) gone.add(personKey(nm0)); continue; } const nm = gs(r, 'name_column').trim(); if (nm) out.set(personKey(nm), { name: nm, hint: `Emp ID ${gs(r, 'key_column') || '—'} · ${rosterStatus(r) || 'no status'}` }); }
+  if (hasRoster()) for (const r of rosterRows()) { if (isGone(r)) { const nm0 = gs(r, 'name_column').trim(); if (nm0) gone.add(personKey(nm0)); continue; } const nm = gs(r, 'name_column').trim(); if (nm) out.set(personKey(nm), { name: nm, row: r, hint: `Emp ID ${gs(r, 'key_column') || '—'} · ${rosterStatus(r) || 'no status'}` }); }
   for (const p of D(true).people.values()) if (!out.has(p.key) && !(opts.current && (gone.has(p.key) || personGone(p)))) out.set(p.key, { name: p.name, hint: ([...p.ids][0] ? 'Emp ID ' + [...p.ids][0] : 'no Emp ID') + (hasRoster() ? ' · tracker only' : '') });
   return [...out.values()].sort((a, b) => a.name.localeCompare(b.name));
 }
@@ -9119,6 +9122,13 @@ const PAST_CSS = `.ph{border:1px solid var(--line);border-radius:10px;padding:10
 function openLogLeave(preKey) {
   if (S.status !== 'ready' || !S.ctx) { toast('The attendance tracker isn’t connected yet. Open the Attendance page once, or ask the admin to connect it in Settings › Save & sync.'); return; }
   const d = D(true); const names = employeeNames({ current: true });   /* v3.71.2: no Left / Moved people when recording attendance */
+  /* v3.103.0: "Show in the Employee box" — only the employee types this person picked (e.g. Designation = Recruiter) */
+  const allNames = names.slice();
+  const recF = () => (window.tdRecFilter ? tdRecFilter() : null);
+  const passRec = n => { const f = recF(); if (!f || !f.field || !Array.isArray(f.values) || !f.values.length) return true; if (!n.row) return false; return f.values.includes(String(g(n.row, f.field) ?? '').trim() || '(blank)'); };
+  const refilter = () => { names.splice(0, names.length, ...allNames.filter(passRec)); };
+  refilter();
+  const whoLabel = () => { const f = recF(); return f && f.field && f.values && f.values.length ? f.values.slice(0, 2).join(', ') + (f.values.length > 2 ? ' +' + (f.values.length - 2) : '') + ' · ' + names.length : 'Everyone · ' + names.length; };
   if (!canLog()) { toast('Your passcode can’t record attendance. Ask the admin for the right in Settings.'); return; }
   const linked = window.PERM && PERM.linkedEmp && PERM.linkedEmp();
   const linkedName = linked ? ((rosterRows().find(r => idKey(gs(r, 'key_column')) === idKey(linked.code)) && gs(rosterRows().find(r => idKey(gs(r, 'key_column')) === idKey(linked.code)), 'name_column').trim()) || linked.name) : '';
@@ -9131,8 +9141,8 @@ function openLogLeave(preKey) {
   const m = openModal({
     title: 'Record attendance',
     body: `<style>${PAST_CSS}.cbx{position:relative}.cbx-list{position:absolute;left:0;right:0;top:calc(100% + 4px);z-index:5;max-height:260px;overflow:auto;background:var(--surface);border:1px solid var(--line-2);border-radius:10px;box-shadow:0 10px 30px rgba(0,0,0,.18);padding:4px}.cbx-opt{display:flex;justify-content:space-between;gap:12px;width:100%;border:0;background:transparent;text-align:left;padding:7px 10px;border-radius:7px;font-size:13px;color:var(--ink);font-weight:500}.cbx-opt small{color:var(--ink-3);font-weight:400}.cbx-opt.on,.cbx-opt:hover{background:var(--accent-soft)}.cbx-empty{padding:10px;color:var(--ink-3);font-size:12px}.cbx-caret{position:absolute;right:8px;top:50%;transform:translateY(-50%);border:0;background:transparent;color:var(--ink-3);padding:4px 6px}</style>
-      <div class="form"><div class="full" style="display:flex;flex-direction:column;gap:4px"><span style="font-size:12px;font-weight:600;color:var(--ink-2)">Employee</span><div class="cbx"><input type="text" id="l-name" value="${esc(pre || '')}" placeholder="Pick or type a name" autocomplete="off" role="combobox" aria-expanded="false" aria-controls="l-list" aria-label="Employee" style="width:100%;padding-right:32px"><button type="button" class="cbx-caret" id="l-caret" tabindex="-1" aria-label="Show all employees">▾</button><div class="cbx-list" id="l-list" role="listbox" hidden></div></div></div>
-      <div style="display:flex;flex-direction:column;gap:4px"><span style="font-size:12px;font-weight:600;color:var(--ink-2)">Type <small style="font-weight:400;color:var(--ink-3)">· type a code or a word, ↑↓ Enter · Alt+T</small></span><div class="cbx"><input type="text" id="l-type" autocomplete="off" role="combobox" aria-expanded="false" aria-controls="l-tlist" aria-label="Type" style="width:100%" placeholder="Choose a type, e.g. SL or sick"><button type="button" class="cbx-caret" tabindex="-1" aria-hidden="true" id="l-tcaret">▾</button><div class="cbx-list" id="l-tlist" role="listbox" hidden></div></div><select id="l-code" hidden aria-hidden="true" tabindex="-1"><option value="" selected></option>${codesAllowed.map(c => `<option value="${c}">${c} · ${CODES[c].label}</option>`).join('')}</select></div><span></span>
+      <div class="form"><div class="full" style="display:flex;flex-direction:column;gap:4px"><span style="font-size:12px;font-weight:600;color:var(--ink-2);display:flex;align-items:center;gap:8px">Employee <button type="button" id="l-who" title="Choose which employee types show in this list" style="border:1px solid var(--line,#e3e6ec);background:var(--surface-2,#f4f6f9);border-radius:999px;padding:2px 10px;font:inherit;font-size:11.5px;font-weight:600;color:var(--ink-2);cursor:pointer">👥 Showing: <span id="l-who-t">${esc(whoLabel())}</span> ▾</button></span><div class="cbx"><input type="text" id="l-name" value="${esc(pre || '')}" placeholder="Pick or type a name" autocomplete="off" role="combobox" aria-expanded="false" aria-controls="l-list" aria-label="Employee" style="width:100%;padding-right:32px"><button type="button" class="cbx-caret" id="l-caret" tabindex="-1" aria-label="Show all employees">▾</button><div class="cbx-list" id="l-list" role="listbox" hidden></div></div></div>
+      <div style="display:flex;flex-direction:column;gap:4px"><span style="font-size:12px;font-weight:600;color:var(--ink-2)">Type <small style="font-weight:400;color:var(--ink-3)">· type a code or a word, ↑↓ Enter · Alt+T</small>${window.PERM && PERM.isSuper() ? ' <button type="button" id="l-notes-ed" style="border:0;background:none;padding:0;color:var(--accent);font:inherit;font-size:11.5px;font-weight:600;cursor:pointer">✎ Descriptions</button>' : ''}</span><div class="cbx"><input type="text" id="l-type" autocomplete="off" role="combobox" aria-expanded="false" aria-controls="l-tlist" aria-label="Type" style="width:100%" placeholder="Choose a type, e.g. SL or sick"><button type="button" class="cbx-caret" tabindex="-1" aria-hidden="true" id="l-tcaret">▾</button><div class="cbx-list" id="l-tlist" role="listbox" hidden></div></div><select id="l-code" hidden aria-hidden="true" tabindex="-1"><option value="" selected></option>${codesAllowed.map(c => `<option value="${c}">${c} · ${CODES[c].label}</option>`).join('')}</select></div><div class="l-desc" id="l-desc" aria-live="polite"></div>
       <label>From<input type="date" id="l-from" value="${today}"></label><label>To<input type="date" id="l-to" value="${today}"></label>
       ${needsApproval() ? `<label class="full" id="l-notewrap" hidden>Note for your approver <span style="color:var(--bad,#c0392b)">*</span> (needed for leave)<input type="text" id="l-note" maxlength="200" aria-required="true" placeholder="e.g. family function, doctor’s appointment" autocomplete="off"></label><div class="full sm" id="l-lanote" hidden style="padding:8px 10px;border-radius:8px;background:var(--accent-soft)">Leave is saved as <b>LA (pending)</b> straight away, and becomes the leave type once an approver confirms it. Late, remote and other updates are saved directly.</div>` : ''}</div>
       <div id="l-prev" class="sm" style="margin-top:12px;padding:10px 12px;border:1px solid var(--line);border-radius:8px;background:var(--surface-2)"></div><div class="err" id="l-err"></div>
@@ -9140,6 +9150,7 @@ function openLogLeave(preKey) {
     footer: `<span class="grow"></span><button class="btn" data-close>Cancel</button><button class="btn primary" id="l-go">Save</button>`,
   });
   const plan = () => {
+    { const c = ($('#l-code', m) || {}).value, d = $('#l-desc', m), n = c && window.tdLogNote ? tdLogNote(c) : ''; if (d) d.innerHTML = n ? '<b>' + esc(c) + ':</b> ' + esc(n) : ''; }   /* v3.103.0: the team's own description of the type */
     { const c = ($('#l-code', m) || {}).value, on = needsLA(c); const w = $('#l-notewrap', m), n2 = $('#l-lanote', m); if (w) w.hidden = !on; if (n2) n2.hidden = !on; }   /* v3.100.0 */
     const name = $('#l-name', m).value, p = resolvePerson(name), from = new Date($('#l-from', m).value + 'T00:00:00Z'), to = new Date($('#l-to', m).value + 'T00:00:00Z');
     if (!p) return { err: name.trim() ? 'No employee with that name in the workforce file or the tracker.' : 'Pick an employee.' };
@@ -9210,6 +9221,7 @@ function openLogLeave(preKey) {
     m.addEventListener('keydown', e => { if (!e.altKey || e.ctrlKey || e.metaKey) return; const k = e.key.toLowerCase(); if (k === 't') { e.preventDefault(); inp.focus(); inp.select(); shown = opts; act = Math.max(0, opts.findIndex(o => o.c === sel.value)); draw(); } else if (k === 'e') { e.preventDefault(); $('#l-name', m).focus(); } });
   }
   m.addEventListener('input', show); m.addEventListener('change', show); show(); if (!pre) $('#l-name', m).focus(); else $('#l-type', m).focus();
+  { const wb = $('#l-who', m); if (wb) wb.onclick = () => window.tdRecFilterPick && tdRecFilterPick(allNames.filter(n => n.row).map(n => n.row), () => { refilter(); const t = $('#l-who-t', m); if (t) t.textContent = whoLabel(); }); }
   $('#l-go', m).onclick = async () => {
     const pl = plan(); if (pl.err) return;
     if (!(await confirmOverwrite(pl.p.name, [...overwriteList(pl.p, pl.set.map(x => x.t), pl.code), ...pendingClash(pl.p.key, pl.set.map(x => isoDate(x.t)), pl.code)]))) return;
@@ -10440,7 +10452,7 @@ function bkSave(pKey, name, which, val) {
 function bkActive(pKey) {
   /* v3.60.0: one lookup table per roster version (this is asked for every leave day on screen) */
   /* the lookup lives for one task only, so a status changed a moment ago is always seen */
-  try { if (!hasRoster()) return true; if (!bkActive.set) { bkActive.set = new Set(rosterRows().filter(r => isActive(r) && !goneKind(r)).map(r => personKey(gs(r, 'name_column')))); setTimeout(() => { bkActive.set = null; }, 0); } return bkActive.set.has(pKey); } catch { return true; }
+  try { if (!hasRoster()) return true; if (!bkActive.set) { bkActive.set = new Set(rosterRows().filter(r => /^\s*active\b/i.test(String(gs(r, 'status_column'))) && !goneKind(r))   /* v3.103.0: 'Active + Resign' (serving notice) is still a live seat */.map(r => personKey(gs(r, 'name_column')))); setTimeout(() => { bkActive.set = null; }, 0); } return bkActive.set.has(pKey); } catch { return true; }
 }
 const bkRequired = pKey => canBackup() && (window.PERM && PERM.online()) && bkActive(pKey);
 /* ask for the backup, then run approve(); the backup is written once the approval has gone through */
@@ -12076,7 +12088,7 @@ async function poll() {
 }
 
 /* ============================== filtering ============================== */
-const APP = { title: "Blasters Deck", version: "3.102.4", released: "2026-11-17" };
+const APP = { title: "Blasters Deck", version: "3.103.0", released: "2026-11-17" };
 const BASE_DIMS = { status: "status_column", desig: "designation_column", client: "client_column", mode: "mode_column" };
 const STANDARD_STATUSES = ["Active", "Manager", "OJT", "Bench", "New", "Projected", "Left", "Moved"];
 const TILE_ORDER = ["Active", "Manager", "OJT", "Bench", "New", "Projected"];
@@ -17508,7 +17520,7 @@ const roleOfUser = u => (u && u.role !== 'superadmin' && u.permissions && u.perm
 const roleLabel = u => u.role === 'superadmin' ? 'Super admin' : (roleOfUser(u) || {}).name || 'No role';
 const rolePages = r => { const p = r.rights || {}; return PERM.groups.filter(g => g.page && p[g.page]).map(g => g.name); };
 const roleSummary = r => { const pg = rolePages(r), n = PERM.keys.filter(k => (r.rights || {})[k]).length; return (r.admin ? 'Admin · ' : '') + (pg.length ? pg.join(', ') : 'no pages') + ' · ' + n + ' rights' + (r.extras && r.extras._bkReport ? ' · Backup report' : '') + (r.extras && r.extras._phones ? ' · Phone numbers' : '') + (r.extras && r.extras._backupEdit === false && r.admin ? ' · no backup editing' : r.extras && r.extras._backupEdit && !r.admin ? ' · sets backups' : ''); };
-const keepLink = p => ({ ...(p && p._emp ? { _emp: p._emp, _empName: p._empName } : {}), ...(p && p._phones ? { _phones: true } : {}) });   /* v3.59.0: a person's phone access survives role changes */
+const keepLink = p => ({ ...(p && p._emp ? { _emp: p._emp, _empName: p._empName } : {}), ...(p && p._phones ? { _phones: true } : {}), ...(p && Array.isArray(p._log) ? { _log: p._log, ...(p._log.length ? { 'att.log': true } : {}) } : {}) });   /* v3.103.0: their own Record attendance types survive role changes too (and the database lets them save) */   /* v3.59.0: a person's phone access survives role changes */
 async function saveRoles(next, note) { await saveTeamSetting('user_roles', next, note ? { name: 'Roles', text: note } : null); }
 /* write a role's rights into each member's account, so the server checks the same rights */
 async function syncRoleMembers(role, members, onStep) {
@@ -17654,6 +17666,16 @@ function drawEditor(box, u, reload, users = [], template = null, groups = []) {
   const drawPicks = () => fill(pickBox, ...opts.map(([id, t, sub, adm]) => h('button', { type: 'button', class: 'role-pick' + (adm && !/^admin$/i.test(t) ? ' adm' : ''), role: 'radio', 'aria-checked': String(pick === id), onclick: () => { pick = id; drawPicks(); } },
     h('span', { class: 'role-dot' }), h('span', { class: 'ppl-it' }, h('b', {}, t), h('small', {}, sub)))));
   drawPicks();
+  /* v3.103.0: Record attendance types just for this person */
+  const LOGI = ((PERM.groups.find(g => g.sub && /Record attendance/.test(g.sub.title)) || {}).sub || { items: [] }).items.map(([k, l]) => [k.slice(4), l]);
+  const ownLog = u && u.permissions && Array.isArray(u.permissions._log) ? u.permissions._log : null;
+  let logMode = ownLog ? 'own' : 'role';
+  const logChecks = LOGI.map(([c, l]) => ({ c, ...checkLine(l, ownLog ? ownLog.includes(c) : false) }));
+  const logGrid = h('div', { class: 'ulog-grid', hidden: logMode !== 'own' }, ...logChecks.map(x => x.el));
+  const logSeg = h('div', { class: 'ulog-seg', role: 'radiogroup', 'aria-label': 'Record attendance types' });
+  const drawLogSeg = () => { fill(logSeg, ...[['role', 'Same as their role'], ['own', 'Only the types ticked below']].map(([k, t]) => h('button', { type: 'button', role: 'radio', 'aria-checked': String(logMode === k), onclick: () => { logMode = k; logGrid.hidden = k !== 'own'; drawLogSeg(); } }, t))); };
+  drawLogSeg();
+  const logBox = h('div', { class: 'ulog' }, logSeg, logGrid, h('p', { class: 'rmod-note', style: 'margin:6px 0 0' }, 'Use this to give one person extra types (say, Remote) or fewer types than the rest of their role. Ticking any type also lets them use Record attendance.'));
   const grpSrc = u;
   const groupChecks = groups.map(g => ({ g, ...checkLine(g.name + ' · ' + g.members.length + (g.members.length === 1 ? ' person' : ' people'), !!grpSrc && memberOf(g, grpSrc.id)) }));
   const groupBox = groups.length ? h('div', { class: 'grp-picks' }, ...groupChecks.map(c => c.el)) : h('p', { class: 'rmod-note', style: 'margin:0' }, 'No groups yet. Make one in the Groups tab above.');
@@ -17685,6 +17707,7 @@ function drawEditor(box, u, reload, users = [], template = null, groups = []) {
         perms = u && u.role !== 'superadmin' ? { ...old, ...link } : { _v: PERM.version, ...PERM.presets['View only'], _notificationAudience: { mode: 'own', users: [] }, ...link };
       } else { const r = roles.find(x => x.id === pick); dbRole = r.admin ? 'admin' : 'user'; perms = { ...tdRolePerms(r), ...link }; }
       if (dbRole !== 'superadmin') perms = { ...perms, _phones: phonesOn.box.checked || !!(pick !== 'none' && perms && perms._phones) };   /* v3.59.0 */
+      if (dbRole !== 'superadmin') { perms = { ...perms }; delete perms._log; if (logMode === 'own') { perms._log = logChecks.filter(x => x.box.checked).map(x => x.c); if (perms._log.length) perms['att.log'] = true; } }   /* v3.103.0 */
       const r0 = await CLOUD.admin.save(u ? u.id : null, nmv, pc, dbRole, active.box.checked, perms, lid);
       const savedId = (r0 && r0.id) || (u && u.id);
       if (savedId != null) { try { await saveGroupsFor(savedId, nmv); } catch (ge) { toast('Saved, but the groups could not be updated: ' + ge.message, true); } }
@@ -17711,6 +17734,7 @@ function drawEditor(box, u, reload, users = [], template = null, groups = []) {
         h('label', {}, 'Linked employee (optional)', emp, empList)),
       active.el),
     sec('2', 'Role', roles.length ? 'What they can open and change comes from their role' : 'Create roles in the Roles tab above, then pick one here', pickBox, h('div', { class: 'ped-phones', hidden: true }, phonesOn.el)),
+    u && u.role === 'superadmin' ? null : sec(groups.length ? '4' : '3', 'Record attendance types', 'Which types this person can pick in Record attendance', logBox),
     groups.length ? sec('3', 'Groups', 'People in the same group see each other’s requests and request notifications', groupBox) : null,
     h('div', { class: 'set-actions ped-save' }, save, err, h('span', { class: 'spacer' }), del));
   if (isNew) name.focus();
@@ -18122,7 +18146,8 @@ async function drawAutoBackups(host) {
   };
   const status = d.schedule ? h('div', { class: 'abk-ok' }, h('span', { class: 'abk-ic' }, '✓'), h('div', { class: 'grow' }, h('b', {}, last ? 'Last backup: ' + dayT(last.at) : 'Switched on: the first one runs tonight'), h('small', {}, 'Runs by itself every night at 2:00 am (India time) and keeps the last 30. Everything: employees, attendance, settings, users, Planner, Activities, pictures and files. Stays encrypted.')), now)
     : h('div', { class: 'abk-ok warn' }, h('span', { class: 'abk-ic' }, '!'), h('div', { class: 'grow' }, h('b', {}, 'The nightly backup is not scheduled yet'), h('small', {}, 'In Supabase open Database → Extensions, switch on pg_cron, then run v395.sql again. “Back up now” works already.')), now);
-  fill(box, h('h4', {}, 'Automatic backups'), status,
+  const remB = PERM.isOwner() ? h('button', { class: 'btn mini', type: 'button', style: 'float:right', onclick: () => window.bdBackupReminderSettings && bdBackupReminderSettings() }, '⏰ Backup reminder') : null;
+  fill(box, h('h4', {}, remB, 'Automatic backups'), status,
     items.length ? h('ul', { class: 'wb-list abk-list' }, ...items.slice(0, 40).map(it => h('li', { class: 'wb-row' }, h('span', { class: 'wb-av cal', 'aria-hidden': 'true' }, String(new Date(it.at).getDate())),
       h('div', { class: 'wb-main' }, h('b', {}, dayT(it.at)), h('small', {}, (it.kind === 'manual' ? 'Made by ' + (it.by || 'you') : 'Nightly') + ' · ' + kb(it.size || 0) + ' · ' + (it.counts ? it.counts.users + ' users, ' + it.counts.tasks + ' tasks, ' + it.counts.activities + ' activities, ' + it.counts.files + ' files' : ''))),
       h('button', { class: 'btn mini', type: 'button', onclick: dl(it) }, '⬇ Download')))) : h('p', { class: 'wb-empty' }, 'No backups yet.'),
@@ -20001,27 +20026,64 @@ window.TDCARD = (() => {
 })();
 </script>
 <script>
-/* v3.95.0: weekly backup reminder for the super admin, one click from the download */
+/* v3.95.0: weekly backup reminder for the super admin, one click from the download
+   v3.103.0: the super admin sets how often (every day … every month), which weekday and what time (ET) */
 (() => {
-  const due = 7 * 864e5; let shown = false, busy = false;
+  let shown = false, busy = false, prefs = null;
+  const DOWS = ['Sunday', 'Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday'];
+  const EVERY = [[1, 'Every day'], [3, 'Every 3 days'], [7, 'Every week'], [14, 'Every 2 weeks'], [30, 'Every month']];
+  const cfgOf = p => ({ every: +(p && p.backup_every) || 7, dow: p && p.backup_dow !== undefined && p.backup_dow !== null && p.backup_dow !== '' ? +p.backup_dow : 1, at: (p && /^\d\d:\d\d$/.test(p.backup_at || '') ? p.backup_at : '10:00') });
+  /* the next moment the reminder is due: N days after the last download, then the chosen weekday (for weekly and longer), at the chosen time, Eastern */
+  const nextDue = (p) => {
+    const c = cfgOf(p), last = p && p.last_backup_dl ? Date.parse(p.last_backup_dl) : null;
+    let base = last == null ? Date.now() - 864e5 * 400 : last + c.every * 864e5;
+    const q = tzParts(Math.max(base, last == null ? Date.now() : base)); let y = q.y, m = q.m, d = q.d;
+    const [hh, mm] = c.at.split(':').map(Number);
+    if (last == null) return Date.now();
+    if (c.every >= 7) { const wd = new Date(Date.UTC(y, m, d)).getUTCDay(); d += (c.dow - wd + 7) % 7; }
+    let t = tzFromWall(y, m, d, hh, mm); if (t < base - 864e5) t += 7 * 864e5;
+    return t;
+  };
+  window.bdBackupNextDue = () => prefs ? nextDue(prefs) : null;
+  window.bdBackupReminderSettings = async () => {
+    let p; try { p = await rpc(null); } catch (e) { toast('Could not load: ' + e.message, true); return; } prefs = p;
+    const c = cfgOf(p);
+    const every = h('select', {}, ...EVERY.map(([v, l]) => h('option', { value: String(v), selected: v === c.every }, l)));
+    const dow = h('select', {}, ...DOWS.map((l, i) => h('option', { value: String(i), selected: i === c.dow }, l)));
+    const at = h('input', { type: 'time', value: c.at });
+    const dowL = h('label', {}, 'On', dow);
+    const nx = h('div', { class: 'bkr-next' });
+    const paint = () => { dowL.hidden = +every.value < 7; const tmp = { ...p, backup_every: +every.value, backup_dow: +dow.value, backup_at: at.value || '10:00' }; const t = nextDue(tmp);
+      nx.textContent = (t <= Date.now() ? '⏰ Due now' : '⏰ Next reminder: ' + new Date(t).toLocaleString('en-US', { weekday: 'short', day: 'numeric', month: 'short', hour: 'numeric', minute: '2-digit' }) + ' ET') + (p.last_backup_dl ? ' · last backup ' + new Date(p.last_backup_dl).toLocaleDateString('en-US', { day: 'numeric', month: 'short' }) : ' · no backup downloaded yet'); };
+    for (const x of [every, dow, at]) x.addEventListener('input', paint);
+    paint();
+    const err = h('span', { class: 'err' });
+    const save = h('button', { class: 'btn primary', type: 'button', onclick: async () => { save.disabled = true;
+      try { await rpc({ backup_every: +every.value, backup_dow: +dow.value, backup_at: at.value || '10:00', backup_snooze: null }); d.close(); toast('Backup reminder saved. It pops up here and on your phone.'); shown = false; }
+      catch (e) { err.textContent = e.message; save.disabled = false; } } }, 'Save');
+    const d = pdlg('Backup reminder', h('div', {}, h('p', { class: 'set-hint', style: 'margin:0 0 12px' }, 'When should the dashboard remind you to download a backup? The clock starts again each time you download one. Times are US Eastern (ET).'),
+      h('div', { class: 'bkr-grid' }, h('label', {}, 'How often', every), dowL, h('label', {}, 'At (ET)', at)), nx), [err, h('button', { class: 'btn', type: 'button', onclick: () => d.close() }, 'Cancel'), save]);
+  };
   const rpc = prefs => CLOUD._rpc('td_my_prefs', { p_token: CLOUD.token(), p_prefs: prefs });
   const daysAgo = t => Math.floor((Date.now() - Date.parse(t)) / 864e5);
   async function check() {
     if (shown || busy || typeof CLOUD === 'undefined' || !CLOUD.token || !CLOUD.token() || !window.PERM || !PERM.online() || !PERM.isOwner() || typeof state === 'undefined' || !state.schema) return;
     if (document.querySelector('.pdlg-veil, #pcDialog, .drawer, .tdc-veil, .a2hs')) return;
-    busy = true; let p; try { p = await rpc(null); } catch { busy = false; return; } busy = false;
+    busy = true; let p; try { p = await rpc(null); } catch { busy = false; return; } busy = false; prefs = p;
     const last = p && p.last_backup_dl, snooze = p && p.backup_snooze;
     if (snooze && Date.parse(snooze) > Date.now()) return;
-    if (last && Date.now() - Date.parse(last) < due) return;
+    if (last && Date.now() < nextDue(p)) return;
     shown = true;
     const n = last ? daysAgo(last) : null;
     const close = () => { card.classList.remove('in'); setTimeout(() => card.remove(), 300); };
     const go = h('button', { type: 'button', class: 'btn primary', onclick: () => { close(); downloadWorkbook(state.file || 'Blasters Deck.xlsx', () => CLOUD.admin.download(), 'this week’s backup', { quick: true }); } }, '⬇ Back up now');
     const later = h('button', { type: 'button', class: 'btn', onclick: async () => { close(); try { await rpc({ backup_snooze: new Date(Date.now() + 864e5).toISOString() }); } catch { } } }, 'Tomorrow');
+    const hour = h('button', { type: 'button', class: 'btn', onclick: async () => { close(); try { await rpc({ backup_snooze: new Date(Date.now() + 3600e3).toISOString() }); } catch { } } }, 'In 1 hour');
+    const setB = h('button', { type: 'button', class: 'btn ghost', title: 'Change when this reminder comes', onclick: () => { close(); window.bdBackupReminderSettings(); } }, '⏰ Change timing');
     const card = h('div', { class: 'bkw', role: 'dialog', 'aria-label': 'Weekly backup' },
       h('span', { class: 'bkw-ic', 'aria-hidden': 'true' }, '🛟'),
-      h('div', { class: 'bkw-t' }, h('b', {}, 'Weekly backup due'), h('small', {}, (n == null ? 'No backup downloaded yet.' : 'Last downloaded ' + (n === 0 ? 'today' : n === 1 ? 'yesterday' : n + ' days ago') + '.') + ' One protected Excel with everything, private details included. Keep it somewhere safe, off this computer.')),
-      h('div', { class: 'bkw-a' }, later, go));
+      h('div', { class: 'bkw-t' }, h('b', {}, 'Backup due'), h('small', {}, (n == null ? 'No backup downloaded yet.' : 'Last downloaded ' + (n === 0 ? 'today' : n === 1 ? 'yesterday' : n + ' days ago') + '.') + ' One protected Excel with everything, private details included. Keep it somewhere safe, off this computer.')),
+      h('div', { class: 'bkw-a' }, setB, h('span', { style: 'flex:1' }), hour, later, go));
     document.body.append(card); requestAnimationFrame(() => card.classList.add('in'));
   }
   addEventListener('bd:backup-done', () => document.querySelector('.bkw')?.remove());
@@ -20217,6 +20279,7 @@ window.bdSearch = (() => {
 /* v3.96.0: "What's new" once per person after each update (remembered in the database); again from More or the bell */
 window.bdWhatsNew = (() => {
   const NOTES = [
+    { v: '3.103.0', items: [['🎯', 'Record attendance types per person', 'In People & access, give one person their own types (say, Remote) instead of their role’s.'], ['📝', 'Type descriptions', 'Admins can describe each type; everyone sees it under the Type box in Record attendance.'], ['⏰', 'Backup reminder timing', 'Choose how often, which day and what time (ET) the backup reminder comes.'], ['👥', 'Choose who shows in Record attendance', 'Pick the employee types you record for (e.g. by Designation); only they show in the Employee box.']] },
     { v: '3.102.0', items: [['🩺', 'Sickroom', 'Send someone to the sickroom and check them back: live timers, a log, and who goes how often and for how long.'], ['🧠', 'Trends', 'In its own deck (the 📈 button at the top): who takes more leave than usual, leave patterns, late streaks and sickroom habits, spotted automatically.']] },
     { v: '3.101.0', items: [['📣', 'Tag people in task comments', 'Type @ in a comment and pick a teammate: they get a notification and can see and reply to the task.'], ['🏢', 'Who is out by client', 'Group the Who is out list by client, or by client and sub client.']] },
     { v: '3.100.0', items: [['➕', 'Record attendance from the top bar', 'One way for everyone: late, remote and other updates go straight into attendance; leave goes in as LA (pending) until an approver confirms it.'], ['⏳', 'Leaves pending', 'The amber pill at the top shows how many leaves wait for approval; tap it to approve or reject.'], ['🛠', 'Troubleshoot notifications', 'The wrench beside the bell checks and fixes notifications on this device.']] },
@@ -20623,6 +20686,19 @@ html body #pinnedHeader #btnBell #bellN[hidden] { display:none !important; }
 .sk-sub { font-size:12px; font-weight:700; color:var(--ink-2); margin:14px 0 6px; }
 .sk-zrow { display:flex; align-items:center; gap:10px; flex-wrap:wrap; font-size:12px; font-weight:600; color:var(--ink-2); } .sk-zrow .sk-seg { margin:0; }
 .sk-hint { font-size:11.5px; font-weight:600; color:#0b6b4f; min-height:14px; } .sk-hint.bad { color:#c0392b; }
+.ulog-seg { display:inline-flex; gap:2px; padding:3px; border-radius:10px; background:var(--surface-2,#f1f3f7); margin-bottom:8px; }
+.ulog-seg button { border:0; background:transparent; padding:6px 12px; border-radius:8px; font:inherit; font-size:12.5px; font-weight:600; color:var(--ink-2); cursor:pointer; }
+.ulog-seg button[aria-checked="true"] { background:var(--surface,#fff); color:var(--ink); box-shadow:0 1px 3px rgba(0,0,0,.08); }
+.ulog-grid { display:grid; grid-template-columns:repeat(auto-fill, minmax(220px, 1fr)); gap:2px 14px; padding:10px 12px; border-radius:12px; background:var(--surface-2,#f6f7fa); }
+.ulog-grid[hidden] { display:none; }
+.l-desc { font-size:12px; line-height:1.45; color:var(--ink-2); background:var(--accent-soft, #eef4ff); border-radius:10px; padding:8px 10px; align-self:end; }
+.l-desc:empty { display:none; } .l-desc b { color:var(--ink); }
+.lnote-row { display:grid; grid-template-columns:150px 1fr; gap:10px; align-items:start; padding:8px 0; border-top:1px solid var(--border,#eceef3); }
+.lnote-row:first-child { border-top:0; } .lnote-row b { font-size:13px; } .lnote-row small { display:block; color:var(--ink-3); font-size:11.5px; }
+.lnote-row textarea { width:100%; min-height:44px; resize:vertical; border:1px solid var(--border,#e3e6ec); border-radius:10px; padding:8px 10px; font:inherit; font-size:13px; background:var(--surface,#fff); color:var(--ink); }
+.bkr-grid { display:grid; grid-template-columns:1fr 1fr; gap:12px; } .bkr-grid label { display:flex; flex-direction:column; gap:5px; font-size:12px; font-weight:600; color:var(--ink-2); }
+.bkr-grid select, .bkr-grid input { height:38px; border-radius:10px; border:1px solid var(--border,#e3e6ec); padding:0 10px; font:inherit; font-size:14px; background:var(--surface,#fff); color:var(--ink); }
+.bkr-next { margin-top:12px; padding:10px 12px; border-radius:12px; background:var(--surface-2,#f6f7fa); font-size:13px; }
 .sk-err { color:#c0392b; font-size:12.5px; min-height:1px; }
 </style>
 <script>
@@ -20633,6 +20709,7 @@ html body #pinnedHeader #btnBell #bellN[hidden] { display:none !important; }
   const SK = { open: false, tab: 'now', list: [], openList: [], per: '7', logPer: 'today', busy: false, at: 0, form: false, edit: null, err: '' };
   const rpc = (fn, a) => CLOUD._rpc(fn, { p_token: CLOUD.token(), ...a });
   const can = () => { try { return !!(typeof CLOUD !== 'undefined' && CLOUD.token && CLOUD.token() && window.ATT && ATT.canRecord && ATT.canRecord()); } catch { return false; } };
+  const isAdm = () => { try { return !!(window.PERM && PERM.isSuper()); } catch { return false; } };   /* v3.103.0: only admins delete sickroom logs */
   const signedIn = () => !$('app')?.hidden && typeof state !== 'undefined' && state.schema;
   const E = { SICK_ALREADY_IN: 'They are already in the sickroom.', SICK_ORDER: 'The return time must be after the start time.', SICK_FUTURE: 'That time is in the future.', ADMIN_ONLY: 'You don’t have the right for this.', SICK_NOT_FOUND: 'That visit was removed by someone else.' };
   const friendly = e => { const m = String(e && e.message || e || ''); const k = Object.keys(E).find(x => m.includes(x)); if (k) return E[k]; if (/td_sick|schema cache|Could not find/i.test(m)) return 'The sickroom is not set up yet: the super admin needs to run sickroom.sql in Supabase.'; return m || 'Something went wrong.'; };
@@ -20722,7 +20799,7 @@ html body #pinnedHeader #btnBell #bellN[hidden] { display:none !important; }
       <label>Went in at <span style="font-weight:400;color:var(--ink-3)">(${SK.zone})</span><input id="skFrom" type="time" value="${zTime(v ? Date.parse(v.start) : Date.now(), SK.zone)}"><small class="sk-hint" id="skFromH"></small></label>
       <label>Came back at <span style="font-weight:400;color:var(--ink-3)">${v ? '(' + SK.zone + ')' : '(' + SK.zone + ', empty if still in)'}</span><input id="skTo" type="time" value="${v && v.end ? zTime(Date.parse(v.end), SK.zone) : ''}"><small class="sk-hint" id="skToH"></small></label>
       <label>Note <span style="font-weight:400;color:var(--ink-3)">(optional)</span><input id="skNote" maxlength="300" value="${v ? esc(v.note || '') : ''}" placeholder="e.g. headache"></label>
-      <div class="sk-act">${v ? `<button type="button" class="sk-btn2" data-skdel="${esc(v.id)}" style="color:#c0392b">Delete</button>` : '<small>Saved and shown in ET, the dashboard’s time.</small>'}<button type="button" class="sk-btn2" data-sk="cancel">Cancel</button><button type="button" class="sk-btn2 go" data-sk="save">${v ? 'Save' : 'Start'}</button></div><p class="sk-err full" id="skErr"></p></div>`;
+      <div class="sk-act">${v && isAdm() ? `<button type="button" class="sk-btn2" data-skdel="${esc(v.id)}" style="color:#c0392b">Delete</button>` : '<small>Saved and shown in ET, the dashboard’s time.</small>'}<button type="button" class="sk-btn2" data-sk="cancel">Cancel</button><button type="button" class="sk-btn2 go" data-sk="save">${v ? 'Save' : 'Start'}</button></div><p class="sk-err full" id="skErr"></p></div>`;
   }
   function hints() {
     const dt = $('skDate')?.value, other = SK.zone === 'IST' ? 'ET' : 'IST';
@@ -20965,6 +21042,63 @@ html body #pageSummary #cardTrends { grid-area:auto !important; grid-column:1 / 
   document.addEventListener('click', e => { if (e.target.closest && e.target.closest('#trBtn')) { const d = $('trDeck'); d && !d.hidden ? trClose() : trOpen(); } });
   setInterval(() => { try { if (!document.hidden && !$('app')?.hidden && typeof state !== 'undefined' && state.schema) run(false); } catch { } }, 15000);
   setTimeout(() => run(false), 3000);
+})();
+</script>
+<script>
+/* v3.103.0: the team's own description of each Record attendance type (internal guidance, e.g. "CL: max 1 a month,
+   tell your TL a day before"). Shown under the Type box in Record attendance; admins edit them. Stored in team settings. */
+(() => {
+  const CODES = [['AL', 'Approved leave'], ['CL', 'Casual leave'], ['SL', 'Sick leave'], ['UL', 'Unplanned leave'], ['AB', 'Absent'], ['HD1', 'Half day, 1st half'], ['HD2', 'Half day, 2nd half'], ['LA', 'Leave application (pending)'], ['R', 'Remote'], ['L', 'Late coming'], ['C', 'Cab late']];
+  const notes = () => { const n = (window.TD_SETTINGS || {}).log_notes; return n && typeof n === 'object' ? n : {}; };
+  window.tdLogNote = c => String(notes()[String(c || '').toUpperCase()] || '').trim();
+  window.tdEditLogNotes = () => {
+    if (!window.PERM || !PERM.isSuper()) return;
+    const cur = notes(), boxes = {};
+    const body = h('div', {}, h('p', { class: 'set-hint', style: 'margin:0 0 8px' }, 'Write what each type means for your team. Everyone sees it under the Type box when they record attendance. Leave a box empty to show nothing.'),
+      ...CODES.map(([c, l]) => { const t = h('textarea', { maxlength: 300, placeholder: 'e.g. ' + (c === 'CL' ? 'Max 1 a month. Tell your TL a day before.' : c === 'SL' ? 'Same day only. A doctor’s note after 2 days.' : c === 'R' ? 'Only with your manager’s OK, logged before 9 AM ET.' : 'When to use it…') }); t.value = cur[c] || ''; boxes[c] = t;
+        return h('div', { class: 'lnote-row' }, h('div', {}, h('b', {}, c), h('small', {}, l)), t); }));
+    const err = h('span', { class: 'err' });
+    const save = h('button', { class: 'btn primary', type: 'button', onclick: async () => {
+      save.disabled = true; err.textContent = '';
+      const next = {}; for (const [c] of CODES) { const v = boxes[c].value.trim(); if (v) next[c] = v.slice(0, 300); }
+      try { await saveTeamSetting('log_notes', next, { name: 'Record attendance', text: 'Updated the type descriptions' }); d.close(); toast('Descriptions saved. Everyone sees them in Record attendance.'); }
+      catch (e) { err.textContent = e.message; save.disabled = false; }
+    } }, 'Save');
+    const d = pdlg('Record attendance: type descriptions', body, [err, h('button', { class: 'btn', type: 'button', onclick: () => d.close() }, 'Cancel'), save]);
+  };
+  document.addEventListener('click', e => { if ((e.composedPath ? e.composedPath() : []).some(x => x && x.id === 'l-notes-ed')) window.tdEditLogNotes(); }, true);
+})();
+</script>
+<script>
+/* v3.103.0: which employees show in Record attendance's Employee box. Each person picks a field (e.g. Designation or
+   Employee type) and the values to show; it is kept with their account (td_my_prefs), so it follows them to any device. */
+(() => {
+  let F = null, loaded = false;
+  const rpc = prefs => CLOUD._rpc('td_my_prefs', { p_token: CLOUD.token(), p_prefs: prefs });
+  window.tdRecFilter = () => F;
+  const fill = (el, ...k) => el.replaceChildren(...k.flat().filter(Boolean));
+  const checkLine = (text, checked) => { const c = h('input', { type: 'checkbox' }); c.checked = !!checked; return { box: c, el: h('label', { class: 'chk-line' }, c, h('span', {}, text)) }; };
+  async function load() { if (loaded || typeof CLOUD === 'undefined' || !CLOUD.token || !CLOUD.token()) return; try { const p = await rpc(null); F = p && p.rec_filter && typeof p.rec_filter === 'object' ? p.rec_filter : null; loaded = true; } catch { } }
+  setInterval(load, 5000); setTimeout(load, 1200);
+  const guess = cols => cols.find(c => /employee\s*type|emp\.?\s*type|staff\s*type/i.test(c)) || cols.find(c => /designation|job\s*title|role|position/i.test(c)) || cols[0];
+  window.tdRecFilterPick = (rows, done) => {
+    const skip = new Set(Object.values(state.schema || {}).filter(v => typeof v === 'string' && /name|emp ?id|phone|whats|mail|dob|birth|date|address|aadha|pan|account/i.test(v)));
+    const cols = (state.cols || []).map(c => c.name).filter(c => c && !skip.has(c)).filter(c => { const v = new Set(rows.map(r => String(g(r, c) ?? '').trim())); return v.size >= 2 && v.size <= 40; });
+    if (!cols.length) { toast('There is no field with a few fixed values (like Designation) to choose by.'); return; }
+    let field = F && cols.includes(F.field) ? F.field : guess(cols), pick = new Set(F && F.field === field ? F.values : []);
+    const sel = h('select', { class: 'input' }, ...cols.map(c => h('option', { value: c, selected: c === field }, c)));
+    const list = h('div', { class: 'ulog-grid', style: 'max-height:320px;overflow:auto' });
+    const draw = () => { const cnt = new Map(); for (const r of rows) { const v = String(g(r, field) ?? '').trim() || '(blank)'; cnt.set(v, (cnt.get(v) || 0) + 1); }
+      fill(list, ...[...cnt].sort((a, b) => b[1] - a[1] || a[0].localeCompare(b[0])).map(([v, n]) => { const c = checkLine(v + ' · ' + n, pick.has(v)); c.box.addEventListener('change', () => { c.box.checked ? pick.add(v) : pick.delete(v); }); return c.el; })); };
+    sel.addEventListener('change', () => { field = sel.value; pick = new Set(); draw(); });
+    draw();
+    const err = h('span', { class: 'err' });
+    const apply = async next => { F = next; try { await rpc({ rec_filter: next }); } catch (e) { err.textContent = e.message; return; } d.close(); done && done(); };
+    const d = pdlg('Show in the Employee box', h('div', {}, h('p', { class: 'set-hint', style: 'margin:0 0 10px' }, 'Pick the employee types you record attendance for. Only they show in the Employee list. This is just for you, on every device.'),
+      h('label', { style: 'display:flex;flex-direction:column;gap:5px;font-size:12px;font-weight:600;margin-bottom:10px' }, 'Choose by', sel), list),
+      [err, h('button', { class: 'btn', type: 'button', onclick: () => apply(null) }, 'Show everyone'), h('button', { class: 'btn primary', type: 'button', onclick: () => apply(pick.size ? { field, values: [...pick] } : null) }, 'Show these')]);
+    d.box.closest('.pdlg-veil').style.zIndex = 5000;
+  };
 })();
 </script>
 </body>
