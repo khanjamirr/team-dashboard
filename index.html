@@ -15,7 +15,7 @@
 <meta name="apple-mobile-web-app-title" content="Blasters Deck">
 <meta name="application-name" content="Blasters Deck">
 <meta name="apple-mobile-web-app-status-bar-style" content="default">
-<title>Blasters Deck · 3.97.3</title>
+<title>Blasters Deck · 3.98.2</title>
 <link rel="preconnect" href="https://fonts.googleapis.com"><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin><link href="https://fonts.googleapis.com/css2?family=Public+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet">
 <style>
 :root {
@@ -3755,6 +3755,42 @@ html body .pdlg.sw-dlg .pdlg-body { overflow:auto; }
 .sw-tbl td { padding:7px 10px; border-top:1px solid var(--border,#eef0f5); vertical-align:top; } .sw-tbl tr.hit td { background:rgba(37,99,235,.08); }
 .sw-d { white-space:nowrap; font-weight:600; } .sw-sr { color:#111; font-weight:650; } .sw-none, td.sw-none { color:#b45309; } .sw-ok { color:#047857; } .sw-l { color:#9a3412; }
 .bkg-c[title*="pseudo name dates"] { outline:1.5px dotted #10b981; outline-offset:1px; }
+/* v3.98.0: notifications panel: tabs, minimal items, footer */
+.nf-tabs { display:flex; gap:4px; padding:4px; margin:0 0 12px; border-radius:12px; background:var(--surface-2,#f1f4f9); position:sticky; top:0; z-index:3; }
+.nf-tabs button { all:unset; cursor:pointer; flex:1; text-align:center; padding:8px 10px; border-radius:9px; font-size:13.5px; font-weight:600; color:var(--muted,#6b7280); }
+.nf-tabs button[aria-selected="true"] { background:var(--surface,#fff); color:var(--ink); box-shadow:0 1px 3px rgba(0,0,0,.1); }
+.nf-foot { position:sticky; bottom:-1px; display:grid; grid-template-columns:1fr 1fr; gap:8px; margin:14px -2px 0; padding:10px 2px 4px; background:linear-gradient(transparent, var(--surface,#fff) 30%); }
+.nf-fbtn { all:unset; box-sizing:border-box; cursor:pointer; display:flex; align-items:center; gap:10px; padding:10px 12px; border-radius:14px; background:var(--surface-2,#f4f6fa); border:1px solid var(--border,#e8ebf2); }
+.nf-fbtn:hover { border-color:var(--accent,#2563eb); } .nf-fbtn > span:first-child { font-size:18px; } .nf-fbtn b { display:block; font-size:13px; } .nf-fbtn small { display:block; font-size:11.5px; color:var(--muted,#6b7280); }
+html body .nf-list { list-style:none; margin:0; padding:0; } html body .nf-item { border:0 !important; border-radius:12px !important; margin:0 0 2px !important; }
+html body .nf-item .nf-main { padding:10px !important; gap:12px !important; border-radius:12px; } html body .nf-item .nf-main:hover { background:var(--surface-2,#f4f6fa); }
+html body .nf-item .nf-ic { width:36px !important; height:36px !important; border-radius:50% !important; display:grid !important; place-items:center; background:var(--surface-2,#eef1f6) !important; font-size:16px !important; flex:none; }
+html body .nf-item.unread .nf-ic { background:color-mix(in srgb, var(--accent,#2563eb) 14%, transparent) !important; }
+html body .nf-item .nf-txt b { font-size:13.5px !important; font-weight:650 !important; } html body .nf-item .nf-txt span { font-size:12.5px !important; color:var(--muted,#6b7280) !important; display:-webkit-box; -webkit-line-clamp:2; -webkit-box-orient:vertical; overflow:hidden; }
+html body .nf-item .nf-time { font-size:11.5px !important; color:var(--muted,#9aa3b2) !important; white-space:nowrap; }
+html body .nf-day { font-size:11.5px !important; text-transform:uppercase; letter-spacing:.06em; color:var(--muted,#8a94a6) !important; margin:14px 4px 6px !important; font-weight:700 !important; }
+/* v3.98.0: activity feed */
+.af-top { display:flex; gap:8px; margin-bottom:10px; } .af-top .af-q { flex:1; min-width:0; border-radius:12px !important; }
+.af-chips { display:flex; gap:6px; flex-wrap:wrap; margin-bottom:4px; }
+.af-list { list-style:none; margin:0; padding:0; }
+.af-i { display:flex; gap:12px; align-items:flex-start; padding:10px; border-radius:12px; } .af-i:hover { background:var(--surface-2,#f4f6fa); }
+.af-ic { width:34px; height:34px; flex:none; border-radius:50%; display:grid; place-items:center; font-size:15px; background:var(--surface-2,#eef1f6); }
+.af-att .af-ic { background:rgba(37,99,235,.1); } .af-add .af-ic { background:rgba(16,185,129,.12); } .af-del .af-ic { background:rgba(239,68,68,.1); } .af-set .af-ic { background:rgba(107,114,128,.12); }
+.af-b { flex:1; min-width:0; } .af-l { font-size:13.5px; line-height:1.4; display:flex; flex-wrap:wrap; align-items:center; gap:6px; } .af-l b { font-weight:650; }
+.af-d { font-size:12.5px; color:var(--muted,#6b7280); margin-top:2px; line-height:1.4; }
+.af-t { font-size:11.5px; color:var(--muted,#9aa3b2); white-space:nowrap; padding-top:2px; }
+.af-badge { font-size:11px; font-weight:700; padding:2px 8px; border-radius:99px; } .af-badge.ok { background:rgba(16,185,129,.13); color:#047857; } .af-badge.rj { background:rgba(239,68,68,.12); color:#dc2626; } .af-badge.la { background:rgba(124,58,237,.12); color:#6d28d9; } .af-badge.x { background:rgba(245,158,11,.14); color:#b45309; }
+.pc-os { padding:12px 14px; border-radius:12px; background:var(--surface-2,#f4f6fa); margin:0 0 14px; font-size:13px; } .pc-os ul { margin:6px 0 0; padding-left:18px; line-height:1.5; } .pc-os p { margin:4px 0; }
+/* v3.98.1: WhatsApp same as phone */
+.wa-same { display:inline-flex !important; align-items:center; gap:7px; margin-top:6px; font-size:12.5px !important; font-weight:500 !important; color:var(--ink-2, #4b5563) !important; cursor:pointer; user-select:none; text-transform:none !important; letter-spacing:0 !important; }
+.wa-same input { width:16px; height:16px; accent-color:#25a244; margin:0; cursor:pointer; }
+input.wa-linked { background:color-mix(in srgb, #25a244 7%, var(--surface, #fff)) !important; color:var(--muted, #6b7280) !important; }
+/* v3.98.2: What's new button and the reload prompt */
+#wnBtn { position:relative; } #wnBtn svg { width:20px; height:20px; } #wnBtn .wn-dot { position:absolute; top:6px; right:6px; width:8px; height:8px; border-radius:50%; background:#10b981; box-shadow:0 0 0 2px var(--surface,#fff); }
+.upd-bar { position:fixed; left:50%; top:14px; z-index:4000; transform:translate(-50%, -160%); transition:transform .35s cubic-bezier(.2,.8,.2,1); display:flex; align-items:center; gap:12px; width:min(560px, calc(100vw - 20px)); padding:12px 14px; border-radius:18px; background:var(--surface,#fff); color:var(--ink); border:1px solid var(--border,#e5e7eb); box-shadow:0 20px 50px -14px rgba(0,0,0,.35); }
+.upd-bar.in { transform:translate(-50%, 0); } .upd-ic { width:38px; height:38px; flex:none; border-radius:12px; display:grid; place-items:center; font-size:18px; background:rgba(16,185,129,.13); }
+.upd-t { flex:1; min-width:0; } .upd-t b { display:block; font-size:14.5px; } .upd-t small { display:block; font-size:12.5px; color:var(--muted,#6b7280); }
+@media (max-width:700px) { .upd-bar { top:calc(8px + env(safe-area-inset-top)); flex-wrap:wrap; } .upd-t { flex:1 1 calc(100% - 60px); } }
 </style></head>
 
 
@@ -3797,6 +3833,7 @@ html body .pdlg.sw-dlg .pdlg-body { overflow:auto; }
       <button class="btn ghost" id="btnSaveNow" hidden></button>
       <button class="btn ghost bell" id="gsBtn" type="button" aria-label="Search" title="Search people, tasks and activities (Ctrl + K)"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" aria-hidden="true"><circle cx="11" cy="11" r="7"/><path d="m20 20-3.5-3.5"/></svg></button>
       <button class="btn ghost bell" id="btnRefresh" type="button" aria-label="Refresh" title="Get the latest changes, requests and notifications now" hidden><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M21 12a9 9 0 1 1-2.64-6.36"/><path d="M21 3v6h-6"/></svg></button>
+      <button class="btn ghost bell" id="wnBtn" type="button" aria-label="What’s new" title="What’s new in this version"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 3l1.8 4.6L18.5 9l-4.7 1.5L12 15l-1.8-4.5L5.5 9l4.7-1.4z"/><path d="M19 15l.8 2.2L22 18l-2.2.8L19 21l-.8-2.2L16 18l2.2-.8z"/></svg><span class="wn-dot" hidden></span></button>
       <button class="btn ghost bell" id="btnBell" type="button" aria-label="Activity" title="Activity: every change, newest first" hidden><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M6 8a6 6 0 0 1 12 0c0 7 3 9 3 9H3s3-2 3-9"/><path d="M10.3 21a1.94 1.94 0 0 0 3.4 0"/></svg><span class="bell-n" id="bellN" hidden></span></button>
     </header>
   <div class="workspace-heading overview-heading"><div><p class="eyebrow">TEAM WORKSPACE</p><h2 id="cleanPageTitle">Overview</h2><p>Your people and priorities, at a glance.</p></div></div>
@@ -7949,7 +7986,7 @@ function gridTable(rows, { mode = 'month', month = null, hl = null } = {}) {
     for (let i = 0; i < dim; i++) {
       const w = dow(r.month, i), wk = w % 6 === 0 && i < rdim, isT = r.month === TODAY_MS && i === TODAY_IDX; const v = r.days[i];
       if (i >= rdim) { cells += `<td class="beyond">${v != null ? chip(v) : ''}</td>`; continue; }
-      cells += `<td class="cell ${wk ? 'wk' : ''} ${isT ? 'tdy' : ''} ${v == null ? 'empty' : ''}" data-act="cell" data-r="${r.uid}" data-d="${i}" data-tip="${esc(cellTip(r, i))}">${v != null ? chip(v, hl && !hl.has(cellCode(v)) ? 'faded' : '') : impliedChip(r.month, i, r)}${bkMark(r, i)}${r.notes && r.notes[i] ? '<span class="note-dot"></span>' : ''}</td>`;
+      cells += `<td class="cell ${wk ? 'wk' : ''} ${isT ? 'tdy' : ''} ${v == null ? 'empty' : ''}${MSEL.has(r.uid + ':' + i) ? ' msel' : ''}" data-act="cell" data-r="${r.uid}" data-d="${i}" data-tip="${esc(cellTip(r, i))}">${v != null ? chip(v, hl && !hl.has(cellCode(v)) ? 'faded' : '') : impliedChip(r.month, i, r)}${bkMark(r, i)}${r.notes && r.notes[i] ? '<span class="note-dot"></span>' : ''}</td>`;
     }
     const wr = mode === 'month' && hasRoster() ? rowRoster(r) : null;
     const dp = mode === 'month' ? departure(r) : null, dpText = dp && dp.dated ? ' ' + longDate(dateOf(dp.ms, dp.i)).replace(/^\w+ /, '') : '';
@@ -8619,7 +8656,7 @@ function openPop(td) {
   p.innerHTML = `<h4>${esc(row.name.trim())} · ${longDate(dateOf(row.month, i))}</h4>
     <input type="text" id="popIn" placeholder="Type a code, then Enter" autocomplete="off" value="${esc(cur)}" aria-label="Attendance code">
     <div class="codes">${PICK.map(c => `<button data-code="${c}" class="${c === cur ? 'sel' : ''}" title="${esc(CODES[c].label)}"${c === cur || okCodes.includes(c) ? '' : ' disabled style="opacity:.3;cursor:not-allowed"'}>${chip(c)}</button>`).join('')}<button data-code=""${okCodes.includes('') || !cur ? '' : ' disabled style="opacity:.3;cursor:not-allowed"'} title="Clear the cell. Blank means present (P), or week off on Sat / Sun"><div class="chip cat-present">Clear</div></button></div>
-    ${bkHtml}<div class="foot"><span class="sm muted" id="popMsg">${cur ? esc(labelOf(cur)) : (impliedCode(row.month, i) === 'WO' ? 'Blank: week off (Sat / Sun)' : 'Blank: counts as present (P)')}</span>${can('att.rows') ? `<button class="btn sm" data-edit="${row.uid}">Edit row…</button>` : ''}</div>`;
+    ${bkHtml}<div class="sm muted pop-tip">Tip: drag across cells, or Shift / Ctrl + click, to change many at once.</div><div class="foot"><span class="sm muted" id="popMsg">${cur ? esc(labelOf(cur)) : (impliedCode(row.month, i) === 'WO' ? 'Blank: week off (Sat / Sun)' : 'Blank: counts as present (P)')}</span>${can('att.rows') ? `<button class="btn sm" data-edit="${row.uid}">Edit row…</button>` : ''}</div>`;
   ROOT.appendChild(p); bindBk();
   const r = td.getBoundingClientRect(), w = p.offsetWidth, h = p.offsetHeight; let x = Math.min(Math.max(8, r.left + r.width / 2 - w / 2), innerWidth - w - 8), y = r.bottom + 6; if (y + h > innerHeight - 8) y = Math.max(8, r.top - h - 6); p.style.left = x + 'px'; p.style.top = y + 'px';
   const inp = $('#popIn', p); inp.focus(); inp.select();
@@ -9738,10 +9775,67 @@ const ACTIONS = {
   'log-leave'(el) { openLogLeave(el.dataset.k || (S.ui.view === 'people' ? S.ui.people.sel : null)); },
   'new-month'() { if (!can('att.addemp')) return toast('Your passcode can’t add employees to the attendance tracker. Ask the admin for the right in Settings.'); openNewMonth(); }, 'add-row'() { if (!can('att.addemp')) return toast('Your passcode can’t add employees to the attendance tracker. Ask the admin for the right in Settings.'); openRowEditor(null); },
   'edit-row'(el) { if (!can('att.rows')) return toast('Your passcode can’t edit rows in the attendance tracker. Ask the admin for the right in Settings.'); openRowEditor(+el.dataset.r); }, 'del-row'(el) { if (!can('att.rows')) return toast('Your passcode can’t delete rows in the attendance tracker. Ask the admin for the right in Settings.'); confirmDelete(+el.dataset.r); },
-  cell(el) { if ($('#pop') && el.classList.contains('selected')) { closePop(); return; } openPop(el); },
+  cell(el, e) { if (e && (e.ctrlKey || e.metaKey || e.shiftKey)) { closePop(); mselClick(el, e.shiftKey); return; } if (MSEL.size) { if (mselDragged) { mselDragged = false; return; } mselClear(); } if ($('#pop') && el.classList.contains('selected')) { closePop(); return; } openPop(el); },
   ...FIXES, ...HIST_ACTIONS,
 };
+/* ---------- v3.98.0: select many cells and set them all at once ----------
+   Drag across cells, Shift + click for a block, Ctrl / ⌘ + click to add or remove single cells. A bar shows the codes;
+   each cell follows the same rights as one-by-one editing, and anything not allowed is skipped and listed. */
+const MSEL = new Set(); let mselAnchor = null, mselDrag = null, mselDragged = false;
+const mselCells = () => [...ROOT.querySelectorAll('td.cell[data-act="cell"]')];
+const mselKey = td => td.dataset.r + ':' + td.dataset.d;
+function mselPaint() { ROOT.querySelectorAll('td.cell[data-act="cell"]').forEach(td => td.classList.toggle('msel', MSEL.has(mselKey(td)))); mselBar(); }
+function mselClear() { MSEL.clear(); mselAnchor = null; mselPaint(); }
+function mselBlock(a, b) {
+  const rows = [...new Set(mselCells().map(td => td.dataset.r))], ra = rows.indexOf(a.dataset.r), rb = rows.indexOf(b.dataset.r);
+  const [r0, r1] = [Math.min(ra, rb), Math.max(ra, rb)], [d0, d1] = [Math.min(+a.dataset.d, +b.dataset.d), Math.max(+a.dataset.d, +b.dataset.d)];
+  return mselCells().filter(td => { const ri = rows.indexOf(td.dataset.r), d = +td.dataset.d; return ri >= r0 && ri <= r1 && d >= d0 && d <= d1; });
+}
+function mselClick(td, shift) {
+  if (shift && mselAnchor && mselAnchor.isConnected) { mselBlock(mselAnchor, td).forEach(x => MSEL.add(mselKey(x))); }
+  else { const k = mselKey(td); if (MSEL.has(k)) MSEL.delete(k); else MSEL.add(k); mselAnchor = td; }
+  mselPaint();
+}
+function mselBar() {
+  let bar = ROOT.getElementById('mselBar');
+  if (!MSEL.size) { bar?.remove(); return; }
+  if (!bar) { bar = document.createElement('div'); bar.id = 'mselBar'; bar.className = 'msel-bar'; ROOT.appendChild(bar);
+    bar.addEventListener('click', e => { const b = e.target.closest('[data-mcode]'); if (b) mselApply(b.dataset.mcode); if (e.target.closest('[data-mclear]')) mselClear(); }); }
+  const people = new Set([...MSEL].map(k => k.split(':')[0])).size;
+  bar.innerHTML = `<div class="msel-top"><b>${MSEL.size} cell${MSEL.size === 1 ? '' : 's'} selected</b><span class="sm muted">${people} ${people === 1 ? 'person' : 'people'} · set them all to:</span><span class="grow"></span><button class="btn sm" data-mclear>Clear selection</button></div>
+    <div class="codes">${PICK.map(c => `<button data-mcode="${c}" title="${esc(CODES[c].label)}">${chip(c)}</button>`).join('')}<button data-mcode="" title="Clear: blank = present (P) on weekdays">Blank</button></div>`;
+}
+async function mselApply(code) {
+  const nv = code === '' ? null : code, list = [], skipped = [];
+  for (const k of MSEL) { const [uid, d] = k.split(':'), row = rowByUid(uid), i = +d; if (!row) continue;
+    const old = row.days[i], o = old == null ? '' : String(old).trim().toUpperCase();
+    if (o === (nv || '')) continue;
+    if (!codeAllowed(o, nv || '')) { skipped.push(row.name.trim() + ' · ' + longDate(dateOf(row.month, i))); continue; }
+    list.push({ row, i, old, o }); }
+  if (!list.length) { toast(skipped.length ? 'You can’t make that change on the selected cells.' : 'Nothing to change: they already say that.'); return; }
+  const over = list.filter(x => x.o).map(x => ({ t: dateOf(x.row.month, x.i), from: x.o, to: nv ? String(nv).toUpperCase() : '' }));
+  const who = [...new Set(list.filter(x => x.o).map(x => x.row.name.trim()))];
+  if (over.length && !(await confirmOverwrite(who.length === 1 ? who[0] : who.length + ' people', over))) return;
+  mutate(`${list.length} cell${list.length === 1 ? '' : 's'} set to ${nv || 'blank'}`, () => { for (const x of list) setDay(x.row, x.i, code); }, { cells: true });
+  MSEL.clear(); mselAnchor = null; mselBar();
+  toast(`${list.length} cell${list.length === 1 ? '' : 's'} set to ${nv || 'blank'}.` + (skipped.length ? ` ${skipped.length} skipped (not allowed): ${skipped.slice(0, 3).join(', ')}${skipped.length > 3 ? '…' : ''}.` : ''));
+}
+/* drag to select */
+function mselWire() {
+  if (!ROOT.getElementById('mselCss')) { const st = document.createElement('style'); st.id = 'mselCss'; st.textContent = `
+    td.cell.msel { background: color-mix(in srgb, var(--accent, #2563eb) 22%, transparent) !important; box-shadow: inset 0 0 0 2px var(--accent, #2563eb); }
+    table:has(td.cell.msel) td.cell { user-select: none; }
+    .msel-bar { position: fixed; left: 50%; bottom: calc(70px + env(safe-area-inset-bottom)); transform: translateX(-50%); z-index: 960; width: min(760px, calc(100vw - 24px)); background: var(--surface, #fff); color: var(--ink); border: 1px solid var(--line, #e5e7eb); border-radius: 18px; box-shadow: 0 20px 50px -14px rgba(0,0,0,.35); padding: 12px 14px; }
+    .msel-top { display: flex; align-items: center; gap: 10px; flex-wrap: wrap; margin-bottom: 8px; } .msel-top .grow { flex: 1; }
+    .msel-bar .codes { display: flex; flex-wrap: wrap; gap: 6px; } .msel-bar .codes button { border: 1px solid var(--line, #e5e7eb); background: var(--surface-2, #f6f7fb); border-radius: 10px; padding: 4px 6px; cursor: pointer; font: inherit; font-size: 12px; } .msel-bar .codes button:hover { border-color: var(--accent, #2563eb); }
+    .pop-tip { margin-top: 6px; }`; ROOT.appendChild(st); }
+  ROOT.addEventListener('mousedown', e => { const td = e.target.closest && e.target.closest('td.cell[data-act="cell"]'); if (!td || e.button !== 0 || e.shiftKey || e.ctrlKey || e.metaKey) return; mselDrag = { a: td, moved: false }; });
+  ROOT.addEventListener('mouseover', e => { if (!mselDrag) return; const td = e.target.closest && e.target.closest('td.cell[data-act="cell"]'); if (!td || td === mselDrag.a && !mselDrag.moved) return;
+    mselDrag.moved = true; closePop(); MSEL.clear(); mselBlock(mselDrag.a, td).forEach(x => MSEL.add(mselKey(x))); mselAnchor = mselDrag.a; mselPaint(); });
+  document.addEventListener('mouseup', () => { if (mselDrag && mselDrag.moved) mselDragged = true; mselDrag = null; });
+}
 function wireEvents() {
+  mselWire();
   ROOT.addEventListener('click', e => {
     if (!e.target.closest('#pop') && !e.target.closest('[data-act="cell"]')) closePop();
     const el = e.target.closest('[data-act]'); if (!el) return; const fn = ACTIONS[el.dataset.act]; if (fn) { e.preventDefault(); fn(el, e); }
@@ -9751,7 +9845,7 @@ function wireEvents() {
   ROOT.addEventListener('change', onBind); ROOT.addEventListener('input', onBind);
   document.addEventListener('keydown', e => {
     if (!active()) return;
-    if (e.key === 'Escape') { if ($('#pop')) closePop(); else if ($('#modalRoot')) closeModal(); return; }
+    if (e.key === 'Escape') { if ($('#pop')) closePop(); else if ($('#modalRoot')) closeModal(); else if (MSEL.size) mselClear(); return; }
     const t = e.composedPath()[0]; const typing = /INPUT|TEXTAREA|SELECT/.test(t?.tagName || '');
     if ((e.ctrlKey || e.metaKey) && e.key.toLowerCase() === 's') { e.preventDefault(); if (S.ctx && S.changes.length) save(); }
     else if ((e.ctrlKey || e.metaKey) && e.key.toLowerCase() === 'z' && !typing && S.undo.length) { e.preventDefault(); undo(); }
@@ -10526,7 +10620,7 @@ function bkGridData(cycle, client, sub, range, merge) {
         P.total += sp2.bill; continue; }
       const def = k === 'LIVE' ? ['P', 'p', 1, 'Seat shown live (on leave, shown present to the client)'] : k === 'LIVEH' ? ['P½', 'hd', .5, 'Seat shown live for half the day'] : k === 'BRH' ? ['BR½', 'br', .5, 'Backup for half the day'] : k === 'X' ? [code, 'x', 0, 'Code ' + code] : BKG[k];
       const why = k !== 'SR' ? '' : v == null ? (() => { const dp = departure(r); return dp ? (dp.kind === 'left' ? 'left' + (dp.dated ? ' (last day in the workforce file)' : ' (no last day in the workforce file, so counted as gone from today)') : 'marked “' + dp.kind + '” in the workforce file') : 'not tracked'; })() : 'attendance code “' + code + '”';   /* v3.97.1: why it is SR */
-      P.cells[j] = { key, iso, why, code, leave: c === 'half' || LEAVE_CATS.has(c) || c === 'applied', t: def[0], cls: def[1], bill: def[2], title: bkFmtD(iso) + ' · ' + (code || (k === 'P' ? 'blank = present' : k === 'L' ? 'week end' : '')) + ' · ' + def[3] + (why ? ' (' + why + ')' : '') + (b && b.b ? ' · ' + b.b : '') };
+      P.cells[j] = { key, iso, why, code, leave: c === 'half' || LEAVE_CATS.has(c) || c === 'applied', t: def[0], cls: def[1], bill: def[2], title: bkFmtD(iso) + ' · ' + (code || (k === 'P' ? 'blank = present' : k === 'L' ? 'week end' : '')) + ' · ' + (code === 'LA' ? 'leave application, pending approval' : def[3]) + (why ? ' (' + why + ')' : '') + (b && b.b ? ' · ' + b.b : '') };
       P.total += def[2];
     }
   });
@@ -11865,7 +11959,7 @@ async function poll() {
 }
 
 /* ============================== filtering ============================== */
-const APP = { title: "Blasters Deck", version: "3.97.3", released: "2026-11-16" };
+const APP = { title: "Blasters Deck", version: "3.98.2", released: "2026-11-16" };
 const BASE_DIMS = { status: "status_column", desig: "designation_column", client: "client_column", mode: "mode_column" };
 const STANDARD_STATUSES = ["Active", "Manager", "OJT", "Bench", "New", "Projected", "Left", "Moved"];
 const TILE_ORDER = ["Active", "Manager", "OJT", "Bench", "New", "Projected"];
@@ -14938,6 +15032,19 @@ function openDrawer(row) {
       nav.append(h("button", { type: "button", class: "emp-jump", "data-sec": id, onclick: () => { sec.open = true; sec.scrollIntoView({ behavior: "smooth", block: "start" }); } }, h("span", { class: "emp-ji", "aria-hidden": "true" }, ICON[grp] || "•"), h("span", { class: "emp-jt" }, grp), navCnt));
     }
     body.append(nav, ...secs);
+    /* v3.98.1: a tick to use the phone number as the WhatsApp number (kept in step while ticked) */
+    { const pc = sch.phone_column || (state.cols.find(c => /^(phone|mobile|contact)( ?(no|number))?\.?$/i.test(c.name)) || {}).name, wc = sch.whatsapp_column || (state.cols.find(c => /whats ?app/i.test(c.name)) || {}).name;
+      const pIn = pc && state.idx[pc] != null ? body.querySelector('#f_' + state.idx[pc]) : null, wIn = wc && wc !== pc && state.idx[wc] != null ? body.querySelector('#f_' + state.idx[wc]) : null;
+      if (pIn && wIn && pIn.tagName === 'INPUT' && wIn.tagName === 'INPUT' && !pIn.disabled && !wIn.disabled) {
+        const norm = v => String(v || '').replace(/[^\d+]/g, '');
+        const box = h('input', { type: 'checkbox' }), lab = h('label', { class: 'wa-same', title: 'Use the phone number as the WhatsApp number' }, box, h('span', {}, 'Same as phone'));
+        const sync = () => { if (!box.checked) return; if (wIn.value !== pIn.value) { wIn.value = pIn.value; wIn.dispatchEvent(new Event('input', { bubbles: true })); wIn.dispatchEvent(new Event('change', { bubbles: true })); } };
+        const set = on => { box.checked = on; wIn.readOnly = on; wIn.classList.toggle('wa-linked', on); if (on) sync(); };
+        box.addEventListener('change', () => set(box.checked));
+        pIn.addEventListener('input', sync); pIn.addEventListener('change', sync);
+        if (pIn.value.trim() && norm(pIn.value) === norm(wIn.value)) set(true);
+        const wrap = wIn.closest('.fgrid > *') || wIn.parentElement; wrap.append(lab);
+      } }
     if (!isNew) {
       const extra = h("details", { class: "emp-sec", open: true }, h("summary", {}, h("span", { class: "emp-ic", "aria-hidden": "true" }, "🗓️"), h("b", {}, "Attendance & route")));
       if (window.ATT) { try { extra.append(ATT.drawerPanel(row)); } catch (e) { console.error(e); } }
@@ -15091,32 +15198,49 @@ async function openActivity(container) {
       "att-link": "linked a tracker name for", "att-unlink": "unlinked a tracker name for", overwrite: "overwrote newer changes to", settings: "changed settings:" };
     const isX = it => /^external-/.test(it.action || "");
     const isAtt = it => !!it.att || /^(att-|external-att-)/.test(it.action || "") || it.action === "overwrite";
-    const cloud = CLOUD.mode() === "cloud";
-    let tab = "all", q = "", shown = 100;
-    const list = h("div", {});
-    const tabs = [["all", "Everything", () => true], ["emp", "Workforce", it => !isAtt(it)], ["att", "Attendance", isAtt], ...(cloud ? [] : [["x", "Changed directly in Excel", isX]])];
-    const search = h("input", { class: "input", type: "search", placeholder: "Find a person or user…", "aria-label": "Search the activity", style: "max-width:260px" });
-    search.addEventListener("input", () => { q = search.value.trim().toLowerCase(); shown = 100; draw(); });
+    const isSet = it => it.action === "settings" || it.action === "add-column" || it.action === "external-columns";
+    /* v3.98.0: a plain-language feed: grouped by day, repeated edits by the same person on the same person merged into one line */
+    const KIND = it => isSet(it) ? ["⚙️", "set"] : /delete|remove/.test(it.action || "") ? ["🗑", "del"] : isAtt(it) ? ["🗓", "att"] : /add/.test(it.action || "") ? ["➕", "add"] : ["👤", "emp"];
+    const CODE = { AL: "approved leave", CL: "casual leave", SL: "sick leave", UL: "unplanned leave", AB: "absent", HD1: "half day", HD2: "half day", LA: "leave application (pending approval)", RJ: "rejected", L: "late", C: "cab late", R: "regularized", WO: "week off", H: "holiday", P: "present" };
+    const badgeOf = (notes, act) => { if (act === "request-approved") return ["Approved", "ok"]; if (act === "request-rejected") return ["Rejected", "rj"]; if (act === "request-submitted") return ["Pending", "la"]; const t = notes.join(" "); if (/LA\s*→\s*RJ/.test(t)) return ["Rejected", "rj"]; if (/LA\s*→\s*(AL|CL|SL|UL|HD1|HD2)/.test(t)) return ["Approved", "ok"]; if (/→\s*LA\b/.test(t)) return ["Applied", "la"]; return null; };
+    const prettyNote = n => String(n).replace(/\b(LA|AL|CL|SL|UL|AB|HD1|HD2|RJ|WO)\b(?=\s*(→|$|\s*[·;,]))/g, c => c).trim();
+    const tabs = [["all", "All", () => true], ["att", "Attendance", isAtt], ["emp", "People", it => !isAtt(it) && !isSet(it)], ["set", "Settings", isSet]].filter(([k, , f]) => k === "all" || d.items.some(f));
+    let tab = "all", q = "", shown = 60;
+    const list = h("div", { class: "af" });
+    const search = h("input", { class: "input af-q", type: "search", placeholder: "Search a person or who made the change", "aria-label": "Search the activity" });
+    search.addEventListener("input", () => { q = search.value.trim().toLowerCase(); shown = 60; draw(); });
+    const dayName = t => { const d0 = new Date(String(t).replace(" ", "T")); if (isNaN(d0)) return "Earlier"; const a = new Date(); a.setHours(0, 0, 0, 0); const x = new Date(d0); x.setHours(0, 0, 0, 0); const diff = Math.round((a - x) / 864e5); return diff === 0 ? "Today" : diff === 1 ? "Yesterday" : d0.toLocaleDateString(undefined, { weekday: "long", day: "numeric", month: "short" }); };
+    const clock = t => { const d0 = new Date(String(t).replace(" ", "T")); return isNaN(d0) ? String(t) : d0.toLocaleTimeString(undefined, { hour: "numeric", minute: "2-digit" }); };
     const draw = () => {
       const pass = tabs.find(t => t[0] === tab)[2];
       const items = d.items.filter(it => pass(it) && (!q || [it.user, it.name, it.key].some(v => String(v ?? "").toLowerCase().includes(q))));
-      const bar = h("div", { class: "acttabs" }, ...tabs.map(([id, name, f]) => h("button", { "aria-pressed": tab === id ? "true" : "false", onclick: () => { tab = id; shown = 100; draw(); } }, name + " (" + d.items.filter(f).length + ")")));
-      list.replaceChildren(bar, items.length ? h("ul", { class: "act" }, items.slice(0, shown).map(it => {
-        const ch = it.action === "edit" || it.action === "external-edit" ? Object.entries(it.details || {}).filter(([c]) => c !== "note") : [];
-        const cap = isX(it) ? 8 : 4;
-        return h("li", {}, h("div", { class: "line" },
-          h("span", {}, h("b", {}, it.user), " " + (verbs[it.action] || it.action) + (it.name ? " " : ""), it.name ? h("b", {}, it.name) : "", isX(it) ? h("span", { class: "xbadge", title: "This change was made in Excel, not in the dashboard" }, "IN EXCEL") : null),
-          h("span", { class: "time" }, it.time)),
-          it.details && it.details.note ? h("div", { class: "note" }, it.details.note) : null,
-          ch.length ? h("div", { class: "chg" }, ch.slice(0, cap).map(([c, v]) => label(c) + ": " + fmt(c, v && v.from) + " → " + fmt(c, v && v.to)).join(" · ") + (ch.length > cap ? " · +" + (ch.length - cap) + " more" : "")) : null);
-      })) : h("div", { class: "empty" }, "No activities recorded yet."));
-      if (items.length > shown) list.append(h("button", { class: "btn", onclick: () => { shown += 100; draw(); } }, "Show more (" + (items.length - shown) + " remaining)"));
+      /* merge: same person, same action, same employee, within 15 minutes */
+      const merged = [];
+      for (const it of items) { const last = merged[merged.length - 1], t = Date.parse(String(it.time).replace(" ", "T")) || 0;
+        if (last && last.user === it.user && last.action === it.action && (last.name || "") === (it.name || "") && Math.abs(last.t0 - t) < 15 * 60e3 && dayName(last.time) === dayName(it.time)) { last.all.push(it); last.t0 = t; continue; }
+        merged.push({ ...it, all: [it], t0: t }); }
+      const bar = h("div", { class: "af-chips" }, ...tabs.map(([id, name, f]) => h("button", { type: "button", class: "nf-chip" + (tab === id ? " on" : ""), onclick: () => { tab = id; shown = 60; draw(); } }, name)));
+      const groups = []; for (const m of merged.slice(0, shown)) { const g = dayName(m.time); let G = groups.find(x => x.g === g); if (!G) groups.push(G = { g, items: [] }); G.items.push(m); }
+      const row = m => { const [ic, k] = KIND(m), notes = m.all.map(x => x.details && x.details.note).filter(Boolean), bd = badgeOf(notes, m.action);
+        const ch = m.action === "edit" || m.action === "external-edit" ? m.all.flatMap(x => Object.entries(x.details || {}).filter(([c]) => c !== "note")) : [];
+        const MORE = { "request-submitted": "sent a leave request for", "request-approved": "approved the leave request of", "request-rejected": "rejected the leave request of", "request-cancelled": "cancelled the leave request of", "delete-column": "deleted a column", "rename-column": "renamed a column", bulk: "updated" };
+        const verb = (verbs[m.action] || MORE[m.action] || String(m.action || "changed").replace(/[-_]/g, " ")).replace(/:$/, "");
+        const lines = [...notes.map(prettyNote), ...ch.map(([c, v]) => label(c) + ": " + fmt(c, v && v.from) + " → " + fmt(c, v && v.to))];
+        return h("li", { class: "af-i af-" + k },
+          h("span", { class: "af-ic", "aria-hidden": "true" }, ic),
+          h("div", { class: "af-b" },
+            h("div", { class: "af-l" }, h("span", {}, h("b", {}, m.user || "Someone"), " " + verb + (m.name ? " " : ""), m.name ? h("b", {}, m.name) : ""), bd ? h("span", { class: "af-badge " + bd[1] }, bd[0]) : null, isX(m) ? h("span", { class: "af-badge x", title: "Changed directly in Excel" }, "In Excel") : null),
+            lines.length ? h("div", { class: "af-d" }, lines.slice(0, 3).join(" · ") + (lines.length > 3 ? " · +" + (lines.length - 3) + " more" : "")) : null),
+          h("span", { class: "af-t", title: String(m.time) }, clock(m.time))); };
+      list.replaceChildren(bar, groups.length ? h("div", {}, ...groups.map(G => h("section", {}, h("h4", { class: "nf-day" }, G.g), h("ul", { class: "af-list" }, ...G.items.map(row)))))
+        : h("div", { class: "nf-empty" }, h("span", { "aria-hidden": "true" }, "🗂"), h("b", {}, q ? "Nothing matches" : "No activity yet"), h("small", {}, "Changes to people, attendance and settings show up here.")));
+      if (merged.length > shown) list.append(h("button", { class: "btn nf-more", type: "button", onclick: () => { shown += 60; draw(); } }, "Show older"));
     };
     draw();
-    const refresh = h("button", { class: "btn mini", onclick: () => openActivity(body) }, "Refresh");
+    const refresh = h("button", { class: "btn mini", type: "button", title: "Refresh", onclick: () => openActivity(body) }, "↻");
     body.replaceChildren(
-      h("div", { class: "activity-controls" }, search, h("span", { class: "spacer" }), refresh),
-      h("p", { class: "set-hint" }, BE.actKeepDays() === 0 ? "New activity is not being recorded (Settings → Storage & clean-up). Entries below were recorded before." : "Changes are written to the “Activity Log” sheet of " + (state.file || "the workbook") + ", newest first, and kept for " + (BE.actKeepDays() === Infinity ? "ever" : BE.actKeepDays() + " days") + " (Settings → Storage & clean-up)."),
+      h("div", { class: "af-top" }, search, refresh),
+      BE.actKeepDays() === 0 ? h("p", { class: "set-hint" }, "New activity isn’t being recorded (Settings › Workbook & storage).") : null,
       ...(d.warning ? [h("div", { class: "banner", role: "status" }, d.warning)] : []), list);
     return d.items;
   } catch (e) { body.replaceChildren(h("div", { class: "banner" }, e.message)); return null; }
@@ -15756,6 +15880,7 @@ function nfOpen(it) {
   else if (it.type === 'playbook') { closeDrawer(); setView('playbook'); }
   else if (it.type === 'request') { closeDrawer(); setView('summary'); }
 }
+let nfTab = 'nf';
 function drawNotifications() {
   if (!notificationBody?.isConnected) return;
   const read = notificationReads(), unread = unreadCount();
@@ -15773,15 +15898,21 @@ function drawNotifications() {
       h('button', { type: 'button', class: 'nf-main', onclick: () => nfOpen(it) }, h('span', { class: 'nf-ic', 'aria-hidden': 'true' }, ic),
         h('span', { class: 'nf-txt' }, h('b', {}, it.title), h('span', {}, it.detail)), h('span', { class: 'nf-time' }, nfAgo(it.time))),
       un ? h('button', { type: 'button', class: 'nf-dot', title: 'Mark as read', 'aria-label': 'Mark as read', onclick: () => markNotificationsRead([it.id]) }) : null); };
+  /* v3.98.0: two tabs (Notifications / Activity) and a clear footer */
+  const canAct = PERM.can('activity.view');
+  if (!canAct) nfTab = 'nf';
+  const tabsEl = canAct ? h('div', { class: 'nf-tabs', role: 'tablist' }, ...[['nf', 'Notifications' + (unread ? ' · ' + unread : '')], ['act', 'Activity']].map(([k, l]) => h('button', { type: 'button', role: 'tab', 'aria-selected': String(nfTab === k), onclick: () => { if (nfTab === k) return; nfTab = k; drawNotifications(); } }, l))) : null;
+  const foot = h('div', { class: 'nf-foot' },
+    h('button', { type: 'button', class: 'nf-fbtn', onclick: () => { closeDrawer(); window.bdWhatsNew && bdWhatsNew(true); } }, h('span', { 'aria-hidden': 'true' }, '✨'), h('span', {}, h('b', {}, 'What’s new'), h('small', {}, 'Version ' + APP.version))),
+    h('button', { type: 'button', class: 'nf-fbtn', onclick: () => { closeDrawer(); window.bdPushCheck && bdPushCheck(); } }, h('span', { 'aria-hidden': 'true' }, '🔔'), h('span', {}, h('b', {}, 'Test notifications'), h('small', {}, 'On this device'))));
+  if (nfTab === 'act') { const host = h('div', { class: 'nf-act' }); notificationBody.replaceChildren(...[tabsEl, host, foot].filter(Boolean)); openActivity(host); const ma0 = document.getElementById('nfMarkAll'); if (ma0) ma0.disabled = !unread; return; }
   notificationBody.replaceChildren(...[
-    inbox, chips,
+    tabsEl, inbox, chips,
     activityError ? h('p', { class: 'err', role: 'status' }, activityError) : null,
     groups.length ? h('div', { class: 'nf-groups' }, ...groups.map(G => h('section', {}, h('h4', { class: 'nf-day' }, G.g), h('ul', { class: 'nf-list' }, ...G.items.map(row)))))
       : h('div', { class: 'nf-empty' }, h('span', { 'aria-hidden': 'true' }, '🔔'), h('b', {}, nfFilter === 'unread' ? 'You’re all caught up' : 'No notifications'), h('small', {}, 'New tasks, requests and playbook updates show up here.')),
     list.length > nfShow ? h('button', { class: 'btn nf-more', type: 'button', onclick: () => { nfShow += 40; drawNotifications(); } }, 'Show older') : null,
-    PERM.can('activity.view') ? h('button', { class: 'linkbtn nf-log', type: 'button', onclick: () => openActivity(notificationBody) }, 'Open the full activity log →') : null,
-    h('button', { class: 'linkbtn nf-log', type: 'button', onclick: () => { closeDrawer(); window.bdPushCheck && bdPushCheck(); } }, '🔔 Check notifications on this device'),
-    h('button', { class: 'linkbtn nf-log', type: 'button', onclick: () => { closeDrawer(); window.bdWhatsNew && bdWhatsNew(true); } }, '✨ What’s new in ' + APP.version)].filter(Boolean));
+    foot].filter(Boolean));
   const ma = document.getElementById('nfMarkAll'); if (ma) ma.disabled = !unread;
 }
 async function bellCheck() {
@@ -19779,6 +19910,8 @@ window.bdSearch = (() => {
 /* v3.96.0: "What's new" once per person after each update (remembered in the database); again from More or the bell */
 window.bdWhatsNew = (() => {
   const NOTES = [
+    { v: '3.98.2', items: [['✨', 'What’s new button', 'The ✨ beside the bell opens these notes any time; a green dot means there is something new.'], ['🔄', 'Reload when a new version is out', 'A bar at the top asks you to reload when Blasters Deck is updated.'], ['💬', 'WhatsApp same as phone', 'A tick in the employee form copies the phone number to WhatsApp.']] },
+    { v: '3.98.0', items: [['▦', 'Change many attendance cells at once', 'Drag across cells (or Shift / Ctrl + click), then pick the code in the bar that appears.'], ['🔔', 'A cleaner notifications panel', 'Notifications and Activity tabs; activity in plain words, grouped by day, with Approved / Rejected tags.'], ['💻', 'Notification help for computers', 'Check notifications now shows the Windows / Mac and Chrome settings to turn on, and a quick test.']] },
     { v: '3.96.0', items: [['🔔', 'Notifications even when the app is closed', 'New tasks, comments, leave requests and their answers reach your phone or computer.'], ['🔍', 'Search everything', 'People, tasks and activities from one box: the 🔍 at the top (Ctrl + K on a computer).'], ['✨', 'What’s new', 'This note after each update. Find it again in More on a phone, or at the bottom of the 🔔 notifications.']] },
     { v: '3.95.0', items: [['☄️', 'Blasters Deck', 'A new name and logo for Team Blasters, and an icon for your Home Screen.'], ['🔁', 'Repeating tasks', 'Daily, weekdays, weekly or monthly: the next one appears by itself.'], ['💬', 'Comments like a chat', 'In every Planner task.'], ['📇', 'Contact cards on phones', 'Tap a person to call, WhatsApp or copy (when you may see the number).'], ['🌙', 'Dark mode on phones', 'Follows your phone’s own setting.']] }];
   const cmp = (a, b) => { const x = String(a).split('.').map(Number), y = String(b).split('.').map(Number); for (let i = 0; i < 3; i++) { if ((x[i] || 0) !== (y[i] || 0)) return (x[i] || 0) - (y[i] || 0); } return 0; };
@@ -19825,6 +19958,7 @@ window.bdPushCheck = async function () {
     let reg = null; try { reg = navigator.serviceWorker ? await navigator.serviceWorker.getRegistration() : null; } catch { }
     L.push(line(!!(reg && reg.active), 'Notification helper installed', 'sw.js is missing on the website. Upload sw.js into the same folder as index.html on Vercel, then reload.'));
     L.push(line('PushManager' in window, 'This browser can receive notifications when closed', 'Use Chrome on Android, or the Home Screen app on iPhone (iOS 16.4 or newer).'));
+    const desktop = !/Android|iPhone|iPad|iPod/i.test(navigator.userAgent), mac = /Mac/i.test(navigator.platform || navigator.userAgent);
     let sub = null; try { sub = reg && reg.pushManager ? await reg.pushManager.getSubscription() : null; } catch { }
     let c = null; try { c = await CLOUD._rpc('td_push_check', { p_token: CLOUD.token(), p_endpoint: sub ? sub.endpoint : '' }); } catch (e) { c = { err: e.message }; }
     if (c && c.err) L.push(line(false, 'Server part set up', /schema cache|Could not find/i.test(c.err) ? 'Run push.sql and push-check.sql in Supabase → SQL Editor.' : c.err));
@@ -19855,11 +19989,55 @@ window.bdPushCheck = async function () {
     const now = h('button', { class: 'btn', type: 'button' }, 'Send a test now');
     const test = h('button', { class: 'btn primary', type: 'button' }, 'Send in 1 minute, then close the app');
     now.addEventListener('click', sendTest(0, now, 'Send a test now')); test.addEventListener('click', sendTest(60, test, 'Send in 1 minute, then close the app'));
-    body.replaceChildren(h('h4', { class: 'pc-h' }, 'This device'), h('ul', { class: 'pc-list' }, ...L), srv.length ? h('h4', { class: 'pc-h' }, 'Server (only you see this)') : null, srv.length ? h('ul', { class: 'pc-list' }, ...srv) : null,
-      h('div', { class: 'pc-acts' }, again, now, test), h('p', { class: 'set-hint pc-note' }, 'To check closed-app notifications: tap “Send in 1 minute”, then close Blasters Deck completely (swipe it away from recent apps). The test should arrive about a minute later. Every morning at 9:30 you also get a reminder of tasks due today or overdue.'));
+    const local = h('button', { class: 'btn', type: 'button', onclick: async () => { if (!('Notification' in window) || Notification.permission !== 'granted') { toast('Allow notifications first.', true); return; } await TDN.show('🔔 Test from this ' + (desktop ? 'computer' : 'phone'), 'If you can see this, ' + (desktop ? 'Windows / Mac and Chrome' : 'this phone') + ' can show Blasters Deck notifications.', 'local-test'); toast('Shown. If nothing popped up, the device itself is hiding notifications: see the steps above.'); } }, 'Show a test here');
+    const osTips = desktop ? h('div', { class: 'pc-os' }, h('b', {}, 'On a computer, also check'),
+      h('ul', {}, ...(mac ? ['Mac: System Settings → Notifications → Google Chrome → Allow notifications (Banners or Alerts), and Focus / Do Not Disturb is off.'] : ['Windows: Settings → System → Notifications → turn on Notifications and Google Chrome, and switch off Focus / Do not disturb.']).map(t => h('li', {}, t)),
+        h('li', {}, 'Chrome: Settings → Privacy and security → Site settings → Notifications → Blasters Deck → Allow.'),
+        h('li', {}, 'Chrome must be running to receive them. To get them with all Chrome windows closed: Chrome Settings → System → “Continue running background apps when Google Chrome is closed” → On.'))) : null;
+    const missing = owner && S && (S.missing || []).length ? h('div', { class: 'pc-os' }, h('b', {}, (S.missing || []).length + ' people have no device registered yet'), h('p', { class: 'set-hint' }, (S.missing || []).slice(0, 40).join(', ') + ((S.missing || []).length > 40 ? '…' : '')), h('small', { class: 'set-hint' }, 'Each of them should open Blasters Deck once on their computer or phone and allow notifications.')) : null;
+    body.replaceChildren(h('h4', { class: 'pc-h' }, 'This device'), h('ul', { class: 'pc-list' }, ...L), osTips, missing, srv.length ? h('h4', { class: 'pc-h' }, 'Server (only you see this)') : null, srv.length ? h('ul', { class: 'pc-list' }, ...srv) : null,
+      h('div', { class: 'pc-acts' }, local, again, now, test), h('p', { class: 'set-hint pc-note' }, 'To check closed-app notifications: tap “Send in 1 minute”, then close Blasters Deck completely (swipe it away from recent apps). The test should arrive about a minute later. Every morning at 9:30 you also get a reminder of tasks due today or overdue.'));
   }
   run();
 };
+</script>
+<script>
+/* v3.98.2: the ✨ button beside the bell opens What's new; a dot shows until you have seen this version's notes.
+   And when a newer version is put on the website, everyone sees a "Reload" prompt (checked every 5 minutes and when
+   the tab comes back). Nothing is stored in the browser: the page simply asks the website which version it serves. */
+(() => {
+  const btn = document.getElementById('wnBtn');
+  const showBtn = () => { if (!btn) return; btn.hidden = !(typeof CLOUD !== 'undefined' && CLOUD.token && CLOUD.token()); };
+  btn?.addEventListener('click', () => { window.bdWhatsNew && bdWhatsNew(true); btn.querySelector('.wn-dot').hidden = true; try { CLOUD._rpc('td_my_prefs', { p_token: CLOUD.token(), p_prefs: { seen_version: APP.version } }).catch(() => { }); } catch { } });
+  let dotChecked = false;
+  async function dot() { if (dotChecked || !btn || btn.hidden) return; dotChecked = true; try { const p = await CLOUD._rpc('td_my_prefs', { p_token: CLOUD.token(), p_prefs: null }) || {}; btn.querySelector('.wn-dot').hidden = p.seen_version === APP.version; } catch { } }
+  document.addEventListener('click', e => { if (e.target.closest && e.target.closest('.wn-ok')) { const d = btn && btn.querySelector('.wn-dot'); if (d) d.hidden = true; } });
+  setInterval(() => { showBtn(); dot(); }, 2000);
+  /* a newer version on the website */
+  const cmp = (a, b) => { const x = String(a).split('.').map(Number), y = String(b).split('.').map(Number); for (let i = 0; i < 3; i++) if ((x[i] || 0) !== (y[i] || 0)) return (x[i] || 0) - (y[i] || 0); return 0; };
+  let shown = null, last = 0;
+  async function check(force) {
+    if (!/^https?:$/.test(location.protocol) || (!force && Date.now() - last < 60e3)) return; last = Date.now();
+    try {
+      const r = await fetch(location.pathname + '?v=' + Date.now(), { cache: 'no-store', credentials: 'same-origin' }); if (!r.ok) return;
+      const t = await r.text(), m = t.match(/version:\s*"(\d+\.\d+\.\d+)"/); if (!m || cmp(m[1], APP.version) <= 0 || shown === m[1]) return;
+      shown = m[1]; prompt(m[1]);
+    } catch { }
+  }
+  function prompt(v) {
+    document.querySelector('.upd-bar')?.remove();
+    const busy = () => (window.ATT && ATT.dirty && ATT.dirty()) || document.querySelector('.drawer.emp2 .emp2-status')?.textContent === 'Unsaved changes';
+    const go = h('button', { type: 'button', class: 'btn primary', onclick: () => { if (busy() && !confirm('You have unsaved changes. Reload anyway?')) return; location.reload(); } }, 'Reload now');
+    const bar = h('div', { class: 'upd-bar', role: 'status' }, h('span', { class: 'upd-ic', 'aria-hidden': 'true' }, '✨'),
+      h('div', { class: 'upd-t' }, h('b', {}, 'A new version is ready (' + v + ')'), h('small', {}, 'Reload to get the latest changes. Save anything you are typing first.')),
+      h('button', { type: 'button', class: 'btn', onclick: () => bar.remove() }, 'Later'), go);
+    document.body.append(bar); requestAnimationFrame(() => bar.classList.add('in'));
+  }
+  window.bdUpdatePrompt = prompt; window.bdUpdateCheck = () => check(true);
+  setInterval(() => check(false), 5 * 60e3);
+  document.addEventListener('visibilitychange', () => { if (!document.hidden) check(false); });
+  setTimeout(() => check(true), 20e3);
+})();
 </script>
 </body>
 </html>
