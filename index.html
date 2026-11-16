@@ -15,7 +15,7 @@
 <meta name="apple-mobile-web-app-title" content="Blasters Deck">
 <meta name="application-name" content="Blasters Deck">
 <meta name="apple-mobile-web-app-status-bar-style" content="default">
-<title>Blasters Deck · 3.101.0</title>
+<title>Blasters Deck · 3.102.1</title>
 <link rel="preconnect" href="https://fonts.googleapis.com"><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin><link href="https://fonts.googleapis.com/css2?family=Public+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet">
 <style>
 :root {
@@ -8037,10 +8037,9 @@ function gridTable(rows, { mode = 'month', month = null, hl = null } = {}) {
     const dp = mode === 'month' ? departure(r) : null, dpText = dp && dp.dated ? ' ' + longDate(dateOf(dp.ms, dp.i)).replace(/^\w+ /, '') : '';
     const first = mode === 'month' ? `<b>${esc(r.name.trim() || '(no name)')}</b><span>${esc(r.client || '—')}${hasRoster() ? ' · ' + (wr ? esc(rosterStatus(wr) || 'no status') + esc(dpText) : `not in workforce · <span class="linkbtn" data-act="link-person" data-k="${esc(personKey(r.name))}">link</span>`) : ''}</span>` : `<b>${monthLabel(r.month)}</b><span>${esc(r.client || '—')}</span>`;
     return `<tr${dp ? ' class="gone"' : ''}><td class="c-name" data-act="${mode === 'month' ? 'person' : 'edit-row'}" data-k="${esc(personKey(r.name))}" data-r="${r.uid}">${first}</td><td class="c-id sm">${r.empId ?? '<span class="muted">—</span>'}</td>${extraFields.map(n => { const v = (r.extra || {})[n], has = v != null && v !== '', ok = mode === 'month' && canFillField(n); return `<td class="c-fld${has ? '' : ' blank'}${ok ? ' can' : ''}"${ok ? ` data-act="log-field" data-field="${esc(n)}" data-r="${r.uid}" data-tip="${esc(n)} · ${esc(r.name.trim())}<br>Click to log or change the value"` : ''}>${has ? esc(String(v)) : (ok ? '+ log' : '—')}</td>`; }).join('')}${cells}
-      <td class="c-tot num" data-tip="Total Leaves (sheet formula)">${fmt(s.total)}</td><td class="c-tot num" data-tip="Unapproved Leaves (UL)">${s.ul || '<span class="muted">0</span>'}</td><td class="c-tot num" data-tip="Upcoming Leaves">${s.upc || '<span class="muted">0</span>'}</td><td class="c-tot num muted" data-tip="Days present so far: blank weekdays count as P, plus P, R, L and C. Not stored in Excel.">${s.present}</td>
-      <td class="c-act">${can('att.rows') ? `<button class="btn sm ghost" data-act="edit-row" data-r="${r.uid}" title="Edit row">${ic('edit')}</button><button class="btn sm ghost" data-act="del-row" data-r="${r.uid}" title="Delete row">${ic('trash')}</button>` : ''}</td></tr>`;
+      <!-- v3.102.1: Total / UL / Upcoming / Present columns removed: they are on the employee record -->       <td class="c-act">${can('att.rows') ? `<button class="btn sm ghost" data-act="edit-row" data-r="${r.uid}" title="Edit row">${ic('edit')}</button><button class="btn sm ghost" data-act="del-row" data-r="${r.uid}" title="Delete row">${ic('trash')}</button>` : ''}</td></tr>`;
   }).join('');
-  return `<table class="att"><thead><tr><th class="c-name">${mode === 'month' ? 'Employee' : 'Month'}</th><th class="c-id">Emp ID</th>${extraFields.map(n => `<th class="c-fld" data-tip="Attendance field · a column after AM in the Excel sheet">${esc(n)}</th>`).join('')}${head}<th class="c-tot" data-tip="Total Leaves">Total</th><th class="c-tot" data-tip="Unapproved Leaves (UL)">UL</th><th class="c-tot" data-tip="Upcoming Leaves">Upcoming</th><th class="c-tot" data-tip="Days present so far: blank weekdays count as P, plus P, R, L and C. Not stored in Excel.">Present</th><th class="c-act"></th></tr></thead><tbody>${body || `<tr><td colspan="${dim + 7 + extraFields.length}" class="empty" style="height:auto">No rows match.</td></tr>`}</tbody></table>`;
+  return `<table class="att"><thead><tr><th class="c-name">${mode === 'month' ? 'Employee' : 'Month'}</th><th class="c-id">Emp ID</th>${extraFields.map(n => `<th class="c-fld" data-tip="Attendance field · a column after AM in the Excel sheet">${esc(n)}</th>`).join('')}${head}<th class="c-act"></th></tr></thead><tbody>${body || `<tr><td colspan="${dim + 3 + extraFields.length}" class="empty" style="height:auto">No rows match.</td></tr>`}</tbody></table>`;
 }
 /* Leave-type filter for the attendance grid: pick one or more types to see only the people who have them this month */
 const LEAVE_FILTERS = [
@@ -11581,6 +11580,8 @@ const healthCount = () => (S.status === 'ready' && S.ctx ? healthIssues().filter
 
 mount();
 return {
+  watchData: () => { try { return S.status === 'ready' && S.ctx ? leaveWatchData() : null; } catch (e) { console.error(e); return null; } },   /* v3.102.0: for Trends */
+  trackedOn: dt => { try { return (D().byMonth.get(Engine.monthSerial(dt.getUTCFullYear(), dt.getUTCMonth())) || []).map(r => ({ name: r.name.trim(), client: r.client ? String(r.client).trim() : '' })); } catch { return []; } },
   fieldNames: attUserFields, hasTracker: Engine.hasTracker, refresh, init: () => { mount(); return connect(); }, askName, decorateTable, healthCount, chooseFileEarly, savedFile: async () => (await kv.get('file')) || ((await kv.get('handle')) || {}).name || '', show, leave, renderCard, renderWatch, drawerPanel, go, renderApprovalRequests, renderRequestHistory, requestCounts, renderAppsCard, openBackupBox, mountBackupReport: el => mountBackupReport(el), canBackup: () => canBackup(), renameField: (a, b) => renameAttField(a, b), attReady: () => S.status === 'ready' && !!S.ctx, recordAttendance: () => openLogLeave(), canRecord: () => canLog(), requestsToDecide: () => requestsToDecide().length + laToDecide(),
   /* v3.19: every recorded code between two dates (UTC ms, null = open), for custom dashboards; follows the attendance scope */
   entries: (from, to) => { if (S.status !== 'ready' || !S.ctx) return null; const d = D(), out = []; for (const m of d.months) { const dim = Engine.daysInMonth(m); for (const r of d.byMonth.get(m) || []) for (let i = 0; i < dim; i++) { const v = r.days[i]; if (v == null || v === '') continue; const dt = dateOf(m, i), t = dt.getTime(); if ((from != null && t < from) || (to != null && t > to)) continue; const cat = catOf(v); out.push({ name: r.name.trim(), empId: r.empId, client: r.client ? String(r.client).trim() : '', date: dt, code: String(v).trim().toUpperCase(), cat, catLabel: CATS[cat] || 'Other' }); } } return out; },
@@ -12045,7 +12046,7 @@ async function poll() {
 }
 
 /* ============================== filtering ============================== */
-const APP = { title: "Blasters Deck", version: "3.101.0", released: "2026-11-16" };
+const APP = { title: "Blasters Deck", version: "3.102.1", released: "2026-11-17" };
 const BASE_DIMS = { status: "status_column", desig: "designation_column", client: "client_column", mode: "mode_column" };
 const STANDARD_STATUSES = ["Active", "Manager", "OJT", "Bench", "New", "Projected", "Left", "Moved"];
 const TILE_ORDER = ["Active", "Manager", "OJT", "Bench", "New", "Projected"];
@@ -19650,6 +19651,7 @@ document.addEventListener('visibilitychange', () => { if (!document.hidden && on
       u.name ? h('div', { class: 'ios-me' }, h('span', { class: 'ios-av' }, String(u.name).split(/\s+/).slice(0, 2).map(x => x[0]).join('').toUpperCase()), h('div', {}, h('b', {}, u.name), h('small', {}, (({ superadmin: 'Super admin', admin: 'Admin' })[u.role] || 'Team member') + (u.loginId ? ' · ' + u.loginId : '')))) : null,
       rest.length ? group('Pages', ...rest.map(t => { const n = t.querySelector('.tabn'); return row(tile(t.dataset.view), nm(t.dataset.view), { badge: n && !n.hidden && n.textContent.trim() ? n.textContent.trim() : '', onclick: () => { close(); t.click(); } }); })) : null,
       group(null, row(h('span', { class: 'ios-tile', style: 'background:#007aff' }, h('b', {}, '☆')), 'Edit tab bar', { sub: 'Choose the 4 pages at the bottom', onclick: () => { close(); editPins(); } }),
+        document.getElementById('btnRefresh') ? row(h('span', { class: 'ios-tile', style: 'background:#34c759' }, h('b', {}, '↻')), 'Refresh', { sub: 'Get the latest changes now', onclick: () => { close(); document.getElementById('btnRefresh').click(); } }) : null,
         row(h('span', { class: 'ios-tile', style: 'background:#ff3b30' }, h('b', {}, '🔔')), 'Check notifications', { sub: 'Test that they reach this phone', onclick: () => { close(); window.bdPushCheck && bdPushCheck(); } }),
         row(h('span', { class: 'ios-tile', style: 'background:#10b981' }, h('b', {}, '✨')), 'What’s new', { sub: 'In version ' + APP.version, onclick: () => { close(); window.bdWhatsNew && bdWhatsNew(true); } })),
       clocks.length ? group('World clocks', ...clocks.map(c => { const z = c.querySelector('.tzc-z b')?.textContent, zn = c.querySelector('.tzc-z small')?.textContent, ic = c.querySelector('.tzc-ic')?.textContent;
@@ -20184,6 +20186,7 @@ window.bdSearch = (() => {
 /* v3.96.0: "What's new" once per person after each update (remembered in the database); again from More or the bell */
 window.bdWhatsNew = (() => {
   const NOTES = [
+    { v: '3.102.0', items: [['🩺', 'Sickroom', 'Send someone to the sickroom and check them back: live timers, a log, and who goes how often and for how long.'], ['🧠', 'Trends', 'On the Overview: who takes more leave than usual, leave patterns, late streaks and sickroom habits, spotted automatically.']] },
     { v: '3.101.0', items: [['📣', 'Tag people in task comments', 'Type @ in a comment and pick a teammate: they get a notification and can see and reply to the task.'], ['🏢', 'Who is out by client', 'Group the Who is out list by client, or by client and sub client.']] },
     { v: '3.100.0', items: [['➕', 'Record attendance from the top bar', 'One way for everyone: late, remote and other updates go straight into attendance; leave goes in as LA (pending) until an approver confirms it.'], ['⏳', 'Leaves pending', 'The amber pill at the top shows how many leaves wait for approval; tap it to approve or reject.'], ['🛠', 'Troubleshoot notifications', 'The wrench beside the bell checks and fixes notifications on this device.']] },
     { v: '3.99.0', items: [['🕘', 'A proper shift picker', 'Shifts are grouped by time zone and show the India time next to the US time, with ☀️ day or 🌙 night at a glance.'], ['🔕', 'Fewer, combined notifications', 'Several changes to the same employee by one person in one sitting arrive as one notification; changes to different employees stay separate.']] },
@@ -20353,6 +20356,39 @@ html body #pageSummary.ov.no-req.has-tasks { grid-template-columns:repeat(3,minm
   header.top .top-div { display:none !important; }
   #lvPanel { top:auto; bottom:0; right:0; left:0; width:auto; max-height:82vh; border-radius:20px 20px 0 0; z-index:1200; padding-bottom:calc(84px + env(safe-area-inset-bottom)); }
 }
+
+/* v3.101.1: phones — greeting and 3 icons on top (search, alerts, ⋯), Leaves + Record beside the big title; the rest in ⋯ */
+#phMore, #phActs { display:none; }
+@media (max-width:700px) {
+  html body.ios div#pinnedHeader.sticky-top.pinned-top { grid-template-areas:"greet icons" "title acts" "tabs tabs" !important; }
+  html body.ios #pinnedHeader > #phActs { grid-area:acts; display:flex; align-items:center; gap:8px; justify-self:end; align-self:center; margin-top:4px; }
+  html body.ios.ios-scrolled #pinnedHeader > #phActs { display:none; }
+  html body.ios #pinnedHeader #phActs .lv-pill, html body.ios #pinnedHeader #phActs .rec-btn { display:inline-flex; align-items:center; justify-content:center; gap:6px; height:36px; border-radius:999px; font:600 13px/1 inherit; font-family:inherit; border:1px solid transparent; cursor:pointer; }
+  html body.ios #pinnedHeader #phActs .lv-pill[hidden], html body.ios #pinnedHeader #phActs .rec-btn[hidden] { display:none !important; }
+  html body.ios #pinnedHeader #phActs .lv-pill { padding:0 10px 0 9px; background:#fff4dc; color:#8a5300; border-color:#f3d48f; }
+  html body.ios #pinnedHeader #phActs .lv-pill.mine { background:#eaf2ff; color:#1d4f9a; border-color:#c8dafc; }
+  html body.ios #pinnedHeader #phActs .lv-pill.quiet { background:transparent; color:var(--ios-lbl2); border-color:var(--ios-sep); padding:0 9px; }
+  html body.ios #pinnedHeader #phActs .lv-pill .lv-t { display:none; }
+  html body.ios #pinnedHeader #phActs .lv-pill .lv-n { min-width:20px; height:20px; padding:0 6px; border-radius:10px; background:#e59a0c; color:#fff; display:inline-grid; place-items:center; font-size:12px; }
+  html body.ios #pinnedHeader #phActs .lv-pill.mine .lv-n { background:#2f6fe0; } html body.ios #pinnedHeader #phActs .lv-pill.quiet .lv-n { display:none; }
+  html body.ios #pinnedHeader #phActs .lv-pill svg, html body.ios #pinnedHeader #phActs .rec-btn svg { width:16px; height:16px; }
+  html body.ios #pinnedHeader #phActs .rec-btn { width:36px; padding:0; background:var(--ink,#111827); color:var(--surface,#fff); }
+  html body.ios #pinnedHeader #phActs .rec-btn span { display:none; }
+  :root[data-theme="dark"] body.ios #pinnedHeader #phActs .lv-pill:not(.quiet):not(.mine) { background:#3a2a08; color:#ffd27a; border-color:#6b4a0c; }
+  html body.ios #pinnedHeader > header.top #btnRefresh, html body.ios #pinnedHeader > header.top #tsBtn, html body.ios #pinnedHeader > header.top #wnBtn, html body.ios #pinnedHeader > header.top .top-div { display:none !important; }
+  html body.ios #pinnedHeader > header.top #phMore { display:none !important; place-items:center; width:36px; height:36px; border:0; border-radius:50%; background:transparent; color:var(--ios-tint); position:relative; cursor:pointer; padding:0; }
+  html body.ios #pinnedHeader > header.top #phMore svg { width:22px; height:22px; }
+  #phMore .ph-dot { position:absolute; top:6px; right:5px; width:8px; height:8px; border-radius:50%; background:#22c55e; box-shadow:0 0 0 2px var(--ios-bar, #fff); }
+  #phMore .ph-dot[hidden] { display:none; }
+  html body.ios #pinnedHeader > .top-greet .tg1 { font-size:14px !important; }
+}
+#phMenu { position:fixed; z-index:1300; min-width:236px; background:var(--surface,#fff); border:1px solid var(--border,#e3e6ec); border-radius:14px; box-shadow:0 18px 44px rgba(15,23,42,.22); padding:6px; }
+#phMenu[hidden] { display:none; }
+#phMenu button { display:flex; align-items:center; gap:12px; width:100%; padding:11px 12px; border:0; background:none; border-radius:10px; font:inherit; font-size:15px; color:var(--ink); text-align:left; cursor:pointer; }
+#phMenu button:active, #phMenu button:hover { background:var(--surface-2,#f3f5f9); }
+#phMenu .ph-i { width:22px; text-align:center; font-size:17px; }
+#phMenu .ph-b { margin-left:auto; min-width:20px; height:20px; padding:0 6px; border-radius:10px; background:#2f6fe0; color:#fff; font-size:12px; font-weight:700; display:inline-grid; place-items:center; }
+#phMenu .ph-g { margin-left:auto; width:8px; height:8px; border-radius:50%; background:#22c55e; }
 </style>
 <script>
 /* v3.100.0: Leaves pill + panel, Record attendance and Troubleshoot in the top bar */
@@ -20409,9 +20445,422 @@ html body #pageSummary.ov.no-req.has-tasks { grid-template-columns:repeat(3,minm
     else if (t.closest('#tsBtn')) { if (window.bdPushCheck) bdPushCheck(); }
   });
   document.addEventListener('keydown', e => { if (e.key === 'Escape') close(); });
+
+  /* v3.101.1: phone layout */
+  function phLayout() {
+    const ios = document.body.classList.contains('ios'), ph = $('pinnedHeader'), hd = ph && ph.querySelector('header.top'), pill = $('lvPill'), rec = $('recBtn'), div = $('topDiv'); if (!ph || !hd || !pill || !rec) return;
+    let acts = $('phActs'), more = $('phMore');
+    if (false) { more = document.createElement('button'); more.id = 'phMore'; more.type = 'button'; more.setAttribute('aria-label', 'More'); more.innerHTML = '<svg viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><circle cx="5" cy="12" r="2"/><circle cx="12" cy="12" r="2"/><circle cx="19" cy="12" r="2"/></svg><i class="ph-dot" hidden></i>'; const bell = $('btnBell'); (bell && bell.parentElement === hd ? bell : hd.lastElementChild).after(more); }
+    const sk = $('skBtn');
+    if (ios) { if (!acts) { acts = document.createElement('div'); acts.id = 'phActs'; ph.append(acts); } if (pill.parentElement !== acts) acts.append(pill, rec); if (sk && sk.parentElement !== acts) rec.after(sk); }
+    else if (acts && pill.parentElement === acts) { (div || $('gsBtn')).before(pill, rec); if (div) div.before(pill, rec); if (sk) rec.after(sk); }
+    const wd = null; const dot = more && more.querySelector('.ph-dot'); if (dot) dot.hidden = !(wd && getComputedStyle(wd).display !== 'none' && !wd.hidden);
+  }
+  function phMenu() {
+    let m = $('phMenu'); if (m && !m.hidden) { m.hidden = true; return; }
+    if (!m) { m = document.createElement('div'); m.id = 'phMenu'; m.setAttribute('role', 'menu'); document.body.append(m); document.addEventListener('mousedown', e => { if (!m.hidden && !m.contains(e.target) && !$('phMore')?.contains(e.target)) m.hidden = true; }, true); }
+    const fl = document.querySelector('#pinnedHeader .tt-filt'), fn = fl && fl.querySelector('.tt-filt-n'), nF = fn ? (parseInt(fn.textContent, 10) || 0) : 0;
+    const wd = document.querySelector('#wnBtn .wn-dot'), newOn = !!(wd && getComputedStyle(wd).display !== 'none' && !wd.hidden);
+    const item = (ic, label, fn2, extra) => { const b = document.createElement('button'); b.type = 'button'; b.setAttribute('role', 'menuitem'); b.innerHTML = '<span class="ph-i" aria-hidden="true">' + ic + '</span><span>' + label + '</span>' + (extra || ''); b.onclick = () => { m.hidden = true; fn2(); }; return b; };
+    m.replaceChildren(...[
+      fl ? item('<svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="2" stroke-linejoin="round"><path d="M3 5h18l-7 8v6l-4 2v-8z"/></svg>', 'Filters', () => fl.click(), nF ? '<span class="ph-b">' + nF + '</span>' : '') : null,
+      $('btnRefresh') ? item('↻', 'Refresh', () => $('btnRefresh').click()) : null,
+      item('🛠', 'Notification problems?', () => window.bdPushCheck && bdPushCheck()),
+      item('✨', 'What’s new', () => $('wnBtn')?.click(), newOn ? '<span class="ph-g"></span>' : '')].filter(Boolean));
+    m.hidden = false;
+    const r = $('phMore').getBoundingClientRect(); m.style.top = (r.bottom + 6) + 'px'; m.style.right = Math.max(8, innerWidth - r.right) + 'px'; m.style.left = 'auto';
+  }
+  document.addEventListener('click', e => { if (e.target.closest && e.target.closest('#phMore')) phMenu(); });
+  setInterval(() => { try { phLayout(); } catch { } }, 1000);
+  addEventListener('resize', () => { try { phLayout(); } catch { } });
   window.addEventListener('att:requests', () => { lastKey = ''; paint(); });
   setInterval(() => { try { paint(); chipLast(); } catch { } }, 4000);
   setTimeout(() => { try { paint(); chipLast(); } catch { } }, 800);
+})();
+</script>
+<style id="sickroom-3102">
+/* v3.102.0: Sickroom — who is in now (live timers), the log, and insights (visits, time, how often) */
+header.top .sk-btn { display:inline-flex; align-items:center; gap:7px; height:36px; padding:0 13px 0 11px; border-radius:999px; border:1.5px solid #9fdcc8; background:#effaf5; color:#0b6b4f; font-family:inherit; font-weight:650; font-size:13px; line-height:1; cursor:pointer; white-space:nowrap; transition:background .15s, box-shadow .15s; }
+header.top .sk-btn:hover { background:#e2f6ee; }
+header.top .sk-btn[hidden] { display:none !important; }
+header.top .sk-btn svg { width:17px; height:17px; flex:none; }
+header.top .sk-btn .sk-n { display:none; min-width:20px; height:20px; padding:0 6px; border-radius:10px; background:#10a37f; color:#fff; font-size:12px; place-items:center; }
+header.top .sk-btn.live { background:#10a37f; color:#fff; border-color:#10a37f; box-shadow:0 0 0 4px rgba(16,163,127,.16); }
+header.top .sk-btn.live .sk-n { display:inline-grid; background:#fff; color:#0b6b4f; }
+header.top .sk-btn .sk-pulse { display:none; width:8px; height:8px; border-radius:50%; background:#fff; animation:skp 1.6s infinite; }
+header.top .sk-btn.live .sk-pulse { display:inline-block; }
+@keyframes skp { 0% { box-shadow:0 0 0 0 rgba(255,255,255,.8); } 70% { box-shadow:0 0 0 7px rgba(255,255,255,0); } 100% { box-shadow:0 0 0 0 rgba(255,255,255,0); } }
+:root[data-theme="dark"] header.top .sk-btn:not(.live) { background:#0d2a22; color:#7be3c2; border-color:#1d5c49; }
+@media (max-width:760px) { header.top .sk-btn .sk-t { display:none; } header.top .sk-btn { padding:0; width:36px; justify-content:center; } header.top .sk-btn.live { width:auto; padding:0 9px; } header.top .sk-btn .sk-pulse { display:none !important; } }
+@media (max-width:700px) { html body.ios #pinnedHeader #phActs .sk-btn { display:inline-flex; align-items:center; justify-content:center; gap:5px; height:36px; width:36px; padding:0; border-radius:999px; border:1.5px solid #9fdcc8; background:#effaf5; color:#0b6b4f; font-family:inherit; font-weight:700; font-size:12px; }
+  html body.ios #pinnedHeader #phActs .sk-btn[hidden] { display:none !important; } html body.ios #pinnedHeader #phActs .sk-btn svg { width:17px; height:17px; }
+  html body.ios #pinnedHeader #phActs .sk-btn .sk-t, html body.ios #pinnedHeader #phActs .sk-btn .sk-pulse { display:none; } html body.ios #pinnedHeader #phActs .sk-btn .sk-n { display:none; }
+  html body.ios #pinnedHeader #phActs .sk-btn.live { width:auto; padding:0 10px; background:#10a37f; color:#fff; border-color:#10a37f; } html body.ios #pinnedHeader #phActs .sk-btn.live .sk-n { display:inline; } }
+
+/* v3.102.0: Record + Sickroom as one split pill (left: record attendance · right: sickroom, with the live count) */
+html body header.top .rec-btn.has-sk { border-radius:999px 0 0 999px; padding-right:12px; }
+html body header.top .sk-btn.merged { margin-left:-12px; height:36px; border:0; border-radius:0 999px 999px 0; padding:0 13px 0 11px; gap:6px; background:#0f6e56; color:#fff; box-shadow:inset 1px 0 0 rgba(255,255,255,.18); }
+html body header.top .sk-btn.merged:hover { background:#0b5c48; }
+html body header.top .sk-btn.merged .sk-t { display:none; }
+html body header.top .sk-btn.merged .sk-n { display:none; background:#fff; color:#0b5c48; }
+html body header.top .sk-btn.merged.live { box-shadow:inset 1px 0 0 rgba(255,255,255,.18); background:#10a37f; }
+html body header.top .sk-btn.merged.live .sk-n { display:inline-grid; }
+html body header.top .sk-btn.merged .sk-pulse { display:none !important; }
+html body header.top .sk-btn.merged.live svg { animation:skb 1.8s ease-in-out infinite; }
+@keyframes skb { 0%,100% { transform:scale(1); } 50% { transform:scale(1.15); } }
+@media (max-width:760px) { html body header.top .rec-btn.has-sk { border-radius:999px 0 0 999px; padding:0; width:36px; } html body header.top .sk-btn.merged { width:auto; min-width:36px; padding:0 10px 0 8px; } }
+@media (max-width:700px) {
+  html body.ios #pinnedHeader #phActs .rec-btn.has-sk { border-radius:18px 0 0 18px; }
+  html body.ios #pinnedHeader #phActs .sk-btn.merged { margin-left:-8px; border:0; border-radius:0 18px 18px 0; width:auto; min-width:38px; padding:0 10px 0 8px; background:#0f6e56; color:#fff; gap:5px; box-shadow:inset 1px 0 0 rgba(255,255,255,.18); }
+  html body.ios #pinnedHeader #phActs .sk-btn.merged.live { background:#10a37f; }
+  html body.ios #pinnedHeader #phActs .sk-btn.merged.live .sk-n { display:inline-grid; place-items:center; min-width:18px; height:18px; padding:0 5px; border-radius:9px; background:#fff; color:#0b5c48; font-size:11px; }
+}
+#skPanel { position:fixed; z-index:60; top:64px; right:16px; width:min(520px, calc(100vw - 24px)); max-height:min(80vh, 760px); overflow:auto; background:var(--surface,#fff); color:var(--ink); border:1px solid var(--border,#e3e6ec); border-radius:18px; box-shadow:0 24px 60px -12px rgba(15,23,42,.28), 0 2px 8px rgba(15,23,42,.08); padding:16px 18px 18px; }
+#skPanel[hidden] { display:none; }
+@media (max-width:760px) { #skPanel { top:auto; bottom:0; left:0; right:0; width:auto; max-height:86vh; border-radius:20px 20px 0 0; z-index:1200; padding-bottom:calc(84px + env(safe-area-inset-bottom)); } }
+.sk-hd { display:flex; align-items:center; gap:10px; margin:0 0 12px; padding-right:36px; }
+.sk-hd .sk-ic { width:36px; height:36px; border-radius:11px; display:grid; place-items:center; background:#e2f6ee; color:#0b6b4f; flex:none; } .sk-hd .sk-ic svg { width:20px; height:20px; }
+.sk-hd h3 { margin:0; font-size:17px; font-weight:750; } .sk-hd small { display:block; color:var(--ink-3,#8a93a3); font-size:12px; margin-top:1px; }
+.sk-x { position:absolute; top:12px; right:12px; width:30px; height:30px; border-radius:50%; border:0; background:var(--surface-2,#f3f5f9); color:var(--ink-2); cursor:pointer; font-size:16px; }
+.sk-tabs { display:flex; gap:2px; padding:3px; border-radius:11px; background:var(--surface-2,#f1f3f7); margin-bottom:12px; }
+.sk-tabs button { flex:1; border:0; background:transparent; padding:7px 8px; border-radius:9px; font:inherit; font-size:13px; font-weight:650; color:var(--ink-2,#5b6475); cursor:pointer; }
+.sk-tabs button[aria-pressed="true"] { background:var(--surface,#fff); color:var(--ink); box-shadow:0 1px 3px rgba(0,0,0,.08); }
+.sk-tabs b { display:inline-grid; place-items:center; min-width:18px; height:18px; padding:0 5px; margin-left:5px; border-radius:9px; background:#10a37f; color:#fff; font-size:11px; }
+.sk-row { display:flex; align-items:center; gap:11px; padding:10px 2px; border-top:1px solid var(--border,#eceef3); }
+.sk-row:first-child { border-top:0; }
+.sk-av { width:34px; height:34px; border-radius:50%; flex:none; display:grid; place-items:center; background:#e2f6ee; color:#0b6b4f; font-size:12px; font-weight:750; }
+.sk-who { flex:1; min-width:0; } .sk-who b { display:block; font-size:14px; font-weight:650; white-space:nowrap; overflow:hidden; text-overflow:ellipsis; } .sk-who small { display:block; font-size:12px; color:var(--ink-3,#8a93a3); white-space:nowrap; overflow:hidden; text-overflow:ellipsis; }
+.sk-timer { font-variant-numeric:tabular-nums; font-weight:750; font-size:15px; color:#0b6b4f; text-align:right; white-space:nowrap; } .sk-timer small { display:block; font-size:11px; font-weight:500; color:var(--ink-3,#8a93a3); }
+.sk-timer.warn { color:#b26a00; } .sk-timer.bad { color:#c0392b; }
+.sk-back { border:0; border-radius:999px; padding:8px 12px; background:#10a37f; color:#fff; font:inherit; font-size:12.5px; font-weight:700; cursor:pointer; white-space:nowrap; }
+.sk-mini { border:0; background:none; color:var(--ink-3,#8a93a3); cursor:pointer; font-size:18px; padding:2px 4px; border-radius:8px; } .sk-mini:hover { background:var(--surface-2,#f3f5f9); }
+.sk-empty { text-align:center; padding:22px 10px; color:var(--ink-3,#8a93a3); font-size:13px; } .sk-empty b { display:block; font-size:24px; margin-bottom:4px; }
+.sk-add { display:flex; align-items:center; justify-content:center; gap:7px; width:100%; margin-top:10px; padding:11px; border-radius:12px; border:1.5px dashed #9fdcc8; background:#f6fdfa; color:#0b6b4f; font:inherit; font-size:13.5px; font-weight:700; cursor:pointer; }
+:root[data-theme="dark"] .sk-add { background:#0d2a22; border-color:#1d5c49; color:#7be3c2; }
+.sk-form { display:grid; grid-template-columns:1fr 1fr; gap:10px; margin-top:10px; padding:12px; border-radius:14px; background:var(--surface-2,#f6f7fa); }
+.sk-form label { display:flex; flex-direction:column; gap:4px; font-size:12px; font-weight:600; color:var(--ink-2,#5b6475); } .sk-form .full { grid-column:1 / -1; }
+.sk-form input, .sk-form select { height:38px; border-radius:10px; border:1px solid var(--border,#e3e6ec); background:var(--surface,#fff); color:var(--ink); padding:0 10px; font:inherit; font-size:14px; }
+.sk-form .sk-act { grid-column:1 / -1; display:flex; gap:8px; justify-content:flex-end; align-items:center; } .sk-form .sk-act small { margin-right:auto; color:var(--ink-3); font-size:11.5px; }
+.sk-btn2 { border:1px solid var(--border,#e3e6ec); background:var(--surface,#fff); color:var(--ink); border-radius:999px; padding:8px 14px; font:inherit; font-size:13px; font-weight:600; cursor:pointer; }
+.sk-btn2.go { background:#10a37f; border-color:#10a37f; color:#fff; }
+.sk-seg { display:inline-flex; gap:2px; padding:2px; border-radius:9px; background:var(--surface-2,#f1f3f7); margin-bottom:10px; }
+.sk-seg button { border:0; background:transparent; padding:5px 10px; border-radius:7px; font:inherit; font-size:12px; font-weight:650; color:var(--ink-2); cursor:pointer; } .sk-seg button[aria-pressed="true"] { background:var(--surface,#fff); color:var(--ink); box-shadow:0 1px 2px rgba(0,0,0,.08); }
+.sk-day { font-size:11px; font-weight:750; letter-spacing:.06em; text-transform:uppercase; color:var(--ink-3,#8a93a3); padding:12px 2px 2px; }
+.sk-kpis { display:grid; grid-template-columns:repeat(4,minmax(0,1fr)); gap:8px; margin-bottom:12px; }
+.sk-k { padding:10px; border-radius:12px; background:var(--surface-2,#f6f7fa); } .sk-k b { display:block; font-size:19px; font-weight:800; letter-spacing:-.02em; } .sk-k span { font-size:11.5px; color:var(--ink-3,#8a93a3); }
+@media (max-width:520px) { .sk-kpis { grid-template-columns:repeat(2,minmax(0,1fr)); } }
+.sk-tbl { width:100%; border-collapse:collapse; font-size:12.5px; } .sk-tbl th { text-align:left; font-size:10.5px; letter-spacing:.05em; text-transform:uppercase; color:var(--ink-3); font-weight:700; padding:6px 4px; border-bottom:1px solid var(--border,#eceef3); }
+.sk-tbl td { padding:8px 4px; border-bottom:1px solid var(--border,#f0f1f5); vertical-align:top; } .sk-tbl td.n { text-align:right; font-variant-numeric:tabular-nums; white-space:nowrap; } .sk-tbl th.n { text-align:right; }
+.sk-tbl td b { font-weight:650; } .sk-tbl td small { display:block; color:var(--ink-3); font-size:11px; }
+.sk-flag { display:inline-block; margin-left:6px; padding:1px 7px; border-radius:999px; background:#fdecea; color:#b3261e; font-size:10.5px; font-weight:700; vertical-align:1px; }
+.sk-hours { display:flex; align-items:flex-end; gap:3px; height:64px; margin:4px 0 2px; } .sk-hours i { flex:1; background:#bfe9da; border-radius:4px 4px 0 0; min-height:2px; } .sk-hours i.top { background:#10a37f; }
+.sk-hl { display:flex; justify-content:space-between; font-size:10.5px; color:var(--ink-3); margin-bottom:12px; }
+.sk-sub { font-size:12px; font-weight:700; color:var(--ink-2); margin:14px 0 6px; }
+.sk-err { color:#c0392b; font-size:12.5px; min-height:1px; }
+</style>
+<script>
+/* v3.102.0: Sickroom. Send someone in, check them back out, and see who goes how often and for how long. Stored in Supabase (td_sickroom). */
+(() => {
+  const $ = id => document.getElementById(id);
+  const ICON = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M5 3v6a5 5 0 0 0 10 0V3"/><path d="M5 3h2M13 3h2"/><path d="M10 14v2a5 5 0 0 0 10 0v-1"/><circle cx="20" cy="12" r="2"/></svg>';
+  const SK = { open: false, tab: 'now', list: [], openList: [], per: '7', logPer: 'today', busy: false, at: 0, form: false, edit: null, err: '' };
+  const rpc = (fn, a) => CLOUD._rpc(fn, { p_token: CLOUD.token(), ...a });
+  const can = () => { try { return !!(typeof CLOUD !== 'undefined' && CLOUD.token && CLOUD.token() && window.ATT && ATT.canRecord && ATT.canRecord()); } catch { return false; } };
+  const signedIn = () => !$('app')?.hidden && typeof state !== 'undefined' && state.schema;
+  const E = { SICK_ALREADY_IN: 'They are already in the sickroom.', SICK_ORDER: 'The return time must be after the start time.', SICK_FUTURE: 'That time is in the future.', ADMIN_ONLY: 'You don’t have the right for this.', SICK_NOT_FOUND: 'That visit was removed by someone else.' };
+  const friendly = e => { const m = String(e && e.message || e || ''); const k = Object.keys(E).find(x => m.includes(x)); if (k) return E[k]; if (/td_sick|schema cache|Could not find/i.test(m)) return 'The sickroom is not set up yet: the super admin needs to run sickroom.sql in Supabase.'; return m || 'Something went wrong.'; };
+  const esc = v => String(v == null ? '' : v).replace(/[&<>"']/g, c => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' })[c]);
+  const ini = n => String(n || '?').trim().split(/\s+/).slice(0, 2).map(x => x[0]).join('').toUpperCase();
+  const tm = d => new Date(d).toLocaleTimeString([], { hour: 'numeric', minute: '2-digit' });
+  const dayLbl = d => { const x = new Date(d), t = new Date(); const k = x.toDateString(); if (k === t.toDateString()) return 'Today'; const y = new Date(t); y.setDate(t.getDate() - 1); if (k === y.toDateString()) return 'Yesterday'; return x.toLocaleDateString([], { weekday: 'short', day: 'numeric', month: 'short' }); };
+  const dur = ms => { const m = Math.max(0, Math.round(ms / 60000)); if (m < 60) return m + ' min'; const h = Math.floor(m / 60), r = m % 60; return h + ' h' + (r ? ' ' + r + ' min' : ''); };
+  const clock = ms => { const s = Math.max(0, Math.floor(ms / 1000)), h = Math.floor(s / 3600), m = Math.floor(s % 3600 / 60), ss = s % 60; return (h ? h + ':' + String(m).padStart(2, '0') : m) + ':' + String(ss).padStart(2, '0'); };
+  const lenOf = v => (v.end ? Date.parse(v.end) : Date.now()) - Date.parse(v.start);
+  const people = () => { try { const gone = /^(left|moved|inactive|abscond|terminat)/i; return (state.rows || []).map(r => ({ emp: gs(r, 'key_column').trim(), name: gs(r, 'name_column').trim(), client: gs(r, 'client_column').trim(), st: gs(r, 'status_column') })).filter(p => p.emp && p.name && !gone.test(String(p.st).trim())).sort((a, b) => a.name.localeCompare(b.name)); } catch { return []; } };
+  const localIso = (dateStr, timeStr) => { if (!dateStr || !timeStr) return null; const d = new Date(dateStr + 'T' + timeStr); return isNaN(d) ? null : d.toISOString(); };
+  const pad = n => String(n).padStart(2, '0');
+  const today = () => { const d = new Date(); return d.getFullYear() + '-' + pad(d.getMonth() + 1) + '-' + pad(d.getDate()); };
+  const nowT = () => { const d = new Date(); return pad(d.getHours()) + ':' + pad(d.getMinutes()); };
+  const isoT = iso => { const d = new Date(iso); return pad(d.getHours()) + ':' + pad(d.getMinutes()); };
+  const isoD = iso => { const d = new Date(iso); return d.getFullYear() + '-' + pad(d.getMonth() + 1) + '-' + pad(d.getDate()); };
+
+  async function load(force) {
+    if (!can() || SK.busy) return; if (!force && Date.now() - SK.at < 20000) return;
+    SK.busy = true;
+    try {
+      const days = Math.max(+SK.per || 7, SK.logPer === '30' ? 30 : SK.logPer === '7' ? 7 : 1) + 1;
+      const from = new Date(); from.setHours(0, 0, 0, 0); from.setDate(from.getDate() - days);
+      const r = await rpc('td_sick_list', { p_from: from.toISOString(), p_to: new Date(Date.now() + 86400000).toISOString() });
+      SK.list = Array.isArray(r) ? r : []; SK.openList = SK.list.filter(v => !v.end); SK.at = Date.now(); SK.err = '';
+    } catch (e) { SK.err = friendly(e); }
+    SK.busy = false; paintBtn(); if (SK.open) draw();
+  }
+  function ensureBtn() {
+    let b = $('skBtn'); if (b) return b;
+    const rec = $('recBtn'); if (!rec) return null;
+    b = document.createElement('button'); b.id = 'skBtn'; b.type = 'button'; b.className = 'sk-btn'; b.hidden = true;
+    b.innerHTML = ICON + '<span class="sk-t">Sickroom</span><span class="sk-pulse"></span><span class="sk-n">0</span>';
+    b.title = 'Sickroom: who is in now, how long, and how often'; rec.after(b); return b;
+  }
+  function paintBtn() {
+    const b = ensureBtn(); if (!b) return;
+    const ok = signedIn() && can(); b.hidden = !ok; if (!ok) return;
+    const rec = $('recBtn'); if (rec && b.previousElementSibling !== rec) rec.after(b);   /* follows Record attendance, also on phones */
+    b.classList.add('merged'); if (rec) { rec.classList.toggle('has-sk', !b.hidden); const sp = rec.querySelector('span'); if (sp && sp.textContent !== 'Record') sp.textContent = 'Record'; rec.title = 'Record attendance: leave, late, remote or a half day'; }
+    const n = SK.openList.length; b.classList.toggle('live', n > 0);
+    b.querySelector('.sk-n').textContent = String(n);
+    b.querySelector('.sk-t').textContent = n ? 'in sickroom' : 'Sickroom';
+    b.setAttribute('aria-label', n ? n + ' in the sickroom now' : 'Sickroom'); b.title = n ? n + ' in the sickroom now: tap to see the timers' : 'Sickroom: send someone in, see who goes how often';
+  }
+  let panel = null;
+  function ensurePanel() { if (panel) return panel; panel = document.createElement('div'); panel.id = 'skPanel'; panel.hidden = true; panel.setAttribute('role', 'dialog'); panel.setAttribute('aria-label', 'Sickroom'); document.body.append(panel);
+    document.addEventListener('mousedown', e => { if (SK.open && !panel.contains(e.target) && !$('skBtn')?.contains(e.target) && !(e.target.closest && e.target.closest('.veil, .modal, dialog, .pdlg, #attModalPortal'))) close(); }, true);
+    return panel; }
+  function open(tab) { ensurePanel(); if (tab) SK.tab = tab; SK.open = true; panel.hidden = false; try { window.lvClose && lvClose(); } catch { } draw(); load(true); }
+  function close() { if (!panel) return; SK.open = false; panel.hidden = true; SK.form = false; SK.edit = null; }
+  window.skOpen = open;
+  window.SKAPI = { can, list: async days => { const f = new Date(); f.setHours(0, 0, 0, 0); f.setDate(f.getDate() - days); const r = await rpc('td_sick_list', { p_from: f.toISOString(), p_to: new Date(Date.now() + 86400000).toISOString() }); return Array.isArray(r) ? r : []; } };
+
+  function draw() {
+    if (!panel) return;
+    const n = SK.openList.length;
+    const head = `<button class="sk-x" type="button" data-sk="close" aria-label="Close">×</button><div class="sk-hd"><span class="sk-ic">${ICON}</span><div><h3>Sickroom</h3><small>${n ? n + (n === 1 ? ' person is' : ' people are') + ' in now' : 'Nobody is in right now'}</small></div></div>
+      <div class="sk-tabs" role="group">${[['now', 'Now', n], ['log', 'Log', 0], ['ins', 'Insights', 0]].map(([k, l, c]) => `<button type="button" data-sktab="${k}" aria-pressed="${SK.tab === k}">${l}${c ? `<b>${c}</b>` : ''}</button>`).join('')}</div>${SK.err ? `<p class="sk-err">${esc(SK.err)}</p>` : ''}`;
+    panel.innerHTML = head + (SK.tab === 'now' ? nowHtml() : SK.tab === 'log' ? logHtml() : insHtml());
+    if (SK.form) wireForm();
+  }
+  function nowHtml() {
+    const L = SK.openList.slice().sort((a, b) => Date.parse(a.start) - Date.parse(b.start));
+    const rows = L.map(v => { const ms = lenOf(v), cls = ms > 3600000 ? 'bad' : ms > 1800000 ? 'warn' : '';
+      return `<div class="sk-row"><span class="sk-av">${esc(ini(v.name))}</span><span class="sk-who"><b>${esc(v.name)}</b><small>${esc([v.client, 'since ' + tm(v.start), v.note ? '“' + v.note + '”' : '', 'by ' + (v.by || '')].filter(Boolean).join(' · '))}</small></span>
+        <span class="sk-timer ${cls}" data-skt="${esc(v.start)}">${clock(ms)}<small>${cls === 'bad' ? 'over an hour' : cls === 'warn' ? 'over 30 min' : 'in sickroom'}</small></span><button type="button" class="sk-back" data-skend="${esc(v.id)}">Back ✓</button><button type="button" class="sk-mini" data-skedit="${esc(v.id)}" aria-label="Change times">⋯</button></div>`; }).join('');
+    return (rows || `<div class="sk-empty"><b>🩺</b>Nobody is in the sickroom right now.</div>`) + (SK.form ? formHtml() : `<button type="button" class="sk-add" data-sk="form">＋ Send someone to the sickroom</button>`);
+  }
+  function formHtml() {
+    const v = SK.edit ? SK.list.find(x => x.id === SK.edit) : null, P = people();
+    return `<div class="sk-form">${v ? `<div class="full"><b>${esc(v.name)}</b> <small style="color:var(--ink-3)">${esc(v.client || '')}</small></div>` : `<label class="full">Employee<input id="skWho" list="skPeople" placeholder="Type a name or Emp code" autocomplete="off"><datalist id="skPeople">${P.map(p => `<option value="${esc(p.name + ' · ' + p.emp)}">${esc(p.client)}</option>`).join('')}</datalist></label>`}
+      <label>Date<input id="skDate" type="date" value="${v ? isoD(v.start) : today()}" max="${today()}"></label>
+      <label>Went in at<input id="skFrom" type="time" value="${v ? isoT(v.start) : nowT()}"></label>
+      <label>Came back at <span style="font-weight:400;color:var(--ink-3)">${v ? '' : '(leave empty if still in)'}</span><input id="skTo" type="time" value="${v && v.end ? isoT(v.end) : ''}"></label>
+      <label>Note <span style="font-weight:400;color:var(--ink-3)">(optional)</span><input id="skNote" maxlength="300" value="${v ? esc(v.note || '') : ''}" placeholder="e.g. headache"></label>
+      <div class="sk-act">${v ? `<button type="button" class="sk-btn2" data-skdel="${esc(v.id)}" style="color:#c0392b">Delete</button>` : '<small>Times are in your time zone.</small>'}<button type="button" class="sk-btn2" data-sk="cancel">Cancel</button><button type="button" class="sk-btn2 go" data-sk="save">${v ? 'Save' : 'Start'}</button></div><p class="sk-err full" id="skErr"></p></div>`;
+  }
+  function wireForm() { const w = $('skWho'); if (w) setTimeout(() => w.focus(), 30); }
+  function logHtml() {
+    const days = SK.logPer === 'today' ? 0 : +SK.logPer, from = new Date(); from.setHours(0, 0, 0, 0); from.setDate(from.getDate() - days);
+    const L = SK.list.filter(v => v.end && Date.parse(v.start) >= from.getTime()).sort((a, b) => Date.parse(b.start) - Date.parse(a.start));
+    let html = `<div class="sk-seg" role="group">${[['today', 'Today'], ['7', '7 days'], ['30', '30 days']].map(([k, l]) => `<button type="button" data-sklog="${k}" aria-pressed="${SK.logPer === k}">${l}</button>`).join('')}</div>`;
+    if (!L.length) return html + `<div class="sk-empty">No finished visits ${SK.logPer === 'today' ? 'today' : 'in this period'}.</div>`;
+    let last = '';
+    for (const v of L) { const d = dayLbl(v.start); if (d !== last) { html += `<div class="sk-day">${esc(d)}</div>`; last = d; }
+      html += `<div class="sk-row"><span class="sk-av">${esc(ini(v.name))}</span><span class="sk-who"><b>${esc(v.name)}</b><small>${esc([v.client, v.note ? '“' + v.note + '”' : '', 'by ' + (v.by || '')].filter(Boolean).join(' · '))}</small></span><span class="sk-timer" style="color:var(--ink)">${dur(lenOf(v))}<small>${tm(v.start)} – ${tm(v.end)}</small></span><button type="button" class="sk-mini" data-skedit="${esc(v.id)}" aria-label="Change">⋯</button></div>`; }
+    return html;
+  }
+  function insHtml() {
+    const days = +SK.per, from = new Date(); from.setHours(0, 0, 0, 0); from.setDate(from.getDate() - (days - 1));
+    const L = SK.list.filter(v => Date.parse(v.start) >= from.getTime());
+    const seg = `<div class="sk-seg" role="group">${[['7', '7 days'], ['30', '30 days'], ['90', '90 days']].map(([k, l]) => `<button type="button" data-skper="${k}" aria-pressed="${SK.per === k}">${l}</button>`).join('')}</div>`;
+    if (!L.length) return seg + `<div class="sk-empty">No sickroom visits in the last ${days} days.</div>`;
+    const tot = L.reduce((a, v) => a + lenOf(v), 0), by = new Map();
+    for (const v of L) { const o = by.get(v.emp) || { name: v.name, client: v.client, n: 0, ms: 0, starts: [] }; o.n++; o.ms += lenOf(v); o.starts.push(Date.parse(v.start)); by.set(v.emp, o); }
+    const P = [...by.values()].map(o => { o.starts.sort((a, b) => a - b); const gaps = o.starts.slice(1).map((t, i) => (t - o.starts[i]) / 86400000); o.gap = gaps.length ? gaps.reduce((a, b) => a + b, 0) / gaps.length : null; o.last = o.starts[o.starts.length - 1];
+      const wk = o.starts.filter(t => t > Date.now() - 7 * 86400000).length; o.flag = wk >= 3 || (days >= 30 && o.n / (days / 30) >= 6) || o.ms / o.n > 45 * 60000; o.why = wk >= 3 ? wk + ' visits this week' : o.ms / o.n > 45 * 60000 ? 'long visits' : 'often'; return o; })
+      .sort((a, b) => b.n - a.n || b.ms - a.ms);
+    const longest = L.reduce((m, v) => Math.max(m, lenOf(v)), 0);
+    const hrs = new Array(24).fill(0); for (const v of L) hrs[new Date(v.start).getHours()]++;
+    const h0 = Math.max(0, hrs.findIndex(x => x) - 1), h1 = Math.min(23, 23 - [...hrs].reverse().findIndex(x => x) + 1), span = hrs.slice(h0, h1 + 1), mx = Math.max(...span);
+    const freq = o => o.n < 2 ? 'once' : o.gap < 0.5 ? o.n + '× in one day' : o.gap < 1.5 ? 'almost daily' : 'every ' + Math.round(o.gap) + ' days';
+    return seg + `<div class="sk-kpis"><div class="sk-k"><b>${by.size}</b><span>people</span></div><div class="sk-k"><b>${L.length}</b><span>visits</span></div><div class="sk-k"><b>${dur(tot)}</b><span>in total</span></div><div class="sk-k"><b>${dur(tot / L.length)}</b><span>average visit</span></div></div>
+      <div class="sk-sub">When people go <span style="font-weight:500;color:var(--ink-3)">· longest visit ${dur(longest)}</span></div>
+      <div class="sk-hours">${span.map((x, i) => `<i class="${x === mx ? 'top' : ''}" style="height:${Math.max(3, x / mx * 100)}%" title="${(h0 + i) % 12 || 12}${h0 + i < 12 ? ' AM' : ' PM'}: ${x} visit${x === 1 ? '' : 's'}"></i>`).join('')}</div>
+      <div class="sk-hl"><span>${(h0 % 12 || 12) + (h0 < 12 ? ' AM' : ' PM')}</span><span>${(h1 % 12 || 12) + (h1 < 12 ? ' AM' : ' PM')}</span></div>
+      <div class="sk-sub">By person</div>
+      <table class="sk-tbl"><thead><tr><th>Person</th><th class="n">Visits</th><th class="n">Total</th><th class="n">Average</th><th>How often</th></tr></thead><tbody>${P.map(o => `<tr><td><b>${esc(o.name)}</b>${o.flag ? `<span class="sk-flag" title="${esc(o.why)}">Frequent</span>` : ''}<small>${esc(o.client || '')} · last ${esc(dayLbl(o.last))}, ${tm(o.last)}</small></td><td class="n">${o.n}</td><td class="n">${dur(o.ms)}</td><td class="n">${dur(o.ms / o.n)}</td><td>${esc(freq(o))}</td></tr>`).join('')}</tbody></table>`;
+  }
+  async function save() {
+    const err = $('skErr'); const say = m => { if (err) err.textContent = m; };
+    const dt = $('skDate').value, f = $('skFrom').value, t = $('skTo').value, note = $('skNote').value.trim();
+    const st = localIso(dt, f), en = t ? localIso(dt, t) : null; if (!st) return say('Choose the date and the time they went in.');
+    if (en && Date.parse(en) <= Date.parse(st)) return say('The return time must be after the start time.');
+    try {
+      if (SK.edit) await rpc('td_sick_edit', { p_id: +SK.edit, p_item: { start: st, end: en || '', note } });
+      else {
+        const raw = ($('skWho').value || '').trim(), P = people(), code = (raw.match(/·\s*([^·]+)$/) || [])[1]?.trim();
+        const p = P.find(x => x.emp === code) || P.find(x => x.emp === raw) || P.find(x => x.name.toLowerCase() === raw.toLowerCase());
+        if (!p) return say('Pick an employee from the list.');
+        await rpc('td_sick_start', { p_item: { emp: p.emp, name: p.name, client: p.client, start: st, end: en || '', note } });
+        toast(en ? 'Visit logged for ' + p.name + '.' : p.name + ' is in the sickroom. Tap “Back ✓” when they return.');
+      }
+      SK.form = false; SK.edit = null; await load(true);
+    } catch (e) { say(friendly(e)); }
+  }
+  document.addEventListener('click', async e => {
+    const t = e.target && e.target.closest ? e.target : null; if (!t) return;
+    if (t.closest('#skBtn')) { SK.open ? close() : open(); return; }
+    if (!panel || !panel.contains(t)) return;
+    const a = t.closest('[data-sk]')?.dataset.sk;
+    if (a === 'close') return close();
+    if (a === 'form') { SK.form = true; SK.edit = null; return draw(); }
+    if (a === 'cancel') { SK.form = false; SK.edit = null; return draw(); }
+    if (a === 'save') return save();
+    const tb = t.closest('[data-sktab]'); if (tb) { SK.tab = tb.dataset.sktab; SK.form = false; SK.edit = null; return draw(); }
+    const lp = t.closest('[data-sklog]'); if (lp) { SK.logPer = lp.dataset.sklog; draw(); return load(true); }
+    const pp = t.closest('[data-skper]'); if (pp) { SK.per = pp.dataset.skper; draw(); return load(true); }
+    const en = t.closest('[data-skend]'); if (en) { en.disabled = true; try { const v = SK.list.find(x => x.id === en.dataset.skend); await rpc('td_sick_end', { p_id: +en.dataset.skend, p_at: null }); toast((v ? v.name : 'They') + ' is back' + (v ? ' after ' + dur(lenOf(v)) : '') + '.'); await load(true); } catch (x) { en.disabled = false; toast(friendly(x)); } return; }
+    const ed = t.closest('[data-skedit]'); if (ed) { SK.tab = 'now'; SK.form = true; SK.edit = ed.dataset.skedit; return draw(); }
+    const dl = t.closest('[data-skdel]'); if (dl) { if (dl.dataset.armed !== '1') { dl.dataset.armed = '1'; dl.textContent = 'Tap again to delete'; return; } try { await rpc('td_sick_edit', { p_id: +dl.dataset.skdel, p_item: { delete: 'true' } }); SK.form = false; SK.edit = null; toast('Visit deleted.'); await load(true); } catch (x) { const er = $('skErr'); if (er) er.textContent = friendly(x); } }
+  });
+  document.addEventListener('keydown', e => { if (e.key === 'Escape' && SK.open) close(); if (e.key === 'Enter' && SK.open && SK.form && e.target.closest && e.target.closest('#skPanel') && e.target.tagName === 'INPUT') { e.preventDefault(); save(); } });
+  /* live timers every second while the panel is open; the button count every minute */
+  setInterval(() => { if (!SK.open || SK.tab !== 'now') return; document.querySelectorAll('#skPanel [data-skt]').forEach(el => { const ms = Date.now() - Date.parse(el.dataset.skt), sm = el.querySelector('small'); el.firstChild.textContent = clock(ms); el.classList.toggle('warn', ms > 1800000 && ms <= 3600000); el.classList.toggle('bad', ms > 3600000); if (sm) sm.textContent = ms > 3600000 ? 'over an hour' : ms > 1800000 ? 'over 30 min' : 'in sickroom'; }); }, 1000);
+  setInterval(() => { try { paintBtn(); if (!document.hidden && signedIn() && can()) load(false); } catch { } }, 5000);
+  setTimeout(() => { try { paintBtn(); load(true); } catch { } }, 1500);
+})();
+</script>
+<style id="trends-3102">
+/* v3.102.0: Trends — spotted automatically from attendance, lates and the sickroom */
+html body #pageSummary #cardTrends { grid-area:auto !important; grid-column:1 / -1 !important; grid-row:auto !important; padding:18px 20px !important; border-radius:18px !important; background:var(--ov-card, var(--surface,#fff)) !important; }
+#cardTrends[hidden] { display:none !important; }
+.tr-hd { display:flex; align-items:center; gap:12px; flex-wrap:wrap; margin-bottom:12px; }
+.tr-ic { width:38px; height:38px; border-radius:12px; display:grid; place-items:center; background:linear-gradient(135deg,#ede9fe,#e0f2fe); font-size:19px; flex:none; }
+.tr-hd h2 { margin:0 !important; font-size:17px !important; font-weight:800 !important; } .tr-hd h2::before { display:none !important; }
+.tr-hd small { display:block; color:var(--ink-3,#8a93a3); font-size:12px; margin-top:1px; }
+.tr-hd .grow { flex:1; }
+.tr-seg { display:inline-flex; gap:2px; padding:3px; border-radius:10px; background:var(--surface-2,#f1f3f7); }
+.tr-seg button { border:0; background:transparent; padding:5px 10px; border-radius:8px; font:inherit; font-size:12px; font-weight:650; color:var(--ink-2); cursor:pointer; white-space:nowrap; }
+.tr-seg button[aria-pressed="true"] { background:var(--surface,#fff); color:var(--ink); box-shadow:0 1px 3px rgba(0,0,0,.08); }
+.tr-seg b { margin-left:4px; font-size:11px; color:var(--ink-3); }
+.tr-re { border:0; background:var(--surface-2,#f1f3f7); width:32px; height:32px; border-radius:50%; cursor:pointer; color:var(--ink-2); font-size:15px; }
+.tr-team { display:flex; gap:8px; flex-wrap:wrap; margin-bottom:14px; }
+.tr-t { display:block; line-height:1.5; padding:8px 12px; border-radius:12px; background:var(--surface-2,#f6f7fa); font-size:12.5px; color:var(--ink-2); max-width:100%; }
+.tr-t b { color:var(--ink); font-weight:700; } .tr-t .up { color:#c0392b; font-weight:700; } .tr-t .dn { color:#0f7b55; font-weight:700; }
+.tr-list { display:grid; grid-template-columns:repeat(auto-fill, minmax(320px, 1fr)); gap:10px; }
+.tr-item { display:flex; gap:12px; padding:12px 14px; border-radius:14px; border:1px solid var(--border,#eceef3); background:var(--surface,#fff); min-width:0; }
+.tr-item.red { border-color:#f5c2bd; background:linear-gradient(0deg, rgba(220,38,38,.03), rgba(220,38,38,.03)), var(--surface,#fff); }
+.tr-av { width:36px; height:36px; border-radius:50%; flex:none; display:grid; place-items:center; font-size:12px; font-weight:800; background:#fff4dc; color:#8a5300; box-shadow:0 0 0 2px #f3d48f; }
+.tr-item.red .tr-av { background:#fdecea; color:#b3261e; box-shadow:0 0 0 2px #f5b4ad; }
+.tr-item.info .tr-av { background:#eaf2ff; color:#1d4f9a; box-shadow:0 0 0 2px #c8dafc; }
+.tr-bd { flex:1; min-width:0; }
+.tr-nm { display:flex; align-items:center; gap:6px; flex-wrap:wrap; } .tr-nm b { font-size:14px; font-weight:700; } .tr-nm small { color:var(--ink-3); font-size:12px; }
+.tr-tag { font-size:10.5px; font-weight:700; padding:1px 7px; border-radius:999px; background:var(--surface-2,#f1f3f7); color:var(--ink-2); }
+.tr-tag.sick { background:#e2f6ee; color:#0b6b4f; } .tr-tag.leave { background:#fff4dc; color:#8a5300; } .tr-tag.late { background:#eaf2ff; color:#1d4f9a; }
+.tr-why { margin:6px 0 0; padding:0; list-style:none; display:flex; flex-direction:column; gap:3px; }
+.tr-why li { font-size:12.5px; color:var(--ink-2); line-height:1.4; padding-left:14px; position:relative; } .tr-why li::before { content:""; position:absolute; left:3px; top:7px; width:5px; height:5px; border-radius:50%; background:currentColor; opacity:.45; }
+.tr-more { display:block; margin:12px auto 0; border:0; background:none; color:var(--accent,#2563eb); font:inherit; font-size:13px; font-weight:650; cursor:pointer; }
+.tr-empty { padding:18px; text-align:center; color:var(--ink-3); font-size:13px; }
+.tr-note { margin-top:10px; font-size:11.5px; color:var(--ink-3); }
+@media (max-width:700px) { .tr-list { grid-template-columns:minmax(0,1fr); } #cardTrends { padding:16px !important; } .tr-hd .tr-seg { order:3; width:100%; overflow-x:auto; } }
+</style>
+<script>
+/* v3.102.0: Trends. Looks at the last 120 days of attendance and the last 60 days of the sickroom, and writes down, in plain
+   words, who is taking more leave than usual, leave patterns (Mondays, next to weekends), late streaks, frequent or long
+   sickroom visits, and sickroom visits followed by sick leave. For approvers and admins only. Nothing is stored. */
+(() => {
+  const $ = id => document.getElementById(id);
+  const DAY = 86400000;
+  const TR = { at: 0, busy: false, items: [], team: [], f: 'all', all: false, err: '' };
+  const allowed = () => { try { return !!(window.PERM && PERM.online && PERM.online() && (PERM.isSuper() || PERM.can('att.approve'))); } catch { return false; } };
+  const esc = v => String(v == null ? '' : v).replace(/[&<>"']/g, c => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' })[c]);
+  const ini = n => String(n || '?').trim().split(/\s+/).slice(0, 2).map(x => x[0]).join('').toUpperCase();
+  const key = n => String(n || '').trim().toLowerCase().replace(/\s+/g, ' ');
+  const sd = d => new Date(d).toLocaleDateString([], { day: 'numeric', month: 'short', timeZone: 'UTC' });
+  const sdl = d => new Date(d).toLocaleDateString([], { day: 'numeric', month: 'short' });
+  const f1 = x => (Math.round(x * 10) / 10).toString();
+  const mins = ms => { const m = Math.round(ms / 60000); return m < 60 ? m + ' min' : Math.floor(m / 60) + ' h' + (m % 60 ? ' ' + (m % 60) + ' min' : ''); };
+  const WDN = ['Sunday', 'Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday'];
+
+  async function compute() {
+    if (!window.ATT || !ATT.entries) return;
+    const now = new Date(), T = Date.UTC(now.getFullYear(), now.getMonth(), now.getDate());
+    const E = ATT.entries(T - 119 * DAY, T); if (!E) return;
+    const P = new Map(), person = (name, client) => { const k = key(name); let o = P.get(k); if (!o) { o = { name: String(name).trim(), client: client || '', sev: 0, tags: new Set(), why: [] }; P.set(k, o); } if (!o.client && client) o.client = client; return o; };
+    const add = (o, sev, tag, text) => { o.sev = Math.max(o.sev, sev); o.tags.add(tag); if (!o.why.includes(text)) o.why.push(text); };
+    const FULL = new Set(['approved', 'sick', 'unplanned']), val = e => FULL.has(e.cat) ? 1 : e.cat === 'half' ? 0.5 : 0;
+    /* ---- leave: more than their own usual ---- */
+    const L = new Map();
+    for (const e of E) { const v = val(e); if (!v) continue; const k = key(e.name), age = (T - e.date.getTime()) / DAY; const o = L.get(k) || { name: e.name, client: e.client, l30: 0, prev: 0, sl30: 0, unpl30: 0, wd: [0, 0, 0, 0, 0, 0, 0] }; if (age < 30) { o.l30 += v; if (e.code === 'SL') o.sl30 += v; if (e.cat === 'unplanned') o.unpl30 += v; } else o.prev += v; o.wd[e.date.getUTCDay()] += v; L.set(k, o); }
+    for (const o of L.values()) {
+      const usual = o.prev / 3;   /* per 30 days, over the 90 days before */
+      if (o.l30 >= 3 && o.l30 >= usual * 2 + 1) add(person(o.name, o.client), o.l30 >= 5 && o.l30 >= usual * 3 ? 2 : 1, 'leave', `${f1(o.l30)} leave days in the last 30 days, about ${f1(usual)} usually`);
+      if (o.sl30 >= 3) add(person(o.name, o.client), o.sl30 >= 5 ? 2 : 1, 'leave', `${f1(o.sl30)} sick leave days in the last 30 days`);
+    }
+    /* ---- the attendance watch list (streaks, weekday patterns, lates) ---- */
+    const W = ATT.watchData ? ATT.watchData() : null;
+    if (W) {
+      for (const s of W.streaks || []) if (s.sev === 'red') for (const w of s.why || []) add(person(s.name, s.client), s.sev === 'red' ? 2 : 1, 'leave', w.charAt(0).toUpperCase() + w.slice(1));
+      for (const p of W.patterns || []) add(person(p.name, p.client), 1, 'leave', p.text + (p.recent && p.recent.length ? ' (latest ' + p.recent.slice(-2).join(', ') + ')' : ''));
+      for (const l of W.lates || []) for (const w of l.why || []) add(person(l.name, l.client), 1, 'late', w.charAt(0).toUpperCase() + w.slice(1));
+    }
+    /* ---- the sickroom ---- */
+    let SR = [];
+    if (window.SKAPI && SKAPI.can()) { try { SR = await SKAPI.list(60); } catch { SR = []; } }
+    const nowMs = Date.now(), len = v => (v.end ? Date.parse(v.end) : nowMs) - Date.parse(v.start);
+    const byE = new Map(); for (const v of SR) { const a = byE.get(v.emp) || []; a.push(v); byE.set(v.emp, a); }
+    const leaveDay = new Map(); for (const e of E) if (e.cat === 'sick' || e.cat === 'unplanned' || e.cat === 'half') leaveDay.set(key(e.name) + '|' + e.date.getTime(), e.code);
+    for (const vs of byE.values()) {
+      const v0 = vs[0], o = () => person(v0.name, v0.client), age = v => (nowMs - Date.parse(v.start)) / DAY;
+      const w7 = vs.filter(v => age(v) < 7).length, w14 = vs.filter(v => age(v) < 14).length, p28 = vs.filter(v => age(v) >= 14 && age(v) < 42).length;
+      const m30 = vs.filter(v => age(v) < 30), t30 = m30.reduce((a, v) => a + len(v), 0);
+      if (w7 >= 3) add(o(), 2, 'sick', `${w7} sickroom visits in the last 7 days`);
+      else if (w14 >= 4) add(o(), 1, 'sick', `${w14} sickroom visits in the last 14 days`);
+      if (w14 >= 3 && w14 >= p28 / 2 * 2 + 1 && w7 < 3) add(o(), 1, 'sick', `Sickroom visits going up: ${w14} in 2 weeks, ${p28} in the 4 weeks before`);
+      if (m30.length >= 2 && t30 / m30.length >= 45 * 60000) add(o(), 1, 'sick', `Long sickroom visits: ${mins(t30 / m30.length)} on average (${m30.length} visits)`);
+      if (t30 >= 3 * 3600000) add(o(), 1, 'sick', `${mins(t30)} in the sickroom in the last 30 days`);
+      for (const v of vs) { const d = new Date(v.start), base = Date.UTC(d.getFullYear(), d.getMonth(), d.getDate());
+        for (const k of [1, 2]) { const c = leaveDay.get(key(v.name) + '|' + (base + k * DAY)); if (c) { add(o(), 1, 'sick', `Sickroom on ${sdl(v.start)}, then ${c} ${k === 1 ? 'the next day' : 'two days later'}`); break; } } }
+    }
+    /* ---- the team as a whole ---- */
+    const team = [];
+    { let a = 0, b = 0; for (const e of E) { const v = val(e), age = (T - e.date.getTime()) / DAY; if (!v) continue; if (age < 30) a += v; else if (age < 60) b += v; }
+      if (a || b) { const ch = b ? Math.round((a - b) / b * 100) : null; team.push(`📅 <b>${f1(a)}</b> leave days in the last 30 days` + (ch == null ? '' : ch === 0 ? ', same as the 30 before' : `, <span class="${ch > 0 ? 'up' : 'dn'}">${ch > 0 ? '▲' : '▼'} ${Math.abs(ch)}%</span> vs the 30 before`)); } }
+    { const wd = [0, 0, 0, 0, 0, 0, 0]; let n = 0; for (const e of E) { const v = val(e); if (!v || (T - e.date.getTime()) / DAY >= 90) continue; const w = e.date.getUTCDay(); if (w === 0 || w === 6) continue; wd[w] += v; n += v; }
+      if (n >= 8) { let top = 1; for (let w = 2; w <= 5; w++) if (wd[w] > wd[top]) top = w; const sh = Math.round(wd[top] / n * 100); if (sh >= 26) team.push(`📆 Most leave falls on <b>${WDN[top]}s</b> (${sh}% over 90 days)`); } }
+    { const hc = new Map(); for (const r of (ATT.trackedOn ? ATT.trackedOn(new Date(T)) : [])) { const c = r.client || 'No client'; hc.set(c, (hc.get(c) || 0) + 1); }
+      const lc = new Map(); for (const e of E) { const v = val(e); if (!v || (T - e.date.getTime()) / DAY >= 30) continue; const c = e.client || 'No client'; lc.set(c, (lc.get(c) || 0) + v); }
+      const rates = [...hc].filter(([, n]) => n >= 3).map(([c, n]) => [c, (lc.get(c) || 0) / (n * 21)]); const all = rates.reduce((a, [c]) => a + (lc.get(c) || 0), 0) / Math.max(1, rates.reduce((a, [c]) => a + hc.get(c) * 21, 0));
+      rates.sort((a, b) => b[1] - a[1]); if (rates.length >= 2 && rates[0][1] >= all * 1.4 && rates[0][1] > 0.02) team.push(`🏢 <b>${esc(rates[0][0])}</b> has the most absence: ${Math.round(rates[0][1] * 100)}% of working days vs ${Math.round(all * 100)}% overall`); }
+    if (SR.length) { const a = SR.filter(v => (nowMs - Date.parse(v.start)) < 7 * DAY), b = SR.filter(v => { const g = (nowMs - Date.parse(v.start)) / DAY; return g >= 7 && g < 14; });
+      team.push(`🩺 <b>${a.length}</b> sickroom visit${a.length === 1 ? '' : 's'} this week` + (b.length || a.length ? (a.length === b.length ? ', same as last week' : `, <span class="${a.length > b.length ? 'up' : 'dn'}">${a.length > b.length ? '▲' : '▼'} ${Math.abs(a.length - b.length)}</span> vs last week`) : '') + (a.length ? ` · ${mins(a.reduce((s, v) => s + len(v), 0))} in total` : '')); }
+    TR.items = [...P.values()].filter(o => o.why.length).sort((a, b) => b.sev - a.sev || b.why.length - a.why.length || a.name.localeCompare(b.name));
+    TR.team = team; TR.at = Date.now();
+  }
+  function ensureCard() {
+    let c = $('cardTrends'); if (c) return c;
+    const pg = $('pageSummary'); if (!pg) return null;
+    c = document.createElement('section'); c.id = 'cardTrends'; c.className = 'card'; c.hidden = true; c.setAttribute('aria-label', 'Trends');
+    pg.append(c);
+    c.addEventListener('click', e => { const b = e.target.closest('[data-trf]'); if (b) { TR.f = b.dataset.trf; TR.all = false; draw(); return; }
+      if (e.target.closest('[data-trall]')) { TR.all = !TR.all; draw(); return; }
+      if (e.target.closest('[data-trre]')) { run(true); } });
+    return c;
+  }
+  function draw() {
+    const c = ensureCard(); if (!c) return;
+    if (!allowed()) { c.hidden = true; return; }
+    c.hidden = false;
+    { const tk = $('ovTasks'); if (tk && tk.parentElement === c.parentElement && (c.compareDocumentPosition(tk) & Node.DOCUMENT_POSITION_FOLLOWING)) tk.after(c); }   /* after My tasks, so it takes the row below */
+    const n = k => k === 'all' ? TR.items.length : TR.items.filter(o => o.tags.has(k)).length;
+    const list = TR.f === 'all' ? TR.items : TR.items.filter(o => o.tags.has(TR.f)), shown = TR.all ? list : list.slice(0, 6);
+    const ago = TR.at ? Math.round((Date.now() - TR.at) / 60000) : null;
+    const TAG = { leave: 'Leave', sick: 'Sickroom', late: 'Late' };
+    c.innerHTML = `<div class="tr-hd"><span class="tr-ic" aria-hidden="true">🧠</span><div><h2>Trends</h2><small>Spotted automatically from attendance${window.SKAPI && SKAPI.can() ? ', lates and the sickroom' : ' and lates'} · ${ago == null ? 'working it out…' : ago < 1 ? 'updated just now' : 'updated ' + ago + ' min ago'}</small></div><span class="grow"></span>
+      <div class="tr-seg" role="group" aria-label="Show">${[['all', 'All'], ['leave', 'Leave'], ['sick', 'Sickroom'], ['late', 'Late']].map(([k, l]) => `<button type="button" data-trf="${k}" aria-pressed="${TR.f === k}">${l}<b>${n(k)}</b></button>`).join('')}</div>
+      <button class="tr-re" type="button" data-trre title="Look again now" aria-label="Refresh trends">↻</button></div>
+      ${TR.team.length ? `<div class="tr-team">${TR.team.map(t => `<span class="tr-t">${t}</span>`).join('')}</div>` : ''}
+      ${shown.length ? `<div class="tr-list">${shown.map(o => `<div class="tr-item ${o.sev >= 2 ? 'red' : o.sev === 1 ? '' : 'info'}"><span class="tr-av">${esc(ini(o.name))}</span><div class="tr-bd"><div class="tr-nm"><b>${esc(o.name)}</b>${o.client ? `<small>${esc(o.client)}</small>` : ''}${[...o.tags].map(t => `<span class="tr-tag ${t}">${TAG[t]}</span>`).join('')}</div><ul class="tr-why">${o.why.slice(0, 4).map(w => `<li>${esc(w)}</li>`).join('')}${o.why.length > 4 ? `<li>and ${o.why.length - 4} more</li>` : ''}</ul></div></div>`).join('')}</div>`
+        : `<div class="tr-empty">${TR.at ? 'Nothing unusual right now. 👍' : 'Looking at the last 120 days…'}</div>`}
+      ${list.length > 6 ? `<button class="tr-more" type="button" data-trall>${TR.all ? 'Show less' : 'Show all ' + list.length}</button>` : ''}
+      <p class="tr-note">Patterns, not verdicts: planned leave on its own is never flagged, and each person is compared with their own usual. Only approvers and admins see this.</p>`;
+  }
+  async function run(force) {
+    if (TR.busy) return; if (!allowed()) { draw(); return; }
+    const ready = window.ATT && ATT.entries && ATT.entries(Date.now(), Date.now()) !== null; if (!ready) return;
+    if (!force && TR.at && Date.now() - TR.at < 5 * 60000) { draw(); return; }
+    TR.busy = true; try { await compute(); } catch (e) { console.error(e); } TR.busy = false; draw();
+  }
+  window.trendsRefresh = () => run(true);
+  setInterval(() => { try { if (!document.hidden && !$('app')?.hidden && typeof state !== 'undefined' && state.view === 'summary') run(false); } catch { } }, 15000);
+  setTimeout(() => run(false), 3000);
 })();
 </script>
 </body>
