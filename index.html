@@ -15,7 +15,7 @@
 <meta name="apple-mobile-web-app-title" content="Blasters Deck">
 <meta name="application-name" content="Blasters Deck">
 <meta name="apple-mobile-web-app-status-bar-style" content="default">
-<title>Blasters Deck · 3.102.1</title>
+<title>Blasters Deck · 3.102.3</title>
 <link rel="preconnect" href="https://fonts.googleapis.com"><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin><link href="https://fonts.googleapis.com/css2?family=Public+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet">
 <style>
 :root {
@@ -4002,6 +4002,36 @@ input.wa-linked { background:color-mix(in srgb, #25a244 7%, var(--surface, #fff)
 <div id="toast" aria-live="polite"></div>
 
 <script>
+/* v3.102.2: the dashboard runs on US Eastern time (EST / EDT), whatever time zone each computer is set to.
+   Every log is written in Eastern time, "today" is the Eastern date, and dates and times are shown in Eastern time. */
+(() => {
+  const TZ = 'America/New_York'; window.TD_TZ = TZ;
+  const OrigDTF = Intl.DateTimeFormat;
+  try { window.TD_LOCAL_TZ = new OrigDTF().resolvedOptions().timeZone || ''; } catch { window.TD_LOCAL_TZ = ''; }   /* this computer's own zone */
+  const fmt = new OrigDTF('en-US', { timeZone: TZ, hourCycle: 'h23', year: 'numeric', month: 'numeric', day: 'numeric', hour: 'numeric', minute: 'numeric', second: 'numeric' });
+  const parts = ms => { const o = {}; for (const x of fmt.formatToParts(new Date(ms))) o[x.type] = +x.value; return { y: o.year, m: o.month - 1, d: o.day, h: o.hour % 24, mi: o.minute, s: o.second }; };
+  const offMin = ms => { const p = parts(ms); return (Date.UTC(p.y, p.m, p.d, p.h, p.mi, p.s) - Math.floor(ms / 1000) * 1000) / 60000; };   /* -300 in winter, -240 in summer */
+  window.tzParts = ms => parts(ms == null ? Date.now() : ms);
+  window.tzOffset = ms => offMin(ms == null ? Date.now() : ms);
+  /* a Date whose ordinary getters (getHours, getDate…) read Eastern wall time: for code that builds text from local getters */
+  window.tzNow = (ms) => { const t = ms == null ? Date.now() : ms; return new Date(t + (offMin(t) + new Date(t).getTimezoneOffset()) * 60000); };
+  /* Eastern wall time ("2026-11-16 14:05" or "2026-11-16") → the real moment */
+  window.tzFromWall = (y, m, d, h = 0, mi = 0, sec = 0) => { const g = Date.UTC(y, m, d, h, mi, sec); let t = g - offMin(g) * 60000; t = g - offMin(t) * 60000; return t; };
+  /* log times: ISO with a zone are exact; plain "YYYY-MM-DD HH:MM:SS" texts are Eastern wall time */
+  window.tdMs = v => { if (v == null || v === '') return NaN; if (typeof v === 'number') return v; const t = String(v).trim(); if (/T.*(Z|[+-]\d\d:?\d\d)$/.test(t)) return Date.parse(t);
+    const m = t.match(/^(\d{4})-(\d\d)-(\d\d)(?:[ T](\d\d):(\d\d)(?::(\d\d))?)?$/); if (m) return tzFromWall(+m[1], +m[2] - 1, +m[3], +(m[4] || 0), +(m[5] || 0), +(m[6] || 0)); return Date.parse(t); };
+  /* show dates and times in Eastern time unless a time zone is asked for */
+  const withTz = o => (o && o.timeZone) ? o : { ...(o || {}), timeZone: TZ };
+  const DP = Date.prototype, tls = DP.toLocaleString, tlds = DP.toLocaleDateString, tlts = DP.toLocaleTimeString;
+  DP.toLocaleString = function (l, o) { return tls.call(this, l, withTz(o)); };
+  DP.toLocaleDateString = function (l, o) { return tlds.call(this, l, withTz(o)); };
+  DP.toLocaleTimeString = function (l, o) { return tlts.call(this, l, withTz(o)); };
+  function DTF(l, o) { return new OrigDTF(l, withTz(o)); }
+  DTF.prototype = OrigDTF.prototype; DTF.supportedLocalesOf = OrigDTF.supportedLocalesOf.bind(OrigDTF);
+  Intl.DateTimeFormat = DTF;
+})();
+</script>
+<script>
 /* v3.74.1: stay inside the Supabase free plan. Every background check goes through TDNET: checks run less often,
    stop while the tab is hidden or nobody has touched the page for 10 minutes, and all run at once on the next click
    (or when the Refresh button is pressed). */
@@ -4322,8 +4352,8 @@ function hash(str) {
 }
 const etagOf = vals => hash(JSON.stringify(vals));
 const pad = (n, l = 2) => String(n).padStart(l, "0");
-function stamp(ms) { const d = new Date(); return d.getFullYear() + pad(d.getMonth() + 1) + pad(d.getDate()) + "_" + pad(d.getHours()) + pad(d.getMinutes()) + pad(d.getSeconds()) + (ms ? "_" + pad(d.getMilliseconds(), 3) : ""); }
-const nowText = () => { const d = new Date(); return d.getFullYear() + "-" + pad(d.getMonth() + 1) + "-" + pad(d.getDate()) + " " + pad(d.getHours()) + ":" + pad(d.getMinutes()) + ":" + pad(d.getSeconds()); };
+function stamp(ms) { const d = window.tzNow ? tzNow() : new Date(); return d.getFullYear() + pad(d.getMonth() + 1) + pad(d.getDate()) + "_" + pad(d.getHours()) + pad(d.getMinutes()) + pad(d.getSeconds()) + (ms ? "_" + pad(d.getMilliseconds(), 3) : ""); }
+const nowText = () => { const d = window.tzNow ? tzNow() : new Date(); return d.getFullYear() + "-" + pad(d.getMonth() + 1) + "-" + pad(d.getDate()) + " " + pad(d.getHours()) + ":" + pad(d.getMinutes()) + ":" + pad(d.getSeconds()); };
 
 /* ------------------------------ zip ------------------------------ */
 const CRC_T = (() => { const t = new Uint32Array(256); for (let n = 0; n < 256; n++) { let c = n; for (let k = 0; k < 8; k++) c = c & 1 ? 0xEDB88320 ^ (c >>> 1) : c >>> 1; t[n] = c >>> 0; } return t; })();
@@ -5212,7 +5242,7 @@ async function purgeLocalCopies() {
 /* After every load or save the dashboard keeps a small copy of the sheet's values (snapshot.json). When the file has a
    newer save than that copy, the two are compared and the differences are logged as "in Excel" activity. */
 const SNAP_FILE = "snapshot.json", SNAP_MAX_ROWS = 5000;
-const fmtTime = ms => { const d = new Date(ms); return d.getFullYear() + "-" + pad(d.getMonth() + 1) + "-" + pad(d.getDate()) + " " + pad(d.getHours()) + ":" + pad(d.getMinutes()) + ":" + pad(d.getSeconds()); };
+const fmtTime = ms => { const d = window.tzNow ? tzNow(ms) : new Date(ms); return d.getFullYear() + "-" + pad(d.getMonth() + 1) + "-" + pad(d.getDate()) + " " + pad(d.getHours()) + ":" + pad(d.getMinutes()) + ":" + pad(d.getSeconds()); };
 async function readSnap() { try { return JSON.parse(await readData(SNAP_FILE)); } catch (_) { return null; } }
 async function writeSnap(sn) { await writeData(SNAP_FILE, JSON.stringify(sn)); }
 async function dropSnap() { await writeData(SNAP_FILE, null); }
@@ -6641,7 +6671,7 @@ const dateOf = (ms, i) => { const d = Engine.serialToDate(ms); return new Date(D
 const dow = (ms, i) => dateOf(ms, i).getUTCDay();
 const isoDate = d => d.toISOString().slice(0, 10);
 const longDate = d => `${WEEKDAYS[d.getUTCDay()]} ${d.getUTCDate()} ${MONTHS[d.getUTCMonth()]} ${d.getUTCFullYear()}`;
-const now0 = new Date();
+const now0 = window.tzNow ? tzNow() : new Date();   /* v3.102.2: today is the Eastern date */
 const TODAY = new Date(Date.UTC(now0.getFullYear(), now0.getMonth(), now0.getDate()));
 const TODAY_MS = Engine.monthSerial(TODAY.getUTCFullYear(), TODAY.getUTCMonth());
 const TODAY_IDX = TODAY.getUTCDate() - 1;
@@ -7274,7 +7304,7 @@ const snapRows = rows => rows.map(r => ({ m: r.month, i: r.empId ?? null, n: r.n
 const fromSnap = s => s.rows.map(x => ({ month: x.m, empId: x.i, name: x.n, client: x.c, reg: x.r, days: x.d.split('|').map(v => (v === '' ? null : v)) }));
 async function writeSnap(rows, sig) { if (rows.length > SNAP_MAX) return; try { await BE.writeData(SNAP, JSON.stringify({ v: 1, file: S.fileName, sig, rows: snapRows(rows) })); } catch (e) { console.error(e); } }
 const pad2 = n => String(n).padStart(2, '0');
-const fmtTime = ms => { const d = new Date(ms); return `${d.getFullYear()}-${pad2(d.getMonth() + 1)}-${pad2(d.getDate())} ${pad2(d.getHours())}:${pad2(d.getMinutes())}:${pad2(d.getSeconds())}`; };
+const fmtTime = ms => { const d = window.tzNow ? tzNow(ms) : new Date(ms); return `${d.getFullYear()}-${pad2(d.getMonth() + 1)}-${pad2(d.getDate())} ${pad2(d.getHours())}:${pad2(d.getMinutes())}:${pad2(d.getSeconds())}`; };
 async function lastModifiedBy(bytes) {
   try { const z = await ZipShim.loadAsync(bytes), f = z.file('docProps/core.xml'); if (!f) return ''; const t = await f.async('string'); const m = /<cp:lastModifiedBy>([^<]*)<\/cp:lastModifiedBy>/.exec(t); return m ? m[1].replace(/&amp;/g, '&').replace(/&lt;/g, '<').replace(/&gt;/g, '>').replace(/&quot;/g, '"').replace(/&apos;/g, "'").trim() : ''; } catch { return ''; }
 }
@@ -12046,7 +12076,7 @@ async function poll() {
 }
 
 /* ============================== filtering ============================== */
-const APP = { title: "Blasters Deck", version: "3.102.1", released: "2026-11-17" };
+const APP = { title: "Blasters Deck", version: "3.102.3", released: "2026-11-17" };
 const BASE_DIMS = { status: "status_column", desig: "designation_column", client: "client_column", mode: "mode_column" };
 const STANDARD_STATUSES = ["Active", "Manager", "OJT", "Bench", "New", "Projected", "Left", "Moved"];
 const TILE_ORDER = ["Active", "Manager", "OJT", "Bench", "New", "Projected"];
@@ -16026,9 +16056,9 @@ window.nfMe = nfMe; window.nfNotMine = nfNotMine;
    e.g. "Rajwinder updated attendance for 2 people". A different person or kind of change starts a new one. */
 const nfFamily = a => { a = String(a || '').replace(/^external-/, ''); return /^att-/.test(a) ? 'att' : ['add', 'edit', 'delete', 'bulk'].includes(a) ? 'emp' : a; };
 function nfGroup(items) {
-  const L = items.slice().sort((x, y) => (Date.parse(x.time) || 0) - (Date.parse(y.time) || 0)), groups = [], open = new Map();
+  const L = items.slice().sort((x, y) => (tdMs(x.time) || 0) - (tdMs(y.time) || 0)), groups = [], open = new Map();
   for (const it of L) {
-    const k = String(it.user || '').trim().toLowerCase() + '|' + nfFamily(it.action) + '|' + String(it.name || '').trim().toLowerCase(),   /* v3.99.1: one per person changed */ t = Date.parse(it.time) || 0, g = open.get(k);
+    const k = String(it.user || '').trim().toLowerCase() + '|' + nfFamily(it.action) + '|' + String(it.name || '').trim().toLowerCase(),   /* v3.99.1: one per person changed */ t = tdMs(it.time) || 0, g = open.get(k);
     if (g && t - g.last <= 30 * 60000) { g.list.push(it); g.last = t; } else { const n = { k, list: [it], last: t }; groups.push(n); open.set(k, n); }
   }
   return groups.map(g => {
@@ -16092,7 +16122,7 @@ function nfTidy(title, body) {
 }
 window.nfTidy = (a, b) => nfTidy(a, b); window.nfPretty = it => nfPretty(it);
 const NF_TYPES = { task: ['☑', 'Tasks'], request: ['📅', 'Requests'], playbook: ['📘', 'Playbook'], activity: ['✎', 'Activity'] };
-const nfAgo = t => { const d = Date.parse(t); if (!d) return ''; const m = Math.max(0, (Date.now() - d) / 60000); return m < 1 ? 'now' : m < 60 ? Math.round(m) + 'm' : m < 1440 ? Math.round(m / 60) + 'h' : m < 1440 * 7 ? Math.round(m / 1440) + 'd' : new Date(d).toLocaleDateString(undefined, { day: 'numeric', month: 'short' }); };
+const nfAgo = t => { const d = tdMs(t); if (!d) return ''; const m = Math.max(0, (Date.now() - d) / 60000); return m < 1 ? 'now' : m < 60 ? Math.round(m) + 'm' : m < 1440 ? Math.round(m / 60) + 'h' : m < 1440 * 7 ? Math.round(m / 1440) + 'd' : new Date(d).toLocaleDateString(undefined, { day: 'numeric', month: 'short' }); };
 function nfOpen(it) {
   markNotificationsRead([it.id]);
   if (it.type === 'task') { closeDrawer(); setView('planner'); if (it.taskId != null) setTimeout(() => window.TDTASKS?.open(it.taskId), 300); }
@@ -16109,7 +16139,7 @@ function drawNotifications() {
   const chips = h('div', { class: 'nf-chips' }, ...[['all', 'All'], ['unread', 'Unread' + (unread ? ' · ' + unread : '')], ...types.map(t => [t, NF_TYPES[t][1]])].map(([v, l]) =>
     h('button', { type: 'button', class: 'nf-chip' + (nfFilter === v ? ' on' : ''), onclick: () => { nfFilter = v; nfShow = 40; drawNotifications(); } }, l)));
   const list = notificationItems.filter(it => nfFilter === 'all' || (nfFilter === 'unread' ? !read.has(it.id) : it.type === nfFilter));
-  const t0 = new Date(); t0.setHours(0, 0, 0, 0); const day = it => { const d = Date.parse(it.time) || 0; return d >= t0.getTime() ? 'Today' : d >= t0.getTime() - 864e5 ? 'Yesterday' : 'Earlier'; };
+  const t0 = new Date(); t0.setHours(0, 0, 0, 0); const day = it => { const d = tdMs(it.time) || 0; return d >= t0.getTime() ? 'Today' : d >= t0.getTime() - 864e5 ? 'Yesterday' : 'Earlier'; };
   const groups = [];
   for (const it of list.slice(0, nfShow)) { const g = day(it); let G = groups.find(x => x.g === g); if (!G) groups.push(G = { g, items: [] }); G.items.push(it); }
   const row = it => { const un = !read.has(it.id), ic = it.icon || (NF_TYPES[it.type] || ['•'])[0], icEl = h('span', { class: 'nf-ic', 'aria-hidden': 'true' }, ic);
@@ -16137,7 +16167,7 @@ async function bellCheck() {
   if (bellBusy || el('app').hidden || (document.hidden && !(window.TDN && TDN.on()))) return;   /* v3.95.0: keeps checking in the background when notifications are on */
   const owner=notificationKey();
   if (notificationOwner !== owner) { notificationOwner=owner; notificationItems=[]; activityError=''; }
-  if (!notificationPermission() && !PERM.can('activity.view')) { notificationItems=[...(window.TDTASKS?TDTASKS.events():[]),...(window.TDPB?TDPB.events():[])].sort((a,b)=>(Date.parse(b.time)||0)-(Date.parse(a.time)||0));bellShow(unreadCount());drawNotifications();try{DETAILS.load();}catch{}return; }
+  if (!notificationPermission() && !PERM.can('activity.view')) { notificationItems=[...(window.TDTASKS?TDTASKS.events():[]),...(window.TDPB?TDPB.events():[])].sort((a,b)=>(tdMs(b.time)||0)-(tdMs(a.time)||0));bellShow(unreadCount());drawNotifications();try{DETAILS.load();}catch{}return; }
   bellBusy=true;
   try {
     if (window.__tdSetP) await window.__tdSetP; else if (!window.__tdSetAt || Date.now() - window.__tdSetAt > 30000) await loadTeamSettings(true);   /* v3.74.1: settings fetched in the last 30 s are reused */
@@ -16148,7 +16178,7 @@ async function bellCheck() {
     }
     if (owner !== notificationKey()) return;
     // Recheck access after asynchronous reads so changed permissions take effect.
-    notificationItems=[...notificationRequestEvents().filter(nfNotMine),...(window.TDTASKS?TDTASKS.events():[]),...(window.TDPB?TDPB.events():[]),...(PERM.can('activity.view')?activity:[])].sort((a,b)=>(Date.parse(b.time)||0)-(Date.parse(a.time)||0));   /* v3.78.0: tasks and playbook too */
+    notificationItems=[...notificationRequestEvents().filter(nfNotMine),...(window.TDTASKS?TDTASKS.events():[]),...(window.TDPB?TDPB.events():[]),...(PERM.can('activity.view')?activity:[])].sort((a,b)=>(tdMs(b.time)||0)-(tdMs(a.time)||0));   /* v3.78.0: tasks and playbook too */
     bellShow(unreadCount());drawNotifications();window.ATT?.renderApprovalRequests();
     try { window.TDN?.items(notificationItems, notificationReads(), it => { try { nfOpen(it); } catch { openBell(); } }); } catch { }
   } catch(e) { activityError='Notifications could not be refreshed: '+e.message;drawNotifications(); }
@@ -20556,6 +20586,8 @@ html body header.top .sk-btn.merged.live svg { animation:skb 1.8s ease-in-out in
 .sk-hours { display:flex; align-items:flex-end; gap:3px; height:64px; margin:4px 0 2px; } .sk-hours i { flex:1; background:#bfe9da; border-radius:4px 4px 0 0; min-height:2px; } .sk-hours i.top { background:#10a37f; }
 .sk-hl { display:flex; justify-content:space-between; font-size:10.5px; color:var(--ink-3); margin-bottom:12px; }
 .sk-sub { font-size:12px; font-weight:700; color:var(--ink-2); margin:14px 0 6px; }
+.sk-zrow { display:flex; align-items:center; gap:10px; flex-wrap:wrap; font-size:12px; font-weight:600; color:var(--ink-2); } .sk-zrow .sk-seg { margin:0; }
+.sk-hint { font-size:11.5px; font-weight:600; color:#0b6b4f; min-height:14px; } .sk-hint.bad { color:#c0392b; }
 .sk-err { color:#c0392b; font-size:12.5px; min-height:1px; }
 </style>
 <script>
@@ -20571,29 +20603,40 @@ html body header.top .sk-btn.merged.live svg { animation:skb 1.8s ease-in-out in
   const friendly = e => { const m = String(e && e.message || e || ''); const k = Object.keys(E).find(x => m.includes(x)); if (k) return E[k]; if (/td_sick|schema cache|Could not find/i.test(m)) return 'The sickroom is not set up yet: the super admin needs to run sickroom.sql in Supabase.'; return m || 'Something went wrong.'; };
   const esc = v => String(v == null ? '' : v).replace(/[&<>"']/g, c => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' })[c]);
   const ini = n => String(n || '?').trim().split(/\s+/).slice(0, 2).map(x => x[0]).join('').toUpperCase();
-  const tm = d => new Date(d).toLocaleTimeString([], { hour: 'numeric', minute: '2-digit' });
-  const dayLbl = d => { const x = new Date(d), t = new Date(); const k = x.toDateString(); if (k === t.toDateString()) return 'Today'; const y = new Date(t); y.setDate(t.getDate() - 1); if (k === y.toDateString()) return 'Yesterday'; return x.toLocaleDateString([], { weekday: 'short', day: 'numeric', month: 'short' }); };
+  /* v3.102.2: every time is entered and shown in Eastern time (the dashboard's time), whatever time zone this computer is set to */
+  const istParts = d => tzParts(new Date(d).getTime()), dayStart = (ms, back) => { const p = tzParts(ms); return tzFromWall(p.y, p.m, p.d - (back || 0)); };
+  const tm = d => { const p = istParts(d); return (p.h % 12 || 12) + ':' + String(p.mi).padStart(2, '0') + ' ' + (p.h < 12 ? 'AM' : 'PM'); };
+  const istDay = d => { const p = istParts(d); return Date.UTC(p.y, p.m, p.d); };   /* the Eastern date, as a UTC midnight */
+  const dayLbl = d => { const k = istDay(d), t = istDay(Date.now()); if (k === t) return 'Today'; if (k === t - 86400000) return 'Yesterday'; return new Date(k).toLocaleDateString([], { weekday: 'short', day: 'numeric', month: 'short', timeZone: 'UTC' }); };
   const dur = ms => { const m = Math.max(0, Math.round(ms / 60000)); if (m < 60) return m + ' min'; const h = Math.floor(m / 60), r = m % 60; return h + ' h' + (r ? ' ' + r + ' min' : ''); };
   const clock = ms => { const s = Math.max(0, Math.floor(ms / 1000)), h = Math.floor(s / 3600), m = Math.floor(s % 3600 / 60), ss = s % 60; return (h ? h + ':' + String(m).padStart(2, '0') : m) + ':' + String(ss).padStart(2, '0'); };
   const lenOf = v => (v.end ? Date.parse(v.end) : Date.now()) - Date.parse(v.start);
   const people = () => { try { const gone = /^(left|moved|inactive|abscond|terminat)/i; return (state.rows || []).map(r => ({ emp: gs(r, 'key_column').trim(), name: gs(r, 'name_column').trim(), client: gs(r, 'client_column').trim(), st: gs(r, 'status_column') })).filter(p => p.emp && p.name && !gone.test(String(p.st).trim())).sort((a, b) => a.name.localeCompare(b.name)); } catch { return []; } };
-  const localIso = (dateStr, timeStr) => { if (!dateStr || !timeStr) return null; const d = new Date(dateStr + 'T' + timeStr); return isNaN(d) ? null : d.toISOString(); };
+  /* v3.102.3: the form can be typed in ET or IST (starts on this computer's zone); it is always saved and shown as ET */
+  if (!SK.zone) SK.zone = /^Asia\/(Kolkata|Calcutta)$/.test(window.TD_LOCAL_TZ || '') ? 'IST' : 'ET';
+  const IST_MS = 330 * 60000;
+  const zParts = (ms, z) => { if (z === 'IST') { const x = new Date(ms + IST_MS); return { y: x.getUTCFullYear(), m: x.getUTCMonth(), d: x.getUTCDate(), h: x.getUTCHours(), mi: x.getUTCMinutes() }; } return tzParts(ms); };
+  const zWall = (z, y, m, d, h, mi) => z === 'IST' ? Date.UTC(y, m, d, h, mi) - IST_MS : tzFromWall(y, m, d, h, mi);
+  const zDate = (ms, z) => { const p = zParts(ms, z); return p.y + '-' + pad(p.m + 1) + '-' + pad(p.d); };
+  const zTime = (ms, z) => { const p = zParts(ms, z); return pad(p.h) + ':' + pad(p.mi); };
+  const zNice = (ms, z) => { const p = zParts(ms, z), wd = new Date(Date.UTC(p.y, p.m, p.d)).toLocaleDateString('en-US', { weekday: 'short', day: 'numeric', month: 'short', timeZone: 'UTC' }); return (p.h % 12 || 12) + ':' + pad(p.mi) + ' ' + (p.h < 12 ? 'AM' : 'PM') + ' ' + z + ' · ' + wd; };
+  const localIso = (dateStr, timeStr) => { if (!dateStr || !timeStr) return null; const [y, m, d] = dateStr.split('-').map(Number), [h, mi] = timeStr.split(':').map(Number); const t = zWall(SK.zone, y, m - 1, d, h, mi); return isNaN(t) ? null : new Date(t).toISOString(); };   /* typed in the zone picked on the form */
   const pad = n => String(n).padStart(2, '0');
-  const today = () => { const d = new Date(); return d.getFullYear() + '-' + pad(d.getMonth() + 1) + '-' + pad(d.getDate()); };
-  const nowT = () => { const d = new Date(); return pad(d.getHours()) + ':' + pad(d.getMinutes()); };
-  const isoT = iso => { const d = new Date(iso); return pad(d.getHours()) + ':' + pad(d.getMinutes()); };
-  const isoD = iso => { const d = new Date(iso); return d.getFullYear() + '-' + pad(d.getMonth() + 1) + '-' + pad(d.getDate()); };
+  const today = () => { const p = istParts(Date.now()); return p.y + '-' + pad(p.m + 1) + '-' + pad(p.d); };
+  const nowT = () => { const p = istParts(Date.now()); return pad(p.h) + ':' + pad(p.mi); };
+  const isoT = iso => { const p = istParts(iso); return pad(p.h) + ':' + pad(p.mi); };
+  const isoD = iso => { const p = istParts(iso); return p.y + '-' + pad(p.m + 1) + '-' + pad(p.d); };
 
   async function load(force) {
     if (!can() || SK.busy) return; if (!force && Date.now() - SK.at < 20000) return;
     SK.busy = true;
     try {
       const days = Math.max(+SK.per || 7, SK.logPer === '30' ? 30 : SK.logPer === '7' ? 7 : 1) + 1;
-      const from = new Date(); from.setHours(0, 0, 0, 0); from.setDate(from.getDate() - days);
+      const from = new Date(dayStart(Date.now(), days));
       const r = await rpc('td_sick_list', { p_from: from.toISOString(), p_to: new Date(Date.now() + 86400000).toISOString() });
       SK.list = Array.isArray(r) ? r : []; SK.openList = SK.list.filter(v => !v.end); SK.at = Date.now(); SK.err = '';
     } catch (e) { SK.err = friendly(e); }
-    SK.busy = false; paintBtn(); if (SK.open) draw();
+    SK.busy = false; paintBtn(); if (SK.open && !SK.form) draw();   /* v3.102.2: never redraw over a form being filled in */
   }
   function ensureBtn() {
     let b = $('skBtn'); if (b) return b;
@@ -20614,17 +20657,17 @@ html body header.top .sk-btn.merged.live svg { animation:skb 1.8s ease-in-out in
   }
   let panel = null;
   function ensurePanel() { if (panel) return panel; panel = document.createElement('div'); panel.id = 'skPanel'; panel.hidden = true; panel.setAttribute('role', 'dialog'); panel.setAttribute('aria-label', 'Sickroom'); document.body.append(panel);
-    document.addEventListener('mousedown', e => { if (SK.open && !panel.contains(e.target) && !$('skBtn')?.contains(e.target) && !(e.target.closest && e.target.closest('.veil, .modal, dialog, .pdlg, #attModalPortal'))) close(); }, true);
+    document.addEventListener('mousedown', e => { if (SK.open && !SK.form && e.isTrusted && e.target && e.target.isConnected && !panel.contains(e.target) && !$('skBtn')?.contains(e.target) && !(e.target.closest && e.target.closest('.veil, .modal, dialog, .pdlg, #attModalPortal'))) close(); }, true);   /* v3.102.2: a form being filled in only closes with × or Cancel */
     return panel; }
   function open(tab) { ensurePanel(); if (tab) SK.tab = tab; SK.open = true; panel.hidden = false; try { window.lvClose && lvClose(); } catch { } draw(); load(true); }
   function close() { if (!panel) return; SK.open = false; panel.hidden = true; SK.form = false; SK.edit = null; }
   window.skOpen = open;
-  window.SKAPI = { can, list: async days => { const f = new Date(); f.setHours(0, 0, 0, 0); f.setDate(f.getDate() - days); const r = await rpc('td_sick_list', { p_from: f.toISOString(), p_to: new Date(Date.now() + 86400000).toISOString() }); return Array.isArray(r) ? r : []; } };
+  window.SKAPI = { can, list: async days => { const f = new Date(dayStart(Date.now(), days)); const r = await rpc('td_sick_list', { p_from: f.toISOString(), p_to: new Date(Date.now() + 86400000).toISOString() }); return Array.isArray(r) ? r : []; } };
 
   function draw() {
     if (!panel) return;
     const n = SK.openList.length;
-    const head = `<button class="sk-x" type="button" data-sk="close" aria-label="Close">×</button><div class="sk-hd"><span class="sk-ic">${ICON}</span><div><h3>Sickroom</h3><small>${n ? n + (n === 1 ? ' person is' : ' people are') + ' in now' : 'Nobody is in right now'}</small></div></div>
+    const head = `<button class="sk-x" type="button" data-sk="close" aria-label="Close">×</button><div class="sk-hd"><span class="sk-ic">${ICON}</span><div><h3>Sickroom</h3><small>${n ? n + (n === 1 ? ' person is' : ' people are') + ' in now' : 'Nobody is in right now'} · times in ET</small></div></div>
       <div class="sk-tabs" role="group">${[['now', 'Now', n], ['log', 'Log', 0], ['ins', 'Insights', 0]].map(([k, l, c]) => `<button type="button" data-sktab="${k}" aria-pressed="${SK.tab === k}">${l}${c ? `<b>${c}</b>` : ''}</button>`).join('')}</div>${SK.err ? `<p class="sk-err">${esc(SK.err)}</p>` : ''}`;
     panel.innerHTML = head + (SK.tab === 'now' ? nowHtml() : SK.tab === 'log' ? logHtml() : insHtml());
     if (SK.form) wireForm();
@@ -20639,15 +20682,22 @@ html body header.top .sk-btn.merged.live svg { animation:skb 1.8s ease-in-out in
   function formHtml() {
     const v = SK.edit ? SK.list.find(x => x.id === SK.edit) : null, P = people();
     return `<div class="sk-form">${v ? `<div class="full"><b>${esc(v.name)}</b> <small style="color:var(--ink-3)">${esc(v.client || '')}</small></div>` : `<label class="full">Employee<input id="skWho" list="skPeople" placeholder="Type a name or Emp code" autocomplete="off"><datalist id="skPeople">${P.map(p => `<option value="${esc(p.name + ' · ' + p.emp)}">${esc(p.client)}</option>`).join('')}</datalist></label>`}
-      <label>Date<input id="skDate" type="date" value="${v ? isoD(v.start) : today()}" max="${today()}"></label>
-      <label>Went in at<input id="skFrom" type="time" value="${v ? isoT(v.start) : nowT()}"></label>
-      <label>Came back at <span style="font-weight:400;color:var(--ink-3)">${v ? '' : '(leave empty if still in)'}</span><input id="skTo" type="time" value="${v && v.end ? isoT(v.end) : ''}"></label>
+      <div class="full sk-zrow"><span>Typing times in</span><div class="sk-seg sk-zseg" role="group" aria-label="Time zone for typing">${[['ET', 'US Eastern (ET)'], ['IST', 'India (IST)']].map(([k, l]) => `<button type="button" data-skz="${k}" aria-pressed="${SK.zone === k}">${l}</button>`).join('')}</div></div>
+      <label>Date <span style="font-weight:400;color:var(--ink-3)">(${SK.zone})</span><input id="skDate" type="date" value="${zDate(v ? Date.parse(v.start) : Date.now(), SK.zone)}" max="${zDate(Date.now(), SK.zone)}"></label>
+      <label>Went in at <span style="font-weight:400;color:var(--ink-3)">(${SK.zone})</span><input id="skFrom" type="time" value="${zTime(v ? Date.parse(v.start) : Date.now(), SK.zone)}"><small class="sk-hint" id="skFromH"></small></label>
+      <label>Came back at <span style="font-weight:400;color:var(--ink-3)">${v ? '(' + SK.zone + ')' : '(' + SK.zone + ', empty if still in)'}</span><input id="skTo" type="time" value="${v && v.end ? zTime(Date.parse(v.end), SK.zone) : ''}"><small class="sk-hint" id="skToH"></small></label>
       <label>Note <span style="font-weight:400;color:var(--ink-3)">(optional)</span><input id="skNote" maxlength="300" value="${v ? esc(v.note || '') : ''}" placeholder="e.g. headache"></label>
-      <div class="sk-act">${v ? `<button type="button" class="sk-btn2" data-skdel="${esc(v.id)}" style="color:#c0392b">Delete</button>` : '<small>Times are in your time zone.</small>'}<button type="button" class="sk-btn2" data-sk="cancel">Cancel</button><button type="button" class="sk-btn2 go" data-sk="save">${v ? 'Save' : 'Start'}</button></div><p class="sk-err full" id="skErr"></p></div>`;
+      <div class="sk-act">${v ? `<button type="button" class="sk-btn2" data-skdel="${esc(v.id)}" style="color:#c0392b">Delete</button>` : '<small>Saved and shown in ET, the dashboard’s time.</small>'}<button type="button" class="sk-btn2" data-sk="cancel">Cancel</button><button type="button" class="sk-btn2 go" data-sk="save">${v ? 'Save' : 'Start'}</button></div><p class="sk-err full" id="skErr"></p></div>`;
   }
-  function wireForm() { const w = $('skWho'); if (w) setTimeout(() => w.focus(), 30); }
+  function hints() {
+    const dt = $('skDate')?.value, other = SK.zone === 'IST' ? 'ET' : 'IST';
+    for (const [inp, out] of [['skFrom', 'skFromH'], ['skTo', 'skToH']]) { const i = $(inp), o = $(out); if (!i || !o) continue; const iso = i.value ? localIso(dt, i.value) : null;
+      if (!iso) { o.textContent = ''; o.classList.remove('bad'); continue; } const ms = Date.parse(iso), fut = ms > Date.now() + 5 * 60000;
+      o.textContent = '= ' + zNice(ms, other) + (fut ? ' · in the future' : ''); o.classList.toggle('bad', fut); }
+  }
+  function wireForm() { const w = $('skWho'); if (w) setTimeout(() => w.focus(), 30); for (const id of ['skDate', 'skFrom', 'skTo']) { const el = $(id); if (el) el.addEventListener('input', hints); } hints(); }
   function logHtml() {
-    const days = SK.logPer === 'today' ? 0 : +SK.logPer, from = new Date(); from.setHours(0, 0, 0, 0); from.setDate(from.getDate() - days);
+    const days = SK.logPer === 'today' ? 0 : +SK.logPer, from = new Date(dayStart(Date.now(), days));
     const L = SK.list.filter(v => v.end && Date.parse(v.start) >= from.getTime()).sort((a, b) => Date.parse(b.start) - Date.parse(a.start));
     let html = `<div class="sk-seg" role="group">${[['today', 'Today'], ['7', '7 days'], ['30', '30 days']].map(([k, l]) => `<button type="button" data-sklog="${k}" aria-pressed="${SK.logPer === k}">${l}</button>`).join('')}</div>`;
     if (!L.length) return html + `<div class="sk-empty">No finished visits ${SK.logPer === 'today' ? 'today' : 'in this period'}.</div>`;
@@ -20657,7 +20707,7 @@ html body header.top .sk-btn.merged.live svg { animation:skb 1.8s ease-in-out in
     return html;
   }
   function insHtml() {
-    const days = +SK.per, from = new Date(); from.setHours(0, 0, 0, 0); from.setDate(from.getDate() - (days - 1));
+    const days = +SK.per, from = new Date(dayStart(Date.now(), days - 1));
     const L = SK.list.filter(v => Date.parse(v.start) >= from.getTime());
     const seg = `<div class="sk-seg" role="group">${[['7', '7 days'], ['30', '30 days'], ['90', '90 days']].map(([k, l]) => `<button type="button" data-skper="${k}" aria-pressed="${SK.per === k}">${l}</button>`).join('')}</div>`;
     if (!L.length) return seg + `<div class="sk-empty">No sickroom visits in the last ${days} days.</div>`;
@@ -20667,7 +20717,7 @@ html body header.top .sk-btn.merged.live svg { animation:skb 1.8s ease-in-out in
       const wk = o.starts.filter(t => t > Date.now() - 7 * 86400000).length; o.flag = wk >= 3 || (days >= 30 && o.n / (days / 30) >= 6) || o.ms / o.n > 45 * 60000; o.why = wk >= 3 ? wk + ' visits this week' : o.ms / o.n > 45 * 60000 ? 'long visits' : 'often'; return o; })
       .sort((a, b) => b.n - a.n || b.ms - a.ms);
     const longest = L.reduce((m, v) => Math.max(m, lenOf(v)), 0);
-    const hrs = new Array(24).fill(0); for (const v of L) hrs[new Date(v.start).getHours()]++;
+    const hrs = new Array(24).fill(0); for (const v of L) hrs[istParts(v.start).h]++;
     const h0 = Math.max(0, hrs.findIndex(x => x) - 1), h1 = Math.min(23, 23 - [...hrs].reverse().findIndex(x => x) + 1), span = hrs.slice(h0, h1 + 1), mx = Math.max(...span);
     const freq = o => o.n < 2 ? 'once' : o.gap < 0.5 ? o.n + '× in one day' : o.gap < 1.5 ? 'almost daily' : 'every ' + Math.round(o.gap) + ' days';
     return seg + `<div class="sk-kpis"><div class="sk-k"><b>${by.size}</b><span>people</span></div><div class="sk-k"><b>${L.length}</b><span>visits</span></div><div class="sk-k"><b>${dur(tot)}</b><span>in total</span></div><div class="sk-k"><b>${dur(tot / L.length)}</b><span>average visit</span></div></div>
@@ -20680,7 +20730,9 @@ html body header.top .sk-btn.merged.live svg { animation:skb 1.8s ease-in-out in
   async function save() {
     const err = $('skErr'); const say = m => { if (err) err.textContent = m; };
     const dt = $('skDate').value, f = $('skFrom').value, t = $('skTo').value, note = $('skNote').value.trim();
-    const st = localIso(dt, f), en = t ? localIso(dt, t) : null; if (!st) return say('Choose the date and the time they went in.');
+    const st = localIso(dt, f); let en = t ? localIso(dt, t) : null; if (!st) return say('Choose the date and the time they went in.');
+    if (en && Date.parse(en) <= Date.parse(st) && Date.parse(st) - Date.parse(en) > 6 * 3600000) en = new Date(Date.parse(en) + 86400000).toISOString();   /* came back after midnight */
+    if (Date.parse(st) > Date.now() + 5 * 60000) return say('That start time is in the future (' + zNice(Date.parse(st), SK.zone === 'IST' ? 'ET' : 'IST') + '). Check the time zone switch above.');
     if (en && Date.parse(en) <= Date.parse(st)) return say('The return time must be after the start time.');
     try {
       if (SK.edit) await rpc('td_sick_edit', { p_id: +SK.edit, p_item: { start: st, end: en || '', note } });
@@ -20703,6 +20755,13 @@ html body header.top .sk-btn.merged.live svg { animation:skb 1.8s ease-in-out in
     if (a === 'form') { SK.form = true; SK.edit = null; return draw(); }
     if (a === 'cancel') { SK.form = false; SK.edit = null; return draw(); }
     if (a === 'save') return save();
+    const zb = t.closest('[data-skz]'); if (zb) { const nz = zb.dataset.skz; if (nz === SK.zone) return;
+      const dt = $('skDate').value, f = $('skFrom').value, to = $('skTo').value, a = f ? localIso(dt, f) : null, b = to ? localIso(dt, to) : null;
+      SK.zone = nz; for (const x of panel.querySelectorAll('[data-skz]')) x.setAttribute('aria-pressed', String(x.dataset.skz === nz));
+      if (a) { $('skDate').value = zDate(Date.parse(a), nz); $('skFrom').value = zTime(Date.parse(a), nz); } if (b) $('skTo').value = zTime(Date.parse(b), nz);
+      $('skDate').max = zDate(Date.now(), nz);
+      for (const lb of panel.querySelectorAll('.sk-form label > span')) lb.textContent = lb.textContent.replace(/\b(ET|IST)\b/, nz);
+      hints(); return; }
     const tb = t.closest('[data-sktab]'); if (tb) { SK.tab = tb.dataset.sktab; SK.form = false; SK.edit = null; return draw(); }
     const lp = t.closest('[data-sklog]'); if (lp) { SK.logPer = lp.dataset.sklog; draw(); return load(true); }
     const pp = t.closest('[data-skper]'); if (pp) { SK.per = pp.dataset.skper; draw(); return load(true); }
@@ -20710,7 +20769,7 @@ html body header.top .sk-btn.merged.live svg { animation:skb 1.8s ease-in-out in
     const ed = t.closest('[data-skedit]'); if (ed) { SK.tab = 'now'; SK.form = true; SK.edit = ed.dataset.skedit; return draw(); }
     const dl = t.closest('[data-skdel]'); if (dl) { if (dl.dataset.armed !== '1') { dl.dataset.armed = '1'; dl.textContent = 'Tap again to delete'; return; } try { await rpc('td_sick_edit', { p_id: +dl.dataset.skdel, p_item: { delete: 'true' } }); SK.form = false; SK.edit = null; toast('Visit deleted.'); await load(true); } catch (x) { const er = $('skErr'); if (er) er.textContent = friendly(x); } }
   });
-  document.addEventListener('keydown', e => { if (e.key === 'Escape' && SK.open) close(); if (e.key === 'Enter' && SK.open && SK.form && e.target.closest && e.target.closest('#skPanel') && e.target.tagName === 'INPUT') { e.preventDefault(); save(); } });
+  document.addEventListener('keydown', e => { if (e.key === 'Escape' && SK.open && !SK.form) close(); if (e.key === 'Enter' && SK.open && SK.form && e.target.closest && e.target.closest('#skPanel') && e.target.tagName === 'INPUT') { e.preventDefault(); save(); } });
   /* live timers every second while the panel is open; the button count every minute */
   setInterval(() => { if (!SK.open || SK.tab !== 'now') return; document.querySelectorAll('#skPanel [data-skt]').forEach(el => { const ms = Date.now() - Date.parse(el.dataset.skt), sm = el.querySelector('small'); el.firstChild.textContent = clock(ms); el.classList.toggle('warn', ms > 1800000 && ms <= 3600000); el.classList.toggle('bad', ms > 3600000); if (sm) sm.textContent = ms > 3600000 ? 'over an hour' : ms > 1800000 ? 'over 30 min' : 'in sickroom'; }); }, 1000);
   setInterval(() => { try { paintBtn(); if (!document.hidden && signedIn() && can()) load(false); } catch { } }, 5000);
@@ -20771,7 +20830,7 @@ html body #pageSummary #cardTrends { grid-area:auto !important; grid-column:1 / 
 
   async function compute() {
     if (!window.ATT || !ATT.entries) return;
-    const now = new Date(), T = Date.UTC(now.getFullYear(), now.getMonth(), now.getDate());
+    const np = tzParts(Date.now()), T = Date.UTC(np.y, np.m, np.d);   /* today, Eastern */
     const E = ATT.entries(T - 119 * DAY, T); if (!E) return;
     const P = new Map(), person = (name, client) => { const k = key(name); let o = P.get(k); if (!o) { o = { name: String(name).trim(), client: client || '', sev: 0, tags: new Set(), why: [] }; P.set(k, o); } if (!o.client && client) o.client = client; return o; };
     const add = (o, sev, tag, text) => { o.sev = Math.max(o.sev, sev); o.tags.add(tag); if (!o.why.includes(text)) o.why.push(text); };
@@ -20806,7 +20865,7 @@ html body #pageSummary #cardTrends { grid-area:auto !important; grid-column:1 / 
       if (w14 >= 3 && w14 >= p28 / 2 * 2 + 1 && w7 < 3) add(o(), 1, 'sick', `Sickroom visits going up: ${w14} in 2 weeks, ${p28} in the 4 weeks before`);
       if (m30.length >= 2 && t30 / m30.length >= 45 * 60000) add(o(), 1, 'sick', `Long sickroom visits: ${mins(t30 / m30.length)} on average (${m30.length} visits)`);
       if (t30 >= 3 * 3600000) add(o(), 1, 'sick', `${mins(t30)} in the sickroom in the last 30 days`);
-      for (const v of vs) { const d = new Date(v.start), base = Date.UTC(d.getFullYear(), d.getMonth(), d.getDate());
+      for (const v of vs) { const pq = tzParts(Date.parse(v.start)), base = Date.UTC(pq.y, pq.m, pq.d);   /* the visit's Eastern date */
         for (const k of [1, 2]) { const c = leaveDay.get(key(v.name) + '|' + (base + k * DAY)); if (c) { add(o(), 1, 'sick', `Sickroom on ${sdl(v.start)}, then ${c} ${k === 1 ? 'the next day' : 'two days later'}`); break; } } }
     }
     /* ---- the team as a whole ---- */
