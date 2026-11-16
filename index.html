@@ -15,7 +15,7 @@
 <meta name="apple-mobile-web-app-title" content="Blasters Deck">
 <meta name="application-name" content="Blasters Deck">
 <meta name="apple-mobile-web-app-status-bar-style" content="default">
-<title>Blasters Deck · 3.97.0</title>
+<title>Blasters Deck · 3.97.1</title>
 <link rel="preconnect" href="https://fonts.googleapis.com"><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin><link href="https://fonts.googleapis.com/css2?family=Public+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet">
 <style>
 :root {
@@ -3743,6 +3743,18 @@ html body .cd-search input.input { flex:1; border:0 !important; background:trans
 .cd-sl { display:flex; justify-content:space-between; gap:10px; font-size:13.5px; padding:2px 0; } .cd-sl em { font-style:normal; color:var(--muted,#6b7280); font-size:12.5px; white-space:nowrap; }
 .cd-err { color:#dc2626; font-size:13px; margin:0; }
 @media (max-width:700px) { html body .pdlg.cd-dlg { width:100vw !important; max-height:100dvh; height:100dvh; border-radius:0 !important; } html body .psn-veil:has(.cd-dlg) { padding:0 !important; align-items:stretch !important; } .cd-list { max-height:none; } }
+/* v3.97.1: why a seat shows SR */
+.bkg-c.why { cursor:help; } .bkg-c.why:hover { outline:2px solid var(--accent,#2563eb); outline-offset:1px; } .bkg-m[data-bkg-why] { cursor:pointer; }
+html body .pdlg.sw-dlg { width:min(980px, calc(100vw - 24px)) !important; max-width:none !important; max-height:calc(100vh - 40px); display:flex; flex-direction:column; }
+html body .pdlg.sw-dlg .pdlg-body { overflow:auto; }
+.sw { display:flex; flex-direction:column; gap:12px; }
+.sw-tips { margin:0; padding:12px 14px 12px 30px; border-radius:12px; background:rgba(37,99,235,.06); font-size:13.5px; line-height:1.5; } .sw-tips li + li { margin-top:4px; }
+.sw-hist { display:flex; flex-direction:column; gap:4px; padding:10px 14px; border-radius:12px; background:var(--surface-2,#f4f6fa); font-size:13px; } .sw-hist div { display:flex; justify-content:space-between; gap:12px; } .sw-hist em { font-style:normal; color:var(--muted,#6b7280); }
+.sw-wrap { overflow:auto; border:1px solid var(--border,#e6e9f0); border-radius:12px; }
+.sw-tbl { width:100%; border-collapse:collapse; font-size:12.5px; } .sw-tbl th { text-align:left; padding:8px 10px; background:var(--surface-2,#f4f6fa); font-size:11.5px; color:var(--muted,#6b7280); white-space:nowrap; }
+.sw-tbl td { padding:7px 10px; border-top:1px solid var(--border,#eef0f5); vertical-align:top; } .sw-tbl tr.hit td { background:rgba(37,99,235,.08); }
+.sw-d { white-space:nowrap; font-weight:600; } .sw-sr { color:#111; font-weight:650; } .sw-none, td.sw-none { color:#b45309; } .sw-ok { color:#047857; } .sw-l { color:#9a3412; }
+.bkg-c[title*="pseudo name dates"] { outline:1.5px dotted #10b981; outline-offset:1px; }
 </style></head>
 
 
@@ -10456,6 +10468,9 @@ function mountBackupReport(body) {
       G = bkGridData(BKR.month, BKR.client, BKR.sub, RG, BKR.names === 'pseudo');
       body.querySelector('#bkrSheet').innerHTML = `<div class="bkg-title">${esc(gTitle)}</div><p class="sm muted" style="text-align:center;margin:-6px 0 10px">${esc(cycRange(BKR.month))} · ${G.people.length} people · billed days = P + H + BR (HD, BR½ and P½ count half)</p>${bkGridLegend()}<div class="bkg-wrap">${bkGridHTML(G, gTitle, BKR.names)}</div>`;
       body.querySelectorAll('[data-bkg-k]').forEach(el => { const go = () => openBackupBox(el.dataset.bkgK, el.dataset.iso, draw); el.addEventListener('click', go); el.addEventListener('keydown', e => { if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); go(); } }); });
+      body.querySelectorAll('[data-bkg-why]').forEach(el => { const go = () => bkSeatWhy(G, +el.dataset.bkgWhy, +el.dataset.j, BKR.names); el.addEventListener('click', go); el.addEventListener('keydown', e => { if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); go(); } }); });
+      /* v3.97.1: the pseudo name dates are read once, then the grid is drawn again with them */
+      if (window.__PSH === undefined && BKR.names === 'pseudo') { window.__PSH = null; BE.readPseudoHistory().then(x => { window.__PSH = x || []; draw(); }).catch(() => { window.__PSH = []; }); }
     }
     /* v3.51.0: calendar view: one block per week (Mon–Fri), each day lists who was on backup, absent or late */
     if (BKR.view === 'rev' && !isRevAdmin()) BKR.view = 'cal';
@@ -10494,7 +10509,7 @@ function bkGridData(cycle, client, sub, range, merge) {
     for (const r of d.byMonth.get(ms) || []) {
       if (!bkPassBase(r, client, sub)) continue;
       const key = personKey(r.name);
-      if (!people.has(key)) people.set(key, { key, name: r.name.trim(), pseudo: bkPseudo(r), client: bkClientOf(r), sub: bkSubOf(r), cells: new Array(days.length).fill(null), total: 0, pass: false });
+      if (!people.has(key)) people.set(key, { key, emp: String(r.empId || ''), name: r.name.trim(), pseudo: bkPseudo(r), client: bkClientOf(r), sub: bkSubOf(r), cells: new Array(days.length).fill(null), total: 0, pass: false });
       const P = people.get(key); if (bkPass(r, client, sub)) P.pass = true; const v = r.days[i], c = v == null ? null : catOf(v), code = v == null ? '' : String(v).trim().toUpperCase();
       let k;
       if (v == null) k = !trackedOn(r, i) ? 'SR' : (w === 0 || w === 6) ? 'L' : 'P';
@@ -10510,11 +10525,12 @@ function bkGridData(cycle, client, sub, range, merge) {
         P.cells[j] = { key, iso, leave: true, t, cls: sp2.bill === 1 ? 'p' : sp2.bill ? 'hd' : 'l', x: 'split ' + (sp2.halves[1] !== 'worked' && sp2.halves[2] !== 'worked' ? 'absf' : sp2.halves[1] !== 'worked' ? 'abs1' : 'abs2'), bill: sp2.bill, title: bkFmtD(iso) + ' · ' + code + ' · ' + bkSplitText(b2, sp2) };
         P.total += sp2.bill; continue; }
       const def = k === 'LIVE' ? ['P', 'p', 1, 'Seat shown live (on leave, shown present to the client)'] : k === 'LIVEH' ? ['P½', 'hd', .5, 'Seat shown live for half the day'] : k === 'BRH' ? ['BR½', 'br', .5, 'Backup for half the day'] : k === 'X' ? [code, 'x', 0, 'Code ' + code] : BKG[k];
-      P.cells[j] = { key, iso, leave: c === 'half' || LEAVE_CATS.has(c) || c === 'applied', t: def[0], cls: def[1], bill: def[2], title: bkFmtD(iso) + ' · ' + (code || (k === 'P' ? 'blank = present' : k === 'L' ? 'week end' : '')) + ' · ' + def[3] + (b && b.b ? ' · ' + b.b : '') };
+      const why = k !== 'SR' ? '' : v == null ? (() => { const dp = departure(r); return dp ? (dp.kind === 'left' ? 'left' + (dp.dated ? ' (last day in the workforce file)' : ' (no last day in the workforce file, so counted as gone from today)') : 'marked “' + dp.kind + '” in the workforce file') : 'not tracked'; })() : 'attendance code “' + code + '”';   /* v3.97.1: why it is SR */
+      P.cells[j] = { key, iso, why, code, leave: c === 'half' || LEAVE_CATS.has(c) || c === 'applied', t: def[0], cls: def[1], bill: def[2], title: bkFmtD(iso) + ' · ' + (code || (k === 'P' ? 'blank = present' : k === 'L' ? 'week end' : '')) + ' · ' + def[3] + (why ? ' (' + why + ')' : '') + (b && b.b ? ' · ' + b.b : '') };
       P.total += def[2];
     }
   });
-  let list = [...people.values()];
+  let list = [...people.values()]; const G_days = days;
   if (merge) {
     /* v3.40.0: pseudo names are seats. When someone leaves and a new person takes the same pseudo name, show one row:
        each day takes the cell of whoever held the seat that day (a working cell beats "seat removed"). */
@@ -10522,9 +10538,17 @@ function bkGridData(cycle, client, sub, range, merge) {
     const score = c => !c ? -1 : c.cls === 'sr' ? 0 : 1 + c.bill;
     list = [...groups.values()].filter(g => g.some(P => P.pass)).map(g => {
       if (g.length === 1) return g[0];
-      const cells = g[0].cells.map((_, j) => g.map(P => P.cells[j]).sort((a, b) => score(b) - score(a))[0]);
+      /* v3.97.1: the pseudo name dates decide who held the seat each day. If that person has no attendance that month,
+         the day counts as a blank (present on a weekday), the same as any blank cell; otherwise the best cell wins as before. */
+      const seat = (g[0].pseudo || '').trim().toLowerCase(), H = (window.__PSH || []).filter(x => String(x.pseudo || '').trim().toLowerCase() === seat);
+      const holderOn = iso => { const x = H.find(e => (!psnDay(e.from) || psnDay(e.from) <= iso) && (!psnDay(e.to) || iso < psnDay(e.to) || (psnDay(e.to) === iso && !H.some(o => o !== e && psnDay(o.from) === iso)))); return x ? g.find(P => (P.emp && String(x.key) === P.emp) || personKey(x.name) === P.key) || { ext: x } : null; };
+      const holders = [];
+      const cells = g[0].cells.map((_, j) => { const iso = isoDate(G_days[j]), hd = H.length ? holderOn(iso) : null; holders[j] = hd ? (hd.ext ? hd.ext.name : hd.name) : '';
+        const best = g.map(P => P.cells[j]).sort((a, b) => score(b) - score(a))[0];
+        if (hd && !hd.ext && !hd.cells[j] && (!best || best.cls === 'sr')) { const we = G_days[j].getUTCDay() % 6 === 0, def = we ? BKG.L : BKG.P; return { key: hd.key, iso, t: def[0], cls: def[1], bill: def[2], viaDates: true, title: bkFmtD(iso) + ' · ' + hd.name + ' held this pseudo name (pseudo name dates) but has no attendance this month · counted as blank = ' + (we ? 'week end' : 'present') }; }
+        return best; });
       const act = g.find(P => P.pass) || g[0];
-      return { ...act, name: g.map(P => P.name).join(' / '), cells, total: cells.reduce((a, c) => a + (c ? c.bill : 0), 0), members: g.map(P => P.name) };
+      return { ...act, name: g.map(P => P.name).join(' / '), cells, total: cells.reduce((a, c) => a + (c ? c.bill : 0), 0), members: g.map(P => P.name), parts: g.map(P => ({ name: P.name, emp: P.emp, cells: P.cells })), holders, hist: H };
     });
   } else {
     /* v3.39.2: real names: a leaver's "seat removed" days are only shown when nobody else has taken their pseudo name */
@@ -10537,12 +10561,44 @@ function bkGridData(cycle, client, sub, range, merge) {
   }
   return { days, people: list.sort((a, b) => (merge ? (a.pseudo || a.name).localeCompare(b.pseudo || b.name) : a.name.localeCompare(b.name))) };
 }
+/* v3.97.1: "why is this seat SR?": day by day, who held the pseudo name (its dates) and what each person's attendance says */
+function bkSeatWhy(G, n, j0, names) {
+  const P = G.people[n]; if (!P) return;
+  const parts = P.parts || [{ name: P.name, emp: P.emp, cells: P.cells }], seat = names === 'pseudo' ? (P.pseudo || P.name) : P.name;
+  const nice = iso => bkFmtD(iso);
+  const desc = c => !c ? ['none', 'no attendance this month'] : c.cls === 'sr' ? ['sr', 'SR · ' + (c.why || 'seat removed')] : c.cls === 'l' ? ['l', c.code ? 'leave / absent (' + c.code + ')' : 'week end'] : ['ok', (c.t || '') + (c.code ? ' (' + c.code + ')' : ' (blank = present)')];
+  /* group consecutive days that look the same */
+  const rows = []; let prev = null;
+  G.days.forEach((dt, j) => {
+    const iso = isoDate(dt), shown = P.cells[j], sig = [shown ? shown.t + shown.cls : '', P.holders ? P.holders[j] : '', ...parts.map(m => desc(m.cells[j]).join(':'))].join('|');
+    if (prev && prev.sig === sig) { prev.to = iso; prev.js.push(j); } else { prev = { sig, from: iso, to: iso, js: [j], shown, holder: P.holders ? P.holders[j] : null, per: parts.map(m => desc(m.cells[j])) }; rows.push(prev); }
+  });
+  const H = P.hist || [];
+  const tbl = h('table', { class: 'sw-tbl' }, h('thead', {}, h('tr', {}, h('th', {}, 'Days'), h('th', {}, 'Shown'), H.length ? h('th', {}, 'Held by (dates)') : null, ...parts.map(m => h('th', {}, m.name)))),
+    h('tbody', {}, ...rows.map(r => h('tr', { class: r.js.includes(j0) ? 'hit' : '' }, h('td', { class: 'sw-d' }, r.from === r.to ? nice(r.from) : nice(r.from) + ' – ' + nice(r.to)),
+      h('td', {}, r.shown ? h('span', { class: 'bkg-c ' + r.shown.cls }, r.shown.t || ' ') : '—'), H.length ? h('td', {}, r.holder || h('span', { class: 'sw-none' }, 'nobody')) : null,
+      ...r.per.map(([k, t]) => h('td', { class: 'sw-' + k }, t))))));
+  const srDays = rows.filter(r => r.shown && r.shown.cls === 'sr');
+  const tips = [];
+  if (srDays.length) {
+    tips.push('SR shows when nobody sharing “' + seat + '” has a working day: everyone is either gone (left / moved in the workforce file), has an SR code, or has no attendance that month.');
+    if (P.parts && !H.length) tips.push('This seat has no pseudo name dates yet, so the report can only use attendance. Open Pseudo names → ⓘ next to “' + seat + '” and set who held it from when.');
+    if (H.length && srDays.some(r => !r.holder)) tips.push('On some SR days nobody held the pseudo name according to its dates: fix the dates in Pseudo names → ⓘ (or Change → Fix the dates).');
+    if (srDays.some(r => r.per.some(([k]) => k === 'sr' && /workforce/.test(r.per.map(x => x[1]).join(' '))))) tips.push('Someone is marked as left / moved in the workforce file: check their status and last working day there.');
+  } else tips.push('No SR days in this period.');
+  if (rows.some(r => r.shown && r.shown.viaDates)) tips.push('Days marked with a dotted border were filled from the pseudo name dates: that person held the seat but has no attendance that month, so the day counts as a blank (present).');
+  const histBox = H.length ? h('div', { class: 'sw-hist' }, h('b', {}, 'Pseudo name dates'), ...H.slice().sort((a, b) => String(psnDay(a.from)).localeCompare(String(psnDay(b.from)))).map(x => h('div', {}, h('span', {}, x.name || x.key), h('em', {}, (psnDay(x.from) ? psnNice(x.from) : 'before the history') + ' → ' + (psnDay(x.to) ? psnNice(x.to) : 'now'))))) : null;
+  psnModal('Why “' + seat + '” shows like this', h('div', { class: 'sw' }, h('ul', { class: 'sw-tips' }, ...tips.map(t => h('li', {}, t))), histBox, h('div', { class: 'sw-wrap' }, tbl)),
+    [h('span', { class: 'grow' }), window.openPseudoNames && P.parts ? h('button', { class: 'btn', type: 'button', onclick: () => { document.querySelectorAll('.psn-veil').forEach(v => v.remove()); try { psnHistory(seat, () => { window.__PSH = undefined; }); } catch { } } }, 'Fix the dates') : null]);
+  [...document.querySelectorAll('.psn-veil')].pop()?.querySelector('.pdlg')?.classList.add('sw-dlg');
+}
+window.bkSeatWhy = bkSeatWhy;
 function bkGridHTML(G, title, names, forCopy) {
   const inl = forCopy ? { p: 'background:#c6f7c6;border:1px solid #4caf50', hd: 'background:#ffff66;border:1px solid #c9b600', h: 'background:#1ee3ef;border:1px solid #0aa', br: 'background:#8bc34a;border:1px solid #5b8f22;color:#fff', sr: 'background:#111;color:#fff;border:1px solid #111', l: 'background:#ff8a8a;border:1px solid #e06666', x: 'background:#eee;border:1px solid #bbb' } : null;
-  const cellIn = c => !c ? '' : forCopy ? `<span style="display:inline-block;min-width:22px;padding:2px 3px;font-weight:700;font-size:11px;${inl[c.cls]}">${esc(c.t) || '&nbsp;'}</span>` : `<span class="bkg-c ${c.cls}${c.x ? ' ' + c.x : ''}${c.leave && canBackup() ? ' ed' : ''}" title="${esc(c.title)}${c.leave && canBackup() ? ' · click to set the backup' : ''}"${c.leave && canBackup() ? ` data-bkg-k="${esc(c.key)}" data-iso="${c.iso}" role="button" tabindex="0"` : ''}>${esc(c.t)}</span>`;
+  const cellIn = (c, n, j) => !c ? '' : forCopy ? `<span style="display:inline-block;min-width:22px;padding:2px 3px;font-weight:700;font-size:11px;${inl[c.cls]}">${esc(c.t) || '&nbsp;'}</span>` : `<span class="bkg-c ${c.cls}${c.x ? ' ' + c.x : ''}${c.leave && canBackup() ? ' ed' : ''}${c.cls === 'sr' || c.viaDates ? ' why' : ''}" title="${esc(c.title)}${c.leave && canBackup() ? ' · click to set the backup' : c.cls === 'sr' ? ' · click to see why' : ''}"${c.leave && canBackup() ? ` data-bkg-k="${esc(c.key)}" data-iso="${c.iso}" role="button" tabindex="0"` : c.cls === 'sr' || c.viaDates ? ` data-bkg-why="${n}" data-j="${j}" role="button" tabindex="0"` : ''}>${esc(c.t)}</span>`;
   const td = forCopy ? ' style="border:1px solid #dce3ed;padding:4px;text-align:center"' : '', th = forCopy ? ' style="border:1px solid #dce3ed;padding:4px;background:#f1f3f7;text-align:center;font-size:11px"' : '';
   const head = `<tr><th${th}>Sr.<br>No.</th><th${forCopy ? ' style="border:1px solid #dce3ed;padding:4px 8px;background:#f1f3f7;text-align:left"' : ' class="nm"'}>Name</th>${G.days.map(dt => `<th${th} class="${dt.getUTCDay() % 6 === 0 ? 'we' : ''}"><span class="wd">${WEEKDAYS[dt.getUTCDay()]}</span>${forCopy ? '<br>' : ''}<b>${dt.getUTCDate()}</b></th>`).join('')}<th${th}>Total<br>Billed<br>Days</th></tr>`;
-  const body = G.people.map((P, n) => `<tr><td${td}>${n + 1}</td><td${forCopy ? ' style="border:1px solid #dce3ed;padding:4px 8px;white-space:nowrap"' : ' class="nm"'}>${esc(names === 'pseudo' ? P.pseudo : P.name)}${!forCopy && P.members ? ` <span class="bkg-m" title="One seat, shared by: ${esc(P.members.join(', '))}">⇄ ${P.members.length}</span>` : ''}</td>${P.cells.map(c => `<td${td}>${cellIn(c)}</td>`).join('')}<td${td}><b>${fmt(P.total)}</b></td></tr>`).join('');
+  const body = G.people.map((P, n) => `<tr><td${td}>${n + 1}</td><td${forCopy ? ' style="border:1px solid #dce3ed;padding:4px 8px;white-space:nowrap"' : ' class="nm"'}>${esc(names === 'pseudo' ? P.pseudo : P.name)}${!forCopy && P.members ? ` <span class="bkg-m" title="One seat, shared by: ${esc(P.members.join(', '))} · click to see who held it each day" data-bkg-why="${n}" data-j="-1" role="button" tabindex="0">⇄ ${P.members.length}</span>` : ''}</td>${P.cells.map((c, j) => `<td${td}>${cellIn(c, n, j)}</td>`).join('')}<td${td}><b>${fmt(P.total)}</b></td></tr>`).join('');
   return `${forCopy ? `<p style="font:bold 14px Segoe UI,Arial,sans-serif;text-align:center">${esc(title)}</p>` : ''}<table class="bkg" ${forCopy ? 'style="border-collapse:collapse;font:12px Segoe UI,Arial,sans-serif"' : ''}><thead>${head}</thead><tbody>${body || `<tr><td colspan="${G.days.length + 3}">No one in this selection.</td></tr>`}</tbody></table>`;
 }
 const bkGridLegend = () => `<div class="bkg-legend">${[['p', 'P', 'Present'], ['hd', 'HD', 'Half Day'], ['h', 'H', 'Holiday'], ['br', 'BR', 'Backup Recruiter'], ['sr', 'SR', 'Seat Remove'], ['l', '', 'Leave / Absent / Week End'], ['p split abs2', 'P', 'Split day: halves covered by backup / seat shown live (A1 / A2 = absent 1st / 2nd half, A = absent all day)']].map(([c, t, l]) => `<span><span class="bkg-c ${c}">${t}</span>${l}</span>`).join('')}</div>`;
@@ -11800,7 +11856,7 @@ async function poll() {
 }
 
 /* ============================== filtering ============================== */
-const APP = { title: "Blasters Deck", version: "3.97.0", released: "2026-11-16" };
+const APP = { title: "Blasters Deck", version: "3.97.1", released: "2026-11-16" };
 const BASE_DIMS = { status: "status_column", desig: "designation_column", client: "client_column", mode: "mode_column" };
 const STANDARD_STATUSES = ["Active", "Manager", "OJT", "Bench", "New", "Projected", "Left", "Moved"];
 const TILE_ORDER = ["Active", "Manager", "OJT", "Bench", "New", "Projected"];
@@ -14370,7 +14426,7 @@ async function psnHistory(name, after) {
   });
   save.addEventListener("click", async () => {
     save.disabled = true; save.textContent = "Saving…";
-    try { await BE.pseudoHistoryEdit([...edits.entries()].map(([x, e]) => ({ pseudo: x.pseudo, key: x.key, from: x.from, to: x.to, newFrom: e.from, newTo: e.to }))); toast("Dates saved."); m.close(); after && after(); }
+    try { await BE.pseudoHistoryEdit([...edits.entries()].map(([x, e]) => ({ pseudo: x.pseudo, key: x.key, from: x.from, to: x.to, newFrom: e.from, newTo: e.to }))); window.__PSH = undefined; toast("Dates saved."); m.close(); after && after(); }
     catch (e) { toast(e.message, true); save.disabled = false; save.textContent = "Save dates"; }
   });
   body.replaceChildren(
@@ -14410,7 +14466,7 @@ async function openPseudoNames(focusId, host) {   /* v3.81.0: host = draw inside
   function drawTabs() {
     tabs.replaceChildren(...[["current", "Pseudo names"], ["history", "History" + (hist ? " · " + hist.length : "")]].map(([k, l]) => h("button", { type: "button", "aria-pressed": String(tab === k), onclick: () => { tab = k; drawTabs(); drawList(); } }, l)));
   }
-  const reloadHist = async () => { hist = null; drawTabs(); try { hist = await BE.readPseudoHistory(); } catch { hist = []; } drawTabs(); drawList(); };
+  const reloadHist = async () => { hist = null; drawTabs(); try { hist = await BE.readPseudoHistory(); } catch { hist = []; } window.__PSH = hist; drawTabs(); drawList(); };
   const since = (p, id) => { const x = (hist || []).find(y => y.pseudo && y.pseudo.toLowerCase() === p.toLowerCase() && y.key === String(id) && !y.to); return x ? psnDay(x.from) : ""; };
   const iBtn = name => h("button", { class: "psn-i", type: "button", title: "History of " + name, "aria-label": "History of " + name, onclick: e => { e.stopPropagation(); psnHistory(name, reloadHist); } }, "i");
   const dateIn = (lbl, v) => { const i = h("input", { class: "input psn-date", type: "date", value: v || psnToday(), max: psnToday(), "aria-label": lbl }); return { i, el: h("label", { class: "psn-dl" }, h("small", {}, lbl), i) }; };
@@ -14730,10 +14786,11 @@ async function openPseudoNames(focusId, host) {   /* v3.81.0: host = draw inside
     const vacantBox = h("div", { class: "cd-panel cd-note" }, h("p", {}, r0 ? nm(r0) + " will have no pseudo name, and “" + s.name + "” becomes free to give to someone later." : ""));
     const panel = h("div", {});
     /* what to do */
-    const OPTS = r0 ? [["give", "👤", "Give “" + s.name + "” to someone else", nm(r0) + " stops using it"], ["rename", "✏️", "Give " + nm(r0) + " a different name", "Choose a vacant name or a new one"], ["vacant", "○", "Make “" + s.name + "” vacant", nm(r0) + " will have no pseudo name"]] : [];
+    const OPTS = r0 ? [["give", "👤", "Give “" + s.name + "” to someone else", nm(r0) + " stops using it"], ["rename", "✏️", "Give " + nm(r0) + " a different name", "Choose a vacant name or a new one"], ["vacant", "○", "Make “" + s.name + "” vacant", nm(r0) + " will have no pseudo name"], ...(admin ? [["dates", "📅", "Only fix the dates", "Correct when " + nm(r0) + " (or someone before) had “" + s.name + "”"]] : [])] : [];
     const optBox = h("div", { class: "cd-opts", role: "radiogroup" });
     const paintOpts = () => optBox.replaceChildren(...OPTS.map(([k, ic, t, d]) => h("button", { type: "button", class: "cd-o" + (mode === k ? " on" : ""), role: "radio", "aria-checked": String(mode === k), onclick: () => { mode = k; paintOpts(); paint(); } }, h("span", { class: "cd-oi" }, ic), h("span", {}, h("b", {}, t), h("small", {}, d)))));
     paintOpts();
+    optBox.addEventListener("click", e => { if (mode === "dates") { m.close(); psnHistory(s.name, () => reloadHist()); } });
     const summary = h("div", { class: "cd-sum" }), err = h("p", { class: "cd-err", role: "alert" });
     const save = h("button", { class: "btn primary", type: "button" }, "Save");
     const newName = () => rnSel.value === NEW ? rnNew.value.trim() : rnSel.value;
