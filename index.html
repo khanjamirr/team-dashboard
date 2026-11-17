@@ -15,7 +15,7 @@
 <meta name="apple-mobile-web-app-title" content="Blasters Deck">
 <meta name="application-name" content="Blasters Deck">
 <meta name="apple-mobile-web-app-status-bar-style" content="default">
-<title>Blasters Deck · 3.108.0</title>
+<title>Blasters Deck · 3.108.1</title>
 <link rel="preconnect" href="https://fonts.googleapis.com"><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin><link href="https://fonts.googleapis.com/css2?family=Public+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet">
 <style>
 :root {
@@ -9263,7 +9263,9 @@ const needsApproval = () => !!(window.PERM && PERM.online() && !can('att.direct'
 /* v3.100.0: one way to record attendance for everyone. Late, remote, cab and other non-leave codes go straight into the
    tracker. Leave (AL, CL, SL, UL, half days) from someone without "Record leave without approval" goes in as LA (pending)
    and a request carries the type they asked for; an approver turns it into the leave or RJ from the Leaves pill. */
-const needsLA = code => needsApproval() && LEAVE_CATS.has(catOf(code));
+/* v3.108.1: leave goes straight into attendance for everyone, unless an admin switches “Leave needs approval” on (team setting leave_approval) */
+const leaveApprovalOn = () => !!((window.TD_SETTINGS || {}).leave_approval === true);
+const needsLA = code => leaveApprovalOn() && needsApproval() && LEAVE_CATS.has(catOf(code));
 let LA_WRITE = false;
 const laCovered = () => { const out = new Set(); for (const r of reqList()) if (r.status === 'pending' && r.inTracker) for (const d of r.dates || []) out.add((r.key || personKey(r.name)) + '|' + d); return out; };
 function writeLA(p, dates, back) {   /* put LA (or back: clear / RJ) on the request's dates that are still LA or empty */
@@ -12179,7 +12181,7 @@ async function poll() {
 }
 
 /* ============================== filtering ============================== */
-const APP = { title: "Blasters Deck", version: "3.108.0", released: "2026-11-17" };
+const APP = { title: "Blasters Deck", version: "3.108.1", released: "2026-11-17" };
 const BASE_DIMS = { status: "status_column", desig: "designation_column", client: "client_column", mode: "mode_column" };
 const STANDARD_STATUSES = ["Active", "Manager", "OJT", "Bench", "New", "Projected", "Left", "Moved"];
 const TILE_ORDER = ["Active", "Manager", "OJT", "Bench", "New", "Projected"];
@@ -20457,6 +20459,7 @@ window.bdSearch = (() => {
 /* v3.96.0: "What's new" once per person after each update (remembered in the database); again from More or the bell */
 window.bdWhatsNew = (() => {
   const NOTES = [
+    { v: '3.108.1', items: [['⚡', 'Leave goes straight in', 'Leave is recorded straight into attendance for everyone and shows in Who is out; admins can switch approval back on in the Leaves panel.']] },
     { v: '3.108.0', items: [['✉', 'Client remarks for emails', 'Admins can add a separate remark for the client email in the backup box; only admins see it, and internal remarks never go into client copies.']] },
     { v: '3.107.0', items: [['⏭', 'Skip the backup for now', 'Record leave first and set backups later: one box comes up at the time an admin sets (with its time zone) listing everyone still missing a backup.']] },
     { v: '3.106.0', items: [['💡', 'Fun fact of the day', 'A new fun fact on the Overview every day; tap “Another” for more.']] },
@@ -20679,17 +20682,22 @@ html body #pageSummary.ov.no-req.has-tasks { grid-template-columns:repeat(3,minm
     const rq = $('ovRequests'); if (!rq) return null;
     panel = document.createElement('div'); panel.id = 'lvPanel'; panel.hidden = true; panel.setAttribute('role', 'dialog'); panel.setAttribute('aria-label', 'Leaves');
     const x = document.createElement('button'); x.className = 'lv-x'; x.type = 'button'; x.setAttribute('aria-label', 'Close'); x.textContent = '×'; x.onclick = () => close();
-    panel.append(x, rq); document.body.append(panel);
+    /* v3.108.1: admins choose whether leave needs approval (off = recorded straight away, shown in Who is out) */
+    const sw = document.createElement('div'); sw.className = 'lv-appr'; sw.hidden = true;
+    sw.innerHTML = '<span>Leave needs approval</span><button type="button" role="switch" aria-checked="false" class="lv-sw"><i></i></button>';
+    sw.querySelector('button').onclick = async () => { const on = !((window.TD_SETTINGS || {}).leave_approval === true); try { await saveTeamSetting('leave_approval', on, { name: 'Leave', text: on ? 'Leave needs approval: on' : 'Leave needs approval: off (recorded straight away)' }); toast(on ? 'Leave now waits for approval (saved as LA).' : 'Leave is now recorded straight away and shows in Who is out.'); } catch (e) { toast('Could not change it: ' + e.message, true); } paintSw(); };
+    panel.append(x, sw, rq); document.body.append(panel);
     const t = $('requestCenterTitle'); if (t) t.textContent = 'Leaves';
     $('pageSummary')?.classList.add('no-req');
     return panel;
   }
+  function paintSw() { const sw = panel && panel.querySelector('.lv-appr'); if (!sw) return; sw.hidden = !(window.PERM && PERM.isSuper()); const on = (window.TD_SETTINGS || {}).leave_approval === true; sw.querySelector('button').setAttribute('aria-checked', String(on)); sw.querySelector('span').textContent = 'Leave needs approval: ' + (on ? 'On' : 'Off'); }
   function close() { if (!panel || panel.hidden) return; panel.hidden = true; $('lvPill')?.setAttribute('aria-expanded', 'false'); document.removeEventListener('mousedown', outside, true); }
   const outside = e => { if (panel && !panel.contains(e.target) && !$('lvPill')?.contains(e.target) && !(e.target.closest && e.target.closest('.modal, .modal-bg, dialog, .pdlg, .ovl, #attHost, [role="dialog"]:not(#lvPanel)'))) close(); };
   function open(tab) {
     const p = ensurePanel(); if (!p) return;
     try { if (typeof OV !== 'undefined' && tab) OV.rc = tab; } catch { }
-    p.hidden = false; $('lvPill')?.setAttribute('aria-expanded', 'true');
+    p.hidden = false; $('lvPill')?.setAttribute('aria-expanded', 'true'); paintSw();
     try { window.organizeRequests && organizeRequests(); } catch (e) { console.error(e); }
     setTimeout(() => document.addEventListener('mousedown', outside, true), 0);
   }
@@ -20869,6 +20877,12 @@ html body .ovx-t.dx .dx-mix { height:5px; }
 html body .ovx-t.dx .dx-act { font-size:11.5px; padding-top:2px; }
 html body .ovx-t.dx.dx-violet, html body .ovx-t.dx.dx-peach, html body .ovx-t.dx.dx-rose, html body .ovx-t.dx.dx-amber, html body .ovx-t.dx.dx-teal, html body .ovx-t.dx.dx-blue { border-bottom-width:2px !important; }
 .ovx-fact { padding:7px 12px !important; margin-bottom:10px !important; font-size:12.5px !important; } .ovx-fact .fi { font-size:15px !important; }
+
+.lv-appr { display:flex; align-items:center; justify-content:space-between; gap:10px; margin:0 40px 10px 0; padding:8px 12px; border-radius:12px; background:var(--surface-2,#f4f6f9); font-size:12.5px; font-weight:600; color:var(--ink-2); }
+.lv-appr[hidden] { display:none; }
+.lv-sw { width:40px; height:22px; border-radius:11px; border:0; background:#cbd2dc; position:relative; cursor:pointer; padding:0; flex:none; }
+.lv-sw i { position:absolute; top:3px; left:3px; width:16px; height:16px; border-radius:50%; background:#fff; transition:left .15s; }
+.lv-sw[aria-checked="true"] { background:#10a37f; } .lv-sw[aria-checked="true"] i { left:21px; }
 #skPanel { position:fixed; z-index:60; top:64px; right:16px; width:min(520px, calc(100vw - 24px)); max-height:min(80vh, 760px); overflow:auto; background:var(--surface,#fff); color:var(--ink); border:1px solid var(--border,#e3e6ec); border-radius:18px; box-shadow:0 24px 60px -12px rgba(15,23,42,.28), 0 2px 8px rgba(15,23,42,.08); padding:16px 18px 18px; }
 #skPanel[hidden] { display:none; }
 @media (max-width:760px) { #skPanel { top:auto; bottom:0; left:0; right:0; width:auto; max-height:86vh; border-radius:20px 20px 0 0; z-index:1200; padding-bottom:calc(84px + env(safe-area-inset-bottom)); } }
