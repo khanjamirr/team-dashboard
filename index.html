@@ -15,7 +15,7 @@
 <meta name="apple-mobile-web-app-title" content="Blasters Deck">
 <meta name="application-name" content="Blasters Deck">
 <meta name="apple-mobile-web-app-status-bar-style" content="default">
-<title>Blasters Deck · 3.108.1</title>
+<title>Blasters Deck · 3.108.2</title>
 <link rel="preconnect" href="https://fonts.googleapis.com"><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin><link href="https://fonts.googleapis.com/css2?family=Public+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet">
 <style>
 :root {
@@ -9162,7 +9162,7 @@ function openLogLeave(preKey) {
   });
   const plan = () => {
     /* v3.107.2: one remark box only. Leave that goes for approval uses the note to the approver; leave that asks for a backup uses the backup box's comment. */
-    { const c = ($('#l-code', m) || {}).value, w = $('#l-remwrap', m); if (w) { let hide = false; try { const nm = (($('#l-name', m) || {}).value || '').trim(), k = nm ? personKey(nm) : ''; hide = !!c && LEAVE_CATS.has(catOf(c)) && (needsLA(c) || (k && bkRequired(k))); } catch { } w.hidden = hide; } }
+    { const c = ($('#l-code', m) || {}).value, w = $('#l-remwrap', m); if (w) { let hide = false; try { const nm = (($('#l-name', m) || {}).value || '').trim(), k = nm ? personKey(nm) : ''; hide = !!c && needsLA(c);   /* v3.108.2: always there, except when the note to the approver takes its place */ } catch { } w.hidden = hide; } }
     { const c = ($('#l-code', m) || {}).value, on = needsLA(c); const w = $('#l-notewrap', m), n2 = $('#l-lanote', m); if (w) w.hidden = !on; if (n2) n2.hidden = !on; }   /* v3.100.0 */
     const name = $('#l-name', m).value, p = resolvePerson(name), from = new Date($('#l-from', m).value + 'T00:00:00Z'), to = new Date($('#l-to', m).value + 'T00:00:00Z');
     if (!p) return { err: name.trim() ? 'No employee with that name in the workforce file or the tracker.' : 'Pick an employee.' };
@@ -9238,7 +9238,8 @@ function openLogLeave(preKey) {
     const pl = plan(); if (pl.err) return;
     if (!(await confirmOverwrite(pl.p.name, [...overwriteList(pl.p, pl.set.map(x => x.t), pl.code), ...pendingClash(pl.p.key, pl.set.map(x => isoDate(x.t)), pl.code)]))) return;
     /* v3.103.1: the internal remark goes with every day recorded */
-    { const rw = $('#l-remwrap', m), rm = rw && rw.hidden ? '' : (($('#l-remark', m) || {}).value || '').trim(); if (rm && window.tdRemarkSave) { const idn = identityOf(pl.p); tdRemarkSave(pl.set.map(x => ({ emp: String(idn.empId ?? ''), name: idn.name || pl.p.name, day: isoDate(x.t), code: pl.code, text: rm }))); } }
+    const recRemark = (() => { const rw = $('#l-remwrap', m); return rw && rw.hidden ? '' : (($('#l-remark', m) || {}).value || '').trim(); })();
+    { const rm = recRemark; if (rm && window.tdRemarkSave) { const idn = identityOf(pl.p); tdRemarkSave(pl.set.map(x => ({ emp: String(idn.empId ?? ''), name: idn.name || pl.p.name, day: isoDate(x.t), code: pl.code, text: rm }))); } }
     if (needsLA(pl.code)) { const note = ($('#l-note', m) || {}).value || ''; if (note.trim() && window.tdRemarkSave) { const idn = identityOf(pl.p); tdRemarkSave(pl.set.map(x => ({ emp: String(idn.empId ?? ''), name: idn.name || pl.p.name, day: isoDate(x.t), code: 'LA', text: note.trim() }))); } closeModal(); sendLeaveRequest(pl, note); return; }
     closeModal();
     const doLog = val => mutate(`Logged ${pl.code} for ${pl.p.name} · ${pl.set.length} day${pl.set.length === 1 ? '' : 's'} (${longDate(pl.set[0].t)}${pl.set.length > 1 ? ' – ' + longDate(pl.set[pl.set.length - 1].t) : ''})`, () => {
@@ -9249,7 +9250,7 @@ function openLogLeave(preKey) {
     const cat = catOf(pl.code);
     if ((LEAVE_CATS.has(cat)) && bkRequired(pl.p.key)) {
       const days = pl.set.map(x => isoDate(x.t));
-      openBackupBox(pl.p.key, days[0], null, { days, confirm: 'Save backup & record ' + pl.code, collect: async val => { const ok = doLog(val); if (ok !== false && val && val.remark && String(val.remark).trim() && window.tdRemarkSave) { const idn = identityOf(pl.p); tdRemarkSave(pl.set.map(x => ({ emp: String(idn.empId ?? ''), name: idn.name || pl.p.name, day: isoDate(x.t), code: pl.code, text: String(val.remark).trim() }))); } if (ok !== false) { if (renderCard.el) renderCard(renderCard.el); toast('Recorded ' + pl.code + (val ? ' · backup: ' + bkLabel(val) + '.' : ' · backup skipped for now. ' + bkDueWhenTxt().replace(/^./, c => c.toUpperCase()) + ' you’ll get one box to set all missing backups.')); } } });
+      openBackupBox(pl.p.key, days[0], null, { days, prefill: recRemark, confirm: 'Save backup & record ' + pl.code, collect: async val => { const ok = doLog(val); if (ok !== false && val && val.remark && String(val.remark).trim() && String(val.remark).trim() !== recRemark && window.tdRemarkSave) { const idn = identityOf(pl.p); tdRemarkSave(pl.set.map(x => ({ emp: String(idn.empId ?? ''), name: idn.name || pl.p.name, day: isoDate(x.t), code: pl.code, text: String(val.remark).trim() }))); } if (ok !== false) { if (renderCard.el) renderCard(renderCard.el); toast('Recorded ' + pl.code + (val ? ' · backup: ' + bkLabel(val) + '.' : ' · backup skipped for now. ' + bkDueWhenTxt().replace(/^./, c => c.toUpperCase()) + ' you’ll get one box to set all missing backups.')); } } });
       return;
     }
     doLog(null);
@@ -10349,7 +10350,7 @@ function openBackupBox(pKey, iso, onDone, opts = {}) {
       </div>
       ${nmMode === 'off' ? '' : `<label id="bkx-pwrap" ${curK === 'no' ? 'style="display:none"' : ''}><span id="bkx-plbl">${curK === 'live' ? 'Taken care of by' : 'Backup person'}</span> <em id="bkx-pem">${nmMode === 'optional' || curK !== 'yes' ? 'optional · pick from the list or type any name (a new person too)' : 'pick from the list or type any name (a new person too)'}</em><input type="text" id="bk-name" list="bk-list" value="${esc(cur && cur.b ? cur.b : '')}" placeholder="${nmMode === 'optional' ? 'Type or pick a name, or leave blank' : 'Type or pick a name'}" autocomplete="off"><datalist id="bk-list">${team.map(t => `<option value="${esc(t.name)}" label="${esc([t.id && 'ID ' + t.id, t.sub, t.out ? 'also off that day' : ''].filter(Boolean).join(' · '))}"></option>`).join('')}</datalist></label>`}
     </div>
-    <label class="bkx-rm" id="bkx-rm" ${opts.collect || curK ? '' : 'hidden'}>${opts.collect ? 'Comments / remarks <em style="color:#c63b3a">required</em>' : 'Remarks <em>optional · copied as written</em>'}<textarea id="bk-rm" rows="2" maxlength="200" placeholder="${opts.collect ? 'Write a comment' : 'Optional note'}">${esc(bkRemark(pKey, iso))}</textarea></label>
+    <label class="bkx-rm" id="bkx-rm" ${opts.collect || curK ? '' : 'hidden'}>${opts.collect ? 'Comments / remarks <em style="color:#c63b3a">required</em>' : 'Remarks <em>optional · copied as written</em>'}<textarea id="bk-rm" rows="2" maxlength="200" placeholder="${opts.collect ? 'Write a comment' : 'Optional note'}">${esc(opts.prefill || bkRemark(pKey, iso))}</textarea></label>
     ${window.PERM && PERM.isSuper() && window.tdClientRemarkOf ? `<label class="bkx-rm bkx-crm">✉ Client remark <em>for the client email only · only admins see this</em><textarea id="bk-crm" rows="2" maxlength="300" placeholder="What the client should read, e.g. Covered by the team; no impact">${esc(tdClientRemarkOf(name, iso))}</textarea></label>` : ''}
     ${bkPrevHtml(pKey, opts.days && opts.days.length ? opts.days : [iso], opts.collect || curK)}
     <div class="err" id="bk-err"></div>`,
@@ -12181,7 +12182,7 @@ async function poll() {
 }
 
 /* ============================== filtering ============================== */
-const APP = { title: "Blasters Deck", version: "3.108.1", released: "2026-11-17" };
+const APP = { title: "Blasters Deck", version: "3.108.2", released: "2026-11-17" };
 const BASE_DIMS = { status: "status_column", desig: "designation_column", client: "client_column", mode: "mode_column" };
 const STANDARD_STATUSES = ["Active", "Manager", "OJT", "Bench", "New", "Projected", "Left", "Moved"];
 const TILE_ORDER = ["Active", "Manager", "OJT", "Bench", "New", "Projected"];
