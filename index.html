@@ -15,7 +15,7 @@
 <meta name="apple-mobile-web-app-title" content="Blasters Deck">
 <meta name="application-name" content="Blasters Deck">
 <meta name="apple-mobile-web-app-status-bar-style" content="default">
-<title>Blasters Deck · 3.108.2</title>
+<title>Blasters Deck · 3.109.0</title>
 <link rel="preconnect" href="https://fonts.googleapis.com"><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin><link href="https://fonts.googleapis.com/css2?family=Public+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet">
 <style>
 :root {
@@ -1917,6 +1917,7 @@ button.ovx-t { cursor:pointer; transition:transform .15s ease; } button.ovx-t:ho
 .ovx-chip { flex:none; border:0; font:inherit; font-size:11.5px; font-weight:650; padding:4px 11px; border-radius:999px; white-space:nowrap; }
 button.ovx-chip { cursor:pointer; } button.ovx-chip:hover { filter:brightness(.96); box-shadow:0 0 0 2px rgba(0,0,0,.06); }
 .ovx-chip.cy { background:#dff1e7; color:#1b6b45; } .ovx-chip.cn { background:#fbe1dd; color:#b4372a; } .ovx-chip.cu { background:var(--ov-chip); color:var(--ov-ink2); }
+.ovx-del { flex:none; width:24px; height:24px; margin-left:4px; border:0; border-radius:50%; background:transparent; color:var(--ov-ink2, #8a8f98); font-size:17px; line-height:1; cursor:pointer; opacity:.45; transition:opacity .15s, background .15s, color .15s; } li:hover > .ovx-del, .ovx-del:focus-visible { opacity:1; } .ovx-del:hover { background:#fbe1dd; color:#b4372a; opacity:1; } @media (hover:none) { .ovx-del { opacity:.8; } }
 .ovx-chip.cl { background:#e3ebff; color:#2948a8; } .ovx-chip.ct { background:#fdf0d5; color:#8a5a00; } .ovx-chip.ca { background:#ece7fb; color:#5b3fc4; }
 .ovx-all { all:unset; cursor:pointer; display:inline-block; margin-top:8px; font-weight:650; color:var(--royal); }
 .ovx-empty { padding:26px 6px; color:var(--ov-ink2); text-align:center; }
@@ -11169,6 +11170,21 @@ function ovCodeMenu(anchor, e, done) {
   });
   m.querySelector('button')?.focus();
 }
+/* v3.109.0: admins can remove a leave (or late mark) straight from Who is out; the day goes back to blank */
+const ovCanDel = e => { try { return !!(window.PERM && PERM.isSuper()) && !!e && !!e.r && e.r.uid != null && e.st !== 'applied' && !!e.v; } catch { return false; } };
+function ovDelLeave(e, done) {
+  if (!ovCanDel(e)) { toast('Only admins can remove a leave.'); return; }
+  const row = S.rows.find(r => r.uid === e.r.uid) || e.r, i = e.dt.getUTCDate() - 1, cur = e.v, who = row.name.trim();
+  const body = document.createElement('div');
+  body.innerHTML = `<p class="set-hint" style="margin:0">Remove <b>${esc(cur)}</b> (${esc(labelOf(cur))}) for <b>${esc(who)}</b> on ${esc(longDate(e.dt))}? The day goes back to blank (present) in attendance.</p>`;
+  const no = document.createElement('button'); no.className = 'btn'; no.type = 'button'; no.textContent = 'Cancel';
+  const yes = document.createElement('button'); yes.className = 'btn danger solid'; yes.type = 'button'; yes.textContent = 'Remove';
+  const d = window.pdlg('Remove leave', body, [no, yes]);
+  no.onclick = () => d.close();
+  yes.onclick = () => { d.close();
+    if (mutate(`${who} · ${longDate(e.dt)}: ${cur} removed`, () => setDay(row, i, ''), { cells: true }) !== false) { toast(`${who}: ${cur} removed on ${longDate(e.dt)}.`); done && done(); } };
+  setTimeout(() => yes.focus(), 0);
+}
 function renderOutCard(el) {
   if (S.status !== 'ready' || !S.ctx) { el.innerHTML = `<div class="ovx-head"><h2>Who is out</h2></div><div class="ovx-empty">${S.status === 'loading' || S.status === 'idle' ? 'Loading attendance…' : 'The attendance workbook isn’t connected yet. <button class="linkbtn" data-att-go="grid">Set it up</button>'}</div>`; el.querySelector('[data-att-go]')?.addEventListener('click', () => go('grid')); return; }
   const R = ovRange(OVP.p), all = ovEntries(R.from, R.to).sort((a, b) => a.iso.localeCompare(b.iso) || a.r.name.localeCompare(b.r.name));
@@ -11194,7 +11210,7 @@ function renderOutCard(el) {
   const pz = OVP.names === 'pseudo', nmOf = r => pz ? (bkPseudo(r) || r.name.trim()) : r.name.trim();
   const more = window.tdMore([`<button type="button" class="btn" data-ov-mail>Email the update</button>`, can('ov.openatt') && can('page.attendance') ? `<button type="button" class="btn" data-att-go="grid">Open attendance</button>` : '', `<button type="button" class="btn" data-att-hist>History &amp; upcoming</button>`, `<hr>`, `<label class="ovx-nsw" title="Show pseudo names instead of real names in this list"><span>Pseudo names</span><input type="checkbox" role="switch" data-ov-names${pz ? ' checked' : ''}><i aria-hidden="true"></i></label>`], "More", "left");
   const rowArr = shown.map((e, ix) => { const [t, c] = OV_ST[e.st], act = ed && ['backup', 'none', 'unset', 'live'].includes(e.st);
-    return `<li><span class="ovx-av">${esc(ini(nmOf(e.r)))}</span><span class="ovx-nm"><b>${esc(nmOf(e.r))}${(() => { const rm = window.tdRemarkOf ? tdRemarkOf(nmOf(e.r), e.iso) : null; return rm ? ` <span class="ovx-rem" title="${esc(rm.text + ' — ' + (rm.by || ''))}">💬</span>` : ''; })()}</b><small>${esc([OVP.p === 'today' ? '' : bkFmtD(e.iso), cl(e.r), dg(e.r)].filter(Boolean).join(' · '))}</small>${(() => { const rm = window.tdRemarkOf ? tdRemarkOf(nmOf(e.r), e.iso) : null; return rm ? `<small class="ovx-remt">“${esc(rm.text.length > 70 ? rm.text.slice(0, 70) + '…' : rm.text)}”</small>` : ''; })()}</span>${e.half ? (pz ? `<span class="ovx-code${ovCanCode(e) ? ' can' : ''}"${ovCanCode(e) ? ` data-ovc="${ix}" role="button" tabindex="0" aria-label="Change the leave type for ${esc(nmOf(e.r))}"` : ''} title="${esc(labelOf(e.v))} in attendance · billed as a half day">HD</span>` : `<span class="ovx-code${ovCanCode(e) ? ' can' : ''}"${ovCanCode(e) ? ` data-ovc="${ix}" role="button" tabindex="0" aria-label="Change the leave type for ${esc(nmOf(e.r))}"` : ''} title="${esc(labelOf(e.v))} · cover set for half a day, billed as a half day">${esc(e.v)}<em class="ovx-half">½ day</em></span>`) : `<span class="ovx-code${ovCanCode(e) ? ' can' : ''}"${ovCanCode(e) ? ` data-ovc="${ix}" role="button" tabindex="0" aria-label="Change the leave type for ${esc(nmOf(e.r))}"` : ''} title="${esc(labelOf(e.v))}">${esc(e.v)}</span>`}${act ? `<button type="button" class="ovx-chip ${c}" data-ovbk="${esc(e.key)}" data-iso="${e.iso}" title="Set or change the backup">${t}</button>` : `<span class="ovx-chip ${c}">${t}</span>`}</li>`; });
+    return `<li><span class="ovx-av">${esc(ini(nmOf(e.r)))}</span><span class="ovx-nm"><b>${esc(nmOf(e.r))}${(() => { const rm = window.tdRemarkOf ? tdRemarkOf(nmOf(e.r), e.iso) : null; return rm ? ` <span class="ovx-rem" title="${esc(rm.text + ' — ' + (rm.by || ''))}">💬</span>` : ''; })()}</b><small>${esc([OVP.p === 'today' ? '' : bkFmtD(e.iso), cl(e.r), dg(e.r)].filter(Boolean).join(' · '))}</small>${(() => { const rm = window.tdRemarkOf ? tdRemarkOf(nmOf(e.r), e.iso) : null; return rm ? `<small class="ovx-remt">“${esc(rm.text.length > 70 ? rm.text.slice(0, 70) + '…' : rm.text)}”</small>` : ''; })()}</span>${e.half ? (pz ? `<span class="ovx-code${ovCanCode(e) ? ' can' : ''}"${ovCanCode(e) ? ` data-ovc="${ix}" role="button" tabindex="0" aria-label="Change the leave type for ${esc(nmOf(e.r))}"` : ''} title="${esc(labelOf(e.v))} in attendance · billed as a half day">HD</span>` : `<span class="ovx-code${ovCanCode(e) ? ' can' : ''}"${ovCanCode(e) ? ` data-ovc="${ix}" role="button" tabindex="0" aria-label="Change the leave type for ${esc(nmOf(e.r))}"` : ''} title="${esc(labelOf(e.v))} · cover set for half a day, billed as a half day">${esc(e.v)}<em class="ovx-half">½ day</em></span>`) : `<span class="ovx-code${ovCanCode(e) ? ' can' : ''}"${ovCanCode(e) ? ` data-ovc="${ix}" role="button" tabindex="0" aria-label="Change the leave type for ${esc(nmOf(e.r))}"` : ''} title="${esc(labelOf(e.v))}">${esc(e.v)}</span>`}${act ? `<button type="button" class="ovx-chip ${c}" data-ovbk="${esc(e.key)}" data-iso="${e.iso}" title="Set or change the backup">${t}</button>` : `<span class="ovx-chip ${c}">${t}</span>`}${ovCanDel(e) ? `<button type="button" class="ovx-del" data-ovdel="${ix}" title="Remove this ${e.st === 'late' ? 'late mark' : 'leave'} (admins only)" aria-label="Remove ${esc(e.v)} for ${esc(nmOf(e.r))}">×</button>` : ''}</li>`; });
   /* v3.100.1: group the list by client, or by client and sub client (kept for this visit only) */
   const gb = OVP.grp || 'none', subOf = r => { try { return bkSubOf(r) || ''; } catch { return ''; } };
   let rows = '';
@@ -11219,6 +11235,7 @@ function renderOutCard(el) {
   el.querySelectorAll('[data-ovg]').forEach(b => b.addEventListener('click', () => { OVP.grp = b.dataset.ovg; renderOutCard(el); }));
   el.querySelector('[data-ov-all]')?.addEventListener('click', () => { OVP.all = !OVP.all; renderOutCard(el); });
   el.querySelectorAll('[data-ovbk]').forEach(b => b.addEventListener('click', () => openBackupBox(b.dataset.ovbk, b.dataset.iso, () => { renderOutCard(el); window.organizeOverview?.(); })));
+  el.querySelectorAll('[data-ovdel]').forEach(b => b.addEventListener('click', ev => { ev.preventDefault(); ev.stopPropagation(); ovDelLeave(shown[+b.dataset.ovdel], () => { renderOutCard(el); window.organizeOverview?.(); }); }));
   /* v3.74.2: click the leave code to change the leave type for that day */
   el.querySelectorAll('[data-ovc]').forEach(b => { const go = ev => { ev.preventDefault(); ev.stopPropagation(); ovCodeMenu(b, shown[+b.dataset.ovc], () => { renderOutCard(el); window.organizeOverview?.(); }); };
     b.addEventListener('click', go); b.addEventListener('keydown', ev => { if (ev.key === 'Enter' || ev.key === ' ') go(ev); }); });
@@ -12182,7 +12199,7 @@ async function poll() {
 }
 
 /* ============================== filtering ============================== */
-const APP = { title: "Blasters Deck", version: "3.108.2", released: "2026-11-17" };
+const APP = { title: "Blasters Deck", version: "3.109.0", released: "2026-11-17" };
 const BASE_DIMS = { status: "status_column", desig: "designation_column", client: "client_column", mode: "mode_column" };
 const STANDARD_STATUSES = ["Active", "Manager", "OJT", "Bench", "New", "Projected", "Left", "Moved"];
 const TILE_ORDER = ["Active", "Manager", "OJT", "Bench", "New", "Projected"];
@@ -14796,6 +14813,7 @@ const pseudoCol = () => ((state.cols || []).find(c => /pseudo/i.test(c.name)) ||
 const psnIsAdmin = () => !window.PERM || !PERM.online() || PERM.isSuper() || PERM.canPsnEdit();   /* v3.81.0: or a role given "manage pseudo names" */
 const psnStatus = r => { const s = gs(r, "status_column").toLowerCase().replace(/\s+/g, "").replace(/&/g, "+"); return /^active\+resign(ed|ation)?$/.test(s) ? "resign" : s === "active" ? "active" : s === "ojt" ? "ojt" : s; };
 const psnEligible = r => ["active", "resign", "ojt"].includes(psnStatus(r));
+const psnPick = r => !!String(gs(r, 'name_column') || '').trim();   /* v3.108.3: any employee can be picked for a pseudo name (live seats are listed first) */
 const psnMaster = () => { const L = (window.TD_SETTINGS || {}).pseudo_names; if (!Array.isArray(L)) return null;
   const seen = new Set(); return L.map(x => typeof x === "string" ? { name: x.trim(), client: "", active: true } : { name: String((x && x.name) || "").trim(), client: String((x && x.client) || "").trim(), sub: String((x && x.sub) || "").trim(), active: !(x && x.active === false) })
     .filter(x => x.name && !seen.has(x.name.toLowerCase()) && seen.add(x.name.toLowerCase())); };
@@ -15083,8 +15101,8 @@ async function openPseudoNames(focusId, host) {   /* v3.81.0: host = draw inside
     const wRes = h("div", { class: "psn-res" });
     const drawWho = () => { const t = wIn.value.trim().toLowerCase();
       if (giveTo) { wRes.replaceChildren(h("div", { class: "psn-opt on" }, h("div", { class: "psn-on" }, h("b", {}, nm(giveTo)), h("span", {}, [giveTo.id, gs(giveTo, "status_column"), cl(giveTo), pv(giveTo) ? "has " + pv(giveTo) + " → it becomes vacant" : ""].filter(Boolean).join(" · "))), h("button", { class: "btn mini", type: "button", onclick: () => { giveTo = null; drawWho(); } }, "Change"))); return; }
-      const ppl = state.rows.filter(x => psnEligible(x) && x.id !== r.id && (!t || (nm(x) + " " + x.id + " " + cl(x)).toLowerCase().includes(t)))
-        .sort((a, b) => ((cl(b) === s.client) - (cl(a) === s.client)) || (!!pv(a) - !!pv(b)) || nm(a).localeCompare(nm(b))).slice(0, 30);
+      const ppl = state.rows.filter(x => psnPick(x) && x.id !== r.id && (!t || (nm(x) + " " + x.id + " " + cl(x)).toLowerCase().includes(t)))
+        .sort((a, b) => (psnEligible(b) - psnEligible(a)) || ((cl(b) === s.client) - (cl(a) === s.client)) || (!!pv(a) - !!pv(b)) || nm(a).localeCompare(nm(b))).slice(0, 500);
       wRes.replaceChildren(...ppl.map(x => h("div", { class: "psn-opt", role: "button", tabindex: "0", onclick: () => { giveTo = x; drawWho(); } },
         h("div", { class: "psn-on" }, h("b", {}, nm(x)), h("span", {}, [x.id, gs(x, "status_column"), cl(x)].filter(Boolean).join(" · "))),
         pv(x) ? h("span", { class: "psn-has" }, "has " + pv(x)) : h("span", { class: "psn-free" }, "no pseudo name")))); };
@@ -15129,15 +15147,15 @@ async function openPseudoNames(focusId, host) {   /* v3.81.0: host = draw inside
     if (to) { to.el.hidden = true; from.i.addEventListener('change', () => { if (to.el.hidden) to.i.value = from.i.value; }); }
     const draw = () => {
       const t = inp.value.trim().toLowerCase();
-      const ppl = state.rows.filter(r => psnEligible(r) && (!s.r || r.id !== s.r.id) && (!t || (nm(r) + " " + r.id + " " + cl(r)).toLowerCase().includes(t)))
-        .sort((a, b) => ((cl(b) === s.client) - (cl(a) === s.client)) || (!!pv(a) - !!pv(b)) || ((psnStatus(a) === "resign") - (psnStatus(b) === "resign")) || nm(a).localeCompare(nm(b))).slice(0, 40);
+      const ppl = state.rows.filter(r => psnPick(r) && (!s.r || r.id !== s.r.id) && (!t || (nm(r) + " " + r.id + " " + cl(r)).toLowerCase().includes(t)))
+        .sort((a, b) => (psnEligible(b) - psnEligible(a)) || ((cl(b) === s.client) - (cl(a) === s.client)) || (!!pv(a) - !!pv(b)) || ((psnStatus(a) === "resign") - (psnStatus(b) === "resign")) || nm(a).localeCompare(nm(b))).slice(0, 500);
       res.replaceChildren(...ppl.map(r => { const has = pv(r), rs = psnStatus(r) === "resign", go = () => tag(s, r, from.i.value, to && (to.el.hidden ? from.i.value : to.i.value));
         return h("div", { class: "psn-opt pk2", role: "button", tabindex: "0", onclick: go, onkeydown: e => { if (e.key === "Enter") go(); } },
           h("span", { class: "pk2-av" }, String(nm(r) || "?").trim().split(/\s+/).slice(0, 2).map(x => x[0]).join("").toUpperCase()),
           h("div", { class: "psn-on" }, h("b", {}, nm(r)), h("span", {}, [r.id, gs(r, "status_column"), cl(r) !== s.client ? cl(r) : ""].filter(Boolean).join(" · "))),
           rs ? h("span", { class: "psn-flag sm" }, "Resigning") : null,
           has ? h("span", { class: "pk2-has", title: "“" + has + "” becomes vacant" }, "has " + has) : h("span", { class: "pk2-free" }, "free")); }),
-        ppl.length ? null : h("p", { class: "hint" }, "No Active, Active + Resign or OJT recruiter matches."));
+        ppl.length ? null : h("p", { class: "hint" }, "No employee matches."));
     };
     inp.addEventListener("input", draw); inp.addEventListener("keydown", e => { if (e.key === "Escape") { editing = null; drawList(); } if (e.key === "Enter") { const b = res.querySelector(".psn-opt"); if (b) b.click(); } });
     draw(); setTimeout(() => inp.focus(), 0);
@@ -15159,14 +15177,14 @@ async function openPseudoNames(focusId, host) {   /* v3.81.0: host = draw inside
       const inp = h("input", { class: "input", type: "search", placeholder: ph, autocomplete: "off" });
       const list = h("div", { class: "cd-list", role: "listbox" }); let chosen = null;
       const draw = () => { const t = inp.value.trim().toLowerCase();
-        const ppl = state.rows.filter(x => psnEligible(x) && !exclude.includes(x.id) && (!t || (nm(x) + " " + x.id + " " + cl(x)).toLowerCase().includes(t)))
-          .sort((a, b) => ((cl(b) === s.client) - (cl(a) === s.client)) || (!!pv(a) - !!pv(b)) || nm(a).localeCompare(nm(b))).slice(0, 50);
+        const ppl = state.rows.filter(x => psnPick(x) && !exclude.includes(x.id) && (!t || (nm(x) + " " + x.id + " " + cl(x)).toLowerCase().includes(t)))
+          .sort((a, b) => (psnEligible(b) - psnEligible(a)) || ((cl(b) === s.client) - (cl(a) === s.client)) || (!!pv(a) - !!pv(b)) || nm(a).localeCompare(nm(b))).slice(0, 500);
         list.replaceChildren(...[...ppl.map(x => { const has = pv(x), on = chosen && chosen.id === x.id;
           return h("button", { type: "button", class: "cd-opt" + (on ? " on" : ""), role: "option", "aria-selected": String(!!on), onclick: () => { chosen = on ? null : x; draw(); onChange(chosen); } },
             h("span", { class: "cd-av" }, on ? "✓" : ini(nm(x))), h("span", { class: "cd-who" }, h("b", {}, nm(x)), h("small", {}, [x.id, gs(x, "status_column"), cl(x) !== s.client ? cl(x) : ""].filter(Boolean).join(" · "))),
             psnStatus(x) === "resign" ? h("span", { class: "cd-tag red" }, "Resigning") : null,
             has ? h("span", { class: "cd-tag" }, "has " + has) : h("span", { class: "cd-tag green" }, "free")); }),
-          ppl.length ? null : h("p", { class: "cd-empty" }, "Nobody matches. Only Active, Active + Resign and OJT recruiters can have a pseudo name.")].filter(Boolean)); };
+          ppl.length ? null : h("p", { class: "cd-empty" }, "Nobody matches.")].filter(Boolean)); };
       inp.addEventListener("input", draw); draw();
       return { el: h("div", { class: "cd-chooser" }, h("label", { class: "cd-search" }, h("span", { "aria-hidden": "true" }, "⌕"), inp), list), focus: () => inp.focus() };
     };
@@ -20460,6 +20478,8 @@ window.bdSearch = (() => {
 /* v3.96.0: "What's new" once per person after each update (remembered in the database); again from More or the bell */
 window.bdWhatsNew = (() => {
   const NOTES = [
+    { v: '3.109.0', items: [['🗑', 'Remove a leave from Who is out', 'Admins see a small × at the end of each row in Who is out. It removes that leave or late mark after a quick check, and the day goes back to blank in attendance. Others don\'t see it.']] },
+    { v: '3.108.3', items: [['🎭', 'Any employee for a pseudo name', 'When you tag, change or replace a pseudo name you can now pick any employee, not only Active, Active + Resign or OJT. Live seats are listed first; Bench, New and Left come after.']] },
     { v: '3.108.1', items: [['⚡', 'Leave goes straight in', 'Leave is recorded straight into attendance for everyone and shows in Who is out; admins can switch approval back on in the Leaves panel.']] },
     { v: '3.108.0', items: [['✉', 'Client remarks for emails', 'Admins can add a separate remark for the client email in the backup box; only admins see it, and internal remarks never go into client copies.']] },
     { v: '3.107.0', items: [['⏭', 'Skip the backup for now', 'Record leave first and set backups later: one box comes up at the time an admin sets (with its time zone) listing everyone still missing a backup.']] },
