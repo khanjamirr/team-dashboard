@@ -15,7 +15,7 @@
 <meta name="apple-mobile-web-app-title" content="Blasters Deck">
 <meta name="application-name" content="Blasters Deck">
 <meta name="apple-mobile-web-app-status-bar-style" content="default">
-<title>Blasters Deck · 3.112.2</title>
+<title>Blasters Deck · 3.112.3</title>
 <link rel="preconnect" href="https://fonts.googleapis.com"><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin><link href="https://fonts.googleapis.com/css2?family=Public+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet">
 <style>
 :root {
@@ -7050,7 +7050,7 @@ async function adopt(ctx, { recover = false } = {}) {
   S.ctx = ctx; S.rows = ctx.rows; S.changes = []; S.undo = []; S.ver++; S.diskChanged = false; S.base = snapshot();
   const d = D(true);
   const has = ms => d.byMonth.has(ms);
-  S.ui.period = S.ui.period && (S.ui.period === 'all' || S.ui.period.startsWith('y:') || has(parseInt(S.ui.period.slice(2), 10))) ? S.ui.period : 'm:' + d.latestMonth;
+  S.ui.period = S.ui.period && (S.ui.period === 'all' || S.ui.period.startsWith('y:') || has(parseInt(S.ui.period.slice(2), 10))) ? S.ui.period : 'm:' + (has(TODAY_MS) ? TODAY_MS : (d.months.filter(m => m <= TODAY_MS).pop() ?? d.latestMonth));   /* v3.112.3: this month, not a month added ahead */
   if (!S.ui.grid.month || !has(S.ui.grid.month)) S.ui.grid.month = has(TODAY_MS) ? TODAY_MS : d.latestMonth;
   if (!has(TODAY_MS) && d.latestMonth != null) S.ui.who.start = isoDate(dateOf(d.latestMonth, 0));   // v3.16: an empty tracker no longer stops the page loading
   if (recover) await restorePendingIfAny();
@@ -7872,6 +7872,28 @@ function weekdayLeaveCard() {
     ${list.length ? `<div style="max-height:440px;overflow:auto;border:1px solid var(--line);border-radius:8px"><table class="rtab" style="width:100%"><thead><tr><th>Employee</th><th class="n" style="text-align:center">Mon</th><th class="n" style="text-align:center">Tue</th><th class="n" style="text-align:center">Wed</th><th class="n" style="text-align:center">Thu</th><th class="n" style="text-align:center">Fri</th><th class="n" style="text-align:center">Total</th><th>Pattern</th></tr></thead><tbody>${rowsHtml}</tbody></table></div>${list.length > 200 ? `<p class="sm muted">Showing the first 200 of ${list.length}. Search to narrow down.</p>` : ''}` : `<div class="empty">${u.only === 'pattern' ? 'Nobody has a clear weekday pattern in this period. Switch “Show” to everyone to see the full breakdown.' : 'No one matches.'}</div>`}
   </div>`;
 }
+/* v3.112.3: everyone's leave for the chosen period, most first, with a search, a sort and a copy */
+const lbUi = () => S.ui.lb || (S.ui.lb = { q: '', sort: 'v', all: false });
+function lbList(ppl) { const u = lbUi(), q = (u.q || '').trim().toLowerCase(), k = u.sort;
+  return ppl.filter(x => (x.v > 0 || x.late > 0 || x.la > 0) && (!q || x.label.toLowerCase().includes(q) || String(x.client || '').toLowerCase().includes(q)))
+    .sort((a, b) => (b[k] - a[k]) || (b.v - a.v) || (b.u - a.u) || a.label.localeCompare(b.label)); }
+function leaderCard(ppl) {
+  const u = lbUi(), L = lbList(ppl), shown = u.all ? L : L.slice(0, 25), mx = Math.max(1, ...L.map(x => x.v));
+  const anyLeave = ppl.filter(x => x.v > 0), tot = anyLeave.reduce((a, x) => a + x.v, 0), avg = anyLeave.length ? tot / anyLeave.length : 0;
+  const sorts = [['v', 'Leave days'], ['u', 'Unplanned / absent'], ['sk', 'Sick'], ['ap', 'Approved'], ['hf', 'Half days'], ['late', 'Late'], ['la', 'Applications']];
+  const n = v => v ? fmt(v) : '<span class="muted">·</span>';
+  const rowsH = shown.map((x, i) => `<tr><td class="n muted">${i + 1}</td><td><button type="button" class="linkbtn" data-act="person" data-k="${esc(x.k)}" style="font-weight:700;text-align:left">${esc(x.label)}</button>${x.client ? `<div class="sm muted">${esc(x.client)}</div>` : ''}</td>
+      <td class="n" style="min-width:120px"><div style="display:flex;align-items:center;gap:8px"><b style="min-width:30px;text-align:right">${fmt(x.v)}</b><div style="flex:1;height:7px;border-radius:4px;background:var(--line);overflow:hidden"><div style="height:100%;width:${Math.round(x.v / mx * 100)}%;background:var(--blue)"></div></div></div></td>
+      <td class="n">${n(x.ap)}</td><td class="n">${n(x.sk)}</td><td class="n"${x.u ? ' style="color:var(--red,#c62828);font-weight:700"' : ''}>${n(x.u)}</td><td class="n">${n(x.hf)}</td><td class="n">${n(x.late)}</td><td class="n">${n(x.la)}</td></tr>`).join('');
+  return `<div class="card" style="margin-bottom:14px"><div style="display:flex;gap:10px;align-items:baseline;flex-wrap:wrap"><h2 style="margin:0">Who took the most leave · ${esc(periodLabel())}</h2>
+<span class="grow"></span>
+      <label class="sm muted">Sort by <select data-bind="lb-sort">${sorts.map(([v, l]) => `<option value="${v}"${u.sort === v ? ' selected' : ''}>${l}</option>`).join('')}</select></label>
+      <input type="search" data-bind="lbq" placeholder="Search a name or client" value="${esc(u.q || '')}" style="width:190px"></div>
+    <div class="sub" style="margin-top:2px">${anyLeave.length ? `<b>${anyLeave.length}</b> ${anyLeave.length === 1 ? 'person' : 'people'} took <b>${fmt(tot)}</b> leave days · <b>${fmt(Math.round(avg * 10) / 10)}</b> each on average. ` : ''}Everyone with leave, late marks or applications in the period, most first. Click a name to see that person.</div>
+    ${L.length ? `<div style="max-height:520px;overflow:auto;border:1px solid var(--line);border-radius:8px;margin-top:8px"><table class="rtab" style="width:100%"><thead><tr><th class="n">#</th><th>Employee</th><th>Leave days</th><th class="n">Approved<br><span class="sm muted">AL, CL</span></th><th class="n">Sick<br><span class="sm muted">SL</span></th><th class="n">Unplanned<br><span class="sm muted">UL, AB</span></th><th class="n">Half days</th><th class="n">Late</th><th class="n">LA</th></tr></thead><tbody>${rowsH}</tbody></table></div>
+      ${L.length > 25 ? `<div style="text-align:center;margin-top:8px"><button class="btn sm" type="button" data-act="lb-all">${u.all ? 'Show the top 25' : 'Show all ' + L.length}</button></div>` : ''}` : `<div class="empty">${u.q ? 'Nobody matches “' + esc(u.q) + '”.' : 'Nothing to show for this selection.'}</div>`}
+  </div>`;
+}
 function reportsView() {
   const d = D(), rows = periodRows(), a = agg(rows), p = S.ui.period, isMonth = p.startsWith('m:');
   const timelineHtml = attTimelineCard(rows), weekdayHtml = weekdayLeaveCard();
@@ -7892,7 +7914,7 @@ function reportsView() {
   ].join('');
 
   const monthly = d.months.map(m => ({ month: m, rows: (d.byMonth.get(m) || []).filter(r => S.ui.client === 'all' || clientGroup(r.client) === S.ui.client) }));
-  const byPerson = new Map(); rows.forEach(r => { const k = personKey(r.name); const o = byPerson.get(k) || { k, label: r.name.trim(), v: 0, u: 0, late: 0, la: 0 }; const s = rowStats(r); o.v += s.total; o.u += s.unpl; o.late += s.late; o.la += s.applied; byPerson.set(k, o); });
+  const byPerson = new Map(); rows.forEach(r => { const k = personKey(r.name); const o = byPerson.get(k) || { k, label: r.name.trim(), v: 0, u: 0, late: 0, la: 0, ap: 0, sk: 0, hf: 0, client: '' }; const s = rowStats(r); o.v += s.total; o.u += s.unpl; o.late += s.late; o.la += s.applied; o.ap += s.approved; o.sk += s.sick; o.hf += s.half * 0.5; if (r.client) o.client = r.client; byPerson.set(k, o); });
   const ppl = [...byPerson.values()];
   const top = ppl.filter(x => x.v > 0).sort((x, y) => y.v - x.v).slice(0, 10).map(x => ({ ...x, tip: `<b>${esc(x.label)}</b><br>${fmt(x.v)} leave days<br>${fmt(x.u)} unplanned · ${x.late} late` }));
   const byClient = new Map(); rows.forEach(r => { const g = clientGroup(r.client); const o = byClient.get(g) || { label: g, v: 0, people: new Set() }; o.v += rowStats(r).total; o.people.add(personKey(r.name)); byClient.set(g, o); });
@@ -7903,6 +7925,7 @@ function reportsView() {
  ...(window.attendanceTimelineExport ? [window.attendanceTimelineExport] : []),
  {title:'Leave days by month',headers:['Month',...SERIES.map(s=>s.name),'Total'],rows:monthly.map(m=>{const v=SERIES.map(s=>m.rows.reduce((a,r)=>a+s.f(rowStats(r)),0));return [monthLabel(m.month),...v,v.reduce((a,b)=>a+b,0)];})},
  {title:'Most leave days · '+periodLabel(),headers:['Employee','Leave days','Unplanned','Late'],rows:top.map(x=>[x.label,x.v,x.u,x.late])},
+ (()=>{const L=lbList(ppl);return {title:'Who took the most leave · '+periodLabel(),headers:['Rank','Employee','Client','Leave days','Approved (AL, CL)','Sick (SL)','Unplanned / absent (UL, AB)','Half days','Late','Applications (LA)'],rows:L.map((x,i)=>[i+1,x.label,x.client,x.v,x.ap,x.sk,x.u,x.hf,x.late,x.la])};})(),
  {title:'Leave days by client group',headers:['Client group','Leave days','People'],rows:cl.map(x=>[x.label,x.v,x.people.size])},
  ...(window.attendanceWeekdayExport ? [window.attendanceWeekdayExport] : []),
  (()=>{const z=leaveSeasonality();return {title:'Leave by month of the year',headers:['Month','Leave days per person','Leave days','Person-months'],rows:z.cal.map(c=>[c.name,Math.round(c.avg*100)/100,c.days,c.rows])};})(),
@@ -7917,6 +7940,7 @@ function reportsView() {
       <label>Client group <select data-bind="oclient">${clientOptions(S.ui.client)}</select></label>
       <span class="grow"></span><span class="sm muted">${isMonth && +p.slice(2) === TODAY_MS ? '<b>This month is still in progress</b>, so it will read low against full months. ' : ''}Leave days follow the sheet’s “Total Leaves” formula (UL, AL, SL, CL, AB + 0.5 per half day).</span>
     </div>
+    ${!a.total && !a.late ? `<div class="card" style="margin-bottom:14px;border-left:4px solid var(--orange);display:flex;gap:12px;align-items:center;flex-wrap:wrap"><div style="flex:1;min-width:220px"><b>No leave recorded in ${esc(periodLabel())}${isMonth && +p.slice(2) > TODAY_MS ? ' yet: it is still ahead' : ''}.</b><div class="sm muted">That is why the charts below are empty. Pick another period above${isMonth && +p.slice(2) !== TODAY_MS && d.months.includes(TODAY_MS) ? ', or jump to this month' : ''}.</div></div>${isMonth && +p.slice(2) !== TODAY_MS && d.months.includes(TODAY_MS) ? `<button class="btn primary sm" type="button" data-act="pick-month" data-m="${TODAY_MS}">Show ${esc(monthLabel(TODAY_MS))}</button>` : ''}<button class="btn sm" type="button" data-act="pick-period" data-v="all">All time</button></div>` : ''}
     ${timelineHtml}
     ${seasonalityCard()}
     ${weekdayHtml}
@@ -7924,6 +7948,7 @@ function reportsView() {
       <div class="card"><h2>Leave days by month</h2><div class="sub">Click a month to focus the whole dashboard on it.</div>${T ? rtable(EX('Leave days by month')) : stackChart(monthly, { selectable: true, sel: isMonth ? +p.slice(2) : null })}</div>
       <div class="card"><h2>Most leave days · ${esc(periodLabel())}</h2><div class="sub">Top 10 people. Click a bar to filter all reports to that person.</div>${T ? rtable(EX('Most leave days')) : hbars(top, { link: true })}</div>
     </div>
+    ${leaderCard(ppl)}
     <div class="grid g2e" style="margin-bottom:14px">
       <div class="card"><h2>${isMonth ? 'People out each day · ' + esc(periodLabel()) : 'Leave days by client group'}</h2><div class="sub">${isMonth ? 'Approved, sick, unplanned and half-day absences.' : 'Sum over the selected period.'}</div>${T ? rtable(isMonth ? EX('People out each day') : EX('Leave days by client group'), ['People']) : isMonth ? dailyChart(+p.slice(2), rows) : hbars(cl, { reportKind:'client', color: 'var(--aqua)' })}</div>
       <div class="card"><h2>${isMonth ? 'Leave days by client group' : 'Leave mix'}</h2><div class="sub">${isMonth ? 'Total leave days per group this month.' : 'Days by type across the period.'}</div>${T ? rtable(isMonth ? EX('Leave days by client group') : EX('Leave mix'), ['People']) : isMonth ? hbars(cl, { reportKind:'client', color: 'var(--aqua)' }) : hbars(SERIES.map(s => ({ label: s.name, v: rows.reduce((t, r) => t + s.f(rowStats(r)), 0) })), { reportKind:'mix', color: 'var(--blue)' })}</div>
@@ -9941,6 +9966,10 @@ const ACTIONS = {
   },
   person(el) { navTo('people', el.dataset.k); },
   'report-select'(el){selectAttendanceReport(el.dataset.kind,el.dataset.value);},
+  'lb-all'() { lbUi().all = !lbUi().all; render(); },
+  'copy-lb'() { const x = (window.attendanceExportData || []).find(t => t.title.startsWith('Who took the most leave')); if (!x) return; const txt = [x.title, x.headers.join('\t'), ...x.rows.map(r => r.join('\t'))].join('\n');
+    navigator.clipboard.writeText(txt).then(() => toast('Copied ' + x.rows.length + ' rows: paste into Excel or Teams.'), () => toast('The browser blocked copying.')); },
+  'pick-period'(el) { if (S.mode === 'reports') { selectAttendanceReport('period', el.dataset.v); return; } S.ui.period = el.dataset.v; render(); },
   'pick-month'(el) { if(S.mode==='reports'){selectAttendanceReport('period','m:'+el.dataset.m);return;} S.ui.period = 'm:' + el.dataset.m; render(); },
   'who-picture'(el) { copyWhoPicture(el); },
   'who-back'() { S.ui.who.start = isoDate(new Date(TODAY.getTime() - 14 * 86400000)); render(); },
@@ -10047,7 +10076,7 @@ function refocus(sel, caret) { render(); const i = $(sel); if (i) { i.focus(); c
 function onBind(e) {
   const fx = e.target.closest('[data-fix]'); if (fx) { fixInput(fx, e); return; }
   const el = e.target.closest('[data-bind]'); if (!el) return; const b = el.dataset.bind, v = el.value, isInput = e.type === 'input';
-  if (isInput && !['gq', 'pq', 'aq', 'hq', 'tlq', 'wdq', 'hiq'].includes(b) && el.type !== 'number') return; if (!isInput && ['gq', 'pq', 'aq', 'hq', 'tlq', 'wdq', 'hiq'].includes(b)) return;
+  if (isInput && !['gq', 'pq', 'aq', 'hq', 'tlq', 'wdq', 'hiq', 'lbq'].includes(b) && el.type !== 'number') return; if (!isInput && ['gq', 'pq', 'aq', 'hq', 'tlq', 'wdq', 'hiq', 'lbq'].includes(b)) return;
   const u = S.ui;
   switch (b) {
     case 'period': if(S.mode==='reports'){selectAttendanceReport('period',v);break;}u.period = v; render(); break; case 'oclient': if(S.mode==='reports'){if(v==='all'){reportScope.cohort=null;reportScope.label='';u.client='all';reportChanged();}else selectAttendanceReport('client',v);break;}u.client = v; render(); break;
@@ -10061,6 +10090,8 @@ function onBind(e) {
     case 'wd-look': wdUi().look = +v; render(); break;
     case 'wd-only': wdUi().only = v; render(); break;
     case 'wdq': wdUi().q = v; refocus('[data-bind="wdq"]'); break;
+    case 'lbq': lbUi().q = v; refocus('[data-bind="lbq"]'); break;
+    case 'lb-sort': lbUi().sort = v; render(); break;
     case 'tl-range': { const t = tlUi(); t.range = v; if (v === 'custom' && !t.from) { const pr = tlRange(periodRows()); if (pr) { t.from = isoDate(pr[0]); t.to = isoDate(pr[1]); } } render(); break; }
     case 'tl-from': if (v) { tlUi().from = v; render(); } break; case 'tl-to': if (v) { tlUi().to = v; render(); } break;
     case 'tl-wk': tlUi().hideWk = el.checked; render(); break;
@@ -12298,7 +12329,7 @@ async function poll() {
 }
 
 /* ============================== filtering ============================== */
-const APP = { title: "Blasters Deck", version: "3.112.2", released: "2026-11-17" };
+const APP = { title: "Blasters Deck", version: "3.112.3", released: "2026-11-17" };
 const BASE_DIMS = { status: "status_column", desig: "designation_column", client: "client_column", mode: "mode_column" };
 const STANDARD_STATUSES = ["Active", "Manager", "OJT", "Bench", "New", "Projected", "Left", "Moved"];
 const TILE_ORDER = ["Active", "Manager", "OJT", "Bench", "New", "Projected"];
@@ -20690,6 +20721,7 @@ window.bdSearch = (() => {
 /* v3.96.0: "What's new" once per person after each update (remembered in the database); again from More or the bell */
 window.bdWhatsNew = (() => {
   const NOTES = [
+    { v: '3.112.3', items: [['🏆', 'Who took the most leave', 'Reports › Attendance has a full ranked list for the chosen period: leave days, approved, sick, unplanned, half days, late and applications per person, with search, sort and copy.'], ['📅', 'Reports open on this month', 'Attendance reports now start on the current month instead of the last month in the tracker (which can be a month added ahead and still empty). An empty period now says so, with a button back to this month.']] },
     { v: '3.112.2', items: [['🧾', 'Backup report: only your pseudo names', 'With pseudo names on, the grid lists only the pseudo names in your list for the chosen client and sub client. A weekday on which nobody had that pseudo name shows a red ! (not billed); click it to see why. A seat shown live still counts as P and a covered leave as BR.']] },
     { v: '3.112.1', items: [['↔', 'Pseudo names: counts and names side by side', 'Counts by client and sub client are on the left; click one and its names show in a table on the right. The cards view is gone.']] },
     { v: '3.112.0', items: [['☰', 'Pseudo names as a table', 'Switch between Cards and Table at the top of Pseudo names. Table shows one compact table per sub client, side by side: pseudo name, recruiter, Emp ID, with Edit and Change. Your choice is remembered.'], ['📜', 'Version history', 'In What’s new, tap “All versions” to see every update and what it brought, with a search. Also in the search bar: “What’s new history”.']] },
