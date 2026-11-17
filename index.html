@@ -15,7 +15,7 @@
 <meta name="apple-mobile-web-app-title" content="Blasters Deck">
 <meta name="application-name" content="Blasters Deck">
 <meta name="apple-mobile-web-app-status-bar-style" content="default">
-<title>Blasters Deck · 3.112.0</title>
+<title>Blasters Deck · 3.112.1</title>
 <link rel="preconnect" href="https://fonts.googleapis.com"><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin><link href="https://fonts.googleapis.com/css2?family=Public+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet">
 <style>
 :root {
@@ -2989,6 +2989,11 @@ tr.act-zero td { color:var(--muted); }
 .psn-subgroup { display:flex; align-items:baseline; gap:8px; padding:8px 4px 6px 18px; margin-top:4px; border-left:3px solid color-mix(in srgb, var(--accent) 40%, transparent); }
 .psn-subgroup b { font-size:13px; } .psn-subgroup small { color:var(--muted); font-size:11.5px; }
 .psn-viewsw { display:inline-flex; gap:2px; padding:3px; border-radius:10px; background:var(--chip,#eef1f6); margin:6px 0 2px; } .psn-viewsw button { border:0; background:transparent; padding:5px 12px; border-radius:8px; font-size:12.5px; font-weight:600; color:var(--muted,#6b7280); cursor:pointer; } .psn-viewsw button.on { background:#fff; color:var(--ink,#111); box-shadow:0 1px 3px rgba(0,0,0,.12); }
+.psn-split { display:grid; grid-template-columns:minmax(280px, 340px) minmax(0, 1fr); gap:16px; align-items:start; margin-top:8px; }
+.psn-split > .psn-left { position:sticky; top:72px; max-height:calc(100vh - 90px); overflow:auto; margin:0 !important; }
+html body .psn-split .psn-left .psc-grid { grid-template-columns:1fr !important; gap:8px; } .psn-split .psn-left > summary { pointer-events:none; } .psn-split .psn-left > summary::marker, .psn-split .psn-left > summary::-webkit-details-marker { display:none; }
+.psn-right { min-width:0; } .psn-right .psn-sum { margin-top:0; } .psn-right .psn-people { display:block !important; } .psn-right .psn-tgrid { grid-template-columns:repeat(auto-fill, minmax(min(100%, 430px), 1fr)); }
+@media (max-width:900px) { .psn-split { grid-template-columns:1fr; } .psn-split > .psn-left { position:static; max-height:none; } }
 .psn-tgrid { grid-column:1/-1; display:grid; grid-template-columns:repeat(auto-fill, minmax(min(100%, 430px), 1fr)); gap:12px; margin:8px 0 6px; align-items:start; }
 .psn-tpanel { background:var(--card,#fff); border:1px solid var(--border,#e3e6ec); border-radius:12px; overflow:hidden; }
 .psn-tpanel > header { display:flex; align-items:baseline; gap:8px; padding:9px 12px; border-bottom:1px solid var(--border,#e3e6ec); background:var(--soft,#f7f8fb); border-left:3px solid #1fa37a; } .psn-tpanel > header b { font-size:13px; } .psn-tpanel > header small { font-size:11px; color:var(--muted,#6b7280); }
@@ -3682,6 +3687,7 @@ html body details.psn-counts > summary::-webkit-details-marker { display:none; }
 html body details.psn-counts > summary::before { content:"›"; display:inline-grid; place-items:center; width:22px; height:22px; border-radius:7px; background:var(--surface-2, #f1f4f9); color:var(--muted, #6b7280); font-size:16px; transition:transform .2s; }
 html body details.psn-counts[open] > summary::before { transform:rotate(90deg); }
 html body details.psn-counts[open] > summary { border-bottom:1px solid var(--border, #eef0f5); }
+html body .psn-split details.psn-left > summary::before { display:none; } html body .psn-split details.psn-left > summary { flex-wrap:wrap; row-gap:2px; }
 html body table.psn-ct { width:100%; border-collapse:collapse; font-size:13.5px; font-variant-numeric:tabular-nums; }
 html body table.psn-ct thead th { padding:10px 18px !important; font-size:11px !important; font-weight:700 !important; letter-spacing:.06em; text-transform:uppercase; color:var(--muted, #8a94a6) !important; background:transparent !important; text-align:center; border:0 !important; white-space:nowrap; }
 html body table.psn-ct thead th:first-child { text-align:left; }
@@ -12272,7 +12278,7 @@ async function poll() {
 }
 
 /* ============================== filtering ============================== */
-const APP = { title: "Blasters Deck", version: "3.112.0", released: "2026-11-17" };
+const APP = { title: "Blasters Deck", version: "3.112.1", released: "2026-11-17" };
 const BASE_DIMS = { status: "status_column", desig: "designation_column", client: "client_column", mode: "mode_column" };
 const STANDARD_STATUSES = ["Active", "Manager", "OJT", "Bench", "New", "Projected", "Left", "Moved"];
 const TILE_ORDER = ["Active", "Manager", "OJT", "Bench", "New", "Projected"];
@@ -14926,8 +14932,15 @@ function buildField(c, value, isNew) {
    recruiter is replaced or the name made vacant, the end date is chosen too. Every assignment stays in the
    "Pseudo Name History" sheet of the same workbook; the small "i" shows a name's history. */
 let psnCountsOpen = true;   /* v3.85.1 */
-let psnView = "cards";   /* v3.112.0: "cards" or "table"; remembered on the account (td_my_prefs.psn_view) */
-setTimeout(async () => { try { if (typeof CLOUD !== "undefined" && CLOUD.token()) { const p = await CLOUD._rpc("td_my_prefs", { p_token: CLOUD.token(), p_prefs: null }); if (p && /^(cards|table)$/.test(p.psn_view || "")) psnView = p.psn_view; } } catch { } }, 3000);
+let psnView = "table";   /* v3.112.1: always the table (cards removed) */
+/* v3.112.1: counts on the left, the names of what you pick on the right */
+function psnMount(listBox, parts, box) {
+  const cnt = parts.find(x => x && x.classList && x.classList.contains("psn-counts")), sum = parts.find(x => x && x.classList && x.classList.contains("psn-sum"));
+  const top = parts.filter(x => x !== cnt && x !== sum);
+  if (cnt) { cnt.open = true; cnt.classList.add("psn-left"); }
+  const right = h("div", { class: "psn-right" }, sum || null, box);
+  listBox.replaceChildren(...top, cnt ? h("div", { class: "psn-split" }, cnt, right) : right);
+}
 const pseudoCol = () => ((state.cols || []).find(c => /pseudo/i.test(c.name)) || {}).name || null;
 const psnIsAdmin = () => !window.PERM || !PERM.online() || PERM.isSuper() || PERM.canPsnEdit();   /* v3.81.0: or a role given "manage pseudo names" */
 const psnStatus = r => { const s = gs(r, "status_column").toLowerCase().replace(/\s+/g, "").replace(/&/g, "+"); return /^active\+resign(ed|ation)?$/.test(s) ? "resign" : s === "active" ? "active" : s === "ojt" ? "ojt" : s; };
@@ -15108,7 +15121,7 @@ async function openPseudoNames(focusId, host) {   /* v3.81.0: host = draw inside
       }
       copyRows = () => withoutOne.filter(r => hit(nm(r), r.id)).map(r => ["", nm(r), String(r.id), cl(r), scOf(r)]);
       if (!box.firstChild) box.append(h("p", { class: "hint" }, "Every Active, Active + Resign and OJT recruiter" + (client !== "all" ? " of " + (client || "no client") : "") + " has a pseudo name."));
-      listBox.replaceChildren(...parts, box); return;
+      psnMount(listBox, parts, box); return;
     }
     const shown = pool.filter(s => (filter === "inactive" ? !s.active : s.active) && (filter === "all" || filter === "inactive" || (filter === "filled" && s.r) || (filter === "vacant" && !s.r) || (filter === "flag" && s.flag)) && hit(s.name, s.client, s.r && nm(s.r), s.r && s.r.id));
     copyRows = () => [...shown].sort((a, b) => (a.client || "").localeCompare(b.client || "") || subOf(a).localeCompare(subOf(b)) || a.name.localeCompare(b.name, undefined, { sensitivity: "base" })).map(s => [s.name, s.r ? nm(s.r) : "", s.r ? String(s.r.id) : "", s.client || "", subOf(s)]);
@@ -15167,10 +15180,8 @@ async function openPseudoNames(focusId, host) {   /* v3.81.0: host = draw inside
       }
     }
     if (!shown.length) box.append(h("p", { class: "hint" }, q ? "No pseudo name or recruiter matches “" + q + "”." : filter === "flag" ? "Nobody needs replacing right now." : filter === "vacant" ? "Every pseudo name is tagged." : filter === "inactive" ? "No inactive pseudo names." : admin ? "No pseudo names here yet. Add one above." : "No pseudo names here yet."));
-    parts.push(h("div", { class: "psn-viewsw", role: "group", "aria-label": "How to show the names" },
-      ...[["cards", "▦ Cards"], ["table", "☰ Table"]].map(([v, t]) => h("button", { type: "button", class: psnView === v ? "on" : "", "aria-pressed": String(psnView === v), onclick: () => { psnView = v; editing = editMeta = null; try { CLOUD._rpc("td_my_prefs", { p_token: CLOUD.token(), p_prefs: { psn_view: v } }).catch(() => { }); } catch { } drawList(); } }, t))));
     parts.push(h("p", { class: "hint psn-sum" }, counts.all + " active pseudo names · " + counts.filled + " tagged · " + counts.vacant + " vacant" + (counts.flag ? " · " + counts.flag + " need a replacement" : "") + (counts.inactive ? " · " + counts.inactive + " inactive" : "")));
-    listBox.replaceChildren(...parts, box);
+    psnMount(listBox, parts, box);
     if (focusId) { const r = state.rows.find(x => x.id === focusId); focusId = null; if (r && pv(r)) { const el = [...box.querySelectorAll(".psn-val")].find(x => x.textContent === pv(r)); if (el) el.scrollIntoView({ block: "center" }); } }
   }
   /* admins: add a name for a client */
@@ -20659,6 +20670,7 @@ window.bdSearch = (() => {
 /* v3.96.0: "What's new" once per person after each update (remembered in the database); again from More or the bell */
 window.bdWhatsNew = (() => {
   const NOTES = [
+    { v: '3.112.1', items: [['↔', 'Pseudo names: counts and names side by side', 'Counts by client and sub client are on the left; click one and its names show in a table on the right. The cards view is gone.']] },
     { v: '3.112.0', items: [['☰', 'Pseudo names as a table', 'Switch between Cards and Table at the top of Pseudo names. Table shows one compact table per sub client, side by side: pseudo name, recruiter, Emp ID, with Edit and Change. Your choice is remembered.'], ['📜', 'Version history', 'In What’s new, tap “All versions” to see every update and what it brought, with a search. Also in the search bar: “What’s new history”.']] },
     { v: '3.111.1', items: [['🛠', 'Backups open in Excel again', 'Excel called the backup corrupt because the attendance sheet pointed to cell styles the workbook didn’t have. Every download now adds any missing styles, and the stored workbook repairs itself on the next save. Download a new backup; older files stay broken.']] },
     { v: '3.111.0', items: [['📣', 'Tag people, or everyone', 'Type @ in a Planner comment, a Playbook entry or an attendance remark to tag someone. They get a notification in the bell and on their phone. Admins can also pick @Everyone to notify the whole team.'], ['⚡', 'Faster notifications, complete activity', 'Every change is logged straight away in its own encrypted table, so nobody’s activity goes missing. Your own changes now show in the bell too, already read and without a pop-up. Phone notifications go out at once.'], ['🎂', 'Celebration reminders: once a day, your times', 'Birthday, anniversary and holiday notifications and the “Celebrations today” box now come once a day per person on all devices. Admins set the time and time zone with ⏰ in Coming up.'], ['🛟', 'Morning backup', 'For the super admin: the first sign-in of the morning (your computer’s time) downloads the full backup by itself, password-protected, with the password shown right after. Change the hours in Backup reminder.']] },
@@ -20709,7 +20721,7 @@ window.bdWhatsNew = (() => {
     const close = () => { veil.classList.remove('in'); setTimeout(() => veil.remove(), 250); if (save) rpc({ seen_version: APP.version }).catch(() => { }); };
     const veil = h('div', { class: 'wn-veil', onclick: e => { if (e.target === veil) close(); } },
       h('div', { class: 'wn', role: 'dialog', 'aria-modal': 'true', 'aria-label': 'What’s new' },
-        h('span', { class: 'wn-tag' }, 'UPDATED · ' + APP.version), h('h2', {}, 'What’s new'), h('p', { class: 'wn-sub' }, 'Blasters Deck was updated' + (APP.released ? ' on ' + new Date(APP.released + 'T00:00:00').toLocaleDateString(undefined, { day: 'numeric', month: 'long' }) : '')),
+        h('span', { class: 'wn-tag' }, 'UPDATED · ' + APP.version), h('h2', {}, 'What’s new'), h('p', { class: 'wn-sub' }, 'Blasters Deck was updated' + (APP.released ? ' on ' + new Date(APP.released + 'T12:00:00').toLocaleDateString(undefined, { day: 'numeric', month: 'long' }) : '')),
         h('div', { class: 'wn-list' }, ...list.flatMap((n, i) => [list.length > 1 ? h('h6', {}, i === 0 ? 'In ' + n.v : 'Earlier · ' + n.v) : null, ...n.items.map(([ic, t, d]) => h('div', { class: 'wn-it' }, h('i', { 'aria-hidden': 'true' }, ic), h('div', {}, h('b', {}, t), h('span', {}, d))))]).filter(Boolean)),
         h('div', { class: 'wn-foot' }, h('button', { type: 'button', class: 'btn wn-all', onclick: () => { close(); setTimeout(history, 260); } }, '📜 All versions'), h('button', { type: 'button', class: 'btn primary wn-ok', onclick: close }, 'Got it'))));
     document.body.append(veil); requestAnimationFrame(() => veil.classList.add('in'));
