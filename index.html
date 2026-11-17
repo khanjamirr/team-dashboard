@@ -15,7 +15,7 @@
 <meta name="apple-mobile-web-app-title" content="Blasters Deck">
 <meta name="application-name" content="Blasters Deck">
 <meta name="apple-mobile-web-app-status-bar-style" content="default">
-<title>Blasters Deck · 3.107.1</title>
+<title>Blasters Deck · 3.108.0</title>
 <link rel="preconnect" href="https://fonts.googleapis.com"><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin><link href="https://fonts.googleapis.com/css2?family=Public+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet">
 <style>
 :root {
@@ -9154,13 +9154,15 @@ function openLogLeave(preKey) {
       <div class="form"><div class="full" style="display:flex;flex-direction:column;gap:4px"><span style="font-size:12px;font-weight:600;color:var(--ink-2);display:flex;align-items:center;gap:8px">Employee ${window.PERM && PERM.isSuper() ? `<button type="button" id="l-who" title="Choose which employee statuses show in this list (for everyone)" style="border:1px solid var(--line,#e3e6ec);background:var(--surface-2,#f4f6f9);border-radius:999px;padding:2px 10px;font:inherit;font-size:11.5px;font-weight:600;color:var(--ink-2);cursor:pointer">👥 Showing: <span id="l-who-t">${esc(whoLabel())}</span> ▾</button>` : (recF() ? `<span style="font-size:11.5px;font-weight:500;color:var(--ink-3)" title="Set by an admin">👥 ${esc(whoLabel())}</span>` : '')}</span><div class="cbx"><input type="text" id="l-name" value="${esc(pre || '')}" placeholder="Pick or type a name" autocomplete="off" role="combobox" aria-expanded="false" aria-controls="l-list" aria-label="Employee" style="width:100%;padding-right:32px"><button type="button" class="cbx-caret" id="l-caret" tabindex="-1" aria-label="Show all employees">▾</button><div class="cbx-list" id="l-list" role="listbox" hidden></div></div></div>
       <div style="display:flex;flex-direction:column;gap:4px"><span style="font-size:12px;font-weight:600;color:var(--ink-2)">Type <small style="font-weight:400;color:var(--ink-3)">· type a code or a word, ↑↓ Enter · Alt+T</small></span><div class="cbx"><input type="text" id="l-type" autocomplete="off" role="combobox" aria-expanded="false" aria-controls="l-tlist" aria-label="Type" style="width:100%" placeholder="Choose a type, e.g. SL or sick"><button type="button" class="cbx-caret" tabindex="-1" aria-hidden="true" id="l-tcaret">▾</button><div class="cbx-list" id="l-tlist" role="listbox" hidden></div></div><select id="l-code" hidden aria-hidden="true" tabindex="-1"><option value="" selected></option>${codesAllowed.map(c => `<option value="${c}">${c} · ${CODES[c].label}</option>`).join('')}</select></div><span></span>
       <label>From<input type="date" id="l-from" value="${today}"></label><label>To<input type="date" id="l-to" value="${today}"></label>
-      <label class="full">Internal remark <span style="font-weight:400;color:var(--ink-3)">(optional · only the team sees it)</span><textarea id="l-remark" maxlength="500" rows="2" style="resize:vertical;min-height:44px;font:inherit;padding:8px 10px;border-radius:8px;border:1px solid var(--line);background:var(--surface);color:var(--ink)" placeholder="e.g. Informed TL at 9:10 AM ET on WhatsApp · doctor’s note to follow"></textarea></label>
+      <label class="full" id="l-remwrap">Internal remark <span style="font-weight:400;color:var(--ink-3)">(optional · only the team sees it)</span><textarea id="l-remark" maxlength="500" rows="2" style="resize:vertical;min-height:44px;font:inherit;padding:8px 10px;border-radius:8px;border:1px solid var(--line);background:var(--surface);color:var(--ink)" placeholder="e.g. Informed TL at 9:10 AM ET on WhatsApp · doctor’s note to follow"></textarea></label>
       ${needsApproval() ? `<label class="full" id="l-notewrap" hidden>Note for your approver <span style="color:var(--bad,#c0392b)">*</span> (needed for leave)<input type="text" id="l-note" maxlength="200" aria-required="true" placeholder="e.g. family function, doctor’s appointment" autocomplete="off"></label><div class="full sm" id="l-lanote" hidden style="padding:8px 10px;border-radius:8px;background:var(--accent-soft)">Leave is saved as <b>LA (pending)</b> straight away, and becomes the leave type once an approver confirms it. Late, remote and other updates are saved directly.</div>` : ''}</div>
       <div id="l-prev" class="sm" style="margin-top:12px;padding:10px 12px;border:1px solid var(--line);border-radius:8px;background:var(--surface-2)"></div><div class="err" id="l-err"></div>
       <div id="l-hist" class="ph-box" style="margin-top:12px"></div>`,
     footer: `<span class="grow"></span><button class="btn" data-close>Cancel</button><button class="btn primary" id="l-go">Save</button>`,
   });
   const plan = () => {
+    /* v3.107.2: one remark box only. Leave that goes for approval uses the note to the approver; leave that asks for a backup uses the backup box's comment. */
+    { const c = ($('#l-code', m) || {}).value, w = $('#l-remwrap', m); if (w) { let hide = false; try { const nm = (($('#l-name', m) || {}).value || '').trim(), k = nm ? personKey(nm) : ''; hide = !!c && LEAVE_CATS.has(catOf(c)) && (needsLA(c) || (k && bkRequired(k))); } catch { } w.hidden = hide; } }
     { const c = ($('#l-code', m) || {}).value, on = needsLA(c); const w = $('#l-notewrap', m), n2 = $('#l-lanote', m); if (w) w.hidden = !on; if (n2) n2.hidden = !on; }   /* v3.100.0 */
     const name = $('#l-name', m).value, p = resolvePerson(name), from = new Date($('#l-from', m).value + 'T00:00:00Z'), to = new Date($('#l-to', m).value + 'T00:00:00Z');
     if (!p) return { err: name.trim() ? 'No employee with that name in the workforce file or the tracker.' : 'Pick an employee.' };
@@ -9236,8 +9238,8 @@ function openLogLeave(preKey) {
     const pl = plan(); if (pl.err) return;
     if (!(await confirmOverwrite(pl.p.name, [...overwriteList(pl.p, pl.set.map(x => x.t), pl.code), ...pendingClash(pl.p.key, pl.set.map(x => isoDate(x.t)), pl.code)]))) return;
     /* v3.103.1: the internal remark goes with every day recorded */
-    { const rm = (($('#l-remark', m) || {}).value || '').trim(); if (rm && window.tdRemarkSave) { const idn = identityOf(pl.p); tdRemarkSave(pl.set.map(x => ({ emp: String(idn.empId ?? ''), name: idn.name || pl.p.name, day: isoDate(x.t), code: pl.code, text: rm }))); } }
-    if (needsLA(pl.code)) { const note = ($('#l-note', m) || {}).value || ''; closeModal(); sendLeaveRequest(pl, note); return; }
+    { const rw = $('#l-remwrap', m), rm = rw && rw.hidden ? '' : (($('#l-remark', m) || {}).value || '').trim(); if (rm && window.tdRemarkSave) { const idn = identityOf(pl.p); tdRemarkSave(pl.set.map(x => ({ emp: String(idn.empId ?? ''), name: idn.name || pl.p.name, day: isoDate(x.t), code: pl.code, text: rm }))); } }
+    if (needsLA(pl.code)) { const note = ($('#l-note', m) || {}).value || ''; if (note.trim() && window.tdRemarkSave) { const idn = identityOf(pl.p); tdRemarkSave(pl.set.map(x => ({ emp: String(idn.empId ?? ''), name: idn.name || pl.p.name, day: isoDate(x.t), code: 'LA', text: note.trim() }))); } closeModal(); sendLeaveRequest(pl, note); return; }
     closeModal();
     const doLog = val => mutate(`Logged ${pl.code} for ${pl.p.name} · ${pl.set.length} day${pl.set.length === 1 ? '' : 's'} (${longDate(pl.set[0].t)}${pl.set.length > 1 ? ' – ' + longDate(pl.set[pl.set.length - 1].t) : ''})`, () => {
       const idn = identityOf(pl.p); for (const s of pl.set) { let row = S.rows.find(r => r.month === s.ms && personKey(r.name) === pl.p.key); if (!row) { row = newRow(s.ms, idn.name, { empId: idn.empId, client: idn.client }); insertRow(row); } setDay(row, s.i, pl.code); }
@@ -9247,7 +9249,7 @@ function openLogLeave(preKey) {
     const cat = catOf(pl.code);
     if ((LEAVE_CATS.has(cat)) && bkRequired(pl.p.key)) {
       const days = pl.set.map(x => isoDate(x.t));
-      openBackupBox(pl.p.key, days[0], null, { days, confirm: 'Save backup & record ' + pl.code, collect: async val => { const ok = doLog(val); if (ok !== false) { if (renderCard.el) renderCard(renderCard.el); toast('Recorded ' + pl.code + (val ? ' · backup: ' + bkLabel(val) + '.' : ' · backup skipped for now. ' + bkDueWhenTxt().replace(/^./, c => c.toUpperCase()) + ' you’ll get one box to set all missing backups.')); } } });
+      openBackupBox(pl.p.key, days[0], null, { days, confirm: 'Save backup & record ' + pl.code, collect: async val => { const ok = doLog(val); if (ok !== false && val && val.remark && String(val.remark).trim() && window.tdRemarkSave) { const idn = identityOf(pl.p); tdRemarkSave(pl.set.map(x => ({ emp: String(idn.empId ?? ''), name: idn.name || pl.p.name, day: isoDate(x.t), code: pl.code, text: String(val.remark).trim() }))); } if (ok !== false) { if (renderCard.el) renderCard(renderCard.el); toast('Recorded ' + pl.code + (val ? ' · backup: ' + bkLabel(val) + '.' : ' · backup skipped for now. ' + bkDueWhenTxt().replace(/^./, c => c.toUpperCase()) + ' you’ll get one box to set all missing backups.')); } } });
       return;
     }
     doLog(null);
@@ -10346,6 +10348,7 @@ function openBackupBox(pKey, iso, onDone, opts = {}) {
       ${nmMode === 'off' ? '' : `<label id="bkx-pwrap" ${curK === 'no' ? 'style="display:none"' : ''}><span id="bkx-plbl">${curK === 'live' ? 'Taken care of by' : 'Backup person'}</span> <em id="bkx-pem">${nmMode === 'optional' || curK !== 'yes' ? 'optional · pick from the list or type any name (a new person too)' : 'pick from the list or type any name (a new person too)'}</em><input type="text" id="bk-name" list="bk-list" value="${esc(cur && cur.b ? cur.b : '')}" placeholder="${nmMode === 'optional' ? 'Type or pick a name, or leave blank' : 'Type or pick a name'}" autocomplete="off"><datalist id="bk-list">${team.map(t => `<option value="${esc(t.name)}" label="${esc([t.id && 'ID ' + t.id, t.sub, t.out ? 'also off that day' : ''].filter(Boolean).join(' · '))}"></option>`).join('')}</datalist></label>`}
     </div>
     <label class="bkx-rm" id="bkx-rm" ${opts.collect || curK ? '' : 'hidden'}>${opts.collect ? 'Comments / remarks <em style="color:#c63b3a">required</em>' : 'Remarks <em>optional · copied as written</em>'}<textarea id="bk-rm" rows="2" maxlength="200" placeholder="${opts.collect ? 'Write a comment' : 'Optional note'}">${esc(bkRemark(pKey, iso))}</textarea></label>
+    ${window.PERM && PERM.isSuper() && window.tdClientRemarkOf ? `<label class="bkx-rm bkx-crm">✉ Client remark <em>for the client email only · only admins see this</em><textarea id="bk-crm" rows="2" maxlength="300" placeholder="What the client should read, e.g. Covered by the team; no impact">${esc(tdClientRemarkOf(name, iso))}</textarea></label>` : ''}
     ${bkPrevHtml(pKey, opts.days && opts.days.length ? opts.days : [iso], opts.collect || curK)}
     <div class="err" id="bk-err"></div>`,
     footer: `${skipOk ? `<button class="btn" id="bk-skip" title="Record the leave now and set the backup later: ${esc(bkDueWhenTxt())} you get one box with everyone still missing a backup">Skip for now</button>` : ''}<span class="grow"></span><button class="btn" data-close>Cancel</button><button class="btn primary" id="bk-go" ${curK ? '' : 'disabled'}>${esc(opts.confirm || 'Save')}</button>` });
@@ -10401,7 +10404,7 @@ function openBackupBox(pKey, iso, onDone, opts = {}) {
   /* v3.53.1: click an earlier remark to use it again */
   m.querySelectorAll('[data-bkprev]').forEach(b => b.addEventListener('click', () => { const t = $('#bk-rm', m); if (!t) return; t.value = b.dataset.bkprev; t.dispatchEvent(new Event('input', { bubbles: true })); t.focus(); }));
   $('#bk-go', m).onclick = async () => {
-    const write = v => write0(v ? { ...v, remark: rmv() } : v);
+    const write = async v => { const out = await write0(v ? { ...v, remark: rmv() } : v); const cr = $('#bk-crm', m); if (cr && window.tdClientRemarkSave) tdClientRemarkSave((opts.days && opts.days.length ? opts.days : [iso]).map(day => ({ name, day, text: cr.value.trim() }))); return out; };   /* v3.108.0 */
     /* v3.43.4: when approving or recording leave, a comment is required */
     if (kind() && half === null) { $('#bk-err', m).textContent = 'Choose Cover for: Full day or Half day.'; return; }
     if (kind() && half === true && !part) { $('#bk-err', m).textContent = 'Choose which half this option is for: 1st half or 2nd half.'; return; }
@@ -11134,7 +11137,7 @@ function overviewStats() {
 function ovClientRecords(list) {
   const pc = typeof colByName === 'function' ? colByName(/pseudo/i) : null;
   const pOf = r => { try { const w = rowRoster(r), v = w && pc ? String(g(w, pc) ?? '').trim() : ''; return v || r.name.trim(); } catch { return r.name.trim(); } };
-  return list.filter(e => e.st === 'backup' || e.st === 'none').map(e => [...(OVP.p === 'today' ? [] : [bkFmtD(e.iso)]), pOf(e.r), (e.st === 'backup' ? 'Backup Provided' : 'Backup Not Provided') + (e.half ? ' (Half day)' : ''), bkRemark(e.key, e.iso)]);
+  return list.filter(e => e.st === 'backup' || e.st === 'none').map(e => [...(OVP.p === 'today' ? [] : [bkFmtD(e.iso)]), pOf(e.r), (e.st === 'backup' ? 'Backup Provided' : 'Backup Not Provided') + (e.half ? ' (Half day)' : ''), window.tdClientRemarkOf ? tdClientRemarkOf(e.r.name, e.iso) : '']);   /* v3.108.0: the client sees only the admins' client remark */
 }
 /* v3.74.2: change the leave type of one day straight from the Who is out card */
 const ovCodeOpts = e => { const cur = e.v; return [...PICK, ''].filter(c => c !== cur && codeAllowed(cur, c)); };
@@ -11306,7 +11309,7 @@ function renderCard(el, opts = {}) {
         /* v3.36.0: client copy: date + title on top, then pseudo name · backup · remarks (blank to fill in) */
         const pOfRow = r => { try { const w = rowRoster(r), v = w && pseudoCol ? String(g(w, pseudoCol) ?? '').trim() : ''; return v || pOf(r.name.trim()); } catch { return r.name.trim(); } };   /* v3.41.3: pseudo name via the matched workforce row (Emp ID first) */
         const pOf = n => { if (!pseudoCol || !n) return n; try { const w = rosterRows().find(r => personKey(gs(r, 'name_column')) === personKey(n)); const v = w ? String(g(w, pseudoCol) ?? '').trim() : ''; return v || n; } catch { return n; } };
-        const recs = list.filter(x => { if (x.c === 'applied') return false; const b = bkGet(personKey(x.r.name), rdIso); return !!b && !bkLive(b); }).map(x => {   /* v3.40.2: only days marked Backup Provided / Not Provided */ const k = personKey(x.r.name), b = bkGet(k, rdIso); return [pOfRow(x.r), (bkYes(b) ? 'Backup Provided' : 'Backup Not Provided') + (b && b.half ? ' (half day)' : ''), bkRemark(k, rdIso)]; });
+        const recs = list.filter(x => { if (x.c === 'applied') return false; const b = bkGet(personKey(x.r.name), rdIso); return !!b && !bkLive(b); }).map(x => {   /* v3.40.2: only days marked Backup Provided / Not Provided */ const k = personKey(x.r.name), b = bkGet(k, rdIso); return [pOfRow(x.r), (bkYes(b) ? 'Backup Provided' : 'Backup Not Provided') + (b && b.half ? ' (half day)' : ''), window.tdClientRemarkOf ? tdClientRemarkOf(x.r.name, rdIso) : '']; });   /* v3.108.0 */
         return { headers: [pseudoCol ? 'Name' : 'Employee', 'Backup', 'Remarks'], records: recs, caption: (isToday ? "Today's attendance record" : 'Attendance record') + ' · ' + longDate(rd), top: [longDate(rd), isToday ? "Today's attendance record" : 'Attendance record'] };
       })();
       renderCard._copy = { ...renderCard._copy, today: listCopy };
@@ -12176,7 +12179,7 @@ async function poll() {
 }
 
 /* ============================== filtering ============================== */
-const APP = { title: "Blasters Deck", version: "3.107.1", released: "2026-11-17" };
+const APP = { title: "Blasters Deck", version: "3.108.0", released: "2026-11-17" };
 const BASE_DIMS = { status: "status_column", desig: "designation_column", client: "client_column", mode: "mode_column" };
 const STANDARD_STATUSES = ["Active", "Manager", "OJT", "Bench", "New", "Projected", "Left", "Moved"];
 const TILE_ORDER = ["Active", "Manager", "OJT", "Bench", "New", "Projected"];
@@ -20454,6 +20457,7 @@ window.bdSearch = (() => {
 /* v3.96.0: "What's new" once per person after each update (remembered in the database); again from More or the bell */
 window.bdWhatsNew = (() => {
   const NOTES = [
+    { v: '3.108.0', items: [['✉', 'Client remarks for emails', 'Admins can add a separate remark for the client email in the backup box; only admins see it, and internal remarks never go into client copies.']] },
     { v: '3.107.0', items: [['⏭', 'Skip the backup for now', 'Record leave first and set backups later: one box comes up at the time an admin sets (with its time zone) listing everyone still missing a backup.']] },
     { v: '3.106.0', items: [['💡', 'Fun fact of the day', 'A new fun fact on the Overview every day; tap “Another” for more.']] },
     { v: '3.105.0', items: [['🔎', 'Search everything', 'The search in the top bar (or Ctrl K) finds people, pages, settings, actions, leave requests, tasks, activities and playbook entries: only what you can open.']] },
@@ -21373,5 +21377,25 @@ window.tdFactOfDay = (off = 0) => { const F = window.TD_FACTS; const p = window.
 .ovx-fact button { border:0; background:none; padding:2px 4px; color:var(--accent,#2563eb); font:inherit; font-size:12.5px; font-weight:650; cursor:pointer; white-space:nowrap; align-self:center; }
 :root[data-theme="dark"] .ovx-fact { background:linear-gradient(90deg, rgba(124,108,240,.18), rgba(16,163,127,.12)); border-color:rgba(124,108,240,.3); }
 </style>
+<script>
+/* v3.108.0: client remarks (for the client email only). Only admins load or save them: Supabase td_client_remarks. */
+(() => {
+  const M = new Map(); let at = 0, busy = false;
+  const k = (n, d) => String(n || '').trim().toLowerCase().replace(/\s+/g, ' ') + '|' + d;
+  const adm = () => { try { return !!(window.PERM && PERM.online() && PERM.isSuper()); } catch { return false; } };
+  window.tdClientRemarkOf = (name, iso) => adm() ? ((M.get(k(name, iso)) || {}).text || '') : '';
+  async function load(force) { if (busy || !adm() || (!force && Date.now() - at < 120000)) return; busy = true;
+    try { const p = tzParts(Date.now()), d0 = new Date(Date.UTC(p.y, p.m - 3, 1)).toISOString().slice(0, 10), d1 = new Date(Date.UTC(p.y, p.m + 3, 0)).toISOString().slice(0, 10);
+      const r = await CLOUD._rpc('td_client_remarks_list', { p_token: CLOUD.token(), p_from: d0, p_to: d1 }); M.clear(); for (const x of (Array.isArray(r) ? r : [])) M.set(k(x.name, String(x.day).slice(0, 10)), x); at = Date.now(); } catch { }
+    busy = false; }
+  window.tdClientRemarkSave = async items => {
+    if (!adm()) return; for (const x of items) { if (x.text) M.set(k(x.name, x.day), x); else M.delete(k(x.name, x.day)); }
+    try { await CLOUD._rpc('td_client_remarks_save', { p_token: CLOUD.token(), p_items: items }); }
+    catch (e) { toast(/schema cache|Could not find/i.test(e.message || '') ? 'The client remark was not saved: run client-remarks.sql in Supabase first.' : 'The client remark was not saved: ' + e.message, true); }
+  };
+  setInterval(() => load(false), 20000); setTimeout(() => load(true), 2500);
+})();
+</script>
+<style>.bkx-crm { margin-top:8px; padding:8px 10px; border-radius:10px; background:color-mix(in srgb, #2563eb 7%, transparent); border:1px dashed color-mix(in srgb, #2563eb 35%, transparent); }</style>
 </body>
 </html>
