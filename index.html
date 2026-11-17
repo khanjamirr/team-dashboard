@@ -15,7 +15,7 @@
 <meta name="apple-mobile-web-app-title" content="Blasters Deck">
 <meta name="application-name" content="Blasters Deck">
 <meta name="apple-mobile-web-app-status-bar-style" content="default">
-<title>Blasters Deck · 3.109.0</title>
+<title>Blasters Deck · 3.111.0</title>
 <link rel="preconnect" href="https://fonts.googleapis.com"><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin><link href="https://fonts.googleapis.com/css2?family=Public+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet">
 <style>
 :root {
@@ -2422,7 +2422,7 @@ html body .atabs.atabs > .atab[hidden] { display:none !important; }
 .nf-main { flex:1; display:flex; gap:12px; align-items:flex-start; text-align:left; border:0; background:transparent; font:inherit; color:inherit; padding:10px 34px 10px 10px; border-radius:12px; cursor:pointer; min-width:0; }
 .nf-main:hover { background:var(--surface-2); }
 .nf-ic { display:grid; place-items:center; width:36px; height:36px; border-radius:50%; background:var(--surface-2); font-size:16px; flex:none; }
-.nf-task .nf-ic { background:#e5eeff; } .nf-request .nf-ic { background:#fff2dc; } .nf-playbook .nf-ic { background:#f1e9ff; }
+.nf-task .nf-ic { background:#e5eeff; } .nf-request .nf-ic { background:#fff2dc; } .nf-playbook .nf-ic { background:#f1e9ff; } .nf-mention .nf-ic { background:#fff1c2; } .pb-taghint { font-weight:500; color:var(--muted,#8a8f98); font-size:11.5px; }
 .nf-txt { flex:1; min-width:0; display:flex; flex-direction:column; gap:2px; } .nf-txt b { font-size:13.5px; } .nf-txt span { font-size:13px; color:var(--ink-2); overflow-wrap:anywhere; display:-webkit-box; -webkit-line-clamp:2; -webkit-box-orient:vertical; overflow:hidden; }
 .nf-item.unread .nf-txt b { color:var(--ink); }
 .nf-time { font-size:11.5px; color:var(--ink-2); white-space:nowrap; padding-top:2px; }
@@ -3031,6 +3031,7 @@ tr.act-zero td { color:var(--muted); }
 .rte-men { display:inline; padding:1px 6px; border-radius:6px; background:color-mix(in srgb, var(--accent,#2563eb) 12%, transparent); color:var(--accent,#2563eb); font-weight:600; white-space:nowrap; }
 .pl-msg.me .rte-men { color:#fff; background:rgba(255,255,255,.22); }
 .rte-men.me { background:#fff1c2; color:#8a5300; }
+.men-av.all { background:#ffe9c7 !important; color:#8a5300 !important; font-size:14px; } .men-sub { display:block; font-size:11px; color:var(--muted,#8a8f98); font-weight:500; }
 .men-pop { position:fixed; z-index:3000; width:240px; max-height:300px; overflow:auto; background:var(--surface,#fff); border:1px solid var(--border,#e3e6ec); border-radius:12px; box-shadow:0 16px 40px rgba(15,23,42,.2); padding:5px; }
 .men-h { font-size:10.5px; font-weight:700; letter-spacing:.06em; text-transform:uppercase; color:var(--ink-3,#8a93a3); padding:6px 8px 4px; }
 .men-opt { display:flex; align-items:center; gap:9px; width:100%; border:0; background:none; padding:7px 8px; border-radius:8px; cursor:pointer; text-align:left; font:inherit; font-size:13.5px; color:var(--ink); }
@@ -3924,7 +3925,7 @@ input.wa-linked { background:color-mix(in srgb, #25a244 7%, var(--surface, #fff)
         <div class="card c-coming" id="cardComing" aria-label="Upcoming birthdays and work anniversaries">
           <div class="card-head">
             <div class="grow"><h2 id="comingTitle">Coming up in the next 14 days</h2><div class="sub">Birthdays and work anniversaries of current team members</div></div>
-            <label class="hint" style="display:flex;align-items:center;gap:6px">Show <select class="input mini" id="comingDays" style="width:auto;min-width:0;height:28px"><option value="7">7 days</option><option value="14" selected>14 days</option><option value="30">30 days</option><option value="60">60 days</option><option value="90">90 days</option><option value="180">180 days</option></select><button type="button" class="btn mini" id="comingCopy" title="Copy names and dates straight from the employee records, ready for Excel, Outlook or Teams">Copy dates</button></label>
+            <label class="hint" style="display:flex;align-items:center;gap:6px">Show <select class="input mini" id="comingDays" style="width:auto;min-width:0;height:28px"><option value="7">7 days</option><option value="14" selected>14 days</option><option value="30">30 days</option><option value="60">60 days</option><option value="90">90 days</option><option value="180">180 days</option></select><button type="button" class="btn mini" id="comingCopy" title="Copy names and dates straight from the employee records, ready for Excel, Outlook or Teams">Copy dates</button><button type="button" class="btn mini" id="comingTime" hidden title="Reminder times (admins)" aria-label="Birthday and anniversary reminder times">⏰</button></label>
           </div>
           <div class="coming" id="coming"></div>
         </div>
@@ -4833,6 +4834,7 @@ async function writeBlob(fh, blob, extra, opts) {
       if (opts && opts.force) fh._force = true;
       w = await fh.createWritable(); await w.write(blob); await w.close();
       for (const t of taken) { const k = LOGQ.indexOf(t); if (k >= 0) LOGQ.splice(k, 1); }
+      try { if (window.TDACT) for (const e of more) TDACT.add(e); } catch (_) { }   /* v3.111.0: this change's entries go to the activity table too */
       return;
     }
     catch (e) { fh._force = false; try { if (w) await w.abort(); } catch (_) { /* ignore */ } w = null; if (e && e.cloud) throw new ApiErr(e.status || 500, e.message, null, e.code); if (i < 2) await sleep(700); }
@@ -5171,7 +5173,7 @@ function stampActivity(e) {
   return { ...e, eventId: e.eventId || crypto.randomUUID(), ...(u && e.user === u.name && !e.userId ? { userId: String(u.id) } : {}) };
 }
 function appendActivity(entries) {
-  for (const e of entries || []) if (e && typeof e === "object") LOGQ.push(stampActivity(e));
+  for (const e of entries || []) if (e && typeof e === "object") { const x = stampActivity(e); LOGQ.push(x); try { window.TDACT && TDACT.add(x); } catch { } }   /* v3.111.0: also logged at once in the database */
   scheduleLogFlush();
   window.dispatchEvent(new CustomEvent('activity:changed'));
   return Promise.resolve();
@@ -5318,7 +5320,10 @@ function activityWindow(items, file, now = Date.now()) {
 async function readActivity() {
   const { u8 } = await readFile(), zip = await Zip.open(u8), loc = await actLocate(zip);
   const requestEvents = window.requestAuditEntries ? window.requestAuditEntries() : [];
-  return activityWindow([...await actRead(zip, loc), ...LOGQ, ...requestEvents], null, Date.now() + 60000);
+  let fromDb = []; try { fromDb = window.TDACT ? await TDACT.list() : []; } catch { }
+  const seen = new Set(), all = [];
+  for (const e of [...fromDb, ...LOGQ, ...await actRead(zip, loc), ...requestEvents]) { const id = e && e.eventId; if (id) { if (seen.has(id)) continue; seen.add(id); } all.push(e); }   /* v3.111.0: one copy of each entry */
+  return activityWindow(all, null, Date.now() + 60000);
 }
 
 /* ------------------------------ data operations ------------------------------ */
@@ -6099,7 +6104,8 @@ const CLOUD = (() => {
     request: (team, hours, reason) => rpc('td_access_request', { p_token: tok(), p_team: team, p_hours: hours, p_reason: reason }),
     decide: (id, action, hours) => rpc('td_access_decide', { p_token: tok(), p_id: id, p_action: action, p_hours: hours ?? null })
   };
-  return { cfg: () => { const c = cfg(); return { url: c.url, anonKey: c.anonKey }; }, phoneKey, contactKeys, fieldKeys, details, teams, atRest: () => dataKeyState, SUPABASE_CONFIG, saveDashboard, changeMyPasscode, passChanged, card, resume, mode, decorate, signOut, useLocalFiles, openAdmin, configured, isAdmin, refreshMe, user, getSettings, setSetting, setShared, saveLeaveRequest, admin, _rpc: rpc, token: () => (session && session.token) || null };
+  return { cfg: () => { const c = cfg(); return { url: c.url, anonKey: c.anonKey }; }, phoneKey, contactKeys, fieldKeys, details, teams, atRest: () => dataKeyState, SUPABASE_CONFIG, saveDashboard, changeMyPasscode, passChanged, card, resume, mode, decorate, signOut, useLocalFiles, openAdmin, configured, isAdmin, refreshMe, user, getSettings, setSetting, setShared, saveLeaveRequest, admin, _rpc: rpc, token: () => (session && session.token) || null,
+    sealText: async t => b64(new Blob([await seal(new TextEncoder().encode(String(t)))])), unsealText: async b => new TextDecoder().decode(await unseal(unb64(String(b)))) };   /* v3.111.0: for the activity log table */
 })();
 
 /* =====================================================================
@@ -9155,7 +9161,7 @@ function openLogLeave(preKey) {
       <div class="form"><div class="full" style="display:flex;flex-direction:column;gap:4px"><span style="font-size:12px;font-weight:600;color:var(--ink-2);display:flex;align-items:center;gap:8px">Employee ${window.PERM && PERM.isSuper() ? `<button type="button" id="l-who" title="Choose which employee statuses show in this list (for everyone)" style="border:1px solid var(--line,#e3e6ec);background:var(--surface-2,#f4f6f9);border-radius:999px;padding:2px 10px;font:inherit;font-size:11.5px;font-weight:600;color:var(--ink-2);cursor:pointer">👥 Showing: <span id="l-who-t">${esc(whoLabel())}</span> ▾</button>` : (recF() ? `<span style="font-size:11.5px;font-weight:500;color:var(--ink-3)" title="Set by an admin">👥 ${esc(whoLabel())}</span>` : '')}</span><div class="cbx"><input type="text" id="l-name" value="${esc(pre || '')}" placeholder="Pick or type a name" autocomplete="off" role="combobox" aria-expanded="false" aria-controls="l-list" aria-label="Employee" style="width:100%;padding-right:32px"><button type="button" class="cbx-caret" id="l-caret" tabindex="-1" aria-label="Show all employees">▾</button><div class="cbx-list" id="l-list" role="listbox" hidden></div></div></div>
       <div style="display:flex;flex-direction:column;gap:4px"><span style="font-size:12px;font-weight:600;color:var(--ink-2)">Type <small style="font-weight:400;color:var(--ink-3)">· type a code or a word, ↑↓ Enter · Alt+T</small></span><div class="cbx"><input type="text" id="l-type" autocomplete="off" role="combobox" aria-expanded="false" aria-controls="l-tlist" aria-label="Type" style="width:100%" placeholder="Choose a type, e.g. SL or sick"><button type="button" class="cbx-caret" tabindex="-1" aria-hidden="true" id="l-tcaret">▾</button><div class="cbx-list" id="l-tlist" role="listbox" hidden></div></div><select id="l-code" hidden aria-hidden="true" tabindex="-1"><option value="" selected></option>${codesAllowed.map(c => `<option value="${c}">${c} · ${CODES[c].label}</option>`).join('')}</select></div><span></span>
       <label>From<input type="date" id="l-from" value="${today}"></label><label>To<input type="date" id="l-to" value="${today}"></label>
-      <label class="full" id="l-remwrap">Internal remark <span style="font-weight:400;color:var(--ink-3)">(optional · only the team sees it)</span><textarea id="l-remark" maxlength="500" rows="2" style="resize:vertical;min-height:44px;font:inherit;padding:8px 10px;border-radius:8px;border:1px solid var(--line);background:var(--surface);color:var(--ink)" placeholder="e.g. Informed TL at 9:10 AM ET on WhatsApp · doctor’s note to follow"></textarea></label>
+      <label class="full" id="l-remwrap">Internal remark <span style="font-weight:400;color:var(--ink-3)">(optional · only the team sees it)</span><textarea id="l-remark" maxlength="500" rows="2" style="resize:vertical;min-height:44px;font:inherit;padding:8px 10px;border-radius:8px;border:1px solid var(--line);background:var(--surface);color:var(--ink)" placeholder="e.g. Informed TL at 9:10 AM ET on WhatsApp · type @ to tag someone"></textarea></label>
       ${needsApproval() ? `<label class="full" id="l-notewrap" hidden>Note for your approver <span style="color:var(--bad,#c0392b)">*</span> (needed for leave)<input type="text" id="l-note" maxlength="200" aria-required="true" placeholder="e.g. family function, doctor’s appointment" autocomplete="off"></label><div class="full sm" id="l-lanote" hidden style="padding:8px 10px;border-radius:8px;background:var(--accent-soft)">Leave is saved as <b>LA (pending)</b> straight away, and becomes the leave type once an approver confirms it. Late, remote and other updates are saved directly.</div>` : ''}</div>
       <div id="l-prev" class="sm" style="margin-top:12px;padding:10px 12px;border:1px solid var(--line);border-radius:8px;background:var(--surface-2)"></div><div class="err" id="l-err"></div>
       <div id="l-hist" class="ph-box" style="margin-top:12px"></div>`,
@@ -10487,14 +10493,22 @@ const BKDUE = { snooze: 0, timer: null, box: null };
 /* v3.103.4: admins set how often it comes back and how far ahead it looks (team settings: bkdue_cfg) */
 const BKDUE_TZ = [['America/New_York', 'US Eastern (ET)'], ['America/Chicago', 'US Central (CT)'], ['America/Denver', 'US Mountain (MT)'], ['America/Los_Angeles', 'US Pacific (PT)'], ['Asia/Kolkata', 'India (IST)']];
 const bkDueCfg = () => { const c = (window.TD_SETTINGS || {}).bkdue_cfg || {}; return { every: [1, 5, 10, 15, 30, 60, 120].includes(+c.every) ? +c.every : 1, ahead: [0, 1, 2, 3].includes(+c.ahead) ? +c.ahead : 1,
-  at: /^\d\d:\d\d$/.test(c.at || '') ? c.at : '', tz: BKDUE_TZ.some(([z]) => z === c.tz) ? c.tz : 'America/New_York' }; };
+  ats: (Array.isArray(c.ats) ? c.ats : [c.at]).filter(t => /^\d\d:\d\d$/.test(t || '')).filter((t, i, a) => a.indexOf(t) === i).sort().slice(0, 8),
+  get at() { return this.ats[0] || ''; }, tz: BKDUE_TZ.some(([z]) => z === c.tz) ? c.tz : 'America/New_York' }; };   /* v3.110.0: several times a day (ats) */
 /* v3.107.0: the moment today (in the chosen zone) when the batch reminder starts; '' = any time */
-const bkDueStartMs = () => { const c = bkDueCfg(); if (!c.at) return 0; const [hh, mm] = c.at.split(':').map(Number), now = Date.now();
+const bkDueAtMs = (at, tz) => { const [hh, mm] = at.split(':').map(Number), now = Date.now(), c = { tz };
   const p = {}; for (const x of new Intl.DateTimeFormat('en-US', { timeZone: c.tz, hourCycle: 'h23', year: 'numeric', month: 'numeric', day: 'numeric', hour: 'numeric', minute: 'numeric', second: 'numeric' }).formatToParts(new Date(now))) p[x.type] = +x.value;
   const off = (Date.UTC(p.year, p.month - 1, p.day, p.hour % 24, p.minute, p.second) - Math.floor(now / 1000) * 1000) / 60000;
   return Date.UTC(p.year, p.month - 1, p.day, hh, mm) - off * 60000; };
-const bkDueWhenTxt = () => { const c = bkDueCfg(); if (!c.at) return 'within a few minutes'; const [hh, mm] = c.at.split(':').map(Number), ab = (BKDUE_TZ.find(([z]) => z === c.tz) || ['', 'ET'])[1].replace(/^.*\((.+)\)$/, '$1');
-  return 'at ' + ((hh % 12) || 12) + ':' + String(mm).padStart(2, '0') + ' ' + (hh < 12 ? 'AM' : 'PM') + ' ' + ab; };
+const bkDueSlots = () => { const c = bkDueCfg(); return c.ats.map(t => bkDueAtMs(t, c.tz)).sort((a, b) => a - b); };   /* today's reminder moments */
+const bkDueLastSlotFor = (ats, tz) => { const n = Date.now(); return ats.map(t => bkDueAtMs(t, tz)).filter(t => t <= n).sort((a, b) => a - b).pop() || 0; };
+const bkDueStartMs = () => { const L = bkDueSlots(); return L.length ? L[0] : 0; };
+const bkDueLastSlot = () => { const n = Date.now(); return bkDueSlots().filter(t => t <= n).pop() || 0; };
+const bkT12 = t => { const [hh, mm] = t.split(':').map(Number); return ((hh % 12) || 12) + ':' + String(mm).padStart(2, '0') + ' ' + (hh < 12 ? 'AM' : 'PM'); };
+const bkDueWhenTxt = () => { const c = bkDueCfg(); if (!c.ats.length) return 'within a few minutes'; const ab = (BKDUE_TZ.find(([z]) => z === c.tz) || ['', 'ET'])[1].replace(/^.*\((.+)\)$/, '$1');
+  const now = Date.now(), next = c.ats.find(t => bkDueAtMs(t, c.tz) > now);
+  if (c.ats.length === 1) return 'at ' + bkT12(c.ats[0]) + ' ' + ab;
+  return next ? 'at ' + bkT12(next) + ' ' + ab + ' (next of ' + c.ats.length + ' reminders)' : 'within a few minutes'; };
 window.bkDueWhenTxt = bkDueWhenTxt;
 const bkEveryTxt = n => n < 60 ? n + (n === 1 ? ' minute' : ' minutes') : (n / 60) + (n === 60 ? ' hour' : ' hours');
 function bkDueSettings() {
@@ -10502,20 +10516,29 @@ function bkDueSettings() {
   const c = bkDueCfg();
   const every = document.createElement('select'); every.className = 'input'; every.innerHTML = [1, 5, 10, 15, 30, 60, 120].map(n => `<option value="${n}" ${n === c.every ? 'selected' : ''}>Every ${bkEveryTxt(n)}</option>`).join('');
   const ahead = document.createElement('select'); ahead.className = 'input'; ahead.innerHTML = [[0, 'Today only'], [1, 'Today and tomorrow'], [2, 'Today and the next 2 days'], [3, 'Today and the next 3 days']].map(([n, l]) => `<option value="${n}" ${n === c.ahead ? 'selected' : ''}>${l}</option>`).join('');
-  const atIn = document.createElement('input'); atIn.type = 'time'; atIn.value = c.at || '';
+  /* v3.110.0: a list of times; each brings the box up again */
+  const times = document.createElement('div'); times.className = 'bkr-times';
+  const addBtn = document.createElement('button'); addBtn.type = 'button'; addBtn.className = 'linkbtn bkr-add'; addBtn.textContent = '+ Add another time';
+  const addTime = v => { const row = document.createElement('div'); row.className = 'bkr-trow'; const i = document.createElement('input'); i.type = 'time'; i.className = 'input'; i.value = v || '';
+    const x = document.createElement('button'); x.type = 'button'; x.className = 'bkr-tx'; x.title = 'Remove this time'; x.textContent = '×'; x.onclick = () => { row.remove(); upd(); };
+    row.append(i, x); times.append(row); upd(); return i; };
+  const tIns = () => [...times.querySelectorAll('input')];
+  const upd = () => { const n = tIns().length; times.querySelectorAll('.bkr-tx').forEach(b => b.hidden = n < 2); addBtn.hidden = n >= 8 || anyB.checked; };
   const anyT = document.createElement('label'); anyT.className = 'chk-line'; const anyB = document.createElement('input'); anyB.type = 'checkbox'; anyB.checked = !c.at; anyT.append(anyB, document.createTextNode(' Any time of day'));
   const tz = document.createElement('select'); tz.className = 'input'; tz.innerHTML = BKDUE_TZ.map(([z, l]) => `<option value="${z}" ${z === c.tz ? 'selected' : ''}>${l}</option>`).join('');
-  const sync = () => { atIn.disabled = tz.disabled = anyB.checked; if (!anyB.checked && !atIn.value) atIn.value = '16:00'; }; anyB.addEventListener('change', sync); sync();
+  const sync = () => { tz.disabled = anyB.checked; tIns().forEach(i => i.disabled = anyB.checked); if (!anyB.checked && !tIns().some(i => i.value)) { if (!tIns().length) addTime('16:00'); else tIns()[0].value = '16:00'; } upd(); };
+  (c.ats.length ? c.ats : ['']).forEach(addTime); addBtn.onclick = () => { const i = addTime(''); i.focus(); }; anyB.addEventListener('change', sync); sync();
   const body = document.createElement('div');
-  body.innerHTML = '<p class="set-hint" style="margin:0 0 12px">When people choose “Skip for now” while recording leave, one box comes up at the time you set, listing everyone still missing a backup so they can be done together. After “Remind me later” it comes back at the interval below. This applies to everyone who sets backups.</p>';
+  body.innerHTML = '<p class="set-hint" style="margin:0 0 12px">When people choose “Skip for now” while recording leave, one box comes up at each time you set, listing everyone still missing a backup so they can be done together. After “Remind me later” it comes back at the interval below. This applies to everyone who sets backups.</p>';
   const grid = document.createElement('div'); grid.className = 'bkr-grid';
-  const l0 = document.createElement('label'); l0.append('Show the box at', atIn); const l0b = document.createElement('label'); l0b.append('Time zone', tz);
+  const l0 = document.createElement('div'); l0.className = 'bkr-l0'; const l0t = document.createElement('span'); l0t.textContent = 'Show the box at'; l0.append(l0t, times, addBtn); const l0b = document.createElement('label'); l0b.append('Time zone', tz);
   const l1 = document.createElement('label'); l1.append('Then comes back', every); const l2 = document.createElement('label'); l2.append('Looks at leave on', ahead); grid.append(l0, l0b, l1, l2); body.append(anyT, grid);
   const save = document.createElement('button'); save.className = 'btn primary'; save.type = 'button'; save.textContent = 'Save';
   const cancel = document.createElement('button'); cancel.className = 'btn'; cancel.type = 'button'; cancel.textContent = 'Cancel';
   const d = window.pdlg('Backup reminder: timing', body, [cancel, save]);
   cancel.onclick = () => d.close();
-  save.onclick = async () => { save.disabled = true; try { const next = { every: +every.value, ahead: +ahead.value, at: anyB.checked ? '' : (atIn.value || '16:00'), tz: tz.value }; await window.saveTeamSetting('bkdue_cfg', next, { name: 'Backup reminder', text: (next.at ? 'Shows at ' + next.at + ' ' + tz.options[tz.selectedIndex].text + ' · ' : '') + 'comes back every ' + bkEveryTxt(next.every) + ' · ' + ahead.options[ahead.selectedIndex].text.toLowerCase() }); d.close(); BKDUE.snooze = Math.min(BKDUE.snooze, Date.now() + next.every * 60000); toast('Saved: ' + (next.at ? 'the box comes up ' + bkDueWhenTxt() + ', then ' : 'it ') + 'comes back every ' + bkEveryTxt(next.every) + '.'); } catch (e) { save.disabled = false; toast('Could not save: ' + e.message, true); } };
+  save.onclick = async () => { save.disabled = true; try { const ats = anyB.checked ? [] : [...new Set(tIns().map(i => i.value).filter(Boolean))].sort(); if (!anyB.checked && !ats.length) { save.disabled = false; toast('Add at least one time, or tick “Any time of day”.', true); return; }
+      const next = { every: +every.value, ahead: +ahead.value, ats, at: ats[0] || '', tz: tz.value }; BKDUE.slotSeen = bkDueLastSlotFor(ats, tz.value); await window.saveTeamSetting('bkdue_cfg', next, { name: 'Backup reminder', text: (ats.length ? 'Shows at ' + ats.map(bkT12).join(', ') + ' ' + tz.options[tz.selectedIndex].text + ' · ' : '') + 'comes back every ' + bkEveryTxt(next.every) + ' · ' + ahead.options[ahead.selectedIndex].text.toLowerCase() }); d.close(); BKDUE.snooze = Math.min(BKDUE.snooze, Date.now() + next.every * 60000); toast('Saved: ' + (ats.length ? 'the box comes up at ' + ats.map(bkT12).join(', ') + ', then ' : 'it ') + 'comes back every ' + bkEveryTxt(next.every) + '.'); } catch (e) { save.disabled = false; toast('Could not save: ' + e.message, true); } };
   d.box.closest('.pdlg-veil').style.zIndex = 10000;
 }
 window.bkDueSettings = bkDueSettings;
@@ -10533,6 +10556,7 @@ function bkDueList() {
   return [...out.values()];
 }
 function bkDueCheck(force) {
+  const slot = bkDueLastSlot(); if (slot && slot > (BKDUE.slotSeen || 0)) { BKDUE.slotSeen = slot; BKDUE.snooze = 0; }   /* v3.110.0: each set time brings it back, even after "Remind me later" */
   if (!force && Date.now() < BKDUE.snooze) return;
   if (!force && Date.now() < bkDueStartMs()) return;   /* v3.107.0: not before the time the admin set */
   if (BKDUE.box && BKDUE.box.isConnected) return;
@@ -12199,7 +12223,7 @@ async function poll() {
 }
 
 /* ============================== filtering ============================== */
-const APP = { title: "Blasters Deck", version: "3.109.0", released: "2026-11-17" };
+const APP = { title: "Blasters Deck", version: "3.111.0", released: "2026-11-17" };
 const BASE_DIMS = { status: "status_column", desig: "designation_column", client: "client_column", mode: "mode_column" };
 const STANDARD_STATUSES = ["Active", "Manager", "OJT", "Bench", "New", "Projected", "Left", "Moved"];
 const TILE_ORDER = ["Active", "Manager", "OJT", "Bench", "New", "Projected"];
@@ -13379,9 +13403,51 @@ function lineChart(months, series, W) {
 }
 
 /* ============================== coming up (top of page) ============================== */
+/* v3.111.0: celebration reminders: the admin sets the times and the time zone (team setting cel_cfg); each person gets each
+   reminder once a day on all their devices (remembered in the database, td_my_prefs.cel_seen) */
+const CEL_TZ = [['Asia/Kolkata', 'India (IST)'], ['America/New_York', 'US Eastern (ET)'], ['America/Chicago', 'US Central (CT)'], ['America/Denver', 'US Mountain (MT)'], ['America/Los_Angeles', 'US Pacific (PT)']];
+const celCfg = () => { const c = (window.TD_SETTINGS || {}).cel_cfg || {}, okT = v => /^\d\d:\d\d$/.test(v || '');
+  return { day: okT(c.day) ? c.day : '00:00', eve: c.eve === '' ? '' : okT(c.eve) ? c.eve : '22:00', tz: CEL_TZ.some(([z]) => z === c.tz) ? c.tz : 'Asia/Kolkata' }; };
+const celNow = () => { const p = {}; for (const x of new Intl.DateTimeFormat('en-US', { timeZone: celCfg().tz, hourCycle: 'h23', year: 'numeric', month: '2-digit', day: '2-digit', hour: '2-digit', minute: '2-digit' }).formatToParts(new Date())) p[x.type] = x.value;
+  return { date: p.year + '-' + p.month + '-' + p.day, hm: (p.hour === '24' ? '00' : p.hour) + ':' + p.minute }; };
+const celT12 = t => { const [hh, mm] = t.split(':').map(Number); return ((hh % 12) || 12) + ':' + String(mm).padStart(2, '0') + ' ' + (hh < 12 ? 'AM' : 'PM'); };
+const celZone = () => (CEL_TZ.find(([z]) => z === celCfg().tz) || ['', 'IST'])[1].replace(/^.*\((.+)\)$/, '$1');
+const CELP = { p: null, at: 0 };
+async function celPrefs(force) {
+  if (!force && CELP.p && Date.now() - CELP.at < 60000) return CELP.p;
+  try { if (typeof CLOUD === 'undefined' || !CLOUD.token()) return null; CELP.p = (await CLOUD._rpc('td_my_prefs', { p_token: CLOUD.token(), p_prefs: null })) || {}; CELP.at = Date.now(); } catch { return CELP.p; }
+  return CELP.p;
+}
+async function celMark(obj) {
+  const cur = ((CELP.p && CELP.p.cel_seen) || {}), next = { ...cur, ...obj };
+  if (CELP.p) CELP.p = { ...CELP.p, cel_seen: next };
+  try { if (typeof CLOUD !== 'undefined' && CLOUD.token()) { CELP.p = await CLOUD._rpc('td_my_prefs', { p_token: CLOUD.token(), p_prefs: { cel_seen: next } }); CELP.at = Date.now(); } } catch { }
+}
+window.celCfg = celCfg; window.celNow = celNow; window.celPrefs = celPrefs; window.celMark = celMark; window.celT12 = celT12; window.celZone = celZone; window.CEL_TZ = CEL_TZ;
+function celSettings() {
+  if (!(window.PERM && PERM.isSuper())) return;
+  const c = celCfg();
+  const dayIn = h('input', { class: 'input', type: 'time', value: c.day });
+  const eveOn = h('input', { type: 'checkbox', checked: !!c.eve }), eveIn = h('input', { class: 'input', type: 'time', value: c.eve || '22:00' });
+  const tz = h('select', { class: 'input' }, ...CEL_TZ.map(([z, l]) => h('option', { value: z, selected: z === c.tz }, l)));
+  const sync = () => { eveIn.disabled = !eveOn.checked; }; eveOn.addEventListener('change', sync); sync();
+  const save = h('button', { class: 'btn primary', type: 'button' }, 'Save');
+  const d = pdlg('Birthday & anniversary reminders', h('div', {},
+    h('p', { class: 'set-hint', style: 'margin:0 0 12px' }, 'When the team gets the “today” notification and the heads-up the evening before. The day itself also follows this time zone. Each person gets each one only once a day, on all their devices.'),
+    h('div', { class: 'bkr-grid' },
+      h('label', {}, 'On the day, at', dayIn), h('label', {}, 'Time zone', tz),
+      h('label', {}, h('span', { class: 'chk-line', style: 'font-weight:600' }, eveOn, ' Heads-up the evening before, at'), eveIn))),
+    [h('button', { class: 'btn', type: 'button', onclick: () => d.close() }, 'Cancel'), save]);
+  save.onclick = async () => { save.disabled = true;
+    const next = { day: dayIn.value || '00:00', eve: eveOn.checked ? (eveIn.value || '22:00') : '', tz: tz.value };
+    try { await window.saveTeamSetting('cel_cfg', next, { name: 'Birthday & anniversary reminders', text: 'On the day at ' + celT12(next.day) + (next.eve ? ', heads-up the evening before at ' + celT12(next.eve) : ', no heads-up') + ' · ' + tz.options[tz.selectedIndex].text });
+      d.close(); toast('Saved: on the day at ' + celT12(next.day) + (next.eve ? ', heads-up at ' + celT12(next.eve) + ' the evening before' : '') + ' (' + celZone() + ').'); try { renderComing && renderComing(); } catch { } }
+    catch (e) { save.disabled = false; toast('Could not save: ' + e.message, true); } };
+}
+window.celSettings = celSettings;
 function upcoming(colKey, kind, days, shift) {
-  /* v3.107.1: birthdays and anniversaries follow India time (the day starts at 12 AM IST) */
-  const t0 = new Date(Date.now() + 330 * 60000 + (shift || 0) * 86400000), t = { getFullYear: () => t0.getUTCFullYear(), getMonth: () => t0.getUTCMonth(), getDate: () => t0.getUTCDate() };
+  /* v3.107.1: birthdays and anniversaries follow India time (the day starts at 12 AM IST) · v3.111.0: or the zone the admin chose */
+  const cd = celNow().date.split('-').map(Number), t0 = new Date(Date.UTC(cd[0], cd[1] - 1, cd[2]) + (shift || 0) * 86400000), t = { getFullYear: () => t0.getUTCFullYear(), getMonth: () => t0.getUTCMonth(), getDate: () => t0.getUTCDate() };
   const today = Date.UTC(t.getFullYear(), t.getMonth(), t.getDate());
   const out = [];
   const bmap = kind === "bday" ? ((window.TD_SETTINGS || {}).birthdays || {}) : null;
@@ -13557,7 +13623,9 @@ function renderHolidays() {
   if (ctry !== "US") { const g = mk("🇮🇳", "India", ind, inNote); g.dataset.ctry = "IN"; parts.push(g); }
   $("#holidays").replaceChildren(...parts);
 }
+document.addEventListener("click", ev => { if (ev.target.closest && ev.target.closest("#comingTime")) celSettings(); });
 function renderComing() {
+  { const ct = document.getElementById("comingTime"); if (ct) { ct.hidden = !(window.PERM && PERM.isSuper()); const c = celCfg(); ct.title = "Reminders: on the day at " + celT12(c.day) + (c.eve ? ", heads-up the evening before at " + celT12(c.eve) : "") + " " + celZone() + " · click to change"; } }
   const days = state.comingDays;
   $("#comingTitle").textContent = "Coming up in the next " + days + " days";
   const initials = name => (name || "?").trim().split(/\s+/).filter(Boolean).slice(0, 2).map(s => s[0]).join("").toUpperCase() || "?";
@@ -13599,27 +13667,27 @@ async function copyCelebrations(days, only) {
 }
 document.addEventListener("click", ev => { if (ev.target.closest && ev.target.closest("#comingCopy")) copyCelebrations(state.comingDays, OV.up === "bday" || OV.up === "anniv" ? OV.up : null); });
 let celebrateShown = false;
-function celebratePopup() {
+async function celebratePopup() {
   if (celebrateShown || !state.rows || !state.rows.length) return;
   const app = document.getElementById("app"); if (!app || app.hidden) return;
   if (window.PERM && PERM.can && !PERM.can("ov.coming")) return;
-  const t = new Date(Date.now() + 330 * 60000), today = t.toISOString().slice(0, 10);   /* v3.107.1: India date */
-  const who = (window.BE && BE.userName && BE.userName()) || "me", KEY = "td_celebrate_closed|" + who;
-  let closed = null; try { closed = localStorage.getItem(KEY); } catch { }
-  if (closed === today) { celebrateShown = true; return; }
-  let b = [], a = []; try { b = upcoming("dob_column", "bday", 0); a = upcoming("doj_column", "anniv", 0); } catch { return; }
+  const cn = celNow(), today = cn.date, t = new Date(today + "T12:00:00Z");   /* v3.111.0: the date in the reminder time zone */
+  if (cn.hm < celCfg().day) { setTimeout(celebratePopup, 60000); return; }   /* not before the time the admin set */
   celebrateShown = true;
+  const pr = await celPrefs(true); if (pr && pr.cel_seen && pr.cel_seen.pop === today) return;   /* once a day, on all devices */
+  let b = [], a = []; try { b = upcoming("dob_column", "bday", 0); a = upcoming("doj_column", "anniv", 0); } catch { return; }
   if (!b.length && !a.length) return;
+  celMark({ pop: today });
   const esc = v => String(v ?? '').replace(/[&<>"']/g, c => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c]));
   const initials = n => (n || "?").trim().split(/\s+/).filter(Boolean).slice(0, 2).map(x => x[0]).join("").toUpperCase() || "?";
   const row = (x, kind) => `<li class="cel-row"><span class="coming-avatar ${kind}">${esc(initials(x.name))}</span><span class="cel-main"><b>${esc(x.name)}</b><small>${kind === "bday" ? "Happy birthday!" : x.years + (x.years === 1 ? " year" : " years") + " with the team"}</small></span><span class="cel-tag ${kind}">${kind === "bday" ? "Birthday" : "Anniversary"}</span></li>`;
   const veil = document.createElement("div"); veil.className = "cel-veil"; veil.setAttribute("role", "dialog"); veil.setAttribute("aria-modal", "true"); veil.setAttribute("aria-label", "Today's celebrations");
   veil.innerHTML = `<div class="cel-box"><div class="cel-top"><svg viewBox="0 0 24 24" width="30" height="30" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M4 21h16"/><path d="M5 21v-7a2 2 0 0 1 2-2h10a2 2 0 0 1 2 2v7"/><path d="M5 16c1.5 1 3 1 4.5 0s3-1 4.5 0 3 1 4.5 0"/><path d="M12 12V8"/><path d="M12 5.5c.8-.8.8-1.7 0-2.5-.8.8-.8 1.7 0 2.5z"/></svg>
-      <div><h3>Celebrations today</h3><p>${esc(t.toLocaleDateString(undefined, { weekday: "long", day: "numeric", month: "long", timeZone: "UTC" }))} (India)</p></div><button type="button" class="cel-x" data-cel="later" aria-label="Close">✕</button></div>
+      <div><h3>Celebrations today</h3><p>${esc(t.toLocaleDateString(undefined, { weekday: "long", day: "numeric", month: "long", timeZone: "UTC" }))} (${esc(celZone())})</p></div><button type="button" class="cel-x" data-cel="later" aria-label="Close">✕</button></div>
     ${b.length ? `<h4>Birthdays (${b.length})</h4><ul class="cel-list">${b.map(x => row(x, "bday")).join("")}</ul>` : ""}
     ${a.length ? `<h4>Work anniversaries (${a.length})</h4><ul class="cel-list">${a.map(x => row(x, "anniv")).join("")}</ul>` : ""}
-    <div class="cel-foot"><button type="button" class="btn" data-cel="copy" title="Copy names and dates from the employee records">Copy dates</button><span style="flex:1"></span><button type="button" class="btn" data-cel="later" title="Close now and show this again the next time the page opens today">Show again next time</button><button type="button" class="btn primary" data-cel="today" title="Don't show this again today">Close for today</button></div></div>`;
-  const done = mode => { if (mode === "today") { try { localStorage.setItem(KEY, today); } catch { } } veil.remove(); document.removeEventListener("keydown", onKey); };
+    <div class="cel-foot"><button type="button" class="btn" data-cel="copy" title="Copy names and dates from the employee records">Copy dates</button><span style="flex:1"></span><button type="button" class="btn primary" data-cel="today" title="It won't show again today">Close</button></div></div>`;
+  const done = mode => { void mode; veil.remove(); document.removeEventListener("keydown", onKey); };
   const onKey = e => { if (e.key === "Escape") done("later"); };
   veil.addEventListener("click", e => { const btn = e.target.closest("[data-cel]"); if (btn && btn.dataset.cel === "copy") copyCelebrations(0); else if (btn) done(btn.dataset.cel); else if (e.target === veil) done("later"); });
   document.addEventListener("keydown", onKey);
@@ -16213,7 +16281,8 @@ function nfGroup(items) {
   });
 }
 window.nfGroup = nfGroup;
-const activityNotification = it => { const p = nfPretty(it); return { id: 'activity:' + (it.eventId || JSON.stringify([it.time, it.user, it.action, it.key, it.name, it.details])), time: it.time, title: p.title, detail: p.body, icon: p.icon, type: 'activity' }; };
+const nfIsMe = it => { const me = nfMe(); return !!((me.id && String(it.userId || '') === me.id) || (me.name && String(it.user || '').trim().toLowerCase() === me.name)); };   /* v3.111.0 */
+const activityNotification = it => { const p = nfPretty(it); return { mine: nfIsMe(it), id: 'activity:' + (it.eventId || JSON.stringify([it.time, it.user, it.action, it.key, it.name, it.details])), time: it.time, title: p.title, detail: p.body, icon: p.icon, type: 'activity' }; };
 let notificationItems = [], notificationOwner = '', notificationBody = null, bellBusy = false, activityError = '';
 function bellShow(n) {
   const b=el('bellN'), btn=el('btnBell'); if (!b || !btn) return;
@@ -16274,13 +16343,14 @@ function nfTidy(title, body) {
   return { title: nfClip(t, 64), body: nfClip(parts.slice(0, 4).join(' · '), 100) };
 }
 window.nfTidy = (a, b) => nfTidy(a, b); window.nfPretty = it => nfPretty(it);
-const NF_TYPES = { task: ['☑', 'Tasks'], request: ['📅', 'Requests'], playbook: ['📘', 'Playbook'], activity: ['✎', 'Activity'] };
+const NF_TYPES = { task: ['☑', 'Tasks'], request: ['📅', 'Requests'], playbook: ['📘', 'Playbook'], mention: ['📣', 'Tags'], activity: ['✎', 'Activity'] };
 const nfAgo = t => { const d = tdMs(t); if (!d) return ''; const m = Math.max(0, (Date.now() - d) / 60000); return m < 1 ? 'now' : m < 60 ? Math.round(m) + 'm' : m < 1440 ? Math.round(m / 60) + 'h' : m < 1440 * 7 ? Math.round(m / 1440) + 'd' : new Date(d).toLocaleDateString(undefined, { day: 'numeric', month: 'short' }); };
 function nfOpen(it) {
   markNotificationsRead([it.id]);
   if (it.type === 'task') { closeDrawer(); setView('planner'); if (it.taskId != null) setTimeout(() => window.TDTASKS?.open(it.taskId), 300); }
   else if (it.type === 'playbook') { closeDrawer(); setView('playbook'); }
   else if (it.type === 'request') { closeDrawer(); setView('summary'); }
+  else if (it.type === 'mention') { closeDrawer(); const l = String(it.link || ''); if (/^playbook/.test(l)) setView('playbook'); else if (/^remark/.test(l)) setView('summary'); else if (/^task:/.test(l)) { setView('planner'); setTimeout(() => window.TDTASKS?.open(l.slice(5)), 300); } }
 }
 let nfTab = 'nf';
 function drawNotifications() {
@@ -16316,22 +16386,27 @@ function drawNotifications() {
     list.length > nfShow ? h('button', { class: 'btn nf-more', type: 'button', onclick: () => { nfShow += 40; drawNotifications(); } }, 'Show older') : null].filter(Boolean));   /* v3.100.0: What’s new and Troubleshoot moved to the top bar */
   const ma = document.getElementById('nfMarkAll'); if (ma) ma.disabled = !unread;
 }
+let bellBusyAt = 0;
 async function bellCheck() {
+  if (bellBusy && Date.now() - bellBusyAt > 45000) bellBusy = false;   /* v3.111.0: a check that hung no longer blocks every later one */
   if (bellBusy || el('app').hidden || (document.hidden && !(window.TDN && TDN.on()))) return;   /* v3.95.0: keeps checking in the background when notifications are on */
   const owner=notificationKey();
   if (notificationOwner !== owner) { notificationOwner=owner; notificationItems=[]; activityError=''; }
-  if (!notificationPermission() && !PERM.can('activity.view')) { notificationItems=[...(window.TDTASKS?TDTASKS.events():[]),...(window.TDPB?TDPB.events():[])].sort((a,b)=>(tdMs(b.time)||0)-(tdMs(a.time)||0));bellShow(unreadCount());drawNotifications();try{DETAILS.load();}catch{}return; }
-  bellBusy=true;
+  if (!notificationPermission() && !PERM.can('activity.view')) { notificationItems=[...(window.TDTASKS?TDTASKS.events():[]),...(window.TDPB?TDPB.events():[]),...(window.TDMEN?TDMEN.events():[])].sort((a,b)=>(tdMs(b.time)||0)-(tdMs(a.time)||0));bellShow(unreadCount());drawNotifications();try{DETAILS.load();}catch{}return; }
+  bellBusy=true; bellBusyAt=Date.now();
   try {
     if (window.__tdSetP) await window.__tdSetP; else if (!window.__tdSetAt || Date.now() - window.__tdSetAt > 30000) await loadTeamSettings(true);   /* v3.74.1: settings fetched in the last 30 s are reused */
+    try { await window.TDMEN?.load(); } catch { }   /* v3.111.0: tags */
     let activity=[];activityError='';
-    if (PERM.can('activity.view')) {
-      try { const d=await api('GET','/api/activity'); const meN=nfMe(); activity=(d.items || []).filter(it=>!String(it.action || '').startsWith('request-') && !(meN.name && String(it.user || '').trim().toLowerCase()===meN.name)); activity=nfGroup(activity); }   /* v3.98.4: not your own changes · v3.99.0: one notification per burst of changes */
+    const allAct=PERM.can('activity.view');
+    if (allAct || window.TDACT) {   /* v3.111.0: your own changes are listed too (already read, no pop-up); people without "See activity" get only their own */
+      try { const d=await api('GET','/api/activity'); activity=(d.items || []).filter(it=>!String(it.action || '').startsWith('request-') && (allAct || nfIsMe(it))); activity=nfGroup(activity); }   /* v3.98.4: not your own changes · v3.99.0: one notification per burst of changes */
       catch(e) { activityError='Activity could not be loaded: '+e.message; }
     }
     if (owner !== notificationKey()) return;
     // Recheck access after asynchronous reads so changed permissions take effect.
-    notificationItems=[...notificationRequestEvents().filter(nfNotMine),...(window.TDTASKS?TDTASKS.events():[]),...(window.TDPB?TDPB.events():[]),...(PERM.can('activity.view')?activity:[])].sort((a,b)=>(tdMs(b.time)||0)-(tdMs(a.time)||0));   /* v3.78.0: tasks and playbook too */
+    notificationItems=[...notificationRequestEvents().map(it=>nfNotMine(it)?it:{...it,mine:true}),...(window.TDTASKS?TDTASKS.events():[]),...(window.TDPB?TDPB.events():[]),...(window.TDMEN?TDMEN.events():[]),...activity].sort((a,b)=>(tdMs(b.time)||0)-(tdMs(a.time)||0));   /* v3.78.0: tasks and playbook too */
+    { const rd=notificationReads(), own=notificationItems.filter(it=>it.mine&&!rd.has(it.id)); if (own.length) { own.forEach(it=>rd.add(it.id)); try { localStorage.setItem(notificationKey(),JSON.stringify([...rd])); } catch { } } }   /* your own: shown, never unread */
     bellShow(unreadCount());drawNotifications();window.ATT?.renderApprovalRequests();
     try { window.TDN?.items(notificationItems, notificationReads(), it => { try { nfOpen(it); } catch { openBell(); } }); } catch { }
   } catch(e) { activityError='Notifications could not be refreshed: '+e.message;drawNotifications(); }
@@ -16340,7 +16415,7 @@ async function bellCheck() {
 window.refreshNotifications=()=>{
   if (notificationOwner !== notificationKey()) notificationItems=[];
   const allowedIds=new Set(notificationRequestEvents().map(it=>it.id));
-  notificationItems=notificationItems.filter(it=>it.type==='request'?allowedIds.has(it.id):it.type==='task'||it.type==='playbook'?true:PERM.can('activity.view'));
+  notificationItems=notificationItems.filter(it=>it.type==='request'?allowedIds.has(it.id):it.type==='task'||it.type==='playbook'||it.type==='mention'||it.mine?true:PERM.can('activity.view'));
   bellShow(unreadCount());drawNotifications();bellCheck();
 };
 window.bellRecount=()=>bellShow(unreadCount());
@@ -18618,19 +18693,21 @@ function pbEdit(entry) {
   const client = h('input', { class: 'input', value: e.client || '', list: 'pbClients', placeholder: 'All clients' });
   const body = rteEditor({ value: isRichHtml(e.body) ? e.body : rich(e.body || ''), placeholder: 'Write the rule, steps or points here. Paste from Outlook or Word, add pictures or attach files.', minHeight: 260, maxHeight: 520, label: 'Text' });
   const pin = h('input', { type: 'checkbox', checked: !!e.pinned });
+  try { mentionify(body); } catch { }   /* v3.111.0: @ to tag someone (admins: @Everyone) */
   const err = h('p', { class: 'err', role: 'alert' });
   const save = h('button', { class: 'btn primary', type: 'button' }, isNew ? 'Add to playbook' : 'Save');
   const d = dlg(isNew ? 'New playbook entry' : 'Edit playbook entry', h('div', { class: 'pb-form' },
     h('div', { class: 'pb-row2' }, h('label', {}, h('span', {}, 'Section'), cat), h('label', {}, h('span', {}, 'Client (optional)'), client, dl)),
     h('label', {}, h('span', {}, 'Title'), title),
-    h('div', {}, h('span', { class: 'pb-lbl' }, 'Text'), body),
+    h('div', {}, h('span', { class: 'pb-lbl' }, 'Text', h('small', { class: 'pb-taghint' }, window.TDMEN ? ' · ' + TDMEN.hint() : '')), body),
     h('label', { class: 'pb-pin' }, pin, ' Pin to the top of its section'), err), [h('button', { class: 'btn', type: 'button', onclick: () => d.close() }, 'Cancel'), save], 'pb-dlg');
   save.addEventListener('click', async () => {
     err.textContent = ''; if (!title.value.trim()) { err.textContent = 'Give the entry a title.'; title.focus(); return; }
     save.disabled = true; save.textContent = 'Saving…';
     const who = meU().name || (typeof BE !== 'undefined' && BE.userName ? BE.userName() : ''), now = new Date().toISOString();
     const rec = { ...e, cat: cat.value, title: title.value.trim(), body: body.value.replace(/\s+$/, ''), client: client.value.trim(), pinned: pin.checked, updatedAt: now, updatedBy: who, ...(isNew ? { createdAt: now, createdBy: who } : {}) };
-    try { await pbSave(list => { const i = list.findIndex(x => x.id === rec.id); if (i >= 0) list[i] = { ...list[i], ...rec }; else list.push(rec); return list; }, isNew ? 'Added to the playbook.' : 'Playbook entry saved.'); d.close(); }
+    try { await pbSave(list => { const i = list.findIndex(x => x.id === rec.id); if (i >= 0) list[i] = { ...list[i], ...rec }; else list.push(rec); return list; }, isNew ? 'Added to the playbook.' : 'Playbook entry saved.'); d.close();
+      try { const plain = String(rec.body || '').replace(/<[^>]+>/g, ' ').replace(/&nbsp;/g, ' ').replace(/\s+/g, ' ').trim(); window.TDMEN && TDMEN.send('playbook', 'Playbook: ' + rec.title.slice(0, 60), (plain.length > 180 ? plain.slice(0, 180) + '…' : plain), 'playbook:' + rec.id, rec.body, isNew ? '' : e.body); } catch { } }
     catch (x) { err.textContent = x.message; save.disabled = false; save.textContent = isNew ? 'Add to playbook' : 'Save'; }
   });
   setTimeout(() => title.focus(), 30);
@@ -18786,10 +18863,11 @@ function mentionify(root) {
     ctx = find(); if (!ctx) { close(); return; }
     const all = await mentionPeople(), q = ctx.q, me = myId();
     list = all.filter(p => String(p.id) !== me && (!q || p.name.toLowerCase().split(/\s+/).some(w => w.startsWith(q)) || p.name.toLowerCase().includes(q))).slice(0, 8);
+    if (window.tdCanTagAll && tdCanTagAll() && (!q || 'everyone'.startsWith(q) || 'all'.startsWith(q))) list.unshift({ id: 'all', name: 'Everyone', all: true });   /* v3.111.0: admins can tag the whole team */
     if (!list.length) { close(); return; }
     ix = Math.min(ix, list.length - 1);
     if (!pop) { pop = h('div', { class: 'men-pop', role: 'listbox' }); document.body.append(pop); }
-    pop.replaceChildren(h('div', { class: 'men-h' }, 'Tag someone'), ...list.map((p, k) => h('button', { type: 'button', role: 'option', class: 'men-opt' + (k === ix ? ' on' : ''), onmousedown: e => { e.preventDefault(); pick(p); } }, h('span', { class: 'men-av' }, initials(p.name)), h('span', {}, p.name))));
+    pop.replaceChildren(h('div', { class: 'men-h' }, 'Tag someone'), ...list.map((p, k) => h('button', { type: 'button', role: 'option', class: 'men-opt' + (k === ix ? ' on' : ''), onmousedown: e => { e.preventDefault(); pick(p); } }, h('span', { class: 'men-av' + (p.all ? ' all' : '') }, p.all ? '👥' : initials(p.name)), h('span', {}, p.name, p.all ? h('small', { class: 'men-sub' }, 'Notify the whole team') : null))));
     const r = getSelection().getRangeAt(0).getBoundingClientRect(), w = 240, hh = pop.offsetHeight;
     let x = Math.min(Math.max(8, r.left), innerWidth - w - 8), y = r.bottom + 6; if (y + hh > innerHeight - 8) y = Math.max(8, r.top - hh - 6);
     pop.style.left = x + 'px'; pop.style.top = y + 'px';
@@ -19008,7 +19086,7 @@ function taskEvents() {
     }
     if (mine && !made) out.push({ id: 'task:' + t.id + ':new', time: t.createdAt, type: 'task', taskId: t.id, title: 'New task for you', detail: t.title + ' · from ' + (t.createdByName || 'someone') + (t.due ? ' · due ' + fmtDay(t.due) : '') });
     for (const n of t.notes || []) if (String(n.byId) !== id && n.text !== 'Created the task' && Date.now() - Date.parse(n.at) < 30 * DAY)
-      out.push({ id: 'task:' + t.id + ':' + n.at, time: n.at, type: 'task', taskId: t.id, title: n.kind === 'status' ? n.by + ' updated a task' : (n.mentions || []).map(String).includes(id) ? '📣 ' + n.by + ' mentioned you' : n.by + ' added a note', detail: t.title + ' · ' + (n.kind === 'status' ? prettySt(n.text) : '“' + plainOf(n.text, 140) + '”') });
+      out.push({ id: 'task:' + t.id + ':' + n.at, time: n.at, type: 'task', taskId: t.id, title: n.kind === 'status' ? n.by + ' updated a task' : (n.mentions || []).map(String).includes(id) ? '📣 ' + n.by + (/data-uid="all"/.test(n.text || '') ? ' tagged everyone' : ' mentioned you') : n.by + ' added a note', detail: t.title + ' · ' + (n.kind === 'status' ? prettySt(n.text) : '“' + plainOf(n.text, 140) + '”') });
   }
   return out;
 }
@@ -19096,7 +19174,7 @@ function rteClean(html, mode) {
         else if (n.getAttribute('data-up')) { const im = document.createElement('img'); im.setAttribute('data-up', n.getAttribute('data-up')); if (mode !== 'save') im.setAttribute('src', n.getAttribute('src') || ''); into.append(im); }
         continue;
       }
-      if (tag === 'SPAN' && /^\d{1,12}$/.test(n.getAttribute('data-uid') || '')) {   /* v3.101.0: an @mention */
+      if (tag === 'SPAN' && /^(\d{1,12}|all)$/.test(n.getAttribute('data-uid') || '')) {   /* v3.101.0: an @mention */
         const m = document.createElement('span'); m.className = 'rte-men'; m.setAttribute('data-uid', n.getAttribute('data-uid')); m.setAttribute('contenteditable', 'false');
         m.textContent = '@' + String(n.textContent || '').replace(/^@+/, '').trim().slice(0, 80); into.append(m); continue; }
       const el = document.createElement(tag === 'FONT' ? 'span' : tag);
@@ -19154,7 +19232,7 @@ async function uploadFile(file) {
 /* show a saved note: safe markup, pictures fetched when shown, files open on click */
 function rteShow(el, html) {
   el.classList.add('rte-view'); el.innerHTML = rteClean(html);
-  { let me = ''; try { me = String((CLOUD.user() || {}).id || ''); } catch { } if (me) el.querySelectorAll('.rte-men[data-uid="' + me + '"]').forEach(m => m.classList.add('me')); el.querySelectorAll('.rte-men').forEach(m => m.removeAttribute('contenteditable')); }
+  { let me = ''; try { me = String((CLOUD.user() || {}).id || ''); } catch { } if (me) el.querySelectorAll('.rte-men[data-uid="' + me + '"], .rte-men[data-uid="all"]').forEach(m => m.classList.add('me')); el.querySelectorAll('.rte-men').forEach(m => m.removeAttribute('contenteditable')); }
   el.querySelectorAll('img[data-file]').forEach(im => { im.classList.add('rte-loading'); fileUrl(im.getAttribute('data-file')).then(f => { im.src = f.url; im.classList.remove('rte-loading'); }).catch(() => { im.alt = '(picture not available)'; im.classList.add('rte-missing'); });
     im.addEventListener('click', () => fileUrl(im.getAttribute('data-file')).then(f => rteLightbox(f.url, f.name))); });
   el.querySelectorAll('a[data-file]').forEach(a => { a.removeAttribute('contenteditable'); a.addEventListener('click', e => { e.preventDefault(); e.stopPropagation(); rteDownload(a.getAttribute('data-file'), a.getAttribute('data-name')); }); });
@@ -19584,34 +19662,45 @@ const dayDone = new Set();
 function remindDays(force) {
   if (!notifOk() || typeof state === 'undefined' || !state.rows || !state.rows.length) return;
   const names = l => l.slice(0, 4).map(x => x.name).join(', ') + (l.length > 4 ? ' and ' + (l.length - 4) + ' more' : '');
-  /* v3.107.1: celebrations on India time: a heads-up at 10 PM IST the evening before, and the day's notification at 12 AM IST */
-  { const ist = new Date(Date.now() + 330 * 60000), istDay = ist.toISOString().slice(0, 10);
-    if (ist.getUTCHours() >= 22 && !dayDone.has('eve-' + istDay) && (!window.PERM || !PERM.can || PERM.can('ov.coming'))) { dayDone.add('eve-' + istDay);
-      let bd = [], an = []; try { bd = upcoming('dob_column', 'bday', 1).filter(x => x.diff === 1); an = upcoming('doj_column', 'anniv', 1).filter(x => x.diff === 1); } catch { }
-      if (bd.length) notify('🎂 Tomorrow: birthday' + (bd.length > 1 ? 's' : ''), names(bd) + (bd.length === 1 ? ' has a birthday tomorrow.' : ' have birthdays tomorrow.') + ' Get the wishes ready.', 'bdaynext-' + istDay, null);
-      if (an.length) notify('🎉 Tomorrow: work anniversar' + (an.length > 1 ? 'ies' : 'y'), an.slice(0, 4).map(x => x.name + ' · ' + x.years + (x.years === 1 ? ' year' : ' years')).join('\n') + (an.length > 4 ? '\n…and ' + (an.length - 4) + ' more' : ''), 'annivnext-' + istDay, null);
-    }
-    if (!dayDone.has('cel-' + istDay) || force) { dayDone.add('cel-' + istDay);
-      if (!window.PERM || !PERM.can || PERM.can('ov.coming')) {
-        let bd = [], an = []; try { bd = upcoming('dob_column', 'bday', 0); an = upcoming('doj_column', 'anniv', 0); } catch { }
-        if (bd.length) notify('🎂 Birthday' + (bd.length > 1 ? 's' : '') + ' today', names(bd) + (bd.length === 1 ? ' has a birthday today. Wish them!' : ' have birthdays today. Wish them!'), 'bday-' + istDay, null);
-        if (an.length) notify('🎉 Work anniversar' + (an.length > 1 ? 'ies' : 'y') + ' today', an.slice(0, 4).map(x => x.name + ' · ' + x.years + (x.years === 1 ? ' year' : ' years')).join('\n') + (an.length > 4 ? '\n…and ' + (an.length - 4) + ' more' : ''), 'anniv-' + istDay, null);
-      } } }
-  const t = new Date(), today = t.getFullYear() + '-' + String(t.getMonth() + 1).padStart(2, '0') + '-' + String(t.getDate()).padStart(2, '0');
-  if (dayDone.has(today) && !force) return; dayDone.add(today);
-  if (false) {
-    let bd = [], an = []; try { bd = upcoming('dob_column', 'bday', 0); an = upcoming('doj_column', 'anniv', 0); } catch { }
-    if (bd.length) notify('🎂 Birthday' + (bd.length > 1 ? 's' : '') + ' today', names(bd) + (bd.length === 1 ? ' has a birthday today. Wish them!' : ' have birthdays today. Wish them!'), 'bday-' + today, null);
-    if (an.length) notify('🎉 Work anniversar' + (an.length > 1 ? 'ies' : 'y') + ' today', an.slice(0, 4).map(x => x.name + ' · ' + x.years + (x.years === 1 ? ' year' : ' years')).join('\n') + (an.length > 4 ? '\n…and ' + (an.length - 4) + ' more' : ''), 'anniv-' + today, null);
-  }
+  remindCel(force).catch(() => { });
+}
+/* v3.111.0: each reminder once a day per person, on every device (remembered in the database), at the times the admin set */
+let celBusy = false;
+async function remindCel(force) {
+  if (celBusy) return; celBusy = true;
   try {
-    const d0 = Date.UTC(t.getFullYear(), t.getMonth(), t.getDate()), years = [t.getFullYear(), t.getFullYear() + 1];
-    const all = [...years.flatMap(usHolidays).map(x => ({ ...x, flag: '🇺🇸', c: 'USA' })), ...years.flatMap(inHolidays).map(x => ({ ...x, flag: '🇮🇳', c: 'India' }))];
-    const on = n => { const seen = new Set(); return all.filter(x => x.obs.getTime() === d0 + n * 86400000 && !seen.has(x.c + x.name) && seen.add(x.c + x.name)); };
-    const now = on(0), next = on(1);
-    if (now.length) notify('🏖️ Holiday today', now.map(x => x.flag + ' ' + x.name + ' (' + x.c + ')').join('\n'), 'hol-' + today, null);
-    if (next.length) notify('📅 Holiday tomorrow', next.map(x => x.flag + ' ' + x.name + ' (' + x.c + ')').join('\n') + '\nPlan the backups today.', 'holnext-' + today, null);
-  } catch { }
+    const names = l => l.slice(0, 4).map(x => x.name).join(', ') + (l.length > 4 ? ' and ' + (l.length - 4) + ' more' : '');
+    const c = window.celCfg(), n = window.celNow(), canC = !window.PERM || !PERM.can || PERM.can('ov.coming');
+    const t = new Date(), today = t.getFullYear() + '-' + String(t.getMonth() + 1).padStart(2, '0') + '-' + String(t.getDate()).padStart(2, '0');
+    const want = [];
+    if (canC && c.eve && n.hm >= c.eve) want.push(['eve', n.date]);
+    if (canC && n.hm >= c.day) want.push(['cel', n.date]);
+    want.push(['hol', today]);
+    const todo = want.filter(([k, v]) => force || !dayDone.has(k + '-' + v)); if (!todo.length) return;
+    const pr = await window.celPrefs(true), seen = (pr && pr.cel_seen) || {}, mark = {};
+    for (const [k, v] of todo) {
+      dayDone.add(k + '-' + v); if (!force && seen[k] === v) continue; mark[k] = v;
+      if (k === 'eve') {
+        let bd = [], an = []; try { bd = upcoming('dob_column', 'bday', 1).filter(x => x.diff === 1); an = upcoming('doj_column', 'anniv', 1).filter(x => x.diff === 1); } catch { }
+        if (bd.length) notify('🎂 Tomorrow: birthday' + (bd.length > 1 ? 's' : ''), names(bd) + (bd.length === 1 ? ' has a birthday tomorrow.' : ' have birthdays tomorrow.') + ' Get the wishes ready.', 'bdaynext-' + v, null);
+        if (an.length) notify('🎉 Tomorrow: work anniversar' + (an.length > 1 ? 'ies' : 'y'), an.slice(0, 4).map(x => x.name + ' · ' + x.years + (x.years === 1 ? ' year' : ' years')).join('\n') + (an.length > 4 ? '\n…and ' + (an.length - 4) + ' more' : ''), 'annivnext-' + v, null);
+      } else if (k === 'cel') {
+        let bd = [], an = []; try { bd = upcoming('dob_column', 'bday', 0); an = upcoming('doj_column', 'anniv', 0); } catch { }
+        if (bd.length) notify('🎂 Birthday' + (bd.length > 1 ? 's' : '') + ' today', names(bd) + (bd.length === 1 ? ' has a birthday today. Wish them!' : ' have birthdays today. Wish them!'), 'bday-' + v, null);
+        if (an.length) notify('🎉 Work anniversar' + (an.length > 1 ? 'ies' : 'y') + ' today', an.slice(0, 4).map(x => x.name + ' · ' + x.years + (x.years === 1 ? ' year' : ' years')).join('\n') + (an.length > 4 ? '\n…and ' + (an.length - 4) + ' more' : ''), 'anniv-' + v, null);
+      } else {
+        try {
+          const d0 = Date.UTC(t.getFullYear(), t.getMonth(), t.getDate()), years = [t.getFullYear(), t.getFullYear() + 1];
+          const all = [...years.flatMap(usHolidays).map(x => ({ ...x, flag: '🇺🇸', c: 'USA' })), ...years.flatMap(inHolidays).map(x => ({ ...x, flag: '🇮🇳', c: 'India' }))];
+          const on = m => { const sn = new Set(); return all.filter(x => x.obs.getTime() === d0 + m * 86400000 && !sn.has(x.c + x.name) && sn.add(x.c + x.name)); };
+          const now = on(0), next = on(1);
+          if (now.length) notify('🏖️ Holiday today', now.map(x => x.flag + ' ' + x.name + ' (' + x.c + ')').join('\n'), 'hol-' + v, null);
+          if (next.length) notify('📅 Holiday tomorrow', next.map(x => x.flag + ' ' + x.name + ' (' + x.c + ')').join('\n') + '\nPlan the backups today.', 'holnext-' + v, null);
+        } catch { }
+      }
+    }
+    if (Object.keys(mark).length) await window.celMark(mark);
+  } finally { celBusy = false; }
 }
 function afterTasks() { try { renderOvTasks(); tabTitle(); remindNow(); } catch (e) { console.warn(e); } try { remindDays(); } catch (e) { console.warn(e); } }
 setInterval(() => { try { remindDays(); } catch { } }, 60000);   /* v3.107.1: every minute, so 10 PM and 12 AM IST land on time */
@@ -20220,19 +20309,32 @@ window.TDCARD = (() => {
       nx.textContent = (t <= Date.now() ? '⏰ Due now' : '⏰ Next reminder: ' + new Date(t).toLocaleString('en-US', { weekday: 'short', day: 'numeric', month: 'short', hour: 'numeric', minute: '2-digit' }) + ' ET') + (p.last_backup_dl ? ' · last backup ' + new Date(p.last_backup_dl).toLocaleDateString('en-US', { day: 'numeric', month: 'short' }) : ' · no backup downloaded yet'); };
     for (const x of [every, dow, at]) x.addEventListener('input', paint);
     paint();
+    /* v3.111.0: download the backup by itself on the first sign-in of the morning (this computer's clock) */
+    const ad = autoCfg(p), adOn = h('input', { type: 'checkbox', checked: ad.on }), adFrom = h('input', { type: 'time', value: ad.from }), adTo = h('input', { type: 'time', value: ad.to });
+    const adSync = () => { adFrom.disabled = adTo.disabled = !adOn.checked; }; adOn.addEventListener('change', adSync); adSync();
+    const adBox = h('div', { class: 'bkr-auto' }, h('label', { class: 'chk-line', style: 'font-weight:600' }, adOn, ' Download it automatically when I first sign in each morning'),
+      h('div', { class: 'bkr-grid' }, h('label', {}, 'Between (your computer’s time)', adFrom), h('label', {}, 'and', adTo)),
+      h('small', { class: 'set-hint' }, 'One password-protected Excel with everything, private details included. The password is shown right after, once a day.'));
     const err = h('span', { class: 'err' });
     const save = h('button', { class: 'btn primary', type: 'button', onclick: async () => { save.disabled = true;
-      try { await rpc({ backup_every: +every.value, backup_dow: +dow.value, backup_at: at.value || '10:00', backup_snooze: null }); d.close(); toast('Backup reminder saved. It pops up here and on your phone.'); shown = false; }
+      try { await rpc({ backup_every: +every.value, backup_dow: +dow.value, backup_at: at.value || '10:00', backup_snooze: null, auto_dl: { on: adOn.checked, from: adFrom.value || '05:00', to: adTo.value || '12:00' } }); d.close(); toast('Backup reminder saved. It pops up here and on your phone.'); shown = false; }
       catch (e) { err.textContent = e.message; save.disabled = false; } } }, 'Save');
     const d = pdlg('Backup reminder', h('div', {}, h('p', { class: 'set-hint', style: 'margin:0 0 12px' }, 'When should the dashboard remind you to download a backup? The clock starts again each time you download one. Times are US Eastern (ET).'),
-      h('div', { class: 'bkr-grid' }, h('label', {}, 'How often', every), dowL, h('label', {}, 'At (ET)', at)), nx), [err, h('button', { class: 'btn', type: 'button', onclick: () => d.close() }, 'Cancel'), save]);
+      h('div', { class: 'bkr-grid' }, h('label', {}, 'How often', every), dowL, h('label', {}, 'At (ET)', at)), nx, adBox), [err, h('button', { class: 'btn', type: 'button', onclick: () => d.close() }, 'Cancel'), save]);
   };
   const rpc = prefs => CLOUD._rpc('td_my_prefs', { p_token: CLOUD.token(), p_prefs: prefs });
+  function autoCfg(p) { const a = (p && p.auto_dl) || {}, okT = v => /^\d\d:\d\d$/.test(v || ''); return { on: a.on !== false, from: okT(a.from) ? a.from : '05:00', to: okT(a.to) ? a.to : '12:00' }; }   /* v3.111.0: on unless turned off */
   const daysAgo = t => Math.floor((Date.now() - Date.parse(t)) / 864e5);
   async function check() {
     if (shown || busy || typeof CLOUD === 'undefined' || !CLOUD.token || !CLOUD.token() || !window.PERM || !PERM.online() || !PERM.isOwner() || typeof state === 'undefined' || !state.schema) return;
     if (document.querySelector('.pdlg-veil, #pcDialog, .drawer, .tdc-veil, .a2hs')) return;
     busy = true; let p; try { p = await rpc(null); } catch { busy = false; return; } busy = false; prefs = p;
+    { const a = autoCfg(p), now = new Date(), hm = String(now.getHours()).padStart(2, '0') + ':' + String(now.getMinutes()).padStart(2, '0'),
+        day = now.getFullYear() + '-' + String(now.getMonth() + 1).padStart(2, '0') + '-' + String(now.getDate()).padStart(2, '0');   /* this computer's own clock */
+      if (a.on && hm >= a.from && hm < a.to && p.auto_dl_last !== day) {
+        shown = true; try { await rpc({ auto_dl_last: day }); } catch { shown = false; return; }   /* once a day, even with several tabs or devices */
+        toast('Good morning! Downloading today’s backup…');
+        downloadWorkbook(state.file || 'Blasters Deck.xlsx', () => CLOUD.admin.download(), 'the morning backup', { quick: true }); return; } }
     const last = p && p.last_backup_dl, snooze = p && p.backup_snooze;
     if (snooze && Date.parse(snooze) > Date.now()) return;
     if (last && Date.now() < nextDue(p)) return;
@@ -20424,6 +20526,7 @@ window.bdSearch = (() => {
     A(() => true, '✨', 'What’s new', 'Action · latest changes to the dashboard', 'release notes updates version', () => document.getElementById('wnBtn')?.click());
     A(() => !!window.bdPushCheck, '🛠', 'Check notifications', 'Action · fix alerts on this device', 'troubleshoot push not getting notifications', () => bdPushCheck());
     A(own, '⏰', 'Backup reminder timing', 'Settings · how often to download a backup', 'weekly backup reminder schedule', () => window.bdBackupReminderSettings && bdBackupReminderSettings());
+    A(sup, '🎂', 'Birthday & anniversary reminders', 'Settings · the time and time zone of the celebration notifications', 'birthday anniversary celebration reminder time zone', () => window.celSettings && celSettings());
     A(sup, '⏰', 'Leave-backup reminder', 'Settings · how often “Backup needed” comes back', 'backup needed upcoming leave reminder minutes', () => window.bkDueSettings && bkDueSettings());
     A(() => true, '🔑', 'Change my passcode', 'Settings · Preferences', 'password passcode security', () => window.openSettings('prefs'));
     return out;
@@ -20478,6 +20581,8 @@ window.bdSearch = (() => {
 /* v3.96.0: "What's new" once per person after each update (remembered in the database); again from More or the bell */
 window.bdWhatsNew = (() => {
   const NOTES = [
+    { v: '3.111.0', items: [['📣', 'Tag people, or everyone', 'Type @ in a Planner comment, a Playbook entry or an attendance remark to tag someone. They get a notification in the bell and on their phone. Admins can also pick @Everyone to notify the whole team.'], ['⚡', 'Faster notifications, complete activity', 'Every change is logged straight away in its own encrypted table, so nobody’s activity goes missing. Your own changes now show in the bell too, already read and without a pop-up. Phone notifications go out at once.'], ['🎂', 'Celebration reminders: once a day, your times', 'Birthday, anniversary and holiday notifications and the “Celebrations today” box now come once a day per person on all devices. Admins set the time and time zone with ⏰ in Coming up.'], ['🛟', 'Morning backup', 'For the super admin: the first sign-in of the morning (your computer’s time) downloads the full backup by itself, password-protected, with the password shown right after. Change the hours in Backup reminder.']] },
+    { v: '3.110.0', items: [['⏰', 'Several backup reminder times', 'In Backup reminder: timing, admins can add more than one time (for example 10 AM, 2 PM and 9 PM). The “Backup needed” box comes up at each one, even if someone chose “Remind me later” earlier.']] },
     { v: '3.109.0', items: [['🗑', 'Remove a leave from Who is out', 'Admins see a small × at the end of each row in Who is out. It removes that leave or late mark after a quick check, and the day goes back to blank in attendance. Others don\'t see it.']] },
     { v: '3.108.3', items: [['🎭', 'Any employee for a pseudo name', 'When you tag, change or replace a pseudo name you can now pick any employee, not only Active, Active + Resign or OJT. Live seats are listed first; Bench, New and Left come after.']] },
     { v: '3.108.1', items: [['⚡', 'Leave goes straight in', 'Leave is recorded straight into attendance for everyone and shows in Who is out; admins can switch approval back on in the Leaves panel.']] },
@@ -20958,7 +21063,9 @@ html body .ovx-t.dx.dx-violet, html body .ovx-t.dx.dx-peach, html body .ovx-t.dx
 .lnote-row:first-child { border-top:0; } .lnote-row b { font-size:13px; } .lnote-row small { display:block; color:var(--ink-3); font-size:11.5px; }
 .lnote-row textarea { width:100%; min-height:44px; resize:vertical; border:1px solid var(--border,#e3e6ec); border-radius:10px; padding:8px 10px; font:inherit; font-size:13px; background:var(--surface,#fff); color:var(--ink); }
 .bkr-grid { display:grid; grid-template-columns:1fr 1fr; gap:12px; } .bkr-grid label { display:flex; flex-direction:column; gap:5px; font-size:12px; font-weight:600; color:var(--ink-2); }
+.bkr-auto { margin-top:14px; padding-top:12px; border-top:1px solid var(--border,#e3e6ec); display:flex; flex-direction:column; gap:8px; }
 .bkr-grid select, .bkr-grid input { height:38px; border-radius:10px; border:1px solid var(--border,#e3e6ec); padding:0 10px; font:inherit; font-size:14px; background:var(--surface,#fff); color:var(--ink); }
+.bkr-l0 { display:flex; flex-direction:column; gap:6px; font-size:12px; font-weight:600; color:var(--ink-2); } .bkr-times { display:flex; flex-direction:column; gap:6px; } .bkr-trow { display:flex; align-items:center; gap:6px; } .bkr-trow input { flex:1; min-width:0; } .bkr-tx { flex:none; width:30px; height:30px; border:0; border-radius:50%; background:transparent; color:var(--muted,#8a8f98); font-size:18px; cursor:pointer; } .bkr-tx:hover { background:#fbe1dd; color:#b4372a; } .bkr-add { align-self:flex-start; font-size:12.5px; font-weight:600; } .bkr-grid { align-items:start; }
 .bkr-next { margin-top:12px; padding:10px 12px; border-radius:12px; background:var(--surface-2,#f6f7fa); font-size:13px; }
 .sk-err { color:#c0392b; font-size:12.5px; min-height:1px; }
 </style>
@@ -21362,6 +21469,122 @@ html body #pageSummary #cardTrends { grid-area:auto !important; grid-column:1 / 
 })();
 </script>
 <script>
+/* v3.111.0: the activity log in its own table (td_activity_log, activity-log.sql). Each entry is encrypted here with the
+   workbook key and saved within a second, so it no longer waits for the whole workbook to be saved. */
+window.TDACT = (() => {
+  const Q = [], C = new Map(); let timer = null, off = false, sending = false, lastAt = '', listAt = 0, listP = null;
+  const ok = () => { try { return typeof CLOUD !== 'undefined' && !!CLOUD.token() && !!CLOUD.sealText; } catch { return false; } };
+  function add(e) { if (off || !ok() || !e || !e.eventId) return; Q.push(e); clearTimeout(timer); timer = setTimeout(flush, 700); }
+  async function flush() {
+    if (sending || !Q.length || off) return; sending = true;
+    const batch = Q.splice(0, 100);
+    try {
+      const items = [];
+      for (const e of batch) { const data = await CLOUD.sealText(JSON.stringify(e)); if (!/^VERFTkMxO/.test(data)) continue;   /* only ever stored encrypted */
+        items.push({ eventId: e.eventId, action: String(e.action || ''), data }); }
+      if (items.length) await CLOUD._rpc('td_activity_add', { p_token: CLOUD.token(), p_items: items });
+      for (const e of batch) C.set(e.eventId, e);
+    } catch (x) {
+      if (/schema cache|Could not find|does not exist/i.test(x.message || '')) off = true;   /* activity-log.sql not run yet: the workbook log still works */
+      else { Q.unshift(...batch); setTimeout(flush, 5000); }
+    } finally { sending = false; if (Q.length && !off) setTimeout(flush, 300); }
+  }
+  async function pull() {
+    const r = await CLOUD._rpc('td_activity_list', { p_token: CLOUD.token(), p_since: lastAt ? new Date(Date.parse(lastAt) - 60000).toISOString() : null });   /* a minute of overlap: entries saved a moment late are not missed */
+    for (const x of (Array.isArray(r) ? r : [])) {
+      if (!lastAt || x.at > lastAt) lastAt = x.at;
+      if (C.has(x.eventId)) continue;
+      try { const e = JSON.parse(await CLOUD.unsealText(x.data)); if (e && typeof e === 'object') C.set(x.eventId, { ...e, eventId: x.eventId, userId: e.userId || x.userId }); } catch { }
+    }
+    listAt = Date.now();
+  }
+  async function list() {
+    if (off || !ok()) return [];
+    if (Date.now() - listAt > 3000) { if (!listP) listP = pull().catch(x => { if (/schema cache|Could not find|does not exist/i.test(x.message || '')) off = true; }).finally(() => { listP = null; }); await listP; }
+    const cut = Date.now() - 30 * 86400000;
+    for (const [k, e] of C) if ((tdMs(e.time) || 0) < cut) C.delete(k);
+    return [...C.values()];
+  }
+  addEventListener('pagehide', () => { if (Q.length) flush(); });
+  return { add, list, flush, state: () => ({ off, queued: Q.length, cached: C.size }) };
+})();
+</script>
+<script>
+/* v3.111.0: tag people, or @Everyone (admins only), in the Planner, the Playbook and attendance remarks.
+   Tags in plain text boxes are written as "@Full Name"; every tagged person gets a bell notification and a push (td_mentions, mention-everyone.sql). */
+(() => {
+  const isAdm = () => { try { return !!(window.PERM && PERM.isSuper()); } catch { return false; } };
+  window.tdCanTagAll = isAdm;
+  const tok = () => { try { return CLOUD.token(); } catch { return null; } };
+  const me = () => { try { return CLOUD.user() || {}; } catch { return {}; } };
+  let PPL = null, pplAt = 0;
+  async function people() {
+    if (PPL && Date.now() - pplAt < 600000) return PPL;
+    try { const r = await CLOUD._rpc('td_mention_people', { p_token: tok() }); PPL = (Array.isArray(r) ? r : []).filter(p => p && p.id && p.name); pplAt = Date.now(); } catch { PPL = PPL || []; }
+    return PPL;
+  }
+  const ini = n => String(n || '?').trim().split(/\s+/).slice(0, 2).map(w => w[0]).join('').toUpperCase();
+  /* ids tagged in a text: "@Everyone" → ['all'] (admins); "@Full Name" → that person's id */
+  function idsIn(text, allowAll) {
+    const t = ' ' + String(text || '').replace(/<[^>]*data-uid="(\d{1,12}|all)"[^>]*>/g, ' @@$1 ').replace(/<[^>]+>/g, ' ').replace(/&nbsp;/g, ' ') + ' ', low = t.toLowerCase(), out = new Set();
+    for (const m of t.matchAll(/@@(\d{1,12}|all)\b/g)) out.add(m[1]);
+    if (/(^|[\s(])@(everyone|all)\b/i.test(t)) out.add('all');
+    for (const p of (PPL || []).slice().sort((a, b) => b.name.length - a.name.length)) { const n = '@' + p.name.toLowerCase(); let i = low.indexOf(n); while (i >= 0) { const nx = low[i + n.length] || ' '; if (!/[a-z0-9]/.test(nx)) { out.add(String(p.id)); break; } i = low.indexOf(n, i + 1); } }
+    out.delete(String(me().id || ''));
+    if (out.has('all') && !(allowAll ?? isAdm())) out.delete('all');
+    return out.has('all') ? ['all'] : [...out];
+  }
+  /* send; only the tags that are new compared with the old text */
+  async function send(kind, title, body, link, newText, oldText) {
+    await people();
+    const was = new Set(idsIn(oldText || '', true)), ids = idsIn(newText).filter(x => !was.has(x));
+    if (!ids.length) return 0;
+    const who = me().name || 'Someone', all = ids[0] === 'all';
+    try { const r = await CLOUD._rpc('td_mention_send', { p_token: tok(), p_kind: kind, p_title: '📣 ' + who + (all ? ' tagged everyone' : ' tagged you') + ' · ' + title, p_body: body, p_link: link, p_ids: ids });
+      const n = (r && r.sent) || 0; if (n) toast(all ? 'Everyone (' + n + ') was notified.' : n === 1 ? 'The person you tagged was notified.' : n + ' people you tagged were notified.'); return n; }
+    catch (e) { toast(/EVERYONE_ADMIN_ONLY/.test(e.message || '') ? 'Only admins can tag everyone.' : /schema cache|Could not find/i.test(e.message || '') ? 'Tags were not sent: the super admin needs to run mention-everyone.sql in Supabase.' : 'Tags were not sent: ' + e.message, true); return 0; }
+  }
+  /* the @ list for plain text boxes (attendance remarks, backup comments) */
+  let pop = null, cur = null, list = [], ix = 0;
+  const close = () => { pop?.remove(); pop = null; cur = null; };
+  const ctxOf = el => { const v = el.value, c = el.selectionStart; if (c == null || c !== el.selectionEnd) return null; const m = v.slice(0, c).match(/(^|[\s(])@([^\s@]{0,30})$/); return m ? { start: c - m[2].length - 1, end: c, q: m[2].toLowerCase() } : null; };
+  const pick = p => { if (!cur || !p) return; const { el, ctx } = cur, v = el.value, ins = '@' + p.name + ' ';
+    el.value = v.slice(0, ctx.start) + ins + v.slice(ctx.end); const c = ctx.start + ins.length; el.setSelectionRange(c, c); close(); el.dispatchEvent(new Event('input', { bubbles: true, composed: true })); el.focus(); };
+  async function draw(el) {
+    const ctx = ctxOf(el); if (!ctx) { close(); return; }
+    const all = await people(), q = ctx.q, mid = String(me().id || '');
+    list = all.filter(p => String(p.id) !== mid && (!q || p.name.toLowerCase().split(/\s+/).some(w => w.startsWith(q)) || p.name.toLowerCase().includes(q))).slice(0, 8);
+    if (isAdm() && (!q || 'everyone'.startsWith(q) || 'all'.startsWith(q))) list.unshift({ id: 'all', name: 'Everyone', all: true });
+    if (!list.length) { close(); return; }
+    ix = Math.min(ix, list.length - 1); cur = { el, ctx };
+    if (!pop) { pop = document.createElement('div'); pop.className = 'men-pop'; pop.setAttribute('role', 'listbox'); pop.style.zIndex = 100000; document.body.append(pop); }
+    pop.innerHTML = '<div class="men-h">Tag someone</div>' + list.map((p, k) => `<button type="button" role="option" class="men-opt${k === ix ? ' on' : ''}" data-k="${k}"><span class="men-av${p.all ? ' all' : ''}">${p.all ? '👥' : ini(p.name)}</span><span>${String(p.name).replace(/[&<>"]/g, c => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;' }[c]))}${p.all ? '<small class="men-sub">Notify the whole team</small>' : ''}</span></button>`).join('');
+    pop.querySelectorAll('[data-k]').forEach(b => b.addEventListener('mousedown', e => { e.preventDefault(); pick(list[+b.dataset.k]); }));
+    const r = el.getBoundingClientRect(), w = 240, hh = pop.offsetHeight;
+    let x = Math.min(Math.max(8, r.left), innerWidth - w - 8), y = r.bottom + 4; if (y + hh > innerHeight - 8) y = Math.max(8, r.top - hh - 4);
+    pop.style.left = x + 'px'; pop.style.top = y + 'px';
+  }
+  const TAGGABLE = new Set(['l-remark', 'bk-rm']);
+  const target = e => { const t = (e.composedPath && e.composedPath()[0]) || e.target; return t && TAGGABLE.has(t.id) ? t : null; };
+  document.addEventListener('input', e => { const el = target(e); if (el) { ix = 0; draw(el); } }, true);
+  document.addEventListener('keydown', e => { if (!pop || !cur) return; const el = target(e); if (!el) return;
+    if (e.key === 'ArrowDown' || e.key === 'ArrowUp') { e.preventDefault(); e.stopPropagation(); ix = (ix + (e.key === 'ArrowDown' ? 1 : -1) + list.length) % list.length; draw(el); }
+    else if (e.key === 'Enter' || e.key === 'Tab') { e.preventDefault(); e.stopPropagation(); pick(list[ix]); }
+    else if (e.key === 'Escape') { e.preventDefault(); e.stopPropagation(); close(); } }, true);
+  document.addEventListener('focusout', e => { if (target(e)) setTimeout(close, 150); }, true);
+  /* my tags, for the bell */
+  let INBOX = [], inAt = 0, inBusy = false;
+  async function load(force) {
+    if (inBusy || !tok() || (!force && Date.now() - inAt < 25000)) return; inBusy = true;
+    try { const r = await CLOUD._rpc('td_mention_inbox', { p_token: tok() }); INBOX = Array.isArray(r) ? r : []; inAt = Date.now(); } catch { }
+    inBusy = false;
+  }
+  const events = () => INBOX.map(x => ({ id: 'men:' + x.id, time: x.at, type: 'mention', title: x.title, detail: x.body, link: x.link || '', by: x.by }));
+  window.TDMEN = { people, idsIn, send, load, events, hint: () => isAdm() ? 'Type @ to tag someone, or @Everyone for the whole team' : 'Type @ to tag someone' };
+  setTimeout(() => { people(); load(true); }, 2500);
+})();
+</script>
+<script>
 /* v3.103.1: internal remarks on recorded attendance, kept in Supabase (td_att_remarks): one per person per day */
 (() => {
   const M = new Map(); let at = 0, busy = false;
@@ -21376,8 +21599,11 @@ html body #pageSummary #cardTrends { grid-area:auto !important; grid-column:1 / 
     busy = false;
   }
   window.tdRemarkSave = async items => {
+    const old = items.map(x => (M.get(k(x.name, x.day)) || {}).text || '').join(' ');   /* v3.111.0: tags that are new get a notification */
     for (const x of items) M.set(k(x.name, x.day), { ...x, by: (CLOUD.user() || {}).name || '', at: new Date().toISOString() });
-    try { await CLOUD._rpc('td_att_remarks_save', { p_token: CLOUD.token(), p_items: items }); }
+    try { await CLOUD._rpc('td_att_remarks_save', { p_token: CLOUD.token(), p_items: items });
+      const x0 = items.find(x => x.text); if (x0 && window.TDMEN) { const days = items.filter(x => x.text).map(x => x.day).sort(), d = s => { const [y, m, dd] = s.split('-').map(Number); return dd + ' ' + ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'][m - 1]; };
+        TDMEN.send('remark', 'attendance remark', x0.name + ' · ' + (x0.code ? x0.code + ' · ' : '') + d(days[0]) + (days.length > 1 ? '–' + d(days[days.length - 1]) : '') + ': ' + String(x0.text).slice(0, 200), 'remark:' + days[0], x0.text, old); } }
     catch (e) { toast(/schema cache|Could not find/i.test(e.message || '') ? 'The remark was not saved: the super admin needs to run att-remarks.sql in Supabase.' : 'The remark was not saved: ' + e.message, true); }
   };
   setInterval(() => load(false), 15000); setTimeout(() => load(true), 2000);
