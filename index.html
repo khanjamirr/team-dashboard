@@ -15,7 +15,7 @@
 <meta name="apple-mobile-web-app-title" content="Blasters Deck">
 <meta name="application-name" content="Blasters Deck">
 <meta name="apple-mobile-web-app-status-bar-style" content="default">
-<title>Blasters Deck · 3.111.0</title>
+<title>Blasters Deck · 3.112.0</title>
 <link rel="preconnect" href="https://fonts.googleapis.com"><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin><link href="https://fonts.googleapis.com/css2?family=Public+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet">
 <style>
 :root {
@@ -2988,6 +2988,16 @@ tr.act-zero td { color:var(--muted); }
 /* v3.85.1: pseudo names by client and sub client */
 .psn-subgroup { display:flex; align-items:baseline; gap:8px; padding:8px 4px 6px 18px; margin-top:4px; border-left:3px solid color-mix(in srgb, var(--accent) 40%, transparent); }
 .psn-subgroup b { font-size:13px; } .psn-subgroup small { color:var(--muted); font-size:11.5px; }
+.psn-viewsw { display:inline-flex; gap:2px; padding:3px; border-radius:10px; background:var(--chip,#eef1f6); margin:6px 0 2px; } .psn-viewsw button { border:0; background:transparent; padding:5px 12px; border-radius:8px; font-size:12.5px; font-weight:600; color:var(--muted,#6b7280); cursor:pointer; } .psn-viewsw button.on { background:#fff; color:var(--ink,#111); box-shadow:0 1px 3px rgba(0,0,0,.12); }
+.psn-tgrid { grid-column:1/-1; display:grid; grid-template-columns:repeat(auto-fill, minmax(min(100%, 430px), 1fr)); gap:12px; margin:8px 0 6px; align-items:start; }
+.psn-tpanel { background:var(--card,#fff); border:1px solid var(--border,#e3e6ec); border-radius:12px; overflow:hidden; }
+.psn-tpanel > header { display:flex; align-items:baseline; gap:8px; padding:9px 12px; border-bottom:1px solid var(--border,#e3e6ec); background:var(--soft,#f7f8fb); border-left:3px solid #1fa37a; } .psn-tpanel > header b { font-size:13px; } .psn-tpanel > header small { font-size:11px; color:var(--muted,#6b7280); }
+.psn-tbl { width:100%; border-collapse:collapse; font-size:12.5px; } .psn-tbl th { text-align:left; font-size:10.5px; font-weight:700; letter-spacing:.04em; text-transform:uppercase; color:var(--muted,#6b7280); padding:6px 10px; border-bottom:1px solid var(--border,#e3e6ec); }
+.psn-tbl td { padding:6px 10px; border-bottom:1px solid var(--line,#f0f2f5); vertical-align:middle; } .psn-tbl tr:last-child td { border-bottom:0; } .psn-tbl tbody tr:hover td { background:#f7f9fd; }
+.psn-tbl td.pn { white-space:nowrap; } .psn-tbl td.pn .psn-val { display:inline-block; padding:2px 9px; border-radius:999px; background:#dceafd; font-weight:600; font-size:12px; } .psn-tbl td.pn .psn-i, .psn-tbl td.pn button { transform:scale(.85); }
+.psn-tbl td.who { font-weight:600; white-space:nowrap; overflow:hidden; text-overflow:ellipsis; max-width:190px; } .psn-tbl { table-layout:auto; } .psn-tbl td, .psn-tbl th { padding-left:8px; padding-right:8px; } .psn-tbl td.id { font-size:11.5px; } .psn-tbl td.who.vac { color:#b4372a; font-weight:600; } .psn-tbl tr.off td { opacity:.55; } .psn-tbl tr.flag td { background:#fff6e5; } .psn-tflag { margin-left:6px; color:#b86e00; }
+.psn-tbl td.id { color:var(--muted,#6b7280); font-variant-numeric:tabular-nums; white-space:nowrap; } .psn-tbl td.act { text-align:right; white-space:nowrap; }
+.psn-tb { border:0; background:transparent; color:#1a6fe0; font-size:12px; font-weight:600; padding:3px 6px; border-radius:6px; cursor:pointer; } .psn-tb:hover { background:#e8f0fd; } .psn-tb.pri { background:#1a6fe0; color:#fff; } .psn-tedit td { background:#f7f9fd; padding:8px; }
 .psn-counts { margin:4px 0 12px; border:1px solid var(--border); border-radius:14px; background:var(--surface); overflow:hidden; }
 .psn-counts > summary { cursor:pointer; padding:10px 14px; font-weight:650; font-size:13px; }
 .psn-ct { width:100%; border-collapse:collapse; font-size:12.5px; } .psn-ct th { text-align:left; font-weight:600; color:var(--muted); padding:6px 14px; border-top:1px solid var(--border); }
@@ -3628,6 +3638,9 @@ body.ios .wn-veil { align-items:flex-end; padding:0; } body.ios .wn { width:100%
 .wn-it { display:flex; gap:12px; margin:0 0 12px; } .wn-it i { font-style:normal; width:34px; height:34px; flex:none; border-radius:10px; display:grid; place-items:center; background:var(--surface-2,#f2f2f7); font-size:17px; }
 .wn-it b { display:block; font-size:15px; } .wn-it span { display:block; font-size:13px; color:var(--ink-2,#555); line-height:1.4; margin-top:1px; }
 .wn-ok { width:100%; justify-content:center; padding:12px !important; border-radius:14px !important; font-size:15px !important; margin-top:6px; }
+.wn-foot { display:flex; gap:8px; margin-top:6px; } .wn-foot .wn-ok { flex:1; margin-top:0; } .wn-all { padding:12px 14px !important; border-radius:14px !important; font-size:14px !important; white-space:nowrap; }
+.wn-big { max-width:620px !important; width:min(620px, 94vw) !important; } .wn-q { width:100%; margin:4px 0 10px; } .wn-hist h6 { display:flex; align-items:center; gap:8px; } .wn-v { font-weight:800; color:var(--ink,#111); letter-spacing:0; font-size:12px; text-transform:none; }
+.wn-k { font-size:10px; font-weight:700; padding:2px 7px; border-radius:999px; letter-spacing:.02em; } .wn-k.new { background:#e3efff; color:#1a5fc2; } .wn-k.fix { background:#eef0f3; color:#5b6270; } .wn-k.cur { background:#dff5ea; color:#13794f; }
 /* v3.96.1: pseudo names as cards, grouped by client and sub client */
 html body .psn-people { display:grid; grid-template-columns:repeat(auto-fill, minmax(290px, 1fr)); gap:10px; align-items:stretch; }
 html body .psn-people > :not(.psn-seat) { grid-column:1 / -1; }
@@ -4476,6 +4489,41 @@ function dateStyleSet(doc) {
   return set;
 }
 
+/* v3.111.1: Excel refuses a whole workbook ("corrupt") when a cell points to a style that isn't in xl/styles.xml. The attendance
+   writer uses fixed style numbers (2, 3, 93, 96), so a workbook whose style list is shorter gets the missing styles added here,
+   on every save and every download. Workbooks that are already fine are returned untouched. */
+async function repairStyles(u8) {
+  let z; try { z = await Zip.open(u8); } catch { return u8; }
+  const st = await z.get("xl/styles.xml"); if (!st) return u8;
+  let xml = td.decode(st);
+  const cx = xml.match(/<cellXfs\b[^>]*?(?:\/>|>([\s\S]*?)<\/cellXfs>)/); if (!cx) return u8;
+  const have = ((cx[1] || '').match(/<xf\b/g) || []).length;
+  let need = -1;
+  for (const e of z.entries) {
+    if (!/^xl\/worksheets\/[^/]+\.xml$/.test(e.name)) continue;
+    const x = td.decode(await z.get(e.name));
+    for (const m of x.matchAll(/<(?:c|row)\b[^>]*?\ss="(\d+)"/g)) if (+m[1] > need) need = +m[1];
+    for (const m of x.matchAll(/<col\b[^>]*?\sstyle="(\d+)"/g)) if (+m[1] > need) need = +m[1];
+  }
+  if (need < have) return u8;
+  /* what the attendance styles look like: thin borders, centred days, bold totals, "mmm-yy" months */
+  const add = (tag, item) => { const re = new RegExp('<' + tag + '\\b([^>]*?)(?:/>|>([\\s\\S]*?)</' + tag + '>)'); const m = xml.match(re);
+    if (!m) { xml = xml.replace(/<cellXfs\b/, `<${tag} count="1">${item}</${tag}><cellXfs`); return 0; }
+    const items = m[2] || '', child = tag === 'numFmts' ? /<numFmt\b/g : tag === 'fonts' ? /<font\b/g : tag === 'borders' ? /<border\b/g : /<fill\b/g;
+    const n = (items.match(child) || []).length;
+    xml = xml.replace(m[0], `<${tag}${m[1].replace(/\s*count="\d+"/, '')} count="${n + 1}">${items}${item}</${tag}>`); return n; };
+  const border = add('borders', '<border><left style="thin"><color auto="1"/></left><right style="thin"><color auto="1"/></right><top style="thin"><color auto="1"/></top><bottom style="thin"><color auto="1"/></bottom><diagonal/></border>');
+  const bold = add('fonts', '<font><b/><sz val="11"/><name val="Calibri"/><family val="2"/></font>');
+  let monthFmt = 17;   /* built-in "mmm-yy" */
+  const xf = (fmt, font, bd, center) => `<xf numFmtId="${fmt}" fontId="${font}" fillId="0" borderId="${bd}" xfId="0"${fmt ? ' applyNumberFormat="1"' : ''}${font ? ' applyFont="1"' : ''}${bd ? ' applyBorder="1"' : ''}${center ? ' applyAlignment="1"><alignment horizontal="center" vertical="center"/></xf>' : '/>'}`;
+  const more = [];
+  for (let i = have; i <= need; i++) more.push(i === 2 ? xf(0, 0, border, true) : i === 3 ? xf(0, 0, border) : i === 93 ? xf(0, bold, border, true) : i === 96 ? xf(monthFmt, 0, border, true) : xf(0, 0, 0));
+  xml = xml.replace(/<cellXfs\b([^>]*?)(?:\/>|>([\s\S]*?)<\/cellXfs>)/, (m, a, items) => `<cellXfs${a.replace(/\s*count="\d+"/, '')} count="${need + 1}">${items || ''}${more.join('')}</cellXfs>`);
+  if (!/<cellStyleXfs\b[^>]*>[\s\S]*?<xf\b/.test(xml)) xml = xml.replace(/<cellStyleXfs\b[^>]*?(?:\/>|>[\s\S]*?<\/cellStyleXfs>)/, '').replace(/<cellXfs\b/, '<cellStyleXfs count="1"><xf numFmtId="0" fontId="0" fillId="0" borderId="0"/></cellStyleXfs><cellXfs');
+  await z.set("xl/styles.xml", te.encode(xml));
+  return new Uint8Array(await z.build().arrayBuffer());   /* bytes, like it was given */
+}
+
 async function openBook(u8, sheetPref) {
   const zip = await Zip.open(u8);
   const wbBytes = await zip.get("xl/workbook.xml"), relBytes = await zip.get("xl/_rels/workbook.xml.rels");
@@ -4828,6 +4876,7 @@ async function writeBlob(fh, blob, extra, opts) {
     try { taken = LOGQ.slice(); blob = await withActivity(blob, [...taken, ...more]); }
     catch (e) { throw new Error("Save stopped because the Activity Log could not be updated: " + e.message); }
   }
+  try { if (fh && /\.xls[xm]$/i.test(fh.name || '')) { const u = new Uint8Array(await blob.arrayBuffer()), f = await repairStyles(u); if (f !== u) blob = new Blob([f], { type: blob.type }); } } catch (_) { }   /* v3.111.1 */
   let w;
   for (let i = 0; i < 3; i++) {
     try {
@@ -5737,7 +5786,7 @@ return {
     return out.sort((a, b) => a.name.localeCompare(b.name));
   },
   async useWorkbook(name) { Conn.fileName = name; Conn.cache = null; await saveConn(); },
-  _internals: { Zip, openBook, buildSchema, crc32 },
+  _internals: { Zip, openBook, buildSchema, crc32 }, repairStyles,
   /* v3.9: Supabase cloud files behave like picked files, but are never stored as browser file handles */
   single: () => Conn.handles.length === 1,
   useCloud(handles, workforceName, pairId) { const d = selectedDirectory(handles); d.name = 'Supabase'; Conn.handles = handles.slice(); Conn.pairId = pairId; Conn.dir = d; Conn.fileName = workforceName; Conn.cache = null; },
@@ -12223,7 +12272,7 @@ async function poll() {
 }
 
 /* ============================== filtering ============================== */
-const APP = { title: "Blasters Deck", version: "3.111.0", released: "2026-11-17" };
+const APP = { title: "Blasters Deck", version: "3.112.0", released: "2026-11-17" };
 const BASE_DIMS = { status: "status_column", desig: "designation_column", client: "client_column", mode: "mode_column" };
 const STANDARD_STATUSES = ["Active", "Manager", "OJT", "Bench", "New", "Projected", "Left", "Moved"];
 const TILE_ORDER = ["Active", "Manager", "OJT", "Bench", "New", "Projected"];
@@ -14877,6 +14926,8 @@ function buildField(c, value, isNew) {
    recruiter is replaced or the name made vacant, the end date is chosen too. Every assignment stays in the
    "Pseudo Name History" sheet of the same workbook; the small "i" shows a name's history. */
 let psnCountsOpen = true;   /* v3.85.1 */
+let psnView = "cards";   /* v3.112.0: "cards" or "table"; remembered on the account (td_my_prefs.psn_view) */
+setTimeout(async () => { try { if (typeof CLOUD !== "undefined" && CLOUD.token()) { const p = await CLOUD._rpc("td_my_prefs", { p_token: CLOUD.token(), p_prefs: null }); if (p && /^(cards|table)$/.test(p.psn_view || "")) psnView = p.psn_view; } } catch { } }, 3000);
 const pseudoCol = () => ((state.cols || []).find(c => /pseudo/i.test(c.name)) || {}).name || null;
 const psnIsAdmin = () => !window.PERM || !PERM.online() || PERM.isSuper() || PERM.canPsnEdit();   /* v3.81.0: or a role given "manage pseudo names" */
 const psnStatus = r => { const s = gs(r, "status_column").toLowerCase().replace(/\s+/g, "").replace(/&/g, "+"); return /^active\+resign(ed|ation)?$/.test(s) ? "resign" : s === "active" ? "active" : s === "ojt" ? "ojt" : s; };
@@ -15075,6 +15126,29 @@ async function openPseudoNames(focusId, host) {   /* v3.81.0: host = draw inside
         if (showSubs) { const v2 = sl.filter(s => !s.r).length, f2 = sl.filter(s => s.flag).length; ordered.push({ head: h("div", { class: "psn-subgroup" }, h("b", {}, sc || "No sub client"), h("small", {}, cntTxt(sl.length, v2, f2, sl.length - v2))) }); }
         for (const s of sl) ordered.push({ s });
       }
+      if (psnView === "table") {   /* v3.112.0: a compact table per sub client, side by side */
+        const grid = h("div", { class: "psn-tgrid" }); let tb = null, panel = null;
+        const newPanel = (title, sub) => { tb = h("tbody"); panel = h("section", { class: "psn-tpanel" }, h("header", {}, h("b", {}, title), sub ? h("small", {}, sub) : null),
+          h("table", { class: "psn-tbl" }, h("thead", {}, h("tr", {}, h("th", {}, "Pseudo name"), h("th", {}, "Recruiter"), h("th", {}, "Emp ID"), h("th", {}, ""))), tb)); grid.append(panel); };
+        if (!showSubs) newPanel(c || "No client", "");
+        for (const o of ordered) {
+          if (o.head) { newPanel(o.head.querySelector("b").textContent, o.head.querySelector("small").textContent); continue; }
+          const s = o.s, key = s.name;
+          const was = !s.r ? (hist || []).filter(x => x.pseudo && x.pseudo.toLowerCase() === s.name.toLowerCase() && x.to).sort((a, b) => String(psnDay(b.to)).localeCompare(String(psnDay(a.to))))[0] : null;
+          tb.append(h("tr", { class: (s.flag ? "flag" : "") + (!s.r ? " vac" : "") + (!s.active ? " off" : "") },
+            h("td", { class: "pn" }, h("span", { class: "psn-val" }, s.name), iBtn(s.name)),
+            s.r ? h("td", { class: "who", title: [gs(s.r, "status_column"), since(s.name, s.r.id) ? "since " + psnNice(since(s.name, s.r.id)) : ""].filter(Boolean).join(" · ") }, nm(s.r), s.flag ? h("span", { class: "psn-tflag", title: "Resigning: tag a replacement" }, "⚠") : null)
+              : h("td", { class: "who vac", title: was ? "last: " + was.name : "not tagged yet" }, s.active ? "Vacant" : "Inactive"),
+            h("td", { class: "id" }, s.r ? String(s.r.id) : ""),
+            h("td", { class: "act" },
+              admin ? h("button", { class: "psn-tb", type: "button", title: "Client, active / inactive", onclick: () => { editMeta = editMeta === key ? null : key; editing = null; drawList(); } }, "Edit") : null,
+              canEdit && s.active ? h("button", { class: "psn-tb" + (s.flag || !s.r ? " pri" : ""), type: "button", onclick: () => { editMeta = null; openChange(s); } }, s.flag ? "Replace" : s.r ? "Change" : "Tag") : null)));
+          if (editMeta === key) tb.append(h("tr", { class: "psn-tedit" }, h("td", { colspan: "4" }, metaEditor(s, master, clients))));
+          if (editing === key) tb.append(h("tr", { class: "psn-tedit" }, h("td", { colspan: "4" }, picker(s))));
+        }
+        box.append(grid);
+        continue;
+      }
       for (const o of ordered) {
         if (o.head) { box.append(o.head); continue; }
         const s = o.s;
@@ -15093,6 +15167,8 @@ async function openPseudoNames(focusId, host) {   /* v3.81.0: host = draw inside
       }
     }
     if (!shown.length) box.append(h("p", { class: "hint" }, q ? "No pseudo name or recruiter matches “" + q + "”." : filter === "flag" ? "Nobody needs replacing right now." : filter === "vacant" ? "Every pseudo name is tagged." : filter === "inactive" ? "No inactive pseudo names." : admin ? "No pseudo names here yet. Add one above." : "No pseudo names here yet."));
+    parts.push(h("div", { class: "psn-viewsw", role: "group", "aria-label": "How to show the names" },
+      ...[["cards", "▦ Cards"], ["table", "☰ Table"]].map(([v, t]) => h("button", { type: "button", class: psnView === v ? "on" : "", "aria-pressed": String(psnView === v), onclick: () => { psnView = v; editing = editMeta = null; try { CLOUD._rpc("td_my_prefs", { p_token: CLOUD.token(), p_prefs: { psn_view: v } }).catch(() => { }); } catch { } drawList(); } }, t))));
     parts.push(h("p", { class: "hint psn-sum" }, counts.all + " active pseudo names · " + counts.filled + " tagged · " + counts.vacant + " vacant" + (counts.flag ? " · " + counts.flag + " need a replacement" : "") + (counts.inactive ? " · " + counts.inactive + " inactive" : "")));
     listBox.replaceChildren(...parts, box);
     if (focusId) { const r = state.rows.find(x => x.id === focusId); focusId = null; if (r && pv(r)) { const el = [...box.querySelectorAll(".psn-val")].find(x => x.textContent === pv(r)); if (el) el.scrollIntoView({ block: "center" }); } }
@@ -16483,6 +16559,7 @@ async function fullCopy(u8, opts = {}) {
     try { u8 = await BE.addSheetToCopy(u8, 'Leave Requests', REQ_HEAD, rows, [26, 10, 34, 6, 11, 20, 17, 20, 17, 30, 30]); } catch (e) { console.warn('Leave requests sheet:', e); }
   }
   if (opts.everything) u8 = await fbAddEverything(u8, opts);   /* v3.87.0 */
+  try { u8 = await BE.repairStyles(u8); } catch (e) { console.warn('styles', e); }   /* v3.111.1: never hand out a file Excel calls corrupt */
   return u8;
 }
 /* ===================== v3.87.0: one backup file with everything =====================
@@ -20524,6 +20601,7 @@ window.bdSearch = (() => {
     A(() => { const t = tab('backups'); return !!(t && !t.hidden) && (!P || !P.canPsn || P.canPsn()); }, '🎭', 'Pseudo names', 'Backups · who holds which seat name', 'pseudo name seat client', () => { window.__bkTab = 'psn'; setView('backups'); });
     A(() => !!document.getElementById('btnBell') && !document.getElementById('btnBell').hidden, '🔔', 'Notifications', 'Action', 'bell alerts activity log', () => window.openBell && openBell());
     A(() => true, '✨', 'What’s new', 'Action · latest changes to the dashboard', 'release notes updates version', () => document.getElementById('wnBtn')?.click());
+    A(() => true, '📜', 'What’s new history', 'Action · every version and what it brought', 'release notes history changelog versions all', () => window.bdWhatsNewHistory && bdWhatsNewHistory());
     A(() => !!window.bdPushCheck, '🛠', 'Check notifications', 'Action · fix alerts on this device', 'troubleshoot push not getting notifications', () => bdPushCheck());
     A(own, '⏰', 'Backup reminder timing', 'Settings · how often to download a backup', 'weekly backup reminder schedule', () => window.bdBackupReminderSettings && bdBackupReminderSettings());
     A(sup, '🎂', 'Birthday & anniversary reminders', 'Settings · the time and time zone of the celebration notifications', 'birthday anniversary celebration reminder time zone', () => window.celSettings && celSettings());
@@ -20581,6 +20659,8 @@ window.bdSearch = (() => {
 /* v3.96.0: "What's new" once per person after each update (remembered in the database); again from More or the bell */
 window.bdWhatsNew = (() => {
   const NOTES = [
+    { v: '3.112.0', items: [['☰', 'Pseudo names as a table', 'Switch between Cards and Table at the top of Pseudo names. Table shows one compact table per sub client, side by side: pseudo name, recruiter, Emp ID, with Edit and Change. Your choice is remembered.'], ['📜', 'Version history', 'In What’s new, tap “All versions” to see every update and what it brought, with a search. Also in the search bar: “What’s new history”.']] },
+    { v: '3.111.1', items: [['🛠', 'Backups open in Excel again', 'Excel called the backup corrupt because the attendance sheet pointed to cell styles the workbook didn’t have. Every download now adds any missing styles, and the stored workbook repairs itself on the next save. Download a new backup; older files stay broken.']] },
     { v: '3.111.0', items: [['📣', 'Tag people, or everyone', 'Type @ in a Planner comment, a Playbook entry or an attendance remark to tag someone. They get a notification in the bell and on their phone. Admins can also pick @Everyone to notify the whole team.'], ['⚡', 'Faster notifications, complete activity', 'Every change is logged straight away in its own encrypted table, so nobody’s activity goes missing. Your own changes now show in the bell too, already read and without a pop-up. Phone notifications go out at once.'], ['🎂', 'Celebration reminders: once a day, your times', 'Birthday, anniversary and holiday notifications and the “Celebrations today” box now come once a day per person on all devices. Admins set the time and time zone with ⏰ in Coming up.'], ['🛟', 'Morning backup', 'For the super admin: the first sign-in of the morning (your computer’s time) downloads the full backup by itself, password-protected, with the password shown right after. Change the hours in Backup reminder.']] },
     { v: '3.110.0', items: [['⏰', 'Several backup reminder times', 'In Backup reminder: timing, admins can add more than one time (for example 10 AM, 2 PM and 9 PM). The “Backup needed” box comes up at each one, even if someone chose “Remind me later” earlier.']] },
     { v: '3.109.0', items: [['🗑', 'Remove a leave from Who is out', 'Admins see a small × at the end of each row in Who is out. It removes that leave or late mark after a quick check, and the day goes back to blank in attendance. Others don\'t see it.']] },
@@ -20606,6 +20686,24 @@ window.bdWhatsNew = (() => {
   const rpc = prefs => CLOUD._rpc('td_my_prefs', { p_token: CLOUD.token(), p_prefs: prefs });
   const signedIn = () => typeof CLOUD !== 'undefined' && CLOUD.token && CLOUD.token() && !document.getElementById('app')?.hidden && typeof state !== 'undefined' && state.schema;
   let done = false, busy = false;
+  /* v3.112.0: the full history of versions, newest first, with a search */
+  function history() {
+    const all = NOTES.filter(n => cmp(n.v, APP.version) <= 0), q = h('input', { class: 'input wn-q', type: 'search', placeholder: 'Search the history (e.g. backup, tag, leave)…', 'aria-label': 'Search the version history' });
+    const box = h('div', { class: 'wn-list wn-hist' });
+    const kind = v => { const [, mi, pa] = v.split('.').map(Number); return pa ? 'fix' : 'new'; };
+    const paint = () => { const t = q.value.trim().toLowerCase();
+      const hits = all.map(n => ({ ...n, items: n.items.filter(it => !t || (it[1] + ' ' + it[2]).toLowerCase().includes(t) || n.v.includes(t)) })).filter(n => n.items.length);
+      box.replaceChildren(...(hits.length ? hits.flatMap(n => [h('h6', {}, h('span', { class: 'wn-v' }, 'v' + n.v), h('span', { class: 'wn-k ' + kind(n.v) }, kind(n.v) === 'fix' ? 'Fix' : 'New features'), n.v === APP.version ? h('span', { class: 'wn-k cur' }, 'Current') : null),
+        ...n.items.map(([ic, tt, d]) => h('div', { class: 'wn-it' }, h('i', { 'aria-hidden': 'true' }, ic), h('div', {}, h('b', {}, tt), h('span', {}, d))))]) : [h('p', { class: 'wn-sub' }, 'Nothing matches “' + q.value + '”.')])); };
+    q.addEventListener('input', paint); paint();
+    const close = () => { veil.classList.remove('in'); setTimeout(() => veil.remove(), 250); };
+    const veil = h('div', { class: 'wn-veil', onclick: e => { if (e.target === veil) close(); } },
+      h('div', { class: 'wn wn-big', role: 'dialog', 'aria-modal': 'true', 'aria-label': 'What’s new: all versions' },
+        h('span', { class: 'wn-tag' }, 'NOW ON ' + APP.version), h('h2', {}, 'Version history'), h('p', { class: 'wn-sub' }, all.length + ' versions of Blasters Deck · newest first'), q, box,
+        h('button', { type: 'button', class: 'btn primary wn-ok', onclick: close }, 'Close')));
+    document.querySelector('.wn-veil')?.remove(); document.body.append(veil); requestAnimationFrame(() => veil.classList.add('in')); setTimeout(() => q.focus(), 50);
+  }
+  window.bdWhatsNewHistory = history;
   function show(list, save) {
     if (document.querySelector('.wn-veil')) return;
     const close = () => { veil.classList.remove('in'); setTimeout(() => veil.remove(), 250); if (save) rpc({ seen_version: APP.version }).catch(() => { }); };
@@ -20613,7 +20711,7 @@ window.bdWhatsNew = (() => {
       h('div', { class: 'wn', role: 'dialog', 'aria-modal': 'true', 'aria-label': 'What’s new' },
         h('span', { class: 'wn-tag' }, 'UPDATED · ' + APP.version), h('h2', {}, 'What’s new'), h('p', { class: 'wn-sub' }, 'Blasters Deck was updated' + (APP.released ? ' on ' + new Date(APP.released + 'T00:00:00').toLocaleDateString(undefined, { day: 'numeric', month: 'long' }) : '')),
         h('div', { class: 'wn-list' }, ...list.flatMap((n, i) => [list.length > 1 ? h('h6', {}, i === 0 ? 'In ' + n.v : 'Earlier · ' + n.v) : null, ...n.items.map(([ic, t, d]) => h('div', { class: 'wn-it' }, h('i', { 'aria-hidden': 'true' }, ic), h('div', {}, h('b', {}, t), h('span', {}, d))))]).filter(Boolean)),
-        h('button', { type: 'button', class: 'btn primary wn-ok', onclick: close }, 'Got it')));
+        h('div', { class: 'wn-foot' }, h('button', { type: 'button', class: 'btn wn-all', onclick: () => { close(); setTimeout(history, 260); } }, '📜 All versions'), h('button', { type: 'button', class: 'btn primary wn-ok', onclick: close }, 'Got it'))));
     document.body.append(veil); requestAnimationFrame(() => veil.classList.add('in'));
   }
   async function check() {
