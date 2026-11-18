@@ -15,7 +15,7 @@
 <meta name="apple-mobile-web-app-title" content="Blasters Deck">
 <meta name="application-name" content="Blasters Deck">
 <meta name="apple-mobile-web-app-status-bar-style" content="default">
-<title>Blasters Deck · 3.112.4</title>
+<title>Blasters Deck · 3.114.0</title>
 <link rel="preconnect" href="https://fonts.googleapis.com"><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin><link href="https://fonts.googleapis.com/css2?family=Public+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet">
 <style>
 :root {
@@ -1919,6 +1919,8 @@ button.ovx-chip { cursor:pointer; } button.ovx-chip:hover { filter:brightness(.9
 .ovx-chip.cy { background:#dff1e7; color:#1b6b45; } .ovx-chip.cn { background:#fbe1dd; color:#b4372a; } .ovx-chip.cu { background:var(--ov-chip); color:var(--ov-ink2); }
 .ovx-del { flex:none; width:24px; height:24px; margin-left:4px; border:0; border-radius:50%; background:transparent; color:var(--ov-ink2, #8a8f98); font-size:17px; line-height:1; cursor:pointer; opacity:.45; transition:opacity .15s, background .15s, color .15s; } li:hover > .ovx-del, .ovx-del:focus-visible { opacity:1; } .ovx-del:hover { background:#fbe1dd; color:#b4372a; opacity:1; } @media (hover:none) { .ovx-del { opacity:.8; } }
 .ovx-chip.cl { background:#e3ebff; color:#2948a8; } .ovx-chip.ct { background:#fdf0d5; color:#8a5a00; } .ovx-chip.ca { background:#ece7fb; color:#5b3fc4; }
+.ovx-la { display:inline-flex; align-items:center; gap:4px; flex-wrap:wrap; justify-content:flex-end; } .ovx-la select { height:24px; font-size:11.5px; padding:0 4px; border-radius:6px; border:1px solid #d7d2f0; } .ovx-la button { width:24px; height:24px; border-radius:50%; border:0; cursor:pointer; font-weight:800; } .ovx-la-ok { background:#dff5ea; color:#13794f; } .ovx-la-ok:hover { background:#13794f; color:#fff; } .ovx-la-rj { background:#fde2e1; color:#b3261e; } .ovx-la-rj:hover { background:#b3261e; color:#fff; }
+.lad-row { display:flex; align-items:center; gap:8px; padding:9px 0; border-top:1px solid var(--border,#e3e6ec); } .lad-row > div { flex:1; min-width:0; } .lad-row b { display:block; } .lad-row small { color:var(--muted,#6b7280); font-size:12px; } .lad-row select { height:30px; border-radius:8px; border:1px solid var(--border,#d6dae2); padding:0 6px; } .lad-late, .lad-today { font-style:normal; font-weight:700; } .lad-late { color:#b3261e; } .lad-today { color:#5b3fc4; }
 .ovx-all { all:unset; cursor:pointer; display:inline-block; margin-top:8px; font-weight:650; color:var(--royal); }
 .ovx-empty { padding:26px 6px; color:var(--ov-ink2); text-align:center; }
 .ovx-week { margin-top:16px; padding-top:14px; border-top:1px solid var(--ov-line); }
@@ -3610,6 +3612,7 @@ html body:not(.ios) #pinnedHeader header.top #gsBtn svg { width:16px; height:16p
 #gsBtn kbd { display:none; } html body:not(.ios) #gsBtn kbd { display:inline-block; font:inherit; font-size:11px; font-weight:600; padding:2px 6px; border-radius:6px; background:var(--surface-2,#f1f3f7); color:var(--ink-3); }
 @media (max-width:1250px) { html body:not(.ios) #pinnedHeader header.top #gsBtn { min-width:0; } html body:not(.ios) #gsBtn .gs-pt, html body:not(.ios) #gsBtn kbd { display:none; } }
 .gs-row.sel { background:var(--accent-soft, #eef4ff); }
+@keyframes gsFlash { 0%, 60% { box-shadow:0 0 0 3px #1a6fe0, 0 0 0 9px rgba(26,111,224,.18); } 100% { box-shadow:none; } } .gs-flash { animation:gsFlash 2.2s ease-out; border-radius:10px; }
 .gs-veil { position:fixed; inset:0; z-index:1004; background:rgba(15,18,32,.35); display:flex; justify-content:center; align-items:flex-start; padding:8vh 16px 16px; }
 .gs { width:min(640px, 100%); max-height:80vh; display:flex; flex-direction:column; background:var(--ios-bg, var(--surface-2, #f2f2f7)); color:var(--ink); border-radius:18px; box-shadow:0 30px 70px -20px rgba(0,0,0,.45); overflow:hidden; }
 body.ios .gs-veil { padding:0; background:var(--ios-bg,#f2f2f7); } body.ios .gs { width:100%; max-height:none; height:100%; border-radius:0; box-shadow:none; padding-top:env(safe-area-inset-top); }
@@ -4031,6 +4034,13 @@ input.wa-linked { background:color-mix(in srgb, #25a244 7%, var(--surface, #fff)
 <div id="tip" hidden role="tooltip"></div>
 <div id="toast" aria-live="polite"></div>
 
+<script>
+/* v3.114.0: one way to match a search everywhere: the whole text, or every word on its own in any order,
+   so "Aman Kureshi" finds "Aman Anvarbhai Kureshi" (no middle name needed) */
+window.tdFold = t => String(t == null ? '' : t).toLowerCase().normalize('NFD').replace(/[\u0300-\u036f]/g, '');
+window.tdMatch = (hay, q) => { const H = tdFold(hay), Q = tdFold(q).trim(); if (!Q) return true; if (H.includes(Q)) return true;
+  const t = Q.split(/\s+/).filter(Boolean); return t.length > 1 && t.every(w => H.includes(w)); };
+</script>
 <script>
 /* v3.102.2: the dashboard runs on US Eastern time (EST / EDT), whatever time zone each computer is set to.
    Every log is written in Eastern time, "today" is the Eastern date, and dates and times are shown in Eastern time. */
@@ -6963,7 +6973,12 @@ function newRow(month, name, opts = {}) {
 }
 function setDay(row, i, code) {
   if (!codeAllowed(row.days[i], code)) throw permError(APPROVAL_CODES.has(String(code || '').toUpperCase()) || APPROVAL_CODES.has(String(row.days[i] || '').toUpperCase()) ? 'Only people with the "Approve leave" right can set or change AL, CL, SL or RJ. Mark the day as LA (leave applied) instead.' : 'Your passcode can’t change attendance. Ask the admin for the right in Settings.');
+  const was = up(String(row.days[i] ?? '').trim()), now = up(String(code ?? '').trim());
   row.days[i] = code === '' ? null : code;
+  /* v3.113.0: a rejected application (RJ) overwritten by a leave: remember the rejection so the cell shows both */
+  try { if (window.tdRejSet && was !== now) { const iso = isoDate(dateOf(row.month, i)), c = catOf(now);
+    if (was === 'RJ' && c && LEAVE_CATS.has(c)) tdRejSet(row.name, iso, true);
+    else if (!(c && LEAVE_CATS.has(c)) && now !== 'RJ' && window.tdRejOf && tdRejOf(row.name, iso)) tdRejSet(row.name, iso, false); } } catch (_) { }
 }
 const rowLabel = r => `${r.name.trim()} · ${monthLabel(r.month)}`;
 
@@ -7550,6 +7565,8 @@ const impliedChip = (ms, i, row) => {
   const c = impliedCode(ms, i); return `<div class="chip implied ${c === 'WO' ? 'wo' : 'p'}" title="${c === 'WO' ? 'Week off (Saturday / Sunday)' : 'Present (blank means present)'}">${c}</div>`; };
 const rowRoster = r => { const m = rosterMatch(r.empId, r.name); return m ? m.row : null; };
 const chip = (v, extra = '') => `<div class="chip cat-${catOf(v)} ${extra}">${esc(String(v).trim() || String(v))}</div>`;
+/* v3.113.0: rejected (RJ) but taken anyway: both codes, split by a diagonal line */
+const rjChip = (v, extra = '') => `<div class="chip rjx cat-${catOf(v)} ${extra}" title="Leave application rejected (RJ), then taken anyway as ${esc(String(v).trim())}"><i>RJ</i><b>${esc(String(v).trim())}</b></div>`;
 function periodRows() {
   const p = S.ui.period; let rows;
   if (p === 'all') rows = D().rows; else if (p.startsWith('y:')) rows = D().rows.filter(r => monthYear(r.month) === +p.slice(2)); else rows = D().byMonth.get(+p.slice(2)) || [];
@@ -7686,7 +7703,7 @@ function tlRange(periodRowsList) {
 function tlRows() {
   const u = tlUi(), q = (u.q || '').trim().toLowerCase();
   let rows = D().rows; if (S.ui.client !== 'all') rows = rows.filter(r => clientGroup(r.client) === S.ui.client);
-  if (q) rows = rows.filter(r => (r.name + ' ' + (r.empId ?? '')).toLowerCase().includes(q));
+  if (q) rows = rows.filter(r => tdMatch(r.name + ' ' + (r.empId ?? ''), q));
   return rows;
 }
 function attTimelineData(periodRowsList) {
@@ -7853,7 +7870,7 @@ function weekdayLeaveCard() {
   const { people, team, u } = weekdayLeaveData();
   const DAYN = ['', 'Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday'];
   const tTot = team.reduce((a, b) => a + b, 0), q = (u.q || '').trim().toLowerCase();
-  const flagged = people.filter(p => p.kind), list = people.filter(p => (u.only === 'pattern' ? p.kind : p.n >= 3) && (!q || p.name.toLowerCase().includes(q)));
+  const flagged = people.filter(p => p.kind), list = people.filter(p => (u.only === 'pattern' ? p.kind : p.n >= 3) && (!q || tdMatch(p.name, q)));
   const lookSel = `<select data-bind="wd-look">${[[90, 'Last 90 days'], [180, 'Last 180 days'], [365, 'Last 12 months'], [0, 'All history']].map(([v, l]) => `<option value="${v}"${u.look === v ? ' selected' : ''}>${l}</option>`).join('')}</select>`;
   const onlySel = `<select data-bind="wd-only"><option value="pattern"${u.only === 'pattern' ? ' selected' : ''}>People with a pattern</option><option value="all"${u.only === 'all' ? ' selected' : ''}>Everyone with 3+ leave days</option></select>`;
   let teamTop = 1; for (let w = 2; w <= 5; w++) if (team[w] > team[teamTop]) teamTop = w;
@@ -8161,7 +8178,7 @@ const fieldMenuItems = () => attUserFields().filter(canFillField).map(n => `<but
 function cellTip(r, i) {
   const v = r.days[i]; const rem0 = window.tdRemarkOf ? tdRemarkOf(r.name, isoDate(dateOf(r.month, i))) : null; const note = (r.notes && r.notes[i] ? '<br><i>' + esc(r.notes[i].replace(/\r/g, '')) + '</i>' : '') + (rem0 ? '<br>💬 <i>' + esc(rem0.text) + '</i> <small>— ' + esc(rem0.by || '') + '</small>' : '');
   const dt = dateOf(r.month, i);
-  return `<b>${esc(r.name.trim())}</b><br>${longDate(dt)}<br>${v == null ? (!trackedOn(r, i) ? 'Blank · not tracked (' + (departure(r).kind === 'left' ? 'left the team' : 'moved') + ')' : impliedCode(r.month, i) === 'WO' ? 'Blank · week off (Sat / Sun)' : 'Blank · counts as present (P)') : esc(String(v).trim()) + ' · ' + esc(labelOf(v))}${LEAVE_CATS.has(catOf(v)) && canBackup() ? '<br>' + bkTipLine(bkGet(personKey(r.name), isoDate(dt))) : ''}${note}`;
+  return `<b>${esc(r.name.trim())}</b><br>${longDate(dt)}<br>${v == null ? (!trackedOn(r, i) ? 'Blank · not tracked (' + (departure(r).kind === 'left' ? 'left the team' : 'moved') + ')' : impliedCode(r.month, i) === 'WO' ? 'Blank · week off (Sat / Sun)' : 'Blank · counts as present (P)') : esc(String(v).trim()) + ' · ' + esc(labelOf(v)) + (window.tdRejOf && LEAVE_CATS.has(catOf(v)) && tdRejOf(r.name, isoDate(dt)) ? '<br><b style="color:#b3261e">RJ</b> · the leave application for this day was rejected, but it was taken anyway' : '')}${LEAVE_CATS.has(catOf(v)) && canBackup() ? '<br>' + bkTipLine(bkGet(personKey(r.name), isoDate(dt))) : ''}${note}`;
 }
 /* v3.30.0: a small corner mark on leave cells: green = backup provided, blue = kept live, red = no backup */
 const bkMark = (r, i) => { if ((S.ui.grid && S.ui.grid.bk === false) || !canBackup()) return ''; const v = r.days[i]; if (v == null || !LEAVE_CATS.has(catOf(v))) return ''; const b = bkGet(personKey(r.name), isoDate(dateOf(r.month, i))); return `<span class="bk-mark ${bkYNCls(b)}${b && b.half ? ' half' : ''}"></span>`; };
@@ -8177,7 +8194,7 @@ function gridTable(rows, { mode = 'month', month = null, hl = null } = {}) {
     for (let i = 0; i < dim; i++) {
       const w = dow(r.month, i), wk = w % 6 === 0 && i < rdim, isT = r.month === TODAY_MS && i === TODAY_IDX; const v = r.days[i];
       if (i >= rdim) { cells += `<td class="beyond">${v != null ? chip(v) : ''}</td>`; continue; }
-      cells += `<td class="cell ${wk ? 'wk' : ''} ${isT ? 'tdy' : ''} ${v == null ? 'empty' : ''}${MSEL.has(r.uid + ':' + i) ? ' msel' : ''}" data-act="cell" data-r="${r.uid}" data-d="${i}" data-tip="${esc(cellTip(r, i))}">${v != null ? chip(v, hl && !hl.has(cellCode(v)) ? 'faded' : '') : impliedChip(r.month, i, r)}${bkMark(r, i)}${(r.notes && r.notes[i]) || (window.tdRemarkOf && tdRemarkOf(r.name, isoDate(dateOf(r.month, i)))) ? '<span class="note-dot"></span>' : ''}</td>`;
+      cells += `<td class="cell ${wk ? 'wk' : ''} ${isT ? 'tdy' : ''} ${v == null ? 'empty' : ''}${MSEL.has(r.uid + ':' + i) ? ' msel' : ''}" data-act="cell" data-r="${r.uid}" data-d="${i}" data-tip="${esc(cellTip(r, i))}">${v != null ? (window.tdRejOf && LEAVE_CATS.has(catOf(v)) && tdRejOf(r.name, isoDate(dateOf(r.month, i))) ? rjChip(v, hl && !hl.has(cellCode(v)) ? 'faded' : '') : chip(v, hl && !hl.has(cellCode(v)) ? 'faded' : '')) : impliedChip(r.month, i, r)}${bkMark(r, i)}${(r.notes && r.notes[i]) || (window.tdRemarkOf && tdRemarkOf(r.name, isoDate(dateOf(r.month, i)))) ? '<span class="note-dot"></span>' : ''}</td>`;
     }
     const wr = mode === 'month' && hasRoster() ? rowRoster(r) : null;
     const dp = mode === 'month' ? departure(r) : null, dpText = dp && dp.dated ? ' ' + longDate(dateOf(dp.ms, dp.i)).replace(/^\w+ /, '') : '';
@@ -8201,7 +8218,7 @@ const rowCodeDays = (r, codes) => r.days.reduce((a, v) => a + (codes.has(cellCod
 function gridBaseRows() {
   const g = S.ui.grid, q = g.q.trim().toLowerCase();
   let rows = (D().byMonth.get(g.month) || []).slice();
-  if (q) rows = rows.filter(r => (r.name + ' ' + (r.empId ?? '') + ' ' + r.client).toLowerCase().includes(q));
+  if (q) rows = rows.filter(r => tdMatch(r.name + ' ' + (r.empId ?? '') + ' ' + r.client, q));
   if (g.client !== 'all') rows = rows.filter(r => clientGroup(r.client) === g.client);
   if (g.status !== 'all' && hasRoster()) rows = rows.filter(r => { const w = rowRoster(r); return (w ? rosterStatus(w) || 'No status' : 'Not in workforce') === g.status; });
   return rows;
@@ -8273,7 +8290,7 @@ function rosterLine(p) {
 function peopleView() {
   const d = D(), pu = S.ui.people, q = pu.q.trim().toLowerCase();
   let list = [...d.people.values()].sort((a, b) => a.name.localeCompare(b.name));
-  const filtered = q ? list.filter(p => (p.name + ' ' + [...p.ids].join(' ')).toLowerCase().includes(q)) : list;
+  const filtered = q ? list.filter(p => tdMatch(p.name + ' ' + [...p.ids].join(' '), q)) : list;
   if (!pu.sel || !d.people.has(pu.sel)) { const lm = (d.byMonth.get(d.latestMonth) || []).slice().sort((a, b) => rowStats(b).total - rowStats(a).total)[0]; pu.sel = lm ? personKey(lm.name) : (filtered[0]?.key || list[0]?.key); }
   const p = d.people.get(pu.sel);
   const side = `<div class="card people-list"><input type="search" placeholder="Search ${list.length} people" value="${esc(pu.q)}" data-bind="pq" style="width:100%;margin-bottom:6px">${filtered.map(x => `<button class="p" data-act="person" data-k="${esc(x.key)}" ${x.key === pu.sel ? 'aria-current="true"' : ''}><span>${esc(x.name)}</span><small>${esc(peopleSub(x))}</small></button>`).join('') || '<div class="empty">No match</div>'}</div>`;
@@ -8504,7 +8521,7 @@ function histEntries(from, to) {
   const u = histUi(), d = D(), q = u.q.trim().toLowerCase(), out = [];
   for (let t = from.getTime(); t <= to.getTime(); t += 86400000) for (const e of entriesOn(d, new Date(t))) {
     if (!histKindOk(e.c, u.kind)) continue;
-    if (q && !(e.r.name + ' ' + (e.r.empId ?? '') + ' ' + (e.r.client || '')).toLowerCase().includes(q)) continue;
+    if (q && !tdMatch(e.r.name + ' ' + (e.r.empId ?? '') + ' ' + (e.r.client || ''), q)) continue;
     const iso = isoDate(e.dt), key = personKey(e.r.name), b = e.c === 'applied' ? null : bkGet(key, iso);
     out.push({ ...e, iso, key, st: e.c === 'applied' ? 'applied' : bkLive(b) ? 'live' : bkYes(b) ? 'backup' : b ? 'none' : 'unset' });
   }
@@ -8699,7 +8716,7 @@ function fixPeopleView() {
   if (!hasRoster()) return `<div class="card"><div class="empty">The workforce file has no employees to match against.</div></div>`;
   const R = fixRows(), h = S.ui.health, q = h.q.trim().toLowerCase(), O = fixOptions();
   const n = f => R.list.filter(x => f === 'all' || x.tags.includes(f)).length;
-  const shown = R.list.filter(x => (h.f === 'all' || x.tags.includes(h.f)) && (!q || (x.p.name + ' ' + [...x.p.ids].join(' ')).toLowerCase().includes(q)));
+  const shown = R.list.filter(x => (h.f === 'all' || x.tags.includes(h.f)) && (!q || tdMatch(x.p.name + ' ' + [...x.p.ids].join(' '), q)));
   const chip = (f, l) => `<button class="fchip ${h.f === f ? 'on' : ''}" data-act="fix-filter" data-f="${f}">${l} <b>${n(f)}</b></button>`;
   const clients = [...new Set(S.rows.map(r => r.client).filter(Boolean))].sort((a, b) => a.localeCompare(b));
   const t = fixTotals(), rows = shown.slice(0, FIX.limit);
@@ -9294,7 +9311,7 @@ function openLogLeave(preKey) {
   { const inp = $('#l-name', m), list = $('#l-list', m); let cur = -1, shown = [];
     const open = all => {
       const q = all ? '' : inp.value.trim().toLowerCase();
-      shown = names.filter(n => !q || n.name.toLowerCase().includes(q) || String(n.hint).toLowerCase().includes(q)).slice(0, 200); cur = -1;
+      shown = names.filter(n => !q || tdMatch(n.name + ' ' + n.hint, q)).sort((a, b) => !q ? 0 : (tdFold(b.name).startsWith(q) - tdFold(a.name).startsWith(q)) || (tdFold(b.name).includes(q) - tdFold(a.name).includes(q))).slice(0, 200); cur = -1;   /* v3.114.0 */
       list.innerHTML = shown.length ? shown.map((n, i) => `<button type="button" class="cbx-opt" role="option" data-i="${i}"><span>${esc(n.name)}</span><small>${esc(n.hint)}</small></button>`).join('') : '<div class="cbx-empty">No employee with that name.</div>';
       list.hidden = false; inp.setAttribute('aria-expanded', 'true');
     };
@@ -10201,6 +10218,9 @@ table.who-tl td.cell:hover .chip { filter:brightness(.96); }
 .lf[aria-pressed=true] { border-color:var(--accent); background:color-mix(in srgb,var(--accent) 12%,var(--surface)); color:var(--ink); box-shadow:inset 0 0 0 1px var(--accent); }
 .lf:disabled { opacity:.45; cursor:default; }
 table.att td.cell .chip.faded { opacity:.22; }
+table.att td.cell .chip.rjx { position:relative; padding:0; overflow:hidden; background:linear-gradient(to bottom right, #fff3f2 0 calc(50% - .6px), #b3261e calc(50% - .6px) calc(50% + .6px), color-mix(in srgb,var(--c) 22%,var(--surface)) calc(50% + .75px) 100%) !important; }
+table.att td.cell .chip.rjx i, table.att td.cell .chip.rjx b { position:absolute; font-style:normal; font-size:7.5px; font-weight:800; line-height:1; letter-spacing:0; }
+table.att td.cell .chip.rjx i { left:2px; top:2px; color:#b3261e; } table.att td.cell .chip.rjx b { right:2px; bottom:2px; }
 /* Charts must shrink with their containing card, including value labels. */
 .grid > *, .card { min-width:0; }
 .hbar { display:grid; grid-template-columns:minmax(70px,32%) minmax(0,1fr) max-content; gap:10px; width:100%; min-width:0; }
@@ -10684,7 +10704,41 @@ function bkDueCheck(force) {
   });
   document.body.append(v); v.querySelector('[data-due]')?.focus();
 }
-function bkDueStart() { if (BKDUE.timer) return; BKDUE.timer = setInterval(() => { try { bkDueCheck(); } catch (e) { console.error(e); } }, 15000); setTimeout(() => { try { bkDueCheck(); } catch { } }, 4000); }
+/* v3.113.0: leave applications (LA) for today or earlier pop up for approvers on the day, until each is approved or rejected */
+const LAP = { snooze: 0, open: false };
+function laDuePending() {
+  const T = TODAY.getTime(), from = T - 45 * 86400000, out = [];
+  for (const r of S.rows || []) for (let i = 0; i < r.days.length; i++) {
+    if (up(String(r.days[i] ?? '').trim()) !== 'LA') continue; const dt = dateOf(r.month, i), t = dt.getTime(); if (t > T || t < from) continue;
+    out.push({ r, i, dt, key: r.uid + ':' + i });
+  }
+  return out.sort((a, b) => a.dt - b.dt || a.r.name.localeCompare(b.r.name));
+}
+function laDueCheck(force) {
+  if (LAP.open || S.status !== 'ready' || !S.ctx || !can('att.approve')) return;
+  if (!force && Date.now() < LAP.snooze) return;
+  if (document.querySelector('.pdlg-veil, .wn-veil, .cel-veil')) return;
+  const L = laDuePending(); if (!L.length) return;
+  LAP.open = true;
+  const box = document.createElement('div'); box.className = 'lad';
+  const paint = () => { const cur = laDuePending();
+    if (!cur.length) { d.close(); toast('All of today’s leave applications are decided.'); return; }
+    box.innerHTML = `<p class="set-hint" style="margin:0 0 10px">${cur.length === 1 ? 'This leave application is' : 'These ' + cur.length + ' leave applications are'} for today${cur.some(x => x.dt < TODAY) ? ' or earlier' : ''} and still waiting. Approve or reject so attendance is right.</p>` +
+      cur.map((x, k) => `<div class="lad-row"><div><b>${esc(x.r.name.trim())}</b><small>${x.dt < TODAY ? '<em class="lad-late">overdue</em> · ' : '<em class="lad-today">today</em> · '}${esc(longDate(x.dt))}${x.r.client ? ' · ' + esc(String(x.r.client).trim()) : ''}</small></div>
+        <select data-lad-code="${k}" aria-label="Approve as"><option value="AL">AL</option><option value="CL">CL</option><option value="SL">SL</option><option value="UL">UL</option></select>
+        <button type="button" class="btn primary sm" data-lad-ok="${k}">Approve</button><button type="button" class="btn sm" data-lad-rj="${k}">Reject</button></div>`).join('');
+    box.querySelectorAll('[data-lad-ok],[data-lad-rj]').forEach(b => b.addEventListener('click', () => { const k = +(b.dataset.ladOk ?? b.dataset.ladRj), x = cur[k]; if (!x) return;
+      const code = b.dataset.ladRj != null ? 'RJ' : (box.querySelector(`[data-lad-code="${k}"]`) || {}).value || 'AL';
+      if (laWithBackup([x.key], code) !== false) { toast(x.r.name.trim() + ': ' + (code === 'RJ' ? 'rejected (RJ)' : 'approved as ' + code) + '.'); setTimeout(paint, 300); } })); };
+  const later = document.createElement('button'); later.type = 'button'; later.className = 'btn'; later.textContent = 'Remind me in an hour';
+  const d = window.pdlg('Leave waiting for approval', box, [later]);
+  later.onclick = () => { LAP.snooze = Date.now() + 3600000; d.close(); };
+  const end = () => { LAP.open = false; if (!LAP.snooze || Date.now() > LAP.snooze) LAP.snooze = Date.now() + 10 * 60000; };   /* closed with ×: back in 10 minutes */
+  try { const veil = d.box.closest('.pdlg-veil') || d.box.parentElement; new MutationObserver((_, o) => { if (!document.body.contains(d.box)) { o.disconnect(); end(); } }).observe(document.body, { childList: true, subtree: true }); } catch { }
+  paint();
+}
+function bkDueStart() { if (BKDUE.timer) return; setInterval(() => { try { laDueCheck(); } catch (e) { console.error(e); } }, 30000); setTimeout(() => { try { laDueCheck(); } catch { } }, 6000);
+  BKDUE.timer = setInterval(() => { try { bkDueCheck(); } catch (e) { console.error(e); } }, 15000); setTimeout(() => { try { bkDueCheck(); } catch { } }, 4000); }
 
 /* ---------- v3.29.0: backup report by pay cycle: "Oct 2026" = 26 Sep – 25 Oct 2026 (the month the cycle ends in) ---------- */
 const BKR = { month: null, client: 'all', sub: 'all', status: 'all', desig: 'all', ms: { client: [], sub: [], status: [], desig: [] }, q: '', view: 'cal', late: 'off', names: 'real', yn: 'all', span: 'cycle', week: 0, day: '' };
@@ -10733,7 +10787,7 @@ const bkPassBase = (r, client, sub) => (client === 'all' ? bkIn(BKR.ms.client, b
 const bkHost = r => { try { return inScope(r); } catch { return true; } };
 const bkPass = (r, client, sub) => bkPassBase(r, client, sub) && bkHost(r)
   && bkIn(BKR.ms.status, bkStatusOf(r)) && bkIn(BKR.ms.desig, bkDesigOf(r))
-  && (!BKR.q || (r.name + ' ' + (r.id || '') + ' ' + (rowRoster(r) ? gs(rowRoster(r), 'key_column') : '')).toLowerCase().includes(BKR.q.toLowerCase()));
+  && (!BKR.q || tdMatch(r.name + ' ' + (r.id || '') + ' ' + (rowRoster(r) ? gs(rowRoster(r), 'key_column') : ''), BKR.q));
 function backupReportData(cycle, client, yn = 'all', range = null, sub = BKR.sub) {
   const d = D(true), items = [], { start, end } = cycParts(cycle);
   /* the cycle spans two tracker months: 26th → end of the first, 1st → 25th of the second */
@@ -11259,7 +11313,7 @@ function decisionStats() {
     risk: risk.reduce((a, e) => a + (e.c === 'half' ? 0.5 : 1), 0), riskNo: risk.filter(e => e.st === 'none').length, riskUnset: risk.filter(e => e.st === 'unset').length, riskTop, cycleEnd: cyEnd,
     notice, joiners, hcNow, hcThen, lateWeek: lw.length, lateLast: lp.length, late3: [...per.values()].filter(n => n >= 3).length, lateDays: topWd };
 }
-const OV_ST = { off: ['Not a live seat', 'cu'], backup: ['Backup provided', 'cy'], none: ['No backup', 'cn'], unset: ['Not updated', 'cu'], live: ['Seat shown live', 'cl'], late: ['Late', 'ct'], applied: ['Awaiting approval', 'ca'] };
+const OV_ST = { off: ['Not a live seat', 'cu'], backup: ['Backup provided', 'cy'], none: ['No backup', 'cn'], unset: ['Not updated', 'cu'], live: ['Seat shown live', 'cl'], late: ['Late', 'ct'], applied: ['LA · awaiting approval', 'ca'] };
 function overviewStats() {
   /* v3.58.2: the tiles follow the filters at the top (through D()) and the Today / Week / Month switch and date */
   if (S.status !== 'ready' || !S.ctx) return null;
@@ -11342,7 +11396,7 @@ function renderOutCard(el) {
   const n = { all: live0.length, abs: live0.filter(isAbs).length, late: live0.filter(e => e.st === 'late').length };
   if (OVP.f === 'nob') OVP.f = 'abs';
   if (OVP.f !== 'abs' && OVP.f !== 'late') OVP.f = 'abs';   /* v3.60.0: no "All"; Leaves is the default */
-  const list = OVP.f === 'abs' ? live0.filter(isAbs) : OVP.f === 'late' ? live0.filter(e => e.st === 'late') : live0;
+  const list = OVP.f === 'abs' ? live0.filter(e => isAbs(e) || e.st === 'applied') : OVP.f === 'late' ? live0.filter(e => e.st === 'late') : live0;
   let wdays = 0; for (let t = R.from.getTime(); t <= R.to.getTime(); t += 86400000) { const w = new Date(t).getUTCDay(); if (w !== 0 && w !== 6) wdays++; }
   const trackedRows = D().byMonth.get(Engine.monthSerial(ovDay().getUTCFullYear(), ovDay().getUTCMonth())) || [], tracked = OVP.names === 'pseudo' ? trackedRows.filter(r => bkActive(personKey(r.name))).length : trackedRows.length, base = Math.max(1, tracked * Math.max(1, wdays));
   const pct = k => { const v = n[k] / base * 100; return (v > 0 && v < 1 ? v.toFixed(1) : Math.round(v)) + '%'; };
@@ -11356,7 +11410,7 @@ function renderOutCard(el) {
   const pz = OVP.names === 'pseudo', nmOf = r => pz ? (bkPseudo(r) || r.name.trim()) : r.name.trim();
   const more = window.tdMore([`<button type="button" class="btn" data-ov-mail>Email the update</button>`, can('ov.openatt') && can('page.attendance') ? `<button type="button" class="btn" data-att-go="grid">Open attendance</button>` : '', `<button type="button" class="btn" data-att-hist>History &amp; upcoming</button>`, `<hr>`, `<label class="ovx-nsw" title="Show pseudo names instead of real names in this list"><span>Pseudo names</span><input type="checkbox" role="switch" data-ov-names${pz ? ' checked' : ''}><i aria-hidden="true"></i></label>`], "More", "left");
   const rowArr = shown.map((e, ix) => { const [t, c] = OV_ST[e.st], act = ed && ['backup', 'none', 'unset', 'live'].includes(e.st);
-    return `<li><span class="ovx-av">${esc(ini(nmOf(e.r)))}</span><span class="ovx-nm"><b>${esc(nmOf(e.r))}${(() => { const rm = window.tdRemarkOf ? tdRemarkOf(nmOf(e.r), e.iso) : null; return rm ? ` <span class="ovx-rem" title="${esc(rm.text + ' — ' + (rm.by || ''))}">💬</span>` : ''; })()}</b><small>${esc([OVP.p === 'today' ? '' : bkFmtD(e.iso), cl(e.r), dg(e.r)].filter(Boolean).join(' · '))}</small>${(() => { const rm = window.tdRemarkOf ? tdRemarkOf(nmOf(e.r), e.iso) : null; return rm ? `<small class="ovx-remt">“${esc(rm.text.length > 70 ? rm.text.slice(0, 70) + '…' : rm.text)}”</small>` : ''; })()}</span>${e.half ? (pz ? `<span class="ovx-code${ovCanCode(e) ? ' can' : ''}"${ovCanCode(e) ? ` data-ovc="${ix}" role="button" tabindex="0" aria-label="Change the leave type for ${esc(nmOf(e.r))}"` : ''} title="${esc(labelOf(e.v))} in attendance · billed as a half day">HD</span>` : `<span class="ovx-code${ovCanCode(e) ? ' can' : ''}"${ovCanCode(e) ? ` data-ovc="${ix}" role="button" tabindex="0" aria-label="Change the leave type for ${esc(nmOf(e.r))}"` : ''} title="${esc(labelOf(e.v))} · cover set for half a day, billed as a half day">${esc(e.v)}<em class="ovx-half">½ day</em></span>`) : `<span class="ovx-code${ovCanCode(e) ? ' can' : ''}"${ovCanCode(e) ? ` data-ovc="${ix}" role="button" tabindex="0" aria-label="Change the leave type for ${esc(nmOf(e.r))}"` : ''} title="${esc(labelOf(e.v))}">${esc(e.v)}</span>`}${act ? `<button type="button" class="ovx-chip ${c}" data-ovbk="${esc(e.key)}" data-iso="${e.iso}" title="Set or change the backup">${t}</button>` : `<span class="ovx-chip ${c}">${t}</span>`}${ovCanDel(e) ? `<button type="button" class="ovx-del" data-ovdel="${ix}" title="Remove this ${e.st === 'late' ? 'late mark' : 'leave'} (admins only)" aria-label="Remove ${esc(e.v)} for ${esc(nmOf(e.r))}">×</button>` : ''}</li>`; });
+    return `<li><span class="ovx-av">${esc(ini(nmOf(e.r)))}</span><span class="ovx-nm"><b>${esc(nmOf(e.r))}${(() => { const rm = window.tdRemarkOf ? tdRemarkOf(nmOf(e.r), e.iso) : null; return rm ? ` <span class="ovx-rem" title="${esc(rm.text + ' — ' + (rm.by || ''))}">💬</span>` : ''; })()}</b><small>${esc([OVP.p === 'today' ? '' : bkFmtD(e.iso), cl(e.r), dg(e.r)].filter(Boolean).join(' · '))}</small>${(() => { const rm = window.tdRemarkOf ? tdRemarkOf(nmOf(e.r), e.iso) : null; return rm ? `<small class="ovx-remt">“${esc(rm.text.length > 70 ? rm.text.slice(0, 70) + '…' : rm.text)}”</small>` : ''; })()}</span>${e.half ? (pz ? `<span class="ovx-code${ovCanCode(e) ? ' can' : ''}"${ovCanCode(e) ? ` data-ovc="${ix}" role="button" tabindex="0" aria-label="Change the leave type for ${esc(nmOf(e.r))}"` : ''} title="${esc(labelOf(e.v))} in attendance · billed as a half day">HD</span>` : `<span class="ovx-code${ovCanCode(e) ? ' can' : ''}"${ovCanCode(e) ? ` data-ovc="${ix}" role="button" tabindex="0" aria-label="Change the leave type for ${esc(nmOf(e.r))}"` : ''} title="${esc(labelOf(e.v))} · cover set for half a day, billed as a half day">${esc(e.v)}<em class="ovx-half">½ day</em></span>`) : `<span class="ovx-code${ovCanCode(e) ? ' can' : ''}"${ovCanCode(e) ? ` data-ovc="${ix}" role="button" tabindex="0" aria-label="Change the leave type for ${esc(nmOf(e.r))}"` : ''} title="${esc(labelOf(e.v))}">${esc(e.v)}</span>`}${e.st === 'applied' && can('att.approve') ? `<span class="ovx-la"><span class="ovx-chip ca" title="Leave application waiting for a decision">Awaiting approval</span><select data-ovla-code="${ix}" aria-label="Approve as"><option value="AL">AL</option><option value="CL">CL</option><option value="SL">SL</option><option value="UL">UL</option></select><button type="button" class="ovx-la-ok" data-ovla-ok="${ix}" title="Approve">✓</button><button type="button" class="ovx-la-rj" data-ovla-rj="${ix}" title="Reject (RJ)">✕</button></span>` : act ? `<button type="button" class="ovx-chip ${c}" data-ovbk="${esc(e.key)}" data-iso="${e.iso}" title="Set or change the backup">${t}</button>` : `<span class="ovx-chip ${c}">${t}</span>`}${ovCanDel(e) ? `<button type="button" class="ovx-del" data-ovdel="${ix}" title="Remove this ${e.st === 'late' ? 'late mark' : 'leave'} (admins only)" aria-label="Remove ${esc(e.v)} for ${esc(nmOf(e.r))}">×</button>` : ''}</li>`; });
   /* v3.100.1: group the list by client, or by client and sub client (kept for this visit only) */
   const gb = OVP.grp || 'none', subOf = r => { try { return bkSubOf(r) || ''; } catch { return ''; } };
   let rows = '';
@@ -11381,6 +11435,9 @@ function renderOutCard(el) {
   el.querySelectorAll('[data-ovg]').forEach(b => b.addEventListener('click', () => { OVP.grp = b.dataset.ovg; renderOutCard(el); }));
   el.querySelector('[data-ov-all]')?.addEventListener('click', () => { OVP.all = !OVP.all; renderOutCard(el); });
   el.querySelectorAll('[data-ovbk]').forEach(b => b.addEventListener('click', () => openBackupBox(b.dataset.ovbk, b.dataset.iso, () => { renderOutCard(el); window.organizeOverview?.(); })));
+  const laDo = (e, code) => { const ok = laWithBackup([e.r.uid + ':' + (e.dt.getUTCDate() - 1)], code); if (ok !== false) { toast(e.r.name.trim() + ': ' + (code === 'RJ' ? 'rejected (RJ)' : 'approved as ' + code) + ' · ' + longDate(e.dt) + '.'); renderOutCard(el); window.organizeOverview?.(); } };
+  el.querySelectorAll('[data-ovla-ok]').forEach(b => b.addEventListener('click', ev => { ev.stopPropagation(); const ix = +b.dataset.ovlaOk, sel = el.querySelector(`[data-ovla-code="${ix}"]`); laDo(shown[ix], sel ? sel.value : 'AL'); }));
+  el.querySelectorAll('[data-ovla-rj]').forEach(b => b.addEventListener('click', ev => { ev.stopPropagation(); laDo(shown[+b.dataset.ovlaRj], 'RJ'); }));
   el.querySelectorAll('[data-ovdel]').forEach(b => b.addEventListener('click', ev => { ev.preventDefault(); ev.stopPropagation(); ovDelLeave(shown[+b.dataset.ovdel], () => { renderOutCard(el); window.organizeOverview?.(); }); }));
   /* v3.74.2: click the leave code to change the leave type for that day */
   el.querySelectorAll('[data-ovc]').forEach(b => { const go = ev => { ev.preventDefault(); ev.stopPropagation(); ovCodeMenu(b, shown[+b.dataset.ovc], () => { renderOutCard(el); window.organizeOverview?.(); }); };
@@ -11884,7 +11941,7 @@ return {
   fieldNames: attUserFields, hasTracker: Engine.hasTracker, refresh, init: () => { mount(); return connect(); }, askName, decorateTable, healthCount, chooseFileEarly, savedFile: async () => (await kv.get('file')) || ((await kv.get('handle')) || {}).name || '', show, leave, renderCard, renderWatch, drawerPanel, go, renderApprovalRequests, renderRequestHistory, requestCounts, renderAppsCard, openBackupBox, mountBackupReport: el => mountBackupReport(el), canBackup: () => canBackup(), renameField: (a, b) => renameAttField(a, b), attReady: () => S.status === 'ready' && !!S.ctx, recordAttendance: () => openLogLeave(), canRecord: () => canLog(), requestsToDecide: () => requestsToDecide().length + laToDecide(),
   /* v3.19: every recorded code between two dates (UTC ms, null = open), for custom dashboards; follows the attendance scope */
   entries: (from, to) => { if (S.status !== 'ready' || !S.ctx) return null; const d = D(), out = []; for (const m of d.months) { const dim = Engine.daysInMonth(m); for (const r of d.byMonth.get(m) || []) for (let i = 0; i < dim; i++) { const v = r.days[i]; if (v == null || v === '') continue; const dt = dateOf(m, i), t = dt.getTime(); if ((from != null && t < from) || (to != null && t > to)) continue; const cat = catOf(v); out.push({ name: r.name.trim(), empId: r.empId, client: r.client ? String(r.client).trim() : '', date: dt, code: String(v).trim().toUpperCase(), cat, catLabel: CATS[cat] || 'Other' }); } } return out; },
-  bkDueNow: () => { BKDUE.snooze = 0; bkDueCheck(true); },
+  bkDueNow: () => { BKDUE.snooze = 0; bkDueCheck(true); }, laDueNow: () => { LAP.snooze = 0; laDueCheck(true); },
   ovDate: v => { if (v !== undefined) { OVP.d = v && v !== isoDate(TODAY) ? v : null; OVP.all = false; } return isoDate(ovDay()); },
   overviewStats, decisionStats: () => { try { return decisionStats(); } catch (e) { console.error(e); return null; } }, ovPeriod: v => { if (v) { OVP.p = v; OVP.all = false; try { localStorage.setItem('td_ovp', v); } catch { } } return OVP.p; },
   todayStats: () => { if (S.status !== 'ready' || !S.ctx) return null; const rows = D().byMonth.get(TODAY_MS) || [], i = TODAY.getUTCDate() - 1, cats = rows.map(r => catOf(r.days[i])); return { full: cats.filter(c => c === 'approved' || c === 'sick' || c === 'unplanned').length, half: cats.filter(c => c === 'half').length, late: cats.filter(c => c === 'late').length, tracked: rows.length }; }, redraw: () => { if (active()) render(); }, state: () => S, dirty: () => S.changes.length,
@@ -12345,7 +12402,7 @@ async function poll() {
 }
 
 /* ============================== filtering ============================== */
-const APP = { title: "Blasters Deck", version: "3.112.4", released: "2026-11-17" };
+const APP = { title: "Blasters Deck", version: "3.114.0", released: "2026-11-18" };
 const BASE_DIMS = { status: "status_column", desig: "designation_column", client: "client_column", mode: "mode_column" };
 const STANDARD_STATUSES = ["Active", "Manager", "OJT", "Bench", "New", "Projected", "Left", "Moved"];
 const TILE_ORDER = ["Active", "Manager", "OJT", "Bench", "New", "Projected"];
@@ -12480,7 +12537,7 @@ function selectInsight(f,rows){
 
 function passes(row, skip) {
   const f = state.filters;
-  if (f.q && !row._s.includes(f.q.toLowerCase())) return false;
+  if (f.q && !tdMatch(row._s, f.q)) return false;   /* v3.114.0: words in any order */
   for (const k in f.sel) { const s = f.sel[k]; if (s.size && k !== skip && !s.has(dimVal(k, row))) return false; }
   return true;
 }
@@ -14396,7 +14453,7 @@ function sortVal(row, tc) {
 }
 function tfPass(row, excludeKey) {
   const t = state.tf;
-  if (t.q && !row._s.includes(t.q.toLowerCase())) return false;
+  if (t.q && !tdMatch(row._s, t.q)) return false;
   for (const [key, f] of Object.entries(t.cols)) {
     if (key === excludeKey) continue;
     const tc = ALLCOLS().find(c => c.key === key); if (!tc) continue;
@@ -15323,7 +15380,7 @@ async function openPseudoNames(focusId, host) {   /* v3.81.0: host = draw inside
     const wRes = h("div", { class: "psn-res" });
     const drawWho = () => { const t = wIn.value.trim().toLowerCase();
       if (giveTo) { wRes.replaceChildren(h("div", { class: "psn-opt on" }, h("div", { class: "psn-on" }, h("b", {}, nm(giveTo)), h("span", {}, [giveTo.id, gs(giveTo, "status_column"), cl(giveTo), pv(giveTo) ? "has " + pv(giveTo) + " → it becomes vacant" : ""].filter(Boolean).join(" · "))), h("button", { class: "btn mini", type: "button", onclick: () => { giveTo = null; drawWho(); } }, "Change"))); return; }
-      const ppl = state.rows.filter(x => psnPick(x) && x.id !== r.id && (!t || (nm(x) + " " + x.id + " " + cl(x)).toLowerCase().includes(t)))
+      const ppl = state.rows.filter(x => psnPick(x) && x.id !== r.id && (!t || tdMatch(nm(x) + " " + x.id + " " + cl(x), t)))
         .sort((a, b) => (psnEligible(b) - psnEligible(a)) || ((cl(b) === s.client) - (cl(a) === s.client)) || (!!pv(a) - !!pv(b)) || nm(a).localeCompare(nm(b))).slice(0, 500);
       wRes.replaceChildren(...ppl.map(x => h("div", { class: "psn-opt", role: "button", tabindex: "0", onclick: () => { giveTo = x; drawWho(); } },
         h("div", { class: "psn-on" }, h("b", {}, nm(x)), h("span", {}, [x.id, gs(x, "status_column"), cl(x)].filter(Boolean).join(" · "))),
@@ -15369,7 +15426,7 @@ async function openPseudoNames(focusId, host) {   /* v3.81.0: host = draw inside
     if (to) { to.el.hidden = true; from.i.addEventListener('change', () => { if (to.el.hidden) to.i.value = from.i.value; }); }
     const draw = () => {
       const t = inp.value.trim().toLowerCase();
-      const ppl = state.rows.filter(r => psnPick(r) && (!s.r || r.id !== s.r.id) && (!t || (nm(r) + " " + r.id + " " + cl(r)).toLowerCase().includes(t)))
+      const ppl = state.rows.filter(r => psnPick(r) && (!s.r || r.id !== s.r.id) && (!t || tdMatch(nm(r) + " " + r.id + " " + cl(r), t)))
         .sort((a, b) => (psnEligible(b) - psnEligible(a)) || ((cl(b) === s.client) - (cl(a) === s.client)) || (!!pv(a) - !!pv(b)) || ((psnStatus(a) === "resign") - (psnStatus(b) === "resign")) || nm(a).localeCompare(nm(b))).slice(0, 500);
       res.replaceChildren(...ppl.map(r => { const has = pv(r), rs = psnStatus(r) === "resign", go = () => tag(s, r, from.i.value, to && (to.el.hidden ? from.i.value : to.i.value));
         return h("div", { class: "psn-opt pk2", role: "button", tabindex: "0", onclick: go, onkeydown: e => { if (e.key === "Enter") go(); } },
@@ -15399,7 +15456,7 @@ async function openPseudoNames(focusId, host) {   /* v3.81.0: host = draw inside
       const inp = h("input", { class: "input", type: "search", placeholder: ph, autocomplete: "off" });
       const list = h("div", { class: "cd-list", role: "listbox" }); let chosen = null;
       const draw = () => { const t = inp.value.trim().toLowerCase();
-        const ppl = state.rows.filter(x => psnPick(x) && !exclude.includes(x.id) && (!t || (nm(x) + " " + x.id + " " + cl(x)).toLowerCase().includes(t)))
+        const ppl = state.rows.filter(x => psnPick(x) && !exclude.includes(x.id) && (!t || tdMatch(nm(x) + " " + x.id + " " + cl(x), t)))
           .sort((a, b) => (psnEligible(b) - psnEligible(a)) || ((cl(b) === s.client) - (cl(a) === s.client)) || (!!pv(a) - !!pv(b)) || nm(a).localeCompare(nm(b))).slice(0, 500);
         list.replaceChildren(...[...ppl.map(x => { const has = pv(x), on = chosen && chosen.id === x.id;
           return h("button", { type: "button", class: "cd-opt" + (on ? " on" : ""), role: "option", "aria-selected": String(!!on), onclick: () => { chosen = on ? null : x; draw(); onChange(chosen); } },
@@ -16853,6 +16910,13 @@ window.openSettings = id => {
   if (id === 'signins' && PERM.online() && PERM.isOwner()) { PPL.tab = 'signins'; id = 'people'; }
   if (SET_ALIAS[id]) { const [m, t] = SET_ALIAS[id]; if (t) SUBTAB[m] = t; id = m; }
   if (id) current = id; if (state.view !== 'settings') setView('settings'); else drawSettingsPage(); };
+/* v3.114.0: open a setting from the search: the page, its tab, and a flash on the card that matches */
+window.openSettingsAt = (id, sub, find) => {
+  try { if (id === 'people' && sub) PPL.tab = sub; else if (sub) SUBTAB[id] = sub; } catch { }
+  current = id; if (state.view !== 'settings') setView('settings'); else drawSettingsPage();
+  if (!find) return; const f = String(find).toLowerCase(); let n = 0;
+  const t = setInterval(() => { const host = el('pageSettings'); const hit = host && [...host.querySelectorAll('h3, h4, h5, legend, .set-card b, label, th, .ch-name, .fld-name, strong')].find(x => x.offsetParent && x.textContent.toLowerCase().includes(f));
+    if (hit || ++n > 20) { clearInterval(t); if (!hit) return; const card = hit.closest('.set-card, .card, section, tr, li') || hit; card.scrollIntoView({ block: 'center', behavior: 'smooth' }); card.classList.add('gs-flash'); setTimeout(() => card.classList.remove('gs-flash'), 2200); } }, 150); };
 window.drawSettingsPage = () => {
   const host = el('pageSettings'); if (!host || typeof state === 'undefined' || state.view !== 'settings') return;
   clearInterval(ticker); ticker = null;
@@ -17337,7 +17401,7 @@ function drawPeopleTable(body, users, me, reload) {
   const drawRows = () => {
     const q = (PPL.q || '').trim().toLowerCase();
     const shown = users.filter(u => (PPL.kind === 'all' || (PPL.kind === 'off' ? !u.active : PPL.kind === 'admin' ? (u.role === 'admin' || u.role === 'superadmin') : u.role === 'user'))
-      && (!q || (u.name + ' ' + (u.login_id || '') + ' ' + roleLabel(u)).toLowerCase().includes(q))).sort((a, b) => (a.role === 'superadmin' ? -1 : 0) - (b.role === 'superadmin' ? -1 : 0) || a.name.localeCompare(b.name));
+      && (!q || tdMatch(u.name + ' ' + (u.login_id || '') + ' ' + roleLabel(u), q))).sort((a, b) => (a.role === 'superadmin' ? -1 : 0) - (b.role === 'superadmin' ? -1 : 0) || a.name.localeCompare(b.name));
     tbody.replaceChildren(...shown.map(u => {
       const r = roleOfUser(u), sup = u.role === 'superadmin';
       const perms = sup ? null : r ? { ...(r.rights || {}), ...(r.extras || {}) } : PERM.upgrade(u.permissions || {});
@@ -20631,31 +20695,53 @@ window.TDN = (() => {
 /* v3.96.0: search people, tasks and activities from one box (the 🔍 at the top on phones; Ctrl + K on a computer) */
 window.bdSearch = (() => {
   const norm = t => String(t == null ? '' : t).toLowerCase().normalize('NFD').replace(/[̀-ͯ]/g, '');
-  const mark = (text, q) => { text = String(text == null ? '' : text); const i = q ? norm(text).indexOf(q) : -1; if (i < 0) return document.createTextNode(text); return h('span', {}, text.slice(0, i), h('mark', {}, text.slice(i, i + q.length)), text.slice(i + q.length)); };
+  /* v3.114.0: highlight the whole search, or each of its words */
+  const mark = (text, q) => { text = String(text == null ? '' : text); if (!q) return document.createTextNode(text); const n = norm(text);
+    let R = []; const i0 = n.indexOf(q); if (i0 >= 0) R = [[i0, i0 + q.length]];
+    else for (const w of q.split(/\s+/).filter(x => x.length > 0)) { let i = -1, from = 0; while ((i = n.indexOf(w, from)) >= 0) { if (i === 0 || /[^a-z0-9]/.test(n[i - 1])) break; from = i + 1; } if (i < 0) i = n.indexOf(w); if (i >= 0) R.push([i, i + w.length]); }
+    if (!R.length) return document.createTextNode(text);
+    R.sort((a, b) => a[0] - b[0]); const M = []; for (const r of R) { const l = M[M.length - 1]; if (l && r[0] <= l[1]) l[1] = Math.max(l[1], r[1]); else M.push([...r]); }
+    const out = []; let at = 0; for (const [a, b] of M) { out.push(text.slice(at, a), h('mark', {}, text.slice(a, b))); at = b; } out.push(text.slice(at)); return h('span', {}, ...out); };
+  /* 0 starts with · 1 contains · 1.5 every word starts a word (any order: "aman kureshi" → "Aman Anvarbhai Kureshi") · 2.5 every word somewhere · 9 no */
+  const words = t => norm(t).split(/[^a-z0-9@.+]+/).filter(Boolean);
+  const sc = (text, q) => { const n = norm(text); if (!q || !n) return 9; if (n.startsWith(q)) return 0; if (n.includes(q)) return 1;
+    const t = q.split(/\s+/).filter(Boolean); if (t.length < 2) return 9; const w = words(text);
+    if (t.every(x => w.some(y => y.startsWith(x)))) return 1.5; if (t.every(x => n.includes(x))) return 2.5; return 9; };
+  /* a close spelling for names (one letter off, in words of 4+ letters): "Kureshy" → "Kureshi" */
+  const near = (a, b) => { if (a.length === b.length && a.length > 2) { const d = []; for (let i = 0; i < a.length; i++) if (a[i] !== b[i]) d.push(i); if (d.length === 2 && d[1] === d[0] + 1 && a[d[0]] === b[d[1]] && a[d[1]] === b[d[0]]) return true; }   /* two letters swapped */
+    if (Math.abs(a.length - b.length) > 1) return false; let i = 0, j = 0, d = 0; while (i < a.length && j < b.length) { if (a[i] === b[j]) { i++; j++; continue; } if (++d > 1) return false; if (a.length > b.length) i++; else if (b.length > a.length) j++; else { i++; j++; } } return d + (a.length - i) + (b.length - j) <= 1; };
+  const fuzzy = (text, q) => { const t = q.split(/\s+/).filter(Boolean), w = words(text); if (!t.length) return false;
+    return t.every(x => w.some(y => y.startsWith(x) || (x.length >= 4 && (near(x, y) || near(x, y.slice(0, x.length)))))); };
   const ini = n => String(n || '?').trim().split(/\s+/).slice(0, 2).map(x => x[0]).join('').toUpperCase();
   const fmtD = iso => { if (!iso) return ''; const d = new Date(String(iso).slice(0, 10) + 'T00:00:00'); return isNaN(d) ? '' : d.toLocaleDateString(undefined, { day: 'numeric', month: 'short' }); };
   const ST = { todo: 'To do', doing: 'In progress', blocked: 'Blocked', done: 'Done' };
+  /* v3.114.0: names by any word order (no middle name needed) or a close spelling, then every field that isn't private */
   function people(q) {
     if (typeof state === 'undefined' || !state.rows) return [];
-    const extra = ['designation_column', 'client_column', 'subclient_column'].map(k => state.schema[k]).filter(Boolean);
-    const pc = (state.cols.find(c => /pseudo/i.test(c.name)) || {}).name;
+    const nmCol = state.schema.name_column, pc = (state.cols.find(c => /pseudo/i.test(c.name)) || {}).name;
+    const other = state.cols.filter(c => !c.auto && c.name !== nmCol && !(window.tdPrivate && tdPrivate(c.name)));
     const out = [];
     for (const r of state.rows) {
-      const name = gs(r, 'name_column'), bits = [name, r.id, pc ? S(g(r, pc)) : '', ...extra.map(c => S(g(r, c)))];
-      const hit = bits.find(b => norm(b).includes(q)); if (!hit) continue;
-      out.push({ k: 'p', score: norm(name).startsWith(q) ? 0 : norm(name).includes(q) ? 1 : 2, name, sub: [gs(r, 'designation_column'), gs(r, 'client_column'), r.id].filter(Boolean).join(' · ') + (hit !== name && hit !== r.id && !norm(name).includes(q) ? ' · ' + hit : ''), r });
+      const name = gs(r, 'name_column'), base = [gs(r, 'designation_column'), gs(r, 'client_column'), gs(r, 'status_column'), r.id].filter(Boolean).join(' · ');
+      let s0 = sc(name, q), why = '';
+      if (s0 === 9 && norm(String(r.id)).startsWith(q)) s0 = 1;
+      if (s0 === 9 && pc && sc(S(g(r, pc)), q) < 9) { s0 = 2; why = 'Pseudo name: ' + S(g(r, pc)); }
+      if (s0 === 9) for (const c of other) { const v = S(g(r, c.name)); if (v && sc(v, q) < 9) { s0 = c.name === state.schema.client_column || c.name === state.schema.subclient_column || c.name === state.schema.designation_column ? 3 : 5; why = (c.label || c.name) + ': ' + v; break; } }
+      if (s0 === 9 && q.length >= 4 && fuzzy(name, q)) { s0 = 4; why = 'Close match'; }
+      if (s0 === 9) continue;
+      out.push({ k: 'p', score: s0, name, sub: base + (why && !base.includes(why.split(': ').pop()) ? ' · ' + why : ''), r });
     }
     return out.sort((a, b) => a.score - b.score || a.name.localeCompare(b.name));
   }
   function tasks(q) {
     if (!window.TDSRC) return [];
-    return TDSRC.tasks().filter(t => [t.title, (t.assignees || []).map(a => a.name).join(' '), t.createdByName, typeof plainOf === 'function' ? plainOf(t.details || '', 400) : ''].some(x => norm(x).includes(q)))
+    return TDSRC.tasks().filter(t => [t.title, (t.assignees || []).map(a => a.name).join(' '), t.createdByName, typeof plainOf === 'function' ? plainOf(t.details || '', 400) : ''].some(x => tdMatch(x, q)))
       .map(t => ({ k: 't', score: norm(t.title).includes(q) ? 0 : 1, name: t.title, sub: [t.due ? 'Due ' + fmtD(t.due) : '', ST[t.status] || t.status, 'For ' + (t.assignees || []).map(a => a.name).slice(0, 3).join(', ')].filter(Boolean).join(' · '), t }))
       .sort((a, b) => a.score - b.score || (a.t.status === 'done') - (b.t.status === 'done'));
   }
   function acts(q) {
     if (!window.TDSRC) return [];
-    return TDSRC.acts().filter(a => [a.title, a.category, (a.people || []).map(p => p.name + ' ' + p.emp).join(' ')].some(x => norm(x).includes(q)))
+    return TDSRC.acts().filter(a => [a.title, a.category, (a.people || []).map(p => p.name + ' ' + p.emp).join(' ')].some(x => tdMatch(x, q)))
       .map(a => { const who = (a.people || []).find(p => norm(p.name).includes(q) || norm(p.emp).includes(q)); return { k: 'a', score: norm(a.title).includes(q) ? 0 : 1, name: a.title, sub: [fmtD(a.day), a.category, who ? who.name + ' took part' : (a.people || []).length + ' took part'].filter(Boolean).join(' · '), a }; })
       .sort((a, b) => a.score - b.score || String(b.a.day).localeCompare(String(a.a.day)));
   }
@@ -20685,16 +20771,78 @@ window.bdSearch = (() => {
     A(sup, '🎂', 'Birthday & anniversary reminders', 'Settings · the time and time zone of the celebration notifications', 'birthday anniversary celebration reminder time zone', () => window.celSettings && celSettings());
     A(sup, '⏰', 'Leave-backup reminder', 'Settings · how often “Backup needed” comes back', 'backup needed upcoming leave reminder minutes', () => window.bkDueSettings && bkDueSettings());
     A(() => true, '🔑', 'Change my passcode', 'Settings · Preferences', 'password passcode security', () => window.openSettings('prefs'));
+    /* v3.114.0: every setting by name, opening the right page and tab and pointing at the card */
+    const mods = new Set((window.TDSETMODS || []).filter(m => { try { return !m.show || m.show(); } catch { return false; } }).map(m => m.id));
+    const SET = (mod, sub, icon, name, where, kw, find) => { if (mods.has(mod)) out.push({ k: 'g', icon, name, sub: 'Settings · ' + where, kw, run: () => window.openSettingsAt ? openSettingsAt(mod, sub, find || name) : window.openSettings(mod) }); };
+    SET('people', 'people', '👥', 'Users & logins', 'People & access', 'users accounts add user new user login id deactivate default password first login', 'Users');
+    SET('people', 'people', '➕', 'Add a user', 'People & access', 'new user account create login invite', 'Add');
+    SET('people', 'roles', '🛡', 'Roles & rights', 'People & access › Roles', 'roles permissions rights access admin key rights pages groups', 'Roles');
+    SET('people', 'passcodes', '🔑', 'Passcode reset requests', 'People & access › Passcodes', 'reset password forgot passcode requests', 'Reset requests');
+    SET('people', 'signins', '🧾', 'Sign-in log', 'People & access › Sign-ins', 'login history failed sign-ins ip attempts lockout sign-in rules', 'Sign-in');
+    SET('people', 'privlog', '🔒', 'Private details log', 'People & access › Private details log', 'who saw phone whatsapp dob private access log', 'Private details log');
+    SET('signins', null, '🧾', 'Sign-in log', 'Sign-in log', 'login history failed sign-ins ip attempts');
+    SET('fields', 'choices', '🧩', 'Employee fields & drop-downs', 'Fields › Employee fields', 'columns choices dropdown list values options status designation client sub client');
+    SET('fields', 'att', '🗓', 'Attendance fields', 'Fields › Attendance fields', 'attendance columns leave types codes tracker fields');
+    SET('fields', 'priv', '🔒', 'Private details fields', 'Fields › Private details', 'phone whatsapp dob encrypted private fields who can see number requests approve', 'Private details');
+    SET('fields', 'priv', '🔐', 'Number requests to approve', 'Fields › Private details', 'phone number request approve whatsapp access', 'Number requests');
+    SET('fields', 'mandatory', '❗', 'Mandatory fields', 'Fields › Mandatory fields', 'required fields must fill');
+    SET('fields', 'backups', '⛨', 'Leave backup settings', 'Fields › Leave backups', 'backup person name backup required seat shown live', 'Backup');
+    SET('data', null, '📗', 'Workbook download', 'Workbook & storage', 'download excel backup encrypted decrypted password export', 'Workbook');
+    SET('data', null, '♻️', 'Replace the workbook', 'Workbook & storage', 'upload replace restore excel file import', 'Workbook');
+    SET('data', null, '🗄', 'Automatic backups', 'Workbook & storage', 'server backups daily automatic restore point', 'Automatic backups');
+    SET('data', null, '🧮', 'Database & server logs', 'Workbook & storage', 'database size storage server logs supabase', 'Database');
+    SET('data', null, '📜', 'Activity log', 'Workbook & storage', 'activity log keep days history retention', 'Activity log');
+    SET('prefs', null, '🎨', 'Theme / dark mode', 'Preferences', 'dark light theme colours appearance', 'Theme');
+    SET('prefs', null, '📍', 'Distance from the office', 'Preferences', 'distance km office location travel', 'Distance');
+    SET('prefs', null, '✍️', 'Your name in the activity log', 'Preferences', 'display name activity log', 'Your name');
+    SET('prefs', null, '💻', 'This device', 'Preferences', 'device sign out browser session', 'This device');
+    /* employee fields by name */
+    try { if (mods.has('fields') && typeof state !== 'undefined' && state.cols) for (const c of state.cols.filter(c => !c.auto).slice(0, 120)) out.push({ k: 'g', icon: '🏷', name: (c.label || c.name), sub: 'Field · Settings › Fields' + (window.tdPrivate && tdPrivate(c.name) ? ' · 🔒 private' : ''), kw: 'field column ' + c.name, run: () => window.openSettingsAt ? openSettingsAt('fields', 'choices', c.label || c.name) : window.openSettings('fields') }); } catch { }
+    /* report tabs */
+    try { const sel = document.getElementById('reportGroup'), t = tab('reports'); if (sel && t && !t.hidden) for (const o of sel.options) out.push({ k: 'g', icon: '📊', name: o.textContent.trim(), sub: 'Reports', kw: 'report chart ' + o.value + (o.value === 'attendance' ? ' leave most leave who took leave timeline people out' : ''), run: () => { setView('reports'); setTimeout(() => { sel.value = o.value; sel.dispatchEvent(new Event('change', { bubbles: true })); }, 120); } }); } catch { }
     return out;
   }
-  function goto(q) { return goItems().map(it => { const n = norm(it.name), k2 = norm(it.sub + ' ' + it.kw); return { ...it, score: n.startsWith(q) ? 0 : n.includes(q) ? 1 : k2.includes(q) ? 2 : 9 }; }).filter(x => x.score < 9).sort((a, b) => a.score - b.score); }
+  function goto(q) { return goItems().map(it => { const a = sc(it.name, q), b = sc(it.sub + ' ' + (it.kw || ''), q); return { ...it, score: a < 9 ? a : b < 9 ? 2 + b / 10 : 9 }; }).filter(x => x.score < 9).sort((a, b) => a.score - b.score); }
+  /* v3.114.0: clients and sub clients (with how many people), pseudo names, holidays, attendance codes and release notes */
+  function clients(q) {
+    if (typeof state === 'undefined' || !state.rows || !state.schema) return [];
+    const M = new Map(), add = (kind, v, parent) => { v = String(v || '').trim(); if (!v) return; const key = kind + '|' + v.toLowerCase(); const o = M.get(key) || { kind, v, parent, n: 0 }; o.n++; M.set(key, o); };
+    for (const r of state.rows) { const c = gs(r, 'client_column'); add('c', c); add('s', gs(r, 'subclient_column'), c); }
+    return [...M.values()].map(o => ({ ...o, score: sc(o.v, q) })).filter(o => o.score < 9).sort((a, b) => a.score - b.score || b.n - a.n).slice(0, 40)
+      .map(o => ({ k: 'c', icon: o.kind === 'c' ? '🏢' : '🏷', name: o.v, sub: (o.kind === 'c' ? 'Client' : 'Sub client' + (o.parent ? ' of ' + o.parent : '')) + ' · ' + o.n + (o.n === 1 ? ' person' : ' people') + ' · show them in Employees',
+        run: () => { setView('employees'); setTimeout(() => { const f = document.getElementById('fq'); if (f) { f.value = o.v; f.dispatchEvent(new Event('input', { bubbles: true })); } }, 150); } }));
+  }
+  function seats(q) {
+    const P = window.PERM; if (P && P.canPsn && !P.canPsn()) return [];
+    let M = []; try { M = typeof psnMaster === 'function' ? (psnMaster() || []) : []; } catch { }
+    const pc = typeof state !== 'undefined' && state.cols ? (state.cols.find(c => /pseudo/i.test(c.name)) || {}).name : null;
+    const who = new Map(); if (pc) for (const r of state.rows) { const v = S(g(r, pc)).trim().toLowerCase(); if (v) who.set(v, gs(r, 'name_column')); }
+    return M.map(x => { const holder = who.get(x.name.toLowerCase()) || ''; const s1 = sc(x.name, q), s2 = holder ? sc(holder, q) : 9; return { x, holder, score: Math.min(s1, s2 + 0.5) }; })
+      .filter(o => o.score < 9).sort((a, b) => a.score - b.score).slice(0, 40)
+      .map(o => ({ k: 's', icon: '🎭', name: o.x.name, sub: 'Pseudo name · ' + (o.holder ? 'held by ' + o.holder : o.x.active ? 'vacant' : 'inactive') + (o.x.client ? ' · ' + o.x.client + (o.x.sub ? ' › ' + o.x.sub : '') : ''), run: () => { window.__bkTab = 'psn'; setView('backups'); } }));
+  }
+  const CODES = [['AL', 'Approved Leave'], ['CL', 'Casual Leave'], ['SL', 'Sick Leave'], ['UL', 'Unplanned Leave'], ['AB', 'Absent'], ['HD1', 'Half day, 1st half'], ['HD2', 'Half day, 2nd half'], ['LA', 'Leave application (pending approval)'], ['RJ', 'Leave request rejected'], ['L', 'Late coming'], ['C', 'Cab late'], ['R', 'Remote'], ['WO', 'Week off'], ['H', 'Holiday'], ['BR', 'Backup provided (billing grid)'], ['P', 'Present']];
+  function extras(q) {
+    const out = [];
+    for (const [c, l] of CODES) { const s1 = norm(c) === q ? 0 : sc(l, q); if (s1 < 9 && (q.length > 1 || norm(c) === q)) out.push({ k: 'x', icon: '🔤', score: s1, name: c + ' · ' + l, sub: 'Attendance code · open Attendance', run: () => setView('attendance') }); }
+    try { const y = new Date().getFullYear(), now = Date.now() - 86400000;
+      const all = [...[y, y + 1].flatMap(v => (typeof usHolidays === 'function' ? usHolidays(v) : []).map(x => ({ ...x, c: '🇺🇸 USA' }))), ...[y, y + 1].flatMap(v => (typeof inHolidays === 'function' ? inHolidays(v) : []).map(x => ({ ...x, c: '🇮🇳 India' })))];
+      const seen = new Set();
+      for (const x of all.filter(x => x.obs && x.obs.getTime() >= now).sort((a, b) => a.obs - b.obs)) { const k = x.c + x.name; if (seen.has(k)) continue; const s1 = sc(x.name, q); if (s1 === 9) continue; seen.add(k);
+        out.push({ k: 'x', icon: '🏖️', score: s1 + 0.2, name: x.name, sub: 'Holiday · ' + x.c + ' · ' + x.obs.toLocaleDateString('en-US', { timeZone: 'UTC', weekday: 'short', day: 'numeric', month: 'short', year: 'numeric' }), run: () => setView('summary') }); } } catch { }
+    return out.sort((a, b) => a.score - b.score).slice(0, 20);
+  }
+  function notes(q) { if (q.length < 3 || !window.bdWhatsNewNotes) return [];
+    return bdWhatsNewNotes().flatMap(n => n.items.map(([ic, t, d]) => ({ v: n.v, ic, t, d }))).map(x => ({ ...x, score: Math.min(sc(x.t, q), sc(x.d, q) + 1) })).filter(x => x.score < 9).sort((a, b) => a.score - b.score).slice(0, 20)
+      .map(x => ({ k: 'n', icon: x.ic, name: x.t, sub: 'What’s new · v' + x.v + ' · ' + x.d.slice(0, 90) + (x.d.length > 90 ? '…' : ''), run: () => window.bdWhatsNewHistory && bdWhatsNewHistory(q) })); }
   function playbook(q) { const L = (window.TD_SETTINGS || {}).playbook; const arr = Array.isArray(L) ? L : Array.isArray(L && L.items) ? L.items : [];
-    return arr.map(e => ({ t: String(e.title || e.name || ''), body: typeof plainOf === 'function' ? plainOf(e.body || e.text || e.details || '', 300) : '' })).filter(e => e.t && (norm(e.t).includes(q) || norm(e.body).includes(q)))
+    return arr.map(e => ({ t: String(e.title || e.name || ''), body: typeof plainOf === 'function' ? plainOf(e.body || e.text || e.details || '', 300) : '' })).filter(e => e.t && (tdMatch(e.t, q) || tdMatch(e.body, q)))
       .map(e => ({ k: 'b', icon: '📘', name: e.t, sub: 'Playbook' + (norm(e.t).includes(q) ? '' : ' · ' + e.body.slice(0, 80)), run: () => setView('playbook') })); }
   function leaves(q) { const L = (window.TD_SETTINGS || {}).leave_requests || []; if (!Array.isArray(L) || !(window.requestNotificationVisible)) return [];
-    return L.filter(r => requestNotificationVisible(r) && [r.name, r.code, r.by, (r.dates || []).join(' ')].some(x => norm(x).includes(q))).slice(-40).reverse()
+    return L.filter(r => requestNotificationVisible(r) && [r.name, r.code, r.by, (r.dates || []).join(' ')].some(x => tdMatch(x, q))).slice(-40).reverse()
       .map(r => ({ k: 'l', icon: r.status === 'pending' ? '⏳' : r.status === 'approved' ? '✅' : r.status === 'rejected' ? '⛔' : '↩️', name: r.name + ' · ' + r.code, sub: (r.status === 'pending' ? 'Waiting' : r.status.charAt(0).toUpperCase() + r.status.slice(1)) + ' · ' + (r.dates || []).slice(0, 3).join(', ') + ' · by ' + (r.by || ''), run: () => window.lvOpen && lvOpen(r.status === 'pending' ? 'approvals' : 'history') })); }
-  window.tdSearchAll = q => ({ g: goto(norm(q)), p: people(norm(q)), t: tasks(norm(q)), a: acts(norm(q)), b: playbook(norm(q)), l: leaves(norm(q)) });
+  const ALL = q => ({ g: goto(q), p: people(q), c: clients(q), s: seats(q), l: leaves(q), t: tasks(q), a: acts(q), b: playbook(q), x: extras(q), n: notes(q) });
+  window.tdSearchAll = q => ALL(norm(q).trim());
   let veil = null;
   function close() { if (!veil) return; veil.remove(); veil = null; document.removeEventListener('keydown', esc, true); }
   const esc = e => { if (e.key === 'Escape') { e.stopPropagation(); close(); } };
@@ -20705,19 +20853,20 @@ window.bdSearch = (() => {
     const inp = h('input', { class: 'gs-in', type: 'search', placeholder: 'Search everything: people, pages, settings, tasks…', 'aria-label': 'Search', autocomplete: 'off', enterkeyhint: 'search' });
     const seg = h('div', { class: 'gs-seg', role: 'tablist' }), list = h('div', { class: 'gs-list' });
     const go = it => { close(); if (it.run) { it.run(); return; } if (it.k === 'p') { if (window.TDCARD && TDCARD.want()) TDCARD.open(it.r); else { setView('employees'); setTimeout(() => openDrawer(it.r), 150); } } else if (it.k === 't') { setView('planner'); setTimeout(() => TDSRC.openTask(it.t), 300); } else { setView('activities'); setTimeout(() => TDSRC.openAct(it.a), 300); } };
-    const ICON = { p: null, t: ['☑', '#e8f1ff'], a: ['🎉', '#fff1e6'], g: ['➜', '#eef1ff'], b: ['📘', '#eef4ff'], l: ['⏳', '#fff4dc'] };
+    const ICON = { p: null, t: ['☑', '#e8f1ff'], a: ['🎉', '#fff1e6'], g: ['➜', '#eef1ff'], b: ['📘', '#eef4ff'], l: ['⏳', '#fff4dc'], c: ['🏢', '#eaf6ef'], s: ['🎭', '#f3ecff'], x: ['🔤', '#f1f3f6'], n: ['✨', '#fff6d8'] };
     function draw() {
       if (!veil) return;
       const q = norm(inp.value.trim());
-      if (!q) { seg.replaceChildren(); const quick = goItems().filter(x => /^Action/.test(x.sub)).slice(0, 8); list.replaceChildren(h('p', { class: 'gs-hint' }, 'Search people, pages, settings, tasks, activities, playbook and leave requests.'), h('section', {}, h('h6', {}, 'Quick actions'), h('div', { class: 'gs-card' }, ...quick.map(it => h('button', { type: 'button', class: 'gs-row', onclick: () => go(it) }, h('span', { class: 'gs-ic', style: 'background:#eef1ff' }, it.icon), h('span', { class: 'gs-t' }, h('b', {}, it.name), h('small', {}, it.sub))))))); return; }
-      const R = { g: goto(q), p: people(q), t: tasks(q), a: acts(q), b: playbook(q), l: leaves(q) }, n = Object.values(R).reduce((a, x) => a + x.length, 0);
-      seg.replaceChildren(...[['all', 'All', n], ['g', 'Go to', R.g.length], ['p', 'People', R.p.length], ['l', 'Leave', R.l.length], ['t', 'Tasks', R.t.length], ['a', 'Activities', R.a.length], ['b', 'Playbook', R.b.length]].filter(([k, , c]) => k === 'all' || c).map(([k, l, c]) => h('button', { type: 'button', class: 'gs-chip' + (kind === k ? ' on' : ''), onclick: () => { kind = k; draw(); } }, l + (k === 'all' ? '' : ' ' + c))));
+      if (!q) { seg.replaceChildren(); const quick = goItems().filter(x => /^Action/.test(x.sub)).slice(0, 8); list.replaceChildren(h('p', { class: 'gs-hint' }, 'Search people (first and last name is enough), pages, every setting, clients, pseudo names, leave, tasks, activities, playbook, holidays, codes and what’s new.'), h('section', {}, h('h6', {}, 'Quick actions'), h('div', { class: 'gs-card' }, ...quick.map(it => h('button', { type: 'button', class: 'gs-row', onclick: () => go(it) }, h('span', { class: 'gs-ic', style: 'background:#eef1ff' }, it.icon), h('span', { class: 'gs-t' }, h('b', {}, it.name), h('small', {}, it.sub))))))); return; }
+      const R = ALL(q), n = Object.values(R).reduce((a, x) => a + x.length, 0);
+      seg.replaceChildren(...[['all', 'All', n], ['p', 'People', R.p.length], ['g', 'Go to', R.g.length], ['c', 'Clients', R.c.length], ['s', 'Pseudo names', R.s.length], ['l', 'Leave', R.l.length], ['t', 'Tasks', R.t.length], ['a', 'Activities', R.a.length], ['b', 'Playbook', R.b.length], ['x', 'Codes & holidays', R.x.length], ['n', 'What’s new', R.n.length]].filter(([k, , c]) => k === 'all' || c).map(([k, l, c]) => h('button', { type: 'button', class: 'gs-chip' + (kind === k ? ' on' : ''), onclick: () => { kind = k; draw(); } }, l + (k === 'all' ? '' : ' ' + c))));
       const grp = (k, title) => { const arr = R[k]; if (!arr.length || (kind !== 'all' && kind !== k)) return null; const lim = kind === 'all' ? 6 : 60;
         return h('section', {}, h('h6', {}, title), h('div', { class: 'gs-card' }, ...arr.slice(0, lim).map(it => h('button', { type: 'button', class: 'gs-row', onclick: () => go(it) },
           it.k === 'p' ? h('span', { class: 'gs-av' }, ini(it.name)) : h('span', { class: 'gs-ic', style: 'background:' + ICON[it.k][1] }, it.icon || ICON[it.k][0]),
           h('span', { class: 'gs-t' }, h('b', {}, mark(it.name, q)), h('small', {}, mark(it.sub, q))))),
           arr.length > lim ? h('button', { type: 'button', class: 'gs-more', onclick: () => { kind = k; draw(); } }, 'Show all ' + arr.length) : null)); };
-      list.replaceChildren(...[grp('g', 'Pages, settings & actions'), grp('p', 'People'), grp('l', 'Leave requests'), grp('t', 'Tasks'), grp('a', 'Activities'), grp('b', 'Playbook'), n ? null : h('p', { class: 'gs-hint' }, 'Nothing found for “' + inp.value.trim() + '”.')].filter(Boolean));
+      const peopleFirst = R.p.length && (!R.g.length || R.p[0].score <= R.g[0].score);
+      list.replaceChildren(...[peopleFirst ? grp('p', 'People') : null, grp('g', 'Pages, settings & actions'), peopleFirst ? null : grp('p', 'People'), grp('c', 'Clients & sub clients'), grp('s', 'Pseudo names'), grp('l', 'Leave requests'), grp('t', 'Tasks'), grp('a', 'Activities'), grp('b', 'Playbook'), grp('x', 'Attendance codes & holidays'), grp('n', 'What’s new'), n ? null : h('p', { class: 'gs-hint' }, 'Nothing found for “' + inp.value.trim() + '”.')].filter(Boolean));
     }
     inp.addEventListener('input', () => { kind = 'all'; draw(); });
     let sel = -1; const rows = () => [...list.querySelectorAll('.gs-row')];
@@ -20737,6 +20886,8 @@ window.bdSearch = (() => {
 /* v3.96.0: "What's new" once per person after each update (remembered in the database); again from More or the bell */
 window.bdWhatsNew = (() => {
   const NOTES = [
+    { v: '3.114.0', items: [['🔎', 'First and last name is enough', 'Searches now match every word on its own, in any order: “Aman Kureshi” finds “Aman Anvarbhai Kureshi”. A close spelling is shown too. This works in the search bar, Employees, Attendance, Record attendance, pseudo names and the billing grid.'], ['🧭', 'Search finds much more', 'The search bar now finds every setting by name (roles, sign-in log, private details, mandatory fields, theme… and opens the right card), each employee field, clients and sub clients with their head count, pseudo names and who holds them, report tabs, attendance codes, holidays and What’s new notes. People match on any field that isn’t private.']] },
+    { v: '3.113.0', items: [['⏳', 'Pending leave on the day', 'A leave application (LA) for today or earlier pops up for approvers until it is approved or rejected, and shows in Who is out as LA · awaiting approval with ✓ / ✕ right on the row. It is listed there but not counted as out.'], ['◩', 'Rejected, then taken anyway', 'If a leave application was rejected (RJ) and the person takes leave that day anyway, the attendance cell shows both, split by a diagonal line (RJ ╱ UL). Needs att-rejected.sql.']] },
     { v: '3.112.4', items: [['📆', 'Most leave follows your dates', 'Who took the most leave now uses the dates chosen in the Attendance timeline (Report period, Last 30 days, Custom dates…), counted day by day.']] },
     { v: '3.112.3', items: [['🏆', 'Who took the most leave', 'Reports › Attendance has a full ranked list for the chosen period: leave days, approved, sick, unplanned, half days, late and applications per person, with search, sort and copy.'], ['📅', 'Reports open on this month', 'Attendance reports now start on the current month instead of the last month in the tracker (which can be a month added ahead and still empty). An empty period now says so, with a button back to this month.']] },
     { v: '3.112.2', items: [['🧾', 'Backup report: only your pseudo names', 'With pseudo names on, the grid lists only the pseudo names in your list for the chosen client and sub client. A weekday on which nobody had that pseudo name shows a red ! (not billed); click it to see why. A seat shown live still counts as P and a covered leave as BR.']] },
@@ -20769,7 +20920,7 @@ window.bdWhatsNew = (() => {
   const signedIn = () => typeof CLOUD !== 'undefined' && CLOUD.token && CLOUD.token() && !document.getElementById('app')?.hidden && typeof state !== 'undefined' && state.schema;
   let done = false, busy = false;
   /* v3.112.0: the full history of versions, newest first, with a search */
-  function history() {
+  function history(q0) {
     const all = NOTES.filter(n => cmp(n.v, APP.version) <= 0), q = h('input', { class: 'input wn-q', type: 'search', placeholder: 'Search the history (e.g. backup, tag, leave)…', 'aria-label': 'Search the version history' });
     const box = h('div', { class: 'wn-list wn-hist' });
     const kind = v => { const [, mi, pa] = v.split('.').map(Number); return pa ? 'fix' : 'new'; };
@@ -20777,6 +20928,7 @@ window.bdWhatsNew = (() => {
       const hits = all.map(n => ({ ...n, items: n.items.filter(it => !t || (it[1] + ' ' + it[2]).toLowerCase().includes(t) || n.v.includes(t)) })).filter(n => n.items.length);
       box.replaceChildren(...(hits.length ? hits.flatMap(n => [h('h6', {}, h('span', { class: 'wn-v' }, 'v' + n.v), h('span', { class: 'wn-k ' + kind(n.v) }, kind(n.v) === 'fix' ? 'Fix' : 'New features'), n.v === APP.version ? h('span', { class: 'wn-k cur' }, 'Current') : null),
         ...n.items.map(([ic, tt, d]) => h('div', { class: 'wn-it' }, h('i', { 'aria-hidden': 'true' }, ic), h('div', {}, h('b', {}, tt), h('span', {}, d))))]) : [h('p', { class: 'wn-sub' }, 'Nothing matches “' + q.value + '”.')])); };
+    if (typeof q0 === 'string') q.value = q0;
     q.addEventListener('input', paint); paint();
     const close = () => { veil.classList.remove('in'); setTimeout(() => veil.remove(), 250); };
     const veil = h('div', { class: 'wn-veil', onclick: e => { if (e.target === veil) close(); } },
@@ -20785,7 +20937,7 @@ window.bdWhatsNew = (() => {
         h('button', { type: 'button', class: 'btn primary wn-ok', onclick: close }, 'Close')));
     document.querySelector('.wn-veil')?.remove(); document.body.append(veil); requestAnimationFrame(() => veil.classList.add('in')); setTimeout(() => q.focus(), 50);
   }
-  window.bdWhatsNewHistory = history;
+  window.bdWhatsNewHistory = history; window.bdWhatsNewNotes = () => NOTES.filter(n => cmp(n.v, APP.version) <= 0);
   function show(list, save) {
     if (document.querySelector('.wn-veil')) return;
     const close = () => { veil.classList.remove('in'); setTimeout(() => veil.remove(), 250); if (save) rpc({ seen_version: APP.version }).catch(() => { }); };
@@ -21787,6 +21939,28 @@ window.TDACT = (() => {
     catch (e) { toast(/schema cache|Could not find/i.test(e.message || '') ? 'The remark was not saved: the super admin needs to run att-remarks.sql in Supabase.' : 'The remark was not saved: ' + e.message, true); }
   };
   setInterval(() => load(false), 15000); setTimeout(() => load(true), 2000);
+})();
+</script>
+<script>
+/* v3.113.0: days where a leave application was rejected (RJ) and the person took leave anyway (td_att_rejected, att-rejected.sql) */
+(() => {
+  const M = new Set(); let at = 0, busy = false, off = false;
+  const k = (name, iso) => String(name || '').trim().toLowerCase().replace(/\s+/g, ' ') + '|' + iso;
+  window.tdRejOf = (name, iso) => M.has(k(name, iso));
+  const ok = () => !off && typeof CLOUD !== 'undefined' && CLOUD.token && CLOUD.token() && !document.getElementById('app')?.hidden;
+  async function load(force) {
+    if (busy || !ok() || (!force && Date.now() - at < 120000)) return; busy = true;
+    try { const p = tzParts(Date.now()), d0 = new Date(Date.UTC(p.y, p.m - 13, 1)).toISOString().slice(0, 10), d1 = new Date(Date.UTC(p.y, p.m + 4, 0)).toISOString().slice(0, 10);
+      const r = await CLOUD._rpc('td_att_rejected_list', { p_token: CLOUD.token(), p_from: d0, p_to: d1 }); const was = M.size; M.clear(); for (const x of (Array.isArray(r) ? r : [])) M.add(k(x.name, String(x.day).slice(0, 10))); at = Date.now();
+      if (M.size || was) try { window.dispatchEvent(new Event('att:remarks')); } catch { } }
+    catch (e) { if (/schema cache|Could not find/i.test(e.message || '')) off = true; }
+    busy = false;
+  }
+  window.tdRejSet = (name, iso, on) => { const key = k(name, iso); if (on ? M.has(key) : !M.has(key)) return; on ? M.add(key) : M.delete(key);
+    if (off || typeof CLOUD === 'undefined' || !CLOUD.token()) return;
+    CLOUD._rpc('td_att_rejected_save', { p_token: CLOUD.token(), p_items: [{ name: String(name).trim(), day: iso, on: !!on }] })
+      .catch(e => { if (/schema cache|Could not find/i.test(e.message || '')) { off = true; try { toast('To show rejected leave taken anyway (RJ ╱ code), the super admin needs to run att-rejected.sql in Supabase.', true); } catch { } } }); };
+  setInterval(() => load(false), 20000); setTimeout(() => load(true), 2200);
 })();
 </script>
 <script>
